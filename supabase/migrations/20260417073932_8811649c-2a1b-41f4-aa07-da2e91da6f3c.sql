@@ -1,0 +1,1 @@
+ALTER TABLE public.tournaments ADD COLUMN IF NOT EXISTS scoring_type TEXT NOT NULL DEFAULT 'points';

@@ -1,0 +1,1 @@
+ALTER TABLE public.tournament_phases ADD COLUMN match_config jsonb DEFAULT '{}'::jsonb;

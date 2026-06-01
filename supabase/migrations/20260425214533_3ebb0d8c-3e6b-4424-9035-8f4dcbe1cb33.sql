@@ -1,0 +1,1 @@
+ALTER TYPE public.stat_type ADD VALUE IF NOT EXISTS 'straight_red';

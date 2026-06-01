@@ -1,0 +1,1 @@
+ALTER TABLE public.tournament_scoring_systems ADD COLUMN IF NOT EXISTS h2h_sub_rules jsonb NOT NULL DEFAULT '["points","goal_difference","goals_scored","wins"]'::jsonb;

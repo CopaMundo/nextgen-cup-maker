@@ -1,0 +1,1 @@
+ALTER TABLE public.tournaments ADD COLUMN is_esport boolean NOT NULL DEFAULT false;

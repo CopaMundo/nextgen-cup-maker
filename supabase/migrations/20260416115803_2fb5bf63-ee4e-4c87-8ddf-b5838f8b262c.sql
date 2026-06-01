@@ -1,0 +1,2 @@
+ALTER TABLE public.tournaments ADD COLUMN IF NOT EXISTS teams_label text NOT NULL DEFAULT 'Teams';
+ALTER TABLE public.tournaments ADD COLUMN IF NOT EXISTS referees_label text NOT NULL DEFAULT 'Scheidsrechters';

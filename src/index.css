@@ -1,0 +1,722 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide number input spinners globally */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* World Cup host-nation header backgrounds (color + Trionda-style motif) */
+  .wc-mx-bg {
+    background-color: #00683F;
+    background-image: url("/src/assets/wc-mx-pattern.png");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .wc-ca-bg {
+    background-color: #8B0000;
+    background-image:
+      linear-gradient(135deg, rgba(160,20,30,0.45) 0%, rgba(110,10,20,0.6) 100%),
+      url("/src/assets/wc-ca-pattern.png");
+    background-size: auto, cover;
+    background-position: center;
+    background-repeat: repeat, no-repeat;
+  }
+  .wc-us-bg {
+    background-color: #1A3FA8;
+    background-image:
+      linear-gradient(135deg, rgba(30,80,200,0.45) 0%, rgba(15,40,120,0.6) 100%),
+      url("/src/assets/wc-us-pattern.png");
+    background-size: auto, cover;
+    background-position: center;
+    background-repeat: repeat, no-repeat;
+  }
+  .wc-mx-solid { background: linear-gradient(135deg,#008B4F 0%,#00683F 100%); }
+  .wc-ca-solid { background: linear-gradient(135deg,#B8001E 0%,#8B0000 100%); }
+  .wc-us-solid { background: linear-gradient(135deg,#1E50C8 0%,#1A3FA8 100%); }
+  .wc-mx-ring { box-shadow: 0 0 0 2px rgba(0,104,63,0.35); }
+  .wc-ca-ring { box-shadow: 0 0 0 2px rgba(139,0,0,0.35); }
+  .wc-us-ring { box-shadow: 0 0 0 2px rgba(26,63,168,0.35); }
+}
+
+/* World Cup host-nation theme tokens — map primary/accent/ring to host color
+   so generic UI accents (info page, fase tabs, ring around home button, etc.)
+   pick up the selected host color automatically. */
+[data-broadcast="world_cup_mexico"] {
+  --primary: 152 100% 20%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 152 100% 27%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 152 100% 20%;
+}
+[data-broadcast="world_cup_canada"] {
+  --primary: 0 100% 27%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 352 100% 36%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 0 100% 27%;
+}
+[data-broadcast="world_cup_usa"] {
+  --primary: 224 73% 38%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 222 74% 45%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 224 73% 38%;
+}
+
+/* ======================================================================
+   COPA MUNDO THEME — Dark & Light
+   Colors: Green #009C3B, Yellow #FFDF00, Blue #002776
+   ====================================================================== */
+@layer base {
+  /* Dark Mode (default) */
+  :root,
+  [data-mode="dark"] {
+    --background: 150 20% 6%;
+    --foreground: 0 0% 95%;
+    --card: 150 15% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 150 15% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 52 100% 50%;
+    --primary-foreground: 150 30% 6%;
+    --secondary: 150 12% 15%;
+    --secondary-foreground: 0 0% 85%;
+    --muted: 150 10% 15%;
+    --muted-foreground: 150 8% 50%;
+    --accent: 52 100% 60%;
+    --accent-foreground: 150 30% 6%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 150 12% 18%;
+    --input: 150 12% 18%;
+    --ring: 52 100% 50%;
+    --radius: 0.75rem;
+    --sidebar-background: 150 20% 6%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 52 100% 50%;
+    --sidebar-primary-foreground: 150 30% 6%;
+    --sidebar-accent: 150 12% 15%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 150 12% 18%;
+    --sidebar-ring: 52 100% 50%;
+    --gradient-hero: linear-gradient(135deg, hsl(150, 25%, 8%) 0%, hsl(143, 20%, 6%) 40%, hsl(216, 30%, 8%) 100%);
+    --gradient-brand: linear-gradient(135deg, hsl(143, 100%, 31%), hsl(52, 100%, 50%));
+    --shadow-glow: 0 0 30px -5px hsla(52, 100%, 50%, 0.25);
+  }
+
+  /* Light Mode */
+  [data-mode="light"] {
+    --background: 0 0% 98%;
+    --foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+    --primary: 220 100% 23%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 12% 92%;
+    --secondary-foreground: 220 20% 25%;
+    --muted: 220 8% 93%;
+    --muted-foreground: 220 10% 40%;
+    --accent: 220 80% 35%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 220 100% 23%;
+    --radius: 0.75rem;
+    --sidebar-background: 220 8% 96%;
+    --sidebar-foreground: 220 20% 25%;
+    --sidebar-primary: 220 100% 23%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 12% 92%;
+    --sidebar-accent-foreground: 220 20% 25%;
+    --sidebar-border: 220 15% 85%;
+    --sidebar-ring: 220 100% 23%;
+    --gradient-hero: linear-gradient(135deg, hsl(220, 15%, 96%) 0%, hsl(143, 10%, 94%) 40%, hsl(52, 15%, 96%) 100%);
+    --gradient-brand: linear-gradient(135deg, hsl(220, 100%, 23%), hsl(143, 100%, 31%));
+    --shadow-glow: 0 0 30px -5px hsla(220, 100%, 23%, 0.15);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient-brand {
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  .card-glow:hover {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .text-gradient-next {
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ======================================================================
+   PRINT STYLES — Planner
+   ====================================================================== */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  nav, .print\:hidden, [data-radix-scroll-area-viewport],
+  button[data-state], [role="tablist"] {
+    display: none !important;
+  }
+
+  .print-planner-area {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  .print-planner-area .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  .print-planner-area .flex.gap-0 {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .print-planner-area .flex.gap-0 > div {
+    min-width: 0 !important;
+    width: auto !important;
+    flex: 1 1 200px !important;
+    page-break-inside: avoid;
+  }
+
+  .print-planner-area .rounded-lg {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+
+  .print-planner-area .bg-card {
+    background: white !important;
+  }
+
+  .print-planner-area .bg-secondary {
+    background: #f5f5f5 !important;
+  }
+
+  [data-planner-drop-zone="true"] {
+    display: none !important;
+  }
+
+  .print-planner-area svg.lucide-grip-vertical {
+    display: none !important;
+  }
+
+  .print-planner-area * {
+    color: black !important;
+  }
+
+  .print-planner-area .text-primary {
+    color: #333 !important;
+    font-weight: bold !important;
+  }
+
+  .print-planner-area .text-muted-foreground {
+    color: #666 !important;
+  }
+
+  @page {
+    margin: 1cm;
+    size: landscape;
+  }
+}
+
+/* ======================================================================
+   BROADCAST STYLE COLOR OVERRIDES
+   Broadcast kleuren zijn ALLEEN voor accenten, kaders, randen, tekst.
+   Achtergrond blijft neutraal (wit/lichtgrijs in light, donker in dark).
+   ====================================================================== */
+
+/* ── 1. Champions League Elite ── Gold #D4AF37 + Navy #001C58 ── */
+[data-broadcast="champions_league"][data-mode="dark"] {
+  --background: 220 15% 7%;
+  --foreground: 0 0% 95%;
+  --card: 220 12% 11%;
+  --card-foreground: 0 0% 95%;
+  --popover: 220 12% 11%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 43 65% 52%;
+  --primary-foreground: 217 100% 7%;
+  --secondary: 220 10% 15%;
+  --secondary-foreground: 0 0% 82%;
+  --muted: 220 8% 15%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 217 100% 30%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 217 30% 22%;
+  --input: 217 30% 22%;
+  --ring: 43 65% 52%;
+}
+[data-broadcast="champions_league"][data-mode="light"] {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 217 100% 17%;
+  --primary-foreground: 43 65% 90%;
+  --secondary: 220 8% 93%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 220 6% 94%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 43 65% 52%;
+  --accent-foreground: 217 100% 10%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 217 15% 85%;
+  --input: 217 15% 85%;
+  --ring: 217 100% 17%;
+}
+
+/* ── 2. FIFA / Game Style ── Neon Mint #00FFA3 + Petrol #004B57 ── */
+[data-broadcast="fifa"][data-mode="dark"] {
+  --background: 200 15% 7%;
+  --foreground: 0 0% 93%;
+  --card: 200 12% 11%;
+  --card-foreground: 0 0% 93%;
+  --popover: 200 12% 11%;
+  --popover-foreground: 0 0% 93%;
+  --primary: 158 100% 50%;
+  --primary-foreground: 189 100% 5%;
+  --secondary: 200 10% 15%;
+  --secondary-foreground: 0 0% 80%;
+  --muted: 200 8% 15%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 64 100% 50%;
+  --accent-foreground: 0 0% 5%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 189 25% 20%;
+  --input: 189 25% 20%;
+  --ring: 158 100% 50%;
+}
+[data-broadcast="fifa"][data-mode="light"] {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 189 100% 17%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 189 10% 93%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 189 8% 94%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 158 100% 35%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 189 15% 85%;
+  --input: 189 15% 85%;
+  --ring: 189 100% 17%;
+}
+
+/* ── 3. Retro Arcade ── Zwart #000 + Wit #FFF ── */
+[data-broadcast="retro"][data-mode="dark"] {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 90%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 90%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 90%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 13%;
+  --secondary-foreground: 0 0% 75%;
+  --muted: 0 0% 13%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 0 0% 75%;
+  --accent-foreground: 0 0% 5%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 0 0% 100%;
+}
+[data-broadcast="retro"][data-mode="light"] {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 93%;
+  --secondary-foreground: 0 0% 20%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 30%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 82%;
+  --input: 0 0% 82%;
+  --ring: 0 0% 0%;
+}
+
+/* ── 4. Breaking News (ESPN/Sky Sports) ── Rood #E20613 + Navy #002D72 ── */
+[data-broadcast="espn"][data-mode="dark"] {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 11%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 357 93% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 82%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 216 100% 30%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 357 93% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 357 93% 45%;
+}
+[data-broadcast="espn"][data-mode="light"] {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 357 93% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 94%;
+  --secondary-foreground: 0 0% 22%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 216 100% 22%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 357 93% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 86%;
+  --input: 0 0% 86%;
+  --ring: 357 93% 45%;
+}
+
+/* ── 5. Street Football ── Neon Geel #CCFF00 + Oranje #FF5E00 ── */
+[data-broadcast="street"][data-mode="dark"] {
+  --background: 0 0% 8%;
+  --foreground: 0 0% 90%;
+  --card: 0 0% 12%;
+  --card-foreground: 0 0% 90%;
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 90%;
+  --primary: 72 100% 50%;
+  --primary-foreground: 0 0% 5%;
+  --secondary: 0 0% 16%;
+  --secondary-foreground: 0 0% 78%;
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 22 100% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 80% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 22%;
+  --input: 0 0% 22%;
+  --ring: 72 100% 50%;
+}
+[data-broadcast="street"][data-mode="light"] {
+  --background: 0 0% 95%;
+  --foreground: 0 0% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 12%;
+  --primary: 0 0% 15%;
+  --primary-foreground: 72 100% 50%;
+  --secondary: 0 0% 90%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 0 0% 91%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 22 100% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 80% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 80%;
+  --input: 0 0% 80%;
+  --ring: 0 0% 15%;
+}
+
+/* ── 6. Data Geek ── Kobaltblauw #2D5AF7 + Oranje #FF9F43 ── */
+[data-broadcast="data_geek"][data-mode="dark"] {
+  --background: 220 12% 7%;
+  --foreground: 0 0% 90%;
+  --card: 220 10% 11%;
+  --card-foreground: 0 0% 90%;
+  --popover: 220 10% 11%;
+  --popover-foreground: 0 0% 90%;
+  --primary: 225 92% 57%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 8% 15%;
+  --secondary-foreground: 0 0% 80%;
+  --muted: 220 6% 15%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 29 100% 63%;
+  --accent-foreground: 0 0% 5%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 225 12% 20%;
+  --input: 225 12% 20%;
+  --ring: 225 92% 57%;
+}
+[data-broadcast="data_geek"][data-mode="light"] {
+  --background: 210 20% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 225 92% 57%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 225 10% 94%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 225 8% 95%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 29 100% 63%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 225 10% 87%;
+  --input: 225 10% 87%;
+  --ring: 225 92% 57%;
+}
+
+/* ── 7. La Gazzetta ── Roze #F6D3D8 bg + Inktzwart #1A1A1A + Grijs #5A5A5A ── */
+[data-broadcast="gazette"][data-mode="light"] {
+  --background: 350 55% 93%;
+  --foreground: 0 0% 10%;
+  --card: 350 40% 96%;
+  --card-foreground: 0 0% 10%;
+  --popover: 350 40% 96%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 0 0% 10%;
+  --primary-foreground: 350 55% 93%;
+  --secondary: 350 28% 88%;
+  --secondary-foreground: 0 0% 18%;
+  --muted: 350 22% 89%;
+  --muted-foreground: 0 0% 35%;
+  --accent: 0 75% 45%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 350 18% 82%;
+  --input: 350 18% 82%;
+  --ring: 0 0% 10%;
+}
+[data-broadcast="gazette"][data-mode="dark"] {
+  --background: 350 12% 8%;
+  --foreground: 350 25% 88%;
+  --card: 350 10% 12%;
+  --card-foreground: 350 25% 88%;
+  --popover: 350 10% 12%;
+  --popover-foreground: 350 25% 88%;
+  --primary: 350 50% 72%;
+  --primary-foreground: 0 0% 5%;
+  --secondary: 350 8% 16%;
+  --secondary-foreground: 350 15% 75%;
+  --muted: 350 6% 16%;
+  --muted-foreground: 350 8% 48%;
+  --accent: 0 75% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 350 10% 22%;
+  --input: 350 10% 22%;
+  --ring: 350 50% 72%;
+}
+
+/* ── 8. Social Media Feed ── Paars #833AB4 + Oranje #F56040 (Instagram) ── */
+[data-broadcast="social"][data-mode="light"] {
+  --background: 0 0% 97%;
+  --foreground: 0 0% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 275 51% 47%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 275 8% 94%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 275 6% 95%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 11 89% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 275 6% 88%;
+  --input: 275 6% 88%;
+  --ring: 275 51% 47%;
+}
+[data-broadcast="social"][data-mode="dark"] {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 93%;
+  --card: 0 0% 11%;
+  --card-foreground: 0 0% 93%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 0 0% 93%;
+  --primary: 275 51% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 275 8% 16%;
+  --secondary-foreground: 0 0% 78%;
+  --muted: 275 6% 16%;
+  --muted-foreground: 0 0% 48%;
+  --accent: 11 89% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 275 8% 20%;
+  --input: 275 8% 20%;
+  --ring: 275 51% 55%;
+}
+
+/* ── 9. Copa Mundo Classic ── Groen #009C3B + Geel #FFDF00 + Blauw #002776 ── */
+[data-broadcast="copa_mundo"][data-mode="dark"] {
+  --background: 150 12% 7%;
+  --foreground: 0 0% 93%;
+  --card: 150 10% 11%;
+  --card-foreground: 0 0% 93%;
+  --popover: 150 10% 11%;
+  --popover-foreground: 0 0% 93%;
+  --primary: 52 100% 50%;
+  --primary-foreground: 143 100% 7%;
+  --secondary: 150 8% 15%;
+  --secondary-foreground: 0 0% 80%;
+  --muted: 150 6% 15%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 143 100% 31%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 95%;
+  --border: 143 15% 20%;
+  --input: 143 15% 20%;
+  --ring: 52 100% 50%;
+}
+[data-broadcast="copa_mundo"][data-mode="light"] {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 143 100% 31%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 143 10% 93%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 143 8% 94%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 52 100% 45%;
+  --accent-foreground: 143 100% 8%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 143 12% 85%;
+  --input: 143 12% 85%;
+  --ring: 143 100% 31%;
+}
+
+/* ── 10. Netflix Docu ── Rood #E50914 + Zilvergrijs #B3B3B3 ── */
+[data-broadcast="netflix"][data-mode="dark"] {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 93%;
+  --card: 0 0% 9%;
+  --card-foreground: 0 0% 93%;
+  --popover: 0 0% 9%;
+  --popover-foreground: 0 0% 93%;
+  --primary: 357 95% 47%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 78%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 48%;
+  --accent: 0 0% 70%;
+  --accent-foreground: 0 0% 5%;
+  --destructive: 357 95% 47%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 357 95% 47%;
+}
+[data-broadcast="netflix"][data-mode="light"] {
+  --background: 0 0% 97%;
+  --foreground: 0 0% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 357 95% 47%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 94%;
+  --secondary-foreground: 0 0% 22%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 0 0% 42%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 357 95% 47%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 86%;
+  --input: 0 0% 86%;
+  --ring: 357 95% 47%;
+}

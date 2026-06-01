@@ -1,0 +1,1 @@
+ALTER TABLE public.tournament_phases ADD COLUMN IF NOT EXISTS logo_url text DEFAULT NULL;

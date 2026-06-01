@@ -1,0 +1,1 @@
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS view_theme text DEFAULT 'tropical';

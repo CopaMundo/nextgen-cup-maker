@@ -1,0 +1,1 @@
+ALTER TABLE public.tournaments ADD COLUMN view_display_style text NOT NULL DEFAULT 'espn';

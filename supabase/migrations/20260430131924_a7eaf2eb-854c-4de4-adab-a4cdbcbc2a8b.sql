@@ -1,0 +1,1 @@
+ALTER TABLE public.group_teams ADD COLUMN IF NOT EXISTS manual_position integer;

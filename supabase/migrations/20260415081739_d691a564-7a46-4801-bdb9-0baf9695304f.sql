@@ -1,0 +1,2 @@
+COMMENT ON COLUMN public.tournaments.match_days IS 'JSON array of ISO date strings for tournament match days';
+COMMENT ON COLUMN public.tournaments.date_mode IS 'Date selection mode: period or individual days';
