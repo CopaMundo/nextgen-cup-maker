@@ -140,7 +140,7 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
     if (editLogoFile) {
       const file = await compressImage(editLogoFile);
       const ext = getFileExtension(file);
-      const path = `format-logos/${format.id}.${ext}`;
+      const path = `${tournamentId}/format-logos/${format.id}.${ext}`;
       const { error: upErr } = await supabase.storage.from("team-logos").upload(path, file, { upsert: true });
       if (upErr) { toast({ title: "Upload mislukt", description: upErr.message, variant: "destructive" }); setUploading(false); return; }
       const { data: urlData } = supabase.storage.from("team-logos").getPublicUrl(path);

@@ -1403,6 +1403,10 @@ export type Database = {
         Args: { _match_days: Json; _tournament_id: string }
         Returns: Json
       }
+      storage_path_tournament_id: {
+        Args: { _object_name: string }
+        Returns: string
+      }
     }
     Enums: {
       phase_type: "group" | "knockout" | "round_robin" | "single_match"
