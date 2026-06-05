@@ -27,8 +27,8 @@ interface Props {
   phaseId: string;
   phaseType: string;
   categoryId: string | null;
-  phases: Phase[];
-  phaseNumber: number;
+  phases?: Phase[];
+  phaseNumber?: number;
   onComplete?: () => void;
 }
 
