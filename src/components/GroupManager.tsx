@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info } from "lucide-react";
+import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, Sparkles } from "lucide-react";
+import LiveDrawDialog from "./LiveDrawDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -904,12 +905,19 @@ const GroupManager = ({
         </p>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {showRandomAssign && (
           <Button variant="outline" size="sm" onClick={() => {
             if (hasAssignedTeams) { setShowRandomConfirm(true); } else { randomAssignTeams(); }
           }}>
             <Shuffle className="h-3 w-3" /> Willekeurige indeling
+          </Button>
+        )}
+        {showRandomAssign && (
+          <Button variant="default" size="sm" onClick={() => {
+            if (hasAssignedTeams) { setPendingLiveDraw(true); } else { setLiveDrawOpen(true); }
+          }}>
+            <Sparkles className="h-3 w-3" /> Live Loting
           </Button>
         )}
         <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)}>
