@@ -142,6 +142,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const [selectedHAMatchId, setSelectedHAMatchId] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
+  const [liveDrawOpen, setLiveDrawOpen] = useState(false);
+  const [pendingLiveDraw, setPendingLiveDraw] = useState(false);
   const [showDeleteSingleConfirm, setShowDeleteSingleConfirm] = useState<string | null>(null);
   const [showDeleteBracketConfirm, setShowDeleteBracketConfirm] = useState<string | null>(null);
   const [showDeletePlacementConfirm, setShowDeletePlacementConfirm] = useState<string | null>(null);
@@ -2965,6 +2967,14 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               if (hasTeams) { setShowRandomConfirm(true); } else { randomAssignRound1(); }
             }}>
               <Shuffle className="h-3 w-3" /> Willekeurige indeling
+            </Button>
+          )}
+          {showRandomAssign && !isSingleMatch && filteredTeams.length > 0 && (
+            <Button variant="default" size="sm" onClick={() => {
+              const hasTeams = r1Matches.some(m => m.home_team_id || m.away_team_id);
+              if (hasTeams) { setPendingLiveDraw(true); } else { setLiveDrawOpen(true); }
+            }}>
+              <Sparkles className="h-3 w-3" /> Live Loting
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)}>
