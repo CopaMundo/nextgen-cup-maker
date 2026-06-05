@@ -3441,7 +3441,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => { setPendingLiveDraw(false); await clearAllSlotsForPhase(); setLiveDrawOpen(true); }}>
+            <AlertDialogAction onClick={async () => { setPendingLiveDraw(false); await clearAllR1Slots(); setLiveDrawOpen(true); }}>
               Loting starten
             </AlertDialogAction>
           </AlertDialogFooter>
