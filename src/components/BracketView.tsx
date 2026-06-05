@@ -3430,6 +3430,33 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={pendingLiveDraw} onOpenChange={setPendingLiveDraw}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Opnieuw loten?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Er zijn al teams ingedeeld. Wil je alle huidige toewijzingen wissen en een nieuwe live loting starten?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={async () => { setPendingLiveDraw(false); await clearAllSlotsForPhase(); setLiveDrawOpen(true); }}>
+              Loting starten
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <LiveDrawDialog
+        open={liveDrawOpen}
+        onOpenChange={setLiveDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        phaseType={currentPhase?.phase_type || "knockout"}
+        categoryId={currentPhase?.category_id ?? null}
+        onComplete={() => { fetchData(); onSlotChange?.(); }}
+      />
     </div>
   );
 };
