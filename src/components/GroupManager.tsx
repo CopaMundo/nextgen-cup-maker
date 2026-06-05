@@ -1085,6 +1085,35 @@ const GroupManager = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={pendingLiveDraw} onOpenChange={setPendingLiveDraw}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Opnieuw loten?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Er zijn al teams ingedeeld. Wil je alle huidige toewijzingen wissen en een nieuwe live loting starten?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setPendingLiveDraw(false); clearAllSlots().then(() => setLiveDrawOpen(true)); }}>
+              Loting starten
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <LiveDrawDialog
+        open={liveDrawOpen}
+        onOpenChange={setLiveDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        phaseType={phaseType}
+        categoryId={categoryId ?? null}
+        phases={phases}
+        phaseNumber={phaseNumber}
+        onComplete={() => { notifySlotChange(); fetchGroups(); }}
+      />
     </div>
   );
 };
