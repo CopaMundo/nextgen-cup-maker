@@ -192,7 +192,7 @@ const LiveDrawDialog = ({ open, onOpenChange, tournamentId, phaseId, phaseType, 
     })();
 
     return () => { cancelled = true; };
-  }, [open, tournamentId, phaseId, phaseType, categoryId, phaseNumber]);
+  }, [open, tournamentId, phaseId, phaseType, categoryId, phaseNumberProp]);
 
   // ------- build draw plan -------
   const drawPlan = useMemo(() => {
