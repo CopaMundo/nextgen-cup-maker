@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info } from "lucide-react";
+import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info, Sparkles } from "lucide-react";
+import LiveDrawDialog from "./LiveDrawDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
