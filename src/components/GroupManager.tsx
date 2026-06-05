@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info } from "lucide-react";
+import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, Sparkles } from "lucide-react";
+import LiveDrawDialog from "./LiveDrawDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -283,6 +284,8 @@ const GroupManager = ({
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
+  const [liveDrawOpen, setLiveDrawOpen] = useState(false);
+  const [pendingLiveDraw, setPendingLiveDraw] = useState(false);
 
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
@@ -904,12 +907,19 @@ const GroupManager = ({
         </p>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {showRandomAssign && (
           <Button variant="outline" size="sm" onClick={() => {
             if (hasAssignedTeams) { setShowRandomConfirm(true); } else { randomAssignTeams(); }
           }}>
             <Shuffle className="h-3 w-3" /> Willekeurige indeling
+          </Button>
+        )}
+        {showRandomAssign && (
+          <Button variant="default" size="sm" onClick={() => {
+            if (hasAssignedTeams) { setPendingLiveDraw(true); } else { setLiveDrawOpen(true); }
+          }}>
+            <Sparkles className="h-3 w-3" /> Live Loting
           </Button>
         )}
         <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)}>
@@ -1075,6 +1085,35 @@ const GroupManager = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={pendingLiveDraw} onOpenChange={setPendingLiveDraw}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Opnieuw loten?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Er zijn al teams ingedeeld. Wil je alle huidige toewijzingen wissen en een nieuwe live loting starten?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setPendingLiveDraw(false); clearAllSlots().then(() => setLiveDrawOpen(true)); }}>
+              Loting starten
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <LiveDrawDialog
+        open={liveDrawOpen}
+        onOpenChange={setLiveDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        phaseType={phaseType}
+        categoryId={categoryId ?? null}
+        phases={phases}
+        phaseNumber={phaseNumber}
+        onComplete={() => { notifySlotChange(); fetchGroups(); }}
+      />
     </div>
   );
 };

@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info } from "lucide-react";
+import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info, Sparkles } from "lucide-react";
+import LiveDrawDialog from "./LiveDrawDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -141,6 +142,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const [selectedHAMatchId, setSelectedHAMatchId] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
+  const [liveDrawOpen, setLiveDrawOpen] = useState(false);
+  const [pendingLiveDraw, setPendingLiveDraw] = useState(false);
   const [showDeleteSingleConfirm, setShowDeleteSingleConfirm] = useState<string | null>(null);
   const [showDeleteBracketConfirm, setShowDeleteBracketConfirm] = useState<string | null>(null);
   const [showDeletePlacementConfirm, setShowDeletePlacementConfirm] = useState<string | null>(null);
@@ -2966,6 +2969,14 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               <Shuffle className="h-3 w-3" /> Willekeurige indeling
             </Button>
           )}
+          {showRandomAssign && !isSingleMatch && filteredTeams.length > 0 && (
+            <Button variant="default" size="sm" onClick={() => {
+              const hasTeams = r1Matches.some(m => m.home_team_id || m.away_team_id);
+              if (hasTeams) { setPendingLiveDraw(true); } else { setLiveDrawOpen(true); }
+            }}>
+              <Sparkles className="h-3 w-3" /> Live Loting
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)}>
             <Trash2 className="h-3 w-3" /> Alles leeg maken
           </Button>
@@ -3419,6 +3430,33 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={pendingLiveDraw} onOpenChange={setPendingLiveDraw}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Opnieuw loten?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Er zijn al teams ingedeeld. Wil je alle huidige toewijzingen wissen en een nieuwe live loting starten?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={async () => { setPendingLiveDraw(false); await clearAllR1Slots(); setLiveDrawOpen(true); }}>
+              Loting starten
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <LiveDrawDialog
+        open={liveDrawOpen}
+        onOpenChange={setLiveDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        phaseType={currentPhase?.phase_type || "knockout"}
+        categoryId={currentPhase?.category_id ?? null}
+        onComplete={() => { fetchData(); onSlotChange?.(); }}
+      />
     </div>
   );
 };
