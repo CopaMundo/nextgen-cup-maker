@@ -90,6 +90,14 @@ const LiveDrawDialog = ({ open, onOpenChange, tournamentId, phaseId, phaseType, 
 
       const filtered = (allTeams || []).filter(t => !categoryId || t.category_id === categoryId);
 
+      // resolve phases context (fallback: fetch from DB)
+      let phases = phasesProp || [];
+      if (!phases.length) {
+        const { data: ph } = await supabase.from("tournament_phases").select("id, phase_number").eq("tournament_id", tournamentId);
+        phases = (ph || []) as Phase[];
+      }
+      const phaseNumber = phaseNumberProp ?? (phases.find(p => p.id === phaseId)?.phase_number ?? 1);
+
       // exclude teams already placed elsewhere (sibling phases + earlier phases)
       const siblingIds = phases.filter(p => p.phase_number === phaseNumber).map(p => p.id);
       const earlierIds = phases.filter(p => p.phase_number < phaseNumber).map(p => p.id);
