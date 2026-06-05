@@ -49,7 +49,7 @@ const shuffle = <T,>(arr: T[]): T[] => {
  * After the animated reveal, persists the assignment using the same writes
  * as the existing "Willekeurige indeling" actions.
  */
-const LiveDrawDialog = ({ open, onOpenChange, tournamentId, phaseId, phaseType, categoryId, phases, phaseNumber, onComplete }: Props) => {
+const LiveDrawDialog = ({ open, onOpenChange, tournamentId, phaseId, phaseType, categoryId, phases: phasesProp, phaseNumber: phaseNumberProp, onComplete }: Props) => {
   const { toast } = useToast();
   const isBracket = phaseType === "knockout" || phaseType === "single_match";
 
