@@ -468,6 +468,10 @@ const GroupManager = ({
       for (const g of (allGroups.data || [])) {
         await generateMatchesForGroup(g.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
       }
+      if (dialogMatchGenMode === "live_draw") {
+        setMatchDrawTargetGroupId(editingGroup.id);
+        setMatchDrawOpen(true);
+      }
     }
 
     setUploading(true);
