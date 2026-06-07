@@ -583,7 +583,50 @@ const LiveDrawDialog = ({
       setStep(s => s + 1);
     }, 500);
     return () => clearTimeout(t);
-  }, [phase, step, pendingGroupAssignments, generatedMatches, mode, redrawGroupsToo]);
+  }, [phase, step, pendingGroupAssignments, generatedMatches, mode, redrawGroupsToo, isBracketPhase, bracketSteps]);
+
+  const persistBracket = async () => {
+    try {
+      const { data: slotRows } = await supabase.from("slots").select("id, slot_code").eq("tournament_id", tournamentId).eq("phase_id", phaseId);
+      const slotMap = new Map((slotRows || []).map(s => [s.slot_code, s.id]));
+      const { data: ms } = await supabase.from("matches").select("id, home_slot_label, away_slot_label").in("id", bracketPairings.map(p => p.matchId));
+      const updates: Promise<any>[] = [];
+      for (const p of bracketPairings) {
+        if (!p.home && !p.away) continue;
+        const upd: any = {};
+        if (p.home) upd.home_team_id = p.home.id;
+        if (p.away) upd.away_team_id = p.away.id;
+        updates.push(Promise.resolve(supabase.from("matches").update(upd).eq("id", p.matchId)));
+        const m = ms?.find(x => x.id === p.matchId);
+        if (m) {
+          if (p.home && m.home_slot_label && slotMap.has(m.home_slot_label)) {
+            updates.push(Promise.resolve(supabase.from("slots").update({ team_id: p.home.id }).eq("id", slotMap.get(m.home_slot_label)!)));
+          }
+          if (p.away && m.away_slot_label && slotMap.has(m.away_slot_label)) {
+            updates.push(Promise.resolve(supabase.from("slots").update({ team_id: p.away.id }).eq("id", slotMap.get(m.away_slot_label)!)));
+          }
+        }
+      }
+      await Promise.all(updates);
+      const { data: allMatches } = await supabase.from("matches").select("id, group_id, home_team_id, away_team_id, match_name").eq("tournament_id", tournamentId).eq("phase_id", phaseId);
+      const terugUpdates: Promise<any>[] = [];
+      for (const t of allMatches || []) {
+        if (!t.match_name?.endsWith("(Terug)")) continue;
+        const base = t.match_name.replace(/ \(Terug\)$/, "");
+        const heen = (allMatches || []).find((x: any) => x.match_name === `${base} (Heen)` && x.group_id === t.group_id);
+        if (!heen) continue;
+        const upd: any = {};
+        if (heen.home_team_id) upd.away_team_id = heen.home_team_id;
+        if (heen.away_team_id) upd.home_team_id = heen.away_team_id;
+        if (Object.keys(upd).length > 0) terugUpdates.push(Promise.resolve(supabase.from("matches").update(upd).eq("id", t.id)));
+      }
+      if (terugUpdates.length) await Promise.all(terugUpdates);
+      toast({ title: "Loting voltooid", description: "Bracket gevuld." });
+      onComplete?.();
+    } catch (e: any) {
+      toast({ title: "Loting mislukt", description: e.message || "Onbekende fout", variant: "destructive" });
+    }
+  };
 
   const applyGroupAssignmentsToSlots = (slots: GroupSlot[], assigns: GroupAssignment[]): GroupSlot[] => {
     const map = new Map(assigns.map(a => [a.slotId, a.team]));
