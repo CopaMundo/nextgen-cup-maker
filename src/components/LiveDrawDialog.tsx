@@ -448,6 +448,43 @@ const LiveDrawDialog = ({
     return out;
   }, [groupSlots, matchConfig, useMatchPots, matchPotSizes, matchPotCount, matchupMatrix, groupNames]);
 
+  // ============ BRACKET DRAW PLAN ============
+  const buildBracketPlan = useCallback((): { matchIdx: number; side: "home" | "away"; team: Team }[] => {
+    const totalSlots = bracketPairings.length * 2;
+    const pickList = teams.slice(0, totalSlots);
+    let order: Team[];
+    if (useGroupPots) {
+      const half = Math.ceil(pickList.length / 2);
+      const potA = shuffle(pickList.slice(0, half));
+      const potB = shuffle(pickList.slice(half));
+      order = [];
+      for (let i = 0; i < bracketPairings.length; i++) {
+        if (potA[i]) order.push(potA[i]);
+        if (potB[i]) order.push(potB[i]);
+      }
+    } else {
+      order = shuffle(pickList);
+    }
+    if (avoidCountry) {
+      for (let i = 0; i + 1 < order.length; i += 2) {
+        if (order[i]?.country && order[i].country === order[i + 1]?.country) {
+          for (let j = i + 2; j < order.length; j++) {
+            if (order[j]?.country !== order[i].country) {
+              [order[i + 1], order[j]] = [order[j], order[i + 1]];
+              break;
+            }
+          }
+        }
+      }
+    }
+    const plan: { matchIdx: number; side: "home" | "away"; team: Team }[] = [];
+    for (let i = 0; i < bracketPairings.length; i++) {
+      if (order[i * 2]) plan.push({ matchIdx: i, side: "home", team: order[i * 2] });
+      if (order[i * 2 + 1]) plan.push({ matchIdx: i, side: "away", team: order[i * 2 + 1] });
+    }
+    return plan;
+  }, [bracketPairings, teams, useGroupPots, avoidCountry]);
+
   // ============ START DRAW ============
   const startDraw = () => {
     setPhase("drawing");
