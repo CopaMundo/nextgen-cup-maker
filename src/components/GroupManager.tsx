@@ -107,7 +107,7 @@ const GroupManager = ({
   };
 
   /** Generate round-robin matches for a group based on its slots */
-  const generateMatchesForGroup = async (groupId: string, matchType?: MatchType, encounters?: number, rounds?: number, genMode?: "auto" | "empty") => {
+  const generateMatchesForGroup = async (groupId: string, matchType?: MatchType, encounters?: number, rounds?: number, genMode?: MatchGenMode) => {
     const { data: slots } = await supabase
       .from("slots")
       .select("slot_code, team_id")
