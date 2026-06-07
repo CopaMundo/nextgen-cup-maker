@@ -499,6 +499,13 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (phase !== "drawing") return;
+    if (isBracketPhase) {
+      const plan = buildBracketPlan();
+      setBracketSteps(plan);
+      setBracketPairings(prev => prev.map(p => ({ ...p, home: null, away: null })));
+      setStep(0);
+      return;
+    }
     // groups stage runs first if needed
     if (mode === "groups" || (mode === "matches" && redrawGroupsToo)) {
       const assignments = buildGroupAssignments();
