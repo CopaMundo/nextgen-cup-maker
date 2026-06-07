@@ -854,58 +854,59 @@ const GroupManager = ({
           </div>
         )}
         {dialogMatchType === "rounds" && (
-          <>
-            <div className="space-y-1">
-              <Label className="text-xs">Aantal speelrondes</Label>
-              <select
-                value={dialogRounds}
-                onChange={(e) => setDialogRounds(parseInt(e.target.value))}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5">
-                <Label className="text-xs">Wedstrijden genereren</Label>
-                <TooltipProvider delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs text-xs">
-                      <p className="font-semibold mb-1">Automatische inplanning</p>
-                      <p className="mb-2">Het systeem genereert alle wedstrijden en vult deze direct willekeurig in met de beschikbare teams.</p>
-                      <p className="font-semibold mb-1">Handmatige inplanning</p>
-                      <p>Het systeem genereert lege wedstrijdslots zonder teams. Je vult daarna zelf per wedstrijd in welke teams tegen elkaar spelen.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: "auto" as const, label: "AUTOMATISCHE INPLANNING" },
-                  { value: "empty" as const, label: "HANDMATIGE INPLANNING" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setDialogMatchGenMode(opt.value)}
-                    className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
-                      dialogMatchGenMode === opt.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/20"
-                    }`}
-                  >
-                    <p className="font-bold text-foreground uppercase tracking-wide">{opt.label}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </>
+          <div className="space-y-1">
+            <Label className="text-xs">Aantal speelrondes</Label>
+            <select
+              value={dialogRounds}
+              onChange={(e) => setDialogRounds(parseInt(e.target.value))}
+              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
         )}
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <Label className="text-xs">Wedstrijden genereren</Label>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs text-xs">
+                  <p className="font-semibold mb-1">Automatische inplanning</p>
+                  <p className="mb-2">Het systeem genereert alle wedstrijden en vult deze direct in met de beschikbare teams.</p>
+                  <p className="font-semibold mb-1">Handmatige inplanning</p>
+                  <p className="mb-2">Lege wedstrijdslots. Je vult zelf in welke teams tegen elkaar spelen.</p>
+                  <p className="font-semibold mb-1">Live loting</p>
+                  <p>Start na opslaan een live loting waarbij de wedstrijden geanimeerd worden geloot, optioneel met potten en een wedstrijdmatrix.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className={`grid gap-2 ${dialogMatchType === "rounds" ? "grid-cols-3" : "grid-cols-2"}`}>
+            {[
+              { value: "auto" as MatchGenMode, label: "AUTOMATISCHE INPLANNING", show: true },
+              { value: "empty" as MatchGenMode, label: "HANDMATIGE INPLANNING", show: dialogMatchType === "rounds" },
+              { value: "live_draw" as MatchGenMode, label: "LIVE LOTING", show: true },
+            ].filter(o => o.show).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setDialogMatchGenMode(opt.value)}
+                className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
+                  dialogMatchGenMode === opt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/20"
+                }`}
+              >
+                <p className="font-bold text-foreground uppercase tracking-wide">{opt.label}</p>
+              </button>
+            ))}
+          </div>
+        </div>
         {showWarning && (
           <p className="text-xs text-destructive font-medium">
             Let op: bij het wijzigen van de {sizeChanged && typeChanged ? "poulegrootte en competitieformat" : sizeChanged ? "poulegrootte" : "competitieformat"} worden de wedstrijden die al gepland zijn uit het schema gehaald.
