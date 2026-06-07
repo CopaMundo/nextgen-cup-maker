@@ -522,9 +522,24 @@ const LiveDrawDialog = ({
     setStep(0);
   }, [phase]);
 
-  // step through group assignments
+  // step through assignments
   useEffect(() => {
     if (phase !== "drawing") return;
+    if (isBracketPhase) {
+      if (bracketSteps.length === 0) return;
+      if (step >= bracketSteps.length) {
+        void persistBracket().then(() => setPhase("done"));
+        return;
+      }
+      const cur = bracketSteps[step];
+      setHighlight(cur.team.id);
+      const t = setTimeout(() => {
+        setBracketPairings(prev => prev.map((p, i) => i === cur.matchIdx ? { ...p, [cur.side]: cur.team } as Pairing : p));
+        setHighlight(null);
+        setStep(s => s + 1);
+      }, 700);
+      return () => clearTimeout(t);
+    }
     if (mode === "groups" || (mode === "matches" && redrawGroupsToo)) {
       if (pendingGroupAssignments.length === 0) return;
       if (step >= pendingGroupAssignments.length) {
