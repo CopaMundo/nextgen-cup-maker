@@ -1004,8 +1004,6 @@ const LiveDrawDialog = ({
   // Decide if matches-mode dialog should start at "choose" (groups vs no-groups)
   useEffect(() => {
     if (!open) return;
-  useEffect(() => {
-    if (!open) return;
     if (!isBracketPhase && mode === "matches" && existingAssignment) {
       setPhase("choose");
     }
