@@ -120,6 +120,10 @@ const GroupManager = ({
     const enc = encounters || phaseEncounters;
     const rnd = rounds || phaseRounds;
     const mode = genMode || "auto";
+    if (mode === "live_draw") {
+      // Skip generation — caller will open LiveDrawDialog for this.
+      return;
+    }
 
     const rawMatchType = mt;
     const genMatchType = rawMatchType === "home_away" ? "home_away" : (rawMatchType === "multiple" || rawMatchType === "rounds") ? "custom" : "single_leg";
