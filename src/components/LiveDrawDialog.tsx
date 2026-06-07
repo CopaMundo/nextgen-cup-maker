@@ -77,9 +77,12 @@ const LiveDrawDialog = ({
   const [teams, setTeams] = useState<Team[]>([]); // available teams
   const [groupSlots, setGroupSlots] = useState<GroupSlot[]>([]); // for groups mode (and overview in matches mode)
   const [groupNames, setGroupNames] = useState<{ id: string; name: string; size: number }[]>([]);
-  const [pairings, setPairings] = useState<Pairing[]>([]); // bracket mode (rare here)
+  const [bracketPairings, setBracketPairings] = useState<Pairing[]>([]);
   const [matchConfig, setMatchConfig] = useState<{ matchType: string; encounters: number; rounds: number }>({ matchType: "single_leg", encounters: 3, rounds: 3 });
   const [existingAssignment, setExistingAssignment] = useState(false); // any slot has a team
+
+  // bracket animation steps
+  const [bracketSteps, setBracketSteps] = useState<{ matchIdx: number; side: "home" | "away"; team: Team }[]>([]);
 
   // ----- group draw options -----
   const [useGroupPots, setUseGroupPots] = useState(false);
