@@ -35,6 +35,7 @@ interface Phase {
 }
 
 type MatchType = "single_leg" | "home_away" | "multiple" | "rounds";
+type MatchGenMode = "auto" | "empty" | "live_draw";
 
 const COMPETITION_TYPES: { value: MatchType; label: string; desc: string }[] = [
   { value: "single_leg", label: "SINGLE LEG", desc: "Elk team speelt één keer tegen elk ander team in de poule" },
@@ -80,7 +81,7 @@ const GroupManager = ({
   const [dialogMatchType, setDialogMatchType] = useState<MatchType>("single_leg");
   const [dialogEncounters, setDialogEncounters] = useState(3);
   const [dialogRounds, setDialogRounds] = useState(3);
-  const [dialogMatchGenMode, setDialogMatchGenMode] = useState<"auto" | "empty">("auto");
+  const [dialogMatchGenMode, setDialogMatchGenMode] = useState<MatchGenMode>("auto");
   const [dialogLogoFile, setDialogLogoFile] = useState<File | null>(null);
   const [dialogLogoPreview, setDialogLogoPreview] = useState<string | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
