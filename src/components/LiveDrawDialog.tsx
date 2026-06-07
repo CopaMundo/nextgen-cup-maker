@@ -746,10 +746,26 @@ const LiveDrawDialog = ({
   const matchPotsValid = matchPotsSum === sizePerGroup;
 
   const renderOptions = () => {
-    const showGroupSection = mode === "groups" || (mode === "matches" && redrawGroupsToo);
-    const showMatchSection = mode === "matches";
+    const showGroupSection = !isBracketPhase && (mode === "groups" || (mode === "matches" && redrawGroupsToo));
+    const showMatchSection = !isBracketPhase && mode === "matches";
     return (
       <div className="space-y-5">
+        {isBracketPhase && (
+          <div className="rounded-xl border border-border bg-card/40 p-4 space-y-3">
+            <div>
+              <Label className="text-sm font-bold">Bracketloting</Label>
+              <p className="text-xs text-muted-foreground">{bracketPairings.length} wedstrijden, {teams.length} teams beschikbaar.</p>
+            </div>
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div><Label className="text-sm font-semibold">Seeded potten</Label><p className="text-xs text-muted-foreground">Splits teams in Pot A en Pot B.</p></div>
+              <Switch checked={useGroupPots} onCheckedChange={setUseGroupPots} />
+            </div>
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div><Label className="text-sm font-semibold">Zelfde land vermijden</Label><p className="text-xs text-muted-foreground">Best-effort.</p></div>
+              <Switch checked={avoidCountry} onCheckedChange={setAvoidCountry} />
+            </div>
+          </div>
+        )}
         {showGroupSection && (
           <div className="rounded-xl border border-border bg-card/40 p-4 space-y-3">
             <div className="flex items-center justify-between">
