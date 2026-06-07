@@ -1131,6 +1131,20 @@ const GroupManager = ({
         phaseNumber={phaseNumber}
         onComplete={() => { notifySlotChange(); fetchGroups(); }}
       />
+
+      <LiveDrawDialog
+        open={matchDrawOpen}
+        onOpenChange={(o) => { setMatchDrawOpen(o); if (!o) setMatchDrawTargetGroupId(null); }}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        phaseType={phaseType}
+        categoryId={categoryId ?? null}
+        phases={phases}
+        phaseNumber={phaseNumber}
+        mode="matches"
+        targetGroupId={matchDrawTargetGroupId}
+        onComplete={() => { notifySlotChange(); fetchGroups(); }}
+      />
     </div>
   );
 };
