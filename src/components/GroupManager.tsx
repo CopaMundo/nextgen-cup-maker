@@ -391,7 +391,12 @@ const GroupManager = ({
       await supabase.from("slots").insert(slotsToInsert);
       await generateMatchesForGroup(data.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
       setGroups((g) => [...g, data]);
-      toast({ title: `${name} toegevoegd met ${dialogSlots} slots en wedstrijden` });
+      const liveDraw = dialogMatchGenMode === "live_draw";
+      toast({ title: liveDraw ? `${name} toegevoegd — start live loting` : `${name} toegevoegd met ${dialogSlots} slots en wedstrijden` });
+      if (liveDraw) {
+        setMatchDrawTargetGroupId(data.id);
+        setMatchDrawOpen(true);
+      }
     }
     setUploading(false);
     setCreateOpen(false);
