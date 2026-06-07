@@ -904,6 +904,37 @@ const LiveDrawDialog = ({
   };
 
   const renderStage = () => {
+    if (isBracketPhase) {
+      return (
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-6 h-full">
+          <div className="rounded-xl border border-border bg-card/40 p-4 min-h-[300px] overflow-auto">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Pot</h3>
+            <div className="flex flex-wrap gap-2">
+              {bracketSteps.slice(step).map((s, i) => (
+                <div key={i} className={cn("flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm transition-all", highlight === s.team.id && "scale-110 ring-2 ring-primary shadow-lg shadow-primary/30")}>
+                  {s.team.logo_url ? <img src={s.team.logo_url} className="h-5 w-5 object-contain" alt="" /> : <CountryFlag country={s.team.country} />}
+                  <span className="font-medium">{s.team.name}</span>
+                </div>
+              ))}
+              {bracketSteps.length - step === 0 && <p className="text-sm text-muted-foreground">Klaar.</p>}
+            </div>
+          </div>
+          <div className="rounded-xl border border-border bg-card/40 p-4 overflow-auto">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Bracket</h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {bracketPairings.map((p, i) => (
+                <div key={p.matchId} className="rounded-lg border border-border bg-background p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Wedstrijd {i + 1}</div>
+                  <TeamSlot team={p.home} />
+                  <div className="text-center text-xs text-muted-foreground my-1">vs</div>
+                  <TeamSlot team={p.away} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
     const inGroupStage = mode === "groups" || (mode === "matches" && redrawGroupsToo && pendingGroupAssignments.length > 0);
     return (
       <div className="grid lg:grid-cols-[1fr_2fr] gap-6 h-full">
