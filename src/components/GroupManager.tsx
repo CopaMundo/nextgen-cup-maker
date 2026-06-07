@@ -291,6 +291,8 @@ const GroupManager = ({
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
   const [liveDrawOpen, setLiveDrawOpen] = useState(false);
   const [pendingLiveDraw, setPendingLiveDraw] = useState(false);
+  const [matchDrawOpen, setMatchDrawOpen] = useState(false);
+  const [matchDrawTargetGroupId, setMatchDrawTargetGroupId] = useState<string | null>(null);
 
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
