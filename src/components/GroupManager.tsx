@@ -35,6 +35,7 @@ interface Phase {
 }
 
 type MatchType = "single_leg" | "home_away" | "multiple" | "rounds";
+type MatchGenMode = "auto" | "empty" | "live_draw";
 
 const COMPETITION_TYPES: { value: MatchType; label: string; desc: string }[] = [
   { value: "single_leg", label: "SINGLE LEG", desc: "Elk team speelt één keer tegen elk ander team in de poule" },
@@ -80,7 +81,7 @@ const GroupManager = ({
   const [dialogMatchType, setDialogMatchType] = useState<MatchType>("single_leg");
   const [dialogEncounters, setDialogEncounters] = useState(3);
   const [dialogRounds, setDialogRounds] = useState(3);
-  const [dialogMatchGenMode, setDialogMatchGenMode] = useState<"auto" | "empty">("auto");
+  const [dialogMatchGenMode, setDialogMatchGenMode] = useState<MatchGenMode>("auto");
   const [dialogLogoFile, setDialogLogoFile] = useState<File | null>(null);
   const [dialogLogoPreview, setDialogLogoPreview] = useState<string | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
@@ -106,7 +107,7 @@ const GroupManager = ({
   };
 
   /** Generate round-robin matches for a group based on its slots */
-  const generateMatchesForGroup = async (groupId: string, matchType?: MatchType, encounters?: number, rounds?: number, genMode?: "auto" | "empty") => {
+  const generateMatchesForGroup = async (groupId: string, matchType?: MatchType, encounters?: number, rounds?: number, genMode?: MatchGenMode) => {
     const { data: slots } = await supabase
       .from("slots")
       .select("slot_code, team_id")
@@ -119,6 +120,10 @@ const GroupManager = ({
     const enc = encounters || phaseEncounters;
     const rnd = rounds || phaseRounds;
     const mode = genMode || "auto";
+    if (mode === "live_draw") {
+      // Skip generation — caller will open LiveDrawDialog for this.
+      return;
+    }
 
     const rawMatchType = mt;
     const genMatchType = rawMatchType === "home_away" ? "home_away" : (rawMatchType === "multiple" || rawMatchType === "rounds") ? "custom" : "single_leg";
@@ -286,6 +291,8 @@ const GroupManager = ({
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
   const [liveDrawOpen, setLiveDrawOpen] = useState(false);
   const [pendingLiveDraw, setPendingLiveDraw] = useState(false);
+  const [matchDrawOpen, setMatchDrawOpen] = useState(false);
+  const [matchDrawTargetGroupId, setMatchDrawTargetGroupId] = useState<string | null>(null);
 
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
@@ -384,7 +391,12 @@ const GroupManager = ({
       await supabase.from("slots").insert(slotsToInsert);
       await generateMatchesForGroup(data.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
       setGroups((g) => [...g, data]);
-      toast({ title: `${name} toegevoegd met ${dialogSlots} slots en wedstrijden` });
+      const liveDraw = dialogMatchGenMode === "live_draw";
+      toast({ title: liveDraw ? `${name} toegevoegd — start live loting` : `${name} toegevoegd met ${dialogSlots} slots en wedstrijden` });
+      if (liveDraw) {
+        setMatchDrawTargetGroupId(data.id);
+        setMatchDrawOpen(true);
+      }
     }
     setUploading(false);
     setCreateOpen(false);
@@ -455,6 +467,10 @@ const GroupManager = ({
       const allGroups = await supabase.from("groups").select("id").eq("phase_id", phaseId);
       for (const g of (allGroups.data || [])) {
         await generateMatchesForGroup(g.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
+      }
+      if (dialogMatchGenMode === "live_draw") {
+        setMatchDrawTargetGroupId(editingGroup.id);
+        setMatchDrawOpen(true);
       }
     }
 
@@ -838,58 +854,59 @@ const GroupManager = ({
           </div>
         )}
         {dialogMatchType === "rounds" && (
-          <>
-            <div className="space-y-1">
-              <Label className="text-xs">Aantal speelrondes</Label>
-              <select
-                value={dialogRounds}
-                onChange={(e) => setDialogRounds(parseInt(e.target.value))}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5">
-                <Label className="text-xs">Wedstrijden genereren</Label>
-                <TooltipProvider delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs text-xs">
-                      <p className="font-semibold mb-1">Automatische inplanning</p>
-                      <p className="mb-2">Het systeem genereert alle wedstrijden en vult deze direct willekeurig in met de beschikbare teams.</p>
-                      <p className="font-semibold mb-1">Handmatige inplanning</p>
-                      <p>Het systeem genereert lege wedstrijdslots zonder teams. Je vult daarna zelf per wedstrijd in welke teams tegen elkaar spelen.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: "auto" as const, label: "AUTOMATISCHE INPLANNING" },
-                  { value: "empty" as const, label: "HANDMATIGE INPLANNING" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setDialogMatchGenMode(opt.value)}
-                    className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
-                      dialogMatchGenMode === opt.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/20"
-                    }`}
-                  >
-                    <p className="font-bold text-foreground uppercase tracking-wide">{opt.label}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </>
+          <div className="space-y-1">
+            <Label className="text-xs">Aantal speelrondes</Label>
+            <select
+              value={dialogRounds}
+              onChange={(e) => setDialogRounds(parseInt(e.target.value))}
+              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
         )}
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <Label className="text-xs">Wedstrijden genereren</Label>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs text-xs">
+                  <p className="font-semibold mb-1">Automatische inplanning</p>
+                  <p className="mb-2">Het systeem genereert alle wedstrijden en vult deze direct in met de beschikbare teams.</p>
+                  <p className="font-semibold mb-1">Handmatige inplanning</p>
+                  <p className="mb-2">Lege wedstrijdslots. Je vult zelf in welke teams tegen elkaar spelen.</p>
+                  <p className="font-semibold mb-1">Live loting</p>
+                  <p>Start na opslaan een live loting waarbij de wedstrijden geanimeerd worden geloot, optioneel met potten en een wedstrijdmatrix.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className={`grid gap-2 ${dialogMatchType === "rounds" ? "grid-cols-3" : "grid-cols-2"}`}>
+            {[
+              { value: "auto" as MatchGenMode, label: "AUTOMATISCHE INPLANNING", show: true },
+              { value: "empty" as MatchGenMode, label: "HANDMATIGE INPLANNING", show: dialogMatchType === "rounds" },
+              { value: "live_draw" as MatchGenMode, label: "LIVE LOTING", show: true },
+            ].filter(o => o.show).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setDialogMatchGenMode(opt.value)}
+                className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
+                  dialogMatchGenMode === opt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/20"
+                }`}
+              >
+                <p className="font-bold text-foreground uppercase tracking-wide">{opt.label}</p>
+              </button>
+            ))}
+          </div>
+        </div>
         {showWarning && (
           <p className="text-xs text-destructive font-medium">
             Let op: bij het wijzigen van de {sizeChanged && typeChanged ? "poulegrootte en competitieformat" : sizeChanged ? "poulegrootte" : "competitieformat"} worden de wedstrijden die al gepland zijn uit het schema gehaald.
@@ -1112,6 +1129,20 @@ const GroupManager = ({
         categoryId={categoryId ?? null}
         phases={phases}
         phaseNumber={phaseNumber}
+        onComplete={() => { notifySlotChange(); fetchGroups(); }}
+      />
+
+      <LiveDrawDialog
+        open={matchDrawOpen}
+        onOpenChange={(o) => { setMatchDrawOpen(o); if (!o) setMatchDrawTargetGroupId(null); }}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        phaseType={phaseType}
+        categoryId={categoryId ?? null}
+        phases={phases}
+        phaseNumber={phaseNumber}
+        mode="matches"
+        targetGroupId={matchDrawTargetGroupId}
         onComplete={() => { notifySlotChange(); fetchGroups(); }}
       />
     </div>
