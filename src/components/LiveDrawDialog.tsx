@@ -194,6 +194,23 @@ const LiveDrawDialog = ({
       setGroupNames(names);
       setExistingAssignment(gs.some(x => x.team !== null));
 
+      // bracket: load round-1 matches
+      if (isBracketPhase) {
+        const { data: matches } = await supabase
+          .from("matches")
+          .select("id, group_id, home_team_id, away_team_id, home_slot_label, away_slot_label, match_name")
+          .eq("tournament_id", tournamentId).eq("phase_id", phaseId);
+        const allMatches = (matches || []) as MatchRow[];
+        const rawSlotCodes = new Set(slots.map(s => s.slot_code));
+        let r1 = allMatches.filter(mt => (mt.home_slot_label && rawSlotCodes.has(mt.home_slot_label)) || (mt.away_slot_label && rawSlotCodes.has(mt.away_slot_label)));
+        r1 = r1.filter(mt => !mt.match_name?.endsWith("(Terug)"));
+        if (cancelled) return;
+        setBracketPairings(r1.map(mt => ({ kind: "match" as const, matchId: mt.id, group_id: mt.group_id, home: null, away: null })));
+        setExistingAssignment(r1.some(mt => mt.home_team_id || mt.away_team_id));
+      } else {
+        setBracketPairings([]);
+      }
+
       // phase match config
       const { data: phaseRow } = await supabase
         .from("tournament_phases").select("match_config").eq("id", phaseId).single();
