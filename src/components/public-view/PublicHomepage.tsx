@@ -1114,14 +1114,16 @@ const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTea
 const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, phaseId }: {
   standings: any[]; favoriteTeam: string | null; tournament: any; standingColors: any[]; phaseId: string;
 }) => {
+  const bStyle = useBroadcastStyle();
   const getColor = (pos: number) => standingColors.find((sc: any) => sc.phase_id === phaseId && pos >= sc.position_from && pos <= sc.position_to);
+  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-card shadow-sm">
+    <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-primary/10 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b-2 border-primary/30">
+            <tr className={ds(bStyle, "tableHeader") || "bg-primary/10 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b-2 border-primary/30"}>
               <th className="w-8 px-1.5 py-2.5 text-left">#</th>
               <th className="px-1.5 py-2.5 text-left">Team</th>
               <th className="w-7 px-0.5 py-2.5 text-center">GS</th>
@@ -1159,7 +1161,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                   <td className="text-center px-0.5 py-2 text-muted-foreground">{row.l}</td>
                   <td className="text-center px-0.5 py-2 font-bold">{row.gd > 0 ? `+${row.gd}` : row.gd}</td>
                   <td className="text-center px-0.5 py-2">
-                    <span className="inline-flex items-center justify-center rounded bg-primary/15 px-1.5 py-0.5 font-black text-primary">{row.pts}</span>
+                    <span className={ds(bStyle, "ptsBadge") || `inline-flex items-center justify-center bg-primary/15 px-1.5 py-0.5 font-black text-primary ${squareStyle ? "" : "rounded"}`}>{row.pts}</span>
                   </td>
                 </tr>
               );
