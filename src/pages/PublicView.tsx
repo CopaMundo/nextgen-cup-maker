@@ -43,7 +43,7 @@ const PublicView = () => {
     }
     return "home";
   });
-  const [standingsTarget, setStandingsTarget] = useState<{ phaseId?: string } | null>(null);
+  const [standingsTarget, setStandingsTarget] = useState<{ phaseId?: string; groupId?: string } | null>(null);
   const [data, setData] = useState<PublicTournamentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
