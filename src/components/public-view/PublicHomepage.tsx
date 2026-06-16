@@ -6,6 +6,7 @@ import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import type { PublicTournamentData } from "@/pages/PublicView";
+import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, homeResetKey }: Props) => {
-  const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes } = data;
+  const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
@@ -194,28 +195,15 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   })() : null;
   const nextKnockoutPhase = showBracketInstead ? nextPhaseAfterCurrent : null;
 
-  const calcStandings = (groupId: string) => {
-    const gts = groupTeams.filter((gt: any) => gt.group_id === groupId);
-    const gMatches = matches.filter((m: any) => m.group_id === groupId && m.is_played);
-    const ptsWin = tournament?.points_win ?? 3;
-    const ptsDraw = tournament?.points_draw ?? 1;
-    const rows = gts.map((gt: any) => {
-      const team = teams.find((t: any) => t.id === gt.team_id);
-      let w = 0, d = 0, l = 0, gf = 0, ga = 0;
-      gMatches.forEach((m: any) => {
-        if (m.home_team_id === gt.team_id) {
-          gf += m.home_score ?? 0; ga += m.away_score ?? 0;
-          if ((m.home_score ?? 0) > (m.away_score ?? 0)) w++; else if (m.home_score === m.away_score) d++; else l++;
-        } else if (m.away_team_id === gt.team_id) {
-          gf += m.away_score ?? 0; ga += m.home_score ?? 0;
-          if ((m.away_score ?? 0) > (m.home_score ?? 0)) w++; else if (m.home_score === m.away_score) d++; else l++;
-        }
-      });
-      return { team, gp: w + d + l, w, d, l, gf, ga, gd: gf - ga, pts: w * ptsWin + d * ptsDraw + gt.bonus_points };
-    });
-    rows.sort((a: any, b: any) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.w - a.w);
-    return rows.map((r: any, i: number) => ({ ...r, pos: i + 1 }));
-  };
+  const calcStandings = (groupId: string) => calculateGroupStandings(
+    groupId,
+    groupTeams as any,
+    matches as any,
+    groups as any,
+    phases as any,
+    (scoringSystems || []) as any,
+    tournament,
+  ).map((r: any) => ({ ...r, team: teams.find((t: any) => t.id === r.teamId) }));
 
   // Sliding window for fav matches: 1 played + 2 upcoming = max 3
   const favMatches = favoriteTeam
