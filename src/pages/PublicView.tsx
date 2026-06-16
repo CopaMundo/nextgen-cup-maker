@@ -43,7 +43,7 @@ const PublicView = () => {
     }
     return "home";
   });
-  const [standingsTarget, setStandingsTarget] = useState<{ phaseId?: string } | null>(null);
+  const [standingsTarget, setStandingsTarget] = useState<{ phaseId?: string; groupId?: string } | null>(null);
   const [data, setData] = useState<PublicTournamentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
@@ -162,7 +162,7 @@ const PublicView = () => {
   const isMultiCat = data?.tournament?.is_multi_category && (data?.categories?.length ?? 0) > 1;
   const needsDivisionSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
 
-  const handleSetActiveTab = useCallback((tab: any, target?: { phaseId?: string }) => {
+  const handleSetActiveTab = useCallback((tab: any, target?: { phaseId?: string; groupId?: string }) => {
     if (needsDivisionSelection && tab !== "info") {
       setActiveTab("info");
       return;
@@ -171,8 +171,8 @@ const PublicView = () => {
     if (target) setStandingsTarget(target);
     else setStandingsTarget(null);
     setActiveTab(tab);
-    // Scroll to top for all tabs except schedule (handled internally)
-    if (tab !== "schedule") {
+    // Scroll to top for all tabs except schedule (handled internally) and standings with a target group
+    if (tab !== "schedule" && !(tab === "standings" && target?.groupId)) {
       window.scrollTo({ top: 0 });
     }
   }, [needsDivisionSelection]);
@@ -215,7 +215,7 @@ const PublicView = () => {
         {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />}
         {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} setActiveTab={handleSetActiveTab} />}
         {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} homeResetKey={homeResetKey} />}
-        {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} />}
+        {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} initialGroupId={standingsTarget?.groupId} />}
         {activeTab === "schedule" && <PublicSchedule data={filteredData} favoriteTeam={favoriteTeam} />}
 
         <PublicBottomNav activeTab={activeTab} setActiveTab={handleSetActiveTab} tournament={data.tournament} favoriteTeam={favoriteTeam} teams={filteredData.teams} />
