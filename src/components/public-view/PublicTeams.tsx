@@ -135,7 +135,7 @@ const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournam
           {groupInfo && (
             <button
               type="button"
-              onClick={() => setActiveTab?.("standings", { phaseId: groupInfo.phaseId })}
+              onClick={() => setActiveTab?.("standings", { phaseId: groupInfo.phaseId, groupId: groupInfo.groupId })}
               className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer underline-offset-2 hover:underline"
             >
               {groupInfo.groupName}: <span className="text-primary font-black">#{groupInfo.pos}</span>
