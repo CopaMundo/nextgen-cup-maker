@@ -15,7 +15,7 @@ const POSITION_LABELS: Record<string, string> = {
   attacker: "Aanvallers",
 };
 
-const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournamentData; favoriteTeam: string | null; setActiveTab?: (tab: any, target?: { phaseId?: string; groupId?: string }) => void }) => {
+const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const { teams, players, staff, matches, stats, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
@@ -74,7 +74,7 @@ const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournam
           tournament,
         );
         const pos = rows.findIndex((r: any) => r.teamId === team.id) + 1;
-        if (pos > 0) return { groupName: g.name, pos, phaseId: g.phase_id, groupId: g.id };
+        if (pos > 0) return { groupName: g.name, pos };
       }
       return null;
     };
@@ -133,13 +133,9 @@ const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournam
             </div>
           )}
           {groupInfo && (
-            <button
-              type="button"
-              onClick={() => setActiveTab?.("standings", { phaseId: groupInfo.phaseId, groupId: groupInfo.groupId })}
-              className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer underline-offset-2 hover:underline"
-            >
+            <span className="text-[10px] font-bold text-muted-foreground">
               {groupInfo.groupName}: <span className="text-primary font-black">#{groupInfo.pos}</span>
-            </button>
+            </span>
           )}
         </div>
 

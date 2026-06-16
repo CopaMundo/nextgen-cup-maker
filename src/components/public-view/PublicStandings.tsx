@@ -10,7 +10,7 @@ import { ds } from "@/lib/broadcastStyles";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
 
-const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: PublicTournamentData; initialPhaseId?: string; initialGroupId?: string }) => {
+const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData; initialPhaseId?: string }) => {
   const { tournament, phases, groups, teams, matches, groupTeams, slots, standingColors, stats, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const [subTab, setSubTab] = useState<"standings" | "stats">("standings");
@@ -65,20 +65,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
     setSelectedPhaseNum(autoPhaseNum);
     setSelectedFormatId(null);
   }, [autoPhaseNum]);
-
-  // When jumping to a specific group (from "my team"), scroll it into view
-  useEffect(() => {
-    if (!initialGroupId) return;
-    const tryScroll = (attempt = 0) => {
-      const el = document.getElementById(`standings-group-${initialGroupId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      } else if (attempt < 10) {
-        setTimeout(() => tryScroll(attempt + 1), 80);
-      }
-    };
-    tryScroll();
-  }, [initialGroupId, selectedPhaseNum, selectedFormatId]);
 
   const activePhaseNum = selectedPhaseNum ?? allPhaseNumbers[0] ?? null;
   const phasesInActiveNum = phases.filter((p: any) => p.phase_number === activePhaseNum);
@@ -244,7 +230,14 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
 
                   if (standings.length === 0) return null;
                   return (
-                    <div key={group.id} id={`standings-group-${group.id}`} className={ds(bStyle, "card")}>
+                    <div key={group.id} className={ds(bStyle, "card")}>
+                      <div className={ds(bStyle, "cardHeader")}>
+                        <div className={ds(bStyle, "cardHeaderDot")} />
+                        <div className="flex items-center gap-1.5">
+                          {group.logo_url && <img src={group.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />}
+                          <h3 className={ds(bStyle, "cardHeaderTitle")}>{group.name}</h3>
+                        </div>
+                      </div>
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs">
                           <thead>
