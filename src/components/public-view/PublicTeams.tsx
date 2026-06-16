@@ -15,7 +15,7 @@ const POSITION_LABELS: Record<string, string> = {
   attacker: "Aanvallers",
 };
 
-const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournamentData; favoriteTeam: string | null; setActiveTab?: (tab: any, target?: { phaseId?: string }) => void }) => {
+const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournamentData; favoriteTeam: string | null; setActiveTab?: (tab: any, target?: { phaseId?: string; groupId?: string }) => void }) => {
   const { teams, players, staff, matches, stats, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
