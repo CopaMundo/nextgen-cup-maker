@@ -23,6 +23,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const bStyle = useBroadcastStyle();
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
+  const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
   const [expandedGrid, setExpandedGrid] = useState<string | null>(null);
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
@@ -580,7 +581,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                       <div className="pb-1.5">
                         <span className="text-[10px] font-black uppercase tracking-[0.18em] text-primary italic">Laatste resultaat</span>
                       </div>
-                      <div className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+                      <div className={matchCardWrapperCls}>
                         <PublicMatchCard
                           match={lastFavMatch}
                           teams={teams}
@@ -600,7 +601,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                       <div className="pb-1.5">
                         <span className="text-[10px] font-black uppercase tracking-[0.18em] text-primary italic">Volgende wedstrijd</span>
                       </div>
-                      <div className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+                      <div className={matchCardWrapperCls}>
                         <PublicMatchCard
                           match={nextFavMatch}
                           teams={teams}
