@@ -54,7 +54,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
         {rows.map((row, ri) => (
           <div key={ri} className="flex justify-center gap-4">
             {row.map((s: any) => (
-              <div key={s.id} className="h-20 w-20 overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm">
+              <div key={s.id} className={`h-20 w-20 overflow-hidden p-2 ${ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border bg-card shadow-sm"}`}>
                 <img src={s.logo_url} alt={s.name || ""} className="h-full w-full object-contain" />
               </div>
             ))}
