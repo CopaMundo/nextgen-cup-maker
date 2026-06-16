@@ -16,7 +16,7 @@ const POSITION_LABELS: Record<string, string> = {
 };
 
 const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
-  const { teams, players, staff, matches, stats, phases, groups, slots, tournament } = data;
+  const { teams, players, staff, matches, stats, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [teamTab, setTeamTab] = useState<"selectie" | "wedstrijden">("selectie");
