@@ -244,7 +244,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
 
                   if (standings.length === 0) return null;
                   return (
-                    <div key={group.id} className={ds(bStyle, "card")}>
+                    <div key={group.id} id={`standings-group-${group.id}`} className={ds(bStyle, "card")}>
                       <div className={ds(bStyle, "cardHeader")}>
                         <div className={ds(bStyle, "cardHeaderDot")} />
                         <div className="flex items-center gap-1.5">
