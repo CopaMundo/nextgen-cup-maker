@@ -85,7 +85,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
               {/* Timeslot header */}
               <div className={ds(bStyle, "timeslotHeader")}>
                 {slot.time && (
-                  <span className={ds(bStyle, "badge")}>
+                  <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
                     {slot.time.slice(0, 5)}
                   </span>
                 )}
@@ -99,7 +99,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   <div
                     key={m.id}
                     ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
-                    className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"
+                    className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
                   >
                     <PublicMatchCard
                       match={m}
