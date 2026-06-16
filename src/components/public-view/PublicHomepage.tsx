@@ -672,7 +672,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {!showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setActiveTab("standings", { phaseId: nextGroupPhaseGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing-next")}
               >
                 <div className={ds(bStyle, "subHeader")}>
                   <div className="flex items-center gap-2">
