@@ -213,7 +213,7 @@ const PublicView = () => {
     <BroadcastStyleContext.Provider value={displayStyle}>
       <div className="min-h-screen bg-background pb-20" data-broadcast={displayStyle}>
         {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />}
-        {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} />}
+        {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} setActiveTab={handleSetActiveTab} />}
         {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} homeResetKey={homeResetKey} />}
         {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} />}
         {activeTab === "schedule" && <PublicSchedule data={filteredData} favoriteTeam={favoriteTeam} />}
