@@ -265,7 +265,7 @@ const TeamMatchList = ({ team, teamMatches, teams, phases, groups, slots, tourna
       </div>
       <div className="p-2 space-y-2">
         {teamMatches.map((m: any) => (
-          <div key={m.id} className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+          <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
             <PublicMatchCard
               match={m}
               teams={teams}
