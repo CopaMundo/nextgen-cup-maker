@@ -74,7 +74,7 @@ const PublicTeams = ({ data, favoriteTeam, setActiveTab }: { data: PublicTournam
           tournament,
         );
         const pos = rows.findIndex((r: any) => r.teamId === team.id) + 1;
-        if (pos > 0) return { groupName: g.name, pos, phaseId: g.phase_id };
+        if (pos > 0) return { groupName: g.name, pos, phaseId: g.phase_id, groupId: g.id };
       }
       return null;
     };
