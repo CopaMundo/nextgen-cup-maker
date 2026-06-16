@@ -6,6 +6,7 @@ import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import type { PublicTournamentData } from "@/pages/PublicView";
+import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, homeResetKey }: Props) => {
-  const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes } = data;
+  const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
@@ -194,28 +195,15 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   })() : null;
   const nextKnockoutPhase = showBracketInstead ? nextPhaseAfterCurrent : null;
 
-  const calcStandings = (groupId: string) => {
-    const gts = groupTeams.filter((gt: any) => gt.group_id === groupId);
-    const gMatches = matches.filter((m: any) => m.group_id === groupId && m.is_played);
-    const ptsWin = tournament?.points_win ?? 3;
-    const ptsDraw = tournament?.points_draw ?? 1;
-    const rows = gts.map((gt: any) => {
-      const team = teams.find((t: any) => t.id === gt.team_id);
-      let w = 0, d = 0, l = 0, gf = 0, ga = 0;
-      gMatches.forEach((m: any) => {
-        if (m.home_team_id === gt.team_id) {
-          gf += m.home_score ?? 0; ga += m.away_score ?? 0;
-          if ((m.home_score ?? 0) > (m.away_score ?? 0)) w++; else if (m.home_score === m.away_score) d++; else l++;
-        } else if (m.away_team_id === gt.team_id) {
-          gf += m.away_score ?? 0; ga += m.home_score ?? 0;
-          if ((m.away_score ?? 0) > (m.home_score ?? 0)) w++; else if (m.home_score === m.away_score) d++; else l++;
-        }
-      });
-      return { team, gp: w + d + l, w, d, l, gf, ga, gd: gf - ga, pts: w * ptsWin + d * ptsDraw + gt.bonus_points };
-    });
-    rows.sort((a: any, b: any) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.w - a.w);
-    return rows.map((r: any, i: number) => ({ ...r, pos: i + 1 }));
-  };
+  const calcStandings = (groupId: string) => calculateGroupStandings(
+    groupId,
+    groupTeams as any,
+    matches as any,
+    groups as any,
+    phases as any,
+    (scoringSystems || []) as any,
+    tournament,
+  ).map((r: any) => ({ ...r, team: teams.find((t: any) => t.id === r.teamId) }));
 
   // Sliding window for fav matches: 1 played + 2 upcoming = max 3
   const favMatches = favoriteTeam
@@ -496,7 +484,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     <div className="pt-4 space-y-4 px-3">
       {/* Tournament name - broadcast header */}
       <div className="flex items-center gap-3 mb-1">
-        {tournament.logo_url && <img src={tournament.logo_url} alt="" className="h-10 w-10 rounded-xl object-contain shadow-sm" />}
+        {tournament.logo_url && <img src={tournament.logo_url} alt="" className={`h-10 w-10 object-contain shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`} />}
         <div className="flex-1 min-w-0">
           <h1 className="font-display font-black text-foreground leading-tight text-lg uppercase tracking-wide truncate">{tournament.name}</h1>
         </div>
@@ -550,7 +538,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               {favTeamObj.logo_url ? (
                 <img src={favTeamObj.logo_url} alt="" className="h-7 w-7 object-contain shrink-0" />
               ) : (
-                <div className="h-7 w-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+                <div className={`h-7 w-7 bg-muted flex items-center justify-center shrink-0 ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-md"}`}>
                   <Star className="h-3 w-3 text-muted-foreground" />
                 </div>
               )}
@@ -1047,6 +1035,8 @@ const GridCard = ({ title, icon, onClick, children }: { title: string; icon?: Re
 
 // Compact standings
 const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: any[]; favoriteTeam: string | null; tournament: any }) => {
+  const bStyle = useBroadcastStyle();
+  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
   let visible = standings;
   const total = standings.length;
 
@@ -1072,7 +1062,7 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
         <span className="w-8 text-center">DS</span>
       </div>
       {visible.map((row: any, idx: number) => (
-        <div key={row.team?.id} className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-xs ${
+        <div key={row.team?.id} className={`flex items-center gap-2 px-2 py-1.5 text-xs ${squareStyle ? "" : "rounded-md"} ${
           favoriteTeam === row.team?.id ? "bg-primary/10 border border-primary/20" : idx % 2 === 1 ? "bg-secondary/30" : ""
         }`}>
           <span className="w-5 text-center font-black text-muted-foreground">{row.pos}</span>
@@ -1086,7 +1076,7 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
           </div>
           <span className="w-5 text-center text-muted-foreground">{row.gp}</span>
           <span className="w-8 text-center">
-            <span className="inline-flex items-center justify-center rounded bg-primary/15 px-1 py-0.5 text-[10px] font-black text-primary">{row.pts}</span>
+            <span className={`inline-flex items-center justify-center bg-primary/15 px-1 py-0.5 text-[10px] font-black text-primary ${squareStyle ? "" : "rounded"}`}>{row.pts}</span>
           </span>
           <span className="w-8 text-center text-muted-foreground font-bold">{row.gd > 0 ? `+${row.gd}` : row.gd}</span>
         </div>
@@ -1124,14 +1114,16 @@ const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTea
 const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, phaseId }: {
   standings: any[]; favoriteTeam: string | null; tournament: any; standingColors: any[]; phaseId: string;
 }) => {
+  const bStyle = useBroadcastStyle();
   const getColor = (pos: number) => standingColors.find((sc: any) => sc.phase_id === phaseId && pos >= sc.position_from && pos <= sc.position_to);
+  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-card shadow-sm">
+    <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-primary/10 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b-2 border-primary/30">
+            <tr className={ds(bStyle, "tableHeader") || "bg-primary/10 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b-2 border-primary/30"}>
               <th className="w-8 px-1.5 py-2.5 text-left">#</th>
               <th className="px-1.5 py-2.5 text-left">Team</th>
               <th className="w-7 px-0.5 py-2.5 text-center">GS</th>
@@ -1169,7 +1161,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                   <td className="text-center px-0.5 py-2 text-muted-foreground">{row.l}</td>
                   <td className="text-center px-0.5 py-2 font-bold">{row.gd > 0 ? `+${row.gd}` : row.gd}</td>
                   <td className="text-center px-0.5 py-2">
-                    <span className="inline-flex items-center justify-center rounded bg-primary/15 px-1.5 py-0.5 font-black text-primary">{row.pts}</span>
+                    <span className={ds(bStyle, "ptsBadge") || `inline-flex items-center justify-center bg-primary/15 px-1.5 py-0.5 font-black text-primary ${squareStyle ? "" : "rounded"}`}>{row.pts}</span>
                   </td>
                 </tr>
               );
