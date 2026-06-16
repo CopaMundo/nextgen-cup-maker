@@ -79,7 +79,7 @@ const PublicMatchCard = ({
   const awayWin = m.is_played && (m.away_score ?? 0) > (m.home_score ?? 0);
 
   const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, isWin: boolean, score: number | null) => (
-    <div className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors ${isWin ? ds(bStyle, "matchTeamRowWin") : ""}`}>
+    <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors ${isWin ? ds(bStyle, "matchTeamRowWin") : ""}`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
           <img src={logo} className="h-full w-full object-contain" alt="" />

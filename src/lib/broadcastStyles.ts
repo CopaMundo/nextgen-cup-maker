@@ -137,6 +137,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     backButton: "flex items-center gap-1 text-[11px] font-mono font-bold text-primary uppercase tracking-[0.12em]",
     matchContext: "bg-primary/8 px-3 py-1 border-b border-dotted border-primary/15",
     matchContextText: "text-[9px] font-mono font-bold uppercase tracking-[0.12em] text-primary",
+    matchTeamRow: "rounded-none",
     matchTeamRowWin: "bg-primary/8",
     matchTeamName: "text-[11px] font-mono font-semibold truncate uppercase",
     matchTeamNameFav: "text-primary",
