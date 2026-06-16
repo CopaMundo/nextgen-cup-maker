@@ -25,10 +25,31 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
   const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
-  const [expandedGrid, setExpandedGrid] = useState<string | null>(null);
+  const [expandedGrid, setExpandedGridState] = useState<string | null>(() => {
+    const hash = window.location.hash.replace("#", "");
+    return hash.startsWith("grid-") ? hash.replace("grid-", "") : null;
+  });
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
+
+  const setExpandedGrid = (value: string | null) => {
+    setExpandedGridState(value);
+    if (value) {
+      window.history.pushState({ expandedGrid: value }, "", `#grid-${value}`);
+    } else {
+      window.history.pushState({}, "", window.location.pathname + window.location.search);
+    }
+  };
+
+  useEffect(() => {
+    const onPop = () => {
+      const hash = window.location.hash.replace("#", "");
+      setExpandedGridState(hash.startsWith("grid-") ? hash.replace("grid-", "") : null);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // Reset expanded grid when Home button is pressed
   useEffect(() => {
@@ -633,7 +654,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {!showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setActiveTab("standings", { phaseId: favGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing")}
               >
                 <div className={ds(bStyle, "subHeader")}>
                   <div className="flex items-center gap-2">
@@ -651,7 +672,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {!showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setActiveTab("standings", { phaseId: nextGroupPhaseGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing-next")}
               >
                 <div className={ds(bStyle, "subHeader")}>
                   <div className="flex items-center gap-2">
