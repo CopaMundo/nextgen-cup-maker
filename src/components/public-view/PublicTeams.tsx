@@ -64,24 +64,17 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
         if (!phase || phase.phase_type === "knockout") continue;
         const gts = data.groupTeams.filter((gt: any) => gt.group_id === g.id);
         if (!gts.find((gt: any) => gt.team_id === team.id)) continue;
-        const gMatches = matches.filter((m: any) => m.group_id === g.id && m.is_played);
-        const rows = gts.map((gt: any) => {
-          let tw = 0, td = 0, tl = 0, tgf = 0, tga = 0;
-          gMatches.forEach((m: any) => {
-            if (m.home_team_id === gt.team_id) {
-              tgf += m.home_score ?? 0; tga += m.away_score ?? 0;
-              if ((m.home_score ?? 0) > (m.away_score ?? 0)) tw++; else if (m.home_score === m.away_score) td++; else tl++;
-            } else if (m.away_team_id === gt.team_id) {
-              tgf += m.away_score ?? 0; tga += m.home_score ?? 0;
-              if ((m.away_score ?? 0) > (m.home_score ?? 0)) tw++; else if (m.home_score === m.away_score) td++; else tl++;
-            }
-          });
-          const pts = tw * (tournament?.points_win ?? 3) + td * (tournament?.points_draw ?? 1) + gt.bonus_points;
-          return { teamId: gt.team_id, pts, gd: tgf - tga, gf: tgf, w: tw };
-        });
-        rows.sort((a: any, b: any) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.w - a.w);
+        const rows = calculateGroupStandings(
+          g.id,
+          groupTeams as any,
+          matches as any,
+          groups as any,
+          phases as any,
+          (scoringSystems || []) as any,
+          tournament,
+        );
         const pos = rows.findIndex((r: any) => r.teamId === team.id) + 1;
-        return { groupName: g.name, pos };
+        if (pos > 0) return { groupName: g.name, pos };
       }
       return null;
     };
