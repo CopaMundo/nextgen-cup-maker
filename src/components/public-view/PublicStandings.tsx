@@ -66,6 +66,20 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
     setSelectedFormatId(null);
   }, [autoPhaseNum]);
 
+  // When jumping to a specific group (from "my team"), scroll it into view
+  useEffect(() => {
+    if (!initialGroupId) return;
+    const tryScroll = (attempt = 0) => {
+      const el = document.getElementById(`standings-group-${initialGroupId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (attempt < 10) {
+        setTimeout(() => tryScroll(attempt + 1), 80);
+      }
+    };
+    tryScroll();
+  }, [initialGroupId, selectedPhaseNum, selectedFormatId]);
+
   const activePhaseNum = selectedPhaseNum ?? allPhaseNumbers[0] ?? null;
   const phasesInActiveNum = phases.filter((p: any) => p.phase_number === activePhaseNum);
   const showFormatsAsTabs = tournament.format_display_mode !== "stacked";
