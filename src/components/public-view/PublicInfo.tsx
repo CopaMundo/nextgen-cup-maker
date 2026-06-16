@@ -129,14 +129,14 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Description */}
         {tournament.description && (
-          <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className={`p-4 ${ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border bg-card shadow-sm"}`}>
             <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{tournament.description}</p>
           </div>
         )}
 
         {/* Division selector */}
         {isMultiCat && (
-          <div ref={divisionRef} className={`rounded-xl p-4 space-y-2 border-2 ${needsSelection ? "border-destructive bg-destructive/10 animate-pulse" : "border-primary/30 bg-primary/5"}`}>
+          <div ref={divisionRef} className={`p-4 space-y-2 border-2 ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"} ${needsSelection ? "border-destructive bg-destructive/10 animate-pulse" : "border-primary/30 bg-primary/5"}`}>
             <label className={`text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-1.5 ${needsSelection ? "text-destructive" : "text-primary"}`}>
               {needsSelection && <AlertCircle className="h-4 w-4" />}
               Meerdere divisies beschikbaar
@@ -159,7 +159,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Attachments */}
         {attachments.length > 0 && (
-          <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className={`p-4 ${ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border bg-card shadow-sm"}`}>
             <div className="flex items-center gap-2 mb-3">
               <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-primary flex items-center gap-1.5">
                 <FileText className="h-3.5 w-3.5" /> Bijlagen
