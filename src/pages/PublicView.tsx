@@ -215,7 +215,7 @@ const PublicView = () => {
         {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />}
         {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} setActiveTab={handleSetActiveTab} />}
         {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} homeResetKey={homeResetKey} />}
-        {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} />}
+        {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} initialGroupId={standingsTarget?.groupId} />}
         {activeTab === "schedule" && <PublicSchedule data={filteredData} favoriteTeam={favoriteTeam} />}
 
         <PublicBottomNav activeTab={activeTab} setActiveTab={handleSetActiveTab} tournament={data.tournament} favoriteTeam={favoriteTeam} teams={filteredData.teams} />
