@@ -25,15 +25,31 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
   const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
-  const [expandedGrid, setExpandedGrid] = useState<string | null>(null);
+  const [expandedGrid, setExpandedGridState] = useState<string | null>(() => {
+    const hash = window.location.hash.replace("#", "");
+    return hash.startsWith("grid-") ? hash.replace("grid-", "") : null;
+  });
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
 
-  // Reset expanded grid when Home button is pressed
+  const setExpandedGrid = (value: string | null) => {
+    setExpandedGridState(value);
+    if (value) {
+      window.history.pushState({ expandedGrid: value }, "", `#grid-${value}`);
+    } else {
+      window.history.pushState({}, "", window.location.pathname + window.location.search);
+    }
+  };
+
   useEffect(() => {
-    if (homeResetKey !== undefined) setExpandedGrid(null);
-  }, [homeResetKey]);
+    const onPop = () => {
+      const hash = window.location.hash.replace("#", "");
+      setExpandedGridState(hash.startsWith("grid-") ? hash.replace("grid-", "") : null);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const teamName = (id: string | null) => teams.find((t: any) => t.id === id)?.name || "–";
   const teamLogo = (id: string | null) => teams.find((t: any) => t.id === id)?.logo_url;
