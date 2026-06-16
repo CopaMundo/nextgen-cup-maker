@@ -51,6 +51,11 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
+  // Reset expanded grid when Home button is pressed
+  useEffect(() => {
+    if (homeResetKey !== undefined) setExpandedGrid(null);
+  }, [homeResetKey]);
+
   const teamName = (id: string | null) => teams.find((t: any) => t.id === id)?.name || "–";
   const teamLogo = (id: string | null) => teams.find((t: any) => t.id === id)?.logo_url;
 
