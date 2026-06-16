@@ -162,7 +162,7 @@ const PublicView = () => {
   const isMultiCat = data?.tournament?.is_multi_category && (data?.categories?.length ?? 0) > 1;
   const needsDivisionSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
 
-  const handleSetActiveTab = useCallback((tab: any, target?: { phaseId?: string }) => {
+  const handleSetActiveTab = useCallback((tab: any, target?: { phaseId?: string; groupId?: string }) => {
     if (needsDivisionSelection && tab !== "info") {
       setActiveTab("info");
       return;
@@ -171,8 +171,8 @@ const PublicView = () => {
     if (target) setStandingsTarget(target);
     else setStandingsTarget(null);
     setActiveTab(tab);
-    // Scroll to top for all tabs except schedule (handled internally)
-    if (tab !== "schedule") {
+    // Scroll to top for all tabs except schedule (handled internally) and standings with a target group
+    if (tab !== "schedule" && !(tab === "standings" && target?.groupId)) {
       window.scrollTo({ top: 0 });
     }
   }, [needsDivisionSelection]);
