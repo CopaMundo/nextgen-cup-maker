@@ -633,7 +633,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {!showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedGrid("fav-standing")}
+                onClick={() => setActiveTab("standings", { phaseId: favGroup.phase_id })}
               >
                 <div className={ds(bStyle, "subHeader")}>
                   <div className="flex items-center gap-2">
@@ -651,7 +651,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {!showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedGrid("fav-standing-next")}
+                onClick={() => setActiveTab("standings", { phaseId: nextGroupPhaseGroup.phase_id })}
               >
                 <div className={ds(bStyle, "subHeader")}>
                   <div className="flex items-center gap-2">
