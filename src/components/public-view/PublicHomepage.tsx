@@ -23,6 +23,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const bStyle = useBroadcastStyle();
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
+  const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
   const [expandedGrid, setExpandedGrid] = useState<string | null>(null);
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
@@ -580,7 +581,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                       <div className="pb-1.5">
                         <span className="text-[10px] font-black uppercase tracking-[0.18em] text-primary italic">Laatste resultaat</span>
                       </div>
-                      <div className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+                      <div className={matchCardWrapperCls}>
                         <PublicMatchCard
                           match={lastFavMatch}
                           teams={teams}
@@ -600,7 +601,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                       <div className="pb-1.5">
                         <span className="text-[10px] font-black uppercase tracking-[0.18em] text-primary italic">Volgende wedstrijd</span>
                       </div>
-                      <div className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+                      <div className={matchCardWrapperCls}>
                         <PublicMatchCard
                           match={nextFavMatch}
                           teams={teams}
@@ -915,6 +916,8 @@ const InlineBracketView = ({ backAction, bStyle, phaseNumberSet, allKnockoutPhas
 
 // Knockout preview
 const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches, phases, groups, tournament }: { matches: any[]; teams: any[]; slots?: any[]; favoriteTeam: string | null; allMatches?: any[]; phases?: any[]; groups?: any[]; tournament?: any }) => {
+  const bStyle = useBroadcastStyle();
+  const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
 
   const favMatches = matches.filter((m: any) => m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam);
   const nextFavMatch = favMatches.find((m: any) => !m.is_played) || favMatches[favMatches.length - 1];
@@ -987,9 +990,11 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
   if (display.length === 0) {
     const fallback = favMatches.length > 0 ? favMatches.slice(0, 3) : matches.slice(0, 3);
     return (
-      <div className="divide-y divide-border">
+      <div className="space-y-2">
         {fallback.map((m: any) => (
-          <PublicMatchCard key={m.id} match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+          <div key={m.id} className={matchCardWrapperCls}>
+            <PublicMatchCard match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+          </div>
         ))}
       </div>
     );
@@ -1000,7 +1005,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
       {nextFavMatch && (
         <div>
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-primary mb-1">Jouw wedstrijd</p>
-          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+          <div className={matchCardWrapperCls}>
             <PublicMatchCard match={nextFavMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
           </div>
         </div>
@@ -1008,7 +1013,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
       {otherMatch && (
         <div className="pt-2 border-t border-border">
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-1">Mogelijke tegenstander</p>
-          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+          <div className={matchCardWrapperCls}>
             <PublicMatchCard match={otherMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
           </div>
         </div>
@@ -1094,10 +1099,11 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
 const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament }: {
   matches: any[]; teams: any[]; phases: any[]; groups: any[]; slots?: any[]; favoriteTeam: string | null; compact?: boolean; tournament?: any;
 }) => {
+  const bStyle = useBroadcastStyle();
   return (
     <div className="space-y-2">
       {matches.map((m: any) => (
-        <div key={m.id} className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+        <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
           <PublicMatchCard
             match={m}
             teams={teams}

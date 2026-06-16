@@ -362,7 +362,7 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                                 {groupMatches
                                   .filter((m: any) => selectedRoundFilter === "all" || String(m.round_number) === selectedRoundFilter)
                                   .map((m: any) => (
-                                    <div key={m.id} className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+                                    <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
                                       <PublicMatchCard
                                         match={m}
                                         teams={teams}

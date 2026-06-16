@@ -93,7 +93,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
                 </span>
               </div>
-              {/* Match cards — each in its own rounded container with spacing */}
+              {/* Match cards — each in its own style-aware container with spacing */}
               <div className="p-2 space-y-2">
                 {slot.matches.map((m: any) => (
                   <div
