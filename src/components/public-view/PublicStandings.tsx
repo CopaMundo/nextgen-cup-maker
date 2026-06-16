@@ -245,13 +245,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
                   if (standings.length === 0) return null;
                   return (
                     <div key={group.id} id={`standings-group-${group.id}`} className={ds(bStyle, "card")}>
-                      <div className={ds(bStyle, "cardHeader")}>
-                        <div className={ds(bStyle, "cardHeaderDot")} />
-                        <div className="flex items-center gap-1.5">
-                          {group.logo_url && <img src={group.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />}
-                          <h3 className={ds(bStyle, "cardHeaderTitle")}>{group.name}</h3>
-                        </div>
-                      </div>
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs">
                           <thead>
