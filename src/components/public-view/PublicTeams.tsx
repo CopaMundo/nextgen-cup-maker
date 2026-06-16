@@ -5,6 +5,7 @@ import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
+import { calculateGroupStandings } from "@/lib/standingsCalculator";
 
 const POSITION_ORDER = ["goalkeeper", "defender", "midfielder", "attacker"];
 const POSITION_LABELS: Record<string, string> = {
@@ -15,7 +16,7 @@ const POSITION_LABELS: Record<string, string> = {
 };
 
 const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
-  const { teams, players, staff, matches, stats, phases, groups, slots, tournament } = data;
+  const { teams, players, staff, matches, stats, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [teamTab, setTeamTab] = useState<"selectie" | "wedstrijden">("selectie");
@@ -63,24 +64,17 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
         if (!phase || phase.phase_type === "knockout") continue;
         const gts = data.groupTeams.filter((gt: any) => gt.group_id === g.id);
         if (!gts.find((gt: any) => gt.team_id === team.id)) continue;
-        const gMatches = matches.filter((m: any) => m.group_id === g.id && m.is_played);
-        const rows = gts.map((gt: any) => {
-          let tw = 0, td = 0, tl = 0, tgf = 0, tga = 0;
-          gMatches.forEach((m: any) => {
-            if (m.home_team_id === gt.team_id) {
-              tgf += m.home_score ?? 0; tga += m.away_score ?? 0;
-              if ((m.home_score ?? 0) > (m.away_score ?? 0)) tw++; else if (m.home_score === m.away_score) td++; else tl++;
-            } else if (m.away_team_id === gt.team_id) {
-              tgf += m.away_score ?? 0; tga += m.home_score ?? 0;
-              if ((m.away_score ?? 0) > (m.home_score ?? 0)) tw++; else if (m.home_score === m.away_score) td++; else tl++;
-            }
-          });
-          const pts = tw * (tournament?.points_win ?? 3) + td * (tournament?.points_draw ?? 1) + gt.bonus_points;
-          return { teamId: gt.team_id, pts, gd: tgf - tga, gf: tgf, w: tw };
-        });
-        rows.sort((a: any, b: any) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.w - a.w);
+        const rows = calculateGroupStandings(
+          g.id,
+          groupTeams as any,
+          matches as any,
+          groups as any,
+          phases as any,
+          (scoringSystems || []) as any,
+          tournament,
+        );
         const pos = rows.findIndex((r: any) => r.teamId === team.id) + 1;
-        return { groupName: g.name, pos };
+        if (pos > 0) return { groupName: g.name, pos };
       }
       return null;
     };
@@ -95,7 +89,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
         {/* Team header - broadcast style */}
         <div className="flex items-center gap-4">
-          <div className="h-16 w-16 overflow-hidden rounded-xl flex-shrink-0 border-2 border-primary/20 shadow-sm">
+          <div className={`h-16 w-16 overflow-hidden flex-shrink-0 border-2 border-primary/20 shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`}>
             {team.logo_url ? <img src={team.logo_url} alt="" className="h-full w-full object-contain" /> :
               <div className="flex h-full w-full items-center justify-center bg-secondary text-2xl font-black text-muted-foreground">{team.name?.charAt(0)}</div>}
           </div>
@@ -106,7 +100,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
         </div>
 
         {team.team_photo_url && (
-          <div className="rounded-xl overflow-hidden border border-border shadow-sm">
+          <div className={`overflow-hidden border border-border shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`}>
             <img src={team.team_photo_url} alt="" className="w-full object-cover" />
           </div>
         )}
@@ -235,7 +229,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
       <div className="grid grid-cols-3 gap-2.5">
         {teams.map((t: any) => (
           <button key={t.id} onClick={() => { setSelectedTeam(t.id); setTeamTab("selectie"); }}
-            className={`flex flex-col items-center gap-2 rounded-xl p-3 transition-all border ${
+            className={`flex flex-col items-center gap-2 p-3 transition-all border ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"} ${
               favoriteTeam === t.id ? "border-primary bg-primary/5 shadow-sm" : "border-transparent hover:bg-secondary/50 hover:border-border"
             }`}>
             <div className="h-12 w-12 overflow-hidden flex-shrink-0">
