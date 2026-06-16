@@ -229,7 +229,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
       <div className="grid grid-cols-3 gap-2.5">
         {teams.map((t: any) => (
           <button key={t.id} onClick={() => { setSelectedTeam(t.id); setTeamTab("selectie"); }}
-            className={`flex flex-col items-center gap-2 rounded-xl p-3 transition-all border ${
+            className={`flex flex-col items-center gap-2 p-3 transition-all border ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"} ${
               favoriteTeam === t.id ? "border-primary bg-primary/5 shadow-sm" : "border-transparent hover:bg-secondary/50 hover:border-border"
             }`}>
             <div className="h-12 w-12 overflow-hidden flex-shrink-0">
