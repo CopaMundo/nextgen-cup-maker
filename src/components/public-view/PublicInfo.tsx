@@ -83,11 +83,11 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             <div className="flex-1" />
           )}
           {tournament.logo_url ? (
-            <div className="h-36 w-36 flex-shrink-0 overflow-hidden rounded-2xl border-4 border-background bg-card shadow-xl">
+            <div className={`h-36 w-36 flex-shrink-0 overflow-hidden border-4 border-background bg-card shadow-xl ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-2xl"}`}>
               <img src={tournament.logo_url} alt="" className="h-full w-full object-contain" />
             </div>
           ) : (
-            <div className="flex h-36 w-36 flex-shrink-0 items-center justify-center rounded-2xl border-4 border-background bg-primary shadow-xl">
+            <div className={`flex h-36 w-36 flex-shrink-0 items-center justify-center border-4 border-background bg-primary shadow-xl ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-2xl"}`}>
               <span className="font-display text-5xl font-black text-primary-foreground">
                 {tournament.name?.charAt(0)}
               </span>
