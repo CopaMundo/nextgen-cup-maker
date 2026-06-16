@@ -916,6 +916,8 @@ const InlineBracketView = ({ backAction, bStyle, phaseNumberSet, allKnockoutPhas
 
 // Knockout preview
 const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches, phases, groups, tournament }: { matches: any[]; teams: any[]; slots?: any[]; favoriteTeam: string | null; allMatches?: any[]; phases?: any[]; groups?: any[]; tournament?: any }) => {
+  const bStyle = useBroadcastStyle();
+  const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
 
   const favMatches = matches.filter((m: any) => m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam);
   const nextFavMatch = favMatches.find((m: any) => !m.is_played) || favMatches[favMatches.length - 1];
@@ -988,9 +990,11 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
   if (display.length === 0) {
     const fallback = favMatches.length > 0 ? favMatches.slice(0, 3) : matches.slice(0, 3);
     return (
-      <div className="divide-y divide-border">
+      <div className="space-y-2">
         {fallback.map((m: any) => (
-          <PublicMatchCard key={m.id} match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+          <div key={m.id} className={matchCardWrapperCls}>
+            <PublicMatchCard match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+          </div>
         ))}
       </div>
     );
@@ -1001,7 +1005,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
       {nextFavMatch && (
         <div>
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-primary mb-1">Jouw wedstrijd</p>
-          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+          <div className={matchCardWrapperCls}>
             <PublicMatchCard match={nextFavMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
           </div>
         </div>
@@ -1009,7 +1013,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
       {otherMatch && (
         <div className="pt-2 border-t border-border">
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-1">Mogelijke tegenstander</p>
-          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+          <div className={matchCardWrapperCls}>
             <PublicMatchCard match={otherMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
           </div>
         </div>
