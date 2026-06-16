@@ -1095,10 +1095,11 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
 const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament }: {
   matches: any[]; teams: any[]; phases: any[]; groups: any[]; slots?: any[]; favoriteTeam: string | null; compact?: boolean; tournament?: any;
 }) => {
+  const bStyle = useBroadcastStyle();
   return (
     <div className="space-y-2">
       {matches.map((m: any) => (
-        <div key={m.id} className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
+        <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
           <PublicMatchCard
             match={m}
             teams={teams}
