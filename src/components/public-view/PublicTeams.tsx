@@ -89,7 +89,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
         {/* Team header - broadcast style */}
         <div className="flex items-center gap-4">
-          <div className="h-16 w-16 overflow-hidden rounded-xl flex-shrink-0 border-2 border-primary/20 shadow-sm">
+          <div className={`h-16 w-16 overflow-hidden flex-shrink-0 border-2 border-primary/20 shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`}>
             {team.logo_url ? <img src={team.logo_url} alt="" className="h-full w-full object-contain" /> :
               <div className="flex h-full w-full items-center justify-center bg-secondary text-2xl font-black text-muted-foreground">{team.name?.charAt(0)}</div>}
           </div>
@@ -100,7 +100,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
         </div>
 
         {team.team_photo_url && (
-          <div className="rounded-xl overflow-hidden border border-border shadow-sm">
+          <div className={`overflow-hidden border border-border shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`}>
             <img src={team.team_photo_url} alt="" className="w-full object-cover" />
           </div>
         )}
