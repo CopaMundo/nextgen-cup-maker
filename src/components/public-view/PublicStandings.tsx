@@ -313,7 +313,7 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                                       {pc.d  && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.d}</td>}
                                       {pc.l  && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.l}</td>}
                                       {pc.gf && <td className="text-center px-0.5 py-2 text-foreground">{formatSigned(row.gf)}</td>}
-                                      {pc.ga && <td className="text-center px-0.5 py-2 text-muted-foreground">-{row.ga}</td>}
+                                      {pc.ga && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.ga}</td>}
                                       {pc.gd && <td className="text-center px-0.5 py-2 font-bold">{formatSigned(row.gd)}</td>}
                                     </>
                                   )}
