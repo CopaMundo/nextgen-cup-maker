@@ -283,14 +283,14 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                                       <span className="font-black text-muted-foreground">{row.pos}</span>
                                     </div>
                                   </td>
-                                  <td className="px-1.5 py-2 whitespace-nowrap">
-                                    <div className="flex items-center gap-1.5">
+                                  <td className="px-1.5 py-2 max-w-0 w-full">
+                                    <div className="flex items-center gap-1.5 min-w-0">
                                       <div className="h-6 w-6 overflow-hidden flex-shrink-0">
                                         {row.team?.logo_url ? <img src={row.team.logo_url} alt="" className="h-full w-full object-contain" /> :
                                           <div className="flex h-full w-full items-center justify-center bg-secondary text-[8px] font-black text-muted-foreground">{row.team?.name?.charAt(0)}</div>}
                                       </div>
-                                      <span className="font-bold text-foreground">{row.team?.name}</span>
-                                      {tournament.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain" />}
+                                      <span className="font-bold text-foreground truncate min-w-0">{row.team?.name}</span>
+                                      {tournament.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain flex-shrink-0" />}
                                     </div>
                                   </td>
                                   {setsMode ? (
