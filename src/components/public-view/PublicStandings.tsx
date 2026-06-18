@@ -295,29 +295,29 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                                   </td>
                                   {setsMode ? (
                                     <>
-                                      {sc.gp && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.gp}</td>}
-                                      {sc.w  && <td className="text-center px-0.5 py-2 font-bold text-foreground">{row.w}</td>}
-                                      {sc.d  && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.d}</td>}
-                                      {sc.l  && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.l}</td>}
-                                      {sc.sf && <td className="text-center px-0.5 py-2 text-foreground">{row.gf}</td>}
-                                      {sc.sa && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.ga}</td>}
-                                      {sc.sd && <td className="text-center px-0.5 py-2 font-bold">{formatSigned(row.gd)}</td>}
-                                      {sc.pf && <td className="text-center px-0.5 py-2 text-foreground">{sp.pf}</td>}
-                                      {sc.pa && <td className="text-center px-0.5 py-2 text-muted-foreground">{sp.pa}</td>}
-                                      {sc.pd && <td className="text-center px-0.5 py-2 font-bold">{formatSigned(sp.pf - sp.pa)}</td>}
+                                      {sc.gp && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.gp}</td>}
+                                      {sc.w  && <td className="text-center px-1.5 py-2 font-bold text-foreground">{row.w}</td>}
+                                      {sc.d  && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.d}</td>}
+                                      {sc.l  && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.l}</td>}
+                                      {sc.sf && <td className="text-center px-1.5 py-2 text-foreground">{row.gf}</td>}
+                                      {sc.sa && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.ga}</td>}
+                                      {sc.sd && <td className="text-center px-1.5 py-2 font-bold">{formatSigned(row.gd)}</td>}
+                                      {sc.pf && <td className="text-center px-1.5 py-2 text-foreground">{sp.pf}</td>}
+                                      {sc.pa && <td className="text-center px-1.5 py-2 text-muted-foreground">{sp.pa}</td>}
+                                      {sc.pd && <td className="text-center px-1.5 py-2 font-bold">{formatSigned(sp.pf - sp.pa)}</td>}
                                     </>
                                   ) : (
                                     <>
-                                      {pc.gp && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.gp}</td>}
-                                      {pc.w  && <td className="text-center px-0.5 py-2 font-bold text-foreground">{row.w}</td>}
-                                      {pc.d  && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.d}</td>}
-                                      {pc.l  && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.l}</td>}
-                                      {pc.gf && <td className="text-center px-0.5 py-2 text-foreground">{formatSigned(row.gf)}</td>}
-                                      {pc.ga && <td className="text-center px-0.5 py-2 text-muted-foreground">{row.ga}</td>}
-                                      {pc.gd && <td className="text-center px-0.5 py-2 font-bold">{formatSigned(row.gd)}</td>}
+                                      {pc.gp && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.gp}</td>}
+                                      {pc.w  && <td className="text-center px-1.5 py-2 font-bold text-foreground">{row.w}</td>}
+                                      {pc.d  && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.d}</td>}
+                                      {pc.l  && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.l}</td>}
+                                      {pc.gf && <td className="text-center px-1.5 py-2 text-foreground">{formatSigned(row.gf)}</td>}
+                                      {pc.ga && <td className="text-center px-1.5 py-2 text-muted-foreground">{row.ga}</td>}
+                                      {pc.gd && <td className="text-center px-1.5 py-2 font-bold">{formatSigned(row.gd)}</td>}
                                     </>
                                   )}
-                                  <td className="text-center px-0.5 py-2">
+                                  <td className="text-center px-1.5 py-2">
                                     <span className={ds(bStyle, "ptsBadge")}>{row.pts}</span>
                                     {row.bonus > 0 && <span className="ml-0.5 text-[9px] font-bold text-primary align-super">+{row.bonus}</span>}
                                   </td>
