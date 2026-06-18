@@ -238,7 +238,7 @@ const PresentationManager = ({
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {(Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
-                  // Verberg de host-nation varianten; die kies je via het kleurpalet hieronder
+                  // Verberg de host-nation varianten; World Cup is één stijl
                   .filter(([key]) => !["world_cup_mexico", "world_cup_canada", "world_cup_usa"].includes(key))
                   .map(([key, info]) => {
                     const wcKeys: BroadcastStyle[] = ["world_cup", "world_cup_mexico", "world_cup_canada", "world_cup_usa"];
@@ -248,10 +248,7 @@ const PresentationManager = ({
                         : displayStyle === key;
                     return (
                       <button key={key} onClick={async () => {
-                        // World Cup tegel: default naar groen als nog geen variant actief
-                        const target: BroadcastStyle = key === "world_cup"
-                          ? (wcKeys.includes(displayStyle) ? displayStyle : "world_cup_mexico")
-                          : key;
+                        const target: BroadcastStyle = key;
                         setDisplayStyle(target);
                         await supabase.from("tournaments").update({ view_display_style: target } as any).eq("id", tournament.id);
                         onUpdate({ ...tournament, view_display_style: target });
@@ -266,31 +263,6 @@ const PresentationManager = ({
                             <p className="text-xs font-bold text-foreground">{info.name}</p>
                             <p className="text-[10px] text-muted-foreground">{info.description}</p>
                           </div>
-                          {key === "world_cup" && (
-                            <div className="ml-auto flex items-center gap-1.5">
-                              {[
-                                { k: "world_cup_mexico", c: "#00683F" },
-                                { k: "world_cup_canada", c: "#8B0000" },
-                                { k: "world_cup_usa", c: "#1A3FA8" },
-                              ].map(d => (
-                                <button
-                                  key={d.k}
-                                  type="button"
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    setDisplayStyle(d.k as BroadcastStyle);
-                                    await supabase.from("tournaments").update({ view_display_style: d.k } as any).eq("id", tournament.id);
-                                    onUpdate({ ...tournament, view_display_style: d.k });
-                                  }}
-                                  className={`h-4 w-4 rounded-full ring-2 ring-offset-1 ring-offset-card transition-all ${
-                                    displayStyle === d.k ? "ring-foreground" : "ring-transparent hover:ring-foreground/40"
-                                  }`}
-                                  style={{ background: d.c }}
-                                  aria-label={d.k}
-                                />
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </button>
                     );
