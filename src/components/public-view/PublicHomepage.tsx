@@ -29,6 +29,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     const hash = window.location.hash.replace("#", "");
     return hash.startsWith("grid-") ? hash.replace("grid-", "") : null;
   });
+  const [favTab, setFavTab] = useState<"matches" | "standings">("matches");
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
