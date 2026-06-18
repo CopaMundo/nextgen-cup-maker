@@ -572,8 +572,26 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               )}
             </div>
 
-            {/* Wedstrijden — laatste resultaat + volgende wedstrijd, klikbaar voor volledig overzicht */}
-            {(lastFavMatch || nextFavMatch) && (
+            {/* Tab switcher: Wedstrijden / Standen */}
+            {(lastFavMatch || nextFavMatch || showCurrentKnockout || showBracketInstead || showNextGroupInstead || (favGroup && favStandings.length > 0)) && (
+              <div className="grid grid-cols-2 gap-0 border-b border-border">
+                <button
+                  onClick={() => setFavTab("matches")}
+                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "matches" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Wedstrijden
+                </button>
+                <button
+                  onClick={() => setFavTab("standings")}
+                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "standings" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Standen
+                </button>
+              </div>
+            )}
+
+            {/* Wedstrijden tab */}
+            {favTab === "matches" && (lastFavMatch || nextFavMatch) && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setExpandedGrid("fav-matches")}
@@ -630,8 +648,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {/* Stand in groepsfase of bracketboom */}
-            {showCurrentKnockout && activeKnockout && (() => {
+            {/* Standen tab — bracket of klassement */}
+            {favTab === "standings" && showCurrentKnockout && activeKnockout && (() => {
               const bracketLabel = getBracketGridCardTitle(activeKnockout);
               return (
                 <div
@@ -652,7 +670,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               );
             })()}
 
-            {!showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
+            {favTab === "standings" && !showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setExpandedGrid("fav-standing")}
@@ -670,7 +688,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {!showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
+            {favTab === "standings" && !showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setExpandedGrid("fav-standing-next")}
@@ -688,7 +706,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {!showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (() => {
+            {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (() => {
               const bracketLabel = getBracketGridCardTitle(nextKnockoutPhase);
               return (
                 <div
