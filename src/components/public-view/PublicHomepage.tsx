@@ -30,6 +30,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     return hash.startsWith("grid-") ? hash.replace("grid-", "") : null;
   });
   const [favTab, setFavTab] = useState<"matches" | "standings">("matches");
+  const [globalTab, setGlobalTab] = useState<"results" | "next">("next");
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
@@ -651,13 +652,12 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-1.5">
                   <BarChart3 className="h-3 w-3" /> Statistieken
                 </div>
-                <div className="grid grid-cols-5 gap-1.5">
+                <div className="grid grid-cols-4 gap-1.5">
                   {[
                     { label: "GS", value: favPlayed.length },
-                    { label: "W", value: favW },
-                    { label: "G", value: favD },
-                    { label: "V", value: favL },
-                    { label: "DS", value: `${favGF}:${favGA}` },
+                    { label: "W-G-V", value: `${favW}-${favD}-${favL}` },
+                    { label: "DV", value: favGF },
+                    { label: "DT", value: favGA },
                   ].map((s) => (
                     <div key={s.label} className={`${ds(bStyle, "matchCardWrapper") || "rounded-md border border-border/60"} bg-card py-2 text-center`}>
                       <div className="text-base font-black text-foreground leading-none">{s.value}</div>
@@ -683,10 +683,10 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {/* Standen tab — navigeert naar standen pagina met juiste fase geselecteerd */}
+            {/* Standen tab — inline weergave (klassement of bracket), terug-knop houdt op homepage */}
             {favTab === "standings" && showCurrentKnockout && activeKnockout && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: activeKnockout.id })}
+                onClick={() => setExpandedGrid(`fav-bracket:${activeKnockout.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -699,7 +699,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: favGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing")}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -712,7 +712,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: nextGroupPhaseGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing-next")}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -725,7 +725,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: nextKnockoutPhase.id })}
+                onClick={() => setExpandedGrid(`fav-bracket:${nextKnockoutPhase.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -739,34 +739,59 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         </div>
       )}
 
-      {/* === GLOBAL: Laatste resultaten === */}
-      {lastBlockMatches.length > 0 && (
-        <div className={`${ds(bStyle, "card")} cursor-pointer`} onClick={() => setExpandedGrid("last-results")}>
-          <div className={`flex items-center justify-between ${homeHeaderCls}`}>
-            <div className="flex items-center">
-              <Clock className="h-3.5 w-3.5 ml-2" />
-              <h2 className={`${homeHeaderTitleCls} ml-2`}>Laatste resultaten</h2>
-            </div>
-            <ChevronRight className="h-4 w-4 mr-2" />
+      {/* === GLOBAL: Programma (Resultaten / Volgende wedstrijden) === */}
+      {(lastBlockMatches.length > 0 || nextBlockMatchesAll.length > 0) && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className={ds(bStyle, "sectionDot")} />
+            <h2 className={ds(bStyle, "sectionTitle")}>Programma</h2>
+            <div className={ds(bStyle, "sectionLine")} />
           </div>
-          <div className="px-3 py-3">
-            <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
-          </div>
-        </div>
-      )}
-
-      {/* === GLOBAL: Volgende wedstrijden === */}
-      {nextBlockMatchesAll.length > 0 && (
-        <div className={`${ds(bStyle, "card")} cursor-pointer`} onClick={() => setExpandedGrid("next-block")}>
-          <div className={`flex items-center justify-between ${homeHeaderCls}`}>
-            <div className="flex items-center">
-              <Clock className="h-3.5 w-3.5 ml-2" />
-              <h2 className={`${homeHeaderTitleCls} ml-2`}>Volgende wedstrijden</h2>
-            </div>
-            <ChevronRight className="h-4 w-4 mr-2" />
-          </div>
-          <div className="px-3 py-3">
-            <MatchListView matches={nextBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+          <div className={ds(bStyle, "card")}>
+            {lastBlockMatches.length > 0 && nextBlockMatchesAll.length > 0 && (
+              <div className="grid grid-cols-2 gap-0 border-b border-border">
+                <button
+                  onClick={() => setGlobalTab("next")}
+                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Volgende wedstrijden
+                </button>
+                <button
+                  onClick={() => setGlobalTab("results")}
+                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Resultaten
+                </button>
+              </div>
+            )}
+            {(globalTab === "next" || lastBlockMatches.length === 0) && nextBlockMatchesAll.length > 0 && (
+              <div
+                className="cursor-pointer hover:bg-muted/30 transition-colors"
+                onClick={() => setExpandedGrid("next-block")}
+              >
+                <div className="px-3 py-3">
+                  <MatchListView matches={nextBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+                </div>
+                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                  Alles bekijken
+                  <ChevronRight className="h-3 w-3 rotate-90" />
+                </div>
+              </div>
+            )}
+            {(globalTab === "results" || nextBlockMatchesAll.length === 0) && lastBlockMatches.length > 0 && (
+              <div
+                className="cursor-pointer hover:bg-muted/30 transition-colors"
+                onClick={() => setExpandedGrid("last-results")}
+              >
+                <div className="px-3 py-3">
+                  <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+                </div>
+                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                  Alles bekijken
+                  <ChevronRight className="h-3 w-3 rotate-90" />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
