@@ -590,20 +590,13 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {/* Wedstrijden tab */}
+            {/* Wedstrijden tab — alleen laatste resultaat + volgende wedstrijd, klik = alle wedstrijden */}
             {favTab === "matches" && (lastFavMatch || nextFavMatch) && (
               <div
                 className="cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setExpandedGrid("fav-matches")}
               >
-                <div className={ds(bStyle, "subHeader")}>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-3 w-3" />
-                    <span className={ds(bStyle, "subHeaderTitle")}>Wedstrijden</span>
-                  </div>
-                  <ChevronRight className="h-3 w-3" />
-                </div>
-                <div className="px-3 pt-3 pb-3 space-y-3">
+                <div className="px-3 pt-3 pb-2 space-y-3">
                   {lastFavMatch && (
                     <div>
                       <div className="pb-1.5">
@@ -645,89 +638,103 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                     </div>
                   )}
                 </div>
+                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                  Alle wedstrijden
+                  <ChevronRight className="h-3 w-3 rotate-90" />
+                </div>
               </div>
             )}
 
-            {/* Standen tab — bracket of klassement */}
-            {favTab === "standings" && showCurrentKnockout && activeKnockout && (() => {
-              const bracketLabel = getBracketGridCardTitle(activeKnockout);
-              return (
-                <div
-                  className="cursor-pointer hover:bg-muted/30 transition-colors"
-                  onClick={() => setExpandedGrid(`fav-bracket:${activeKnockout.id}`)}
-                >
-                  <div className={ds(bStyle, "subHeader")}>
-                    <div className="flex items-center gap-2">
-                      <Trophy className="h-3 w-3" />
-                      <span className={ds(bStyle, "subHeaderTitle")}>{bracketLabel}</span>
-                    </div>
-                    <ChevronRight className="h-3 w-3" />
-                  </div>
-                  <div className="px-3 pb-3 pt-2">
-                    <KnockoutPreview matches={matches.filter((m: any) => m.phase_id === activeKnockout.id)} teams={teams} slots={slots} favoriteTeam={favoriteTeam} allMatches={matches} phases={phases} groups={groups} tournament={tournament} />
-                  </div>
+            {/* Statistieken onder wedstrijden tab */}
+            {favTab === "matches" && favPlayed.length > 0 && (
+              <div className="px-3 py-3 space-y-2">
+                <div className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-1.5">
+                  <BarChart3 className="h-3 w-3" /> Statistieken
                 </div>
-              );
-            })()}
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[
+                    { label: "GS", value: favPlayed.length },
+                    { label: "W", value: favW },
+                    { label: "G", value: favD },
+                    { label: "V", value: favL },
+                    { label: "DS", value: `${favGF}:${favGA}` },
+                  ].map((s) => (
+                    <div key={s.label} className={`${ds(bStyle, "matchCardWrapper") || "rounded-md border border-border/60"} bg-card py-2 text-center`}>
+                      <div className="text-base font-black text-foreground leading-none">{s.value}</div>
+                      <div className="text-[9px] font-black uppercase tracking-[0.18em] text-muted-foreground mt-1">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+                {form.length > 0 && (
+                  <div className="flex items-center gap-1.5 pt-1">
+                    <span className="text-[9px] font-black uppercase tracking-[0.18em] text-muted-foreground">Vorm</span>
+                    {form.map((f, i) => (
+                      <span
+                        key={i}
+                        className={`inline-flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-black text-white ${
+                          f === "W" ? "bg-green-600" : f === "G" ? "bg-yellow-500" : "bg-red-600"
+                        }`}
+                      >
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Standen tab — navigeert naar standen pagina met juiste fase geselecteerd */}
+            {favTab === "standings" && showCurrentKnockout && activeKnockout && (
+              <button
+                onClick={() => setActiveTab("standings", { phaseId: activeKnockout.id })}
+                className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">{getBracketGridCardTitle(activeKnockout)}</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
 
             {favTab === "standings" && !showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
-              <div
-                className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedGrid("fav-standing")}
+              <button
+                onClick={() => setActiveTab("standings", { phaseId: favGroup.phase_id })}
+                className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
-                <div className={ds(bStyle, "subHeader")}>
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-3 w-3" />
-                    <span className={ds(bStyle, "subHeaderTitle")}>{favGroup.name} – Klassement</span>
-                  </div>
-                  <ChevronRight className="h-3 w-3" />
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">{favGroup.name} – Klassement</span>
                 </div>
-                <div className="px-3 pb-3 pt-2">
-                  <CompactStanding standings={favStandings} favoriteTeam={favoriteTeam} tournament={tournament} />
-                </div>
-              </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
             )}
 
             {favTab === "standings" && !showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
-              <div
-                className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedGrid("fav-standing-next")}
+              <button
+                onClick={() => setActiveTab("standings", { phaseId: nextGroupPhaseGroup.phase_id })}
+                className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
-                <div className={ds(bStyle, "subHeader")}>
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-3 w-3" />
-                    <span className={ds(bStyle, "subHeaderTitle")}>{nextGroupPhaseGroup.name} – Klassement</span>
-                  </div>
-                  <ChevronRight className="h-3 w-3" />
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">{nextGroupPhaseGroup.name} – Klassement</span>
                 </div>
-                <div className="px-3 pb-3 pt-2">
-                  <CompactStanding standings={calcStandings(nextGroupPhaseGroup.id)} favoriteTeam={favoriteTeam} tournament={tournament} />
-                </div>
-              </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
             )}
 
-            {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (() => {
-              const bracketLabel = getBracketGridCardTitle(nextKnockoutPhase);
-              return (
-                <div
-                  className="cursor-pointer hover:bg-muted/30 transition-colors"
-                  onClick={() => setExpandedGrid(`fav-bracket:${nextKnockoutPhase.id}`)}
-                >
-                  <div className={ds(bStyle, "subHeader")}>
-                    <div className="flex items-center gap-2">
-                      <Trophy className="h-3 w-3" />
-                      <span className={ds(bStyle, "subHeaderTitle")}>{bracketLabel}</span>
-                    </div>
-                    <ChevronRight className="h-3 w-3" />
-                  </div>
-                  <div className="px-3 pb-3 pt-2">
-                    <KnockoutPreview matches={matches.filter((m: any) => m.phase_id === nextKnockoutPhase.id)} teams={teams} slots={slots} favoriteTeam={favoriteTeam} allMatches={matches} phases={phases} groups={groups} tournament={tournament} />
-                  </div>
+            {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
+              <button
+                onClick={() => setActiveTab("standings", { phaseId: nextKnockoutPhase.id })}
+                className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">{getBracketGridCardTitle(nextKnockoutPhase)}</span>
                 </div>
-              );
-            })()}
-
-
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </div>
       )}
