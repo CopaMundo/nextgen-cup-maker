@@ -242,33 +242,33 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                         <table className="w-full text-xs table-auto">
                           <thead>
                             <tr className={ds(bStyle, "tableHeader")}>
-                              <th className="w-8 px-1.5 py-2.5 text-left">#</th>
-                              <th className="px-1.5 py-2.5 text-left">Team</th>
+                              <th className="w-8 px-1.5 py-1.5 text-left">#</th>
+                              <th className="px-1.5 py-1.5 text-left">Team</th>
                               {setsMode ? (
                                 <>
-                                  {sc.gp && <th className="w-9 px-1.5 py-2.5 text-center">GS</th>}
-                                  {sc.w  && <th className="w-9 px-1.5 py-2.5 text-center">W</th>}
-                                  {sc.d  && <th className="w-9 px-1.5 py-2.5 text-center">G</th>}
-                                  {sc.l  && <th className="w-9 px-1.5 py-2.5 text-center">V</th>}
-                                  {sc.sf && <th className="w-9 px-1.5 py-2.5 text-center">S+</th>}
-                                  {sc.sa && <th className="w-9 px-1.5 py-2.5 text-center">S-</th>}
-                                  {sc.sd && <th className="w-11 px-1.5 py-2.5 text-center">S+/-</th>}
-                                  {sc.pf && <th className="w-11 px-1.5 py-2.5 text-center">P/S+</th>}
-                                  {sc.pa && <th className="w-11 px-1.5 py-2.5 text-center">P/S-</th>}
-                                  {sc.pd && <th className="w-12 px-1.5 py-2.5 text-center">P/S+/-</th>}
+                                  {sc.gp && <th className="w-9 px-1.5 py-1.5 text-center">GS</th>}
+                                  {sc.w  && <th className="w-9 px-1.5 py-1.5 text-center">W</th>}
+                                  {sc.d  && <th className="w-9 px-1.5 py-1.5 text-center">G</th>}
+                                  {sc.l  && <th className="w-9 px-1.5 py-1.5 text-center">V</th>}
+                                  {sc.sf && <th className="w-9 px-1.5 py-1.5 text-center">S+</th>}
+                                  {sc.sa && <th className="w-9 px-1.5 py-1.5 text-center">S-</th>}
+                                  {sc.sd && <th className="w-11 px-1.5 py-1.5 text-center">S+/-</th>}
+                                  {sc.pf && <th className="w-11 px-1.5 py-1.5 text-center">P/S+</th>}
+                                  {sc.pa && <th className="w-11 px-1.5 py-1.5 text-center">P/S-</th>}
+                                  {sc.pd && <th className="w-12 px-1.5 py-1.5 text-center">P/S+/-</th>}
                                 </>
                               ) : (
                                 <>
-                                  {pc.gp && <th className="w-9 px-1.5 py-2.5 text-center">GS</th>}
-                                  {pc.w  && <th className="w-9 px-1.5 py-2.5 text-center">W</th>}
-                                  {pc.d  && <th className="w-9 px-1.5 py-2.5 text-center">G</th>}
-                                  {pc.l  && <th className="w-9 px-1.5 py-2.5 text-center">V</th>}
-                                  {pc.gf && <th className="w-9 px-1.5 py-2.5 text-center">+</th>}
-                                  {pc.ga && <th className="w-9 px-1.5 py-2.5 text-center">-</th>}
-                                  {pc.gd && <th className="w-11 px-1.5 py-2.5 text-center">+/-</th>}
+                                  {pc.gp && <th className="w-9 px-1.5 py-1.5 text-center">GS</th>}
+                                  {pc.w  && <th className="w-9 px-1.5 py-1.5 text-center">W</th>}
+                                  {pc.d  && <th className="w-9 px-1.5 py-1.5 text-center">G</th>}
+                                  {pc.l  && <th className="w-9 px-1.5 py-1.5 text-center">V</th>}
+                                  {pc.gf && <th className="w-9 px-1.5 py-1.5 text-center">+</th>}
+                                  {pc.ga && <th className="w-9 px-1.5 py-1.5 text-center">-</th>}
+                                  {pc.gd && <th className="w-11 px-1.5 py-1.5 text-center">+/-</th>}
                                 </>
                               )}
-                              <th className="w-10 px-1.5 py-2.5 text-center">P</th>
+                              <th className="w-10 px-1.5 py-1.5 text-center">P</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border/50">
