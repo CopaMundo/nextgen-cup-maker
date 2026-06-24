@@ -652,13 +652,12 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-1.5">
                   <BarChart3 className="h-3 w-3" /> Statistieken
                 </div>
-                <div className="grid grid-cols-5 gap-1.5">
+                <div className="grid grid-cols-4 gap-1.5">
                   {[
                     { label: "GS", value: favPlayed.length },
-                    { label: "W", value: favW },
-                    { label: "G", value: favD },
-                    { label: "V", value: favL },
-                    { label: "DS", value: `${favGF}:${favGA}` },
+                    { label: "W-G-V", value: `${favW}-${favD}-${favL}` },
+                    { label: "DV", value: favGF },
+                    { label: "DT", value: favGA },
                   ].map((s) => (
                     <div key={s.label} className={`${ds(bStyle, "matchCardWrapper") || "rounded-md border border-border/60"} bg-card py-2 text-center`}>
                       <div className="text-base font-black text-foreground leading-none">{s.value}</div>
@@ -684,10 +683,10 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {/* Standen tab — navigeert naar standen pagina met juiste fase geselecteerd */}
+            {/* Standen tab — inline weergave (klassement of bracket), terug-knop houdt op homepage */}
             {favTab === "standings" && showCurrentKnockout && activeKnockout && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: activeKnockout.id })}
+                onClick={() => setExpandedGrid(`fav-bracket:${activeKnockout.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -700,7 +699,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: favGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing")}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -713,7 +712,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: nextGroupPhaseGroup.phase_id })}
+                onClick={() => setExpandedGrid("fav-standing-next")}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -726,7 +725,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
               <button
-                onClick={() => setActiveTab("standings", { phaseId: nextKnockoutPhase.id })}
+                onClick={() => setExpandedGrid(`fav-bracket:${nextKnockoutPhase.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
