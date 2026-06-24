@@ -507,7 +507,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     navTab: "text-muted-foreground hover:text-foreground",
     navTabActive: "text-[#1FB8A8]",
     navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#5BE7D6]",
-    tableHeader: "bg-[#5BE7D6] text-black text-[9px] font-black uppercase tracking-[0.12em] italic",
+    tableHeader: "bg-foreground text-background text-[9px] font-black uppercase tracking-[0.12em] italic",
     tableRowAlt: "bg-[#5BE7D6]/[0.06]",
     ptsBadge: "inline-flex items-center justify-center rounded-full bg-[#5BE7D6] text-black px-2 py-0.5 text-[11px] font-black tabular-nums",
     timeslotHeader: "bg-foreground text-background flex items-center gap-2 px-4 py-2 rounded-t-2xl italic shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)]",
