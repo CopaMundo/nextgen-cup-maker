@@ -149,39 +149,68 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   // ==== draft helpers ====
+  const applyFieldMode = (mode: FieldMode) => {
+    if (!draft) return;
+    setFieldMode(mode);
+    if (mode === "all") setDraft({ ...draft, allowedFields: null });
+    else if (mode === "none") setDraft({ ...draft, allowedFields: [] });
+    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...fieldNames] });
+  };
   const toggleField = (name: string) => {
     if (!draft) return;
     const current = draft.allowedFields ?? [...fieldNames];
     const next = current.includes(name) ? current.filter(f => f !== name) : [...current, name];
-    setDraft({ ...draft, allowedFields: next.length === fieldNames.length ? null : next });
+    setDraft({ ...draft, allowedFields: next });
   };
-  const fieldChecked = (name: string) => !draft?.allowedFields || draft.allowedFields.includes(name);
 
-  const toggleDay = (date: string) => {
+  const dayMode = (date: string): DayMode => {
+    if (!draft?.availability) return "all";
+    const win = draft.availability.find(a => a.date === date);
+    if (!win) return "none";
+    return win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to ? "all" : "times";
+  };
+  const applyDayMode = (date: string, mode: DayMode) => {
     if (!draft) return;
-    const current = draft.availability ?? [];
-    const has = current.some(a => a.date === date);
-    const next = has ? current.filter(a => a.date !== date) : [...current, { date, from: "09:00", to: "18:00" }];
-    setDraft({ ...draft, availability: next.length === 0 ? null : next });
+    const base = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    let next = base.filter(a => a.date !== date);
+    if (mode === "all") next = [...next, { date, ...WHOLE_DAY }];
+    if (mode === "times") {
+      const prev = draft.availability?.find(a => a.date === date);
+      const isWholeDay = !prev || (prev.from === WHOLE_DAY.from && prev.to === WHOLE_DAY.to);
+      next = [...next, { date, from: isWholeDay ? "09:00" : prev.from, to: isWholeDay ? "18:00" : prev.to }];
+    }
+    next.sort((a, b) => a.date.localeCompare(b.date));
+    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to);
+    setDraft({ ...draft, availability: allWholeDay ? null : next });
   };
   const updateWindow = (date: string, key: "from" | "to", value: string) => {
     if (!draft?.availability) return;
     setDraft({ ...draft, availability: draft.availability.map(a => (a.date === date ? { ...a, [key]: value } : a)) });
   };
 
+  const applyExcludeMode = (mode: ExcludeMode) => {
+    if (!draft) return;
+    setExcludeMode(mode);
+    if (mode === "none") setDraft({ ...draft, excludedTeams: [] });
+  };
   const toggleTeam = (id: string) => {
     if (!draft) return;
     const has = draft.excludedTeams.includes(id);
     setDraft({ ...draft, excludedTeams: has ? draft.excludedTeams.filter(t => t !== id) : [...draft.excludedTeams, id] });
   };
 
+  const applyRoleMode = (mode: RoleMode) => {
+    if (!draft) return;
+    setRoleMode(mode);
+    if (mode === "all") setDraft({ ...draft, roles: null });
+    else setDraft({ ...draft, roles: draft.roles && draft.roles.length > 0 ? draft.roles : [...ALL_ROLES] });
+  };
   const toggleRole = (role: number) => {
     if (!draft) return;
     const current = draft.roles ?? [...ALL_ROLES];
     const next = current.includes(role) ? current.filter(r => r !== role) : [...current, role];
-    setDraft({ ...draft, roles: next.length === ALL_ROLES.length ? null : next });
+    setDraft({ ...draft, roles: next });
   };
-  const roleChecked = (role: number) => !draft?.roles || draft.roles.includes(role);
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
