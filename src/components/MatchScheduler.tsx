@@ -798,7 +798,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   const autoAssignReferees = async () => {
-    if (referees.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
+    if (refereeConfigs.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
     const scheduled = matches.filter(m => m.match_date && m.match_time && m.field);
     if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden", variant: "destructive" }); return; }
     const sorted = [...scheduled].sort((a, b) => {
@@ -811,28 +811,43 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
       if (!timeSlots.has(key)) timeSlots.set(key, []);
       timeSlots.get(key)!.push(m);
     }
+
+    // Bestaande belasting meenemen voor de max-limiet
+    const load = new Map<string, number>();
+    for (const m of matches) {
+      for (const name of (m.referee || "").split(",").map(s => s.trim()).filter(Boolean)) {
+        load.set(name, (load.get(name) || 0) + 1);
+      }
+    }
+
     let refIndex = 0;
     const updates: { id: string; referee: string }[] = [];
+    let skipped = 0;
+
     for (const [, slotMatches] of timeSlots) {
       const usedInSlot = new Set<string>();
       for (const m of slotMatches) {
-        let found = false;
-        for (let attempt = 0; attempt < referees.length; attempt++) {
-          const ref = referees[(refIndex + attempt) % referees.length];
-          if (!usedInSlot.has(ref)) {
-            updates.push({ id: m.id, referee: ref });
-            usedInSlot.add(ref);
-            refIndex = (refIndex + attempt + 1) % referees.length;
-            found = true;
+        const assigned: string[] = [];
+        for (let role = 1; role <= refereesPerMatch; role++) {
+          let picked: RefereeConfig | null = null;
+          for (let attempt = 0; attempt < refereeConfigs.length; attempt++) {
+            const cand = refereeConfigs[(refIndex + attempt) % refereeConfigs.length];
+            if (usedInSlot.has(cand.name)) continue;
+            if (!refereeCanOfficiate(cand, m, role, load.get(cand.name) || 0)) continue;
+            picked = cand;
+            refIndex = (refIndex + attempt + 1) % refereeConfigs.length;
             break;
           }
+          if (!picked) break;
+          usedInSlot.add(picked.name);
+          load.set(picked.name, (load.get(picked.name) || 0) + 1);
+          assigned.push(picked.name);
         }
-        if (!found) {
-          updates.push({ id: m.id, referee: referees[refIndex % referees.length] });
-          refIndex = (refIndex + 1) % referees.length;
-        }
+        if (assigned.length === 0) { skipped++; continue; }
+        updates.push({ id: m.id, referee: assigned.join(", ") });
       }
     }
+
     for (const u of updates) {
       await supabase.from("matches").update({ referee: u.referee }).eq("id", u.id);
     }
@@ -840,7 +855,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
       const u = updates.find(x => x.id === m.id);
       return u ? { ...m, referee: u.referee } : m;
     }));
-    toast({ title: `${updates.length} scheidsrechters toegewezen!` });
+    toast({
+      title: `${updates.length} wedstrijden ingedeeld`,
+      description: skipped > 0 ? `${skipped} wedstrijden zonder beschikbare scheidsrechter (instellingen)` : undefined,
+    });
   };
 
   // === MATCH UPDATE ===
