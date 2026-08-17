@@ -120,9 +120,6 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     <div className="space-y-4">
       {/* Actions row */}
       <div className="flex items-center gap-2 flex-wrap">
-        <Button variant="outline" size="sm" onClick={() => { setNewRef(""); setShowAdd(true); }} className="gap-1">
-          <Plus className="h-3.5 w-3.5" /> Scheidsrechter toevoegen
-        </Button>
         {categoryId && (
           <Button variant="outline" size="sm" onClick={openImport} className="gap-1">
             <Download className="h-3.5 w-3.5" /> Importeer uit divisies
@@ -132,27 +129,27 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       </div>
 
       {/* Grid of referees */}
-      {referees.length === 0 ? (
-        <div className="text-center py-12">
-          <WhistleIcon className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-          <p className="text-sm text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {referees.map((r, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
-              <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="flex-1 text-sm font-medium text-foreground truncate">{r}</span>
-              <button onClick={() => { setEditIdx(i); setEditName(r); }} className="text-muted-foreground hover:text-foreground transition-colors shrink-0" title="Bewerken">
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
-              <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0" title="Verwijderen">
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        {referees.map((r, i) => (
+          <div key={i} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
+            <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="flex-1 text-sm font-medium text-foreground truncate">{r}</span>
+            <button onClick={() => { setEditIdx(i); setEditName(r); }} className="text-muted-foreground hover:text-foreground transition-colors shrink-0" title="Bewerken">
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0" title="Verwijderen">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => { setNewRef(""); setShowAdd(true); }}
+          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card/50 px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+        >
+          <Plus className="h-3.5 w-3.5" /> Scheidsrechter
+        </button>
+      </div>
+
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
