@@ -3249,18 +3249,24 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                       </div>
                     ) : (
                       <div className="space-y-1">
-                        {referees.map((r, i) => {
-                          const count = matches.filter(m => m.referee === r).length;
+                        {refereeConfigs.map((rc, i) => {
+                          const r = rc.name;
+                          const count = matches.filter(m => (m.referee || "").split(",").map(s => s.trim()).includes(r)).length;
                           return (
-                            <div key={i} className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs">
-                              <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">{count}</span>
-                              <span className="flex-1 font-medium text-foreground truncate">{r}</span>
-                              <button onClick={() => { setEditRefIdx(i); setEditRefName(r); }} className="text-muted-foreground hover:text-foreground">
-                                <Pencil className="h-3 w-3" />
-                              </button>
-                              <button onClick={() => setDeleteRefIdx(i)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="h-3 w-3" />
-                              </button>
+                            <div key={i} className="rounded-md border border-border px-2.5 py-1.5 text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">{count}</span>
+                                <span className="flex-1 font-medium text-foreground truncate">{r}</span>
+                                <button onClick={() => { setEditRefIdx(i); setEditRefName(r); }} className="text-muted-foreground hover:text-foreground">
+                                  <Pencil className="h-3 w-3" />
+                                </button>
+                                <button onClick={() => setDeleteRefIdx(i)} className="text-muted-foreground hover:text-destructive">
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
+                              <p className="mt-1 text-[9px] leading-snug text-muted-foreground">
+                                {summarizeReferee(rc, { totalFields: fields.length, teamName: (id) => teams.find(t => t.id === id)?.name || "?" }).join(" · ")}
+                              </p>
                             </div>
                           );
                         })}
