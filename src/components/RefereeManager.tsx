@@ -12,10 +12,17 @@ import {
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeReferee,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
+
+type FieldMode = "all" | "select" | "none";
+type DayMode = "all" | "times" | "none";
+type ExcludeMode = "none" | "select";
+type RoleMode = "all" | "select";
+const WHOLE_DAY = { from: "00:00", to: "23:59" };
 
 interface Props {
   tournamentId: string;
