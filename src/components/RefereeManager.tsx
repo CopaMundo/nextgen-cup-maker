@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeReferee,
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeReferee, summarizeRefereeLabeled,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
 
@@ -32,6 +32,8 @@ interface Props {
 const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [referees, setReferees] = useState<RefereeConfig[]>([]);
   const [fieldNames, setFieldNames] = useState<string[]>([]);
+  const [locationNames, setLocationNames] = useState<string[]>([]);
+  const [fieldOnlyNames, setFieldOnlyNames] = useState<string[]>([]);
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
   const [days, setDays] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,6 +73,8 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     const rawFields = (categoryId ? catRes.data?.fields : tRes.data?.fields) as any;
     const fieldsList = Array.isArray(rawFields) ? rawFields.map((f: any) => (typeof f === "string" ? f : f?.name)).filter(Boolean) : [];
     const locations = (locRes.data || []).map((l: any) => l.name).filter(Boolean);
+    setLocationNames(Array.from(new Set(locations)));
+    setFieldOnlyNames(Array.from(new Set(fieldsList)));
     setFieldNames(Array.from(new Set([...locations, ...fieldsList])));
 
     setTeams((teamRes.data || []) as any);
@@ -161,7 +165,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     setFieldMode(mode);
     if (mode === "all") setDraft({ ...draft, allowedFields: null });
     else if (mode === "none") setDraft({ ...draft, allowedFields: [] });
-    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...fieldNames] });
+    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...locationNames, ...fieldOnlyNames] });
   };
   const toggleField = (name: string) => {
     if (!draft) return;
@@ -249,9 +253,13 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
-            <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
-              {summarizeReferee(r, { totalFields: fieldNames.length, teamName }).join(" · ")}
-            </p>
+            <div className="mt-2 space-y-0.5">
+              {summarizeRefereeLabeled(r, { locations: locationNames, fields: fieldOnlyNames, teamName }).map(line => (
+                <p key={line.label} className="text-[10px] leading-snug text-muted-foreground">
+                  <span className="font-medium text-foreground/80">{line.label} =</span> {line.value}
+                </p>
+              ))}
+            </div>
           </div>
         ))}
         <button
@@ -303,13 +311,33 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                   fieldNames.length === 0 ? (
                     <p className="text-xs text-muted-foreground">Nog geen velden of locaties ingesteld.</p>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      {fieldNames.map(f => (
-                        <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                          <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
-                          <span className="truncate">{f}</span>
-                        </label>
-                      ))}
+                    <div className="space-y-3">
+                      {locationNames.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-medium text-muted-foreground">Locaties</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {locationNames.map(loc => (
+                              <label key={loc} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                                <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(loc)} onCheckedChange={() => toggleField(loc)} />
+                                <span className="truncate">{loc}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {fieldOnlyNames.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-medium text-muted-foreground">Velden</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {fieldOnlyNames.map(f => (
+                              <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                                <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
+                                <span className="truncate">{f}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 )}

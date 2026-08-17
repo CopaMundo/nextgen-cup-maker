@@ -106,6 +106,58 @@ export const summarizeReferee = (
   return parts;
 };
 
+export interface RefereeSummaryLine {
+  label: string;
+  value: string;
+}
+
+/** Gelabelde samenvatting voor scheidsrechtertegels (label = waarde). */
+export const summarizeRefereeLabeled = (
+  ref: RefereeConfig,
+  opts: { locations?: string[]; fields?: string[]; teamName?: (id: string) => string } = {}
+): RefereeSummaryLine[] => {
+  const lines: RefereeSummaryLine[] = [];
+  const total = (opts.locations?.length || 0) + (opts.fields?.length || 0);
+
+  if (ref.allowedFields && ref.allowedFields.length === 0) {
+    lines.push({ label: "Locaties/velden", value: "Geen velden" });
+  } else if (!ref.allowedFields || (total > 0 && ref.allowedFields.length >= total)) {
+    lines.push({ label: "Locaties/velden", value: "Alle velden" });
+  } else {
+    lines.push({
+      label: "Locaties/velden",
+      value: ref.allowedFields.length === 1 ? ref.allowedFields[0] : `${ref.allowedFields.length} velden`,
+    });
+  }
+
+  if (!ref.availability || ref.availability.length === 0) {
+    lines.push({ label: "Beschikbaarheid", value: "Hele dag" });
+  } else if (ref.availability.length === 1) {
+    lines.push({ label: "Beschikbaarheid", value: `${ref.availability[0].from}–${ref.availability[0].to}` });
+  } else {
+    lines.push({ label: "Beschikbaarheid", value: `${ref.availability.length} dagen` });
+  }
+
+  lines.push({ label: "Max aantal wedstrijden", value: ref.maxMatches ? `Max ${ref.maxMatches}` : "Geen limiet" });
+
+  if (!ref.excludedTeams || ref.excludedTeams.length === 0) {
+    lines.push({ label: "Uitgesloten teams/spelers", value: "/" });
+  } else if (ref.excludedTeams.length === 1 && opts.teamName) {
+    lines.push({ label: "Uitgesloten teams/spelers", value: `Niet: ${opts.teamName(ref.excludedTeams[0])}` });
+  } else {
+    lines.push({ label: "Uitgesloten teams/spelers", value: `${ref.excludedTeams.length} uitgesloten` });
+  }
+
+  const roles = ref.roles;
+  if (!roles || roles.length === 0 || roles.length >= ALL_ROLES.length) {
+    lines.push({ label: "Rol 1-5", value: "Alle rollen" });
+  } else {
+    lines.push({ label: "Rol 1-5", value: `Rol ${[...roles].sort((a, b) => a - b).join(", ")}` });
+  }
+
+  return lines;
+};
+
 export interface MatchLike {
   match_date: string | null;
   match_time: string | null;
