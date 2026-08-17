@@ -709,22 +709,26 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     const remaining = allFormats.filter(f => f.phase_number !== phaseNumber);
     const uniquePhaseNumbers = [...new Set(remaining.map(f => f.phase_number))].sort((a, b) => a - b);
 
-    const updates: Phase[] = [];
-    for (let i = 0; i < uniquePhaseNumbers.length; i++) {
-      const oldNumber = uniquePhaseNumbers[i];
-      const newNumber = i + 1;
-      if (oldNumber !== newNumber) {
-        const toUpdate = remaining.filter(f => f.phase_number === oldNumber);
-        for (const fmt of toUpdate) {
-          await supabase.from("tournament_phases").update({ phase_number: newNumber } as any).eq("id", fmt.id);
-          fmt.phase_number = newNumber;
-        }
+    const renumberMap = new Map<number, number>();
+    uniquePhaseNumbers.forEach((oldNumber, i) => renumberMap.set(oldNumber, i + 1));
+
+    for (const fmt of remaining) {
+      const newNumber = renumberMap.get(fmt.phase_number)!;
+      if (newNumber !== fmt.phase_number) {
+        await supabase.from("tournament_phases").update({ phase_number: newNumber } as any).eq("id", fmt.id);
       }
     }
 
-    setAllFormats(remaining);
+    const renumbered = remaining
+      .map((fmt) => ({ ...fmt, phase_number: renumberMap.get(fmt.phase_number)! }))
+      .sort((a, b) => a.phase_number - b.phase_number || a.sort_order - b.sort_order);
+
+    setAllFormats(renumbered);
+    setDraftPhaseNumbers((prev) => prev.filter((n) => n !== phaseNumber && n <= renumbered.length));
+    setSlotRefreshKey(k => k + 1);
     setDeletePhaseNumber(null);
     toast({ title: "Fase verwijderd en hernummerd" });
+
   };
 
   // Swap format sort_order within a phase

@@ -361,9 +361,26 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   };
 
   const removeMatchDayEntry = async (index: number) => {
-    const updated = (form.match_days || []).filter((_: MatchDayEntry, i: number) => i !== index);
+    const entries = (form.match_days || []) as MatchDayEntry[];
+    const removedEntry = entries[index];
+    const updated = entries.filter((_: MatchDayEntry, i: number) => i !== index);
+
+    // Dates that no longer exist after removal → unschedule their matches
+    const expand = (e: MatchDayEntry) => (typeof e === "string" ? [e] : listIsoDatesInRange(e.start, e.end));
+    const remainingDates = new Set(updated.flatMap(expand));
+    const orphanDates = removedEntry ? expand(removedEntry).filter((d) => !remainingDates.has(d)) : [];
+
     await saveMatchDays(updated);
+
+    if (orphanDates.length > 0) {
+      await supabase
+        .from("matches")
+        .update({ match_date: null, match_time: null, field: null })
+        .eq("tournament_id", tournament.id)
+        .in("match_date", orphanDates);
+    }
   };
+
 
   const addPeriod = async () => {
     if (!periodStart || !periodEnd) return;
