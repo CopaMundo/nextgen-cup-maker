@@ -165,7 +165,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     setFieldMode(mode);
     if (mode === "all") setDraft({ ...draft, allowedFields: null });
     else if (mode === "none") setDraft({ ...draft, allowedFields: [] });
-    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...fieldNames] });
+    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...locationNames, ...fieldOnlyNames] });
   };
   const toggleField = (name: string) => {
     if (!draft) return;
