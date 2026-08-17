@@ -39,6 +39,9 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [newRef, setNewRef] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [draft, setDraft] = useState<RefereeConfig | null>(null);
+  const [fieldMode, setFieldMode] = useState<FieldMode>("all");
+  const [excludeMode, setExcludeMode] = useState<ExcludeMode>("none");
+  const [roleMode, setRoleMode] = useState<RoleMode>("all");
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [otherCategories, setOtherCategories] = useState<{ id: string; name: string; referees: RefereeConfig[] }[]>([]);
