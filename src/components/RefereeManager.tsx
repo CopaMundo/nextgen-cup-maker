@@ -253,9 +253,13 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
-            <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
-              {summarizeReferee(r, { totalFields: fieldNames.length, teamName }).join(" · ")}
-            </p>
+            <div className="mt-2 space-y-0.5">
+              {summarizeRefereeLabeled(r, { locations: locationNames, fields: fieldOnlyNames, teamName }).map(line => (
+                <p key={line.label} className="text-[10px] leading-snug text-muted-foreground">
+                  <span className="font-medium text-foreground/80">{line.label} =</span> {line.value}
+                </p>
+              ))}
+            </div>
           </div>
         ))}
         <button
