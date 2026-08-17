@@ -2168,13 +2168,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === TOURNAMENT DATES ===
-  const getTournamentDates = () => {
-    const periodDays = tournament.start_date && tournament.end_date
-      ? listIsoDatesInRange(tournament.start_date, tournament.end_date)
-      : normalizeIsoDates([tournament.start_date, tournament.end_date]);
-    const extraDays = expandMatchDays((tournament.match_days as MatchDayEntry[]) || []);
-    return normalizeIsoDates([...periodDays, ...extraDays]);
-  };
+  const getTournamentDates = () => getTournamentPlannerDates(tournament);
+
 
   const tournamentDates = getTournamentDates();
 
