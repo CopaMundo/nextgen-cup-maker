@@ -173,10 +173,24 @@ export const summarizeRefereeLabeled = (
   const locations = opts.locations || [];
   const fields = opts.fields || [];
 
+  // Locaties/velden — één regel, ook als er meerdere locaties zijn.
   if (locations.length > 0) {
-    for (const loc of locations) {
-      const mode = getLocationFieldMode(loc, ref.allowedFields, fields);
-      lines.push({ label: loc, value: locationModeLabel(mode, fields, ref.allowedFields) });
+    const modes = locations.map(loc => getLocationFieldMode(loc, ref.allowedFields, fields));
+    const allAll = modes.every(m => m === "all");
+    const allNone = modes.every(m => m === "none");
+    if (allNone) {
+      lines.push({ label: "Locaties/velden", value: "Geen velden" });
+    } else if (allAll) {
+      lines.push({ label: "Locaties/velden", value: "Alle velden" });
+    } else {
+      const noneCount = modes.filter(m => m === "none").length;
+      const allCount = modes.filter(m => m === "all").length;
+      const selectCount = modes.filter(m => m === "select").length;
+      const parts: string[] = [];
+      if (allCount > 0) parts.push(`${allCount} alle velden`);
+      if (selectCount > 0) parts.push(`${selectCount} selectie`);
+      if (noneCount > 0) parts.push(`${noneCount} geen`);
+      lines.push({ label: "Locaties/velden", value: parts.join(", ") });
     }
   } else {
     const total = fields.length;
