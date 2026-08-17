@@ -20,6 +20,52 @@ export interface RefereeConfig {
 
 export const ALL_ROLES = [1, 2, 3, 4, 5];
 
+export type LocationFieldMode = "all" | "select" | "none";
+
+/** Bepaal de veldmodus voor één locatie op basis van allowedFields. */
+export const getLocationFieldMode = (
+  location: string,
+  allowedFields: string[] | null,
+  fields: string[]
+): LocationFieldMode => {
+  if (!allowedFields || allowedFields.length === 0) return "none";
+  const hasLocation = allowedFields.includes(location);
+  if (!hasLocation) return "none";
+  if (fields.length === 0) return "all";
+  const allFieldsSelected = fields.every(f => allowedFields.includes(f));
+  return allFieldsSelected ? "all" : "select";
+};
+
+/** Wijzig allowedFields voor één locatie (locatienaam zit zelf ook in allowedFields). */
+export const setLocationFieldMode = (
+  location: string,
+  mode: LocationFieldMode,
+  allowedFields: string[] | null,
+  fields: string[]
+): string[] => {
+  const base = allowedFields ? [...allowedFields] : [];
+  if (mode === "none") {
+    return base.filter(f => f !== location && !fields.includes(f));
+  }
+  const set = new Set(base);
+  set.add(location);
+  fields.forEach(f => set.add(f));
+  return Array.from(set);
+};
+
+/** Wissel één veld aan/uit binnen allowedFields. */
+export const toggleFieldInAllowed = (
+  field: string,
+  allowedFields: string[] | null,
+  allFields: string[]
+): string[] => {
+  const base = allowedFields ? [...allowedFields] : [...allFields];
+  const set = new Set(base);
+  if (set.has(field)) set.delete(field);
+  else set.add(field);
+  return Array.from(set);
+};
+
 export const parseReferee = (entry: any): RefereeConfig => {
   if (typeof entry === "string") {
     return { name: entry, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null };
@@ -111,23 +157,53 @@ export interface RefereeSummaryLine {
   value: string;
 }
 
+const locationModeLabel = (mode: LocationFieldMode, fields: string[], allowedFields: string[] | null): string => {
+  if (mode === "none") return "Geen";
+  if (mode === "all" || fields.length === 0) return "Alle velden";
+  const selectedCount = fields.filter(f => allowedFields?.includes(f)).length;
+  return selectedCount === 1 ? "1 veld" : `${selectedCount} velden`;
+};
+
 /** Gelabelde samenvatting voor scheidsrechtertegels (label = waarde). */
 export const summarizeRefereeLabeled = (
   ref: RefereeConfig,
   opts: { locations?: string[]; fields?: string[]; teamName?: (id: string) => string } = {}
 ): RefereeSummaryLine[] => {
   const lines: RefereeSummaryLine[] = [];
-  const total = (opts.locations?.length || 0) + (opts.fields?.length || 0);
+  const locations = opts.locations || [];
+  const fields = opts.fields || [];
 
-  if (ref.allowedFields && ref.allowedFields.length === 0) {
-    lines.push({ label: "Locaties/velden", value: "Geen velden" });
-  } else if (!ref.allowedFields || (total > 0 && ref.allowedFields.length >= total)) {
-    lines.push({ label: "Locaties/velden", value: "Alle velden" });
+  // Locaties/velden — één regel, ook als er meerdere locaties zijn.
+  if (locations.length > 0) {
+    const modes = locations.map(loc => getLocationFieldMode(loc, ref.allowedFields, fields));
+    const allAll = modes.every(m => m === "all");
+    const allNone = modes.every(m => m === "none");
+    if (allNone) {
+      lines.push({ label: "Locaties/velden", value: "Geen velden" });
+    } else if (allAll) {
+      lines.push({ label: "Locaties/velden", value: "Alle velden" });
+    } else {
+      const noneCount = modes.filter(m => m === "none").length;
+      const allCount = modes.filter(m => m === "all").length;
+      const selectCount = modes.filter(m => m === "select").length;
+      const parts: string[] = [];
+      if (allCount > 0) parts.push(`${allCount} alle velden`);
+      if (selectCount > 0) parts.push(`${selectCount} selectie`);
+      if (noneCount > 0) parts.push(`${noneCount} geen`);
+      lines.push({ label: "Locaties/velden", value: parts.join(", ") });
+    }
   } else {
-    lines.push({
-      label: "Locaties/velden",
-      value: ref.allowedFields.length === 1 ? ref.allowedFields[0] : `${ref.allowedFields.length} velden`,
-    });
+    const total = fields.length;
+    if (ref.allowedFields && ref.allowedFields.length === 0) {
+      lines.push({ label: "Locaties/velden", value: "Geen velden" });
+    } else if (!ref.allowedFields || (total > 0 && ref.allowedFields.length >= total)) {
+      lines.push({ label: "Locaties/velden", value: "Alle velden" });
+    } else {
+      lines.push({
+        label: "Locaties/velden",
+        value: ref.allowedFields.length === 1 ? ref.allowedFields[0] : `${ref.allowedFields.length} velden`,
+      });
+    }
   }
 
   if (!ref.availability || ref.availability.length === 0) {

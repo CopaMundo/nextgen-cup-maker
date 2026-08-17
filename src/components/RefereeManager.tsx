@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeReferee, summarizeRefereeLabeled,
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeRefereeLabeled,
+  getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
 
-type FieldMode = "all" | "select" | "none";
 type DayMode = "all" | "times" | "none";
 type ExcludeMode = "none" | "select";
 type RoleMode = "all" | "select";
@@ -41,7 +41,6 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [newRef, setNewRef] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [draft, setDraft] = useState<RefereeConfig | null>(null);
-  const [fieldMode, setFieldMode] = useState<FieldMode>("all");
   const [excludeMode, setExcludeMode] = useState<ExcludeMode>("none");
   const [roleMode, setRoleMode] = useState<RoleMode>("all");
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
@@ -111,7 +110,6 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     const ref: RefereeConfig = JSON.parse(JSON.stringify(referees[i]));
     setEditIdx(i);
     setDraft(ref);
-    setFieldMode(ref.allowedFields === null ? "all" : ref.allowedFields.length === 0 ? "none" : "select");
     setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
     setRoleMode(ref.roles === null ? "all" : "select");
   };
@@ -160,18 +158,19 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   // ==== draft helpers ====
-  const applyFieldMode = (mode: FieldMode) => {
+  const applyLocationFieldMode = (location: string, mode: LocationFieldMode) => {
     if (!draft) return;
-    setFieldMode(mode);
-    if (mode === "all") setDraft({ ...draft, allowedFields: null });
-    else if (mode === "none") setDraft({ ...draft, allowedFields: [] });
-    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...locationNames, ...fieldOnlyNames] });
+    setDraft({
+      ...draft,
+      allowedFields: setLocationFieldMode(location, mode, draft.allowedFields, fieldOnlyNames),
+    });
   };
   const toggleField = (name: string) => {
     if (!draft) return;
-    const current = draft.allowedFields ?? [...fieldNames];
-    const next = current.includes(name) ? current.filter(f => f !== name) : [...current, name];
-    setDraft({ ...draft, allowedFields: next });
+    setDraft({
+      ...draft,
+      allowedFields: toggleFieldInAllowed(name, draft.allowedFields, fieldNames),
+    });
   };
 
   const dayMode = (date: string): DayMode => {
@@ -297,49 +296,68 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
               </div>
 
               {/* Locaties en velden */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-sm font-semibold">Locaties en velden</Label>
-                <Select value={fieldMode} onValueChange={(v) => applyFieldMode(v as FieldMode)}>
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle velden</SelectItem>
-                    <SelectItem value="select">Selecteer velden</SelectItem>
-                    <SelectItem value="none">Geen</SelectItem>
-                  </SelectContent>
-                </Select>
-                {fieldMode === "select" && (
-                  fieldNames.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">Nog geen velden of locaties ingesteld.</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {locationNames.length > 0 && (
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-medium text-muted-foreground">Locaties</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {locationNames.map(loc => (
-                              <label key={loc} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                                <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(loc)} onCheckedChange={() => toggleField(loc)} />
-                                <span className="truncate">{loc}</span>
-                              </label>
-                            ))}
-                          </div>
+                {locationNames.length === 0 && fieldOnlyNames.length === 0 && (
+                  <p className="text-xs text-muted-foreground">Nog geen locaties of velden ingesteld.</p>
+                )}
+                {locationNames.length === 0 && fieldOnlyNames.length > 0 && (
+                  <div className="space-y-2">
+                    <Select
+                      value={getLocationFieldMode("", draft.allowedFields, fieldOnlyNames)}
+                      onValueChange={(v) => setDraft({ ...draft, allowedFields: v === "all" ? null : v === "none" ? [] : [...fieldOnlyNames] })}
+                    >
+                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle velden</SelectItem>
+                        <SelectItem value="select">Selecteer velden</SelectItem>
+                        <SelectItem value="none">Geen</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {getLocationFieldMode("", draft.allowedFields, fieldOnlyNames) === "select" && (
+                      <div className="grid grid-cols-2 gap-2">
+                        {fieldOnlyNames.map(f => (
+                          <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                            <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
+                            <span className="truncate">{f}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {locationNames.length > 0 && (
+                  <div className="space-y-3">
+                    {locationNames.map(loc => {
+                      const mode = getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
+                      return (
+                        <div key={loc} className="space-y-2 rounded-lg border border-border px-3 py-2.5">
+                          <p className="text-xs font-medium text-muted-foreground">{loc}</p>
+                          <Select value={mode} onValueChange={(v) => applyLocationFieldMode(loc, v as LocationFieldMode)}>
+                            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">Alle velden</SelectItem>
+                              <SelectItem value="select">Selecteer velden</SelectItem>
+                              <SelectItem value="none">Geen</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {mode === "select" && fieldOnlyNames.length > 0 && (
+                            <div className="grid grid-cols-2 gap-2">
+                              {fieldOnlyNames.map(f => (
+                                <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                                  <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
+                                  <span className="truncate">{f}</span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                          {mode === "select" && fieldOnlyNames.length === 0 && (
+                            <p className="text-xs text-muted-foreground">Nog geen velden ingesteld.</p>
+                          )}
                         </div>
-                      )}
-                      {fieldOnlyNames.length > 0 && (
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-medium text-muted-foreground">Velden</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {fieldOnlyNames.map(f => (
-                              <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                                <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
-                                <span className="truncate">{f}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )
+                      );
+                    })}
+                  </div>
                 )}
               </div>
 
