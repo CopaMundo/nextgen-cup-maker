@@ -12,10 +12,17 @@ import {
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeReferee,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
+
+type FieldMode = "all" | "select" | "none";
+type DayMode = "all" | "times" | "none";
+type ExcludeMode = "none" | "select";
+type RoleMode = "all" | "select";
+const WHOLE_DAY = { from: "00:00", to: "23:59" };
 
 interface Props {
   tournamentId: string;
@@ -32,6 +39,9 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [newRef, setNewRef] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [draft, setDraft] = useState<RefereeConfig | null>(null);
+  const [fieldMode, setFieldMode] = useState<FieldMode>("all");
+  const [excludeMode, setExcludeMode] = useState<ExcludeMode>("none");
+  const [roleMode, setRoleMode] = useState<RoleMode>("all");
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [otherCategories, setOtherCategories] = useState<{ id: string; name: string; referees: RefereeConfig[] }[]>([]);
@@ -94,8 +104,12 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   const openEdit = (i: number) => {
+    const ref: RefereeConfig = JSON.parse(JSON.stringify(referees[i]));
     setEditIdx(i);
-    setDraft(JSON.parse(JSON.stringify(referees[i])));
+    setDraft(ref);
+    setFieldMode(ref.allowedFields === null ? "all" : ref.allowedFields.length === 0 ? "none" : "select");
+    setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
+    setRoleMode(ref.roles === null ? "all" : "select");
   };
 
   const closeEdit = () => { setEditIdx(null); setDraft(null); };
@@ -142,39 +156,68 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   // ==== draft helpers ====
+  const applyFieldMode = (mode: FieldMode) => {
+    if (!draft) return;
+    setFieldMode(mode);
+    if (mode === "all") setDraft({ ...draft, allowedFields: null });
+    else if (mode === "none") setDraft({ ...draft, allowedFields: [] });
+    else setDraft({ ...draft, allowedFields: draft.allowedFields && draft.allowedFields.length > 0 ? draft.allowedFields : [...fieldNames] });
+  };
   const toggleField = (name: string) => {
     if (!draft) return;
     const current = draft.allowedFields ?? [...fieldNames];
     const next = current.includes(name) ? current.filter(f => f !== name) : [...current, name];
-    setDraft({ ...draft, allowedFields: next.length === fieldNames.length ? null : next });
+    setDraft({ ...draft, allowedFields: next });
   };
-  const fieldChecked = (name: string) => !draft?.allowedFields || draft.allowedFields.includes(name);
 
-  const toggleDay = (date: string) => {
+  const dayMode = (date: string): DayMode => {
+    if (!draft?.availability) return "all";
+    const win = draft.availability.find(a => a.date === date);
+    if (!win) return "none";
+    return win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to ? "all" : "times";
+  };
+  const applyDayMode = (date: string, mode: DayMode) => {
     if (!draft) return;
-    const current = draft.availability ?? [];
-    const has = current.some(a => a.date === date);
-    const next = has ? current.filter(a => a.date !== date) : [...current, { date, from: "09:00", to: "18:00" }];
-    setDraft({ ...draft, availability: next.length === 0 ? null : next });
+    const base = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    let next = base.filter(a => a.date !== date);
+    if (mode === "all") next = [...next, { date, ...WHOLE_DAY }];
+    if (mode === "times") {
+      const prev = draft.availability?.find(a => a.date === date);
+      const isWholeDay = !prev || (prev.from === WHOLE_DAY.from && prev.to === WHOLE_DAY.to);
+      next = [...next, { date, from: isWholeDay ? "09:00" : prev.from, to: isWholeDay ? "18:00" : prev.to }];
+    }
+    next.sort((a, b) => a.date.localeCompare(b.date));
+    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to);
+    setDraft({ ...draft, availability: allWholeDay ? null : next });
   };
   const updateWindow = (date: string, key: "from" | "to", value: string) => {
     if (!draft?.availability) return;
     setDraft({ ...draft, availability: draft.availability.map(a => (a.date === date ? { ...a, [key]: value } : a)) });
   };
 
+  const applyExcludeMode = (mode: ExcludeMode) => {
+    if (!draft) return;
+    setExcludeMode(mode);
+    if (mode === "none") setDraft({ ...draft, excludedTeams: [] });
+  };
   const toggleTeam = (id: string) => {
     if (!draft) return;
     const has = draft.excludedTeams.includes(id);
     setDraft({ ...draft, excludedTeams: has ? draft.excludedTeams.filter(t => t !== id) : [...draft.excludedTeams, id] });
   };
 
+  const applyRoleMode = (mode: RoleMode) => {
+    if (!draft) return;
+    setRoleMode(mode);
+    if (mode === "all") setDraft({ ...draft, roles: null });
+    else setDraft({ ...draft, roles: draft.roles && draft.roles.length > 0 ? draft.roles : [...ALL_ROLES] });
+  };
   const toggleRole = (role: number) => {
     if (!draft) return;
     const current = draft.roles ?? [...ALL_ROLES];
     const next = current.includes(role) ? current.filter(r => r !== role) : [...current, role];
-    setDraft({ ...draft, roles: next.length === ALL_ROLES.length ? null : next });
+    setDraft({ ...draft, roles: next });
   };
-  const roleChecked = (role: number) => !draft?.roles || draft.roles.includes(role);
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
@@ -235,7 +278,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
       {/* Edit dialog */}
       <Dialog open={editIdx !== null} onOpenChange={(open) => { if (!open) closeEdit(); }}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Scheidsrechter bewerken</DialogTitle></DialogHeader>
           {draft && (
             <div className="space-y-5">
@@ -247,52 +290,67 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
               {/* Locaties en velden */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wide">Locaties en velden</Label>
-                {fieldNames.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">Nog geen velden of locaties ingesteld.</p>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    {fieldNames.map(f => (
-                      <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                        <Checkbox checked={fieldChecked(f)} onCheckedChange={() => toggleField(f)} />
-                        <span className="truncate">{f}</span>
-                      </label>
-                    ))}
-                  </div>
+                <Label className="text-sm font-semibold">Locaties en velden</Label>
+                <Select value={fieldMode} onValueChange={(v) => applyFieldMode(v as FieldMode)}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle velden</SelectItem>
+                    <SelectItem value="select">Selecteer velden</SelectItem>
+                    <SelectItem value="none">Geen</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldMode === "select" && (
+                  fieldNames.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Nog geen velden of locaties ingesteld.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {fieldNames.map(f => (
+                        <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                          <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
+                          <span className="truncate">{f}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )
                 )}
               </div>
 
               {/* Beschikbaarheid */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wide">Beschikbaarheid (dagen en tijden)</Label>
+                <Label className="text-sm font-semibold">Beschikbaarheid (dagen en tijden)</Label>
                 {days.length === 0 ? (
                   <p className="text-xs text-muted-foreground">Nog geen wedstrijddagen ingesteld.</p>
                 ) : (
-                  <div className="space-y-2">
-                    <p className="text-[11px] text-muted-foreground">Geen dag aangevinkt = hele dag beschikbaar op alle dagen.</p>
-                    {days.map(d => {
-                      const win = draft.availability?.find(a => a.date === d);
-                      return (
-                        <div key={d} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2">
-                          <Checkbox checked={!!win} onCheckedChange={() => toggleDay(d)} />
-                          <span className="flex-1 text-sm">{formatIsoDateForLocale(d)}</span>
-                          {win && (
-                            <div className="flex items-center gap-1">
-                              <Input type="time" value={win.from} onChange={(e) => updateWindow(d, "from", e.target.value)} className="h-8 w-[92px] text-xs" />
-                              <span className="text-xs text-muted-foreground">tot</span>
-                              <Input type="time" value={win.to} onChange={(e) => updateWindow(d, "to", e.target.value)} className="h-8 w-[92px] text-xs" />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  days.map(d => {
+                    const mode = dayMode(d);
+                    const win = draft.availability?.find(a => a.date === d);
+                    return (
+                      <div key={d} className="space-y-1.5 rounded-lg border border-border px-2.5 py-2">
+                        <p className="text-[11px] font-medium text-muted-foreground">{formatIsoDateForLocale(d)}</p>
+                        <Select value={mode} onValueChange={(v) => applyDayMode(d, v as DayMode)}>
+                          <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Hele dag</SelectItem>
+                            <SelectItem value="times">Selecteer tijden</SelectItem>
+                            <SelectItem value="none">Niet beschikbaar</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {mode === "times" && win && (
+                          <div className="flex items-center gap-1">
+                            <Input type="time" value={win.from} onChange={(e) => updateWindow(d, "from", e.target.value)} className="h-8 w-[92px] text-xs" />
+                            <span className="text-xs text-muted-foreground">tot</span>
+                            <Input type="time" value={win.to} onChange={(e) => updateWindow(d, "to", e.target.value)} className="h-8 w-[92px] text-xs" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
 
               {/* Max aantal wedstrijden */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold uppercase tracking-wide">Max aantal wedstrijden</Label>
+                <Label className="text-sm font-semibold">Max. aantal wedstrijden</Label>
                 <Input
                   type="number"
                   min={1}
@@ -305,32 +363,50 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
               {/* Uitgesloten teams */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wide">Uitgesloten teams / spelers</Label>
-                {teams.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">Nog geen deelnemers toegevoegd.</p>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
-                    {teams.map(t => (
-                      <label key={t.id} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                        <Checkbox checked={draft.excludedTeams.includes(t.id)} onCheckedChange={() => toggleTeam(t.id)} />
-                        <span className="truncate">{t.name}</span>
-                      </label>
-                    ))}
-                  </div>
+                <Label className="text-sm font-semibold">Uitgesloten teams/spelers</Label>
+                <Select value={excludeMode} onValueChange={(v) => applyExcludeMode(v as ExcludeMode)}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Geen</SelectItem>
+                    <SelectItem value="select">Selecteer teams/spelers</SelectItem>
+                  </SelectContent>
+                </Select>
+                {excludeMode === "select" && (
+                  teams.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Nog geen deelnemers toegevoegd.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+                      {teams.map(t => (
+                        <label key={t.id} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                          <Checkbox checked={draft.excludedTeams.includes(t.id)} onCheckedChange={() => toggleTeam(t.id)} />
+                          <span className="truncate">{t.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )
                 )}
               </div>
 
               {/* Rollen */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wide">Rol 1-5</Label>
-                <div className="flex flex-wrap gap-2">
-                  {ALL_ROLES.map(role => (
-                    <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
-                      <Checkbox checked={roleChecked(role)} onCheckedChange={() => toggleRole(role)} />
-                      <span>Rol {role}</span>
-                    </label>
-                  ))}
-                </div>
+                <Label className="text-sm font-semibold">Rol (1-5)</Label>
+                <Select value={roleMode} onValueChange={(v) => applyRoleMode(v as RoleMode)}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle rollen</SelectItem>
+                    <SelectItem value="select">Selecteer rollen</SelectItem>
+                  </SelectContent>
+                </Select>
+                {roleMode === "select" && (
+                  <div className="flex flex-wrap gap-2">
+                    {ALL_ROLES.map(role => (
+                      <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
+                        <Checkbox checked={(draft.roles ?? ALL_ROLES).includes(role)} onCheckedChange={() => toggleRole(role)} />
+                        <span>Rol {role}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-2 pt-1">
@@ -341,6 +417,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
           )}
         </DialogContent>
       </Dialog>
+
 
       {/* Delete confirmation */}
       <AlertDialog open={deleteIdx !== null} onOpenChange={(open) => { if (!open) setDeleteIdx(null); }}>
