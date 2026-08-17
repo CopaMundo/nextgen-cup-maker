@@ -19,6 +19,7 @@ import { parseIsoDate, formatIsoDate } from "@/lib/dateUtils";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
+import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee } from "@/lib/refereeConfig";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -590,7 +591,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
     // Load category-specific fields/referees if categoryId is set
     let catFields: FieldConfig[] = [];
-    let catReferees: string[] = [];
+    let catReferees: RefereeConfig[] = [];
     let catData: any = null;
     if (categoryId) {
       const { data: catRow } = await supabase.from("tournament_categories").select("*").eq("id", categoryId).single();
@@ -600,17 +601,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
         if (Array.isArray(savedFields) && savedFields.length > 0) {
           catFields = savedFields.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" }));
         }
-        catReferees = Array.isArray(catRow.referees) ? (catRow.referees as string[]) : [];
+        catReferees = parseReferees(catRow.referees);
       }
     } else {
       const saved = tournament.fields as any;
       if (Array.isArray(saved) && saved.length > 0) {
         catFields = saved.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" }));
       }
-      catReferees = Array.isArray(tournament.referees) ? (tournament.referees as string[]) : [];
+      catReferees = parseReferees(tournament.referees);
     }
     setFields(catFields);
-    setReferees(catReferees);
+    setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
     let savedBreaks: PlannerBreak[] | null = null;
@@ -735,24 +736,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === REFEREE MANAGEMENT ===
-  const saveReferees = async (updated: string[]) => {
+  const saveReferees = async (updated: RefereeConfig[]) => {
+    const payload = serializeReferees(updated) as any;
     if (categoryId) {
-      await supabase.from("tournament_categories").update({ referees: updated as any }).eq("id", categoryId);
+      await supabase.from("tournament_categories").update({ referees: payload }).eq("id", categoryId);
     } else {
-      await supabase.from("tournaments").update({ referees: updated as any }).eq("id", tournamentId);
+      await supabase.from("tournaments").update({ referees: payload }).eq("id", tournamentId);
     }
-    setReferees(updated);
+    setRefereeConfigs(updated);
   };
   const addReferee = async () => {
     if (!newRef.trim()) return;
-    const updated = [...referees, newRef.trim()];
+    const updated: RefereeConfig[] = [...refereeConfigs, { name: newRef.trim(), allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }];
     await saveReferees(updated);
     setNewRef("");
     setShowRefAdd(false);
   };
   const editReferee = async () => {
     if (editRefIdx === null || !editRefName.trim()) return;
-    const updated = referees.map((r, i) => i === editRefIdx ? editRefName.trim() : r);
+    const updated = refereeConfigs.map((r, i) => i === editRefIdx ? { ...r, name: editRefName.trim() } : r);
     // Also update any matches that had the old name
     const oldName = referees[editRefIdx];
     const newName = editRefName.trim();
@@ -769,7 +771,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
   const confirmRemoveReferee = async () => {
     if (deleteRefIdx === null) return;
-    const updated = referees.filter((_, i) => i !== deleteRefIdx);
+    const updated = refereeConfigs.filter((_, i) => i !== deleteRefIdx);
     await saveReferees(updated);
     setDeleteRefIdx(null);
   };
@@ -788,7 +790,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const importRefereesFrom = async (catId: string) => {
     const cat = allCategories.find(c => c.id === catId);
     if (!cat) return;
-    const imported = Array.isArray(cat.referees) ? (cat.referees as string[]) : [];
+    const imported = parseReferees(cat.referees);
     if (imported.length === 0) { toast({ title: "Deze divisie heeft geen scheidsrechters", variant: "destructive" }); return; }
     await saveReferees(imported);
     setShowImportRefs(false);
