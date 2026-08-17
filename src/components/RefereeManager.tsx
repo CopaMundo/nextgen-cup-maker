@@ -307,13 +307,33 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                   fieldNames.length === 0 ? (
                     <p className="text-xs text-muted-foreground">Nog geen velden of locaties ingesteld.</p>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      {fieldNames.map(f => (
-                        <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                          <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
-                          <span className="truncate">{f}</span>
-                        </label>
-                      ))}
+                    <div className="space-y-3">
+                      {locationNames.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-medium text-muted-foreground">Locaties</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {locationNames.map(loc => (
+                              <label key={loc} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                                <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(loc)} onCheckedChange={() => toggleField(loc)} />
+                                <span className="truncate">{loc}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {fieldOnlyNames.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-medium text-muted-foreground">Velden</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {fieldOnlyNames.map(f => (
+                              <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                                <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
+                                <span className="truncate">{f}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 )}
