@@ -371,7 +371,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [newFieldStartTime, setNewFieldStartTime] = useState("09:00");
   const [deleteFieldIdx, setDeleteFieldIdx] = useState<number | null>(null);
   const [clearFieldIdx, setClearFieldIdx] = useState<number | null>(null);
-  const [referees, setReferees] = useState<string[]>([]);
+  const [refereeConfigs, setRefereeConfigs] = useState<RefereeConfig[]>([]);
+  const referees = refereeConfigs.map(r => r.name);
   const [refereesPerMatch, setRefereesPerMatch] = useState(1);
   const [categoryData, setCategoryData] = useState<any>(null);
   const [allCategories, setAllCategories] = useState<{ id: string; name: string; fields: any; referees: any }[]>([]);
