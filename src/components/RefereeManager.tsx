@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Pencil, Trash2, Download } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
@@ -10,6 +12,10 @@ import {
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeReferee,
+} from "@/lib/refereeConfig";
+import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
 
 interface Props {
   tournamentId: string;
@@ -17,74 +23,101 @@ interface Props {
 }
 
 const RefereeManager = ({ tournamentId, categoryId }: Props) => {
-  const [referees, setReferees] = useState<string[]>([]);
+  const [referees, setReferees] = useState<RefereeConfig[]>([]);
+  const [fieldNames, setFieldNames] = useState<string[]>([]);
+  const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
+  const [days, setDays] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [newRef, setNewRef] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
-  const [editName, setEditName] = useState("");
+  const [draft, setDraft] = useState<RefereeConfig | null>(null);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [showImport, setShowImport] = useState(false);
-  const [otherCategories, setOtherCategories] = useState<{ id: string; name: string; referees: string[] }[]>([]);
+  const [otherCategories, setOtherCategories] = useState<{ id: string; name: string; referees: RefereeConfig[] }[]>([]);
 
   useEffect(() => {
-    fetchReferees();
+    fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tournamentId, categoryId]);
 
-  const fetchReferees = async () => {
+  const fetchAll = async () => {
     setLoading(true);
-    if (categoryId) {
-      const { data } = await supabase.from("tournament_categories").select("referees").eq("id", categoryId).single();
-      setReferees(Array.isArray(data?.referees) ? (data.referees as string[]) : []);
-    } else {
-      const { data } = await supabase.from("tournaments").select("referees").eq("id", tournamentId).single();
-      setReferees(Array.isArray(data?.referees) ? (data.referees as string[]) : []);
-    }
+
+    const [tRes, locRes, teamRes, catRes] = await Promise.all([
+      supabase.from("tournaments").select("referees, fields, match_days, start_date, end_date").eq("id", tournamentId).single(),
+      supabase.from("tournament_locations").select("name").eq("tournament_id", tournamentId),
+      (categoryId
+        ? supabase.from("teams").select("id, name").eq("tournament_id", tournamentId).eq("category_id", categoryId).order("name")
+        : supabase.from("teams").select("id, name").eq("tournament_id", tournamentId).order("name")),
+      categoryId
+        ? supabase.from("tournament_categories").select("referees, fields").eq("id", categoryId).single()
+        : Promise.resolve({ data: null } as any),
+    ]);
+
+    const source: any = categoryId ? catRes.data : tRes.data;
+    setReferees(parseReferees(source?.referees));
+
+    const rawFields = (categoryId ? catRes.data?.fields : tRes.data?.fields) as any;
+    const fieldsList = Array.isArray(rawFields) ? rawFields.map((f: any) => (typeof f === "string" ? f : f?.name)).filter(Boolean) : [];
+    const locations = (locRes.data || []).map((l: any) => l.name).filter(Boolean);
+    setFieldNames(Array.from(new Set([...locations, ...fieldsList])));
+
+    setTeams((teamRes.data || []) as any);
+
+    const t: any = tRes.data;
+    const explicit = expandMatchDays(((t?.match_days as MatchDayEntry[]) || []));
+    const period = t?.start_date && t?.end_date ? listIsoDatesInRange(t.start_date, t.end_date) : normalizeIsoDates([t?.start_date, t?.end_date]);
+    setDays(explicit.length > 0 ? explicit : period);
+
     setLoading(false);
   };
 
-  const saveReferees = async (updated: string[]) => {
+  const saveReferees = async (updated: RefereeConfig[]) => {
+    const payload = serializeReferees(updated) as any;
     if (categoryId) {
-      await supabase.from("tournament_categories").update({ referees: updated as any }).eq("id", categoryId);
+      await supabase.from("tournament_categories").update({ referees: payload }).eq("id", categoryId);
     } else {
-      await supabase.from("tournaments").update({ referees: updated as any }).eq("id", tournamentId);
+      await supabase.from("tournaments").update({ referees: payload }).eq("id", tournamentId);
     }
     setReferees(updated);
   };
 
   const addReferee = async () => {
     if (!newRef.trim()) return;
-    await saveReferees([...referees, newRef.trim()]);
+    await saveReferees([
+      ...referees,
+      { name: newRef.trim(), allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null },
+    ]);
     setNewRef("");
     setShowAdd(false);
   };
 
-  const editReferee = async () => {
-    if (editIdx === null || !editName.trim()) return;
-    const oldName = referees[editIdx];
-    const newName = editName.trim();
-    const updated = referees.map((r, i) => i === editIdx ? newName : r);
+  const openEdit = (i: number) => {
+    setEditIdx(i);
+    setDraft(JSON.parse(JSON.stringify(referees[i])));
+  };
+
+  const closeEdit = () => { setEditIdx(null); setDraft(null); };
+
+  const saveEdit = async () => {
+    if (editIdx === null || !draft || !draft.name.trim()) return;
+    const oldName = referees[editIdx].name;
+    const newName = draft.name.trim();
     if (oldName !== newName) {
       const { data: matchesWithRef } = await supabase
-        .from("matches")
-        .select("id")
-        .eq("tournament_id", tournamentId)
-        .eq("referee", oldName);
-      if (matchesWithRef) {
-        for (const m of matchesWithRef) {
-          await supabase.from("matches").update({ referee: newName }).eq("id", m.id);
-        }
+        .from("matches").select("id").eq("tournament_id", tournamentId).eq("referee", oldName);
+      for (const m of matchesWithRef || []) {
+        await supabase.from("matches").update({ referee: newName }).eq("id", m.id);
       }
     }
-    await saveReferees(updated);
-    setEditIdx(null);
-    setEditName("");
+    await saveReferees(referees.map((r, i) => (i === editIdx ? { ...draft, name: newName } : r)));
+    closeEdit();
   };
 
   const confirmRemoveReferee = async () => {
     if (deleteIdx === null) return;
-    const updated = referees.filter((_, i) => i !== deleteIdx);
-    await saveReferees(updated);
+    await saveReferees(referees.filter((_, i) => i !== deleteIdx));
     setDeleteIdx(null);
   };
 
@@ -96,23 +129,54 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       .neq("id", categoryId || "")
       .order("sort_order");
     setOtherCategories(
-      (cats || []).map(c => ({
-        id: c.id,
-        name: c.name,
-        referees: Array.isArray(c.referees) ? (c.referees as string[]) : [],
-      })).filter(c => c.referees.length > 0)
+      (cats || []).map(c => ({ id: c.id, name: c.name, referees: parseReferees(c.referees) })).filter(c => c.referees.length > 0)
     );
     setShowImport(true);
   };
 
-  const importFromCategory = async (catRefs: string[]) => {
-    const existing = new Set(referees);
-    const toAdd = catRefs.filter(r => !existing.has(r));
-    if (toAdd.length > 0) {
-      await saveReferees([...referees, ...toAdd]);
-    }
+  const importFromCategory = async (catRefs: RefereeConfig[]) => {
+    const existing = new Set(referees.map(r => r.name));
+    const toAdd = catRefs.filter(r => !existing.has(r.name));
+    if (toAdd.length > 0) await saveReferees([...referees, ...toAdd]);
     setShowImport(false);
   };
+
+  // ==== draft helpers ====
+  const toggleField = (name: string) => {
+    if (!draft) return;
+    const current = draft.allowedFields ?? [...fieldNames];
+    const next = current.includes(name) ? current.filter(f => f !== name) : [...current, name];
+    setDraft({ ...draft, allowedFields: next.length === fieldNames.length ? null : next });
+  };
+  const fieldChecked = (name: string) => !draft?.allowedFields || draft.allowedFields.includes(name);
+
+  const toggleDay = (date: string) => {
+    if (!draft) return;
+    const current = draft.availability ?? [];
+    const has = current.some(a => a.date === date);
+    const next = has ? current.filter(a => a.date !== date) : [...current, { date, from: "09:00", to: "18:00" }];
+    setDraft({ ...draft, availability: next.length === 0 ? null : next });
+  };
+  const updateWindow = (date: string, key: "from" | "to", value: string) => {
+    if (!draft?.availability) return;
+    setDraft({ ...draft, availability: draft.availability.map(a => (a.date === date ? { ...a, [key]: value } : a)) });
+  };
+
+  const toggleTeam = (id: string) => {
+    if (!draft) return;
+    const has = draft.excludedTeams.includes(id);
+    setDraft({ ...draft, excludedTeams: has ? draft.excludedTeams.filter(t => t !== id) : [...draft.excludedTeams, id] });
+  };
+
+  const toggleRole = (role: number) => {
+    if (!draft) return;
+    const current = draft.roles ?? [...ALL_ROLES];
+    const next = current.includes(role) ? current.filter(r => r !== role) : [...current, role];
+    setDraft({ ...draft, roles: next.length === ALL_ROLES.length ? null : next });
+  };
+  const roleChecked = (role: number) => !draft?.roles || draft.roles.includes(role);
+
+  const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
 
@@ -131,15 +195,20 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       {/* Grid of referees */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {referees.map((r, i) => (
-          <div key={i} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
-            <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="flex-1 text-sm font-medium text-foreground truncate">{r}</span>
-            <button onClick={() => { setEditIdx(i); setEditName(r); }} className="text-muted-foreground hover:text-foreground transition-colors shrink-0" title="Bewerken">
-              <Pencil className="h-3.5 w-3.5" />
-            </button>
-            <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0" title="Verwijderen">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+          <div key={i} className="rounded-xl border border-border bg-card px-3 py-2.5">
+            <div className="flex items-center gap-2">
+              <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="flex-1 text-sm font-medium text-foreground truncate">{r.name}</span>
+              <button onClick={() => openEdit(i)} className="text-muted-foreground hover:text-foreground transition-colors shrink-0" title="Bewerken">
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0" title="Verwijderen">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
+              {summarizeReferee(r, { totalFields: fieldNames.length, teamName }).join(" · ")}
+            </p>
           </div>
         ))}
         <button
@@ -149,7 +218,6 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
           <Plus className="h-3.5 w-3.5" /> Scheidsrechter
         </button>
       </div>
-
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
@@ -166,16 +234,111 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       </Dialog>
 
       {/* Edit dialog */}
-      <Dialog open={editIdx !== null} onOpenChange={(open) => { if (!open) { setEditIdx(null); setEditName(""); } }}>
-        <DialogContent className="max-w-sm">
+      <Dialog open={editIdx !== null} onOpenChange={(open) => { if (!open) closeEdit(); }}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Scheidsrechter bewerken</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Naam scheidsrechter" onKeyDown={(e) => e.key === "Enter" && editReferee()} autoFocus />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setEditIdx(null); setEditName(""); }}>Annuleren</Button>
-              <Button onClick={editReferee} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+          {draft && (
+            <div className="space-y-5">
+              {/* Naam */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold uppercase tracking-wide">Naam</Label>
+                <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Naam scheidsrechter" autoFocus />
+              </div>
+
+              {/* Locaties en velden */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-wide">Locaties en velden</Label>
+                {fieldNames.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Nog geen velden of locaties ingesteld.</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {fieldNames.map(f => (
+                      <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                        <Checkbox checked={fieldChecked(f)} onCheckedChange={() => toggleField(f)} />
+                        <span className="truncate">{f}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Beschikbaarheid */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-wide">Beschikbaarheid (dagen en tijden)</Label>
+                {days.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Nog geen wedstrijddagen ingesteld.</p>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-muted-foreground">Geen dag aangevinkt = hele dag beschikbaar op alle dagen.</p>
+                    {days.map(d => {
+                      const win = draft.availability?.find(a => a.date === d);
+                      return (
+                        <div key={d} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2">
+                          <Checkbox checked={!!win} onCheckedChange={() => toggleDay(d)} />
+                          <span className="flex-1 text-sm">{formatIsoDateForLocale(d)}</span>
+                          {win && (
+                            <div className="flex items-center gap-1">
+                              <Input type="time" value={win.from} onChange={(e) => updateWindow(d, "from", e.target.value)} className="h-8 w-[92px] text-xs" />
+                              <span className="text-xs text-muted-foreground">tot</span>
+                              <Input type="time" value={win.to} onChange={(e) => updateWindow(d, "to", e.target.value)} className="h-8 w-[92px] text-xs" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Max aantal wedstrijden */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold uppercase tracking-wide">Max aantal wedstrijden</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={draft.maxMatches ?? ""}
+                  placeholder="Geen limiet"
+                  onChange={(e) => setDraft({ ...draft, maxMatches: e.target.value === "" ? null : Number(e.target.value) })}
+                  className="h-9 w-36"
+                />
+              </div>
+
+              {/* Uitgesloten teams */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-wide">Uitgesloten teams / spelers</Label>
+                {teams.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Nog geen deelnemers toegevoegd.</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+                    {teams.map(t => (
+                      <label key={t.id} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                        <Checkbox checked={draft.excludedTeams.includes(t.id)} onCheckedChange={() => toggleTeam(t.id)} />
+                        <span className="truncate">{t.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Rollen */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-wide">Rol 1-5</Label>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_ROLES.map(role => (
+                    <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
+                      <Checkbox checked={roleChecked(role)} onCheckedChange={() => toggleRole(role)} />
+                      <span>Rol {role}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-1">
+                <Button variant="outline" onClick={closeEdit}>Annuleren</Button>
+                <Button onClick={saveEdit} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+              </div>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -185,7 +348,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Scheidsrechter verwijderen?</AlertDialogTitle>
             <AlertDialogDescription>
-              Weet je zeker dat je {deleteIdx !== null ? `"${referees[deleteIdx]}"` : "deze scheidsrechter"} wilt verwijderen?
+              Weet je zeker dat je {deleteIdx !== null ? `"${referees[deleteIdx].name}"` : "deze scheidsrechter"} wilt verwijderen?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

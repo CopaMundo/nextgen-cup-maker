@@ -19,6 +19,7 @@ import { parseIsoDate, formatIsoDate } from "@/lib/dateUtils";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
+import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee } from "@/lib/refereeConfig";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -371,7 +372,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [newFieldStartTime, setNewFieldStartTime] = useState("09:00");
   const [deleteFieldIdx, setDeleteFieldIdx] = useState<number | null>(null);
   const [clearFieldIdx, setClearFieldIdx] = useState<number | null>(null);
-  const [referees, setReferees] = useState<string[]>([]);
+  const [refereeConfigs, setRefereeConfigs] = useState<RefereeConfig[]>([]);
+  const referees = refereeConfigs.map(r => r.name);
   const [refereesPerMatch, setRefereesPerMatch] = useState(1);
   const [categoryData, setCategoryData] = useState<any>(null);
   const [allCategories, setAllCategories] = useState<{ id: string; name: string; fields: any; referees: any }[]>([]);
@@ -589,7 +591,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
     // Load category-specific fields/referees if categoryId is set
     let catFields: FieldConfig[] = [];
-    let catReferees: string[] = [];
+    let catReferees: RefereeConfig[] = [];
     let catData: any = null;
     if (categoryId) {
       const { data: catRow } = await supabase.from("tournament_categories").select("*").eq("id", categoryId).single();
@@ -599,17 +601,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
         if (Array.isArray(savedFields) && savedFields.length > 0) {
           catFields = savedFields.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" }));
         }
-        catReferees = Array.isArray(catRow.referees) ? (catRow.referees as string[]) : [];
+        catReferees = parseReferees(catRow.referees);
       }
     } else {
       const saved = tournament.fields as any;
       if (Array.isArray(saved) && saved.length > 0) {
         catFields = saved.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" }));
       }
-      catReferees = Array.isArray(tournament.referees) ? (tournament.referees as string[]) : [];
+      catReferees = parseReferees(tournament.referees);
     }
     setFields(catFields);
-    setReferees(catReferees);
+    setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
     let savedBreaks: PlannerBreak[] | null = null;
@@ -734,24 +736,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === REFEREE MANAGEMENT ===
-  const saveReferees = async (updated: string[]) => {
+  const saveReferees = async (updated: RefereeConfig[]) => {
+    const payload = serializeReferees(updated) as any;
     if (categoryId) {
-      await supabase.from("tournament_categories").update({ referees: updated as any }).eq("id", categoryId);
+      await supabase.from("tournament_categories").update({ referees: payload }).eq("id", categoryId);
     } else {
-      await supabase.from("tournaments").update({ referees: updated as any }).eq("id", tournamentId);
+      await supabase.from("tournaments").update({ referees: payload }).eq("id", tournamentId);
     }
-    setReferees(updated);
+    setRefereeConfigs(updated);
   };
   const addReferee = async () => {
     if (!newRef.trim()) return;
-    const updated = [...referees, newRef.trim()];
+    const updated: RefereeConfig[] = [...refereeConfigs, { name: newRef.trim(), allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }];
     await saveReferees(updated);
     setNewRef("");
     setShowRefAdd(false);
   };
   const editReferee = async () => {
     if (editRefIdx === null || !editRefName.trim()) return;
-    const updated = referees.map((r, i) => i === editRefIdx ? editRefName.trim() : r);
+    const updated = refereeConfigs.map((r, i) => i === editRefIdx ? { ...r, name: editRefName.trim() } : r);
     // Also update any matches that had the old name
     const oldName = referees[editRefIdx];
     const newName = editRefName.trim();
@@ -768,7 +771,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
   const confirmRemoveReferee = async () => {
     if (deleteRefIdx === null) return;
-    const updated = referees.filter((_, i) => i !== deleteRefIdx);
+    const updated = refereeConfigs.filter((_, i) => i !== deleteRefIdx);
     await saveReferees(updated);
     setDeleteRefIdx(null);
   };
@@ -787,7 +790,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const importRefereesFrom = async (catId: string) => {
     const cat = allCategories.find(c => c.id === catId);
     if (!cat) return;
-    const imported = Array.isArray(cat.referees) ? (cat.referees as string[]) : [];
+    const imported = parseReferees(cat.referees);
     if (imported.length === 0) { toast({ title: "Deze divisie heeft geen scheidsrechters", variant: "destructive" }); return; }
     await saveReferees(imported);
     setShowImportRefs(false);
@@ -795,7 +798,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   const autoAssignReferees = async () => {
-    if (referees.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
+    if (refereeConfigs.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
     const scheduled = matches.filter(m => m.match_date && m.match_time && m.field);
     if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden", variant: "destructive" }); return; }
     const sorted = [...scheduled].sort((a, b) => {
@@ -808,28 +811,43 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
       if (!timeSlots.has(key)) timeSlots.set(key, []);
       timeSlots.get(key)!.push(m);
     }
+
+    // Bestaande belasting meenemen voor de max-limiet
+    const load = new Map<string, number>();
+    for (const m of matches) {
+      for (const name of (m.referee || "").split(",").map(s => s.trim()).filter(Boolean)) {
+        load.set(name, (load.get(name) || 0) + 1);
+      }
+    }
+
     let refIndex = 0;
     const updates: { id: string; referee: string }[] = [];
+    let skipped = 0;
+
     for (const [, slotMatches] of timeSlots) {
       const usedInSlot = new Set<string>();
       for (const m of slotMatches) {
-        let found = false;
-        for (let attempt = 0; attempt < referees.length; attempt++) {
-          const ref = referees[(refIndex + attempt) % referees.length];
-          if (!usedInSlot.has(ref)) {
-            updates.push({ id: m.id, referee: ref });
-            usedInSlot.add(ref);
-            refIndex = (refIndex + attempt + 1) % referees.length;
-            found = true;
+        const assigned: string[] = [];
+        for (let role = 1; role <= refereesPerMatch; role++) {
+          let picked: RefereeConfig | null = null;
+          for (let attempt = 0; attempt < refereeConfigs.length; attempt++) {
+            const cand = refereeConfigs[(refIndex + attempt) % refereeConfigs.length];
+            if (usedInSlot.has(cand.name)) continue;
+            if (!refereeCanOfficiate(cand, m, role, load.get(cand.name) || 0)) continue;
+            picked = cand;
+            refIndex = (refIndex + attempt + 1) % refereeConfigs.length;
             break;
           }
+          if (!picked) break;
+          usedInSlot.add(picked.name);
+          load.set(picked.name, (load.get(picked.name) || 0) + 1);
+          assigned.push(picked.name);
         }
-        if (!found) {
-          updates.push({ id: m.id, referee: referees[refIndex % referees.length] });
-          refIndex = (refIndex + 1) % referees.length;
-        }
+        if (assigned.length === 0) { skipped++; continue; }
+        updates.push({ id: m.id, referee: assigned.join(", ") });
       }
     }
+
     for (const u of updates) {
       await supabase.from("matches").update({ referee: u.referee }).eq("id", u.id);
     }
@@ -837,7 +855,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
       const u = updates.find(x => x.id === m.id);
       return u ? { ...m, referee: u.referee } : m;
     }));
-    toast({ title: `${updates.length} scheidsrechters toegewezen!` });
+    toast({
+      title: `${updates.length} wedstrijden ingedeeld`,
+      description: skipped > 0 ? `${skipped} wedstrijden zonder beschikbare scheidsrechter (instellingen)` : undefined,
+    });
   };
 
   // === MATCH UPDATE ===
@@ -3228,18 +3249,24 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                       </div>
                     ) : (
                       <div className="space-y-1">
-                        {referees.map((r, i) => {
-                          const count = matches.filter(m => m.referee === r).length;
+                        {refereeConfigs.map((rc, i) => {
+                          const r = rc.name;
+                          const count = matches.filter(m => (m.referee || "").split(",").map(s => s.trim()).includes(r)).length;
                           return (
-                            <div key={i} className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs">
-                              <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">{count}</span>
-                              <span className="flex-1 font-medium text-foreground truncate">{r}</span>
-                              <button onClick={() => { setEditRefIdx(i); setEditRefName(r); }} className="text-muted-foreground hover:text-foreground">
-                                <Pencil className="h-3 w-3" />
-                              </button>
-                              <button onClick={() => setDeleteRefIdx(i)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="h-3 w-3" />
-                              </button>
+                            <div key={i} className="rounded-md border border-border px-2.5 py-1.5 text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">{count}</span>
+                                <span className="flex-1 font-medium text-foreground truncate">{r}</span>
+                                <button onClick={() => { setEditRefIdx(i); setEditRefName(r); }} className="text-muted-foreground hover:text-foreground">
+                                  <Pencil className="h-3 w-3" />
+                                </button>
+                                <button onClick={() => setDeleteRefIdx(i)} className="text-muted-foreground hover:text-destructive">
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
+                              <p className="mt-1 text-[9px] leading-snug text-muted-foreground">
+                                {summarizeReferee(rc, { totalFields: fields.length, teamName: (id) => teams.find(t => t.id === id)?.name || "?" }).join(" · ")}
+                              </p>
                             </div>
                           );
                         })}
