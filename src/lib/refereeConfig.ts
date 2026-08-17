@@ -70,7 +70,9 @@ export const summarizeReferee = (
 ): string[] => {
   const parts: string[] = [];
 
-  if (!ref.allowedFields || ref.allowedFields.length === 0 || (opts.totalFields && ref.allowedFields.length >= opts.totalFields)) {
+  if (ref.allowedFields && ref.allowedFields.length === 0) {
+    parts.push("Geen velden");
+  } else if (!ref.allowedFields || (opts.totalFields && ref.allowedFields.length >= opts.totalFields)) {
     parts.push("Alle velden");
   } else {
     parts.push(ref.allowedFields.length === 1 ? ref.allowedFields[0] : `${ref.allowedFields.length} velden`);
