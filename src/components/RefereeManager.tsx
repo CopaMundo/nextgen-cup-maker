@@ -104,8 +104,12 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   const openEdit = (i: number) => {
+    const ref: RefereeConfig = JSON.parse(JSON.stringify(referees[i]));
     setEditIdx(i);
-    setDraft(JSON.parse(JSON.stringify(referees[i])));
+    setDraft(ref);
+    setFieldMode(ref.allowedFields === null ? "all" : ref.allowedFields.length === 0 ? "none" : "select");
+    setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
+    setRoleMode(ref.roles === null ? "all" : "select");
   };
 
   const closeEdit = () => { setEditIdx(null); setDraft(null); };
