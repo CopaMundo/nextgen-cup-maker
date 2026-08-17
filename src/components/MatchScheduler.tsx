@@ -152,12 +152,15 @@ const formatDateDMY = (d: string | null) => {
 };
 
 const getTournamentPlannerDates = (tournament: any) => {
+  const extraDays = expandMatchDays((tournament.match_days as MatchDayEntry[]) || []);
+  // When explicit match days are configured, those are the only valid dates.
+  if (extraDays.length > 0) return extraDays;
   const periodDays = tournament.start_date && tournament.end_date
     ? listIsoDatesInRange(tournament.start_date, tournament.end_date)
     : normalizeIsoDates([tournament.start_date, tournament.end_date]);
-  const extraDays = expandMatchDays((tournament.match_days as MatchDayEntry[]) || []);
-  return normalizeIsoDates([...periodDays, ...extraDays]);
+  return normalizeIsoDates(periodDays);
 };
+
 
 const getFirstScheduledMatchDate = (matches: Match[]) => {
   const dates = normalizeIsoDates(
