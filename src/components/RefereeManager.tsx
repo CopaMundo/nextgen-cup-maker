@@ -32,6 +32,8 @@ interface Props {
 const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [referees, setReferees] = useState<RefereeConfig[]>([]);
   const [fieldNames, setFieldNames] = useState<string[]>([]);
+  const [locationNames, setLocationNames] = useState<string[]>([]);
+  const [fieldOnlyNames, setFieldOnlyNames] = useState<string[]>([]);
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
   const [days, setDays] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
