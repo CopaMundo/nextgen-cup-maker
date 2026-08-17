@@ -73,6 +73,8 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     const rawFields = (categoryId ? catRes.data?.fields : tRes.data?.fields) as any;
     const fieldsList = Array.isArray(rawFields) ? rawFields.map((f: any) => (typeof f === "string" ? f : f?.name)).filter(Boolean) : [];
     const locations = (locRes.data || []).map((l: any) => l.name).filter(Boolean);
+    setLocationNames(Array.from(new Set(locations)));
+    setFieldOnlyNames(Array.from(new Set(fieldsList)));
     setFieldNames(Array.from(new Set([...locations, ...fieldsList])));
 
     setTeams((teamRes.data || []) as any);
