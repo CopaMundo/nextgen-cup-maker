@@ -16,13 +16,10 @@ import { calculateGroupStandings, type ScoringSystem } from "@/lib/standingsCalc
 import { getMatchSideDisplayName } from "@/lib/slotLabels";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
-import { parseReferees } from "@/lib/refereeConfig";
-import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, type MatchDayEntry } from "@/lib/dateUtils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
-import { CalendarClock } from "lucide-react";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
