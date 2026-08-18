@@ -178,7 +178,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       supabase.from("slots").select("*").eq("tournament_id", tournamentId).order("sort_order"),
       supabase.from("tournament_scoring_systems" as any).select("id, scoring_type, num_sets, set_points_mode, set_result_points, decisive_set, playoff_mode, no_draws, points_win, points_draw, points_loss, points_big_win, big_win_threshold, points_win_overtime, points_draw_with_goals, points_draw_no_goals, points_loss_overtime, tiebreaker_rules").eq("tournament_id", tournamentId),
       categoryId
-        ? supabase.from("tournament_categories").select("fields").eq("tournament_id", tournamentId).eq("id", categoryId).maybeSingle()
+        ? supabase.from("tournament_categories").select("fields, referees").eq("tournament_id", tournamentId).eq("id", categoryId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
     setMatches(mRes as any);
@@ -192,6 +192,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     } else {
       setCategoryFieldNames([]);
     }
+    const rawReferees = (catRes?.data as any)?.referees ?? tournament?.referees;
+    setRefereeNames(parseReferees(rawReferees).map(r => r.name).filter(Boolean));
+
     if (pRes.data) {
       setPhases(pRes.data as any);
       // Auto-select first phase if nothing persisted
