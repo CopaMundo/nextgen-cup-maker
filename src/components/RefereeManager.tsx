@@ -353,7 +353,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                 {locationNames.length > 0 && (
                   <div className="space-y-3">
                     {locationNames.map(loc => {
-                      const mode = getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
+                      const mode = locModes[loc] ?? getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
                       return (
                         <div key={loc} className="space-y-2 rounded-lg border border-border px-3 py-2.5">
                           <p className="text-xs font-medium text-muted-foreground">{loc}</p>
