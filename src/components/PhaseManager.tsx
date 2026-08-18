@@ -55,6 +55,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
   const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null);
   const [editPhaseNumber, setEditPhaseNumber] = useState<number | null>(null);
   const [editPhaseLabel, setEditPhaseLabel] = useState("");
+  /** Labels voor fases die (nog) geen formats hebben; worden toegepast bij het eerste format. */
+  const [pendingPhaseLabels, setPendingPhaseLabels] = useState<Record<number, string>>({});
   const [savingPhaseEdit, setSavingPhaseEdit] = useState(false);
   const [activePhaseNumber, setActivePhaseNumber] = useState<number | null>(null);
   const [draftPhaseNumbers, setDraftPhaseNumbers] = useState<number[]>([]);
@@ -121,7 +123,11 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
   const openPhaseEdit = (phaseNumber: number) => {
     const firstFormat = allFormats.find(f => f.phase_number === phaseNumber);
     const existingLabel = firstFormat?.match_config?.phaseLabel;
-    setEditPhaseLabel(typeof existingLabel === "string" ? existingLabel : "");
+    setEditPhaseLabel(
+      typeof existingLabel === "string" && existingLabel
+        ? existingLabel
+        : (pendingPhaseLabels[phaseNumber] ?? "")
+    );
     setEditPhaseNumber(phaseNumber);
   };
 
@@ -130,7 +136,25 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     setSavingPhaseEdit(true);
 
     const trimmedLabel = editPhaseLabel.trim();
-    const phaseFormats = allFormats.filter(f => f.phase_number === editPhaseNumber);
+    const phaseNumber = editPhaseNumber;
+    const phaseFormats = allFormats.filter(f => f.phase_number === phaseNumber);
+
+    // Fase zonder formats: bewaar de naam lokaal en pas hem toe op het eerste format.
+    if (phaseFormats.length === 0) {
+      setPendingPhaseLabels(prev => {
+        const next = { ...prev };
+        if (trimmedLabel) next[phaseNumber] = trimmedLabel;
+        else delete next[phaseNumber];
+        return next;
+      });
+      setSavingPhaseEdit(false);
+      setEditPhaseNumber(null);
+      toast({
+        title: "Naam ingesteld",
+        description: "De naam wordt opgeslagen zodra je een format toevoegt aan deze fase.",
+      });
+      return;
+    }
 
     for (const phaseFormat of phaseFormats) {
       const nextMatchConfig = { ...(phaseFormat.match_config ?? {}) } as Record<string, any>;
@@ -152,15 +176,23 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     }
 
     setAllFormats(prev => prev.map(f => {
-      if (f.phase_number !== editPhaseNumber) return f;
+      if (f.phase_number !== phaseNumber) return f;
       const nextMatchConfig = { ...(f.match_config ?? {}) } as Record<string, any>;
       if (trimmedLabel) nextMatchConfig.phaseLabel = trimmedLabel;
       else delete nextMatchConfig.phaseLabel;
       return { ...f, match_config: nextMatchConfig };
     }));
 
+    setPendingPhaseLabels(prev => {
+      if (!(phaseNumber in prev)) return prev;
+      const next = { ...prev };
+      delete next[phaseNumber];
+      return next;
+    });
+
     setSavingPhaseEdit(false);
     setEditPhaseNumber(null);
+    toast({ title: "Fasenaam opgeslagen" });
   };
 
   const getErrorMessage = (error: unknown, fallback: string) => {
@@ -268,7 +300,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       } : {};
 
       const existingPhaseFormat = allFormats.find(f => f.phase_number === phaseNumber);
-      const inheritedPhaseLabel = existingPhaseFormat?.match_config?.phaseLabel;
+      const inheritedPhaseLabel =
+        existingPhaseFormat?.match_config?.phaseLabel ?? pendingPhaseLabels[phaseNumber];
       const matchConfigWithPhaseLabel = {
         ...matchConfig,
         ...(typeof inheritedPhaseLabel === "string" && inheritedPhaseLabel ? { phaseLabel: inheritedPhaseLabel } : {}),
@@ -1157,7 +1190,11 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                       : "text-muted-foreground hover:text-foreground")
                   }
                 >
-                  <span>{getPhaseLabel(c.phaseNumber, allFormats)}</span>
+                  <span>
+                    {allFormats.some(f => f.phase_number === c.phaseNumber)
+                      ? getPhaseLabel(c.phaseNumber, allFormats)
+                      : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`)}
+                  </span>
                   {isActive && (
                     <span className="flex items-center gap-0.5 ml-1">
                       <span
