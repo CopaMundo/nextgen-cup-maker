@@ -2304,101 +2304,48 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         );
       })()}
 
-      {/* Handmatige planning: datum, uur, veld & scheidsrechter */}
-      <Dialog open={!!planningMatchId} onOpenChange={(open) => { if (!open) setPlanningMatchId(null); }}>
+      {/* Teams toewijzen aan een wedstrijd */}
+      <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Wedstrijd plannen</DialogTitle>
-            <DialogDescription>Stel datum, uur, veld en scheidsrechter handmatig in.</DialogDescription>
+            <DialogTitle>Teams toewijzen</DialogTitle>
+            <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Datum</Label>
-                {availablePlanningDates.length > 0 ? (
-                  <Select
-                    value={planningDraft.date || "__none__"}
-                    onValueChange={(v) => setPlanningDraft(d => ({ ...d, date: v === "__none__" ? "" : v }))}
-                  >
-                    <SelectTrigger className="h-9"><SelectValue placeholder="Kies datum" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">Geen datum</SelectItem>
-                      {availablePlanningDates.map(d => (
-                        <SelectItem key={d} value={d}>{formatDateDMY(d) || d}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Input
-                    type="date"
-                    className="h-9"
-                    value={planningDraft.date}
-                    onChange={(e) => setPlanningDraft(d => ({ ...d, date: e.target.value }))}
-                  />
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Uur</Label>
-                <Input
-                  type="time"
-                  className="h-9"
-                  value={planningDraft.time}
-                  onChange={(e) => setPlanningDraft(d => ({ ...d, time: e.target.value }))}
-                />
-              </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Thuis</Label>
+              <Select
+                value={assignDraft.homeTeamId || "__none__"}
+                onValueChange={(v) => setAssignDraft(d => ({ ...d, homeTeamId: v === "__none__" ? "" : v }))}
+              >
+                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Geen team</SelectItem>
+                  {teams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Veld</Label>
-              {configuredPlannerFieldNames.length > 0 ? (
-                <Select
-                  value={planningDraft.field || "__none__"}
-                  onValueChange={(v) => setPlanningDraft(d => ({ ...d, field: v === "__none__" ? "" : v }))}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Kies veld" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">Geen veld</SelectItem>
-                    {configuredPlannerFieldNames.map((f: string) => (
-                      <SelectItem key={f} value={f}>{f}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  className="h-9"
-                  value={planningDraft.field}
-                  onChange={(e) => setPlanningDraft(d => ({ ...d, field: e.target.value }))}
-                  placeholder="Veldnaam"
-                />
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Scheidsrechter</Label>
-              {refereeNames.length > 0 ? (
-                <Select
-                  value={planningDraft.referee || "__none__"}
-                  onValueChange={(v) => setPlanningDraft(d => ({ ...d, referee: v === "__none__" ? "" : v }))}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Kies scheidsrechter" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">Geen scheidsrechter</SelectItem>
-                    {refereeNames.map(r => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  className="h-9"
-                  value={planningDraft.referee}
-                  onChange={(e) => setPlanningDraft(d => ({ ...d, referee: e.target.value }))}
-                  placeholder="Naam scheidsrechter"
-                />
-              )}
+              <Label className="text-xs">Uit</Label>
+              <Select
+                value={assignDraft.awayTeamId || "__none__"}
+                onValueChange={(v) => setAssignDraft(d => ({ ...d, awayTeamId: v === "__none__" ? "" : v }))}
+              >
+                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Geen team</SelectItem>
+                  {teams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPlanningMatchId(null)}>Annuleren</Button>
-            <Button onClick={savePlanning} disabled={savingPlanning}>Opslaan</Button>
+            <Button variant="outline" onClick={() => setAssigningMatchId(null)}>Annuleren</Button>
+            <Button onClick={saveAssign} disabled={savingAssign}>Opslaan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
