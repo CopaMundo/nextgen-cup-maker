@@ -1703,13 +1703,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {/* Action icons */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              onClick={() => openPlanningDialog(match)}
-              className="text-muted-foreground hover:text-primary transition-colors"
-              title="Datum, uur, veld & scheidsrechter instellen"
-            >
-              <CalendarClock className="h-3.5 w-3.5" />
-            </button>
+            {canAssignTeams(match) && (
+              <button
+                onClick={() => openAssignDialog(match)}
+                className="text-muted-foreground hover:text-primary transition-colors"
+                title="Teams toewijzen"
+              >
+                <Users className="h-3.5 w-3.5" />
+              </button>
+            )}
 
             {match.group_id && (phase?.phase_type === "group" || phase?.phase_type === "round_robin") && (
               <button
