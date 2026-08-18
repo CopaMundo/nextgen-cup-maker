@@ -196,8 +196,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     } else {
       setCategoryFieldNames([]);
     }
-    const rawReferees = (catRes?.data as any)?.referees ?? tournament?.referees;
-    setRefereeNames(parseReferees(rawReferees).map(r => r.name).filter(Boolean));
 
     if (pRes.data) {
       setPhases(pRes.data as any);
