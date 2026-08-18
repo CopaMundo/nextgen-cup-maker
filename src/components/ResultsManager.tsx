@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, RotateCcw, BarChart3, ChevronDown, ChevronRight, ChevronUp, Plus, Minus, MapPin, ListOrdered } from "lucide-react";
+import { CheckCircle2, RotateCcw, BarChart3, ChevronDown, ChevronRight, ChevronUp, Plus, Minus, MapPin, ListOrdered, Users } from "lucide-react";
 import rankingPodium from "@/assets/ranking-podium.png";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import MatchDetailDialog from "./MatchDetailDialog";
@@ -16,13 +16,10 @@ import { calculateGroupStandings, type ScoringSystem } from "@/lib/standingsCalc
 import { getMatchSideDisplayName } from "@/lib/slotLabels";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
-import { parseReferees } from "@/lib/refereeConfig";
-import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, type MatchDayEntry } from "@/lib/dateUtils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
-import { CalendarClock } from "lucide-react";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -110,11 +107,10 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0);
   const [collapsedTimeSlots, setCollapsedTimeSlots] = useState<Set<string>>(new Set());
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
-  const [refereeNames, setRefereeNames] = useState<string[]>([]);
-  // Handmatige planning vanuit het resultatenschema (draft-state: pas opslaan bij "Opslaan")
-  const [planningMatchId, setPlanningMatchId] = useState<string | null>(null);
-  const [planningDraft, setPlanningDraft] = useState<{ date: string; time: string; field: string; referee: string }>({ date: "", time: "", field: "", referee: "" });
-  const [savingPlanning, setSavingPlanning] = useState(false);
+  // Teams toewijzen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
+  const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
+  const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
+  const [savingAssign, setSavingAssign] = useState(false);
   const { toast } = useToast();
 
 
@@ -200,8 +196,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     } else {
       setCategoryFieldNames([]);
     }
-    const rawReferees = (catRes?.data as any)?.referees ?? tournament?.referees;
-    setRefereeNames(parseReferees(rawReferees).map(r => r.name).filter(Boolean));
 
     if (pRes.data) {
       setPhases(pRes.data as any);
@@ -1209,44 +1203,67 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return configuredPlannerFieldNames.includes(match.field);
   };
 
-  // Beschikbare wedstrijddagen voor handmatige planning
-  const availablePlanningDates = useMemo(() => {
-    const extra = expandMatchDays((tournament?.match_days as MatchDayEntry[]) || []);
-    if (extra.length > 0) return extra;
-    if (tournament?.start_date && tournament?.end_date) {
-      return listIsoDatesInRange(tournament.start_date, tournament.end_date);
-    }
-    return normalizeIsoDates([tournament?.start_date, tournament?.end_date]);
-  }, [tournament?.match_days, tournament?.start_date, tournament?.end_date]);
-
-  const openPlanningDialog = (match: Match) => {
-    setPlanningDraft({
-      date: match.match_date || "",
-      time: match.match_time ? match.match_time.slice(0, 5) : "",
-      field: match.field || "",
-      referee: match.referee || "",
-    });
-    setPlanningMatchId(match.id);
+  // Teams toewijzen aan een wedstrijd (enkel home/away, de rest gebeurt in het Schema-tabblad)
+  const canAssignTeams = (match: Match) => {
+    const format = phases.find(p => p.id === match.phase_id);
+    return Boolean(format && canEditFormat(format));
   };
 
-  const savePlanning = async () => {
-    if (!planningMatchId) return;
-    setSavingPlanning(true);
+  const openAssignDialog = (match: Match) => {
+    setAssignDraft({
+      homeTeamId: match.home_team_id || "",
+      awayTeamId: match.away_team_id || "",
+    });
+    setAssigningMatchId(match.id);
+  };
+
+  const saveAssign = async () => {
+    if (!assigningMatchId) return;
+    setSavingAssign(true);
+    const currentMatch = matches.find(m => m.id === assigningMatchId);
+    if (!currentMatch) {
+      setSavingAssign(false);
+      return;
+    }
+
     const payload = {
-      match_date: planningDraft.date || null,
-      match_time: planningDraft.time ? `${planningDraft.time}:00` : null,
-      field: planningDraft.field || null,
-      referee: planningDraft.referee || null,
+      home_team_id: assignDraft.homeTeamId || null,
+      away_team_id: assignDraft.awayTeamId || null,
     };
-    const { error } = await supabase.from("matches").update(payload as any).eq("id", planningMatchId);
-    setSavingPlanning(false);
+
+    const teamsChanged = currentMatch.home_team_id !== payload.home_team_id ||
+                         currentMatch.away_team_id !== payload.away_team_id;
+
+    let finalPayload: any = { ...payload };
+    if (teamsChanged && currentMatch.is_played) {
+      finalPayload = {
+        ...finalPayload,
+        home_score: null,
+        away_score: null,
+        home_penalties: null,
+        away_penalties: null,
+        set_scores: null,
+        is_played: false,
+      };
+      await supabase.from("match_stats").delete().eq("match_id", currentMatch.id);
+    }
+
+    const { error } = await supabase.from("matches").update(finalPayload).eq("id", assigningMatchId);
+    setSavingAssign(false);
     if (error) {
       toast({ title: "Opslaan mislukt", description: error.message, variant: "destructive" });
       return;
     }
-    setMatches(prev => prev.map(m => (m.id === planningMatchId ? { ...m, ...payload } as Match : m)));
-    setPlanningMatchId(null);
-    toast({ title: "Planning opgeslagen" });
+
+    let updatedMatches = matches.map(m => m.id === assigningMatchId ? { ...m, ...finalPayload } as Match : m);
+
+    if (teamsChanged && currentMatch.match_name) {
+      updatedMatches = await clearDownstreamTeams(currentMatch.match_name, updatedMatches, currentMatch.phase_id);
+    }
+
+    setMatches(updatedMatches);
+    setAssigningMatchId(null);
+    toast({ title: "Teams opgeslagen" });
   };
 
 
@@ -1686,13 +1703,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {/* Action icons */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              onClick={() => openPlanningDialog(match)}
-              className="text-muted-foreground hover:text-primary transition-colors"
-              title="Datum, uur, veld & scheidsrechter instellen"
-            >
-              <CalendarClock className="h-3.5 w-3.5" />
-            </button>
+            {canAssignTeams(match) && (
+              <button
+                onClick={() => openAssignDialog(match)}
+                className="text-muted-foreground hover:text-primary transition-colors"
+                title="Teams toewijzen"
+              >
+                <Users className="h-3.5 w-3.5" />
+              </button>
+            )}
 
             {match.group_id && (phase?.phase_type === "group" || phase?.phase_type === "round_robin") && (
               <button
@@ -2285,101 +2304,48 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         );
       })()}
 
-      {/* Handmatige planning: datum, uur, veld & scheidsrechter */}
-      <Dialog open={!!planningMatchId} onOpenChange={(open) => { if (!open) setPlanningMatchId(null); }}>
+      {/* Teams toewijzen aan een wedstrijd */}
+      <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Wedstrijd plannen</DialogTitle>
-            <DialogDescription>Stel datum, uur, veld en scheidsrechter handmatig in.</DialogDescription>
+            <DialogTitle>Teams toewijzen</DialogTitle>
+            <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Datum</Label>
-                {availablePlanningDates.length > 0 ? (
-                  <Select
-                    value={planningDraft.date || "__none__"}
-                    onValueChange={(v) => setPlanningDraft(d => ({ ...d, date: v === "__none__" ? "" : v }))}
-                  >
-                    <SelectTrigger className="h-9"><SelectValue placeholder="Kies datum" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">Geen datum</SelectItem>
-                      {availablePlanningDates.map(d => (
-                        <SelectItem key={d} value={d}>{formatDateDMY(d) || d}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Input
-                    type="date"
-                    className="h-9"
-                    value={planningDraft.date}
-                    onChange={(e) => setPlanningDraft(d => ({ ...d, date: e.target.value }))}
-                  />
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Uur</Label>
-                <Input
-                  type="time"
-                  className="h-9"
-                  value={planningDraft.time}
-                  onChange={(e) => setPlanningDraft(d => ({ ...d, time: e.target.value }))}
-                />
-              </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Thuis</Label>
+              <Select
+                value={assignDraft.homeTeamId || "__none__"}
+                onValueChange={(v) => setAssignDraft(d => ({ ...d, homeTeamId: v === "__none__" ? "" : v }))}
+              >
+                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Geen team</SelectItem>
+                  {teams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Veld</Label>
-              {configuredPlannerFieldNames.length > 0 ? (
-                <Select
-                  value={planningDraft.field || "__none__"}
-                  onValueChange={(v) => setPlanningDraft(d => ({ ...d, field: v === "__none__" ? "" : v }))}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Kies veld" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">Geen veld</SelectItem>
-                    {configuredPlannerFieldNames.map((f: string) => (
-                      <SelectItem key={f} value={f}>{f}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  className="h-9"
-                  value={planningDraft.field}
-                  onChange={(e) => setPlanningDraft(d => ({ ...d, field: e.target.value }))}
-                  placeholder="Veldnaam"
-                />
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Scheidsrechter</Label>
-              {refereeNames.length > 0 ? (
-                <Select
-                  value={planningDraft.referee || "__none__"}
-                  onValueChange={(v) => setPlanningDraft(d => ({ ...d, referee: v === "__none__" ? "" : v }))}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Kies scheidsrechter" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">Geen scheidsrechter</SelectItem>
-                    {refereeNames.map(r => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  className="h-9"
-                  value={planningDraft.referee}
-                  onChange={(e) => setPlanningDraft(d => ({ ...d, referee: e.target.value }))}
-                  placeholder="Naam scheidsrechter"
-                />
-              )}
+              <Label className="text-xs">Uit</Label>
+              <Select
+                value={assignDraft.awayTeamId || "__none__"}
+                onValueChange={(v) => setAssignDraft(d => ({ ...d, awayTeamId: v === "__none__" ? "" : v }))}
+              >
+                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Geen team</SelectItem>
+                  {teams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPlanningMatchId(null)}>Annuleren</Button>
-            <Button onClick={savePlanning} disabled={savingPlanning}>Opslaan</Button>
+            <Button variant="outline" onClick={() => setAssigningMatchId(null)}>Annuleren</Button>
+            <Button onClick={saveAssign} disabled={savingAssign}>Opslaan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
