@@ -144,6 +144,9 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
 const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
+// Uniform block height so all field columns share one visual timeline
+const PLANNER_ROW_H = "h-[92px]";
+
 
 const formatDateDMY = (d: string | null) => {
   if (!d) return null;
