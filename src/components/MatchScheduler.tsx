@@ -2777,14 +2777,53 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                     ? (previewIndex >= dragOrigIdx ? previewIndex + 1 : previewIndex)
                                     : previewIndex)
                                   : null;
-                                return fieldMatches.map((m, idx) => {
-                                const hasBreakAfter = fieldBreaks.find(b => b.afterSlotIndex === idx);
+                                const lastStart = items.length ? items[items.length - 1].startMin : -1;
+                                const rowTimes = timelineTimes.filter(t => t <= lastStart);
+                                return rowTimes.map((rowTime) => {
+                                const item = items.find(i => i.startMin === rowTime);
+
+                                // Empty timeline block (field starts later / other field has a pause)
+                                if (!item) {
+                                  return (
+                                    <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
+                                      <div className={`${PLANNER_ROW_H} rounded-lg border border-dashed border-border/60 bg-muted/20 flex items-center justify-center`}>
+                                        <span className="text-[10px] font-mono text-muted-foreground/50">{minutesToTime(rowTime)}</span>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                // Pause block — same size as a match block
+                                if (item.kind === "break") {
+                                  const brk = item.brk;
+                                  return (
+                                    <div key={`break-${brk.id}`} className="px-1.5 py-0.5">
+                                      <PlannerItem
+                                        payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
+                                        className={`${PLANNER_ROW_H} rounded-lg bg-primary/10 border border-primary/30 px-3 flex flex-col items-start justify-center gap-1`}
+                                      >
+                                        <div className="flex items-center justify-between w-full">
+                                          <span className="text-[11px] font-mono font-bold text-primary">{minutesToTime(item.startMin)}</span>
+                                          <button onClick={(e) => { e.stopPropagation(); void removeBreak(brk.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-xs text-primary font-medium">Pauze</span>
+                                          <span className="text-[10px] border border-primary/30 text-primary rounded-full px-2 py-0.5">{brk.duration} minuten</span>
+                                        </div>
+                                      </PlannerItem>
+                                    </div>
+                                  );
+                                }
+
+                                const m = item.match;
+                                const idx = item.idx;
                                 const isDragging = dragItemId === m.id;
                                 const time = slotTimes[idx] || m.match_time?.slice(0, 5) || "—";
                                 const isPreviewHere = visualInsertIdx === idx && dragItemId && dragItemId !== m.id;
                                 const isPreviewAfter = visualInsertIdx === idx + 1 && dragItemId && dragItemId !== m.id;
                                 const phase = phases.find(p => p.id === m.phase_id);
                                 const group = allGroups.find(g => g.id === m.group_id);
+
 
                                 return (
                                   <div key={m.id}>
