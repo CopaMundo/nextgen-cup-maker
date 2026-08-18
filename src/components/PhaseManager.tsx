@@ -684,8 +684,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
 
   // Delete entire phase (all formats in it) with renumbering. Also handles draft (empty) phases.
   const deletePhase = async (phaseNumber: number) => {
-    // Never allow deleting the last remaining phase
-    if (containers.length <= 1) {
+    // Never allow deleting the last remaining phase or the first phase
+    if (containers.length <= 1 || phaseNumber === 1) {
       setDeletePhaseNumber(null);
       return;
     }
@@ -1170,7 +1170,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </span>
-                      {containers.length > 1 && (
+                      {containers.length > 1 && c.phaseNumber !== 1 && (
                         <span
                           role="button"
                           tabIndex={0}
