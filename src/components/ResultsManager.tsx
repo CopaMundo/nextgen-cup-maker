@@ -107,7 +107,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0);
   const [collapsedTimeSlots, setCollapsedTimeSlots] = useState<Set<string>>(new Set());
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
-  // Teams toewijzen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
+  // Teams wijzigen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
   const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
   const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
   const [savingAssign, setSavingAssign] = useState(false);
@@ -1203,10 +1203,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return configuredPlannerFieldNames.includes(match.field);
   };
 
-  // Teams toewijzen aan een wedstrijd (enkel home/away, de rest gebeurt in het Schema-tabblad)
+  // Teams wijzigen aan een wedstrijd (enkel home/away, de rest gebeurt in het Schema-tabblad)
+  // Eenmaal gepland in het Schema-tabblad kan je de teams niet meer wijzigen.
   const canAssignTeams = (match: Match) => {
     const format = phases.find(p => p.id === match.phase_id);
-    return Boolean(format && canEditFormat(format));
+    return Boolean(format && canEditFormat(format) && !isMatchPlannedInSchema(match));
   };
 
   const openAssignDialog = (match: Match) => {
@@ -1707,7 +1708,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               <button
                 onClick={() => openAssignDialog(match)}
                 className="text-muted-foreground hover:text-primary transition-colors"
-                title="Teams toewijzen"
+                title="Teams wijzigen"
               >
                 <Users className="h-3.5 w-3.5" />
               </button>
@@ -2304,11 +2305,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         );
       })()}
 
-      {/* Teams toewijzen aan een wedstrijd */}
+      {/* Teams wijzigen aan een wedstrijd */}
       <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Teams toewijzen</DialogTitle>
+            <DialogTitle>Teams wijzigen</DialogTitle>
             <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
