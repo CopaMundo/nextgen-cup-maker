@@ -102,7 +102,13 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0);
   const [collapsedTimeSlots, setCollapsedTimeSlots] = useState<Set<string>>(new Set());
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
+  const [refereeNames, setRefereeNames] = useState<string[]>([]);
+  // Handmatige planning vanuit het resultatenschema (draft-state: pas opslaan bij "Opslaan")
+  const [planningMatchId, setPlanningMatchId] = useState<string | null>(null);
+  const [planningDraft, setPlanningDraft] = useState<{ date: string; time: string; field: string; referee: string }>({ date: "", time: "", field: "", referee: "" });
+  const [savingPlanning, setSavingPlanning] = useState(false);
   const { toast } = useToast();
+
 
   const hasAnyStats = tournament?.enable_goalscorers || tournament?.enable_assists || tournament?.enable_yellow_cards || tournament?.enable_red_cards;
 
