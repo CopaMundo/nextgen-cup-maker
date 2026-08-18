@@ -1190,7 +1190,11 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                       : "text-muted-foreground hover:text-foreground")
                   }
                 >
-                  <span>{getPhaseLabel(c.phaseNumber, allFormats)}</span>
+                  <span>
+                    {allFormats.some(f => f.phase_number === c.phaseNumber)
+                      ? getPhaseLabel(c.phaseNumber, allFormats)
+                      : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`)}
+                  </span>
                   {isActive && (
                     <span className="flex items-center gap-0.5 ml-1">
                       <span
