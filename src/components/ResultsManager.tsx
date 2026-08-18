@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, RotateCcw, BarChart3, ChevronDown, ChevronRight, ChevronUp, Plus, Minus, MapPin, ListOrdered } from "lucide-react";
+import { CheckCircle2, RotateCcw, BarChart3, ChevronDown, ChevronRight, ChevronUp, Plus, Minus, MapPin, ListOrdered, Users } from "lucide-react";
 import rankingPodium from "@/assets/ranking-podium.png";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import MatchDetailDialog from "./MatchDetailDialog";
