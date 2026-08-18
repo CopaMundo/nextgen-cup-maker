@@ -1209,6 +1209,47 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return configuredPlannerFieldNames.includes(match.field);
   };
 
+  // Beschikbare wedstrijddagen voor handmatige planning
+  const availablePlanningDates = useMemo(() => {
+    const extra = expandMatchDays((tournament?.match_days as MatchDayEntry[]) || []);
+    if (extra.length > 0) return extra;
+    if (tournament?.start_date && tournament?.end_date) {
+      return listIsoDatesInRange(tournament.start_date, tournament.end_date);
+    }
+    return normalizeIsoDates([tournament?.start_date, tournament?.end_date]);
+  }, [tournament?.match_days, tournament?.start_date, tournament?.end_date]);
+
+  const openPlanningDialog = (match: Match) => {
+    setPlanningDraft({
+      date: match.match_date || "",
+      time: match.match_time ? match.match_time.slice(0, 5) : "",
+      field: match.field || "",
+      referee: match.referee || "",
+    });
+    setPlanningMatchId(match.id);
+  };
+
+  const savePlanning = async () => {
+    if (!planningMatchId) return;
+    setSavingPlanning(true);
+    const payload = {
+      match_date: planningDraft.date || null,
+      match_time: planningDraft.time ? `${planningDraft.time}:00` : null,
+      field: planningDraft.field || null,
+      referee: planningDraft.referee || null,
+    };
+    const { error } = await supabase.from("matches").update(payload as any).eq("id", planningMatchId);
+    setSavingPlanning(false);
+    if (error) {
+      toast({ title: "Opslaan mislukt", description: error.message, variant: "destructive" });
+      return;
+    }
+    setMatches(prev => prev.map(m => (m.id === planningMatchId ? { ...m, ...payload } as Match : m)));
+    setPlanningMatchId(null);
+    toast({ title: "Planning opgeslagen" });
+  };
+
+
   // All matches: visible planner time slots first, unplanned always at the bottom.
   // C-mode: ALWAYS list every match in the (category-scoped) tournament chronologically,
   // independent of the active phase tab. Phase tabs only drive the format-chip rail above.
