@@ -1203,44 +1203,67 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return configuredPlannerFieldNames.includes(match.field);
   };
 
-  // Beschikbare wedstrijddagen voor handmatige planning
-  const availablePlanningDates = useMemo(() => {
-    const extra = expandMatchDays((tournament?.match_days as MatchDayEntry[]) || []);
-    if (extra.length > 0) return extra;
-    if (tournament?.start_date && tournament?.end_date) {
-      return listIsoDatesInRange(tournament.start_date, tournament.end_date);
-    }
-    return normalizeIsoDates([tournament?.start_date, tournament?.end_date]);
-  }, [tournament?.match_days, tournament?.start_date, tournament?.end_date]);
-
-  const openPlanningDialog = (match: Match) => {
-    setPlanningDraft({
-      date: match.match_date || "",
-      time: match.match_time ? match.match_time.slice(0, 5) : "",
-      field: match.field || "",
-      referee: match.referee || "",
-    });
-    setPlanningMatchId(match.id);
+  // Teams toewijzen aan een wedstrijd (enkel home/away, de rest gebeurt in het Schema-tabblad)
+  const canAssignTeams = (match: Match) => {
+    const format = phases.find(p => p.id === match.phase_id);
+    return Boolean(format && canEditFormat(format));
   };
 
-  const savePlanning = async () => {
-    if (!planningMatchId) return;
-    setSavingPlanning(true);
+  const openAssignDialog = (match: Match) => {
+    setAssignDraft({
+      homeTeamId: match.home_team_id || "",
+      awayTeamId: match.away_team_id || "",
+    });
+    setAssigningMatchId(match.id);
+  };
+
+  const saveAssign = async () => {
+    if (!assigningMatchId) return;
+    setSavingAssign(true);
+    const currentMatch = matches.find(m => m.id === assigningMatchId);
+    if (!currentMatch) {
+      setSavingAssign(false);
+      return;
+    }
+
     const payload = {
-      match_date: planningDraft.date || null,
-      match_time: planningDraft.time ? `${planningDraft.time}:00` : null,
-      field: planningDraft.field || null,
-      referee: planningDraft.referee || null,
+      home_team_id: assignDraft.homeTeamId || null,
+      away_team_id: assignDraft.awayTeamId || null,
     };
-    const { error } = await supabase.from("matches").update(payload as any).eq("id", planningMatchId);
-    setSavingPlanning(false);
+
+    const teamsChanged = currentMatch.home_team_id !== payload.home_team_id ||
+                         currentMatch.away_team_id !== payload.away_team_id;
+
+    let finalPayload: any = { ...payload };
+    if (teamsChanged && currentMatch.is_played) {
+      finalPayload = {
+        ...finalPayload,
+        home_score: null,
+        away_score: null,
+        home_penalties: null,
+        away_penalties: null,
+        set_scores: null,
+        is_played: false,
+      };
+      await supabase.from("match_stats").delete().eq("match_id", currentMatch.id);
+    }
+
+    const { error } = await supabase.from("matches").update(finalPayload).eq("id", assigningMatchId);
+    setSavingAssign(false);
     if (error) {
       toast({ title: "Opslaan mislukt", description: error.message, variant: "destructive" });
       return;
     }
-    setMatches(prev => prev.map(m => (m.id === planningMatchId ? { ...m, ...payload } as Match : m)));
-    setPlanningMatchId(null);
-    toast({ title: "Planning opgeslagen" });
+
+    let updatedMatches = matches.map(m => m.id === assigningMatchId ? { ...m, ...finalPayload } as Match : m);
+
+    if (teamsChanged && currentMatch.match_name) {
+      updatedMatches = await clearDownstreamTeams(currentMatch.match_name, updatedMatches, currentMatch.phase_id);
+    }
+
+    setMatches(updatedMatches);
+    setAssigningMatchId(null);
+    toast({ title: "Teams opgeslagen" });
   };
 
 
