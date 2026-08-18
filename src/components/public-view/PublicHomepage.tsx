@@ -7,6 +7,7 @@ import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
+import { getPhaseLabel } from "@/lib/phaseLabel";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
