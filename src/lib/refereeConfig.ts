@@ -28,7 +28,8 @@ export const getLocationFieldMode = (
   allowedFields: string[] | null,
   fields: string[]
 ): LocationFieldMode => {
-  if (!allowedFields || allowedFields.length === 0) return "none";
+  if (!allowedFields) return "all";
+  if (allowedFields.length === 0) return "none";
   const hasLocation = allowedFields.includes(location);
   if (!hasLocation) return "none";
   if (fields.length === 0) return "all";

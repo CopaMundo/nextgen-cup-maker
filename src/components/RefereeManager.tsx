@@ -41,6 +41,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [newRef, setNewRef] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [draft, setDraft] = useState<RefereeConfig | null>(null);
+  const [locModes, setLocModes] = useState<Record<string, LocationFieldMode>>({});
   const [excludeMode, setExcludeMode] = useState<ExcludeMode>("none");
   const [roleMode, setRoleMode] = useState<RoleMode>("all");
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
@@ -110,6 +111,11 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     const ref: RefereeConfig = JSON.parse(JSON.stringify(referees[i]));
     setEditIdx(i);
     setDraft(ref);
+    const modes: Record<string, LocationFieldMode> = {};
+    locationNames.forEach(loc => {
+      modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldOnlyNames);
+    });
+    setLocModes(modes);
     setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
     setRoleMode(ref.roles === null ? "all" : "select");
   };
@@ -158,12 +164,30 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   // ==== draft helpers ====
+  /** Bouw allowedFields op basis van de gekozen modus per locatie. */
+  const composeAllowed = (
+    modes: Record<string, LocationFieldMode>,
+    current: string[] | null
+  ): string[] | null => {
+    if (locationNames.length === 0) return current;
+    if (locationNames.every(loc => (modes[loc] ?? "all") === "all")) return null;
+    const set = new Set<string>();
+    const previouslySelected = (current ?? fieldOnlyNames).filter(f => fieldOnlyNames.includes(f));
+    locationNames.forEach(loc => {
+      const mode = modes[loc] ?? "all";
+      if (mode === "none") return;
+      set.add(loc);
+      if (mode === "all") fieldOnlyNames.forEach(f => set.add(f));
+      else previouslySelected.forEach(f => set.add(f));
+    });
+    return Array.from(set);
+  };
+
   const applyLocationFieldMode = (location: string, mode: LocationFieldMode) => {
     if (!draft) return;
-    setDraft({
-      ...draft,
-      allowedFields: setLocationFieldMode(location, mode, draft.allowedFields, fieldOnlyNames),
-    });
+    const nextModes = { ...locModes, [location]: mode };
+    setLocModes(nextModes);
+    setDraft({ ...draft, allowedFields: composeAllowed(nextModes, draft.allowedFields) });
   };
   const toggleField = (name: string) => {
     if (!draft) return;
@@ -329,7 +353,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                 {locationNames.length > 0 && (
                   <div className="space-y-3">
                     {locationNames.map(loc => {
-                      const mode = getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
+                      const mode = locModes[loc] ?? getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
                       return (
                         <div key={loc} className="space-y-2 rounded-lg border border-border px-3 py-2.5">
                           <p className="text-xs font-medium text-muted-foreground">{loc}</p>
