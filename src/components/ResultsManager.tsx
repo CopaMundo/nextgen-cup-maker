@@ -107,11 +107,10 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0);
   const [collapsedTimeSlots, setCollapsedTimeSlots] = useState<Set<string>>(new Set());
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
-  const [refereeNames, setRefereeNames] = useState<string[]>([]);
-  // Handmatige planning vanuit het resultatenschema (draft-state: pas opslaan bij "Opslaan")
-  const [planningMatchId, setPlanningMatchId] = useState<string | null>(null);
-  const [planningDraft, setPlanningDraft] = useState<{ date: string; time: string; field: string; referee: string }>({ date: "", time: "", field: "", referee: "" });
-  const [savingPlanning, setSavingPlanning] = useState(false);
+  // Teams toewijzen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
+  const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
+  const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
+  const [savingAssign, setSavingAssign] = useState(false);
   const { toast } = useToast();
 
 
