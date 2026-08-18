@@ -55,6 +55,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
   const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null);
   const [editPhaseNumber, setEditPhaseNumber] = useState<number | null>(null);
   const [editPhaseLabel, setEditPhaseLabel] = useState("");
+  /** Labels voor fases die (nog) geen formats hebben; worden toegepast bij het eerste format. */
+  const [pendingPhaseLabels, setPendingPhaseLabels] = useState<Record<number, string>>({});
   const [savingPhaseEdit, setSavingPhaseEdit] = useState(false);
   const [activePhaseNumber, setActivePhaseNumber] = useState<number | null>(null);
   const [draftPhaseNumbers, setDraftPhaseNumbers] = useState<number[]>([]);
