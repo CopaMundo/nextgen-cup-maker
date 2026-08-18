@@ -41,6 +41,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [newRef, setNewRef] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [draft, setDraft] = useState<RefereeConfig | null>(null);
+  const [locModes, setLocModes] = useState<Record<string, LocationFieldMode>>({});
   const [excludeMode, setExcludeMode] = useState<ExcludeMode>("none");
   const [roleMode, setRoleMode] = useState<RoleMode>("all");
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
