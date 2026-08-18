@@ -2903,19 +2903,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                       </div>
                                     </div>
 
-                                    {/* Break after match */}
-                                    {hasBreakAfter && (
-                                      <PlannerItem
-                                        payload={{ id: hasBreakAfter.id, type: "break", field_id: field.name, slot_index: hasBreakAfter.afterSlotIndex, container: "schema" }}
-                                        className="mx-1.5 my-0.5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-1.5 flex items-center justify-between"
-                                      >
-                                        <span className="text-xs text-primary font-medium">Pauze</span>
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-[10px] border border-primary/30 text-primary rounded-full px-2 py-0.5">{hasBreakAfter.duration} minuten</span>
-                                          <button onClick={(e) => { e.stopPropagation(); void removeBreak(hasBreakAfter.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
-                                        </div>
-                                      </PlannerItem>
-                                    )}
+
+
 
                                     <PlannerInsertionMarker active={!!(isPreviewAfter && idx === fieldMatches.length - 1)} />
                                   </div>
