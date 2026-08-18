@@ -2840,7 +2840,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                       <div className="px-1.5 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${PLANNER_ROW_H} overflow-hidden rounded-lg border p-2 text-xs transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-2 text-xs transition-all duration-200 ${
                                             mobileSelectedMatchId === m.id
                                               ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
