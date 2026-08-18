@@ -110,6 +110,11 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     const ref: RefereeConfig = JSON.parse(JSON.stringify(referees[i]));
     setEditIdx(i);
     setDraft(ref);
+    const modes: Record<string, LocationFieldMode> = {};
+    locationNames.forEach(loc => {
+      modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldOnlyNames);
+    });
+    setLocModes(modes);
     setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
     setRoleMode(ref.roles === null ? "all" : "select");
   };
