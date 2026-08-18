@@ -1170,7 +1170,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </span>
-                      {containers.length > 1 && (
+                      {containers.length > 1 && c.phaseNumber !== 1 && (
                         <span
                           role="button"
                           tabIndex={0}
