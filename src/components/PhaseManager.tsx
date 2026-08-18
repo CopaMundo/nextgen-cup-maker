@@ -300,7 +300,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       } : {};
 
       const existingPhaseFormat = allFormats.find(f => f.phase_number === phaseNumber);
-      const inheritedPhaseLabel = existingPhaseFormat?.match_config?.phaseLabel;
+      const inheritedPhaseLabel =
+        existingPhaseFormat?.match_config?.phaseLabel ?? pendingPhaseLabels[phaseNumber];
       const matchConfigWithPhaseLabel = {
         ...matchConfig,
         ...(typeof inheritedPhaseLabel === "string" && inheritedPhaseLabel ? { phaseLabel: inheritedPhaseLabel } : {}),
