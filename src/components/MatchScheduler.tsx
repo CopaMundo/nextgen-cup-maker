@@ -2662,18 +2662,30 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                   const fieldBreaks = plannerBreaks.filter(b => b.fieldNames.includes(field.name));
                   let currentTime = timeToMinutes(field.startTime);
                   const slotTimes: string[] = [];
+                  const items: { kind: "match" | "break"; startMin: number; idx: number; match?: any; brk?: any }[] = [];
                   for (let i = 0; i < fieldMatches.length; i++) {
                     slotTimes.push(minutesToTime(currentTime));
+                    items.push({ kind: "match", startMin: currentTime, idx: i, match: fieldMatches[i] });
                     const matchPhase = phases.find(p => p.id === fieldMatches[i].phase_id);
                     const matchCfg = (matchPhase?.match_config as any) || {};
                     const dur = matchCfg.phaseDuration ?? globalMatchDuration;
                     const brk = matchCfg.phaseBreak ?? globalBreakDuration;
                     currentTime += dur + brk;
                     const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-                    if (breakHere) currentTime += breakHere.duration;
+                    if (breakHere) {
+                      items.push({ kind: "break", startMin: currentTime, idx: i, brk: breakHere });
+                      currentTime += breakHere.duration;
+                    }
                   }
-                  return { field, fieldMatches, fieldBreaks, slotTimes, nextFreeTime: minutesToTime(currentTime) };
+                  return { field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime: minutesToTime(currentTime) };
                 });
+
+                // Shared timeline: every distinct start time becomes a row, so equal
+                // moments line up across all field columns (gaps get an empty block).
+                const timelineTimes = Array.from(
+                  new Set(fieldData.flatMap(f => f.items.map(i => i.startMin)))
+                ).sort((a, b) => a - b);
+
 
                 return (
                   <div>
