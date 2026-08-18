@@ -144,6 +144,9 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
 const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
+// Uniform block height so all field columns share one visual timeline
+const PLANNER_ROW_H = "h-[92px]";
+
 
 const formatDateDMY = (d: string | null) => {
   if (!d) return null;
@@ -2662,18 +2665,30 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                   const fieldBreaks = plannerBreaks.filter(b => b.fieldNames.includes(field.name));
                   let currentTime = timeToMinutes(field.startTime);
                   const slotTimes: string[] = [];
+                  const items: { kind: "match" | "break"; startMin: number; idx: number; match?: any; brk?: any }[] = [];
                   for (let i = 0; i < fieldMatches.length; i++) {
                     slotTimes.push(minutesToTime(currentTime));
+                    items.push({ kind: "match", startMin: currentTime, idx: i, match: fieldMatches[i] });
                     const matchPhase = phases.find(p => p.id === fieldMatches[i].phase_id);
                     const matchCfg = (matchPhase?.match_config as any) || {};
                     const dur = matchCfg.phaseDuration ?? globalMatchDuration;
                     const brk = matchCfg.phaseBreak ?? globalBreakDuration;
                     currentTime += dur + brk;
                     const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-                    if (breakHere) currentTime += breakHere.duration;
+                    if (breakHere) {
+                      items.push({ kind: "break", startMin: currentTime, idx: i, brk: breakHere });
+                      currentTime += breakHere.duration;
+                    }
                   }
-                  return { field, fieldMatches, fieldBreaks, slotTimes, nextFreeTime: minutesToTime(currentTime) };
+                  return { field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime: minutesToTime(currentTime) };
                 });
+
+                // Shared timeline: every distinct start time becomes a row, so equal
+                // moments line up across all field columns (gaps get an empty block).
+                const timelineTimes = Array.from(
+                  new Set(fieldData.flatMap(f => f.items.map(i => i.startMin)))
+                ).sort((a, b) => a - b);
+
 
                 return (
                   <div>
@@ -2706,7 +2721,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-0 min-w-0">
-                        {fieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, nextFreeTime }) => (
+                        {fieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
                           <div key={field.name} className="min-w-[330px] w-[330px] flex-shrink-0 print:min-w-0 print:w-auto print:flex-1">
                             {/* Field header */}
                             <div
@@ -2765,14 +2780,53 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                     ? (previewIndex >= dragOrigIdx ? previewIndex + 1 : previewIndex)
                                     : previewIndex)
                                   : null;
-                                return fieldMatches.map((m, idx) => {
-                                const hasBreakAfter = fieldBreaks.find(b => b.afterSlotIndex === idx);
+                                const lastStart = items.length ? items[items.length - 1].startMin : -1;
+                                const rowTimes = timelineTimes.filter(t => t <= lastStart);
+                                return rowTimes.map((rowTime) => {
+                                const item = items.find(i => i.startMin === rowTime);
+
+                                // Empty timeline block (field starts later / other field has a pause)
+                                if (!item) {
+                                  return (
+                                    <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
+                                      <div className={`${PLANNER_ROW_H} rounded-lg border border-dashed border-border/60 bg-muted/20 flex items-center justify-center`}>
+                                        <span className="text-[10px] font-mono text-muted-foreground/50">{minutesToTime(rowTime)}</span>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                // Pause block — same size as a match block
+                                if (item.kind === "break") {
+                                  const brk = item.brk;
+                                  return (
+                                    <div key={`break-${brk.id}`} className="px-1.5 py-0.5">
+                                      <PlannerItem
+                                        payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
+                                        className={`${PLANNER_ROW_H} rounded-lg bg-primary/10 border border-primary/30 px-3 flex flex-col items-start justify-center gap-1`}
+                                      >
+                                        <div className="flex items-center justify-between w-full">
+                                          <span className="text-[11px] font-mono font-bold text-primary">{minutesToTime(item.startMin)}</span>
+                                          <button onClick={(e) => { e.stopPropagation(); void removeBreak(brk.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-xs text-primary font-medium">Pauze</span>
+                                          <span className="text-[10px] border border-primary/30 text-primary rounded-full px-2 py-0.5">{brk.duration} minuten</span>
+                                        </div>
+                                      </PlannerItem>
+                                    </div>
+                                  );
+                                }
+
+                                const m = item.match;
+                                const idx = item.idx;
                                 const isDragging = dragItemId === m.id;
                                 const time = slotTimes[idx] || m.match_time?.slice(0, 5) || "—";
                                 const isPreviewHere = visualInsertIdx === idx && dragItemId && dragItemId !== m.id;
                                 const isPreviewAfter = visualInsertIdx === idx + 1 && dragItemId && dragItemId !== m.id;
                                 const phase = phases.find(p => p.id === m.phase_id);
                                 const group = allGroups.find(g => g.id === m.group_id);
+
 
                                 return (
                                   <div key={m.id}>
@@ -2786,7 +2840,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                       <div className="px-1.5 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`rounded-lg border p-2 text-xs transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-2 text-xs transition-all duration-200 ${
                                             mobileSelectedMatchId === m.id
                                               ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
@@ -2852,19 +2906,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                       </div>
                                     </div>
 
-                                    {/* Break after match */}
-                                    {hasBreakAfter && (
-                                      <PlannerItem
-                                        payload={{ id: hasBreakAfter.id, type: "break", field_id: field.name, slot_index: hasBreakAfter.afterSlotIndex, container: "schema" }}
-                                        className="mx-1.5 my-0.5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-1.5 flex items-center justify-between"
-                                      >
-                                        <span className="text-xs text-primary font-medium">Pauze</span>
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-[10px] border border-primary/30 text-primary rounded-full px-2 py-0.5">{hasBreakAfter.duration} minuten</span>
-                                          <button onClick={(e) => { e.stopPropagation(); void removeBreak(hasBreakAfter.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
-                                        </div>
-                                      </PlannerItem>
-                                    )}
+
+
 
                                     <PlannerInsertionMarker active={!!(isPreviewAfter && idx === fieldMatches.length - 1)} />
                                   </div>
