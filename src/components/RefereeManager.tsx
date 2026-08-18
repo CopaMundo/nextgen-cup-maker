@@ -164,12 +164,30 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   // ==== draft helpers ====
+  /** Bouw allowedFields op basis van de gekozen modus per locatie. */
+  const composeAllowed = (
+    modes: Record<string, LocationFieldMode>,
+    current: string[] | null
+  ): string[] | null => {
+    if (locationNames.length === 0) return current;
+    if (locationNames.every(loc => (modes[loc] ?? "all") === "all")) return null;
+    const set = new Set<string>();
+    const previouslySelected = (current ?? fieldOnlyNames).filter(f => fieldOnlyNames.includes(f));
+    locationNames.forEach(loc => {
+      const mode = modes[loc] ?? "all";
+      if (mode === "none") return;
+      set.add(loc);
+      if (mode === "all") fieldOnlyNames.forEach(f => set.add(f));
+      else previouslySelected.forEach(f => set.add(f));
+    });
+    return Array.from(set);
+  };
+
   const applyLocationFieldMode = (location: string, mode: LocationFieldMode) => {
     if (!draft) return;
-    setDraft({
-      ...draft,
-      allowedFields: setLocationFieldMode(location, mode, draft.allowedFields, fieldOnlyNames),
-    });
+    const nextModes = { ...locModes, [location]: mode };
+    setLocModes(nextModes);
+    setDraft({ ...draft, allowedFields: composeAllowed(nextModes, draft.allowedFields) });
   };
   const toggleField = (name: string) => {
     if (!draft) return;
