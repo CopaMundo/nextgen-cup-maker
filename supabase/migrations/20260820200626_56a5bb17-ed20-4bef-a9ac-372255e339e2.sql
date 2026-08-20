@@ -1,0 +1,1 @@
+update public.tournaments set view_display_style = 'copa_mundo' where view_display_style in ('world_cup','espn');
