@@ -23,7 +23,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   data_geek: { name: "Data Geek", description: "Analytisch dashboard met matrix-achtige data visualisatie", preview: "📊" },
   gazette: { name: "La Gazzetta", description: "Iconische roze Italiaanse sportkrant met serif headers", preview: "📰" },
   social: { name: "Social Feed", description: "Instagram-achtig met afgeronde cards en zachte gradients", preview: "📱" },
-  copa_mundo: { name: "Copa Mundo", description: "Premium Europees avondvoetbal: diep marineblauw met elektrisch blauw, Montserrat typografie", preview: "🏆" },
+  copa_mundo: { name: "Copa Mundo", description: "Premium Zuid-Amerikaans zwart & goud: diep zwart met warm goud, Barlow Condensed typografie", preview: "🏆" },
   netflix: { name: "Netflix", description: "Cinematisch zwart met iconisch rood en filmische spanning", preview: "🎬" },
   world_cup: { name: "World Cup 2026", description: "Koraal-roze met zwarte capsule-cards, gele cirkel accenten en vette typografie", preview: "🌎" },
   world_cup_mexico: { name: "World Cup — Mexico", description: "Groene host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇲🇽" },
