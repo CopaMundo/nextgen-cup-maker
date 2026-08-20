@@ -633,48 +633,62 @@ input[type="number"] {
   --ring: 275 51% 55%;
 }
 
-/* ── 9. Copa Mundo Classic ── Groen #009C3B + Geel #FFDF00 + Blauw #002776 ── */
+/* ── 9. Copa Mundo ── Premium match-centre: deep green-black + Copa Mundo geel #FFD600 ── */
+[data-broadcast="copa_mundo"] {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+}
+[data-broadcast="copa_mundo"] .font-display,
+[data-broadcast="copa_mundo"] h1,
+[data-broadcast="copa_mundo"] h2,
+[data-broadcast="copa_mundo"] h3 {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+}
 [data-broadcast="copa_mundo"][data-mode="dark"] {
-  --background: 150 12% 7%;
-  --foreground: 0 0% 93%;
-  --card: 150 10% 11%;
-  --card-foreground: 0 0% 93%;
-  --popover: 150 10% 11%;
-  --popover-foreground: 0 0% 93%;
-  --primary: 52 100% 50%;
-  --primary-foreground: 143 100% 7%;
-  --secondary: 150 8% 15%;
-  --secondary-foreground: 0 0% 80%;
-  --muted: 150 6% 15%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 143 100% 31%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 143 15% 20%;
-  --input: 143 15% 20%;
-  --ring: 52 100% 50%;
+  /* #07110E background, #101B17 card, #17241F secondary surface */
+  --background: 158 43% 5%;
+  --foreground: 60 20% 95%;
+  --card: 158 24% 8%;
+  --card-foreground: 60 20% 95%;
+  --popover: 158 24% 8%;
+  --popover-foreground: 60 20% 95%;
+  --primary: 50 100% 50%;
+  --primary-foreground: 158 43% 5%;
+  --secondary: 156 22% 11%;
+  --secondary-foreground: 60 12% 88%;
+  --muted: 156 22% 11%;
+  --muted-foreground: 158 7% 58%;
+  --accent: 156 22% 11%;
+  --accent-foreground: 60 20% 95%;
+  --destructive: 0 65% 48%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 156 12% 18%;
+  --input: 156 12% 18%;
+  --ring: 50 100% 50%;
+  --radius: 0.875rem;
 }
 [data-broadcast="copa_mundo"][data-mode="light"] {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 10%;
+  /* #F5F5F0 background, #FFFFFF cards, #07110E text, #101B17 dark green */
+  --background: 60 20% 95%;
+  --foreground: 158 43% 5%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
+  --card-foreground: 158 43% 5%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 143 100% 31%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 143 10% 93%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 143 8% 94%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 52 100% 45%;
-  --accent-foreground: 143 100% 8%;
-  --destructive: 0 70% 50%;
+  --popover-foreground: 158 43% 5%;
+  --primary: 50 100% 45%;
+  --primary-foreground: 158 43% 5%;
+  --secondary: 60 14% 91%;
+  --secondary-foreground: 158 30% 12%;
+  --muted: 60 14% 91%;
+  --muted-foreground: 158 8% 40%;
+  --accent: 158 24% 8%;
+  --accent-foreground: 60 20% 95%;
+  --destructive: 0 65% 48%;
   --destructive-foreground: 0 0% 100%;
-  --border: 143 12% 85%;
-  --input: 143 12% 85%;
-  --ring: 143 100% 31%;
+  --border: 158 10% 84%;
+  --input: 158 10% 84%;
+  --ring: 50 100% 45%;
+  --radius: 0.875rem;
 }
 
 /* ── 10. Netflix Docu ── Rood #E50914 + Zilvergrijs #B3B3B3 ── */
