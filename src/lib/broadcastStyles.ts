@@ -31,7 +31,9 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   world_cup_mexico: { name: "World Cup — Mexico", description: "Groene host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇲🇽" },
   world_cup_canada: { name: "World Cup — Canada", description: "Rode host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇨🇦" },
   world_cup_usa: { name: "World Cup — USA", description: "Blauwe host-nation stijl met sterren print zoals op de Trionda bal", preview: "🇺🇸" },
+  retro_football: { name: "Retro Football", description: "Vintage matchdayprogramma uit de jaren '70/'80: crèmepapier, bosgroen en verschoten rood met Roboto Condensed", preview: "📕" },
 };
+
 
 const STYLES: Record<BroadcastStyle, Record<string, string>> = {
   // ── 1. CHAMPIONS LEAGUE ───
