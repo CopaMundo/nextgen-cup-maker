@@ -48,7 +48,7 @@ const PublicView = () => {
   const [loading, setLoading] = useState(true);
   const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [homeResetKey, setHomeResetKey] = useState(0);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const PublicView = () => {
     const storedCat = localStorage.getItem(`cat-${token}`);
     if (storedCat) setSelectedCategory(storedCat);
     const storedDark = localStorage.getItem(`dark-${token}`);
-    if (storedDark === "true") setDarkMode(true);
+    if (storedDark !== null) setDarkMode(storedDark === "true");
     fetchData();
   }, [token]);
 
