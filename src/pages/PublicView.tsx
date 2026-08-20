@@ -63,7 +63,7 @@ const PublicView = () => {
 
   useEffect(() => {
     if (!data?.tournament) return;
-    const style = data.tournament.view_display_style || "espn";
+    const style = data.tournament.view_display_style || "copa_mundo";
     document.documentElement.setAttribute("data-mode", darkMode ? "dark" : "light");
     document.documentElement.setAttribute("data-broadcast", style);
     return () => {
@@ -207,7 +207,7 @@ const PublicView = () => {
     filteredData.standingColors = data.standingColors.filter((sc: any) => catPhaseIds.includes(sc.phase_id));
   }
 
-  const displayStyle = (data.tournament.view_display_style || "espn") as BroadcastStyle;
+  const displayStyle = (data.tournament.view_display_style || "copa_mundo") as BroadcastStyle;
 
   return (
     <BroadcastStyleContext.Provider value={displayStyle}>
