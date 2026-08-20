@@ -12,7 +12,9 @@ export type BroadcastStyle =
   | "world_cup"
   | "world_cup_mexico"
   | "world_cup_canada"
-  | "world_cup_usa";
+  | "world_cup_usa"
+  | "retro_football";
+
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
   champions_league: { name: "Champions League", description: "Elitaire donkerblauwe premium stijl met gouden accenten", preview: "⭐" },
