@@ -78,7 +78,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
           </div>
         ) : (
-          <div className="h-36 w-full bg-gradient-to-br from-primary/20 via-secondary to-background" />
+          <div className="h-40 w-full bg-[radial-gradient(120%_100%_at_50%_0%,hsl(var(--secondary))_0%,hsl(var(--background))_70%)] relative"><div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" /></div>
         )}
 
         <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 flex items-end justify-center px-5">
@@ -115,7 +115,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
         {/* Date & Location badges */}
         <div className="flex flex-wrap gap-2 justify-center">
           {(tournament.start_date || tournament.end_date) && (
-            <div className={`flex items-center gap-1.5 bg-primary/10 border border-primary/20 px-3 py-2 text-sm ${controlFrameShape}`}>
+            <div className={`flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
               <CalendarDays className="h-4 w-4 text-primary" />
               <span className="text-foreground font-bold text-xs">
                 {formatDate(tournament.start_date)}
@@ -124,7 +124,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             </div>
           )}
           {locations.length > 0 && (
-            <div className={`flex items-center gap-1.5 bg-primary/10 border border-primary/20 px-3 py-2 text-sm ${controlFrameShape}`}>
+            <div className={`flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
               <MapPin className="h-4 w-4 text-primary" />
               <span className="text-foreground font-bold text-xs">{locations.map(l => l.name).join(", ")}</span>
             </div>
@@ -140,7 +140,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Division selector */}
         {isMultiCat && (
-          <div ref={divisionRef} className={`p-4 space-y-2 border-2 ${squareStyle ? "" : "rounded-xl"} ${needsSelection ? "border-destructive bg-destructive/10 animate-pulse" : "border-primary/30 bg-primary/5"}`}>
+          <div ref={divisionRef} className={`p-4 space-y-2 border-2 ${squareStyle ? "" : "rounded-xl"} ${needsSelection ? "border-destructive bg-destructive/10 animate-pulse" : "border-foreground/10 bg-secondary/50"}`}>
             <label className={`text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-1.5 ${needsSelection ? "text-destructive" : "text-primary"}`}>
               {needsSelection && <AlertCircle className="h-4 w-4" />}
               Meerdere divisies beschikbaar
