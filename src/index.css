@@ -734,3 +734,82 @@ input[type="number"] {
   --input: 0 0% 86%;
   --ring: 357 95% 47%;
 }
+
+/* ── 15. RETRO FOOTBALL ── 1970s/80s matchday programme: aged cream #E9DFC5,
+   forest green #17392C, burnt red #B13A2C, mustard #D2A431, ink #24231F ── */
+[data-broadcast="retro_football"] {
+  font-family: 'Roboto Slab', Georgia, serif;
+}
+[data-broadcast="retro_football"] h1,
+[data-broadcast="retro_football"] h2,
+[data-broadcast="retro_football"] h3,
+[data-broadcast="retro_football"] .font-display {
+  font-family: 'Roboto Condensed', 'Oswald', Impact, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+}
+/* condensed numerals for scores / times / rankings */
+[data-broadcast="retro_football"] .tabular-nums,
+[data-broadcast="retro_football"] table th,
+[data-broadcast="retro_football"] .rf-num {
+  font-family: 'Roboto Condensed', 'Oswald', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+/* extremely subtle printed-paper grain */
+[data-broadcast="retro_football"] {
+  position: relative;
+  background-image:
+    radial-gradient(circle at 18% 12%, hsl(43 45% 78% / 0.35) 0%, transparent 42%),
+    radial-gradient(circle at 82% 78%, hsl(39 25% 70% / 0.28) 0%, transparent 45%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  background-attachment: fixed, fixed, fixed;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+[data-broadcast="retro_football"][data-mode="light"] {
+  --background: 43 45% 84%;
+  --foreground: 48 7% 13%;
+  --card: 43 57% 89%;
+  --card-foreground: 48 7% 13%;
+  --popover: 43 57% 89%;
+  --popover-foreground: 48 7% 13%;
+  --primary: 6 60% 43%;
+  --primary-foreground: 43 57% 89%;
+  --secondary: 43 38% 80%;
+  --secondary-foreground: 157 43% 16%;
+  --muted: 43 38% 80%;
+  --muted-foreground: 39 11% 42%;
+  --accent: 157 43% 16%;
+  --accent-foreground: 43 57% 89%;
+  --destructive: 5 58% 33%;
+  --destructive-foreground: 43 57% 89%;
+  --border: 39 11% 42%;
+  --input: 39 11% 42%;
+  --ring: 6 60% 43%;
+  --radius: 0.3rem;
+  --gradient-hero: linear-gradient(180deg, hsl(43 57% 89%) 0%, hsl(43 45% 84%) 100%);
+}
+[data-broadcast="retro_football"][data-mode="dark"] {
+  --background: 157 43% 10%;
+  --foreground: 43 50% 88%;
+  --card: 150 31% 15%;
+  --card-foreground: 43 50% 88%;
+  --popover: 150 31% 15%;
+  --popover-foreground: 43 50% 88%;
+  --primary: 6 60% 48%;
+  --primary-foreground: 43 57% 92%;
+  --secondary: 150 26% 20%;
+  --secondary-foreground: 43 45% 84%;
+  --muted: 150 26% 20%;
+  --muted-foreground: 43 15% 65%;
+  --accent: 43 45% 84%;
+  --accent-foreground: 157 43% 14%;
+  --destructive: 5 58% 40%;
+  --destructive-foreground: 43 57% 92%;
+  --border: 150 18% 30%;
+  --input: 150 18% 30%;
+  --ring: 6 60% 48%;
+  --radius: 0.3rem;
+  --gradient-hero: linear-gradient(180deg, hsl(157 43% 14%) 0%, hsl(157 43% 10%) 100%);
+}
