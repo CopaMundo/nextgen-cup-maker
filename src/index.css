@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700;1,800&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -633,63 +633,70 @@ input[type="number"] {
   --ring: 275 51% 55%;
 }
 
-/* ── 9. Copa Mundo ── Premium European night-football: deep navy #050A24 + electric blue #3975FF ── */
+/* ── 9. Copa Mundo ── Premium South American black & gold: #080808 + gold #D4AF37 ── */
 [data-broadcast="copa_mundo"] {
-  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 [data-broadcast="copa_mundo"] .font-display,
 [data-broadcast="copa_mundo"] h1,
 [data-broadcast="copa_mundo"] h2,
 [data-broadcast="copa_mundo"] h3 {
-  font-family: 'Montserrat', 'Inter', sans-serif;
-  letter-spacing: -0.01em;
+  font-family: 'Barlow Condensed', 'Montserrat', 'Inter', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+[data-broadcast="copa_mundo"] .tabular-nums,
+[data-broadcast="copa_mundo"] [data-numeric] {
+  font-family: 'Barlow Condensed', 'Montserrat', 'Inter', sans-serif;
+  font-weight: 800;
 }
 [data-broadcast="copa_mundo"][data-mode="dark"] {
-  /* #050A24 background, #0B153A card, #101D4A secondary, #14245A elevated */
-  --background: 230 76% 8%;
-  --foreground: 0 0% 100%;
-  --card: 227 68% 14%;
-  --card-foreground: 0 0% 100%;
-  --popover: 227 68% 14%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 222 100% 61%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 227 64% 18%;
-  --secondary-foreground: 226 35% 85%;
-  --muted: 227 64% 18%;
-  --muted-foreground: 226 30% 68%;
-  --accent: 226 64% 22%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 70% 52%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 226 55% 26%;
-  --input: 226 55% 26%;
-  --ring: 222 100% 61%;
-  --radius: 0.875rem;
-  --gradient-hero: linear-gradient(180deg, hsl(230 76% 8%) 0%, hsl(225 77% 13%) 100%);
+  /* #080808 background, #141414 card, #1B1B1B secondary, #22201C elevated, gold #D4AF37 */
+  --background: 0 0% 3%;
+  --foreground: 44 33% 95%;
+  --card: 0 0% 8%;
+  --card-foreground: 44 33% 95%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 44 33% 95%;
+  --primary: 46 65% 52%;
+  --primary-foreground: 0 0% 3%;
+  --secondary: 0 0% 11%;
+  --secondary-foreground: 40 9% 64%;
+  --muted: 0 0% 11%;
+  --muted-foreground: 40 6% 64%;
+  --accent: 40 10% 12%;
+  --accent-foreground: 44 33% 95%;
+  --destructive: 0 65% 45%;
+  --destructive-foreground: 44 33% 95%;
+  --border: 0 0% 14%;
+  --input: 0 0% 14%;
+  --ring: 46 65% 52%;
+  --radius: 0.75rem;
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 3%) 0%, hsl(0 0% 5%) 100%);
 }
 [data-broadcast="copa_mundo"][data-mode="light"] {
-  --background: 225 40% 97%;
-  --foreground: 230 60% 12%;
+  --background: 44 25% 97%;
+  --foreground: 0 0% 8%;
   --card: 0 0% 100%;
-  --card-foreground: 230 60% 12%;
+  --card-foreground: 0 0% 8%;
   --popover: 0 0% 100%;
-  --popover-foreground: 230 60% 12%;
-  --primary: 226 100% 57%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 225 35% 93%;
-  --secondary-foreground: 230 45% 20%;
-  --muted: 225 35% 93%;
-  --muted-foreground: 225 19% 45%;
-  --accent: 227 68% 16%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 42 60% 38%;
+  --primary-foreground: 44 33% 97%;
+  --secondary: 42 20% 93%;
+  --secondary-foreground: 0 0% 18%;
+  --muted: 42 20% 93%;
+  --muted-foreground: 40 6% 42%;
+  --accent: 0 0% 10%;
+  --accent-foreground: 44 33% 95%;
+  --destructive: 0 65% 45%;
   --destructive-foreground: 0 0% 100%;
-  --border: 225 30% 86%;
-  --input: 225 30% 86%;
-  --ring: 226 100% 57%;
-  --radius: 0.875rem;
+  --border: 42 15% 85%;
+  --input: 42 15% 85%;
+  --ring: 42 60% 38%;
+  --radius: 0.75rem;
 }
+
 
 /* ── 10. Netflix Docu ── Rood #E50914 + Zilvergrijs #B3B3B3 ── */
 [data-broadcast="netflix"][data-mode="dark"] {
