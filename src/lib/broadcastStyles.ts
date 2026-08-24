@@ -828,12 +828,64 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     logoFrame: "ring-1 ring-primary/40 shadow-[0_0_28px_hsl(var(--primary)/0.28)]",
     bracketConnector: "en-connector",
   },
-
+  // ── BROADCAST #3: JOGA BONITO (new generation) ───
+  joga_bonito: {
+    sectionDot: "h-4 w-[4px] rounded-[1px] bg-accent -rotate-6",
+    sectionTitle: "jb-brush text-[19px] text-foreground",
+    sectionMeta: "font-['Barlow_Condensed'] text-[12px] font-semibold uppercase tracking-[0.06em] text-muted-foreground",
+    sectionLine: "flex-1 h-[3px] rounded-full bg-gradient-to-r from-primary/70 via-accent/35 to-transparent",
+    card: "rounded-[13px] border border-border bg-card overflow-hidden shadow-[0_2px_10px_-6px_hsl(var(--broadcast-navy)/0.25)]",
+    matchCardWrapper: "rounded-[13px] border border-border bg-card overflow-hidden shadow-[0_2px_10px_-6px_hsl(var(--broadcast-navy)/0.25)]",
+    cardHeader: "bg-secondary border-b border-border px-3 py-1.5 flex items-center gap-2",
+    cardHeaderDot: "h-3 w-[3px] rounded-[1px] bg-primary -rotate-6",
+    cardHeaderTitle: "font-['Barlow_Condensed'] text-[12px] font-bold text-foreground uppercase tracking-[0.06em]",
+    homeCardHeader: "bg-secondary border-b border-border border-l-[3px] border-l-primary px-3 py-1.5 flex items-center gap-2",
+    homeCardHeaderTitle: "jb-brush text-[15px] text-foreground",
+    tabContainer: "flex gap-5 border-b border-border",
+    tabActive: "jb-underline flex-1 px-1 pb-2.5 pt-1 font-['Barlow_Condensed'] text-[14px] font-bold uppercase tracking-[0.06em] text-accent transition-colors duration-150",
+    tabInactive: "flex-1 px-1 pb-2.5 pt-1 font-['Barlow_Condensed'] text-[14px] font-semibold uppercase tracking-[0.06em] text-muted-foreground hover:text-foreground transition-colors duration-150",
+    badge: "inline-flex items-center rounded-[8px] bg-secondary border border-border px-2 py-0.5 font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.06em] text-foreground tabular-nums",
+    label: "jb-brush text-[14px] text-foreground",
+    backButton: "flex items-center gap-1 font-['Barlow_Condensed'] text-[13px] font-bold uppercase tracking-[0.06em] text-accent",
+    matchContext: "bg-secondary px-3 py-1 border-b border-border",
+    matchContextText: "font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
+    matchTeamRow: "px-3 py-2 rounded-[8px]",
+    matchTeamRowWin: "bg-[hsl(var(--broadcast-score)/0.14)] border-l-[3px] border-l-accent",
+    matchTeamName: "font-['Barlow_Condensed'] text-[14px] font-semibold truncate",
+    matchTeamNameFav: "text-accent",
+    matchScore: "font-['Barlow_Condensed'] text-[19px] font-extrabold tabular-nums",
+    matchScoreWin: "text-foreground",
+    matchScoreLose: "text-muted-foreground",
+    matchTimeBadge: "inline-flex items-center rounded-[7px] bg-accent px-2 py-0.5 font-['Barlow_Condensed'] text-[13px] font-extrabold text-accent-foreground tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1 bg-secondary/60 border-t border-border",
+    navBar: "bg-background/95 backdrop-blur-md border-t-2 border-primary/70",
+    navCenter: "bg-card text-muted-foreground border-border rounded-full",
+    navCenterActive: "bg-card text-accent border-accent rounded-full scale-105",
+    navTab: "text-muted-foreground hover:text-foreground",
+    navTabActive: "text-accent",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-accent",
+    tableHeader: "bg-secondary font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground border-b border-border",
+    tableRowAlt: "bg-secondary/35",
+    ptsBadge: "inline-flex items-center justify-center rounded-[6px] bg-accent px-1.5 py-0.5 font-['Barlow_Condensed'] text-[13px] font-extrabold text-accent-foreground tabular-nums",
+    timeslotHeader: "bg-secondary text-foreground flex items-center gap-2 px-3 py-1.5 border-b border-border",
+    timeslotBadge: "inline-flex items-center rounded-[6px] bg-[hsl(var(--broadcast-navy))] px-2 py-0.5 font-['Barlow_Condensed'] text-[14px] font-extrabold text-white tabular-nums",
+    timeslotHeaderMeta: "font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.06em] text-muted-foreground",
+    dateHeader: "jb-paint-bar bg-primary text-primary-foreground px-3 py-1 font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[0.07em]",
+    phaseTab: "px-3 py-1 rounded-[8px] font-['Barlow_Condensed'] text-[13px] font-bold uppercase tracking-[0.07em] whitespace-nowrap transition-colors duration-150",
+    phaseTabActive: "jb-underline bg-transparent text-accent",
+    phaseTabInactive: "bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-accent/50",
+    subHeader: "px-3 py-1.5 flex items-center justify-between gap-2 bg-secondary border-l-[3px] border-l-primary",
+    subHeaderTitle: "jb-brush text-[15px] text-foreground",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
+    coverOverlay: "jb-cover",
+    logoFrame: "ring-2 ring-primary/70 shadow-[0_4px_18px_-6px_hsl(var(--broadcast-navy)/0.5)]",
+    bracketConnector: "jb-connector",
+  },
 };
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito"];
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
   (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, NEW_BROADCAST_STYLES.includes(k) ? "broadcast" : "legacy"])
