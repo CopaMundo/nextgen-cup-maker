@@ -841,3 +841,9 @@ export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"
 export function ds(style: BroadcastStyle, token: string): string {
   return STYLES[style]?.[token] ?? "";
 }
+
+/** True als de stijl vierkante kaders gebruikt (geen border-radius). */
+export function isSquareStyle(style: BroadcastStyle): boolean {
+  const w = ds(style, "matchCardWrapper");
+  return Boolean(w) && !/rounded-(?!none)/.test(w);
+}

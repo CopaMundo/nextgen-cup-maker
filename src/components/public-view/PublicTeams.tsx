@@ -4,7 +4,7 @@ import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
-import { ds } from "@/lib/broadcastStyles";
+import { ds , isSquareStyle } from "@/lib/broadcastStyles";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 
 const POSITION_ORDER = ["goalkeeper", "defender", "midfielder", "attacker"];
@@ -89,7 +89,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
         {/* Team header - broadcast style */}
         <div className="flex items-center gap-4">
-          <div className={`h-16 w-16 overflow-hidden flex-shrink-0 border-2 border-primary/20 shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`}>
+          <div className={`h-16 w-16 overflow-hidden flex-shrink-0 border-2 border-primary/20 shadow-sm ${isSquareStyle(bStyle) ? "" : "rounded-xl"}`}>
             {team.logo_url ? <img src={team.logo_url} alt="" className="h-full w-full object-contain" /> :
               <div className="flex h-full w-full items-center justify-center bg-secondary text-2xl font-black text-muted-foreground">{team.name?.charAt(0)}</div>}
           </div>
@@ -100,7 +100,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
         </div>
 
         {team.team_photo_url && (
-          <div className={`overflow-hidden border border-border shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`}>
+          <div className={`overflow-hidden border border-border shadow-sm ${isSquareStyle(bStyle) ? "" : "rounded-xl"}`}>
             <img src={team.team_photo_url} alt="" className="w-full object-cover" />
           </div>
         )}
@@ -229,7 +229,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
       <div className="grid grid-cols-3 gap-2.5">
         {teams.map((t: any) => (
           <button key={t.id} onClick={() => { setSelectedTeam(t.id); setTeamTab("selectie"); }}
-            className={`flex flex-col items-center gap-2 p-3 transition-all border ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"} ${
+            className={`flex flex-col items-center gap-2 p-3 transition-all border ${isSquareStyle(bStyle) ? "" : "rounded-xl"} ${
               favoriteTeam === t.id ? "border-primary bg-primary/5 shadow-sm" : "border-transparent hover:bg-secondary/50 hover:border-border"
             }`}>
             <div className="h-12 w-12 overflow-hidden flex-shrink-0">
