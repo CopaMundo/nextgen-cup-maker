@@ -912,3 +912,132 @@ input[type="number"] {
   --broadcast-danger: 0 72% 54%;
   --broadcast-success: 152 54% 39%;
 }
+
+/* ── BROADCAST #2: EUROPEAN NIGHTS ─────────────────────────────────────────
+   Dark (hero): midnight navy #020814 + electric blue #2864FF, violet accent
+   Light: #F7F8FC studio version + deep European blue #1746D1
+   Display: Barlow Condensed — Body: Inter
+   ───────────────────────────────────────────────────────────────────────── */
+[data-broadcast="european_nights"] {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+[data-broadcast="european_nights"] h1,
+[data-broadcast="european_nights"] h2,
+[data-broadcast="european_nights"] h3,
+[data-broadcast="european_nights"] .font-display,
+[data-broadcast="european_nights"] .en-display {
+  font-family: 'Barlow Condensed', 'Inter', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+
+[data-broadcast="european_nights"][data-mode="dark"] {
+  --background: 213 75% 5%;
+  --foreground: 224 100% 98%;
+  --card: 217 58% 9%;
+  --card-foreground: 224 100% 98%;
+  --popover: 217 53% 12%;
+  --popover-foreground: 224 100% 98%;
+  --primary: 223 100% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 49% 13%;
+  --secondary-foreground: 215 18% 74%;
+  --muted: 215 49% 13%;
+  --muted-foreground: 213 17% 68%;
+  --accent: 258 100% 62%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 73% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 217 39% 21%;
+  --input: 217 39% 21%;
+  --ring: 223 100% 58%;
+  --radius: 0.5rem;
+  --gradient-hero: linear-gradient(180deg, hsl(217 58% 9%) 0%, hsl(213 75% 5%) 100%);
+
+  --broadcast-bg: 213 75% 5%;
+  --broadcast-surface: 217 58% 9%;
+  --broadcast-surface-secondary: 215 49% 13%;
+  --broadcast-surface-elevated: 217 53% 12%;
+  --broadcast-text: 224 100% 98%;
+  --broadcast-text-secondary: 213 17% 68%;
+  --broadcast-text-muted: 213 15% 47%;
+  --broadcast-border: 217 39% 21%;
+  --broadcast-primary: 223 100% 58%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-score: 222 79% 34%;
+  --broadcast-violet: 258 100% 62%;
+  --broadcast-cyan: 187 71% 50%;
+  --broadcast-danger: 0 73% 58%;
+  --broadcast-success: 155 57% 46%;
+
+  /* Zeer subtiele floodlight-atmosfeer (2-8% opacity) */
+  background-image:
+    radial-gradient(120% 60% at 50% -10%, hsl(223 100% 58% / 0.07) 0%, transparent 60%),
+    radial-gradient(70% 40% at 100% 8%, hsl(258 100% 62% / 0.05) 0%, transparent 70%),
+    radial-gradient(60% 35% at 0% 4%, hsl(187 71% 50% / 0.035) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+[data-broadcast="european_nights"][data-mode="light"] {
+  --background: 225 43% 98%;
+  --foreground: 220 40% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 40% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 40% 11%;
+  --primary: 224 80% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 33% 96%;
+  --secondary-foreground: 218 15% 30%;
+  --muted: 220 33% 96%;
+  --muted-foreground: 218 14% 45%;
+  --accent: 258 79% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 357 66% 54%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 22% 88%;
+  --input: 220 22% 88%;
+  --ring: 224 80% 45%;
+  --radius: 0.5rem;
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(225 43% 98%) 100%);
+
+  --broadcast-bg: 225 43% 98%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 220 33% 96%;
+  --broadcast-surface-elevated: 221 45% 94%;
+  --broadcast-text: 220 40% 11%;
+  --broadcast-text-secondary: 218 14% 45%;
+  --broadcast-text-muted: 219 12% 60%;
+  --broadcast-border: 220 22% 88%;
+  --broadcast-primary: 224 80% 45%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-score: 224 80% 45%;
+  --broadcast-violet: 258 79% 60%;
+  --broadcast-cyan: 187 60% 45%;
+  --broadcast-danger: 357 66% 54%;
+  --broadcast-success: 158 60% 34%;
+
+  background-image:
+    radial-gradient(110% 50% at 50% -8%, hsl(224 80% 45% / 0.05) 0%, transparent 65%),
+    radial-gradient(60% 30% at 100% 2%, hsl(258 79% 60% / 0.03) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Broadcast typografie: scores, tijden en cijfers in Barlow Condensed */
+[data-broadcast="european_nights"] .tabular-nums {
+  font-family: 'Barlow Condensed', 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+@keyframes en-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+[data-broadcast="european_nights"] .en-live-dot {
+  animation: en-live-pulse 1.6s ease-in-out infinite;
+}
