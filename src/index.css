@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -1077,3 +1077,170 @@ input[type="number"] {
   stroke-width: 1.5;
 }
 
+
+/* ── BROADCAST #3: JOGA BONITO ──────────────────────────────────────────────
+   Braziliaanse straatvoetbalcultuur: navy basis, geel als broadcast-accent,
+   groen voor actieve states, warm wit voor rust.
+   Headings: Permanent Marker — UI/data: Barlow Condensed — body: Inter
+   ───────────────────────────────────────────────────────────────────────── */
+[data-broadcast="joga_bonito"] {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+[data-broadcast="joga_bonito"] h1,
+[data-broadcast="joga_bonito"] h2,
+[data-broadcast="joga_bonito"] h3,
+[data-broadcast="joga_bonito"] .font-display,
+[data-broadcast="joga_bonito"] .jb-brush {
+  font-family: 'Permanent Marker', 'Caveat Brush', 'Barlow Condensed', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.015em;
+  line-height: 1.1;
+}
+
+[data-broadcast="joga_bonito"][data-mode="light"] {
+  --background: 48 100% 98%;
+  --foreground: 220 79% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 79% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 79% 15%;
+  --primary: 50 100% 50%;
+  --primary-foreground: 222 87% 24%;
+  --secondary: 47 55% 92%;
+  --secondary-foreground: 220 12% 46%;
+  --muted: 47 55% 92%;
+  --muted-foreground: 220 12% 46%;
+  --accent: 133 91% 34%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 4 74% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 45 24% 83%;
+  --input: 45 24% 83%;
+  --ring: 133 91% 34%;
+  --radius: 0.8rem;
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(48 100% 98%) 100%);
+
+  --broadcast-bg: 48 100% 98%;
+  --broadcast-night: 222 87% 24%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 47 55% 92%;
+  --broadcast-surface-elevated: 47 55% 92%;
+  --broadcast-text: 220 79% 15%;
+  --broadcast-text-secondary: 220 12% 46%;
+  --broadcast-text-muted: 220 10% 58%;
+  --broadcast-border: 45 24% 83%;
+  --broadcast-primary: 50 100% 50%;
+  --broadcast-primary-contrast: 222 87% 24%;
+  --broadcast-score: 133 91% 34%;
+  --broadcast-bright: 132 77% 44%;
+  --broadcast-navy: 222 87% 24%;
+  --broadcast-cyan: 133 91% 34%;
+  --broadcast-violet: 222 87% 24%;
+  --broadcast-magenta: 50 100% 50%;
+  --broadcast-danger: 4 74% 48%;
+  --broadcast-success: 133 91% 34%;
+
+  background-image:
+    radial-gradient(120% 55% at 50% -10%, hsl(50 100% 50% / 0.16) 0%, transparent 60%),
+    radial-gradient(60% 30% at 0% 5%, hsl(133 91% 34% / 0.07) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+[data-broadcast="joga_bonito"][data-mode="dark"] {
+  --background: 220 90% 15%;
+  --foreground: 0 0% 100%;
+  --card: 222 87% 24%;
+  --card-foreground: 0 0% 100%;
+  --popover: 220 82% 27%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 50 100% 50%;
+  --primary-foreground: 222 87% 24%;
+  --secondary: 220 82% 27%;
+  --secondary-foreground: 218 43% 84%;
+  --muted: 220 82% 27%;
+  --muted-foreground: 218 43% 84%;
+  --accent: 132 77% 44%;
+  --accent-foreground: 222 87% 24%;
+  --destructive: 4 74% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 45% 38%;
+  --input: 220 45% 38%;
+  --ring: 50 100% 50%;
+  --radius: 0.8rem;
+  --gradient-hero: linear-gradient(180deg, hsl(222 87% 24%) 0%, hsl(220 90% 15%) 100%);
+
+  --broadcast-bg: 220 90% 15%;
+  --broadcast-night: 220 90% 11%;
+  --broadcast-surface: 222 87% 24%;
+  --broadcast-surface-secondary: 220 82% 27%;
+  --broadcast-surface-elevated: 220 82% 27%;
+  --broadcast-text: 0 0% 100%;
+  --broadcast-text-secondary: 218 43% 84%;
+  --broadcast-text-muted: 218 30% 72%;
+  --broadcast-border: 220 45% 38%;
+  --broadcast-primary: 50 100% 50%;
+  --broadcast-primary-contrast: 222 87% 24%;
+  --broadcast-score: 132 77% 44%;
+  --broadcast-bright: 132 77% 44%;
+  --broadcast-navy: 222 87% 24%;
+  --broadcast-cyan: 132 77% 44%;
+  --broadcast-violet: 222 87% 24%;
+  --broadcast-magenta: 50 100% 50%;
+  --broadcast-danger: 4 74% 52%;
+  --broadcast-success: 132 77% 44%;
+
+  background-image:
+    radial-gradient(120% 55% at 50% -10%, hsl(50 100% 50% / 0.10) 0%, transparent 62%),
+    radial-gradient(70% 35% at 100% 8%, hsl(132 77% 44% / 0.08) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Data/scores in Barlow Condensed */
+[data-broadcast="joga_bonito"] .tabular-nums {
+  font-family: 'Barlow Condensed', Inter, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Hand-painted marker underline onder actieve tabs/titels */
+.jb-underline {
+  position: relative;
+}
+.jb-underline::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: -3px;
+  height: 5px;
+  pointer-events: none;
+  background: hsl(var(--broadcast-score));
+  clip-path: polygon(0 42%, 8% 12%, 26% 55%, 44% 8%, 63% 52%, 82% 16%, 100% 46%, 96% 100%, 72% 74%, 48% 100%, 24% 70%, 4% 96%);
+  opacity: 0.9;
+}
+/* Gele paint-brush balk (datumheaders) */
+.jb-paint-bar {
+  position: relative;
+  background: hsl(var(--broadcast-primary));
+  clip-path: polygon(0 6%, 2% 0, 99% 3%, 100% 12%, 100% 92%, 98% 100%, 2% 97%, 0 88%);
+}
+/* Cover-overlay: navy gradient + warme gele highlight */
+.jb-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, hsl(var(--broadcast-night) / 0.12) 0%, hsl(var(--broadcast-night) / 0.55) 58%, hsl(var(--background)) 100%),
+    radial-gradient(80% 60% at 15% 10%, hsl(var(--broadcast-primary) / 0.22) 0%, transparent 70%),
+    radial-gradient(70% 55% at 92% 20%, hsl(var(--broadcast-score) / 0.16) 0%, transparent 72%);
+}
+/* Bracket connectors: subtiel navy/grijs */
+.jb-connector {
+  stroke: hsl(var(--broadcast-border));
+}
+.jb-connector line {
+  stroke-width: 1.5;
+}
