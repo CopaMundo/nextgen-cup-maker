@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -2727,13 +2727,47 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     );
   };
 
+  // --- Measure real bracket card height so vertical spacing/connectors always line up ---
+  const bracketCardEls = useRef<Map<string, HTMLDivElement>>(new Map());
+  const bracketCardObserver = useRef<ResizeObserver | null>(null);
+  const [measuredCardH, setMeasuredCardH] = useState(0);
+
+  const recomputeCardH = useCallback(() => {
+    let max = 0;
+    bracketCardEls.current.forEach((el, id) => {
+      if (!el.isConnected) { bracketCardEls.current.delete(id); return; }
+      max = Math.max(max, el.offsetHeight);
+    });
+    setMeasuredCardH(prev => (Math.abs(prev - max) > 0.5 ? max : prev));
+  }, []);
+
+  const setBracketCardRef = useCallback((id: string) => (el: HTMLDivElement | null) => {
+    if (typeof ResizeObserver !== "undefined" && !bracketCardObserver.current) {
+      bracketCardObserver.current = new ResizeObserver(() => recomputeCardH());
+    }
+    const prev = bracketCardEls.current.get(id);
+    if (prev && prev !== el) {
+      bracketCardObserver.current?.unobserve(prev);
+      bracketCardEls.current.delete(id);
+    }
+    if (el) {
+      bracketCardEls.current.set(id, el);
+      bracketCardObserver.current?.observe(el);
+    }
+    recomputeCardH();
+  }, [recomputeCardH]);
+
+  useEffect(() => () => { bracketCardObserver.current?.disconnect(); bracketCardObserver.current = null; }, []);
+
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
     const CARD_W = 240;
     const CONNECTOR_W = 32;
-    const CARD_H = effectiveScoreEditable ? 92 : 78;
-    const GAP = 16;
+    // Card height is measured from the real DOM (headers, dates, score inputs all change it),
+    // so spacing stays correct whether cards are empty, filled with teams or with scores.
+    const CARD_H = Math.max(measuredCardH, effectiveScoreEditable ? 92 : 78);
+    const GAP = 20;
     const HEADER_H = 36; // Header height (mb-3 + text)
 
     const isWinnerRef = (label: string | null) => (label ?? "").startsWith("Winnaar ");
@@ -2861,7 +2895,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   {/* Match cards */}
                   <div className="relative" style={{ height: totalHeight }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx) }}>
+                      <div key={match.id} ref={setBracketCardRef(match.id)} className="absolute left-0 right-0" style={{ top: getTop(matchIdx) }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
