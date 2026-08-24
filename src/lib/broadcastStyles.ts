@@ -46,6 +46,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   old_newspaper: { name: "Old Newspaper", description: "Broadcast Style #5 — oude Europese sportkrant: vergeeld papier, zwarte drukinkt, serif krantenkoppen en klassieke uitslagenpagina's", preview: "🗞️" },
   modern_bw: { name: "Modern Black & White", description: "Broadcast Style #6 — strak, premium en minimalistisch: zuiver zwart-wit met grijstinten, Inter typografie, veel witruimte en grote scores", preview: "◼" },
   wc26: { name: "World Cup 26", description: "Broadcast Style #7 — internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
+  la_rosa: { name: "La Rosa", description: "Broadcast Style #8 — moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
