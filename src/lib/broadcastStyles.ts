@@ -14,7 +14,8 @@ export type BroadcastStyle =
   | "world_cup_canada"
   | "world_cup_usa"
   | "retro_football"
-  | "copa_mundo_bc";
+  | "copa_mundo_bc"
+  | "european_nights";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -34,6 +35,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   world_cup_usa: { name: "World Cup — USA", description: "Blauwe host-nation stijl met sterren print zoals op de Trionda bal", preview: "🇺🇸" },
   copa_mundo_bc: { name: "Copa Mundo", description: "Broadcast Style #1 — de native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
   retro_football: { name: "Retro Football", description: "Vintage matchdayprogramma uit de jaren '70/'80: crèmepapier, bosgroen en verschoten rood met Roboto Condensed", preview: "📕" },
+  european_nights: { name: "European Nights", description: "Broadcast Style #2 — premium Europese voetbalavond: middernachtblauw met elektrisch blauw en violet accent, Barlow Condensed + Inter", preview: "🌙" },
 };
 
 
@@ -771,15 +773,66 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     subHeaderTitle: "text-[11px] font-bold uppercase tracking-[0.06em] text-foreground",
     subLabel: "inline-flex items-center px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-muted-foreground",
   },
+  // ── BROADCAST #2: EUROPEAN NIGHTS (new generation) ───
+  european_nights: {
+    sectionDot: "h-4 w-[3px] rounded-[1px] bg-primary",
+    sectionTitle: "font-['Barlow_Condensed'] text-[17px] font-extrabold uppercase tracking-[0.02em] text-foreground",
+    sectionMeta: "text-[11px] font-medium text-muted-foreground",
+    sectionLine: "flex-1 h-px bg-border",
+    card: "rounded-[8px] border border-border bg-card overflow-hidden",
+    matchCardWrapper: "rounded-[8px] border border-border bg-card overflow-hidden",
+    cardHeader: "bg-secondary border-b border-border px-3 py-1.5 flex items-center gap-2",
+    cardHeaderDot: "h-3 w-[3px] rounded-[1px] bg-primary",
+    cardHeaderTitle: "font-['Barlow_Condensed'] text-[12px] font-bold text-foreground uppercase tracking-[0.06em]",
+    homeCardHeader: "bg-secondary border-b border-border border-l-2 border-l-primary px-3 py-1.5 flex items-center gap-2",
+    homeCardHeaderTitle: "font-['Barlow_Condensed'] text-[13px] font-extrabold text-foreground uppercase tracking-[0.06em]",
+    tabContainer: "flex gap-4 border-b border-border",
+    tabActive: "flex-1 px-1 pb-2 pt-1 font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[0.06em] text-primary border-b-2 border-primary transition-colors duration-150",
+    tabInactive: "flex-1 px-1 pb-2 pt-1 font-['Barlow_Condensed'] text-[13px] font-bold uppercase tracking-[0.06em] text-muted-foreground border-b-2 border-transparent hover:text-foreground transition-colors duration-150",
+    badge: "inline-flex items-center rounded-[4px] bg-secondary border border-border px-2 py-0.5 font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.04em] text-foreground tabular-nums",
+    label: "text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground",
+    backButton: "flex items-center gap-1 font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.06em] text-primary",
+    matchContext: "bg-secondary/70 px-3 py-1 border-b border-border",
+    matchContextText: "font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
+    matchTeamRow: "px-3 py-2 rounded-[4px]",
+    matchTeamRowWin: "bg-primary/[0.08]",
+    matchTeamName: "text-[12px] font-semibold truncate",
+    matchTeamNameFav: "text-primary",
+    matchScore: "font-['Barlow_Condensed'] text-[17px] font-extrabold tabular-nums",
+    matchScoreWin: "text-foreground",
+    matchScoreLose: "text-muted-foreground",
+    matchTimeBadge: "inline-flex items-center rounded-[5px] bg-primary px-2 py-0.5 font-['Barlow_Condensed'] text-[13px] font-extrabold text-primary-foreground tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1 bg-secondary/50 border-t border-border",
+    navBar: "bg-secondary/95 backdrop-blur-md border-t border-border",
+    navCenter: "bg-card text-muted-foreground border-border rounded-full",
+    navCenterActive: "bg-card text-primary border-primary rounded-full scale-105 shadow-[0_0_14px_hsl(var(--primary)/0.35)]",
+    navTab: "text-muted-foreground hover:text-foreground",
+    navTabActive: "text-primary",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-primary",
+    tableHeader: "bg-secondary font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground border-b border-border",
+    tableRowAlt: "bg-secondary/35",
+    ptsBadge: "inline-flex items-center justify-center rounded-[4px] bg-[hsl(var(--broadcast-score))] px-1.5 py-0.5 font-['Barlow_Condensed'] text-[13px] font-extrabold text-primary-foreground tabular-nums",
+    timeslotHeader: "bg-secondary text-foreground flex items-center gap-2 px-3 py-1.5 border-b border-border border-l-2 border-l-primary",
+    timeslotBadge: "inline-flex items-center rounded-[4px] bg-primary px-2 py-0.5 font-['Barlow_Condensed'] text-[14px] font-extrabold text-primary-foreground tabular-nums",
+    timeslotHeaderMeta: "font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.06em] text-muted-foreground",
+    dateHeader: "bg-primary text-primary-foreground px-2.5 py-0.5 rounded-[4px] font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[0.06em]",
+    phaseTab: "px-3 py-1 rounded-[5px] font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.07em] whitespace-nowrap transition-colors duration-150",
+    phaseTabActive: "bg-primary text-primary-foreground",
+    phaseTabInactive: "bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-primary/50",
+    subHeader: "px-3 py-1.5 flex items-center justify-between gap-2 bg-secondary border-l-2 border-l-primary",
+    subHeaderTitle: "font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[0.06em] text-foreground",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
+  },
 };
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights"];
+
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
-  (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, k === "copa_mundo_bc" ? "broadcast" : "legacy"])
+  (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, NEW_BROADCAST_STYLES.includes(k) ? "broadcast" : "legacy"])
 ) as Record<BroadcastStyle, "broadcast" | "legacy">;
 
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc"];
 
 
 export function ds(style: BroadcastStyle, token: string): string {
