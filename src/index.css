@@ -1748,3 +1748,167 @@ body[data-broadcast="modern_bw"] {
 .mbw-connector line {
   stroke-width: 1.25;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BROADCAST STYLE #7 — WORLD CUP 26
+   Internationale broadcastlook: zwart/wit met turquoise accent en
+   spaarzaam goud. Barlow Condensed display + Inter body. 6px radius.
+   ══════════════════════════════════════════════════════════════ */
+[data-broadcast="wc26"],
+[data-broadcast="wc26"] body,
+body[data-broadcast="wc26"] {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background-image: none;
+}
+[data-broadcast="wc26"] h1,
+[data-broadcast="wc26"] h2,
+[data-broadcast="wc26"] h3,
+[data-broadcast="wc26"] .font-display {
+  font-family: 'Barlow Condensed', Inter, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+[data-broadcast="wc26"] .tabular-nums {
+  font-family: 'Barlow Condensed', Inter, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+[data-broadcast="wc26"][data-mode="light"] {
+  --background: 60 9% 97%;
+  --foreground: 0 0% 4%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 4%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 4%;
+  --primary: 173 77% 44%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 60 4% 93%;
+  --secondary-foreground: 0 0% 41%;
+  --muted: 60 4% 93%;
+  --muted-foreground: 0 0% 41%;
+  --accent: 173 77% 44%;
+  --accent-foreground: 0 0% 4%;
+  --destructive: 0 65% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 60 5% 84%;
+  --input: 60 5% 84%;
+  --ring: 173 77% 44%;
+  --radius: 0.375rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 60 9% 97%;
+  --broadcast-night: 0 0% 2%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 60 4% 93%;
+  --broadcast-surface-elevated: 60 4% 95%;
+  --broadcast-text: 0 0% 4%;
+  --broadcast-text-secondary: 0 0% 41%;
+  --broadcast-text-muted: 0 0% 55%;
+  --broadcast-border: 60 5% 84%;
+  --broadcast-primary: 173 77% 44%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-score: 0 0% 4%;
+  --broadcast-bright: 172 73% 55%;
+  --broadcast-gold: 46 62% 56%;
+  --broadcast-navy: 0 0% 2%;
+  --broadcast-cyan: 173 77% 44%;
+  --broadcast-violet: 173 77% 44%;
+  --broadcast-magenta: 46 62% 56%;
+  --broadcast-danger: 0 65% 45%;
+  --broadcast-success: 173 77% 44%;
+}
+
+[data-broadcast="wc26"][data-mode="dark"] {
+  --background: 0 0% 2%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 173 77% 44%;
+  --primary-foreground: 0 0% 2%;
+  --secondary: 0 0% 11%;
+  --secondary-foreground: 0 0% 68%;
+  --muted: 0 0% 11%;
+  --muted-foreground: 0 0% 66%;
+  --accent: 172 73% 55%;
+  --accent-foreground: 0 0% 2%;
+  --destructive: 0 70% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 173 77% 44%;
+  --radius: 0.375rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 0 0% 2%;
+  --broadcast-night: 0 0% 0%;
+  --broadcast-surface: 0 0% 5%;
+  --broadcast-surface-secondary: 0 0% 11%;
+  --broadcast-surface-elevated: 0 0% 13%;
+  --broadcast-text: 0 0% 100%;
+  --broadcast-text-secondary: 0 0% 68%;
+  --broadcast-text-muted: 0 0% 55%;
+  --broadcast-border: 0 0% 18%;
+  --broadcast-primary: 173 77% 44%;
+  --broadcast-primary-contrast: 0 0% 2%;
+  --broadcast-score: 0 0% 100%;
+  --broadcast-bright: 172 73% 55%;
+  --broadcast-gold: 46 62% 56%;
+  --broadcast-navy: 0 0% 0%;
+  --broadcast-cyan: 173 77% 44%;
+  --broadcast-violet: 173 77% 44%;
+  --broadcast-magenta: 46 62% 56%;
+  --broadcast-danger: 0 70% 52%;
+  --broadcast-success: 173 77% 44%;
+}
+
+/* Kaders: 6px radius, dunne borders, nauwelijks shadows, geen gradients */
+[data-broadcast="wc26"] .wc26-card {
+  border-radius: 6px;
+}
+[data-broadcast="wc26"] .rounded-none {
+  border-radius: 6px;
+}
+[data-broadcast="wc26"] [class*="shadow-"] {
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.06) !important;
+}
+[data-broadcast="wc26"] [class*="bg-gradient"] {
+  background-image: none !important;
+}
+
+/* Turquoise kwalificatie-indicator (dunne verticale streep) */
+.wc26-qual {
+  box-shadow: inset 3px 0 0 hsl(var(--broadcast-primary));
+}
+.wc26-qual-gold {
+  box-shadow: inset 3px 0 0 hsl(var(--broadcast-gold));
+}
+
+/* Cover-overlay infopagina: sterke donkere overlay voor witte typografie */
+.wc26-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, hsl(0 0% 0% / 0.25) 0%, hsl(0 0% 0% / 0.7) 55%, hsl(var(--background)) 100%);
+}
+.wc26-cover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: hsl(var(--broadcast-primary));
+}
+
+/* Bracket connectors: dun en geometrisch */
+.wc26-connector {
+  stroke: hsl(var(--broadcast-text) / 0.35);
+}
+.wc26-connector line {
+  stroke-width: 1.25;
+}
