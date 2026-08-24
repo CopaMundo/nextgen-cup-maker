@@ -1249,7 +1249,9 @@ input[type="number"] {
    BROADCAST STYLE #4 — RETRO BLACK & WHITE
    Vintage matchdayprogramma: warm gebroken wit, zwart, dunne lijnen
    ══════════════════════════════════════════════════════════════ */
-[data-broadcast="retro_bw"] {
+[data-broadcast="retro_bw"],
+[data-broadcast="retro_bw"] body,
+body[data-broadcast="retro_bw"] {
   font-family: Barlow, Inter, system-ui, -apple-system, sans-serif;
 }
 [data-broadcast="retro_bw"] h1,
