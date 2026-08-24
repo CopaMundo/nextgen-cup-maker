@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -1243,4 +1243,157 @@ input[type="number"] {
 }
 .jb-connector line {
   stroke-width: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BROADCAST STYLE #4 — RETRO BLACK & WHITE
+   Vintage matchdayprogramma: warm gebroken wit, zwart, dunne lijnen
+   ══════════════════════════════════════════════════════════════ */
+[data-broadcast="retro_bw"] {
+  font-family: Barlow, Inter, system-ui, -apple-system, sans-serif;
+}
+[data-broadcast="retro_bw"] h1,
+[data-broadcast="retro_bw"] h2,
+[data-broadcast="retro_bw"] h3,
+[data-broadcast="retro_bw"] .font-display {
+  font-family: 'Barlow Condensed', Barlow, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.05;
+}
+[data-broadcast="retro_bw"] .tabular-nums {
+  font-family: 'Barlow Condensed', Barlow, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+[data-broadcast="retro_bw"][data-mode="light"] {
+  --background: 40 17% 96%;
+  --foreground: 0 0% 7%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 7%;
+  --primary: 0 0% 4%;
+  --primary-foreground: 40 17% 96%;
+  --secondary: 40 11% 93%;
+  --secondary-foreground: 0 0% 45%;
+  --muted: 40 11% 93%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 0%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 0% 20%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 43 8% 81%;
+  --input: 43 8% 81%;
+  --ring: 0 0% 7%;
+  --radius: 0.2rem;
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(40 17% 96%) 100%);
+
+  --broadcast-bg: 40 17% 96%;
+  --broadcast-night: 0 0% 4%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 40 11% 93%;
+  --broadcast-surface-elevated: 40 11% 93%;
+  --broadcast-text: 0 0% 7%;
+  --broadcast-text-secondary: 0 0% 45%;
+  --broadcast-text-muted: 0 0% 58%;
+  --broadcast-border: 43 8% 81%;
+  --broadcast-primary: 0 0% 4%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-score: 0 0% 4%;
+  --broadcast-bright: 0 0% 20%;
+  --broadcast-navy: 0 0% 4%;
+  --broadcast-cyan: 0 0% 4%;
+  --broadcast-violet: 0 0% 4%;
+  --broadcast-magenta: 0 0% 4%;
+  --broadcast-danger: 0 0% 20%;
+  --broadcast-success: 0 0% 4%;
+}
+
+[data-broadcast="retro_bw"][data-mode="dark"] {
+  --background: 0 0% 7%;
+  --foreground: 40 17% 96%;
+  --card: 0 0% 11%;
+  --card-foreground: 40 17% 96%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 40 17% 96%;
+  --primary: 40 17% 96%;
+  --primary-foreground: 0 0% 7%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 66%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 66%;
+  --accent: 0 0% 100%;
+  --accent-foreground: 0 0% 7%;
+  --destructive: 0 0% 75%;
+  --destructive-foreground: 0 0% 7%;
+  --border: 0 0% 26%;
+  --input: 0 0% 26%;
+  --ring: 40 17% 96%;
+  --radius: 0.2rem;
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 11%) 0%, hsl(0 0% 7%) 100%);
+
+  --broadcast-bg: 0 0% 7%;
+  --broadcast-night: 0 0% 4%;
+  --broadcast-surface: 0 0% 11%;
+  --broadcast-surface-secondary: 0 0% 15%;
+  --broadcast-surface-elevated: 0 0% 15%;
+  --broadcast-text: 40 17% 96%;
+  --broadcast-text-secondary: 0 0% 66%;
+  --broadcast-text-muted: 0 0% 56%;
+  --broadcast-border: 0 0% 26%;
+  --broadcast-primary: 40 17% 96%;
+  --broadcast-primary-contrast: 0 0% 7%;
+  --broadcast-score: 40 17% 96%;
+  --broadcast-bright: 0 0% 100%;
+  --broadcast-navy: 0 0% 4%;
+  --broadcast-cyan: 40 17% 96%;
+  --broadcast-violet: 40 17% 96%;
+  --broadcast-magenta: 40 17% 96%;
+  --broadcast-danger: 0 0% 75%;
+  --broadcast-success: 40 17% 96%;
+}
+
+/* Subtiele papier/grain texture op grote achtergrondvlakken */
+[data-broadcast="retro_bw"] {
+  background-image:
+    repeating-linear-gradient(0deg, hsl(var(--broadcast-text) / 0.022) 0px, hsl(var(--broadcast-text) / 0.022) 1px, transparent 1px, transparent 3px),
+    radial-gradient(120% 60% at 50% -10%, hsl(var(--broadcast-text) / 0.05) 0%, transparent 62%);
+  background-repeat: repeat, no-repeat;
+  background-attachment: fixed;
+}
+
+/* Print-achtige kaders: 3px radius, geen zachte shadows */
+[data-broadcast="retro_bw"] .rbw-card,
+[data-broadcast="retro_bw"] .rounded-none {
+  border-radius: 3px;
+}
+[data-broadcast="retro_bw"] [class*="shadow-"] {
+  box-shadow: none !important;
+}
+
+/* Zwarte brush-stroke achter belangrijke titels/datums */
+.rbw-brush {
+  position: relative;
+  clip-path: polygon(0 7%, 1.5% 0, 99% 3%, 100% 13%, 100% 91%, 98.5% 100%, 1.5% 96%, 0 87%);
+}
+
+/* Cover-overlay: krantachtige zwart-wit fade */
+.rbw-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, hsl(var(--broadcast-night) / 0.10) 0%, hsl(var(--broadcast-night) / 0.55) 60%, hsl(var(--background)) 100%),
+    repeating-linear-gradient(0deg, hsl(var(--broadcast-night) / 0.06) 0px, hsl(var(--broadcast-night) / 0.06) 1px, transparent 1px, transparent 3px);
+}
+
+/* Bracket connectors: dunne grijze lijnen */
+.rbw-connector {
+  stroke: hsl(var(--broadcast-border));
+}
+.rbw-connector line {
+  stroke-width: 1;
 }
