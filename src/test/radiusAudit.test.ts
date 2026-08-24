@@ -43,6 +43,14 @@ describe("radius audit", () => {
     expect(values[0]).toBe(values[1]);
   });
 
+  it("mapt sm/md/lg radii één-op-één op var(--radius) (forms, dropdowns, modals)", () => {
+    const cfg = readFileSync(join(process.cwd(), "tailwind.config.ts"), "utf8");
+    const block = cfg.match(/borderRadius:\s*{[\s\S]*?}/)?.[0] ?? "";
+    for (const key of ["lg", "md", "sm"]) {
+      expect(block).toMatch(new RegExp(`${key}: "var\\(--radius\\)"`));
+    }
+  });
+
   it("normaliseert grote Tailwind radii naar var(--radius)", () => {
     const css = readFileSync(join(SRC, "index.css"), "utf8");
     for (const cls of [".rounded-lg", ".rounded-xl", ".rounded-2xl", ".rounded-3xl"]) {
