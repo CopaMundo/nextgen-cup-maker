@@ -23,7 +23,8 @@ describe("radius audit", () => {
   it("gebruikt geen willekeurige rounded-[..px] waarden in app-code", () => {
     const offenders: string[] = [];
     for (const file of files) {
-      if (file.includes("/components/ui/")) continue; // shadcn primitives
+      // shadcn primitives en de broadcast-stijltokens mogen expliciete waarden zetten
+      if (file.includes("/components/ui/") || file.endsWith("broadcastStyles.ts")) continue;
       const content = readFileSync(file, "utf8");
       const matches = content.match(/rounded-\[[0-9.]+(px|rem)\]/g);
       if (matches) offenders.push(`${file}: ${matches.join(", ")}`);
@@ -33,7 +34,7 @@ describe("radius audit", () => {
 
   it("definieert --radius voor light én dark basis-thema", () => {
     const css = readFileSync(join(SRC, "index.css"), "utf8");
-    const root = css.match(/:root\s*{[\s\S]*?}/);
+    const root = css.match(/:root,\s*\[data-mode="dark"\]\s*{[\s\S]*?}/);
     const light = css.match(/\[data-mode="light"\]\s*{[\s\S]*?}/);
     expect(root?.[0]).toMatch(/--radius:/);
     expect(light?.[0]).toMatch(/--radius:/);
