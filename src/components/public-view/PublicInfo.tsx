@@ -18,8 +18,9 @@ interface Props {
 const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onToggleDarkMode }: Props) => {
   const { tournament, attachments, sponsors, locations, categories } = data;
   const bStyle = useBroadcastStyle();
-  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
-  const cardFrame = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border bg-card shadow-sm";
+  const wrapperToken = ds(bStyle, "matchCardWrapper");
+  const squareStyle = Boolean(wrapperToken) && !/rounded-(?!none)/.test(wrapperToken);
+  const cardFrame = wrapperToken || "rounded-xl border border-border bg-card shadow-sm";
   const largeFrameShape = squareStyle ? "" : "rounded-2xl";
   const controlFrameShape = squareStyle ? "rounded-none" : "rounded-lg";
   const divisionRef = useRef<HTMLDivElement>(null);
