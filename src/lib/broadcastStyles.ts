@@ -15,7 +15,8 @@ export type BroadcastStyle =
   | "world_cup_usa"
   | "retro_football"
   | "copa_mundo_bc"
-  | "european_nights";
+  | "european_nights"
+  | "joga_bonito";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
