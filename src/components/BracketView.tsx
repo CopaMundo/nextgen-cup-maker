@@ -2895,7 +2895,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   {/* Match cards */}
                   <div className="relative" style={{ height: totalHeight }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx) }}>
+                      <div key={match.id} ref={setBracketCardRef(match.id)} className="absolute left-0 right-0" style={{ top: getTop(matchIdx) }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
