@@ -20,7 +20,8 @@ export type BroadcastStyle =
   | "retro_bw"
   | "old_newspaper"
   | "modern_bw"
-  | "wc26";
+  | "wc26"
+  | "la_rosa";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -45,6 +46,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   old_newspaper: { name: "Old Newspaper", description: "Broadcast Style #5 — oude Europese sportkrant: vergeeld papier, zwarte drukinkt, serif krantenkoppen en klassieke uitslagenpagina's", preview: "🗞️" },
   modern_bw: { name: "Modern Black & White", description: "Broadcast Style #6 — strak, premium en minimalistisch: zuiver zwart-wit met grijstinten, Inter typografie, veel witruimte en grote scores", preview: "◼" },
   wc26: { name: "World Cup 26", description: "Broadcast Style #7 — internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
+  la_rosa: { name: "La Rosa", description: "Broadcast Style #8 — moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
@@ -1103,13 +1105,66 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     logoFrame: "border border-border bg-card",
     bracketConnector: "wc26-connector",
   },
+// ── LA ROSA ───
+  la_rosa: {
+    sectionDot: "h-5 w-[3px] rounded-none bg-primary",
+    sectionTitle: "font-['Roboto_Condensed'] text-[21px] font-black uppercase tracking-[0.02em] text-foreground",
+    sectionMeta: "font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground",
+    sectionLine: "flex-1 h-px bg-[hsl(var(--broadcast-border))]",
+    card: "lrosa-card border border-[hsl(var(--broadcast-border))] bg-card overflow-hidden",
+    matchCardWrapper: "lrosa-card border border-[hsl(var(--broadcast-border))] bg-card overflow-hidden",
+    cardHeader: "bg-[hsl(var(--broadcast-surface-secondary))] border-b border-[hsl(var(--broadcast-border))] px-3 py-2 flex items-center gap-2",
+    cardHeaderDot: "h-3.5 w-[3px] bg-primary",
+    cardHeaderTitle: "font-['Roboto_Condensed'] text-[12px] font-bold text-foreground uppercase tracking-[0.12em]",
+    homeCardHeader: "bg-foreground border-b border-foreground px-3 py-2 flex items-center gap-2",
+    homeCardHeaderTitle: "font-['Roboto_Condensed'] text-[13px] font-black uppercase tracking-[0.12em] text-background",
+    tabContainer: "flex gap-0 border-b border-[hsl(var(--broadcast-border))]",
+    tabActive: "flex-1 px-3 py-2 border-b-2 border-primary font-['Roboto_Condensed'] text-[13px] font-black uppercase tracking-[0.1em] text-foreground transition-colors",
+    tabInactive: "flex-1 px-3 py-2 border-b-2 border-transparent font-['Roboto_Condensed'] text-[13px] font-bold uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors",
+    badge: "inline-flex items-center rounded-none border border-[hsl(var(--broadcast-border))] bg-[hsl(var(--broadcast-surface-secondary))] px-2 py-0.5 font-['Roboto_Condensed'] text-[12px] font-bold uppercase tracking-[0.08em] text-foreground tabular-nums",
+    label: "font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.18em] text-primary",
+    backButton: "flex items-center gap-1 font-['Roboto_Condensed'] text-[12px] font-bold uppercase tracking-[0.12em] text-foreground",
+    matchContext: "bg-[hsl(var(--broadcast-surface-secondary))] px-3 py-1.5 border-b border-[hsl(var(--broadcast-border))]",
+    matchContextText: "font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.12em] text-foreground",
+    matchTeamRow: "px-3 py-2",
+    matchTeamRowWin: "bg-transparent",
+    matchTeamName: "text-[14px] font-semibold truncate",
+    matchTeamNameFav: "font-bold text-primary",
+    matchScore: "font-['Roboto_Condensed'] text-[26px] font-black tabular-nums leading-none",
+    matchScoreWin: "text-foreground",
+    matchScoreLose: "text-muted-foreground",
+    matchTimeBadge: "inline-flex items-center rounded-none bg-foreground px-2 py-0.5 font-['Roboto_Condensed'] text-[13px] font-bold text-background tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1.5 border-t border-[hsl(var(--broadcast-border))]",
+    navBar: "bg-[hsl(var(--broadcast-night))] border-t border-[hsl(var(--broadcast-night))]",
+    navCenter: "rounded-none bg-[hsl(var(--broadcast-night))] text-white border-[hsl(var(--broadcast-paper))]",
+    navCenterActive: "rounded-none bg-[hsl(var(--broadcast-night))] text-primary border-primary",
+    navTab: "text-white/60 hover:text-white",
+    navTabActive: "text-primary",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-primary",
+    tableHeader: "bg-foreground font-['Roboto_Condensed'] text-[10px] font-bold uppercase tracking-[0.14em] text-background",
+    tableRowAlt: "bg-[hsl(var(--broadcast-surface-secondary))]",
+    ptsBadge: "inline-flex items-center justify-center min-w-[26px] rounded-none bg-foreground px-1.5 py-0.5 font-['Roboto_Condensed'] text-[13px] font-black text-background tabular-nums",
+    timeslotHeader: "bg-foreground text-background flex items-center gap-2 px-3 py-2",
+    timeslotBadge: "inline-flex items-center rounded-none font-['Roboto_Condensed'] text-[19px] font-black text-background tabular-nums tracking-[0.02em]",
+    timeslotHeaderMeta: "font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.14em] text-background/70",
+    dateHeader: "rounded-none bg-primary text-primary-foreground px-3 py-1.5 font-['Roboto_Condensed'] text-[15px] font-black uppercase tracking-[0.1em]",
+    phaseTab: "px-3 py-1.5 rounded-none font-['Roboto_Condensed'] text-[12px] font-bold uppercase tracking-[0.1em] whitespace-nowrap transition-colors",
+    phaseTabActive: "bg-primary text-primary-foreground border border-primary",
+    phaseTabInactive: "bg-card border border-[hsl(var(--broadcast-border))] text-muted-foreground hover:text-foreground",
+    subHeader: "px-3 py-2 flex items-center justify-between gap-2 bg-foreground",
+    subHeaderTitle: "font-['Roboto_Condensed'] text-[13px] font-black uppercase tracking-[0.12em] text-background",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.14em] text-background/70",
+    coverOverlay: "lrosa-cover",
+    logoFrame: "border border-foreground bg-[hsl(var(--broadcast-paper))]",
+    bracketConnector: "lrosa-connector",
+  },
 };
 
 
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa"];
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
   (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, NEW_BROADCAST_STYLES.includes(k) ? "broadcast" : "legacy"])
