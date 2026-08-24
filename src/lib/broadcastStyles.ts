@@ -39,6 +39,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   retro_football: { name: "Retro Football", description: "Vintage matchdayprogramma uit de jaren '70/'80: crèmepapier, bosgroen en verschoten rood met Roboto Condensed", preview: "📕" },
   european_nights: { name: "European Nights", description: "Broadcast Style #2 — premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
   joga_bonito: { name: "Joga Bonito", description: "Broadcast Style #3 — Braziliaanse straatvoetbalcultuur: diep navy met geel en groen, brush-headings (Permanent Marker) + Barlow Condensed", preview: "🇧🇷" },
+  retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
 
