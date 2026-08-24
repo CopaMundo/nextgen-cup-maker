@@ -1068,4 +1068,12 @@ input[type="number"] {
   background: linear-gradient(150deg, hsl(0 0% 100% / 0.14) 0%, hsl(0 0% 100% / 0.03) 45%, transparent 100%);
   backdrop-filter: blur(6px);
 }
+/* European Nights bracket connector lines */
+.en-connector {
+  stroke: hsl(var(--broadcast-primary));
+  filter: drop-shadow(0 0 2px hsl(var(--broadcast-primary) / 0.65));
+}
+.en-connector line {
+  stroke-width: 1.5;
+}
 

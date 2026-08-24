@@ -795,7 +795,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     matchContext: "bg-secondary px-3 py-1 border-b border-border",
     matchContextText: "font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
     matchTeamRow: "px-3 py-2 rounded-[8px]",
-    matchTeamRowWin: "bg-primary/[0.08]",
+    matchTeamRowWin: "bg-[hsl(var(--broadcast-primary)/0.16)] border-l-[3px] border-l-[hsl(var(--broadcast-primary)/0.55)]",
     matchTeamName: "text-[12px] font-semibold truncate",
     matchTeamNameFav: "text-primary",
     matchScore: "font-['Roboto_Condensed'] text-[17px] font-extrabold tabular-nums",
@@ -824,6 +824,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     subLabel: "inline-flex items-center px-2 py-0.5 font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
     coverOverlay: "en-cover-prism",
     logoFrame: "ring-1 ring-primary/40 shadow-[0_0_28px_hsl(var(--primary)/0.28)]",
+    bracketConnector: "en-connector",
   },
 
 };
