@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=Libre+Baskerville:wght@400;700&family=Libre+Franklin:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -1397,5 +1397,170 @@ body[data-broadcast="retro_bw"] {
   stroke: hsl(var(--broadcast-border));
 }
 .rbw-connector line {
+  stroke-width: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BROADCAST STYLE #5 — OLD NEWSPAPER
+   Oude Europese sportkrant: vergeeld papier, drukinkt, serif headlines
+   ══════════════════════════════════════════════════════════════ */
+[data-broadcast="old_newspaper"],
+[data-broadcast="old_newspaper"] body,
+body[data-broadcast="old_newspaper"] {
+  font-family: 'Libre Franklin', Inter, system-ui, sans-serif;
+}
+[data-broadcast="old_newspaper"] h1,
+[data-broadcast="old_newspaper"] h2,
+[data-broadcast="old_newspaper"] .font-display {
+  font-family: 'Playfair Display', 'Libre Baskerville', Georgia, serif;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+[data-broadcast="old_newspaper"] h3 {
+  font-family: 'Roboto Slab', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+[data-broadcast="old_newspaper"] .tabular-nums {
+  font-family: 'Roboto Slab', Georgia, serif;
+  font-weight: 800;
+}
+
+[data-broadcast="old_newspaper"][data-mode="light"] {
+  --background: 41 34% 86%;
+  --foreground: 45 8% 9%;
+  --card: 45 44% 91%;
+  --card-foreground: 45 8% 9%;
+  --popover: 45 44% 91%;
+  --popover-foreground: 45 8% 9%;
+  --primary: 45 8% 12%;
+  --primary-foreground: 45 44% 91%;
+  --secondary: 41 24% 80%;
+  --secondary-foreground: 42 8% 36%;
+  --muted: 41 24% 80%;
+  --muted-foreground: 42 8% 36%;
+  --accent: 5 59% 34%;
+  --accent-foreground: 45 44% 95%;
+  --destructive: 5 59% 34%;
+  --destructive-foreground: 45 44% 95%;
+  --border: 40 11% 50%;
+  --input: 40 11% 50%;
+  --ring: 45 8% 12%;
+  --radius: 0.1rem;
+  --gradient-hero: linear-gradient(180deg, hsl(45 44% 91%) 0%, hsl(41 34% 86%) 100%);
+
+  --broadcast-bg: 41 34% 86%;
+  --broadcast-night: 45 8% 13%;
+  --broadcast-surface: 45 44% 91%;
+  --broadcast-surface-secondary: 41 24% 80%;
+  --broadcast-surface-elevated: 41 24% 80%;
+  --broadcast-text: 45 8% 9%;
+  --broadcast-text-secondary: 42 8% 36%;
+  --broadcast-text-muted: 40 9% 48%;
+  --broadcast-border: 40 11% 50%;
+  --broadcast-primary: 45 8% 13%;
+  --broadcast-primary-contrast: 45 44% 93%;
+  --broadcast-score: 45 8% 9%;
+  --broadcast-bright: 5 59% 34%;
+  --broadcast-navy: 45 8% 13%;
+  --broadcast-cyan: 45 8% 13%;
+  --broadcast-violet: 5 59% 34%;
+  --broadcast-magenta: 5 59% 34%;
+  --broadcast-danger: 5 59% 34%;
+  --broadcast-success: 45 8% 13%;
+}
+
+[data-broadcast="old_newspaper"][data-mode="dark"] {
+  --background: 45 8% 11%;
+  --foreground: 42 30% 88%;
+  --card: 45 8% 15%;
+  --card-foreground: 42 30% 88%;
+  --popover: 45 8% 15%;
+  --popover-foreground: 42 30% 88%;
+  --primary: 42 30% 88%;
+  --primary-foreground: 45 8% 11%;
+  --secondary: 44 7% 20%;
+  --secondary-foreground: 41 14% 66%;
+  --muted: 44 7% 20%;
+  --muted-foreground: 41 14% 66%;
+  --accent: 6 52% 51%;
+  --accent-foreground: 45 8% 11%;
+  --destructive: 6 52% 51%;
+  --destructive-foreground: 45 8% 11%;
+  --border: 42 8% 33%;
+  --input: 42 8% 33%;
+  --ring: 42 30% 88%;
+  --radius: 0.1rem;
+  --gradient-hero: linear-gradient(180deg, hsl(45 8% 15%) 0%, hsl(45 8% 11%) 100%);
+
+  --broadcast-bg: 45 8% 11%;
+  --broadcast-night: 45 8% 8%;
+  --broadcast-surface: 45 8% 15%;
+  --broadcast-surface-secondary: 44 7% 20%;
+  --broadcast-surface-elevated: 44 7% 20%;
+  --broadcast-text: 42 30% 88%;
+  --broadcast-text-secondary: 41 14% 66%;
+  --broadcast-text-muted: 41 10% 56%;
+  --broadcast-border: 42 8% 33%;
+  --broadcast-primary: 42 30% 88%;
+  --broadcast-primary-contrast: 45 8% 11%;
+  --broadcast-score: 42 30% 88%;
+  --broadcast-bright: 6 52% 51%;
+  --broadcast-navy: 45 8% 8%;
+  --broadcast-cyan: 42 30% 88%;
+  --broadcast-violet: 6 52% 51%;
+  --broadcast-magenta: 6 52% 51%;
+  --broadcast-danger: 6 52% 51%;
+  --broadcast-success: 42 30% 88%;
+}
+
+/* Krantenpapier: fijne grain + lichte vergeling */
+[data-broadcast="old_newspaper"] {
+  background-image:
+    repeating-linear-gradient(0deg, hsl(var(--broadcast-text) / 0.018) 0px, hsl(var(--broadcast-text) / 0.018) 1px, transparent 1px, transparent 4px),
+    repeating-linear-gradient(90deg, hsl(var(--broadcast-text) / 0.014) 0px, hsl(var(--broadcast-text) / 0.014) 1px, transparent 1px, transparent 5px),
+    radial-gradient(130% 70% at 50% -10%, hsl(var(--broadcast-text) / 0.06) 0%, transparent 60%);
+  background-repeat: repeat, repeat, no-repeat;
+  background-attachment: fixed;
+}
+
+/* Print-look: rechte hoeken, geen shadows */
+[data-broadcast="old_newspaper"] .onp-card,
+[data-broadcast="old_newspaper"] .rounded-none {
+  border-radius: 1px;
+}
+[data-broadcast="old_newspaper"] [class*="shadow-"] {
+  box-shadow: none !important;
+}
+
+/* Dubbele newspaper rule onder headlines */
+.onp-rule-double {
+  border-top: 3px solid hsl(var(--broadcast-text));
+  border-bottom: 1px solid hsl(var(--broadcast-text));
+  height: 4px;
+}
+
+/* Donker inktvlak met subtiele print-imperfecties */
+.onp-ink {
+  background-color: hsl(var(--broadcast-night));
+  background-image: repeating-linear-gradient(0deg, hsl(0 0% 100% / 0.05) 0px, hsl(0 0% 100% / 0.05) 1px, transparent 1px, transparent 3px);
+}
+
+/* Cover-overlay: voorpagina van de krant */
+.onp-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, hsl(var(--broadcast-night) / 0.15) 0%, hsl(var(--broadcast-night) / 0.6) 62%, hsl(var(--background)) 100%),
+    repeating-linear-gradient(0deg, hsl(var(--broadcast-night) / 0.07) 0px, hsl(var(--broadcast-night) / 0.07) 1px, transparent 1px, transparent 4px);
+}
+
+/* Bracket connectors: dunne technische krantlijnen */
+.onp-connector {
+  stroke: hsl(var(--broadcast-text) / 0.55);
+}
+.onp-connector line {
   stroke-width: 1;
 }

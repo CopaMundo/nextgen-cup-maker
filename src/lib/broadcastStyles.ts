@@ -17,7 +17,8 @@ export type BroadcastStyle =
   | "copa_mundo_bc"
   | "european_nights"
   | "joga_bonito"
-  | "retro_bw";
+  | "retro_bw"
+  | "old_newspaper";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -39,6 +40,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   retro_football: { name: "Retro Football", description: "Vintage matchdayprogramma uit de jaren '70/'80: crèmepapier, bosgroen en verschoten rood met Roboto Condensed", preview: "📕" },
   european_nights: { name: "European Nights", description: "Broadcast Style #2 — premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
   joga_bonito: { name: "Joga Bonito", description: "Broadcast Style #3 — Braziliaanse straatvoetbalcultuur: diep navy met geel en groen, brush-headings (Permanent Marker) + Barlow Condensed", preview: "🇧🇷" },
+  old_newspaper: { name: "Old Newspaper", description: "Broadcast Style #5 — oude Europese sportkrant: vergeeld papier, zwarte drukinkt, serif krantenkoppen en klassieke uitslagenpagina's", preview: "🗞️" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
@@ -937,11 +939,64 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     logoFrame: "border-border",
     bracketConnector: "rbw-connector",
   },
+// ── OLD NEWSPAPER ───
+  old_newspaper: {
+    sectionDot: "h-3 w-3 bg-foreground",
+    sectionTitle: "font-['Playfair_Display'] text-[22px] font-black uppercase tracking-[-0.01em] text-foreground",
+    sectionMeta: "font-['Libre_Franklin'] text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground",
+    sectionLine: "flex-1 h-[3px] border-y border-foreground/70 bg-transparent",
+    card: "onp-card border-y border-border bg-card overflow-hidden",
+    matchCardWrapper: "onp-card border-b border-border bg-transparent overflow-hidden",
+    cardHeader: "bg-secondary border-b border-foreground/60 px-3 py-1.5 flex items-center gap-2",
+    cardHeaderDot: "h-2 w-2 bg-foreground",
+    cardHeaderTitle: "font-['Roboto_Slab'] text-[12px] font-bold text-foreground uppercase tracking-[0.14em]",
+    homeCardHeader: "onp-ink border-b border-foreground px-3 py-1.5 flex items-center gap-2",
+    homeCardHeaderTitle: "font-['Roboto_Slab'] text-[13px] font-bold uppercase tracking-[0.14em] text-background",
+    tabContainer: "flex gap-px border-y border-foreground/60",
+    tabActive: "flex-1 px-2.5 py-1.5 onp-ink text-background font-['Roboto_Slab'] text-[11px] font-bold uppercase tracking-[0.14em] transition-colors",
+    tabInactive: "flex-1 px-2.5 py-1.5 bg-card border-x border-border text-muted-foreground font-['Roboto_Slab'] text-[11px] font-semibold uppercase tracking-[0.14em] hover:text-foreground transition-colors",
+    badge: "inline-flex items-center onp-card border border-foreground/60 bg-transparent px-1.5 py-0.5 font-['Libre_Franklin'] text-[10px] font-bold uppercase tracking-[0.14em] text-foreground tabular-nums",
+    label: "font-['Libre_Franklin'] text-[10px] font-bold uppercase tracking-[0.2em] text-foreground",
+    backButton: "flex items-center gap-1 font-['Libre_Franklin'] text-[11px] font-bold uppercase tracking-[0.16em] text-foreground",
+    matchContext: "px-3 py-1 border-b border-border/70",
+    matchContextText: "font-['Libre_Franklin'] text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground",
+    matchTeamRow: "px-3 py-1.5",
+    matchTeamRowWin: "bg-secondary/60 border-l-2 border-l-foreground",
+    matchTeamName: "font-['Libre_Franklin'] text-[14px] font-semibold tracking-[0.01em] truncate",
+    matchTeamNameFav: "font-extrabold underline decoration-2 underline-offset-2",
+    matchScore: "font-['Roboto_Slab'] text-[22px] font-extrabold tabular-nums",
+    matchScoreWin: "text-foreground",
+    matchScoreLose: "text-muted-foreground",
+    matchTimeBadge: "inline-flex items-center onp-card onp-ink px-2 py-0.5 font-['Roboto_Slab'] text-[13px] font-extrabold text-background tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1 border-t border-border/70",
+    navBar: "bg-background border-t-2 border-foreground",
+    navCenter: "onp-card bg-card text-foreground border-foreground",
+    navCenterActive: "onp-card onp-ink text-background border-foreground",
+    navTab: "text-muted-foreground hover:text-foreground",
+    navTabActive: "text-accent",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-accent",
+    tableHeader: "bg-secondary font-['Libre_Franklin'] text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground border-y border-foreground/60",
+    tableRowAlt: "bg-secondary/40",
+    ptsBadge: "inline-flex items-center justify-center min-w-[22px] onp-card border border-foreground/70 px-1.5 py-0.5 font-['Roboto_Slab'] text-[13px] font-extrabold text-foreground tabular-nums",
+    timeslotHeader: "border-y border-foreground bg-transparent flex items-center gap-2 px-3 py-1.5",
+    timeslotBadge: "font-['Roboto_Slab'] text-[16px] font-extrabold text-foreground tabular-nums",
+    timeslotHeaderMeta: "font-['Libre_Franklin'] text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground",
+    dateHeader: "font-['Playfair_Display'] text-[20px] font-black uppercase tracking-[-0.01em] text-foreground border-b-[3px] border-foreground pb-0.5",
+    phaseTab: "px-3 py-1 onp-card font-['Roboto_Slab'] text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap transition-colors",
+    phaseTabActive: "onp-ink text-background border border-foreground",
+    phaseTabInactive: "bg-card border border-border text-muted-foreground hover:text-foreground",
+    subHeader: "px-3 py-1.5 flex items-center justify-between gap-2 onp-ink",
+    subHeaderTitle: "font-['Roboto_Slab'] text-[13px] font-bold uppercase tracking-[0.14em] text-background",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['Libre_Franklin'] text-[10px] font-bold uppercase tracking-[0.16em] text-background/70",
+    coverOverlay: "onp-cover",
+    logoFrame: "border-2 border-foreground/70",
+    bracketConnector: "onp-connector",
+  },
 };
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper"];
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
   (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, NEW_BROADCAST_STYLES.includes(k) ? "broadcast" : "legacy"])
