@@ -813,3 +813,102 @@ input[type="number"] {
   --radius: 0.3rem;
   --gradient-hero: linear-gradient(180deg, hsl(157 43% 14%) 0%, hsl(157 43% 10%) 100%);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BROADCAST STYLES — NEW GENERATION (naast de bestaande/legacy thema's)
+   Elke broadcast style levert semantische tokens voor light EN dark.
+   Nieuwe styles voegen enkel een eigen [data-broadcast="..."] blok toe.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── BROADCAST #1: COPA MUNDO ──────────────────────────────────────────────
+   Dark: dark green-black #07110D + Copa Mundo yellow #FFD900
+   Light: #F8F9FB + deep Copa Mundo blue #0B3B82
+   ───────────────────────────────────────────────────────────────────────── */
+[data-broadcast="copa_mundo_bc"] {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+[data-broadcast="copa_mundo_bc"] h1,
+[data-broadcast="copa_mundo_bc"] h2,
+[data-broadcast="copa_mundo_bc"] h3,
+[data-broadcast="copa_mundo_bc"] .font-display {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+
+[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
+  --background: 150 40% 5%;
+  --foreground: 120 8% 96%;
+  --card: 153 23% 10%;
+  --card-foreground: 120 8% 96%;
+  --popover: 150 20% 12%;
+  --popover-foreground: 120 8% 96%;
+  --primary: 51 100% 50%;
+  --primary-foreground: 100 12% 7%;
+  --secondary: 152 17% 15%;
+  --secondary-foreground: 154 8% 78%;
+  --muted: 152 17% 15%;
+  --muted-foreground: 154 8% 62%;
+  --accent: 150 20% 12%;
+  --accent-foreground: 120 8% 96%;
+  --destructive: 2 66% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 150 18% 18%;
+  --input: 152 17% 15%;
+  --ring: 51 100% 50%;
+  --radius: 0.625rem;
+  --gradient-hero: linear-gradient(180deg, hsl(153 23% 10%) 0%, hsl(150 40% 5%) 100%);
+
+  /* semantic broadcast tokens (reusable by future broadcast styles) */
+  --broadcast-bg: 150 40% 5%;
+  --broadcast-surface: 153 23% 10%;
+  --broadcast-surface-secondary: 152 17% 15%;
+  --broadcast-surface-elevated: 150 20% 12%;
+  --broadcast-text: 120 8% 96%;
+  --broadcast-text-secondary: 154 8% 62%;
+  --broadcast-text-muted: 152 7% 43%;
+  --broadcast-border: 150 18% 18%;
+  --broadcast-primary: 51 100% 50%;
+  --broadcast-primary-contrast: 100 12% 7%;
+  --broadcast-danger: 2 66% 56%;
+  --broadcast-success: 145 40% 50%;
+}
+
+[data-broadcast="copa_mundo_bc"][data-mode="light"] {
+  --background: 220 27% 98%;
+  --foreground: 224 29% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 29% 13%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 29% 13%;
+  --primary: 214 84% 28%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 225 24% 95%;
+  --secondary-foreground: 218 10% 30%;
+  --muted: 225 18% 93%;
+  --muted-foreground: 218 10% 41%;
+  --accent: 217 55% 91%;
+  --accent-foreground: 214 84% 24%;
+  --destructive: 0 72% 54%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 217 15% 87%;
+  --input: 217 15% 87%;
+  --ring: 214 84% 28%;
+  --radius: 0.625rem;
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 27% 98%) 100%);
+
+  --broadcast-bg: 220 27% 98%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 225 24% 95%;
+  --broadcast-surface-elevated: 217 55% 91%;
+  --broadcast-text: 224 29% 13%;
+  --broadcast-text-secondary: 218 10% 41%;
+  --broadcast-text-muted: 213 8% 58%;
+  --broadcast-border: 217 15% 87%;
+  --broadcast-primary: 214 84% 28%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-danger: 0 72% 54%;
+  --broadcast-success: 152 54% 39%;
+}
