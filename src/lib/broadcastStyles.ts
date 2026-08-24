@@ -13,7 +13,8 @@ export type BroadcastStyle =
   | "world_cup_mexico"
   | "world_cup_canada"
   | "world_cup_usa"
-  | "retro_football";
+  | "retro_football"
+  | "copa_mundo_bc";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -31,6 +32,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   world_cup_mexico: { name: "World Cup — Mexico", description: "Groene host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇲🇽" },
   world_cup_canada: { name: "World Cup — Canada", description: "Rode host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇨🇦" },
   world_cup_usa: { name: "World Cup — USA", description: "Blauwe host-nation stijl met sterren print zoals op de Trionda bal", preview: "🇺🇸" },
+  copa_mundo_bc: { name: "Copa Mundo", description: "Broadcast Style #1 — de native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
   retro_football: { name: "Retro Football", description: "Vintage matchdayprogramma uit de jaren '70/'80: crèmepapier, bosgroen en verschoten rood met Roboto Condensed", preview: "📕" },
 };
 
@@ -719,7 +721,65 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     subHeaderTitle: "font-['Roboto_Condensed'] text-[11px] font-extrabold uppercase tracking-[0.08em] text-accent-foreground",
     subLabel: "inline-flex items-center px-2 py-0.5 font-['Roboto_Condensed'] text-[10px] font-extrabold uppercase tracking-[0.08em] text-accent-foreground/85",
   },
+  // ── BROADCAST #1: COPA MUNDO (new generation) ───
+  copa_mundo_bc: {
+    sectionDot: "h-3.5 w-1 rounded-full bg-primary",
+    sectionTitle: "text-[15px] font-bold text-foreground tracking-tight",
+    sectionMeta: "text-[11px] font-medium text-muted-foreground",
+    sectionLine: "flex-1 h-px bg-border",
+    card: "rounded-[10px] border border-border bg-card overflow-hidden",
+    matchCardWrapper: "rounded-[10px] border border-border bg-card overflow-hidden",
+    cardHeader: "bg-secondary border-b border-border px-3 py-2 flex items-center gap-2",
+    cardHeaderDot: "h-1.5 w-1.5 rounded-full bg-primary",
+    cardHeaderTitle: "text-[10px] font-semibold text-foreground uppercase tracking-[0.08em]",
+    homeCardHeader: "bg-secondary border-b border-border px-3 py-2 flex items-center gap-2",
+    homeCardHeaderTitle: "text-[11px] font-semibold text-foreground uppercase tracking-[0.08em]",
+    tabContainer: "flex gap-1 rounded-[8px] bg-secondary border border-border p-1",
+    tabActive: "flex-1 px-3 py-1.5 rounded-[6px] text-[11px] font-semibold transition-colors bg-primary text-primary-foreground",
+    tabInactive: "flex-1 px-3 py-1.5 rounded-[6px] text-[11px] font-medium transition-colors text-muted-foreground hover:text-foreground",
+    badge: "inline-flex items-center rounded-[6px] bg-secondary border border-border px-2 py-0.5 text-[10px] font-semibold text-foreground tabular-nums",
+    label: "text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground",
+    backButton: "flex items-center gap-1 text-[11px] font-semibold text-primary",
+    matchContext: "bg-secondary px-3 py-1.5 border-b border-border",
+    matchContextText: "text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground",
+    matchTeamRow: "px-3 py-2",
+    matchTeamRowWin: "bg-primary/[0.07]",
+    matchTeamName: "text-[12px] font-semibold truncate",
+    matchTeamNameFav: "text-primary",
+    matchScore: "text-[14px] font-extrabold tabular-nums",
+    matchScoreWin: "text-foreground",
+    matchScoreLose: "text-muted-foreground",
+    matchTimeBadge: "inline-flex items-center rounded-[6px] border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1.5 bg-secondary/60 border-t border-border",
+    navBar: "bg-background/95 backdrop-blur-md border-t border-border",
+    navCenter: "bg-card text-muted-foreground border-border rounded-full",
+    navCenterActive: "bg-card text-primary border-primary rounded-full scale-105",
+    navTab: "text-muted-foreground hover:text-foreground",
+    navTabActive: "text-primary",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary",
+    tableHeader: "bg-secondary text-[10px] font-semibold uppercase tracking-[0.06em] text-muted-foreground border-b border-border",
+    tableRowAlt: "bg-secondary/40",
+    ptsBadge: "inline-flex items-center justify-center rounded-[6px] bg-primary px-1.5 py-0.5 text-[11px] font-extrabold text-primary-foreground tabular-nums",
+    timeslotHeader: "bg-secondary text-foreground flex items-center gap-2 px-3 py-2 border-b border-border",
+    timeslotBadge: "inline-flex items-center rounded-[6px] border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary tabular-nums",
+    timeslotHeaderMeta: "text-[11px] font-medium text-muted-foreground",
+    dateHeader: "bg-primary text-primary-foreground px-2.5 py-0.5 rounded-[6px] text-[10px] font-semibold uppercase tracking-[0.06em]",
+    phaseTab: "px-3 py-1.5 rounded-[8px] text-[10px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap transition-colors",
+    phaseTabActive: "bg-primary text-primary-foreground",
+    phaseTabInactive: "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/40",
+    subHeader: "px-3 py-2 flex items-center justify-between gap-2 bg-secondary border-l-2 border-l-primary",
+    subHeaderTitle: "text-[11px] font-bold uppercase tracking-[0.06em] text-foreground",
+    subLabel: "inline-flex items-center px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-muted-foreground",
+  },
 };
+
+
+/** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
+export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
+  (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, k === "copa_mundo_bc" ? "broadcast" : "legacy"])
+) as Record<BroadcastStyle, "broadcast" | "legacy">;
+
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc"];
 
 
 export function ds(style: BroadcastStyle, token: string): string {
