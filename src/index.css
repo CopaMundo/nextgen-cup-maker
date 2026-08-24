@@ -109,7 +109,7 @@ input[type="number"] {
     --border: 150 12% 18%;
     --input: 150 12% 18%;
     --ring: 52 100% 50%;
-    --radius: 0.75rem;
+    --radius: 0.2rem;
     --sidebar-background: 150 20% 6%;
     --sidebar-foreground: 0 0% 85%;
     --sidebar-primary: 52 100% 50%;
@@ -144,7 +144,7 @@ input[type="number"] {
     --border: 220 15% 85%;
     --input: 220 15% 85%;
     --ring: 220 100% 23%;
-    --radius: 0.75rem;
+    --radius: 0.2rem;
     --sidebar-background: 220 8% 96%;
     --sidebar-foreground: 220 20% 25%;
     --sidebar-primary: 220 100% 23%;
