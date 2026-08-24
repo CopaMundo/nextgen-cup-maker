@@ -234,41 +234,52 @@ const PresentationManager = ({
                 <Eye className="h-5 w-5 text-primary" /> Broadcast stijl
               </h2>
               <p className="text-sm text-muted-foreground">
-                Kies hoe het toernooi visueel wordt gepresenteerd voor bezoekers.
+                Kies hoe het toernooi visueel wordt gepresenteerd voor bezoekers. Light/dark wordt door de bezoeker zelf gekozen.
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {(Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
-                  // Verberg de host-nation varianten; World Cup is één stijl
-                  .filter(([key]) => !["world_cup_mexico", "world_cup_canada", "world_cup_usa"].includes(key))
-                  .map(([key, info]) => {
-                    const wcKeys: BroadcastStyle[] = ["world_cup", "world_cup_mexico", "world_cup_canada", "world_cup_usa"];
-                    const isActive =
-                      key === "world_cup"
-                        ? wcKeys.includes(displayStyle)
-                        : displayStyle === key;
-                    return (
-                      <button key={key} onClick={async () => {
-                        const target: BroadcastStyle = key;
-                        setDisplayStyle(target);
-                        await supabase.from("tournaments").update({ view_display_style: target } as any).eq("id", tournament.id);
-                        onUpdate({ ...tournament, view_display_style: target });
-                        toast({ title: `Stijl '${info.name}' ingesteld` });
-                      }}
-                        className={`rounded-lg border p-3 text-left transition-colors ${
-                          isActive ? "border-primary bg-primary/10" : "border-border hover:border-foreground/30"
-                        }`}>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{info.preview}</span>
-                          <div>
-                            <p className="text-xs font-bold text-foreground">{info.name}</p>
-                            <p className="text-[10px] text-muted-foreground">{info.description}</p>
-                          </div>
+              {(() => {
+                const applyStyle = async (target: BroadcastStyle, name: string) => {
+                  setDisplayStyle(target);
+                  await supabase.from("tournaments").update({ view_display_style: target } as any).eq("id", tournament.id);
+                  onUpdate({ ...tournament, view_display_style: target });
+                  toast({ title: `Stijl '${name}' ingesteld` });
+                };
+                const entries = (Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
+                  .filter(([key]) => !["world_cup_mexico", "world_cup_canada", "world_cup_usa"].includes(key));
+                const renderCard = ([key, info]: [BroadcastStyle, { name: string; description: string; preview: string }]) => {
+                  const wcKeys: BroadcastStyle[] = ["world_cup", "world_cup_mexico", "world_cup_canada", "world_cup_usa"];
+                  const isActive = key === "world_cup" ? wcKeys.includes(displayStyle) : displayStyle === key;
+                  return (
+                    <button key={key} onClick={() => applyStyle(key, info.name)}
+                      className={`rounded-lg border p-3 text-left transition-colors ${
+                        isActive ? "border-primary bg-primary/10" : "border-border hover:border-foreground/30"
+                      }`}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{info.preview}</span>
+                        <div>
+                          <p className="text-xs font-bold text-foreground">{info.name}</p>
+                          <p className="text-[10px] text-muted-foreground">{info.description}</p>
                         </div>
-                      </button>
-                    );
-                  })}
-              </div>
+                      </div>
+                    </button>
+                  );
+                };
+                const newGen = entries.filter(([k]) => NEW_BROADCAST_STYLES.includes(k));
+                const legacy = entries.filter(([k]) => !NEW_BROADCAST_STYLES.includes(k));
+                return (
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Broadcast styles (nieuw)</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{newGen.map(renderCard)}</div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Legacy thema's</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{legacy.map(renderCard)}</div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
+
 
             {/* Format display */}
             <div className="rounded-xl border border-border bg-card p-6 space-y-4">
