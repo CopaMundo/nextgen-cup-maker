@@ -18,8 +18,9 @@ interface Props {
 const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onToggleDarkMode }: Props) => {
   const { tournament, attachments, sponsors, locations, categories } = data;
   const bStyle = useBroadcastStyle();
-  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
-  const cardFrame = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border bg-card shadow-sm";
+  const wrapperToken = ds(bStyle, "matchCardWrapper");
+  const squareStyle = Boolean(wrapperToken) && !/rounded-(?!none)/.test(wrapperToken);
+  const cardFrame = wrapperToken || "rounded-xl border border-border bg-card shadow-sm";
   const largeFrameShape = squareStyle ? "" : "rounded-2xl";
   const controlFrameShape = squareStyle ? "rounded-none" : "rounded-lg";
   const divisionRef = useRef<HTMLDivElement>(null);
@@ -75,10 +76,19 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
         {tournament.cover_url ? (
           <div className="h-48 w-full overflow-hidden">
             <img src={tournament.cover_url} alt="" className="h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            {ds(bStyle, "coverOverlay") ? (
+              <>
+                <div className={ds(bStyle, "coverOverlay")} />
+                <div className="en-prism-line bottom-0" />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            )}
           </div>
         ) : (
-          <div className="h-40 w-full bg-[radial-gradient(120%_100%_at_50%_0%,hsl(var(--secondary))_0%,hsl(var(--background))_70%)] relative"><div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" /></div>
+          <div className="h-40 w-full bg-[radial-gradient(120%_100%_at_50%_0%,hsl(var(--secondary))_0%,hsl(var(--background))_70%)] relative">
+            {ds(bStyle, "coverOverlay") ? <div className="en-prism-line bottom-0" /> : <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />}
+          </div>
         )}
 
         <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 flex items-end justify-center px-5">
@@ -87,16 +97,17 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             <div className="flex-1" />
           )}
           {tournament.logo_url ? (
-            <div className={`h-36 w-36 flex-shrink-0 overflow-hidden border-4 border-background bg-card shadow-xl ${largeFrameShape}`}>
+            <div className={`h-36 w-36 flex-shrink-0 overflow-hidden border-4 border-background bg-card shadow-xl ${largeFrameShape} ${ds(bStyle, "logoFrame")}`}>
               <img src={tournament.logo_url} alt="" className="h-full w-full object-contain" />
             </div>
           ) : (
-            <div className={`flex h-36 w-36 flex-shrink-0 items-center justify-center border-4 border-background bg-primary shadow-xl ${largeFrameShape}`}>
+            <div className={`flex h-36 w-36 flex-shrink-0 items-center justify-center border-4 border-background bg-primary shadow-xl ${largeFrameShape} ${ds(bStyle, "logoFrame")}`}>
               <span className="font-display text-5xl font-black text-primary-foreground">
                 {tournament.name?.charAt(0)}
               </span>
             </div>
           )}
+
           {onToggleDarkMode ? (
             <div className="flex-1 flex justify-end pb-1">
               <button onClick={onToggleDarkMode}

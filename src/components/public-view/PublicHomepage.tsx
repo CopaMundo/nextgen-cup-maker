@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, BarChart3, MessageCircle } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
-import { ds } from "@/lib/broadcastStyles";
+import { ds , isSquareStyle } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
@@ -508,7 +508,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     <div className="pt-4 space-y-4 px-3">
       {/* Tournament name - broadcast header */}
       <div className="flex items-center gap-3 mb-1">
-        {tournament.logo_url && <img src={tournament.logo_url} alt="" className={`h-10 w-10 object-contain shadow-sm ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-xl"}`} />}
+        {tournament.logo_url && <img src={tournament.logo_url} alt="" className={`h-10 w-10 object-contain shadow-sm ${isSquareStyle(bStyle) ? "" : "rounded-xl"}`} />}
         <div className="flex-1 min-w-0">
           <h1 className="font-display font-black text-foreground leading-tight text-lg uppercase tracking-wide truncate">{tournament.name}</h1>
         </div>
@@ -562,7 +562,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               {favTeamObj.logo_url ? (
                 <img src={favTeamObj.logo_url} alt="" className="h-7 w-7 object-contain shrink-0" />
               ) : (
-                <div className={`h-7 w-7 bg-muted flex items-center justify-center shrink-0 ${ds(bStyle, "matchCardWrapper") ? "" : "rounded-md"}`}>
+                <div className={`h-7 w-7 bg-muted flex items-center justify-center shrink-0 ${isSquareStyle(bStyle) ? "" : "rounded-md"}`}>
                   <Star className="h-3 w-3 text-muted-foreground" />
                 </div>
               )}
@@ -1109,7 +1109,7 @@ const GridCard = ({ title, icon, onClick, children }: { title: string; icon?: Re
 // Compact standings
 const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: any[]; favoriteTeam: string | null; tournament: any }) => {
   const bStyle = useBroadcastStyle();
-  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
+  const squareStyle = isSquareStyle(bStyle);
   let visible = standings;
   const total = standings.length;
 
@@ -1189,7 +1189,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
 }) => {
   const bStyle = useBroadcastStyle();
   const getColor = (pos: number) => standingColors.find((sc: any) => sc.phase_id === phaseId && pos >= sc.position_from && pos <= sc.position_to);
-  const squareStyle = Boolean(ds(bStyle, "matchCardWrapper"));
+  const squareStyle = isSquareStyle(bStyle);
 
   return (
     <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>
