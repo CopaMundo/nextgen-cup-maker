@@ -974,10 +974,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   const xFar = side === "left" ? CONNECTOR_W : 0;
                   return (
                     <g key={matchIdx}>
-                      <line x1={xCardEdge} y1={y1} x2={midX} y2={y1} className="stroke-border" strokeWidth={1.5} />
-                      <line x1={xCardEdge} y1={y2} x2={midX} y2={y2} className="stroke-border" strokeWidth={1.5} />
-                      <line x1={midX} y1={y1} x2={midX} y2={y2} className="stroke-border" strokeWidth={1.5} />
-                      <line x1={midX} y1={yTarget} x2={xFar} y2={yTarget} className="stroke-border" strokeWidth={1.5} />
+                      <line x1={xCardEdge} y1={y1} x2={midX} y2={y1} className={ds(bStyle, "bracketConnector") || "stroke-border"} strokeWidth={1.5} />
+                      <line x1={xCardEdge} y1={y2} x2={midX} y2={y2} className={ds(bStyle, "bracketConnector") || "stroke-border"} strokeWidth={1.5} />
+                      <line x1={midX} y1={y1} x2={midX} y2={y2} className={ds(bStyle, "bracketConnector") || "stroke-border"} strokeWidth={1.5} />
+                      <line x1={midX} y1={yTarget} x2={xFar} y2={yTarget} className={ds(bStyle, "bracketConnector") || "stroke-border"} strokeWidth={1.5} />
                     </g>
                   );
                 })}
