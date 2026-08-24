@@ -2732,8 +2732,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     if (bracketRounds.length === 0) return null;
     const CARD_W = 240;
     const CONNECTOR_W = 32;
-    const CARD_H = effectiveScoreEditable ? 92 : 78;
-    const GAP = 16;
+    // Card height is measured from the real DOM (headers, dates, score inputs all change it),
+    // so spacing stays correct whether cards are empty, filled with teams or with scores.
+    const CARD_H = Math.max(measuredCardH, effectiveScoreEditable ? 92 : 78);
+    const GAP = 20;
     const HEADER_H = 36; // Header height (mb-3 + text)
 
     const isWinnerRef = (label: string | null) => (label ?? "").startsWith("Winnaar ");
