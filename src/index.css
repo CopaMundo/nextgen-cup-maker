@@ -858,7 +858,7 @@ input[type="number"] {
   --border: 150 18% 18%;
   --input: 152 17% 15%;
   --ring: 51 100% 50%;
-  --radius: 0.625rem;
+  --radius: 0.2rem;
   --gradient-hero: linear-gradient(180deg, hsl(153 23% 10%) 0%, hsl(150 40% 5%) 100%);
 
   /* semantic broadcast tokens (reusable by future broadcast styles) */
@@ -896,7 +896,7 @@ input[type="number"] {
   --border: 217 15% 87%;
   --input: 217 15% 87%;
   --ring: 214 84% 28%;
-  --radius: 0.625rem;
+  --radius: 0.2rem;
   --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 27% 98%) 100%);
 
   --broadcast-bg: 220 27% 98%;
@@ -953,7 +953,7 @@ input[type="number"] {
   --border: 226 45% 26%;
   --input: 226 45% 26%;
   --ring: 218 100% 55%;
-  --radius: 0.7rem;
+  --radius: 0.2rem;
   --gradient-hero: linear-gradient(180deg, hsl(227 65% 12%) 0%, hsl(229 84% 5%) 100%);
 
   --broadcast-bg: 228 76% 8%;
@@ -1005,7 +1005,7 @@ input[type="number"] {
   --border: 219 40% 90%;
   --input: 219 40% 90%;
   --ring: 219 83% 47%;
-  --radius: 0.7rem;
+  --radius: 0.2rem;
   --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(223 54% 97%) 100%);
 
   --broadcast-bg: 223 54% 97%;
@@ -1563,4 +1563,10 @@ body[data-broadcast="old_newspaper"] {
 }
 .onp-connector line {
   stroke-width: 1;
+}
+
+/* Copa Mundo & European Nights: zelfde vierkante afronding als Retro Black & White (3px) */
+[data-broadcast="copa_mundo_bc"] .rounded-none,
+[data-broadcast="european_nights"] .rounded-none {
+  border-radius: 3px;
 }
