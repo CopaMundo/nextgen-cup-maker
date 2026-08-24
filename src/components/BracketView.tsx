@@ -2727,6 +2727,38 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     );
   };
 
+  // --- Measure real bracket card height so vertical spacing/connectors always line up ---
+  const bracketCardEls = useRef<Map<string, HTMLDivElement>>(new Map());
+  const bracketCardObserver = useRef<ResizeObserver | null>(null);
+  const [measuredCardH, setMeasuredCardH] = useState(0);
+
+  const recomputeCardH = useCallback(() => {
+    let max = 0;
+    bracketCardEls.current.forEach((el, id) => {
+      if (!el.isConnected) { bracketCardEls.current.delete(id); return; }
+      max = Math.max(max, el.offsetHeight);
+    });
+    setMeasuredCardH(prev => (Math.abs(prev - max) > 0.5 ? max : prev));
+  }, []);
+
+  const setBracketCardRef = useCallback((id: string) => (el: HTMLDivElement | null) => {
+    if (typeof ResizeObserver !== "undefined" && !bracketCardObserver.current) {
+      bracketCardObserver.current = new ResizeObserver(() => recomputeCardH());
+    }
+    const prev = bracketCardEls.current.get(id);
+    if (prev && prev !== el) {
+      bracketCardObserver.current?.unobserve(prev);
+      bracketCardEls.current.delete(id);
+    }
+    if (el) {
+      bracketCardEls.current.set(id, el);
+      bracketCardObserver.current?.observe(el);
+    }
+    recomputeCardH();
+  }, [recomputeCardH]);
+
+  useEffect(() => () => { bracketCardObserver.current?.disconnect(); bracketCardObserver.current = null; }, []);
+
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
