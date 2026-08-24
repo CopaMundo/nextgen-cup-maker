@@ -824,6 +824,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     subLabel: "inline-flex items-center px-2 py-0.5 font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground",
     coverOverlay: "en-cover-prism",
     logoFrame: "ring-1 ring-primary/40 shadow-[0_0_28px_hsl(var(--primary)/0.28)]",
+    bracketConnector: "en-connector",
   },
 
 };
