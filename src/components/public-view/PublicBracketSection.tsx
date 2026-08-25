@@ -670,7 +670,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   }}
                 >{displayScore ?? "–"}</span>
                 {penValue !== null && (
-                  <span className="text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
+                  <span className="inline-block min-w-[1.5rem] text-left text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
                 )}
               </div>
             );

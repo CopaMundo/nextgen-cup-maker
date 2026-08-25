@@ -96,7 +96,7 @@ const PublicMatchCard = ({
           <>
             <span className={`min-w-[1.1rem] text-right tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
             {hasPenalties && (
-              <span className="text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
+              <span className="inline-block min-w-[1.5rem] text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
             )}
           </>
         ) : null}
