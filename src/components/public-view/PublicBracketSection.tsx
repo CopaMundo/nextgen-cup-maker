@@ -655,22 +655,30 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               </span>
             )}
           </div>
-          {isPlayedish && (
-            <div className="flex items-center gap-0.5 shrink-0">
-              <span
-                className={`tabular-nums ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[11px]"}`}
-                style={isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : undefined}
-              >{displayScore ?? "–"}</span>
-              {matchIsHA && haTotal?.hasPenalties && (
-                <span className="text-[8px] text-muted-foreground font-medium ml-px">
-                  ({side === "home" ? haTotal.homePen : haTotal.awayPen})
-                </span>
-              )}
-              {!matchIsHA && match.home_penalties !== null && (
-                <span className="text-[8px] text-muted-foreground font-medium ml-px">({side === "home" ? match.home_penalties : match.away_penalties})</span>
-              )}
-            </div>
-          )}
+          {isPlayedish && (() => {
+            const penValue = matchIsHA
+              ? (haTotal?.hasPenalties ? (side === "home" ? haTotal.homePen : haTotal.awayPen) : null)
+              : (match.home_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
+            const scoreW = tightSide ? 8 : isCompactPretty ? Math.max(10, (fsScore ?? 11)) : 12;
+            const penW = tightSide ? 10 : 14;
+            return (
+              <div className="flex items-center shrink-0">
+                <span
+                  className={`tabular-nums text-right ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[11px]"}`}
+                  style={{
+                    minWidth: scoreW,
+                    ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
+                  }}
+                >{displayScore ?? "–"}</span>
+                <span
+                  aria-hidden={penValue === null}
+                  className="text-[8px] text-muted-foreground font-medium text-left ml-px"
+                  style={{ width: penW, display: "inline-block" }}
+                >{penValue !== null ? `(${penValue})` : ""}</span>
+              </div>
+            );
+          })()}
+
         </div>
       );
     };
