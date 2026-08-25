@@ -2261,3 +2261,243 @@ body[data-broadcast="soccertec"] {
 .stec-connector line {
   stroke-width: 1.25;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BROADCAST STYLE #10 — OLD CLUBHOUSE
+   Het oude wedstrijd- en uitslagenbord uit een traditionele
+   voetbalkantine: donkergroen, zwart letterboard, hout en oud
+   crème papier. Oswald titels/scores + Roboto Condensed body.
+   ══════════════════════════════════════════════════════════════ */
+[data-broadcast="old_clubhouse"],
+[data-broadcast="old_clubhouse"] body,
+body[data-broadcast="old_clubhouse"] {
+  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+  background-image: none;
+}
+[data-broadcast="old_clubhouse"] h1,
+[data-broadcast="old_clubhouse"] h2,
+[data-broadcast="old_clubhouse"] h3,
+[data-broadcast="old_clubhouse"] .font-display {
+  font-family: Oswald, 'Roboto Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+[data-broadcast="old_clubhouse"] .tabular-nums {
+  font-family: Oswald, 'Roboto Condensed', sans-serif;
+  font-weight: 600;
+}
+
+/* Light: oud crème wedstrijdpapier op het clubhuisbord */
+[data-broadcast="old_clubhouse"][data-mode="light"] {
+  --background: 43 53% 87%;
+  --foreground: 60 8% 8%;
+  --card: 45 51% 81%;
+  --card-foreground: 60 8% 8%;
+  --popover: 43 53% 87%;
+  --popover-foreground: 60 8% 8%;
+  --primary: 133 22% 11%;
+  --primary-foreground: 46 51% 88%;
+  --secondary: 45 38% 76%;
+  --secondary-foreground: 42 12% 32%;
+  --muted: 45 38% 76%;
+  --muted-foreground: 42 10% 40%;
+  --accent: 88 28% 33%;
+  --accent-foreground: 46 51% 88%;
+  --destructive: 8 45% 38%;
+  --destructive-foreground: 46 51% 88%;
+  --border: 42 22% 64%;
+  --input: 42 22% 64%;
+  --ring: 88 28% 33%;
+  --radius: 0.125rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 43 53% 87%;
+  --broadcast-night: 60 6% 6%;
+  --broadcast-paper: 43 53% 87%;
+  --broadcast-surface: 45 51% 81%;
+  --broadcast-surface-secondary: 45 38% 76%;
+  --broadcast-surface-elevated: 43 53% 90%;
+  --broadcast-text: 60 8% 8%;
+  --broadcast-text-secondary: 42 10% 40%;
+  --broadcast-text-muted: 42 10% 46%;
+  --broadcast-border: 42 22% 60%;
+  --broadcast-primary: 133 22% 11%;
+  --broadcast-primary-contrast: 46 51% 88%;
+  --broadcast-score: 46 51% 88%;
+  --broadcast-bright: 45 51% 81%;
+  --broadcast-gold: 41 35% 48%;
+  --broadcast-navy: 120 15% 17%;
+  --broadcast-cyan: 88 28% 33%;
+  --broadcast-violet: 26 38% 30%;
+  --broadcast-magenta: 8 45% 38%;
+  --broadcast-danger: 8 45% 38%;
+  --broadcast-success: 88 28% 33%;
+  --broadcast-wood: 26 35% 21%;
+  --broadcast-wood-light: 26 38% 30%;
+  --broadcast-cream: 45 51% 81%;
+}
+
+/* Dark: donkergroen clubhuisbord met zwart letterboard */
+[data-broadcast="old_clubhouse"][data-mode="dark"] {
+  --background: 120 15% 17%;
+  --foreground: 46 51% 88%;
+  --card: 133 22% 11%;
+  --card-foreground: 46 51% 88%;
+  --popover: 133 22% 11%;
+  --popover-foreground: 46 51% 88%;
+  --primary: 45 51% 81%;
+  --primary-foreground: 60 6% 6%;
+  --secondary: 120 13% 22%;
+  --secondary-foreground: 46 30% 76%;
+  --muted: 120 13% 22%;
+  --muted-foreground: 42 16% 66%;
+  --accent: 41 35% 48%;
+  --accent-foreground: 60 6% 6%;
+  --destructive: 8 48% 44%;
+  --destructive-foreground: 46 51% 88%;
+  --border: 120 12% 28%;
+  --input: 120 12% 28%;
+  --ring: 41 35% 48%;
+  --radius: 0.125rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 120 15% 17%;
+  --broadcast-night: 60 6% 6%;
+  --broadcast-paper: 45 51% 81%;
+  --broadcast-surface: 133 22% 11%;
+  --broadcast-surface-secondary: 120 13% 22%;
+  --broadcast-surface-elevated: 120 13% 25%;
+  --broadcast-text: 46 51% 88%;
+  --broadcast-text-secondary: 42 16% 70%;
+  --broadcast-text-muted: 42 12% 60%;
+  --broadcast-border: 120 12% 28%;
+  --broadcast-primary: 45 51% 81%;
+  --broadcast-primary-contrast: 60 6% 6%;
+  --broadcast-score: 46 51% 88%;
+  --broadcast-bright: 45 51% 81%;
+  --broadcast-gold: 41 35% 48%;
+  --broadcast-navy: 133 22% 11%;
+  --broadcast-cyan: 88 28% 33%;
+  --broadcast-violet: 26 38% 30%;
+  --broadcast-magenta: 8 48% 44%;
+  --broadcast-danger: 8 48% 44%;
+  --broadcast-success: 88 28% 33%;
+  --broadcast-wood: 26 35% 21%;
+  --broadcast-wood-light: 26 38% 30%;
+  --broadcast-cream: 45 51% 81%;
+}
+
+/* Geen moderne floating cards: dunne donkere borders, 0–3px radius */
+[data-broadcast="old_clubhouse"] .rounded-none,
+[data-broadcast="old_clubhouse"] .och-card,
+[data-broadcast="old_clubhouse"] .och-board,
+[data-broadcast="old_clubhouse"] .och-frame {
+  border-radius: 2px;
+}
+[data-broadcast="old_clubhouse"] [class*="shadow-"] {
+  box-shadow: none !important;
+}
+[data-broadcast="old_clubhouse"] [class*="bg-gradient"] {
+  background-image: none !important;
+}
+
+/* Houten omlijsting: hoofdframes en sectieomkadering */
+.och-frame {
+  border: 3px solid hsl(var(--broadcast-wood));
+  background-color: hsl(var(--broadcast-wood-light));
+  background-image:
+    repeating-linear-gradient(90deg, hsl(0 0% 0% / 0.10) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, hsl(0 0% 100% / 0.045) 0 2px, transparent 2px 11px);
+  box-shadow: inset 0 0 0 1px hsl(var(--broadcast-cream) / 0.14) !important;
+}
+
+/* Zwart letterboard met horizontale gleuven: standen en uitslagen */
+.och-board {
+  background-color: hsl(var(--broadcast-night));
+  background-image: repeating-linear-gradient(
+    180deg,
+    hsl(var(--broadcast-cream) / 0.055) 0 1px,
+    transparent 1px 9px
+  );
+  border: 1px solid hsl(60 6% 3%);
+}
+
+/* Crème papieren informatievel */
+.och-paper {
+  background-color: hsl(var(--broadcast-cream));
+  background-image:
+    repeating-linear-gradient(180deg, hsl(26 35% 21% / 0.035) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, hsl(26 35% 21% / 0.025) 0 1px, transparent 1px 6px);
+  border: 1px solid hsl(42 22% 58%);
+  color: hsl(60 8% 8%);
+}
+
+/* Kurkbord voor documenten/bijlagen */
+.och-cork {
+  background-color: hsl(30 32% 58%);
+  background-image:
+    radial-gradient(circle at 20% 30%, hsl(26 35% 21% / 0.22) 0 1.2px, transparent 1.4px),
+    radial-gradient(circle at 70% 65%, hsl(26 35% 21% / 0.18) 0 1.4px, transparent 1.6px),
+    radial-gradient(circle at 45% 85%, hsl(26 35% 21% / 0.16) 0 1px, transparent 1.2px);
+  background-size: 14px 14px, 19px 19px, 11px 11px;
+  border: 2px solid hsl(var(--broadcast-wood));
+}
+
+/* Geëmailleerd donkergroen bordje met kleine metalen schroeven */
+.och-enamel {
+  background-color: hsl(133 22% 11%);
+  border: 1px solid hsl(88 28% 33%);
+  box-shadow: inset 0 0 0 1px hsl(var(--broadcast-cream) / 0.12) !important;
+}
+.och-screws {
+  position: relative;
+}
+.och-screws::before,
+.och-screws::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 35% 35%, hsl(var(--broadcast-gold)), hsl(41 30% 30%));
+  pointer-events: none;
+  opacity: 0.85;
+}
+.och-screws::before { left: 5px; }
+.och-screws::after { right: 5px; }
+
+/* Kwalificatie-indicator: klein fysiek gekleurd markerplaatje aan de rij */
+.och-qual {
+  box-shadow: inset 4px 0 0 hsl(var(--broadcast-gold)) !important;
+}
+
+/* Bracket verbindingslijnen: dun crème/grijs */
+.och-connector {
+  stroke: hsl(45 30% 70% / 0.75);
+}
+.och-connector line {
+  stroke-width: 1.25;
+}
+
+/* Infopagina cover: verweerd donker binnen houten frame */
+.och-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg, hsl(0 0% 0% / 0.05) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, hsl(133 22% 11% / 0.35) 0%, hsl(133 22% 11% / 0.82) 60%, hsl(var(--background)) 100%);
+}
+.och-cover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: hsl(var(--broadcast-wood));
+}
