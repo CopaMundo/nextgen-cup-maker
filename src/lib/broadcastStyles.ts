@@ -1384,7 +1384,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec", "old_clubhouse", "sticker_album"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec", "old_clubhouse", "sticker_album", "teletext"];
 
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
