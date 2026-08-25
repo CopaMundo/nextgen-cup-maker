@@ -636,7 +636,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       const isPlayedish = match.is_played || (matchIsHA && haTotal?.anyScored);
 
       return (
-        <div className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-1.5 px-2.5 py-1.5"} ${winRowClass}`} style={tightSide ? { height: cardH / 2 } : undefined}>
+        <div
+          className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-2 px-2.5 h-[34px]"} ${winRowClass}`}
+          style={tightSide ? { height: cardH / 2 } : undefined}
+        >
           {won && !winRowHasEdgeMarker && (
             <span
               aria-hidden
@@ -644,10 +647,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               style={{ width: tightSide ? 2 : 3 }}
             />
           )}
-          {logo && <img src={logo} className={`${tightSide ? "" : "h-5 w-5"} object-contain flex-shrink-0`} alt="" style={isCompactPretty ? { height: logoSize, width: logoSize } : tightSide && !isCompactPretty ? { height: 10, width: 10 } : undefined} />}
+          {logo && <img src={logo} className={`${tightSide ? "" : "h-6 w-6"} object-contain flex-shrink-0`} alt="" style={isCompactPretty ? { height: logoSize, width: logoSize } : tightSide && !isCompactPretty ? { height: 10, width: 10 } : undefined} />}
           <div className="flex items-center gap-1 flex-1 min-w-0">
             <span
-              className={`truncate ${tid ? ds(bStyle, "matchTeamName") : "text-[9px] text-muted-foreground"} ${won ? "font-bold" : ""}`}
+              className={`truncate leading-none ${tid ? ds(bStyle, "matchTeamName") : "text-[10px] text-muted-foreground"} ${won ? "font-bold" : ""}`}
               style={isCompactPretty ? { fontSize: fsName, lineHeight: `${fsName + 3}px` } : tightSide ? { fontSize: 7, lineHeight: "12px" } : undefined}
             >{name}</span>
             {tournament?.show_country && country && (!compactTree || isCompactPretty) && (
@@ -659,20 +662,24 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {isPlayedish && (() => {
             const penValue = matchIsHA
               ? (haTotal?.hasPenalties ? (side === "home" ? haTotal.homePen : haTotal.awayPen) : null)
-              : (match.home_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
+              : (match.home_penalties !== null && match.away_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
             const scoreW = tightSide ? 8 : isCompactPretty ? Math.max(10, (fsScore ?? 11)) : 12;
+            const hasPen = penValue !== null && penValue !== undefined;
+            const penSlot = tightSide ? 9 : 14;
             return (
-              <div className="relative flex items-center shrink-0">
+              <div className="flex items-center shrink-0">
                 <span
-                  className={`tabular-nums text-right ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[11px]"}`}
+                  className={`tabular-nums text-right leading-none ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[12px]"}`}
                   style={{
                     minWidth: scoreW,
                     ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
                   }}
                 >{displayScore ?? "–"}</span>
-                {penValue !== null && (
-                  <span className="absolute left-full ml-0.5 text-left text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
-                )}
+                {/* Fixed-width penalty slot: always reserved so the main score never shifts */}
+                <span
+                  className="text-left text-[8px] text-muted-foreground font-medium leading-none whitespace-nowrap tabular-nums ml-0.5 shrink-0"
+                  style={{ width: penSlot }}
+                >{hasPen ? `(${penValue})` : ""}</span>
               </div>
             );
 
@@ -680,6 +687,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 
         </div>
       );
+
     };
 
     // For H&A: show field/ref/time of the *active* (next unplayed) leg.
