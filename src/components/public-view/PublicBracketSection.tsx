@@ -669,9 +669,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
                   }}
                 >{displayScore ?? "–"}</span>
-                {penValue !== null && (
-                  <span className="text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
-                )}
+                <span
+                  aria-hidden={penValue === null}
+                  className={`inline-block w-[1.25rem] shrink-0 text-left text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums ${penValue === null ? "invisible" : ""}`}
+                >({penValue ?? 0})</span>
               </div>
             );
 
