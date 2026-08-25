@@ -80,7 +80,7 @@ const PublicMatchCard = ({
   const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
 
   const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean) => (
-    <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors`}>
+    <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
           <img src={logo} className="h-full w-full object-contain" alt="" />
@@ -88,13 +88,13 @@ const PublicMatchCard = ({
           <div className="flex h-full w-full items-center justify-center bg-secondary text-[10px] font-black text-muted-foreground">{name.charAt(0)}</div>
         )}
       </div>
-      <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
+      <span className={`flex-1 truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
         {name}
       </span>
       <div className="relative flex items-center">
         {m.is_played ? (
           <>
-            <span className={`min-w-[1.1rem] text-right tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
+            <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
             {hasPenalties && (
               <span className="absolute left-full ml-0.5 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
             )}
@@ -104,6 +104,7 @@ const PublicMatchCard = ({
 
     </div>
   );
+
 
 
   const [open, setOpen] = useState(false);
