@@ -877,41 +877,43 @@ input[type="number"] {
 }
 
 [data-broadcast="copa_mundo_bc"][data-mode="light"] {
-  --background: 220 27% 98%;
-  --foreground: 224 29% 13%;
+  /* Light mode gebaseerd op het logo-groen #1E8D4C */
+  --background: 140 25% 98%;
+  --foreground: 155 40% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 224 29% 13%;
+  --card-foreground: 155 40% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 224 29% 13%;
-  --primary: 214 84% 28%;
+  --popover-foreground: 155 40% 11%;
+  --primary: 145 65% 34%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 225 24% 95%;
-  --secondary-foreground: 218 10% 30%;
-  --muted: 225 18% 93%;
-  --muted-foreground: 218 10% 41%;
-  --accent: 217 55% 91%;
-  --accent-foreground: 214 84% 24%;
+  --secondary: 145 22% 95%;
+  --secondary-foreground: 155 25% 24%;
+  --muted: 145 18% 94%;
+  --muted-foreground: 150 12% 40%;
+  --accent: 145 38% 90%;
+  --accent-foreground: 148 70% 22%;
   --destructive: 0 72% 54%;
   --destructive-foreground: 0 0% 100%;
-  --border: 217 15% 87%;
-  --input: 217 15% 87%;
-  --ring: 214 84% 28%;
+  --border: 145 16% 86%;
+  --input: 145 16% 86%;
+  --ring: 145 65% 34%;
   --radius: 0.2rem;
-  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 27% 98%) 100%);
+  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(140 25% 98%) 100%);
 
-  --broadcast-bg: 220 27% 98%;
+  --broadcast-bg: 140 25% 98%;
   --broadcast-surface: 0 0% 100%;
-  --broadcast-surface-secondary: 225 24% 95%;
-  --broadcast-surface-elevated: 217 55% 91%;
-  --broadcast-text: 224 29% 13%;
-  --broadcast-text-secondary: 218 10% 41%;
-  --broadcast-text-muted: 213 8% 58%;
-  --broadcast-border: 217 15% 87%;
-  --broadcast-primary: 214 84% 28%;
+  --broadcast-surface-secondary: 145 22% 95%;
+  --broadcast-surface-elevated: 145 38% 90%;
+  --broadcast-text: 155 40% 11%;
+  --broadcast-text-secondary: 150 12% 40%;
+  --broadcast-text-muted: 148 10% 56%;
+  --broadcast-border: 145 16% 86%;
+  --broadcast-primary: 145 65% 34%;
   --broadcast-primary-contrast: 0 0% 100%;
   --broadcast-danger: 0 72% 54%;
-  --broadcast-success: 152 54% 39%;
+  --broadcast-success: 145 60% 33%;
 }
+
 
 /* ── BROADCAST #2: EUROPEAN NIGHTS ─────────────────────────────────────────
    Kick-of-light inspired: night blue base + electric blue, cyan, violet en
