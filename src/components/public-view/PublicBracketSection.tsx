@@ -401,9 +401,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const COMPACT_BASE_W = Math.round(200 * compactBracketScale);
   const COMPACT_BASE_H = Math.round(56 * compactBracketScale);
   const COMPACT_BASE_GAP = Math.round(12 * Math.min(compactBracketScale, 1.4));
-  const CARD_W = isMobile ? Math.min(260, typeof window !== "undefined" ? window.innerWidth - EDGE_PAD - PEEK_W - 8 : 240) : compactTree ? COMPACT_BASE_W : 240;
+  const CARD_W = isMobile ? Math.min(288, typeof window !== "undefined" ? window.innerWidth - EDGE_PAD - PEEK_W - 8 : 268) : compactTree ? COMPACT_BASE_W : 268;
   const CONNECTOR_W = isMobile ? 0 : compactTree ? Math.round(28 * Math.min(compactBracketScale, 1.4)) : 32;
-  const CARD_H = isMobile ? 92 : compactTree ? COMPACT_BASE_H : 85;
+  const CARD_H = isMobile ? 104 : compactTree ? COMPACT_BASE_H : 96;
+
   const GAP = isMobile ? 20 : compactTree ? COMPACT_BASE_GAP : 16;
   const HEADER_H = isMobile ? 28 : compactTree ? Math.round(26 * Math.min(compactBracketScale, 1.3)) : 36;
   // Column = card + some gap, so the next column's cards are visible as peek
@@ -635,7 +636,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       const isPlayedish = match.is_played || (matchIsHA && haTotal?.anyScored);
 
       return (
-        <div className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-1.5 px-2.5 py-1.5"} ${winRowClass}`} style={tightSide ? { height: cardH / 2 } : undefined}>
+        <div
+          className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-2 px-2.5 h-[34px]"} ${winRowClass}`}
+          style={tightSide ? { height: cardH / 2 } : undefined}
+        >
           {won && !winRowHasEdgeMarker && (
             <span
               aria-hidden
@@ -643,10 +647,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               style={{ width: tightSide ? 2 : 3 }}
             />
           )}
-          {logo && <img src={logo} className={`${tightSide ? "" : "h-5 w-5"} object-contain flex-shrink-0`} alt="" style={isCompactPretty ? { height: logoSize, width: logoSize } : tightSide && !isCompactPretty ? { height: 10, width: 10 } : undefined} />}
+          {logo && <img src={logo} className={`${tightSide ? "" : "h-6 w-6"} object-contain flex-shrink-0`} alt="" style={isCompactPretty ? { height: logoSize, width: logoSize } : tightSide && !isCompactPretty ? { height: 10, width: 10 } : undefined} />}
           <div className="flex items-center gap-1 flex-1 min-w-0">
             <span
-              className={`truncate ${tid ? ds(bStyle, "matchTeamName") : "text-[9px] text-muted-foreground"} ${won ? "font-bold" : ""}`}
+              className={`truncate leading-none ${tid ? ds(bStyle, "matchTeamName") : "text-[10px] text-muted-foreground"} ${won ? "font-bold" : ""}`}
               style={isCompactPretty ? { fontSize: fsName, lineHeight: `${fsName + 3}px` } : tightSide ? { fontSize: 7, lineHeight: "12px" } : undefined}
             >{name}</span>
             {tournament?.show_country && country && (!compactTree || isCompactPretty) && (
@@ -658,20 +662,24 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {isPlayedish && (() => {
             const penValue = matchIsHA
               ? (haTotal?.hasPenalties ? (side === "home" ? haTotal.homePen : haTotal.awayPen) : null)
-              : (match.home_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
+              : (match.home_penalties !== null && match.away_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
             const scoreW = tightSide ? 8 : isCompactPretty ? Math.max(10, (fsScore ?? 11)) : 12;
+            const hasPen = penValue !== null && penValue !== undefined;
+            const penSlot = tightSide ? 9 : 14;
             return (
-              <div className="relative flex items-center shrink-0">
+              <div className="flex items-center shrink-0">
                 <span
-                  className={`tabular-nums text-right ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[11px]"}`}
+                  className={`tabular-nums text-right leading-none ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[12px]"}`}
                   style={{
                     minWidth: scoreW,
                     ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
                   }}
                 >{displayScore ?? "–"}</span>
-                {penValue !== null && (
-                  <span className="absolute left-full ml-0.5 text-left text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
-                )}
+                {/* Fixed-width penalty slot: always reserved so the main score never shifts */}
+                <span
+                  className="text-left text-[8px] text-muted-foreground font-medium leading-none whitespace-nowrap tabular-nums ml-0.5 shrink-0"
+                  style={{ width: penSlot }}
+                >{hasPen ? `(${penValue})` : ""}</span>
               </div>
             );
 
@@ -679,6 +687,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 
         </div>
       );
+
     };
 
     // For H&A: show field/ref/time of the *active* (next unplayed) leg.
@@ -710,12 +719,12 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const tight = (compact && !isMobile) || compactTree;
     const card = (
       <div
-        className={`${ds(bStyle, "card")} ${tight ? "" : "w-60"} ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-primary/30 transition-shadow" : ""}`}
+        className={`${ds(bStyle, "card")} ${tight ? "" : "w-[268px]"} ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-primary/30 transition-shadow" : ""}`}
         style={{ overflow: "hidden", width: tight ? cardW : undefined, height: tight ? cardH : undefined, boxSizing: "border-box" }}
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={ds(bStyle, "matchContext")} style={compactTree ? { display: "none" } : undefined}>
-          <div className="flex items-start justify-between leading-none">
+          <div className={`flex items-start justify-between leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             <div className="min-w-0">
                 <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                 {phase?.name || displayName}
@@ -742,9 +751,14 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {renderSide("home")}
           {renderSide("away")}
           {showInlineTime && (
-            <span className={`absolute right-2 top-1/2 -translate-y-1/2 font-bold text-muted-foreground text-[10px]`}>{displayTimeStr}</span>
+            tight ? (
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 font-bold text-muted-foreground text-[10px]">{displayTimeStr}</span>
+            ) : (
+              <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 ${ds(bStyle, "matchTimeBadge")}`}>{displayTimeStr}</span>
+            )
           )}
         </div>
+
       </div>
     );
 
