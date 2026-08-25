@@ -91,12 +91,12 @@ const PublicMatchCard = ({
       <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
         {name}
       </span>
-      <div className={`${hasPenalties ? "w-14" : "w-8"} flex items-center justify-end`}>
+      <div className="grid grid-cols-[2.5rem_1.25rem] items-center gap-1">
         {m.is_played ? (
           <>
-            <span className={`w-8 text-right ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
+            <span className={`text-right tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
             {hasPenalties && (
-              <span className="w-6 pl-0.5 text-left text-[8px] font-medium leading-none text-muted-foreground">({penalties})</span>
+              <span className="text-left text-[8px] font-medium leading-none whitespace-nowrap text-muted-foreground">({penalties})</span>
             )}
           </>
         ) : null}
