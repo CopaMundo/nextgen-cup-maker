@@ -104,30 +104,6 @@ const PublicMatchCard = ({
     </div>
   );
 
-  const _unusedRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null) => (
-    <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors`}>
-      <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
-        {logo ? (
-          <img src={logo} className="h-full w-full object-contain" alt="" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-secondary text-[10px] font-black text-muted-foreground">{name.charAt(0)}</div>
-        )}
-      </div>
-      <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
-        {name}
-      </span>
-      <div className={`${hasPenalties ? "w-12" : "w-8"} text-right`}>
-        {m.is_played ? (
-          <span className="inline-flex items-baseline justify-end gap-0.5">
-            <span className={`${ds(bStyle, "matchScore")} ${ds(bStyle, "matchScoreLose")}`}>{score}</span>
-            {hasPenalties && (
-              <span className="text-[8px] font-medium text-muted-foreground">({penalties})</span>
-            )}
-          </span>
-        ) : null}
-      </div>
-    </div>
-  );
 
   const [open, setOpen] = useState(false);
 
@@ -191,7 +167,7 @@ const PublicMatchCard = ({
 
         {/* Match body */}
         <div className="relative px-3 py-2">
-          {renderTeamRow(homeName, homeLogo, m.home_team_id, m.home_penalties, m.home_score)}
+          {renderTeamRow(homeName, homeLogo, m.home_team_id, m.home_penalties, m.home_score, homeWin)}
 
           {/* Time/VS badge — absolutely positioned to keep card height identical to played cards */}
           {!m.is_played && (
@@ -202,7 +178,7 @@ const PublicMatchCard = ({
             </div>
           )}
 
-          {renderTeamRow(awayName, awayLogo, m.away_team_id, m.away_penalties, m.away_score)}
+          {renderTeamRow(awayName, awayLogo, m.away_team_id, m.away_penalties, m.away_score, awayWin)}
         </div>
       </div>
 
