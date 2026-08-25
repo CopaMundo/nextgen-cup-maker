@@ -1118,7 +1118,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     subHeaderTitle: "font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[0.12em] text-background",
     subLabel: "inline-flex items-center px-2 py-0.5 font-['Barlow_Condensed'] text-[11px] font-semibold uppercase tracking-[0.14em] text-background/70",
     coverOverlay: "wc26-cover",
-    logoFrame: "border border-border bg-card",
+    logoFrame: "!border-foreground bg-card",
     bracketConnector: "wc26-connector",
   },
 // ── LA ROSA ───
