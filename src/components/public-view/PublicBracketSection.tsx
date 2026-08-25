@@ -660,9 +660,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               ? (haTotal?.hasPenalties ? (side === "home" ? haTotal.homePen : haTotal.awayPen) : null)
               : (match.home_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
             const scoreW = tightSide ? 8 : isCompactPretty ? Math.max(10, (fsScore ?? 11)) : 12;
-            const penW = tightSide ? 10 : 14;
             return (
-              <div className="flex items-center shrink-0">
+              <div className="flex items-center gap-0.5 shrink-0">
                 <span
                   className={`tabular-nums text-right ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[11px]"}`}
                   style={{
@@ -670,13 +669,12 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
                   }}
                 >{displayScore ?? "–"}</span>
-                <span
-                  aria-hidden={penValue === null}
-                  className="text-[8px] text-muted-foreground font-medium text-left ml-px"
-                  style={{ width: penW, display: "inline-block" }}
-                >{penValue !== null ? `(${penValue})` : ""}</span>
+                {penValue !== null && (
+                  <span className="text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
+                )}
               </div>
             );
+
           })()}
 
         </div>
