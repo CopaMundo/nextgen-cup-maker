@@ -31,23 +31,25 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
 
           if (tab.isCenter) {
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`absolute left-1/2 top-1 flex h-14 w-14 -translate-x-1/2 -translate-y-3 transform-gpu items-center justify-center rounded-2xl shadow-lg transition-colors border-2 ${
-                  isActive ? ds(bStyle, "navCenterActive") : ds(bStyle, "navCenter")
-                }`}
-              >
-                {favTeam?.logo_url ? (
-                  <img src={favTeam.logo_url} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
-                ) : tournament.logo_url ? (
-                  <img src={tournament.logo_url} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
-                ) : (
-                  <Icon className="h-6 w-6" />
-                )}
-              </button>
+              <div key={tab.id} className="h-12 w-full">
+                <button
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`absolute left-1/2 top-1 flex h-14 w-14 -translate-x-1/2 -translate-y-3 transform-gpu items-center justify-center rounded-2xl shadow-lg transition-colors border-2 ${
+                    isActive ? ds(bStyle, "navCenterActive") : ds(bStyle, "navCenter")
+                  }`}
+                >
+                  {favTeam?.logo_url ? (
+                    <img src={favTeam.logo_url} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
+                  ) : tournament.logo_url ? (
+                    <img src={tournament.logo_url} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
+                  ) : (
+                    <Icon className="h-6 w-6" />
+                  )}
+                </button>
+              </div>
             );
           }
+
 
 
           return (
