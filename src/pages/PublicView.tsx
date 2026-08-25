@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import type { BroadcastStyle } from "@/lib/broadcastStyles";
+import { defaultAppearanceForStyle, type BroadcastStyle } from "@/lib/broadcastStyles";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import PublicBottomNav from "@/components/public-view/PublicBottomNav";
 import PublicInfo from "@/components/public-view/PublicInfo";
