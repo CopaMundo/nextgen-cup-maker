@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, BarChart3, MessageCircle } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
-import { ds , isSquareStyle } from "@/lib/broadcastStyles";
+import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
@@ -1109,7 +1109,6 @@ const GridCard = ({ title, icon, onClick, children }: { title: string; icon?: Re
 // Compact standings
 const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: any[]; favoriteTeam: string | null; tournament: any }) => {
   const bStyle = useBroadcastStyle();
-  const squareStyle = isSquareStyle(bStyle);
   let visible = standings;
   const total = standings.length;
 
@@ -1189,7 +1188,6 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
 }) => {
   const bStyle = useBroadcastStyle();
   const getColor = (pos: number) => standingColors.find((sc: any) => sc.phase_id === phaseId && pos >= sc.position_from && pos <= sc.position_to);
-  const squareStyle = isSquareStyle(bStyle);
 
   return (
     <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>

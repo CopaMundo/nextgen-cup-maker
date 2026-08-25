@@ -4,7 +4,7 @@ import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
-import { ds , isSquareStyle } from "@/lib/broadcastStyles";
+import { ds } from "@/lib/broadcastStyles";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 
 const POSITION_ORDER = ["goalkeeper", "defender", "midfielder", "attacker"];
@@ -131,11 +131,6 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
                 }`}>{r}</span>
               ))}
             </div>
-          )}
-          {groupInfo && (
-            <span className="text-[10px] font-bold text-muted-foreground">
-              {groupInfo.groupName}: <span className="text-primary font-black">#{groupInfo.pos}</span>
-            </span>
           )}
         </div>
 

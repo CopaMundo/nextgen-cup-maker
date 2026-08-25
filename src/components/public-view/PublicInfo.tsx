@@ -19,7 +19,6 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
   const { tournament, attachments, sponsors, locations, categories } = data;
   const bStyle = useBroadcastStyle();
   const wrapperToken = ds(bStyle, "matchCardWrapper");
-  const squareStyle = Boolean(wrapperToken) && !/rounded-(?!none)/.test(wrapperToken);
   const cardFrame = wrapperToken || "rounded-xl border border-border bg-card shadow-sm";
   const largeFrameShape = "rounded-2xl";
   const controlFrameShape = "rounded-lg";
