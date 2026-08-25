@@ -661,7 +661,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               : (match.home_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
             const scoreW = tightSide ? 8 : isCompactPretty ? Math.max(10, (fsScore ?? 11)) : 12;
             return (
-              <div className="flex items-center gap-0.5 shrink-0">
+              <div className="relative flex items-center shrink-0">
                 <span
                   className={`tabular-nums text-right ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[11px]"}`}
                   style={{
@@ -669,10 +669,9 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
                   }}
                 >{displayScore ?? "–"}</span>
-                <span
-                  aria-hidden={penValue === null}
-                  className={`inline-block w-[1.25rem] shrink-0 text-left text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums ${penValue === null ? "invisible" : ""}`}
-                >({penValue ?? 0})</span>
+                {penValue !== null && (
+                  <span className="absolute left-full ml-0.5 text-left text-[8px] text-muted-foreground font-medium whitespace-nowrap tabular-nums">({penValue})</span>
+                )}
               </div>
             );
 

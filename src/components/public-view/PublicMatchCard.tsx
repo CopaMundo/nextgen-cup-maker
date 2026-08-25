@@ -91,14 +91,13 @@ const PublicMatchCard = ({
       <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
         {name}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="relative flex items-center">
         {m.is_played ? (
           <>
             <span className={`min-w-[1.1rem] text-right tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
-            <span
-              aria-hidden={!hasPenalties}
-              className={`inline-block w-[1.25rem] shrink-0 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground ${hasPenalties ? "" : "invisible"}`}
-            >({penalties ?? 0})</span>
+            {hasPenalties && (
+              <span className="absolute left-full ml-0.5 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
+            )}
           </>
         ) : null}
       </div>
