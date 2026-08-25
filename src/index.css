@@ -1900,6 +1900,17 @@ body[data-broadcast="wc26"] {
   background: hsl(var(--broadcast-primary));
 }
 
+/* Zwarte infobalk in wedstrijd-/bracketkaarten: alle tekst en icons wit */
+[data-broadcast="wc26"] .wc26-context,
+[data-broadcast="wc26"] .wc26-context * {
+  color: hsl(var(--background)) !important;
+}
+[data-broadcast="wc26"] .wc26-context svg {
+  color: hsl(var(--background)) !important;
+  opacity: 0.85;
+}
+
+
 /* Bracket connectors: dun en geometrisch */
 .wc26-connector {
   stroke: hsl(var(--broadcast-text) / 0.35);
