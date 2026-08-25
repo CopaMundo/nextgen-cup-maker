@@ -2076,3 +2076,188 @@ body[data-broadcast="la_rosa"] {
 .lrosa-connector line {
   stroke-width: 1.25;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BROADCAST STYLE #9 — SOCCERTEC MASTERS
+   Premium monochroom elite-jeugdtoernooi: zuiver wit, harde
+   zwarte vlakken, Barlow Condensed titels/scores + Inter body.
+   ══════════════════════════════════════════════════════════════ */
+[data-broadcast="soccertec"],
+[data-broadcast="soccertec"] body,
+body[data-broadcast="soccertec"] {
+  font-family: Inter, system-ui, sans-serif;
+  background-image: none;
+}
+[data-broadcast="soccertec"] h1,
+[data-broadcast="soccertec"] h2,
+[data-broadcast="soccertec"] h3,
+[data-broadcast="soccertec"] .font-display {
+  font-family: 'Barlow Condensed', Inter, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.0;
+  text-transform: uppercase;
+}
+[data-broadcast="soccertec"] .tabular-nums {
+  font-family: 'Barlow Condensed', Inter, sans-serif;
+  font-weight: 800;
+}
+
+/* Light: wit papier, zwarte inkt */
+[data-broadcast="soccertec"][data-mode="light"] {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 60 5% 95%;
+  --secondary-foreground: 0 0% 45%;
+  --muted: 60 5% 95%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 0%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 0% 0%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 87%;
+  --input: 0 0% 87%;
+  --ring: 0 0% 0%;
+  --radius: 0.125rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 0 0% 100%;
+  --broadcast-night: 0 0% 0%;
+  --broadcast-paper: 0 0% 100%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 60 5% 95%;
+  --broadcast-surface-elevated: 0 0% 100%;
+  --broadcast-text: 0 0% 3%;
+  --broadcast-text-secondary: 0 0% 45%;
+  --broadcast-text-muted: 0 0% 55%;
+  --broadcast-border: 0 0% 87%;
+  --broadcast-primary: 0 0% 0%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-score: 0 0% 3%;
+  --broadcast-bright: 0 0% 0%;
+  --broadcast-gold: 0 0% 0%;
+  --broadcast-navy: 0 0% 0%;
+  --broadcast-cyan: 0 0% 0%;
+  --broadcast-violet: 0 0% 0%;
+  --broadcast-magenta: 0 0% 0%;
+  --broadcast-danger: 0 0% 0%;
+  --broadcast-success: 0 0% 0%;
+}
+
+/* Dark: geïnverteerd zwart met witte inkt */
+[data-broadcast="soccertec"][data-mode="dark"] {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 13%;
+  --secondary-foreground: 0 0% 72%;
+  --muted: 0 0% 13%;
+  --muted-foreground: 0 0% 66%;
+  --accent: 0 0% 100%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 0% 100%;
+  --destructive-foreground: 0 0% 0%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 0 0% 100%;
+  --radius: 0.125rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 0 0% 4%;
+  --broadcast-night: 0 0% 0%;
+  --broadcast-paper: 0 0% 8%;
+  --broadcast-surface: 0 0% 8%;
+  --broadcast-surface-secondary: 0 0% 13%;
+  --broadcast-surface-elevated: 0 0% 16%;
+  --broadcast-text: 0 0% 98%;
+  --broadcast-text-secondary: 0 0% 72%;
+  --broadcast-text-muted: 0 0% 60%;
+  --broadcast-border: 0 0% 20%;
+  --broadcast-primary: 0 0% 100%;
+  --broadcast-primary-contrast: 0 0% 0%;
+  --broadcast-score: 0 0% 98%;
+  --broadcast-bright: 0 0% 100%;
+  --broadcast-gold: 0 0% 100%;
+  --broadcast-navy: 0 0% 0%;
+  --broadcast-cyan: 0 0% 100%;
+  --broadcast-violet: 0 0% 100%;
+  --broadcast-magenta: 0 0% 100%;
+  --broadcast-danger: 0 0% 100%;
+  --broadcast-success: 0 0% 100%;
+}
+
+/* Editorial kaders: 0–4px, dunne borders, geen shadows/gradients */
+[data-broadcast="soccertec"] .stec-card {
+  border-radius: 2px;
+}
+[data-broadcast="soccertec"] .rounded-none {
+  border-radius: 2px;
+}
+[data-broadcast="soccertec"] [class*="shadow-"] {
+  box-shadow: none !important;
+}
+[data-broadcast="soccertec"] [class*="bg-gradient"] {
+  background-image: none !important;
+}
+
+/* Kwalificatie-indicator: dikke zwarte section marker links */
+.stec-qual {
+  box-shadow: inset 3px 0 0 hsl(var(--broadcast-text)) !important;
+}
+
+/* Oversized transparante MASTERS-typografie als grafisch element */
+.stec-watermark {
+  position: relative;
+  overflow: hidden;
+}
+.stec-watermark::before {
+  content: "MASTERS";
+  position: absolute;
+  right: -0.06em;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Barlow Condensed', Inter, sans-serif;
+  font-weight: 800;
+  font-size: 4.5rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: hsl(var(--broadcast-text) / 0.05);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Infopagina cover: krachtige zwart-wit behandeling */
+.stec-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, hsl(0 0% 0% / 0.25) 0%, hsl(0 0% 0% / 0.78) 62%, hsl(var(--background)) 100%);
+}
+.stec-cover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: hsl(var(--broadcast-text));
+}
+
+/* Bracket connectors: neutrale grijze lijnen #B8B8B8 */
+.stec-connector {
+  stroke: hsl(0 0% 72%);
+}
+.stec-connector line {
+  stroke-width: 1.25;
+}

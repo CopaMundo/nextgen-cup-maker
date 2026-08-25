@@ -21,7 +21,8 @@ export type BroadcastStyle =
   | "old_newspaper"
   | "modern_bw"
   | "wc26"
-  | "la_rosa";
+  | "la_rosa"
+  | "soccertec";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -47,6 +48,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   modern_bw: { name: "Modern Black & White", description: "Broadcast Style #6 — strak, premium en minimalistisch: zuiver zwart-wit met grijstinten, Inter typografie, veel witruimte en grote scores", preview: "◼" },
   wc26: { name: "World Cup 26", description: "Broadcast Style #7 — internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
   la_rosa: { name: "La Rosa", description: "Broadcast Style #8 — moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
+  soccertec: { name: "SoccerTec Masters", description: "Broadcast Style #9 — premium monochrome elite youth football: zuiver wit met harde zwarte vlakken, Barlow Condensed titels/scores + Inter body", preview: "◾" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
@@ -1158,13 +1160,67 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     logoFrame: "border border-foreground bg-[hsl(var(--broadcast-paper))]",
     bracketConnector: "lrosa-connector",
   },
+// ── SOCCERTEC MASTERS ───
+  soccertec: {
+    sectionDot: "h-5 w-[3px] rounded-none bg-foreground",
+    sectionTitle: "font-['Barlow_Condensed'] text-[22px] font-extrabold uppercase tracking-[0.03em] text-foreground",
+    sectionMeta: "font-['Barlow_Condensed'] text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground",
+    sectionLine: "flex-1 h-px bg-[hsl(var(--broadcast-border))]",
+    card: "stec-card border border-[hsl(var(--broadcast-border))] bg-card overflow-hidden",
+    matchCardWrapper: "stec-card border border-[hsl(var(--broadcast-border))] bg-card overflow-hidden",
+    cardHeader: "bg-foreground border-b border-foreground px-3 py-2 flex items-center gap-2",
+    cardHeaderDot: "h-3.5 w-[3px] bg-background",
+    cardHeaderTitle: "font-['Barlow_Condensed'] text-[13px] font-extrabold text-background uppercase tracking-[0.14em]",
+    homeCardHeader: "bg-foreground border-b border-foreground px-3 py-2 flex items-center gap-2",
+    homeCardHeaderTitle: "font-['Barlow_Condensed'] text-[14px] font-extrabold uppercase tracking-[0.14em] text-background",
+    tabContainer: "flex gap-0 border-b border-[hsl(var(--broadcast-border))]",
+    tabActive: "flex-1 px-3 py-2 bg-foreground font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[0.12em] text-background transition-colors",
+    tabInactive: "flex-1 px-3 py-2 bg-card font-['Barlow_Condensed'] text-[13px] font-semibold uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground transition-colors",
+    badge: "inline-flex items-center rounded-none border border-[hsl(var(--broadcast-border))] bg-[hsl(var(--broadcast-surface-secondary))] px-2 py-0.5 font-['Barlow_Condensed'] text-[12px] font-semibold uppercase tracking-[0.1em] text-foreground tabular-nums",
+    label: "font-['Barlow_Condensed'] text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground",
+    backButton: "flex items-center gap-1 font-['Barlow_Condensed'] text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground",
+    matchContext: "bg-[hsl(var(--broadcast-surface-secondary))] px-3 py-1.5 border-b border-[hsl(var(--broadcast-border))]",
+    matchContextText: "font-['Barlow_Condensed'] text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground",
+    matchTeamRow: "px-3 py-2",
+    matchTeamRowWin: "bg-[hsl(var(--broadcast-surface-secondary))]",
+    matchTeamName: "text-[14px] font-semibold truncate",
+    matchTeamNameFav: "font-bold text-foreground",
+    matchScore: "font-['Barlow_Condensed'] text-[28px] font-extrabold tabular-nums leading-none",
+    matchScoreWin: "text-foreground",
+    matchScoreLose: "text-muted-foreground",
+    matchTimeBadge: "inline-flex items-center rounded-none bg-foreground px-2 py-0.5 font-['Barlow_Condensed'] text-[13px] font-bold text-background tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1.5 border-t border-[hsl(var(--broadcast-border))]",
+    navBar: "bg-[hsl(var(--broadcast-night))] border-t border-[hsl(var(--broadcast-night))]",
+    navCenter: "rounded-none bg-[hsl(var(--broadcast-night))] text-white border-white/70",
+    navCenterActive: "rounded-none bg-[hsl(var(--broadcast-night))] text-white border-white",
+    navTab: "text-[hsl(0_0%_60%)] hover:text-white",
+    navTabActive: "text-white",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-white",
+    tableHeader: "bg-foreground font-['Barlow_Condensed'] text-[10px] font-semibold uppercase tracking-[0.16em] text-background",
+    tableRowAlt: "bg-[hsl(var(--broadcast-surface-secondary))]",
+    ptsBadge: "inline-flex items-center justify-center min-w-[26px] rounded-none bg-foreground px-1.5 py-0.5 font-['Barlow_Condensed'] text-[13px] font-extrabold text-background tabular-nums",
+    timeslotHeader: "bg-foreground text-background flex items-center gap-2 px-3 py-2",
+    timeslotBadge: "inline-flex items-center rounded-none font-['Barlow_Condensed'] text-[20px] font-extrabold text-background tabular-nums tracking-[0.02em]",
+    timeslotHeaderMeta: "font-['Barlow_Condensed'] text-[11px] font-semibold uppercase tracking-[0.16em] text-background/70",
+    dateHeader: "rounded-none bg-foreground text-background px-3 py-1.5 font-['Barlow_Condensed'] text-[15px] font-extrabold uppercase tracking-[0.12em]",
+    phaseTab: "px-3 py-1.5 rounded-none font-['Barlow_Condensed'] text-[12px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-colors",
+    phaseTabActive: "bg-foreground text-background border border-foreground",
+    phaseTabInactive: "bg-card border border-[hsl(var(--broadcast-border))] text-muted-foreground hover:text-foreground",
+    subHeader: "px-3 py-2 flex items-center justify-between gap-2 bg-foreground",
+    subHeaderTitle: "font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[0.14em] text-background",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['Barlow_Condensed'] text-[11px] font-semibold uppercase tracking-[0.16em] text-background/70",
+    coverOverlay: "stec-cover",
+    logoFrame: "border border-foreground bg-[hsl(var(--broadcast-paper))]",
+    bracketConnector: "stec-connector",
+  },
 };
 
 
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec"];
+
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
   (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, NEW_BROADCAST_STYLES.includes(k) ? "broadcast" : "legacy"])
