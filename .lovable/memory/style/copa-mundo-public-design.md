@@ -5,7 +5,7 @@ type: design
 ---
 De publieke toernooiweergave gebruikt de broadcaststijl `copa_mundo` als standaard (fallback in PublicView), dark mode is de primaire ervaring (default aan).
 
-Palet (dark): background #07110E, card #101B17, secondary surface #17241F, tekst #F5F5F0, secundaire tekst #8D9B95, accent geel #FFD600. Light: groen-getinte off-white bg, witte cards, donkergroene tekst en logo-groen #1E8D4C als primaire kleur (geen blauw meer). Geen turquoise/blauw als hoofdkleur.
+Palet (dark): background #07110E, card #101B17, secondary surface #17241F, tekst #F5F5F0, secundaire tekst #8D9B95, accent geel #FFD600. Light: bg #F5F5F0, cards #FFFFFF, tekst #07110E, accent #FFD600. Geen turquoise/blauw als hoofdkleur (max klein accent #2E9C91 / #225C83).
 
 Verhouding: 80-85% donkergroen/zwart, 10-15% cream, max 5-10% geel. Geel enkel voor: actieve nav/tabs, tijden, punten-pills, belangrijke knoppen, dunne lijnen — nooit grote gele vlakken.
 

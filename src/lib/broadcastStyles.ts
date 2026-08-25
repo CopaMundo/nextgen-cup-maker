@@ -43,7 +43,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   world_cup_mexico: { name: "World Cup — Mexico", description: "Groene host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇲🇽" },
   world_cup_canada: { name: "World Cup — Canada", description: "Rode host-nation stijl met chevron print zoals op de Trionda bal", preview: "🇨🇦" },
   world_cup_usa: { name: "World Cup — USA", description: "Blauwe host-nation stijl met sterren print zoals op de Trionda bal", preview: "🇺🇸" },
-  copa_mundo_bc: { name: "Copa Mundo", description: "Broadcast Style #1 — de native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en logo-groen (light), Inter typografie", preview: "🟡" },
+  copa_mundo_bc: { name: "Copa Mundo", description: "Broadcast Style #1 — de native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
   retro_football: { name: "Retro Football", description: "Vintage matchdayprogramma uit de jaren '70/'80: crèmepapier, bosgroen en verschoten rood met Roboto Condensed", preview: "📕" },
   european_nights: { name: "European Nights", description: "Broadcast Style #2 — premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
   joga_bonito: { name: "Joga Bonito", description: "Broadcast Style #3 — Braziliaanse straatvoetbalcultuur: diep navy met geel en groen, brush-headings (Permanent Marker) + Barlow Condensed", preview: "🇧🇷" },
