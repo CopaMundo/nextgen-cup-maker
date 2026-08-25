@@ -21,7 +21,8 @@ export type BroadcastStyle =
   | "old_newspaper"
   | "modern_bw"
   | "wc26"
-  | "la_rosa";
+  | "la_rosa"
+  | "soccertec";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
