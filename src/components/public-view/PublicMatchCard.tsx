@@ -76,8 +76,35 @@ const PublicMatchCard = ({
   const awayLogo = getTeamLogo(teams, m.away_team_id);
 
   const hasPenalties = m.home_penalties != null && m.away_penalties != null;
+  const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
+  const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
 
-  const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null) => (
+  const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean) => (
+    <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors`}>
+      <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
+        {logo ? (
+          <img src={logo} className="h-full w-full object-contain" alt="" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-secondary text-[10px] font-black text-muted-foreground">{name.charAt(0)}</div>
+        )}
+      </div>
+      <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
+        {name}
+      </span>
+      <div className={`${hasPenalties ? "w-14" : "w-8"} flex items-center justify-end`}>
+        {m.is_played ? (
+          <>
+            <span className={`w-8 text-right ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
+            {hasPenalties && (
+              <span className="w-6 pl-0.5 text-left text-[8px] font-medium leading-none text-muted-foreground">({penalties})</span>
+            )}
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const _unusedRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null) => (
     <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
