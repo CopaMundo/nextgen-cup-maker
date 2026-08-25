@@ -633,7 +633,14 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       const isPlayedish = match.is_played || (matchIsHA && haTotal?.anyScored);
 
       return (
-        <div className={`flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-1.5 px-2.5 py-1.5"} ${won ? ds(bStyle, "matchTeamRowWin") : ""}`} style={tightSide ? { height: cardH / 2 } : undefined}>
+        <div className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-1.5 px-2.5 py-1.5"} ${won ? ds(bStyle, "matchTeamRowWin") : ""}`} style={tightSide ? { height: cardH / 2 } : undefined}>
+          {won && (
+            <span
+              aria-hidden
+              className={`absolute left-0 top-0 bottom-0 ${ds(bStyle, "bracketQualBar") || "bg-primary"}`}
+              style={{ width: tightSide ? 2 : 3 }}
+            />
+          )}
           {logo && <img src={logo} className={`${tightSide ? "" : "h-5 w-5"} object-contain flex-shrink-0`} alt="" style={isCompactPretty ? { height: logoSize, width: logoSize } : tightSide && !isCompactPretty ? { height: 10, width: 10 } : undefined} />}
           <div className="flex items-center gap-1 flex-1 min-w-0">
             <span
