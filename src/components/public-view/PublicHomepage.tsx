@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, BarChart3, MessageCircle } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
-import { ds , isSquareStyle } from "@/lib/broadcastStyles";
+import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
@@ -508,7 +508,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     <div className="pt-4 space-y-4 px-3">
       {/* Tournament name - broadcast header */}
       <div className="flex items-center gap-3 mb-1">
-        {tournament.logo_url && <img src={tournament.logo_url} alt="" className={`h-10 w-10 object-contain shadow-sm ${isSquareStyle(bStyle) ? "" : "rounded-xl"}`} />}
+        {tournament.logo_url && <img src={tournament.logo_url} alt="" className={`h-10 w-10 object-contain shadow-sm rounded-xl`} />}
         <div className="flex-1 min-w-0">
           <h1 className="font-display font-black text-foreground leading-tight text-lg uppercase tracking-wide truncate">{tournament.name}</h1>
         </div>
@@ -562,7 +562,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               {favTeamObj.logo_url ? (
                 <img src={favTeamObj.logo_url} alt="" className="h-7 w-7 object-contain shrink-0" />
               ) : (
-                <div className={`h-7 w-7 bg-muted flex items-center justify-center shrink-0 ${isSquareStyle(bStyle) ? "" : "rounded-md"}`}>
+                <div className={`h-7 w-7 bg-muted flex items-center justify-center shrink-0 rounded-md`}>
                   <Star className="h-3 w-3 text-muted-foreground" />
                 </div>
               )}
@@ -1109,7 +1109,6 @@ const GridCard = ({ title, icon, onClick, children }: { title: string; icon?: Re
 // Compact standings
 const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: any[]; favoriteTeam: string | null; tournament: any }) => {
   const bStyle = useBroadcastStyle();
-  const squareStyle = isSquareStyle(bStyle);
   let visible = standings;
   const total = standings.length;
 
@@ -1135,7 +1134,7 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
         <span className="w-8 text-center">DS</span>
       </div>
       {visible.map((row: any, idx: number) => (
-        <div key={row.team?.id} className={`flex items-center gap-2 px-2 py-1.5 text-xs ${squareStyle ? "" : "rounded-md"} ${
+        <div key={row.team?.id} className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md ${
           favoriteTeam === row.team?.id ? "bg-primary/10 border border-primary/20" : idx % 2 === 1 ? "bg-secondary/30" : ""
         }`}>
           <span className="w-5 text-center font-black text-muted-foreground">{row.pos}</span>
@@ -1149,7 +1148,7 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
           </div>
           <span className="w-5 text-center text-muted-foreground">{row.gp}</span>
           <span className="w-8 text-center">
-            <span className={`inline-flex items-center justify-center bg-primary/15 px-1 py-0.5 text-[10px] font-black text-primary ${squareStyle ? "" : "rounded"}`}>{row.pts}</span>
+            <span className={`inline-flex items-center justify-center bg-primary/15 px-1 py-0.5 text-[10px] font-black text-primary rounded`}>{row.pts}</span>
           </span>
           <span className="w-8 text-center text-muted-foreground font-bold">{row.gd > 0 ? `+${row.gd}` : row.gd}</span>
         </div>
@@ -1189,7 +1188,6 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
 }) => {
   const bStyle = useBroadcastStyle();
   const getColor = (pos: number) => standingColors.find((sc: any) => sc.phase_id === phaseId && pos >= sc.position_from && pos <= sc.position_to);
-  const squareStyle = isSquareStyle(bStyle);
 
   return (
     <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>
@@ -1234,7 +1232,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                   <td className="text-center px-0.5 py-2 text-muted-foreground">{row.l}</td>
                   <td className="text-center px-0.5 py-2 font-bold">{row.gd > 0 ? `+${row.gd}` : row.gd}</td>
                   <td className="text-center px-0.5 py-2">
-                    <span className={ds(bStyle, "ptsBadge") || `inline-flex items-center justify-center bg-primary/15 px-1.5 py-0.5 font-black text-primary ${squareStyle ? "" : "rounded"}`}>{row.pts}</span>
+                    <span className={ds(bStyle, "ptsBadge") || `inline-flex items-center justify-center bg-primary/15 px-1.5 py-0.5 font-black text-primary rounded`}>{row.pts}</span>
                   </td>
                 </tr>
               );
