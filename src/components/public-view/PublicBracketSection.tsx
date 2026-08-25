@@ -646,7 +646,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {logo && <img src={logo} className={`${tightSide ? "" : "h-5 w-5"} object-contain flex-shrink-0`} alt="" style={isCompactPretty ? { height: logoSize, width: logoSize } : tightSide && !isCompactPretty ? { height: 10, width: 10 } : undefined} />}
           <div className="flex items-center gap-1 flex-1 min-w-0">
             <span
-              className={`truncate ${tid ? ds(bStyle, "matchTeamName") : "text-[9px] text-muted-foreground"} ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ""}`}
+              className={`truncate ${tid ? ds(bStyle, "matchTeamName") : "text-[9px] text-muted-foreground"} ${won ? "font-bold" : ""}`}
               style={isCompactPretty ? { fontSize: fsName, lineHeight: `${fsName + 3}px` } : tightSide ? { fontSize: 7, lineHeight: "12px" } : undefined}
             >{name}</span>
             {tournament?.show_country && country && (!compactTree || isCompactPretty) && (
