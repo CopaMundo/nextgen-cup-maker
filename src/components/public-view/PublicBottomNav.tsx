@@ -23,8 +23,8 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
-      <div className="flex items-end justify-around px-2 pt-1 pb-2">
+    <nav className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
+      <div className="grid h-16 grid-cols-5 items-end px-2 pt-1 pb-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -34,7 +34,7 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg transition-all border-2 ${
+                className={`mx-auto flex h-14 w-14 -translate-y-3 items-center justify-center rounded-2xl shadow-lg transition-colors border-2 ${
                   isActive ? ds(bStyle, "navCenterActive") : ds(bStyle, "navCenter")
                 }`}
               >
@@ -53,7 +53,7 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-all ${
+              className={`flex h-12 w-full flex-col items-center justify-end gap-0.5 py-1 transition-colors ${
                 isActive ? ds(bStyle, "navTabActive") : ds(bStyle, "navTab")
               }`}
             >
