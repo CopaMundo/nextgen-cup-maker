@@ -54,6 +54,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   soccertec: { name: "SoccerTec Masters", description: "Broadcast Style #9 — premium monochrome elite youth football: zuiver wit met harde zwarte vlakken, Barlow Condensed titels/scores + Inter body", preview: "◾" },
   old_clubhouse: { name: "Old Clubhouse", description: "Broadcast Style #10 — het oude wedstrijd- en uitslagenbord uit de voetbalkantine: donkergroen, zwart letterboard, hout en oud crème papier, Oswald + Roboto Condensed", preview: "🪵" },
   sticker_album: { name: "Sticker Album", description: "Broadcast Style #11 — premium voetbalstickeralbum: warm albumpapier, witte sticker cards met stickernummers, vintage navy en football red, Barlow Condensed + Inter", preview: "📗" },
+  teletext: { name: "Teletext Football", description: "Broadcast Style #12 — klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 + IBM Plex Mono, pagenummers en platte kolommen", preview: "▚" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
