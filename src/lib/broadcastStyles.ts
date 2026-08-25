@@ -22,7 +22,8 @@ export type BroadcastStyle =
   | "modern_bw"
   | "wc26"
   | "la_rosa"
-  | "soccertec";
+  | "soccertec"
+  | "old_clubhouse";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -49,6 +50,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   wc26: { name: "World Cup 26", description: "Broadcast Style #7 — internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
   la_rosa: { name: "La Rosa", description: "Broadcast Style #8 — moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
   soccertec: { name: "SoccerTec Masters", description: "Broadcast Style #9 — premium monochrome elite youth football: zuiver wit met harde zwarte vlakken, Barlow Condensed titels/scores + Inter body", preview: "◾" },
+  old_clubhouse: { name: "Old Clubhouse", description: "Broadcast Style #10 — het oude wedstrijd- en uitslagenbord uit de voetbalkantine: donkergroen, zwart letterboard, hout en oud crème papier, Oswald + Roboto Condensed", preview: "🪵" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
@@ -1213,13 +1215,66 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     logoFrame: "border border-foreground bg-[hsl(var(--broadcast-paper))]",
     bracketConnector: "stec-connector",
   },
+// ── OLD CLUBHOUSE ───
+  old_clubhouse: {
+    sectionDot: "h-5 w-[4px] rounded-none bg-[hsl(var(--broadcast-gold))]",
+    sectionTitle: "font-['Oswald'] text-[21px] font-bold uppercase tracking-[0.07em] text-foreground",
+    sectionMeta: "font-['Oswald'] text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground",
+    sectionLine: "flex-1 h-px bg-[hsl(var(--broadcast-border))]",
+    card: "och-frame p-[3px] overflow-hidden",
+    matchCardWrapper: "och-board overflow-hidden",
+    cardHeader: "och-enamel och-screws px-4 py-2 flex items-center gap-2",
+    cardHeaderDot: "h-3.5 w-[3px] bg-[hsl(var(--broadcast-gold))]",
+    cardHeaderTitle: "font-['Oswald'] text-[13px] font-bold text-[hsl(var(--broadcast-cream))] uppercase tracking-[0.16em]",
+    homeCardHeader: "och-enamel och-screws px-4 py-2 flex items-center gap-2",
+    homeCardHeaderTitle: "font-['Oswald'] text-[14px] font-bold uppercase tracking-[0.16em] text-[hsl(var(--broadcast-cream))]",
+    tabContainer: "flex gap-1 p-1 och-board",
+    tabActive: "flex-1 px-3 py-2 och-enamel font-['Oswald'] text-[13px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--broadcast-cream))] transition-colors",
+    tabInactive: "flex-1 px-3 py-2 och-paper font-['Oswald'] text-[13px] font-medium uppercase tracking-[0.12em] opacity-80 hover:opacity-100 transition-opacity",
+    badge: "inline-flex items-center rounded-none och-paper px-2 py-0.5 font-['Oswald'] text-[12px] font-semibold uppercase tracking-[0.1em] tabular-nums",
+    label: "font-['Oswald'] text-[10px] font-medium uppercase tracking-[0.22em] text-muted-foreground",
+    backButton: "flex items-center gap-1 font-['Oswald'] text-[12px] font-medium uppercase tracking-[0.14em] text-foreground",
+    matchContext: "flex items-center gap-2 px-3 py-1.5 border-b border-[hsl(var(--broadcast-cream)/0.18)] bg-[hsl(var(--broadcast-night))]",
+    matchContextText: "inline-flex items-center och-paper px-1.5 py-[1px] font-['Oswald'] text-[10px] font-semibold uppercase tracking-[0.14em]",
+    matchTeamRow: "px-3 py-2 border-b border-[hsl(var(--broadcast-cream)/0.10)]",
+    matchTeamRowWin: "bg-[hsl(var(--broadcast-cream)/0.07)]",
+    matchTeamName: "font-['Oswald'] text-[14px] font-medium uppercase tracking-[0.06em] text-[hsl(var(--broadcast-cream))] truncate",
+    matchTeamNameFav: "font-bold text-[hsl(var(--broadcast-gold))]",
+    matchScore: "inline-flex min-w-[26px] items-center justify-center och-paper px-1.5 font-['Oswald'] text-[24px] font-bold tabular-nums leading-tight",
+    matchScoreWin: "",
+    matchScoreLose: "opacity-70",
+    matchTimeBadge: "inline-flex items-center rounded-none och-paper px-2 py-0.5 font-['Oswald'] text-[13px] font-bold tabular-nums",
+    matchFooter: "flex items-center justify-between px-3 py-1.5 border-t border-[hsl(var(--broadcast-cream)/0.14)]",
+    navBar: "och-frame border-b-0 border-x-0",
+    navCenter: "rounded-none och-paper border-[hsl(var(--broadcast-wood))] text-foreground",
+    navCenterActive: "rounded-none och-enamel border-[hsl(var(--broadcast-gold))] text-[hsl(var(--broadcast-cream))]",
+    navTab: "text-[hsl(var(--broadcast-cream)/0.6)] hover:text-[hsl(var(--broadcast-cream))]",
+    navTabActive: "text-[hsl(var(--broadcast-gold))]",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-[hsl(var(--broadcast-gold))]",
+    tableHeader: "och-enamel font-['Oswald'] text-[10px] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--broadcast-cream))]",
+    tableRowAlt: "bg-[hsl(var(--broadcast-cream)/0.05)]",
+    ptsBadge: "inline-flex items-center justify-center min-w-[26px] rounded-none och-paper px-1.5 py-0.5 font-['Oswald'] text-[13px] font-bold tabular-nums",
+    timeslotHeader: "och-enamel och-screws px-4 py-1.5 flex items-center justify-between gap-2",
+    timeslotBadge: "inline-flex items-center och-paper px-1.5 rounded-none font-['Oswald'] text-[18px] font-bold tabular-nums tracking-[0.02em]",
+    timeslotHeaderMeta: "font-['Oswald'] text-[11px] font-medium uppercase tracking-[0.16em] text-[hsl(var(--broadcast-cream)/0.75)]",
+    dateHeader: "rounded-none och-enamel och-screws px-4 py-2 font-['Oswald'] text-[15px] font-bold uppercase tracking-[0.14em] text-[hsl(var(--broadcast-cream))]",
+    phaseTab: "px-3 py-1.5 rounded-none font-['Oswald'] text-[12px] font-medium uppercase tracking-[0.12em] whitespace-nowrap transition-colors",
+    phaseTabActive: "och-enamel text-[hsl(var(--broadcast-cream))]",
+    phaseTabInactive: "och-paper opacity-80 hover:opacity-100",
+    subHeader: "px-3 py-2 flex items-center justify-between gap-2 och-enamel",
+    subHeaderTitle: "font-['Oswald'] text-[13px] font-bold uppercase tracking-[0.14em] text-[hsl(var(--broadcast-cream))]",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['Oswald'] text-[11px] font-medium uppercase tracking-[0.16em] text-[hsl(var(--broadcast-cream)/0.75)]",
+    coverOverlay: "och-cover",
+    logoFrame: "och-frame p-[3px]",
+    bracketConnector: "och-connector",
+  },
 };
 
 
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec", "old_clubhouse"];
 
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
