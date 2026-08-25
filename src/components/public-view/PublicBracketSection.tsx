@@ -624,6 +624,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       const country = tid ? teams.find((t: any) => t.id === tid)?.country : null;
       const tightSide = compact || compactTree;
       const isCompactPretty = compactTree && !compact;
+      const winRowClass = won ? ds(bStyle, "matchTeamRowWin") : "";
+      const winRowHasEdgeMarker = /\bborder-l(?:-|$)|\bborder-l-\[/.test(winRowClass);
 
       // H&A: show only total score (no +1)
       const displayScore = matchIsHA && haTotal && haTotal.anyScored
@@ -633,8 +635,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       const isPlayedish = match.is_played || (matchIsHA && haTotal?.anyScored);
 
       return (
-        <div className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-1.5 px-2.5 py-1.5"} ${won ? ds(bStyle, "matchTeamRowWin") : ""}`} style={tightSide ? { height: cardH / 2 } : undefined}>
-          {won && (
+        <div className={`relative flex items-center ${isCompactPretty ? "gap-1.5 px-2 py-0" : tightSide ? "gap-0.5 px-1 py-0" : "gap-1.5 px-2.5 py-1.5"} ${winRowClass}`} style={tightSide ? { height: cardH / 2 } : undefined}>
+          {won && !winRowHasEdgeMarker && (
             <span
               aria-hidden
               className={`absolute left-0 top-0 bottom-0 ${ds(bStyle, "bracketQualBar") || "bg-primary"}`}

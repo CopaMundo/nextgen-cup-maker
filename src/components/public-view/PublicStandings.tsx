@@ -277,9 +277,15 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                               const sp = setPts?.get(row.team?.id) || { pf: 0, pa: 0 };
                               return (
                                 <tr key={row.team?.id} className={`transition-colors ${idx % 2 === 0 ? "" : ds(bStyle, "tableRowAlt")}`}>
-                                  <td className="px-1.5 py-2">
+                                  <td className="relative px-1.5 py-2">
+                                    {colorZone && (
+                                      <span
+                                        aria-hidden
+                                        className="absolute left-0 top-0 bottom-0 w-[3px]"
+                                        style={{ backgroundColor: colorZone.color }}
+                                      />
+                                    )}
                                     <div className="flex items-center gap-1">
-                                      {colorZone && <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: colorZone.color }} />}
                                       <span className="font-black text-muted-foreground">{row.pos}</span>
                                     </div>
                                   </td>
