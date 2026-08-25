@@ -24,7 +24,8 @@ export type BroadcastStyle =
   | "la_rosa"
   | "soccertec"
   | "old_clubhouse"
-  | "sticker_album";
+  | "sticker_album"
+  | "teletext";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
@@ -53,6 +54,7 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   soccertec: { name: "SoccerTec Masters", description: "Broadcast Style #9 — premium monochrome elite youth football: zuiver wit met harde zwarte vlakken, Barlow Condensed titels/scores + Inter body", preview: "◾" },
   old_clubhouse: { name: "Old Clubhouse", description: "Broadcast Style #10 — het oude wedstrijd- en uitslagenbord uit de voetbalkantine: donkergroen, zwart letterboard, hout en oud crème papier, Oswald + Roboto Condensed", preview: "🪵" },
   sticker_album: { name: "Sticker Album", description: "Broadcast Style #11 — premium voetbalstickeralbum: warm albumpapier, witte sticker cards met stickernummers, vintage navy en football red, Barlow Condensed + Inter", preview: "📗" },
+  teletext: { name: "Teletext Football", description: "Broadcast Style #12 — klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 + IBM Plex Mono, pagenummers en platte kolommen", preview: "▚" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
@@ -1323,13 +1325,66 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     logoFrame: "sa-sticker p-[3px]",
     bracketConnector: "sa-connector",
   },
+// ── TELETEXT FOOTBALL ───
+  teletext: {
+    sectionDot: "h-4 w-[10px] bg-[hsl(var(--broadcast-cyan))]",
+    sectionTitle: "font-['VT323'] text-[26px] uppercase tracking-[0.06em] text-[hsl(var(--broadcast-cyan))]",
+    sectionMeta: "font-['IBM_Plex_Mono'] text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground",
+    sectionLine: "flex-1 h-px bg-[hsl(var(--broadcast-border))]",
+    card: "ttx-panel overflow-hidden",
+    matchCardWrapper: "ttx-panel overflow-hidden",
+    cardHeader: "ttx-bar-cyan px-3 py-1 flex items-center gap-2",
+    cardHeaderDot: "h-3 w-[8px] bg-black",
+    cardHeaderTitle: "font-['VT323'] text-[18px] uppercase tracking-[0.08em]",
+    homeCardHeader: "ttx-bar-cyan px-3 py-1 flex items-center gap-2",
+    homeCardHeaderTitle: "font-['VT323'] text-[19px] uppercase tracking-[0.08em]",
+    tabContainer: "flex gap-[2px] p-0 bg-[hsl(var(--broadcast-surface-secondary))]",
+    tabActive: "flex-1 px-3 py-2 ttx-bar-yellow font-['VT323'] text-[18px] uppercase tracking-[0.08em]",
+    tabInactive: "flex-1 px-3 py-2 bg-[hsl(var(--broadcast-surface))] font-['VT323'] text-[18px] uppercase tracking-[0.08em] text-[hsl(var(--broadcast-cyan))]",
+    badge: "inline-flex items-center bg-[hsl(var(--broadcast-surface-secondary))] px-2 py-0.5 font-['VT323'] text-[17px] uppercase tracking-[0.06em] tabular-nums text-[hsl(var(--broadcast-cyan))]",
+    label: "font-['IBM_Plex_Mono'] text-[10px] font-semibold uppercase tracking-[0.22em] text-[hsl(var(--broadcast-cyan))]",
+    backButton: "flex items-center gap-1 font-['VT323'] text-[18px] uppercase tracking-[0.08em] text-[hsl(var(--broadcast-cyan))]",
+    matchContext: "flex items-center gap-2 px-3 py-1 border-b border-[hsl(var(--broadcast-border))] bg-[hsl(var(--broadcast-surface-secondary))]",
+    matchContextText: "font-['IBM_Plex_Mono'] text-[10px] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--broadcast-cyan))]",
+    matchTeamRow: "px-3 py-2 border-b border-[hsl(var(--broadcast-border)/0.6)]",
+    matchTeamRowWin: "bg-[hsl(var(--broadcast-success)/0.10)]",
+    matchTeamName: "font-['IBM_Plex_Mono'] text-[13px] font-semibold uppercase tracking-[0.06em] text-foreground truncate",
+    matchTeamNameFav: "text-[hsl(60_100%_50%)]",
+    matchScore: "font-['VT323'] text-[30px] tabular-nums leading-none",
+    matchScoreWin: "text-[hsl(60_100%_50%)]",
+    matchScoreLose: "text-[hsl(60_100%_50%)]/70",
+    matchTimeBadge: "inline-flex items-center px-2 py-0.5 font-['VT323'] text-[19px] tabular-nums text-[hsl(var(--broadcast-cyan))]",
+    matchFooter: "flex items-center justify-between px-3 py-1 border-t border-[hsl(var(--broadcast-border))]",
+    navBar: "bg-[hsl(var(--broadcast-surface))] border-t-2 border-[hsl(var(--broadcast-cyan))]",
+    navCenter: "bg-[hsl(var(--broadcast-surface-secondary))] border-[hsl(var(--broadcast-cyan))] text-[hsl(var(--broadcast-cyan))]",
+    navCenterActive: "bg-[hsl(60_100%_50%)] border-[hsl(60_100%_50%)] text-black",
+    navTab: "text-[hsl(var(--broadcast-cyan))] hover:text-foreground",
+    navTabActive: "text-[hsl(60_100%_50%)]",
+    navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[3px] bg-[hsl(60_100%_50%)]",
+    tableHeader: "ttx-bar-blue font-['IBM_Plex_Mono'] text-[10px] font-bold uppercase tracking-[0.14em]",
+    tableRowAlt: "bg-[hsl(var(--broadcast-surface-secondary)/0.7)]",
+    ptsBadge: "inline-flex items-center justify-center min-w-[24px] px-1 font-['VT323'] text-[21px] tabular-nums text-[hsl(60_100%_50%)]",
+    timeslotHeader: "ttx-bar-cyan px-3 py-1 flex items-center justify-between gap-2",
+    timeslotBadge: "font-['VT323'] text-[22px] tabular-nums tracking-[0.04em]",
+    timeslotHeaderMeta: "font-['IBM_Plex_Mono'] text-[10px] font-semibold uppercase tracking-[0.16em]",
+    dateHeader: "ttx-bar-yellow px-3 py-1 font-['VT323'] text-[20px] uppercase tracking-[0.1em]",
+    phaseTab: "px-3 py-1.5 font-['VT323'] text-[18px] uppercase tracking-[0.08em] whitespace-nowrap transition-colors",
+    phaseTabActive: "ttx-bar-yellow",
+    phaseTabInactive: "bg-[hsl(var(--broadcast-surface-secondary))] text-[hsl(var(--broadcast-cyan))]",
+    subHeader: "px-3 py-1.5 flex items-center justify-between gap-2 ttx-bar-blue",
+    subHeaderTitle: "font-['VT323'] text-[19px] uppercase tracking-[0.1em]",
+    subLabel: "inline-flex items-center px-2 py-0.5 font-['IBM_Plex_Mono'] text-[10px] font-semibold uppercase tracking-[0.16em]",
+    coverOverlay: "ttx-cover",
+    logoFrame: "border border-[hsl(var(--broadcast-cyan))] p-[3px]",
+    bracketConnector: "ttx-connector",
+  },
 };
 
 
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec", "old_clubhouse", "sticker_album"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec", "old_clubhouse", "sticker_album", "teletext"];
 
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(

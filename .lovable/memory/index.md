@@ -4,3 +4,4 @@
 - [Broadcast SoccerTec Masters](mem://style/broadcast-soccertec-masters) — soccertec stijl: premium monochroom zwart-wit, Barlow Condensed, 2px radius
 - [Broadcast Old Clubhouse](mem://style/broadcast-old-clubhouse) — old_clubhouse stijl: voetbalkantine-uitslagenbord, hout/letterboard/crème, Oswald
 - [Broadcast Sticker Album](mem://style/broadcast-sticker-album) — sticker_album stijl: voetbalstickeralbum, albumpapier + witte stickers, navy/rood, Barlow Condensed
+- [Broadcast Teletext Football](mem://style/broadcast-teletext-football) — teletext stijl: voetbalteletekst, zwart + cyan/geel/groen/rood, VT323 + IBM Plex Mono, 0px radius
