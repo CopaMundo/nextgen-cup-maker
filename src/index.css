@@ -1943,9 +1943,9 @@ body[data-broadcast="la_rosa"] {
 [data-broadcast="la_rosa"][data-mode="light"] {
   --background: 351 51% 88%;
   --foreground: 0 0% 4%;
-  --card: 8 100% 99%;
+  --card: 351 55% 93%;
   --card-foreground: 0 0% 4%;
-  --popover: 8 100% 99%;
+  --popover: 351 55% 93%;
   --popover-foreground: 0 0% 4%;
   --primary: 340 100% 45%;
   --primary-foreground: 0 0% 100%;
@@ -1965,10 +1965,10 @@ body[data-broadcast="la_rosa"] {
 
   --broadcast-bg: 351 51% 88%;
   --broadcast-night: 0 0% 4%;
-  --broadcast-paper: 8 100% 99%;
-  --broadcast-surface: 8 100% 99%;
+  --broadcast-paper: 351 55% 93%;
+  --broadcast-surface: 351 55% 93%;
   --broadcast-surface-secondary: 351 55% 93%;
-  --broadcast-surface-elevated: 8 100% 99%;
+  --broadcast-surface-elevated: 351 55% 93%;
   --broadcast-text: 0 0% 4%;
   --broadcast-text-secondary: 345 6% 42%;
   --broadcast-text-muted: 345 6% 52%;
@@ -1989,11 +1989,11 @@ body[data-broadcast="la_rosa"] {
 /* Dark: zwarte inktpagina met roze typografie */
 [data-broadcast="la_rosa"][data-mode="dark"] {
   --background: 0 0% 6%;
-  --foreground: 8 60% 97%;
+  --foreground: 351 60% 90%;
   --card: 0 0% 10%;
-  --card-foreground: 8 60% 97%;
+  --card-foreground: 351 60% 90%;
   --popover: 0 0% 10%;
-  --popover-foreground: 8 60% 97%;
+  --popover-foreground: 351 60% 90%;
   --primary: 340 100% 52%;
   --primary-foreground: 0 0% 100%;
   --secondary: 345 10% 15%;
@@ -2016,14 +2016,14 @@ body[data-broadcast="la_rosa"] {
   --broadcast-surface: 0 0% 10%;
   --broadcast-surface-secondary: 345 10% 15%;
   --broadcast-surface-elevated: 345 10% 18%;
-  --broadcast-text: 8 60% 97%;
-  --broadcast-text-secondary: 351 20% 78%;
-  --broadcast-text-muted: 351 12% 62%;
+  --broadcast-text: 351 60% 90%;
+  --broadcast-text-secondary: 351 45% 82%;
+  --broadcast-text-muted: 351 30% 70%;
   --broadcast-border: 345 10% 22%;
   --broadcast-primary: 340 100% 52%;
   --broadcast-primary-contrast: 0 0% 100%;
-  --broadcast-score: 8 60% 97%;
-  --broadcast-bright: 351 51% 88%;
+  --broadcast-score: 351 60% 90%;
+  --broadcast-bright: 351 60% 90%;
   --broadcast-gold: 344 100% 45%;
   --broadcast-navy: 0 0% 0%;
   --broadcast-cyan: 340 100% 52%;

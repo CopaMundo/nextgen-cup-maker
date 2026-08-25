@@ -1158,7 +1158,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     navTabActive: "text-primary",
     navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-primary",
     tableHeader: "bg-foreground font-['Roboto_Condensed'] text-[10px] font-bold uppercase tracking-[0.14em] text-background",
-    tableRowAlt: "bg-[hsl(var(--broadcast-surface-secondary))]",
+    tableRowAlt: "bg-transparent",
     ptsBadge: "inline-flex items-center justify-center min-w-[26px] rounded-none bg-foreground px-1.5 py-0.5 font-['Roboto_Condensed'] text-[13px] font-black text-background tabular-nums",
     timeslotHeader: "bg-foreground text-background flex items-center gap-2 px-3 py-2",
     timeslotBadge: "inline-flex items-center rounded-none font-['Roboto_Condensed'] text-[19px] font-black text-background tabular-nums tracking-[0.02em]",
