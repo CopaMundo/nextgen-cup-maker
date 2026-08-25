@@ -95,9 +95,10 @@ const PublicMatchCard = ({
         {m.is_played ? (
           <>
             <span className={`min-w-[1.1rem] text-right tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
-            {hasPenalties && (
-              <span className="inline-block min-w-[1.5rem] text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
-            )}
+            <span
+              aria-hidden={!hasPenalties}
+              className={`inline-block w-[1.25rem] shrink-0 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground ${hasPenalties ? "" : "invisible"}`}
+            >({penalties ?? 0})</span>
           </>
         ) : null}
       </div>
