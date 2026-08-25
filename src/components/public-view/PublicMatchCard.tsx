@@ -75,11 +75,10 @@ const PublicMatchCard = ({
   const homeLogo = getTeamLogo(teams, m.home_team_id);
   const awayLogo = getTeamLogo(teams, m.away_team_id);
 
-  const homeWin = m.is_played && (m.home_score ?? 0) > (m.away_score ?? 0);
-  const awayWin = m.is_played && (m.away_score ?? 0) > (m.home_score ?? 0);
+  const hasPenalties = m.home_penalties != null && m.away_penalties != null;
 
-  const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, isWin: boolean, score: number | null) => (
-    <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors ${isWin ? ds(bStyle, "matchTeamRowWin") : ""}`}>
+  const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null) => (
+    <div className={`flex items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 py-1.5 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
           <img src={logo} className="h-full w-full object-contain" alt="" />
@@ -90,9 +89,14 @@ const PublicMatchCard = ({
       <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
         {name}
       </span>
-      <div className="w-8 text-right">
+      <div className={`${hasPenalties ? "w-12" : "w-8"} text-right`}>
         {m.is_played ? (
-          <span className={`${ds(bStyle, "matchScore")} ${isWin ? ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
+          <span className="inline-flex items-baseline justify-end gap-0.5">
+            <span className={`${ds(bStyle, "matchScore")} ${ds(bStyle, "matchScoreLose")}`}>{score}</span>
+            {hasPenalties && (
+              <span className="text-[8px] font-medium text-muted-foreground">({penalties})</span>
+            )}
+          </span>
         ) : null}
       </div>
     </div>
