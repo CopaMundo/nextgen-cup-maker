@@ -1107,7 +1107,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     tableHeader: "bg-foreground font-['Barlow_Condensed'] text-[10px] font-bold uppercase tracking-[0.14em] text-background border-b border-border",
     tableRowAlt: "bg-primary/[0.04]",
     ptsBadge: "inline-flex items-center justify-center min-w-[24px] rounded-none border border-border bg-foreground px-1.5 py-0.5 font-['Barlow_Condensed'] text-[13px] font-bold text-background tabular-nums",
-    timeslotHeader: "bg-primary/[0.10] text-foreground flex items-center gap-2 px-3 py-2 border-l-4 border-y border-r border-primary shadow-[inset_0_1px_0_hsl(var(--primary)/0.35)]",
+    timeslotHeader: "bg-primary/[0.08] text-foreground flex items-center gap-2 px-3 py-2 border border-primary rounded-t-[6px]",
     timeslotBadge: "inline-flex items-center wc26-card bg-primary px-2 py-0.5 font-['Barlow_Condensed'] text-[14px] font-bold text-primary-foreground tabular-nums",
     timeslotHeaderMeta: "font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[0.14em] text-primary",
     dateHeader: "wc26-card bg-foreground text-background px-3 py-1.5 font-['Barlow_Condensed'] text-[14px] font-extrabold uppercase tracking-[0.1em]",
