@@ -1414,3 +1414,17 @@ export function isSquareStyle(style: BroadcastStyle): boolean {
   const w = ds(style, "matchCardWrapper");
   return Boolean(w) && !/rounded-(?!none)/.test(w);
 }
+
+/** Standaard verschijning (light/dark) per broadcaststijl. Default = dark. */
+export const STYLE_DEFAULT_APPEARANCE: Partial<Record<BroadcastStyle, "light" | "dark">> = {
+  copa_mundo_bc: "dark",
+  european_nights: "dark",
+  teletext: "dark",
+  retro_bw: "dark",
+  la_rosa: "light",
+  wc26: "light",
+};
+
+export function defaultAppearanceForStyle(style: BroadcastStyle): "light" | "dark" {
+  return STYLE_DEFAULT_APPEARANCE[style] ?? "dark";
+}

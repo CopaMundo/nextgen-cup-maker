@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import type { BroadcastStyle } from "@/lib/broadcastStyles";
+import { defaultAppearanceForStyle, type BroadcastStyle } from "@/lib/broadcastStyles";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import PublicBottomNav from "@/components/public-view/PublicBottomNav";
 import PublicInfo from "@/components/public-view/PublicInfo";
@@ -60,6 +60,15 @@ const PublicView = () => {
     if (storedDark !== null) setDarkMode(storedDark === "true");
     fetchData();
   }, [token]);
+
+  // Standaard light/dark per broadcaststijl, tenzij de bezoeker zelf al koos
+  useEffect(() => {
+    if (!data?.tournament) return;
+    if (localStorage.getItem(`dark-${token}`) !== null) return;
+    const style = (data.tournament.view_display_style || "copa_mundo") as BroadcastStyle;
+    setDarkMode(defaultAppearanceForStyle(style) === "dark");
+  }, [data?.tournament?.view_display_style, token]);
+
 
   useEffect(() => {
     if (!data?.tournament) return;
