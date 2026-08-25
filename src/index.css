@@ -1897,7 +1897,7 @@ body[data-broadcast="wc26"] {
   right: 0;
   bottom: 0;
   height: 3px;
-  background: hsl(var(--broadcast-primary));
+  background: hsl(var(--foreground));
 }
 
 /* Zwarte infobalk in wedstrijd-/bracketkaarten: alle tekst en icons wit */
