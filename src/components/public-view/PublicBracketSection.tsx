@@ -719,12 +719,12 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const tight = (compact && !isMobile) || compactTree;
     const card = (
       <div
-        className={`${ds(bStyle, "card")} ${tight ? "" : "w-60"} ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-primary/30 transition-shadow" : ""}`}
+        className={`${ds(bStyle, "card")} ${tight ? "" : "w-[268px]"} ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-primary/30 transition-shadow" : ""}`}
         style={{ overflow: "hidden", width: tight ? cardW : undefined, height: tight ? cardH : undefined, boxSizing: "border-box" }}
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={ds(bStyle, "matchContext")} style={compactTree ? { display: "none" } : undefined}>
-          <div className="flex items-start justify-between leading-none">
+          <div className={`flex items-start justify-between leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             <div className="min-w-0">
                 <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                 {phase?.name || displayName}
@@ -751,9 +751,14 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {renderSide("home")}
           {renderSide("away")}
           {showInlineTime && (
-            <span className={`absolute right-2 top-1/2 -translate-y-1/2 font-bold text-muted-foreground text-[10px]`}>{displayTimeStr}</span>
+            tight ? (
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 font-bold text-muted-foreground text-[10px]">{displayTimeStr}</span>
+            ) : (
+              <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 ${ds(bStyle, "matchTimeBadge")}`}>{displayTimeStr}</span>
+            )
           )}
         </div>
+
       </div>
     );
 
