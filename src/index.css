@@ -2725,3 +2725,248 @@ body[data-broadcast="sticker_album"] {
 [data-broadcast="sticker_album"] .grid-cols-3 > button.border-primary {
   box-shadow: 2px 2px 0 hsl(216 51% 18% / 0.35);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BROADCAST STYLE #12 — TELETEXT FOOTBALL
+   Klassieke Europese voetbalteletekst / results service:
+   zwarte achtergrond, beperkt teletextpalet (cyan/yellow/green/
+   red/blue), VT323 + IBM Plex Mono, 0px radius, geen shadows.
+   ══════════════════════════════════════════════════════════════ */
+[data-broadcast="teletext"],
+[data-broadcast="teletext"] body,
+body[data-broadcast="teletext"] {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: 0.02em;
+  background-image: repeating-linear-gradient(180deg, hsl(0 0% 100% / 0.022) 0 1px, transparent 1px 3px);
+}
+[data-broadcast="teletext"] h1,
+[data-broadcast="teletext"] h2,
+[data-broadcast="teletext"] h3,
+[data-broadcast="teletext"] .font-display {
+  font-family: 'VT323', 'IBM Plex Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+[data-broadcast="teletext"] .tabular-nums {
+  font-family: 'VT323', 'IBM Plex Mono', monospace;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dark: authentieke teletext op zwart */
+[data-broadcast="teletext"][data-mode="dark"] {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 6%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 180 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 6%;
+  --secondary-foreground: 0 0% 75%;
+  --muted: 0 0% 6%;
+  --muted-foreground: 0 0% 75%;
+  --accent: 60 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 100% 59%;
+  --destructive-foreground: 0 0% 0%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 180 100% 50%;
+  --radius: 0rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 0 0% 0%;
+  --broadcast-night: 0 0% 0%;
+  --broadcast-paper: 0 0% 0%;
+  --broadcast-surface: 0 0% 0%;
+  --broadcast-surface-secondary: 0 0% 6%;
+  --broadcast-surface-elevated: 0 0% 10%;
+  --broadcast-text: 0 0% 100%;
+  --broadcast-text-secondary: 0 0% 75%;
+  --broadcast-text-muted: 0 0% 75%;
+  --broadcast-border: 0 0% 20%;
+  --broadcast-primary: 180 100% 50%;
+  --broadcast-primary-contrast: 0 0% 0%;
+  --broadcast-score: 60 100% 50%;
+  --broadcast-bright: 0 0% 100%;
+  --broadcast-gold: 60 100% 50%;
+  --broadcast-navy: 218 100% 50%;
+  --broadcast-cyan: 180 100% 50%;
+  --broadcast-violet: 218 100% 50%;
+  --broadcast-magenta: 0 100% 59%;
+  --broadcast-danger: 0 100% 59%;
+  --broadcast-success: 120 100% 50%;
+  --broadcast-cream: 0 0% 100%;
+}
+
+/* Light: "printed teletext" — teletextpagina op papier */
+[data-broadcast="teletext"][data-mode="light"] {
+  --background: 60 12% 95%;
+  --foreground: 0 0% 7%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 7%;
+  --primary: 186 100% 28%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 60 10% 90%;
+  --secondary-foreground: 0 0% 35%;
+  --muted: 60 10% 90%;
+  --muted-foreground: 0 0% 38%;
+  --accent: 48 100% 42%;
+  --accent-foreground: 0 0% 7%;
+  --destructive: 0 78% 46%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 60 6% 80%;
+  --input: 60 6% 80%;
+  --ring: 186 100% 28%;
+  --radius: 0rem;
+  --gradient-hero: none;
+
+  --broadcast-bg: 60 12% 95%;
+  --broadcast-night: 0 0% 7%;
+  --broadcast-paper: 0 0% 100%;
+  --broadcast-surface: 0 0% 100%;
+  --broadcast-surface-secondary: 60 10% 90%;
+  --broadcast-surface-elevated: 0 0% 100%;
+  --broadcast-text: 0 0% 7%;
+  --broadcast-text-secondary: 0 0% 38%;
+  --broadcast-text-muted: 0 0% 42%;
+  --broadcast-border: 60 6% 80%;
+  --broadcast-primary: 186 100% 28%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-score: 40 100% 32%;
+  --broadcast-bright: 0 0% 7%;
+  --broadcast-gold: 40 100% 32%;
+  --broadcast-navy: 218 100% 40%;
+  --broadcast-cyan: 186 100% 28%;
+  --broadcast-violet: 218 100% 40%;
+  --broadcast-magenta: 0 78% 46%;
+  --broadcast-danger: 0 78% 46%;
+  --broadcast-success: 140 70% 30%;
+  --broadcast-cream: 0 0% 100%;
+}
+
+/* Harde rechte hoeken: geen enkele afronding in deze stijl */
+[data-broadcast="teletext"] [class*="rounded"] {
+  border-radius: 0 !important;
+}
+[data-broadcast="teletext"] .rounded-full,
+[data-broadcast="teletext"] img.rounded-full {
+  border-radius: 0 !important;
+}
+[data-broadcast="teletext"] [class*="bg-gradient"] {
+  background-image: none !important;
+}
+[data-broadcast="teletext"] [class*="shadow"] {
+  box-shadow: none !important;
+}
+
+/* Desktop: content binnen een televisiescherm-breedte */
+@media (min-width: 900px) {
+  [data-broadcast="teletext"] .min-h-screen > div,
+  [data-broadcast="teletext"] main {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Vlak teletextpaneel: platte regels, geen kaart */
+.ttx-panel {
+  background-color: hsl(var(--broadcast-surface));
+  border: 0;
+  border-top: 1px solid hsl(var(--broadcast-border));
+  border-bottom: 1px solid hsl(var(--broadcast-border));
+}
+
+/* Gekleurde teletextbalken */
+.ttx-bar-cyan {
+  background-color: hsl(var(--broadcast-cyan));
+  color: hsl(0 0% 0%);
+}
+.ttx-bar-yellow {
+  background-color: hsl(60 100% 50%);
+  color: hsl(0 0% 0%);
+}
+[data-broadcast="teletext"][data-mode="light"] .ttx-bar-yellow {
+  background-color: hsl(48 100% 50%);
+}
+.ttx-bar-blue {
+  background-color: hsl(var(--broadcast-navy));
+  color: hsl(0 0% 100%);
+}
+.ttx-bar-red {
+  background-color: hsl(var(--broadcast-danger));
+  color: hsl(0 0% 0%);
+}
+
+/* ASCII-achtige separator */
+.ttx-rule {
+  border-top: 1px dashed hsl(var(--broadcast-border));
+}
+
+/* Kwalificatiezone: groene teletextmarker */
+.ttx-qual {
+  box-shadow: inset 4px 0 0 hsl(var(--broadcast-success)) !important;
+}
+
+/* Bracket: rechte teletextlijnen */
+.ttx-connector {
+  stroke: hsl(var(--broadcast-cyan) / 0.8);
+}
+.ttx-connector line {
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+/* Infopagina: cover in een teletext/video-window met dither */
+.ttx-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg, hsl(0 0% 0% / 0.28) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, hsl(0 0% 0% / 0.35) 0%, hsl(0 0% 0% / 0.82) 68%, hsl(var(--background)) 100%);
+}
+.ttx-cover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    hsl(var(--broadcast-cyan)) 0 25%,
+    hsl(60 100% 50%) 25% 50%,
+    hsl(120 100% 50%) 50% 75%,
+    hsl(var(--broadcast-danger)) 75% 100%);
+}
+
+/* Teletext pagenummers in het teamsraster (201, 202, ...) */
+[data-broadcast="teletext"] .grid-cols-3 {
+  counter-reset: ttx-page 200;
+}
+[data-broadcast="teletext"] .grid-cols-3 > button {
+  counter-increment: ttx-page;
+  position: relative;
+  background-color: hsl(var(--broadcast-surface-secondary));
+  border-color: hsl(var(--broadcast-border));
+}
+[data-broadcast="teletext"] .grid-cols-3 > button::before {
+  content: counter(ttx-page);
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-family: 'VT323', 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1;
+  color: hsl(var(--broadcast-cyan));
+  pointer-events: none;
+}
+[data-broadcast="teletext"] .grid-cols-3 > button.border-primary {
+  border-color: hsl(60 100% 50%);
+}
