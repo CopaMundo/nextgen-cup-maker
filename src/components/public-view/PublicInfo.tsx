@@ -21,8 +21,8 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
   const wrapperToken = ds(bStyle, "matchCardWrapper");
   const squareStyle = Boolean(wrapperToken) && !/rounded-(?!none)/.test(wrapperToken);
   const cardFrame = wrapperToken || "rounded-xl border border-border bg-card shadow-sm";
-  const largeFrameShape = squareStyle ? "" : "rounded-2xl";
-  const controlFrameShape = squareStyle ? "rounded-none" : "rounded-lg";
+  const largeFrameShape = "rounded-2xl";
+  const controlFrameShape = "rounded-lg";
   const divisionRef = useRef<HTMLDivElement>(null);
   const isMultiCat = tournament.is_multi_category && categories.length > 1;
   const needsSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
@@ -151,13 +151,13 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Division selector */}
         {isMultiCat && (
-          <div ref={divisionRef} className={`p-4 space-y-2 border-2 ${squareStyle ? "" : "rounded-xl"} ${needsSelection ? "border-destructive bg-destructive/10 animate-pulse" : "border-foreground/10 bg-secondary/50"}`}>
+          <div ref={divisionRef} className={`p-4 space-y-2 border-2 rounded-xl ${needsSelection ? "border-destructive bg-destructive/10 animate-pulse" : "border-foreground/10 bg-secondary/50"}`}>
             <label className={`text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-1.5 ${needsSelection ? "text-destructive" : "text-primary"}`}>
               {needsSelection && <AlertCircle className="h-4 w-4" />}
               Meerdere divisies beschikbaar
             </label>
             <Select value={selectedCategory || ""} onValueChange={(v) => onCategoryChange?.(v)}>
-              <SelectTrigger className={`w-full ${squareStyle ? "rounded-none" : ""} ${needsSelection ? "border-destructive" : ""}`}>
+              <SelectTrigger className={`w-full ${needsSelection ? "border-destructive" : ""}`}>
                 <SelectValue placeholder="Kies divisie" />
               </SelectTrigger>
               <SelectContent>
