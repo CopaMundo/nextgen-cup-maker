@@ -2730,12 +2730,12 @@ body[data-broadcast="sticker_album"] {
    BROADCAST STYLE #12 — TELETEXT FOOTBALL
    Klassieke Europese voetbalteletekst / results service:
    zwarte achtergrond, beperkt teletextpalet (cyan/yellow/green/
-   red/blue), VT323 + IBM Plex Mono, 0px radius, geen shadows.
+   red/blue), VT323 als enige lettertype, 0px radius, geen shadows.
    ══════════════════════════════════════════════════════════════ */
 [data-broadcast="teletext"],
 [data-broadcast="teletext"] body,
 body[data-broadcast="teletext"] {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'VT323', ui-monospace, monospace;
   letter-spacing: 0.02em;
   background-image: repeating-linear-gradient(180deg, hsl(0 0% 100% / 0.022) 0 1px, transparent 1px 3px);
 }
@@ -2743,14 +2743,14 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"] h2,
 [data-broadcast="teletext"] h3,
 [data-broadcast="teletext"] .font-display {
-  font-family: 'VT323', 'IBM Plex Mono', monospace;
+  font-family: 'VT323', ui-monospace, monospace;
   font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1.05;
   text-transform: uppercase;
 }
 [data-broadcast="teletext"] .tabular-nums {
-  font-family: 'VT323', 'IBM Plex Mono', monospace;
+  font-family: 'VT323', ui-monospace, monospace;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
@@ -2817,8 +2817,8 @@ body[data-broadcast="teletext"] {
   --secondary-foreground: 0 0% 35%;
   --muted: 60 10% 90%;
   --muted-foreground: 0 0% 38%;
-  --accent: 48 100% 42%;
-  --accent-foreground: 0 0% 7%;
+  --accent: 45 100% 24%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 78% 46%;
   --destructive-foreground: 0 0% 100%;
   --border: 60 6% 80%;
@@ -2839,9 +2839,9 @@ body[data-broadcast="teletext"] {
   --broadcast-border: 60 6% 80%;
   --broadcast-primary: 186 100% 28%;
   --broadcast-primary-contrast: 0 0% 100%;
-  --broadcast-score: 40 100% 32%;
+  --broadcast-score: 45 100% 24%;
   --broadcast-bright: 0 0% 7%;
-  --broadcast-gold: 40 100% 32%;
+  --broadcast-gold: 45 100% 24%;
   --broadcast-navy: 218 100% 40%;
   --broadcast-cyan: 186 100% 28%;
   --broadcast-violet: 218 100% 40%;
@@ -2961,7 +2961,7 @@ body[data-broadcast="teletext"] {
   position: absolute;
   top: 2px;
   left: 4px;
-  font-family: 'VT323', 'IBM Plex Mono', monospace;
+  font-family: 'VT323', ui-monospace, monospace;
   font-size: 13px;
   line-height: 1;
   color: hsl(var(--broadcast-cyan));
