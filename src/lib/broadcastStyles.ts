@@ -24,7 +24,8 @@ export type BroadcastStyle =
   | "la_rosa"
   | "soccertec"
   | "old_clubhouse"
-  | "sticker_album";
+  | "sticker_album"
+  | "teletext";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
