@@ -61,6 +61,15 @@ const PublicView = () => {
     fetchData();
   }, [token]);
 
+  // Standaard light/dark per broadcaststijl, tenzij de bezoeker zelf al koos
+  useEffect(() => {
+    if (!data?.tournament) return;
+    if (localStorage.getItem(`dark-${token}`) !== null) return;
+    const style = (data.tournament.view_display_style || "copa_mundo") as BroadcastStyle;
+    setDarkMode(defaultAppearanceForStyle(style) === "dark");
+  }, [data?.tournament?.view_display_style, token]);
+
+
   useEffect(() => {
     if (!data?.tournament) return;
     const style = data.tournament.view_display_style || "copa_mundo";
