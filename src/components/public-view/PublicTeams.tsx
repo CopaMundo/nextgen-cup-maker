@@ -58,28 +58,6 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
     });
     Object.values(playersByPosition).forEach(arr => arr.sort((a: any, b: any) => (a.last_name || "").localeCompare(b.last_name || "")));
 
-    const findGroupInfo = () => {
-      for (const g of groups) {
-        const phase = phases.find((p: any) => p.id === g.phase_id);
-        if (!phase || phase.phase_type === "knockout") continue;
-        const gts = data.groupTeams.filter((gt: any) => gt.group_id === g.id);
-        if (!gts.find((gt: any) => gt.team_id === team.id)) continue;
-        const rows = calculateGroupStandings(
-          g.id,
-          groupTeams as any,
-          matches as any,
-          groups as any,
-          phases as any,
-          (scoringSystems || []) as any,
-          tournament,
-        );
-        const pos = rows.findIndex((r: any) => r.teamId === team.id) + 1;
-        if (pos > 0) return { groupName: g.name, pos };
-      }
-      return null;
-    };
-
-    const groupInfo = findGroupInfo();
 
     return (
       <div className="px-3 pt-4 space-y-4">
@@ -120,7 +98,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
           ))}
         </div>
 
-        {/* Form + Position */}
+        {/* Form */}
         <div className="flex items-center gap-3">
           {form.length > 0 && (
             <div className="flex items-center gap-1.5">
