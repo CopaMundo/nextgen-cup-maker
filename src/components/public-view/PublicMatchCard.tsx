@@ -91,7 +91,7 @@ const PublicMatchCard = ({
       <span className={`flex-1 ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : "text-foreground"}`}>
         {name}
       </span>
-      <div className={`grid items-center gap-1 ${hasPenalties ? "grid-cols-[1fr_2.5rem_1.25rem]" : "grid-cols-[1fr_2.5rem]"}`}>
+      <div className="grid grid-cols-[2.5rem_1.25rem] items-center gap-1">
         {m.is_played ? (
           <>
             <span className={`text-right tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
