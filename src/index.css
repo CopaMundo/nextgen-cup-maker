@@ -2867,7 +2867,7 @@ body[data-broadcast="sticker_album"] {
 body[data-broadcast="teletext"] {
   font-family: 'VT323', ui-monospace, monospace;
   letter-spacing: 0.02em;
-  background-image: repeating-linear-gradient(180deg, hsl(0 0% 100% / 0.022) 0 1px, transparent 1px 3px);
+  background-image: none;
 }
 [data-broadcast="teletext"] h1,
 [data-broadcast="teletext"] h2,
