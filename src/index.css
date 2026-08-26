@@ -3053,18 +3053,18 @@ body[data-broadcast="teletext"] {
   --input: 120 45% 26%;
   --ring: 120 100% 50%;
 
-  --broadcast-bg: 0 0% 4%;
-  --broadcast-night: 0 0% 4%;
-  --broadcast-paper: 0 0% 4%;
-  --broadcast-surface: 0 0% 4%;
-  --broadcast-surface-secondary: 0 0% 9%;
-  --broadcast-surface-elevated: 0 0% 12%;
+  --broadcast-bg: 0 0% 10%;
+  --broadcast-night: 0 0% 10%;
+  --broadcast-paper: 0 0% 10%;
+  --broadcast-surface: 0 0% 10%;
+  --broadcast-surface-secondary: 0 0% 15%;
+  --broadcast-surface-elevated: 0 0% 18%;
   --broadcast-text: 0 0% 100%;
   --broadcast-text-secondary: 120 40% 74%;
   --broadcast-text-muted: 120 30% 68%;
   --broadcast-border: 120 45% 26%;
   --broadcast-primary: 120 100% 50%;
-  --broadcast-primary-contrast: 0 0% 4%;
+  --broadcast-primary-contrast: 0 0% 10%;
   --broadcast-score: 60 100% 50%;
   --broadcast-gold: 60 100% 50%;
   --broadcast-navy: 0 100% 50%;
