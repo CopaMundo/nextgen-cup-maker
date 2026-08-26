@@ -3450,3 +3450,35 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-panel .ttx-bar-cyan * {
   color: hsl(120 100% 50%);
 }
+
+/* P800: homepage "Mijn team" balk tekst geel */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-header,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-header * {
+  color: hsl(60 100% 50%) !important;
+}
+
+/* P800: "Mijn team" tab-switcher — geselecteerd groen, overige geel */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-tabs .ttx-myteam-tab {
+  color: hsl(60 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-tabs .ttx-myteam-tab[data-active="true"] {
+  color: hsl(120 100% 50%) !important;
+  border-bottom-color: hsl(120 100% 50%) !important;
+}
+
+/* P800: favoriete team in wedstrijdkaarten lichtblauw */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-fav-team {
+  color: hsl(180 100% 50%) !important;
+}
+
+/* P800: klassement groepsfase — teamnamen geel, posities + statistieken groen */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td:first-child span {
+  color: hsl(120 100% 50%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td:nth-child(2) span.font-bold {
+  color: hsl(60 100% 50%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td.text-center,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td.text-center span {
+  color: hsl(120 100% 50%) !important;
+}
