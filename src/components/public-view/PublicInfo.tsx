@@ -69,7 +69,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
   };
 
   return (
-    <div>
+    <div className={bStyle === "teletext" ? "ttx-info" : undefined}>
       {/* Cover + Logo header */}
       <div className="relative">
         {tournament.cover_url ? (
