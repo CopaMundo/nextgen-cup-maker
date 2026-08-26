@@ -73,10 +73,10 @@ const PublicView = () => {
   useEffect(() => {
     if (!data?.tournament) return;
     const style = data.tournament.view_display_style || "copa_mundo";
-    // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 101 en 601.
+    // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 501 en 801.
     if (style === "teletext") {
       document.documentElement.setAttribute("data-mode", "dark");
-      document.documentElement.setAttribute("data-ttx-variant", darkMode ? "101" : "601");
+      document.documentElement.setAttribute("data-ttx-variant", darkMode ? "501" : "801");
     } else {
       document.documentElement.setAttribute("data-mode", darkMode ? "dark" : "light");
       document.documentElement.removeAttribute("data-ttx-variant");
