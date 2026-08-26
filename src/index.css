@@ -1093,9 +1093,24 @@ input[type="number"] {
 /* Infobalk in wedstrijdkaarten/brackets: dark = nachtblauw, light = Electric Blue #143CDB */
 [data-broadcast="european_nights"][data-mode="dark"] .en-infobar {
   background-color: hsl(226 58% 16%);
+  color: #ffffff;
 }
 [data-broadcast="european_nights"][data-mode="light"] .en-infobar {
   background-color: #143CDB;
+  color: #ffffff;
+}
+[data-broadcast="european_nights"][data-mode="light"] .en-infobar * {
+  color: #ffffff !important;
+}
+/* Tijdsbalk in schema: licht thema krijgt witte achtergrond + Electric Blue rand/tekst */
+[data-broadcast="european_nights"][data-mode="light"] .en-timeslot-header {
+  background-color: #ffffff !important;
+  color: #143CDB !important;
+  border-top: 1px solid #143CDB;
+  border-bottom: 1px solid #143CDB;
+}
+[data-broadcast="european_nights"][data-mode="light"] .en-timeslot-header * {
+  color: #143CDB !important;
 }
 /* Homeknop: cirkel — dark = Electric Blue #143CDB, light = wit */
 .en-home-btn {

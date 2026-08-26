@@ -841,7 +841,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     tableHeader: "bg-secondary font-['Roboto_Condensed'] text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground border-b border-border",
     tableRowAlt: "bg-secondary/35",
     ptsBadge: "inline-flex items-center justify-center rounded-[3px] bg-[hsl(var(--broadcast-score))] px-1.5 py-0.5 font-['Roboto_Condensed'] text-[13px] font-extrabold text-primary-foreground tabular-nums",
-    timeslotHeader: "bg-primary text-primary-foreground flex items-center gap-2 px-3 py-1.5",
+    timeslotHeader: "en-timeslot-header bg-primary text-primary-foreground flex items-center gap-2 px-3 py-1.5",
     timeslotBadge: "inline-flex items-center rounded-[3px] bg-primary-foreground/15 border border-primary-foreground/30 px-2 py-0.5 font-['Roboto_Condensed'] text-[14px] font-extrabold text-primary-foreground tabular-nums",
     timeslotHeaderMeta: "font-['Roboto_Condensed'] text-[12px] font-bold uppercase tracking-[0.06em] text-primary-foreground/85",
     dateHeader: "bg-primary text-primary-foreground px-2.5 py-0.5 rounded-[3px] font-['Roboto_Condensed'] text-[12px] font-bold uppercase tracking-[0.06em]",
