@@ -1090,17 +1090,24 @@ input[type="number"] {
 [data-broadcast="european_nights"] .en-live-dot {
   animation: en-live-pulse 1.6s ease-in-out infinite;
 }
-/* Infobalk in wedstrijdkaarten/brackets: altijd de dark-mode nachtblauwe balk */
-.en-infobar {
+/* Infobalk in wedstrijdkaarten/brackets: dark = nachtblauw, light = Electric Blue #143CDB */
+[data-broadcast="european_nights"][data-mode="dark"] .en-infobar {
   background-color: hsl(226 58% 16%);
 }
-/* Homeknop: cirkel met vervaagde donkerblauwe achtergrond zodat het logo opvalt */
+[data-broadcast="european_nights"][data-mode="light"] .en-infobar {
+  background-color: #143CDB;
+}
+/* Homeknop: cirkel — dark = Electric Blue #143CDB, light = wit */
 .en-home-btn {
-  background-color: hsl(227 65% 14%);
   border-radius: 9999px;
 }
+[data-broadcast="european_nights"] .en-home-btn {
+  background-color: #143CDB;
+  color: #ffffff;
+}
 [data-broadcast="european_nights"][data-mode="light"] .en-home-btn {
-  background-color: hsl(227 55% 22%);
+  background-color: #ffffff;
+  color: hsl(222 74% 11%);
 }
 
 /* Prismatische cover-overlay en glass highlights */
