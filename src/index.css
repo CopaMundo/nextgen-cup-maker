@@ -3257,6 +3257,9 @@ body[data-broadcast="teletext"] {
 }
 [data-broadcast="teletext"][data-ttx-variant="500"] h1 {
   color: hsl(60 100% 50%);
+  display: inline-block;
+  border: 3px solid hsl(218 100% 50%);
+  padding: 0.25rem 0.75rem;
 }
 
 /* ── P800 kleurregels ────────────────────────────────────────────
@@ -3293,7 +3296,10 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"] .ttx-section-title * {
   color: hsl(0 0% 100%) !important;
 }
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-section-title,
+/* P500: titelbalk = links lichtblauw (cyan), vervolglijn donkerblauw */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-section-title {
+  background-color: hsl(180 100% 50%);
+}
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-section-line {
   background-color: hsl(218 100% 50%);
 }
