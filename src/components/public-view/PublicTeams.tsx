@@ -197,7 +197,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
         <div className={ds(bStyle, "sectionDot")} />
         <h2 className={ds(bStyle, "sectionTitle")}>Teams</h2>
         <div className={ds(bStyle, "sectionLine")} />
-        <span className="text-[10px] font-bold text-muted-foreground uppercase">{teams.length} teams</span>
+        <span className="ttx-section-meta text-[10px] font-bold text-muted-foreground uppercase">{teams.length} teams</span>
       </div>
       <div className="grid grid-cols-3 gap-2.5">
         {teams.map((t: any) => (
