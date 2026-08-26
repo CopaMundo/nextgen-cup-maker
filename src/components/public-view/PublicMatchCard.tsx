@@ -88,7 +88,7 @@ const PublicMatchCard = ({
           <div className="flex h-full w-full items-center justify-center bg-secondary text-[10px] font-black text-muted-foreground">{name.charAt(0)}</div>
         )}
       </div>
-      <span className={`flex-1 truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? ds(bStyle, "matchTeamNameFav") : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
+      <span className={`flex-1 truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? `ttx-fav-team ${ds(bStyle, "matchTeamNameFav")}` : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
         {name}
       </span>
       <div className="relative flex items-center">
