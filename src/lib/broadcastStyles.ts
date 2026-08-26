@@ -1158,7 +1158,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     matchTimeBadge: "inline-flex items-center rounded-none bg-foreground px-2 py-0.5 font-['Roboto_Condensed'] text-[13px] font-bold text-background tabular-nums",
     matchFooter: "flex items-center justify-between px-3 py-1.5 border-t border-[hsl(var(--broadcast-border))]",
     navBar: "bg-[hsl(var(--broadcast-night))] border-t border-[hsl(var(--broadcast-night))]",
-    navCenter: "rounded-none bg-[hsl(var(--broadcast-night))] text-white border-[hsl(var(--broadcast-paper))]",
+    navCenter: "lrosa-home-btn rounded-none",
     navCenterActive: "rounded-none bg-[hsl(var(--broadcast-night))] text-primary border-primary",
     navTab: "text-white/60 hover:text-white",
     navTabActive: "text-primary",
