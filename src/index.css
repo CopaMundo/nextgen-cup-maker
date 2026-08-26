@@ -3260,22 +3260,11 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── P800 kleurregels ────────────────────────────────────────────
-   Infopagina: prismalijn in het felle rood/oranje dat al in het
-   P800-thema zit, net als de lijnen, icoontjes en tekst van de
-   info-badges eronder.                                           */
+   Infopagina: prismalijn blijft fel rood; tekst, iconen, titels en
+   badges zijn geel via de P800-themavariabelen.                   */
 [data-broadcast="teletext"][data-ttx-variant="801"] .en-prism-line {
   background: hsl(0 100% 50%);
   height: 3px;
-}
-[data-broadcast="teletext"][data-ttx-variant="801"] .text-primary {
-  color: hsl(0 100% 50%);
-}
-[data-broadcast="teletext"][data-ttx-variant="801"] .border-primary\/20,
-[data-broadcast="teletext"][data-ttx-variant="801"] .bg-primary\/20 {
-  border-color: hsl(0 100% 50% / 0.4);
-}
-[data-broadcast="teletext"][data-ttx-variant="801"] .bg-primary\/20 {
-  background-color: hsl(0 100% 50% / 0.2);
 }
 /* Klassement: positienummer + teamnaam lichtblauw, statistieken geel */
 [data-broadcast="teletext"][data-ttx-variant="500"] table tbody td:first-child span {
