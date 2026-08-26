@@ -3273,3 +3273,8 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"] .ttx-panel [class*="text-muted-foreground"] {
   color: hsl(0 0% 100%);
 }
+
+/* P500: donkerblauw is hoofdkleur, maar teamnamen blijven lichtblauw */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-panel span.truncate {
+  color: hsl(180 100% 50%);
+}
