@@ -1192,7 +1192,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
   return (
     <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="ttx-standings-table w-full text-xs">
           <thead>
             <tr className={ds(bStyle, "tableHeader") || "bg-primary/10 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b-2 border-primary/30"}>
               <th className="w-8 px-1.5 py-2.5 text-left">#</th>
