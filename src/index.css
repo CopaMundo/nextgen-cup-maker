@@ -1938,6 +1938,17 @@ body[data-broadcast="wc26"] {
   background: hsl(var(--broadcast-primary));
 }
 
+/* Cover-streep voor Copa Mundo: volle themakleur met gloed */
+[data-broadcast="copa_mundo_bc"] .en-prism-line {
+  background: hsl(var(--broadcast-primary));
+  height: 3px;
+  box-shadow: 0 0 14px hsl(var(--broadcast-primary) / 0.55);
+}
+[data-broadcast="copa_mundo_bc"][data-mode="light"] .en-prism-line {
+  background: hsl(var(--broadcast-primary));
+  box-shadow: 0 0 12px hsl(var(--broadcast-primary) / 0.45);
+}
+
 
 /* Zwarte infobalk in wedstrijd-/bracketkaarten: alle tekst en icons wit */
 [data-broadcast="wc26"] .wc26-context,
