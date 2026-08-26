@@ -258,14 +258,14 @@ const PublicMatchDetailDialog = ({
     const aWin = (aScore ?? 0) > (hScore ?? 0);
     return (
       <div className={`${ds(bStyle, "card")} overflow-hidden`}>
-        <div className={`flex items-center gap-2 px-3 py-1.5 ${hWin ? ds(bStyle, "matchTeamRowWin") : ""}`}>
+        <div className={`flex items-center gap-2 px-3 py-1.5`}>
           {hLogo
             ? <img src={hLogo} className="h-5 w-5 object-contain flex-shrink-0" alt="" />
             : <div className="h-5 w-5 bg-secondary rounded text-[8px] flex items-center justify-center font-bold flex-shrink-0">{hName.charAt(0)}</div>}
           <span className={`flex-1 truncate ${ds(bStyle, "matchTeamName")} ${hWin ? "font-bold" : ""}`}>{hName}</span>
           <span className={`text-sm tabular-nums ${hWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{hScore ?? "–"}</span>
         </div>
-        <div className={`flex items-center gap-2 px-3 py-1.5 border-t border-border ${aWin ? ds(bStyle, "matchTeamRowWin") : ""}`}>
+        <div className={`flex items-center gap-2 px-3 py-1.5 border-t border-border`}>
           {aLogo
             ? <img src={aLogo} className="h-5 w-5 object-contain flex-shrink-0" alt="" />
             : <div className="h-5 w-5 bg-secondary rounded text-[8px] flex items-center justify-center font-bold flex-shrink-0">{aName.charAt(0)}</div>}
