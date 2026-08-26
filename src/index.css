@@ -2991,7 +2991,7 @@ body[data-broadcast="teletext"] {
   --card-foreground: 0 0% 100%;
   --popover: 0 0% 14%;
   --popover-foreground: 0 0% 100%;
-  --primary: 180 100% 50%;
+  --primary: 218 100% 50%;
   --primary-foreground: 0 0% 10%;
   --secondary: 0 0% 14%;
   --secondary-foreground: 0 0% 75%;
@@ -3003,7 +3003,7 @@ body[data-broadcast="teletext"] {
   --destructive-foreground: 0 0% 0%;
   --border: 0 0% 26%;
   --input: 0 0% 26%;
-  --ring: 180 100% 50%;
+  --ring: 218 100% 50%;
 
   --broadcast-bg: 0 0% 10%;
   --broadcast-night: 0 0% 10%;
@@ -3015,13 +3015,13 @@ body[data-broadcast="teletext"] {
   --broadcast-text-secondary: 0 0% 75%;
   --broadcast-text-muted: 0 0% 75%;
   --broadcast-border: 0 0% 26%;
-  --broadcast-primary: 180 100% 50%;
+  --broadcast-primary: 218 100% 50%;
   --broadcast-primary-contrast: 0 0% 10%;
   --broadcast-score: 60 100% 50%;
   --broadcast-bright: 0 0% 100%;
   --broadcast-gold: 60 100% 50%;
   --broadcast-navy: 218 100% 50%;
-  --broadcast-cyan: 180 100% 50%;
+  --broadcast-cyan: 218 100% 50%;
   --broadcast-violet: 218 100% 50%;
   --broadcast-magenta: 0 100% 59%;
   --broadcast-danger: 0 100% 59%;
@@ -3272,4 +3272,9 @@ body[data-broadcast="teletext"] {
 /* Teletext: infobalk (wedstrijdkaarten + knockoutbrackets) volledig wit */
 [data-broadcast="teletext"] .ttx-panel [class*="text-muted-foreground"] {
   color: hsl(0 0% 100%);
+}
+
+/* P500: donkerblauw is hoofdkleur, maar teamnamen blijven lichtblauw */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-panel span.truncate {
+  color: hsl(180 100% 50%);
 }
