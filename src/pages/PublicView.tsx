@@ -73,12 +73,20 @@ const PublicView = () => {
   useEffect(() => {
     if (!data?.tournament) return;
     const style = data.tournament.view_display_style || "copa_mundo";
-    document.documentElement.setAttribute("data-mode", darkMode ? "dark" : "light");
+    // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 101 en 601.
+    if (style === "teletext") {
+      document.documentElement.setAttribute("data-mode", "dark");
+      document.documentElement.setAttribute("data-ttx-variant", darkMode ? "101" : "601");
+    } else {
+      document.documentElement.setAttribute("data-mode", darkMode ? "dark" : "light");
+      document.documentElement.removeAttribute("data-ttx-variant");
+    }
     document.documentElement.setAttribute("data-broadcast", style);
     return () => {
       const savedMode = localStorage.getItem("copa-mode") || "dark";
       document.documentElement.setAttribute("data-mode", savedMode);
       document.documentElement.removeAttribute("data-broadcast");
+      document.documentElement.removeAttribute("data-ttx-variant");
     };
   }, [data?.tournament?.view_display_style, darkMode]);
 
