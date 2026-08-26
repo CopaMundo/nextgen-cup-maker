@@ -726,7 +726,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={ds(bStyle, "matchContext")} style={compactTree ? { display: "none" } : undefined}>
-          <div className={`flex items-start justify-between leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
+          <div className={`flex w-full flex-1 min-w-0 items-start justify-between leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             <div className="min-w-0">
                 <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                 {phase?.name || displayName}
