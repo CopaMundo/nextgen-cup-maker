@@ -2196,8 +2196,8 @@ body[data-broadcast="la_rosa"] {
 /* Homeknop: light = lichtroze vlak met zwarte rand, dark = licht zwart met roze rand */
 [data-broadcast="la_rosa"][data-mode="light"] .lrosa-home-btn {
   background-color: hsl(351 55% 93%);
-  border-color: hsl(0 0% 4%);
-  color: hsl(0 0% 4%);
+  border-color: hsl(0 0% 22%);
+  color: hsl(0 0% 8%);
 }
 [data-broadcast="la_rosa"][data-mode="dark"] .lrosa-home-btn {
   background-color: hsl(0 0% 10%);
