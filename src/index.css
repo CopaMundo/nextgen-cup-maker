@@ -2981,6 +2981,45 @@ body[data-broadcast="teletext"] {
   --broadcast-cream: 0 0% 100%;
 }
 
+/* ── Teletekst variant P601: tweede teletekst-identiteit ──────────
+   Zelfde zwarte scherm, maar blauw-gedomineerde koppen i.p.v. cyan,
+   witte body, gele uitslagen. Wordt gekozen via de P101/P601-knop.  */
+[data-broadcast="teletext"][data-ttx-variant="601"] {
+  --primary: 224 100% 58%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 60 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --ring: 224 100% 58%;
+  --broadcast-primary: 224 100% 58%;
+  --broadcast-primary-contrast: 0 0% 100%;
+  --broadcast-cyan: 224 100% 58%;
+  --broadcast-score: 60 100% 50%;
+  --broadcast-gold: 60 100% 50%;
+  --broadcast-navy: 224 100% 58%;
+  --broadcast-violet: 224 100% 58%;
+  --broadcast-surface-secondary: 224 60% 12%;
+  --broadcast-surface-elevated: 224 55% 16%;
+  --secondary: 224 60% 12%;
+  --secondary-foreground: 0 0% 92%;
+  --muted: 224 60% 12%;
+  --muted-foreground: 0 0% 78%;
+  --border: 224 45% 30%;
+  --input: 224 45% 30%;
+}
+[data-broadcast="teletext"][data-ttx-variant="601"] .ttx-bar-cyan {
+  background-color: hsl(224 100% 58%);
+  color: hsl(0 0% 100%);
+}
+[data-broadcast="teletext"][data-ttx-variant="601"] .ttx-bar-blue {
+  background-color: hsl(60 100% 50%);
+  color: hsl(0 0% 0%);
+}
+[data-broadcast="teletext"][data-ttx-variant="601"] .ttx-connector line {
+  stroke: hsl(224 100% 58%);
+}
+
+
+
 /* Harde rechte hoeken: geen enkele afronding in deze stijl */
 [data-broadcast="teletext"] [class*="rounded"] {
   border-radius: 0 !important;
