@@ -1222,7 +1222,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                         {row.team?.logo_url ? <img src={row.team.logo_url} alt="" className="h-full w-full object-contain" /> :
                           <div className="flex h-full w-full items-center justify-center text-[8px] font-black text-muted-foreground bg-secondary">{row.team?.name?.charAt(0)}</div>}
                       </div>
-                      <span className={`font-bold ${favoriteTeam === row.team?.id ? "text-primary" : "text-foreground"}`}>{row.team?.name}</span>
+                      <span className={`font-bold ${favoriteTeam === row.team?.id ? "ttx-fav-team text-primary" : "text-foreground"}`}>{row.team?.name}</span>
                       {tournament?.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain" />}
                     </div>
                   </td>
