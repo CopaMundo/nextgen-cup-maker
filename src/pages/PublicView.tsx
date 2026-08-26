@@ -73,7 +73,7 @@ const PublicView = () => {
   useEffect(() => {
     if (!data?.tournament) return;
     const style = data.tournament.view_display_style || "copa_mundo";
-    // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 501 en 801.
+    // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 500 en 800.
     if (style === "teletext") {
       document.documentElement.setAttribute("data-mode", "dark");
       document.documentElement.setAttribute("data-ttx-variant", darkMode ? "500" : "801");

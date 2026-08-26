@@ -3234,7 +3234,7 @@ body[data-broadcast="teletext"] {
   color: hsl(0 0% 100%);
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 {
-  counter-reset: ttx-page 801;
+  counter-reset: ttx-page 800;
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button::before {
   color: hsl(120 100% 50%);
@@ -3257,6 +3257,24 @@ body[data-broadcast="teletext"] {
 }
 [data-broadcast="teletext"][data-ttx-variant="500"] h1 {
   color: hsl(60 100% 50%);
+}
+
+/* ── P800 kleurregels ────────────────────────────────────────────
+   Infopagina: prismalijn oranje, net als de lijnen, icoontjes en
+   tekst van de info-badges eronder.                              */
+[data-broadcast="teletext"][data-ttx-variant="801"] .en-prism-line {
+  background: hsl(30 100% 50%);
+  height: 3px;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .text-primary {
+  color: hsl(30 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .border-primary\/20,
+[data-broadcast="teletext"][data-ttx-variant="801"] .bg-primary\/20 {
+  border-color: hsl(30 100% 50% / 0.4);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .bg-primary\/20 {
+  background-color: hsl(30 100% 50% / 0.2);
 }
 /* Klassement: positienummer + teamnaam lichtblauw, statistieken geel */
 [data-broadcast="teletext"][data-ttx-variant="500"] table tbody td:first-child span {
