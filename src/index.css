@@ -3258,6 +3258,13 @@ body[data-broadcast="teletext"] {
   color: hsl(60 100% 50%);
 }
 
+/* Wedstrijdkaarten + knockoutbrackets: bovenste en onderste rand in donkerblauw
+   zoals de groepsklassement-header (ttx-bar-blue / --broadcast-navy). */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-panel {
+  border-top-color: hsl(var(--broadcast-navy));
+  border-bottom-color: hsl(var(--broadcast-navy));
+}
+
 /* Teletext: infobalk (wedstrijdkaarten + knockoutbrackets) volledig wit */
 [data-broadcast="teletext"] .ttx-panel [class*="text-muted-foreground"] {
   color: hsl(0 0% 100%);
