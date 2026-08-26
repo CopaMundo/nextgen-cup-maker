@@ -926,8 +926,7 @@ input[type="number"] {
   color: hsl(var(--primary) / 0.85);
   text-shadow: 0 0 8px hsl(var(--primary) / 0.3);
 }
-:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-score.font-bold,
-:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-score:has(.font-bold) {
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-score.font-bold {
   color: hsl(var(--primary));
   text-shadow: 0 0 12px hsl(var(--primary) / 0.45);
 }
