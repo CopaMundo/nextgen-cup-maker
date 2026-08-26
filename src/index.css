@@ -3033,17 +3033,17 @@ body[data-broadcast="teletext"] {
    Effen bijna-zwart scherm, groene koppen/kolommen, gele teamnamen
    en uitslagen, volvlakke rode balken met gele tekst, cyan nav.    */
 [data-broadcast="teletext"][data-ttx-variant="801"] {
-  --background: 0 0% 4%;
+  --background: 0 0% 10%;
   --foreground: 0 0% 100%;
-  --card: 0 0% 4%;
+  --card: 0 0% 10%;
   --card-foreground: 0 0% 100%;
-  --popover: 0 0% 8%;
+  --popover: 0 0% 14%;
   --popover-foreground: 0 0% 100%;
   --primary: 120 100% 50%;
-  --primary-foreground: 0 0% 4%;
-  --secondary: 0 0% 9%;
+  --primary-foreground: 0 0% 10%;
+  --secondary: 0 0% 15%;
   --secondary-foreground: 0 0% 92%;
-  --muted: 0 0% 9%;
+  --muted: 0 0% 15%;
   --muted-foreground: 120 40% 74%;
   --accent: 60 100% 50%;
   --accent-foreground: 0 0% 0%;
