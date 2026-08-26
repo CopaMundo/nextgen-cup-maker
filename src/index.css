@@ -3281,3 +3281,27 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"] .ttx-panel [class*="text-muted-foreground"] {
   color: hsl(0 0% 100%);
 }
+
+/* ── Teletekst: elke sectietitel is een volledige gekleurde balk ── */
+[data-broadcast="teletext"] .ttx-section-title {
+  margin-right: -0.75rem;
+}
+[data-broadcast="teletext"] .ttx-section-line {
+  min-height: 1.75rem;
+}
+[data-broadcast="teletext"] .ttx-section-title,
+[data-broadcast="teletext"] .ttx-section-title * {
+  color: hsl(0 0% 100%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-section-title,
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-section-line {
+  background-color: hsl(218 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-title,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-line {
+  background-color: hsl(0 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-title,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-title * {
+  color: hsl(60 100% 50%) !important;
+}
