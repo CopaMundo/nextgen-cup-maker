@@ -1090,6 +1090,19 @@ input[type="number"] {
 [data-broadcast="european_nights"] .en-live-dot {
   animation: en-live-pulse 1.6s ease-in-out infinite;
 }
+/* Infobalk in wedstrijdkaarten/brackets: altijd de dark-mode nachtblauwe balk */
+.en-infobar {
+  background-color: hsl(226 58% 16%);
+}
+/* Homeknop: cirkel met vervaagde donkerblauwe achtergrond zodat het logo opvalt */
+.en-home-btn {
+  background-color: hsl(227 65% 14%);
+  border-radius: 9999px;
+}
+[data-broadcast="european_nights"][data-mode="light"] .en-home-btn {
+  background-color: hsl(227 55% 22%);
+}
+
 /* Prismatische cover-overlay en glass highlights */
 .en-cover-prism {
   position: absolute;
