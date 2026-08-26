@@ -940,6 +940,12 @@ input[type="number"] {
   border-left-color: hsl(var(--primary));
 }
 
+/* Light mode: brighter theme-blue winner marker so it doesn't blend into the info bar. */
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-winner {
+  background-color: hsl(var(--primary) / 0.12);
+  border-left-color: hsl(var(--primary));
+}
+
 /* Copa Mundo cover overlay: subtle gradient that keeps the logo readable. */
 .cm-cover {
   position: absolute;
