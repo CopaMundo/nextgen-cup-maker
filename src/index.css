@@ -2169,6 +2169,31 @@ body[data-broadcast="la_rosa"] {
   box-shadow: inset 3px 0 0 hsl(var(--broadcast-primary)) !important;
 }
 
+/* Infobalk wedstrijdkaarten/brackets: light neemt de dark-kleur over */
+[data-broadcast="la_rosa"] .lrosa-infobar {
+  background-color: hsl(345 10% 15%);
+  border-bottom: 1px solid hsl(345 10% 15%);
+}
+[data-broadcast="la_rosa"] .lrosa-infobar,
+[data-broadcast="la_rosa"] .lrosa-infobar * {
+  color: hsl(351 60% 92%);
+}
+[data-broadcast="la_rosa"] .lrosa-infobar .text-muted-foreground {
+  color: hsl(351 20% 76%);
+}
+
+/* Homeknop: light = lichtroze vlak met zwarte rand, dark = licht zwart met roze rand */
+[data-broadcast="la_rosa"][data-mode="light"] .lrosa-home-btn {
+  background-color: hsl(351 55% 93%);
+  border-color: hsl(0 0% 4%);
+  color: hsl(0 0% 4%);
+}
+[data-broadcast="la_rosa"][data-mode="dark"] .lrosa-home-btn {
+  background-color: hsl(0 0% 10%);
+  border-color: hsl(351 60% 90%);
+  color: hsl(351 60% 90%);
+}
+
 /* Infopagina cover: editorial roze/zwarte overlay */
 .lrosa-cover {
   position: absolute;
