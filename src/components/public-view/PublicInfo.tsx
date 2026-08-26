@@ -110,7 +110,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
           {onToggleDarkMode ? (
             <div className="flex-1 flex justify-end pb-1">
               <button onClick={onToggleDarkMode}
-                className={`flex items-center gap-1.5 border border-border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-all shadow-sm ${controlFrameShape}`}>
+                className={`ttx-variant-toggle flex items-center gap-1.5 border border-border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-all shadow-sm ${controlFrameShape}`}>
                 {bStyle === "teletext" ? (
                   <span className="tabular-nums">P{darkMode ? "500" : "800"}</span>
                 ) : (
@@ -162,12 +162,12 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
               Meerdere divisies beschikbaar
             </label>
             <Select value={selectedCategory || ""} onValueChange={(v) => onCategoryChange?.(v)}>
-              <SelectTrigger className={`w-full ${needsSelection ? "border-destructive" : ""}`}>
+              <SelectTrigger className={`ttx-division-trigger w-full ${needsSelection ? "border-destructive" : ""}`}>
                 <SelectValue placeholder="Kies divisie" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="ttx-select-content">
                 {categories.map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id} className="ttx-select-item">{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
