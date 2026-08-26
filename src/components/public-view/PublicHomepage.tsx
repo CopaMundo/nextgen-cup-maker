@@ -1133,10 +1133,8 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
         <span className="w-8 text-center">P</span>
         <span className="w-8 text-center">DS</span>
       </div>
-      {visible.map((row: any, idx: number) => (
-        <div key={row.team?.id} className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md ${
-          favoriteTeam === row.team?.id ? "bg-primary/10 border border-primary/20" : idx % 2 === 1 ? "bg-secondary/30" : ""
-        }`}>
+      {visible.map((row: any) => (
+        <div key={row.team?.id} className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md">
           <span className="w-5 text-center font-black text-muted-foreground">{row.pos}</span>
           <div className="h-5 w-5 overflow-hidden flex-shrink-0">
             {row.team?.logo_url ? <img src={row.team.logo_url} alt="" className="h-full w-full object-contain" /> :
@@ -1206,10 +1204,10 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {standings.map((row: any, idx: number) => {
+            {standings.map((row: any) => {
               const colorZone = getColor(row.pos);
               return (
-                <tr key={row.team?.id} className={`${favoriteTeam === row.team?.id ? "bg-primary/5" : idx % 2 === 1 ? "bg-secondary/20" : ""}`}>
+                <tr key={row.team?.id}>
                   <td className="px-1.5 py-2">
                     <div className="flex items-center gap-1">
                       {colorZone && <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: colorZone.color }} />}

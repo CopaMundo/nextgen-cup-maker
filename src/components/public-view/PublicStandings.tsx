@@ -272,11 +272,11 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border/50">
-                            {standings.map((row: any, idx: number) => {
+                            {standings.map((row: any) => {
                               const colorZone = getColor(format.id, row.pos);
                               const sp = setPts?.get(row.team?.id) || { pf: 0, pa: 0 };
                               return (
-                                <tr key={row.team?.id} className={`transition-colors ${idx % 2 === 0 ? "" : ds(bStyle, "tableRowAlt")}`}>
+                                <tr key={row.team?.id} className="transition-colors">
                                   <td className="relative px-1.5 py-2">
                                     {colorZone && (
                                       <span

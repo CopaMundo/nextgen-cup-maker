@@ -5,4 +5,4 @@
 - [Broadcast Old Clubhouse](mem://style/broadcast-old-clubhouse) — old_clubhouse stijl: voetbalkantine-uitslagenbord, hout/letterboard/crème, Oswald
 - [Broadcast Sticker Album](mem://style/broadcast-sticker-album) — sticker_album stijl: voetbalstickeralbum, albumpapier + witte stickers, navy/rood, Barlow Condensed
 - [Broadcast Teletext Football](mem://style/broadcast-teletext-football) — teletext stijl: voetbalteletekst, zwart + cyan/geel/groen/rood, VT323 als enige lettertype, 0px radius
-- [Standings alternating rows](mem://style/standings-alternating-rows) — All public standings tables use the same zebra-stripe pattern in every broadcast theme
+- [Uniform standings rows](mem://style/standings-alternating-rows) — Public group standings use one row background without zebra striping; qualification markers stay unchanged
