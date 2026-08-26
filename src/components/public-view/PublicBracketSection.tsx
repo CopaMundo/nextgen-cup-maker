@@ -735,7 +735,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
               )}
             </div>
-            <div className="text-right flex-shrink-0 ml-0.5">
+            <div className="text-right flex-shrink-0 ml-auto">
               {displayField && (
                 <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
                   <MapPin className="h-2 w-2" /> {displayField}

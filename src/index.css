@@ -3257,3 +3257,8 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="500"] table tbody td.text-center {
   color: hsl(60 100% 50%);
 }
+
+/* Teletext: infobalk (wedstrijdkaarten + knockoutbrackets) volledig wit */
+[data-broadcast="teletext"] .ttx-panel [class*="text-muted-foreground"] {
+  color: hsl(0 0% 100%);
+}
