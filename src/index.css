@@ -3239,3 +3239,14 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"] .grid-cols-3 > button.border-primary {
   border-color: hsl(60 100% 50%);
 }
+
+/* Teletext pagenummers per variant (502…, 802…) */
+[data-broadcast="teletext"][data-ttx-variant="501"] .grid-cols-3 {
+  counter-reset: ttx-page 501;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 {
+  counter-reset: ttx-page 801;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button::before {
+  color: hsl(120 100% 50%);
+}
