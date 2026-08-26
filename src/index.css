@@ -3027,6 +3027,7 @@ body[data-broadcast="teletext"] {
   --broadcast-danger: 0 100% 59%;
   --broadcast-success: 120 100% 50%;
   --broadcast-cream: 0 0% 100%;
+  --ttx-line: 218 100% 50%;
 }
 
 /* ── Teletekst P801 — Nederlandse versie ─────────────────────────
@@ -3074,6 +3075,7 @@ body[data-broadcast="teletext"] {
   --broadcast-danger: 0 100% 50%;
   --broadcast-success: 120 100% 50%;
   --broadcast-cream: 60 100% 50%;
+  --ttx-line: 120 45% 26%;
 }
 /* Sectiebalken = volvlakke rode teletextbalk met gele tekst */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-bar-cyan,
@@ -3239,10 +3241,19 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── P500 kleurregels ────────────────────────────────────────────
-   Infopagina: prismalijn volledig lichtblauw, toernooinaam geel.  */
+   Infopagina: prismalijn donkerblauw (zoals klassement-headers),
+   toernooinaam geel. Tijdsblokken: donkerblauw met witte tekst.  */
 [data-broadcast="teletext"][data-ttx-variant="500"] .en-prism-line {
-  background: hsl(180 100% 50%);
+  background: hsl(218 100% 50%);
   height: 3px;
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-timeslot {
+  background-color: hsl(218 100% 50%);
+  color: hsl(0 0% 100%);
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-timeslot,
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-timeslot * {
+  color: hsl(0 0% 100%);
 }
 [data-broadcast="teletext"][data-ttx-variant="500"] h1 {
   color: hsl(60 100% 50%);
