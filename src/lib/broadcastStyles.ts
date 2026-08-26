@@ -770,6 +770,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     matchContextText: "text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground cm-match-context",
     matchTeamRow: "px-3 py-2",
     matchTeamRowWin: "",
+    bracketQualBar: "bg-[#FFD600]",
     matchTeamName: "text-[12px] font-semibold truncate cm-match-name",
     matchTeamNameFav: "text-primary",
     matchScore: "text-[14px] font-extrabold tabular-nums cm-match-score",
