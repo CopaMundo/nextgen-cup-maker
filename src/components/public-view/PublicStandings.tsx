@@ -281,8 +281,7 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                                     {colorZone && (
                                       <span
                                         aria-hidden
-                                        className="absolute left-0 top-0 bottom-0 w-[3px]"
-                                        style={{ backgroundColor: colorZone.color }}
+                                        className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary"
                                       />
                                     )}
                                     <div className="flex items-center gap-1">

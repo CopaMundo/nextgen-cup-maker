@@ -1212,7 +1212,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                 <tr key={row.team?.id} className={`${favoriteTeam === row.team?.id ? "bg-primary/5" : idx % 2 === 1 ? "bg-secondary/20" : ""}`}>
                   <td className="px-1.5 py-2">
                     <div className="flex items-center gap-1">
-                      {colorZone && <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: colorZone.color }} />}
+                      {colorZone && <div className="w-1 h-5 rounded-full flex-shrink-0 bg-primary" />}
                       <span className="font-black text-muted-foreground">{row.pos}</span>
                     </div>
                   </td>
