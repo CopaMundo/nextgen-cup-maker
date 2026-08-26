@@ -1344,10 +1344,10 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
   },
 // ── TELETEXT FOOTBALL ───
   teletext: {
-    sectionDot: "h-4 w-[10px] bg-[hsl(var(--broadcast-cyan))]",
-    sectionTitle: "font-['VT323'] text-[26px] uppercase tracking-[0.06em] text-[hsl(var(--broadcast-cyan))]",
+    sectionDot: "hidden",
+    sectionTitle: "ttx-section-title ttx-bar-blue px-2 font-['VT323'] text-[26px] leading-[1.15] uppercase tracking-[0.06em]",
     sectionMeta: "font-['VT323'] text-[12px] uppercase tracking-[0.12em] text-muted-foreground",
-    sectionLine: "flex-1 h-px bg-[hsl(var(--ttx-line))]",
+    sectionLine: "ttx-section-line ttx-bar-blue flex-1 self-stretch",
     card: "ttx-panel overflow-hidden",
     matchCardWrapper: "ttx-panel overflow-hidden",
     cardHeader: "ttx-bar-cyan px-3 py-1 flex items-center gap-2",
