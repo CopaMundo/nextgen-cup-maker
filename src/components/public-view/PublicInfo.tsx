@@ -131,7 +131,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
         {/* Date & Location badges */}
         <div className="flex flex-wrap gap-2 justify-center">
           {(tournament.start_date || tournament.end_date) && (
-            <div className={`flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
+            <div className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
               <CalendarDays className="h-4 w-4 text-primary" />
               <span className="text-foreground font-bold text-xs">
                 {formatDate(tournament.start_date)}
@@ -140,7 +140,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             </div>
           )}
           {locations.length > 0 && (
-            <div className={`flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
+            <div className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
               <MapPin className="h-4 w-4 text-primary" />
               <span className="text-foreground font-bold text-xs">{locations.map(l => l.name).join(", ")}</span>
             </div>

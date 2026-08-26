@@ -77,7 +77,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   <div className={ds(bStyle, "dateHeader")}>
                     {formatDate(slot.date)}
                   </div>
-                  <div className={ds(bStyle, "sectionLine")} />
+                  {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
                 </div>
               </div>
             )}
