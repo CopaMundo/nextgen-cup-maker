@@ -3030,29 +3030,29 @@ body[data-broadcast="teletext"] {
   --ttx-line: 218 100% 50%;
 }
 
-/* ── Teletekst P801 — Nederlandse versie ─────────────────────────
-   Effen bijna-zwart scherm, groene koppen/kolommen, gele teamnamen
-   en uitslagen, volvlakke rode balken met gele tekst, cyan nav.    */
+/* ── Teletekst P800 — Nederlandse versie ─────────────────────────
+   Effen bijna-zwart scherm, gele tekst/iconen/titels en onderbalk,
+   rode accentlijn en rode balken met gele tekst.                   */
 [data-broadcast="teletext"][data-ttx-variant="801"] {
   --background: 0 0% 10%;
-  --foreground: 0 0% 100%;
+  --foreground: 60 100% 50%;
   --card: 0 0% 10%;
-  --card-foreground: 0 0% 100%;
+  --card-foreground: 60 100% 50%;
   --popover: 0 0% 14%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 120 100% 50%;
+  --popover-foreground: 60 100% 50%;
+  --primary: 60 100% 50%;
   --primary-foreground: 0 0% 10%;
   --secondary: 0 0% 15%;
-  --secondary-foreground: 0 0% 92%;
+  --secondary-foreground: 60 100% 50%;
   --muted: 0 0% 15%;
-  --muted-foreground: 120 40% 74%;
+  --muted-foreground: 60 100% 50%;
   --accent: 60 100% 50%;
   --accent-foreground: 0 0% 0%;
   --destructive: 0 100% 50%;
   --destructive-foreground: 60 100% 50%;
-  --border: 120 45% 26%;
-  --input: 120 45% 26%;
-  --ring: 120 100% 50%;
+  --border: 60 100% 50%;
+  --input: 60 100% 50%;
+  --ring: 60 100% 50%;
 
   --broadcast-bg: 0 0% 10%;
   --broadcast-night: 0 0% 10%;
@@ -3060,22 +3060,22 @@ body[data-broadcast="teletext"] {
   --broadcast-surface: 0 0% 10%;
   --broadcast-surface-secondary: 0 0% 15%;
   --broadcast-surface-elevated: 0 0% 18%;
-  --broadcast-text: 0 0% 100%;
-  --broadcast-text-secondary: 120 40% 74%;
-  --broadcast-text-muted: 120 30% 68%;
-  --broadcast-border: 120 45% 26%;
-  --broadcast-primary: 120 100% 50%;
+  --broadcast-text: 60 100% 50%;
+  --broadcast-text-secondary: 60 100% 50%;
+  --broadcast-text-muted: 60 100% 50%;
+  --broadcast-border: 60 100% 50%;
+  --broadcast-primary: 60 100% 50%;
   --broadcast-primary-contrast: 0 0% 10%;
   --broadcast-score: 60 100% 50%;
   --broadcast-gold: 60 100% 50%;
-  --broadcast-bright: 0 0% 100%;
+  --broadcast-bright: 60 100% 50%;
   --broadcast-navy: 0 100% 50%;
-  --broadcast-cyan: 120 100% 50%;
+  --broadcast-cyan: 60 100% 50%;
   --broadcast-violet: 0 100% 50%;
   --broadcast-danger: 0 100% 50%;
   --broadcast-success: 120 100% 50%;
   --broadcast-cream: 60 100% 50%;
-  --ttx-line: 120 45% 26%;
+  --ttx-line: 60 100% 50%;
 }
 /* Sectiebalken = volvlakke rode teletextbalk met gele tekst */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-bar-cyan,
@@ -3260,22 +3260,11 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── P800 kleurregels ────────────────────────────────────────────
-   Infopagina: prismalijn in het felle rood/oranje dat al in het
-   P800-thema zit, net als de lijnen, icoontjes en tekst van de
-   info-badges eronder.                                           */
+   Infopagina: prismalijn blijft fel rood; tekst, iconen, titels en
+   badges zijn geel via de P800-themavariabelen.                   */
 [data-broadcast="teletext"][data-ttx-variant="801"] .en-prism-line {
   background: hsl(0 100% 50%);
   height: 3px;
-}
-[data-broadcast="teletext"][data-ttx-variant="801"] .text-primary {
-  color: hsl(0 100% 50%);
-}
-[data-broadcast="teletext"][data-ttx-variant="801"] .border-primary\/20,
-[data-broadcast="teletext"][data-ttx-variant="801"] .bg-primary\/20 {
-  border-color: hsl(0 100% 50% / 0.4);
-}
-[data-broadcast="teletext"][data-ttx-variant="801"] .bg-primary\/20 {
-  background-color: hsl(0 100% 50% / 0.2);
 }
 /* Klassement: positienummer + teamnaam lichtblauw, statistieken geel */
 [data-broadcast="teletext"][data-ttx-variant="500"] table tbody td:first-child span {
