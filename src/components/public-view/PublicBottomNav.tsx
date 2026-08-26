@@ -37,12 +37,12 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
               <div key={tab.id} className="h-12 w-full">
                 <button
                   onClick={() => setActiveTab(tab.id)}
-                  className={`absolute left-1/2 bottom-0 -translate-x-1/2 transform-gpu items-center justify-center shadow-lg transition-colors ${
+                  className={`absolute left-1/2 bottom-0 -translate-x-1/2 transform-gpu flex h-[72px] w-12 items-center justify-center rounded-[6px] border-2 shadow-lg transition-colors ${
                     isWc26
-                      ? `wc26-home-btn flex h-[72px] w-12 rounded-[6px] border-2 bg-card ${
+                      ? `wc26-home-btn bg-card ${
                           isActive ? "border-primary" : "border-[hsl(var(--broadcast-gold))]"
                         }`
-                      : `flex h-14 w-14 rounded-2xl border-2 ${
+                      : `bg-card ${
                           isActive ? ds(bStyle, "navCenterActive") : ds(bStyle, "navCenter")
                         }`
                   }`}
@@ -51,16 +51,17 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
                     <img
                       src={logoSrc}
                       alt=""
-                      width={isWc26 ? 36 : 32}
-                      height={isWc26 ? 36 : 32}
-                      className={`object-contain ${isWc26 ? "h-9 w-9" : "h-8 w-8"}`}
+                      width={36}
+                      height={36}
+                      className="h-9 w-9 object-contain"
                     />
                   ) : (
-                    <Icon className={`${isWc26 ? "h-7 w-7 text-foreground" : "h-6 w-6"}`} />
+                    <Icon className="h-7 w-7 text-foreground" />
                   )}
                 </button>
               </div>
             );
+
           }
 
 
