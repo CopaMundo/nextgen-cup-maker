@@ -2981,10 +2981,10 @@ body[data-broadcast="teletext"] {
   --broadcast-cream: 0 0% 100%;
 }
 
-/* ── Teletekst P501 — Belgische versie ───────────────────────────
+/* ── Teletekst P500 — Belgische versie ───────────────────────────
    Oorspronkelijke teletekst-look (cyan primary, gele scores, witte
    tekst) maar op een effen LICHTZWART scherm i.p.v. puur zwart.   */
-[data-broadcast="teletext"][data-ttx-variant="501"] {
+[data-broadcast="teletext"][data-ttx-variant="500"] {
   --background: 0 0% 10%;
   --foreground: 0 0% 100%;
   --card: 0 0% 10%;
@@ -3067,6 +3067,7 @@ body[data-broadcast="teletext"] {
   --broadcast-primary-contrast: 0 0% 10%;
   --broadcast-score: 60 100% 50%;
   --broadcast-gold: 60 100% 50%;
+  --broadcast-bright: 0 0% 100%;
   --broadcast-navy: 0 100% 50%;
   --broadcast-cyan: 120 100% 50%;
   --broadcast-violet: 0 100% 50%;
@@ -3223,13 +3224,36 @@ body[data-broadcast="teletext"] {
   border-color: hsl(60 100% 50%);
 }
 
-/* Teletext pagenummers per variant (502…, 802…) */
-[data-broadcast="teletext"][data-ttx-variant="501"] .grid-cols-3 {
-  counter-reset: ttx-page 501;
+/* Teletext pagenummers per variant (501…, 801…) */
+[data-broadcast="teletext"][data-ttx-variant="500"] .grid-cols-3 {
+  counter-reset: ttx-page 500;
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .grid-cols-3 > button::before {
+  color: hsl(0 0% 100%);
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 {
   counter-reset: ttx-page 801;
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button::before {
   color: hsl(120 100% 50%);
+}
+
+/* ── P500 kleurregels ────────────────────────────────────────────
+   Infopagina: prismalijn volledig lichtblauw, toernooinaam geel.  */
+[data-broadcast="teletext"][data-ttx-variant="500"] .en-prism-line {
+  background: hsl(180 100% 50%);
+  height: 3px;
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] h1 {
+  color: hsl(60 100% 50%);
+}
+/* Klassement: positienummer + teamnaam lichtblauw, statistieken geel */
+[data-broadcast="teletext"][data-ttx-variant="500"] table tbody td:first-child span {
+  color: hsl(180 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] table tbody td:nth-child(2) span.font-bold {
+  color: hsl(180 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] table tbody td.text-center {
+  color: hsl(60 100% 50%);
 }
