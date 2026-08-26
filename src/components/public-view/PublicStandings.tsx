@@ -337,7 +337,7 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                         <div className="border-t border-border px-3 py-2 flex flex-wrap gap-3">
                           {colors.map((c: any) => (
                             <div key={c.id} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: c.color }} />
+                              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "hsl(var(--primary))" }} />
                               <span>{c.label || `Positie ${c.position_from}–${c.position_to}`}</span>
                             </div>
                           ))}
