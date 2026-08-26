@@ -3375,8 +3375,7 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-select-content [role="option"][data-state="checked"] {
   color: hsl(0 0% 100%) !important;
 }
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-division-trigger [data-radix-select-value],
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-division-trigger [data-placeholder] {
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-division-trigger > span {
   color: hsl(60 100% 50%);
 }
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-variant-toggle,
