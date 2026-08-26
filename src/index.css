@@ -3027,6 +3027,7 @@ body[data-broadcast="teletext"] {
   --broadcast-danger: 0 100% 59%;
   --broadcast-success: 120 100% 50%;
   --broadcast-cream: 0 0% 100%;
+  --ttx-line: 218 100% 50%;
 }
 
 /* ── Teletekst P801 — Nederlandse versie ─────────────────────────
