@@ -2169,24 +2169,35 @@ body[data-broadcast="la_rosa"] {
   box-shadow: inset 3px 0 0 hsl(var(--broadcast-primary)) !important;
 }
 
-/* Infobalk wedstrijdkaarten/brackets: light neemt de dark-kleur over */
-[data-broadcast="la_rosa"] .lrosa-infobar {
-  background-color: hsl(345 10% 15%);
-  border-bottom: 1px solid hsl(345 10% 15%);
+/* Infobalk wedstrijdkaarten/brackets: donkerder roze dan teamrijen */
+[data-broadcast="la_rosa"][data-mode="light"] .lrosa-infobar {
+  background-color: hsl(350 42% 78%);
+  border-bottom: 1px solid hsl(350 35% 70%);
 }
-[data-broadcast="la_rosa"] .lrosa-infobar,
-[data-broadcast="la_rosa"] .lrosa-infobar * {
+[data-broadcast="la_rosa"][data-mode="light"] .lrosa-infobar,
+[data-broadcast="la_rosa"][data-mode="light"] .lrosa-infobar * {
+  color: hsl(0 0% 8%);
+}
+[data-broadcast="la_rosa"][data-mode="light"] .lrosa-infobar .text-muted-foreground {
+  color: hsl(345 8% 28%);
+}
+[data-broadcast="la_rosa"][data-mode="dark"] .lrosa-infobar {
+  background-color: hsl(345 18% 16%);
+  border-bottom: 1px solid hsl(345 18% 16%);
+}
+[data-broadcast="la_rosa"][data-mode="dark"] .lrosa-infobar,
+[data-broadcast="la_rosa"][data-mode="dark"] .lrosa-infobar * {
   color: hsl(351 60% 92%);
 }
-[data-broadcast="la_rosa"] .lrosa-infobar .text-muted-foreground {
+[data-broadcast="la_rosa"][data-mode="dark"] .lrosa-infobar .text-muted-foreground {
   color: hsl(351 20% 76%);
 }
 
 /* Homeknop: light = lichtroze vlak met zwarte rand, dark = licht zwart met roze rand */
 [data-broadcast="la_rosa"][data-mode="light"] .lrosa-home-btn {
   background-color: hsl(351 55% 93%);
-  border-color: hsl(0 0% 4%);
-  color: hsl(0 0% 4%);
+  border-color: hsl(0 0% 22%);
+  color: hsl(0 0% 8%);
 }
 [data-broadcast="la_rosa"][data-mode="dark"] .lrosa-home-btn {
   background-color: hsl(0 0% 10%);
