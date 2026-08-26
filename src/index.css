@@ -1984,6 +1984,17 @@ body[data-broadcast="wc26"] {
   stroke-width: 1.25;
 }
 
+/* WC26 homeknop: verticale zwarte "26"-rechthoek met toernooilogo als trofee */
+[data-broadcast="wc26"] .wc26-home-btn {
+  box-shadow: 0 2px 6px hsl(0 0% 0% / 0.35);
+}
+[data-broadcast="wc26"] .wc26-home-btn:active {
+  transform: translateX(-50%) translateY(calc(-0.75rem + 1px));
+}
+[data-broadcast="wc26"] .wc26-home-btn img {
+  filter: drop-shadow(0 1px 1px hsl(0 0% 0% / 0.25));
+}
+
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #8 — LA ROSA
    Moderne Italiaanse sportkrant: roze papier, zwarte inkt,
