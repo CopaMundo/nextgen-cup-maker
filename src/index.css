@@ -3234,7 +3234,7 @@ body[data-broadcast="teletext"] {
   color: hsl(0 0% 100%);
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 {
-  counter-reset: ttx-page 801;
+  counter-reset: ttx-page 800;
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button::before {
   color: hsl(120 100% 50%);
