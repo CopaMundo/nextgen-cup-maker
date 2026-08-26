@@ -1429,8 +1429,8 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
               {allRoundsToRender.length > 1 && (
                 <div className={`flex items-center gap-2 ${presentationCompact ? "mb-1.5" : "mb-3"} ${idx > 0 ? (presentationCompact ? "mt-3" : "mt-6") : ""}`}>
                   <div className={ds(bStyle, "sectionDot")} />
-                  <h3 className={`${ds(bStyle, "sectionTitle") || "text-sm font-black uppercase tracking-wider"} !text-xs`}>{section.section}</h3>
-                  <div className={ds(bStyle, "sectionLine")} />
+                  <h3 className={`${ds(bStyle, "sectionTitle") || "text-sm font-black uppercase tracking-wider"} !text-xs ${bStyle === "teletext" ? "ttx-title-solo" : ""}`}>{section.section}</h3>
+                  {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
                 </div>
               )}
               <BracketTree bracketRounds={section.rounds} teams={teams} slots={slots} tournament={tournament} phases={phases} groups={groups} labelGroups={labelGroups} favoriteTeam={favoriteTeam} allMatches={matches} phaseMatchType={phaseMatchType} presentationCompact={presentationCompact} skipFirstRounds={skipFirstRounds} />
@@ -1444,8 +1444,8 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
               {getSubContent.allRounds.length > 1 && (
                 <div className={`flex items-center gap-2 ${presentationCompact ? "mb-1.5" : "mb-3"} ${idx > 0 ? (presentationCompact ? "mt-3" : "mt-6") : ""}`}>
                   <div className={ds(bStyle, "sectionDot")} />
-                  <h3 className={`${ds(bStyle, "sectionTitle") || "text-sm font-black uppercase tracking-wider"} !text-xs`}>{section.section}</h3>
-                  <div className={ds(bStyle, "sectionLine")} />
+                  <h3 className={`${ds(bStyle, "sectionTitle") || "text-sm font-black uppercase tracking-wider"} !text-xs ${bStyle === "teletext" ? "ttx-title-solo" : ""}`}>{section.section}</h3>
+                  {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
                 </div>
               )}
               <BracketTree bracketRounds={section.rounds} teams={teams} slots={slots} tournament={tournament} phases={phases} groups={groups} labelGroups={labelGroups} favoriteTeam={favoriteTeam} allMatches={matches} phaseMatchType={phaseMatchType} presentationCompact={presentationCompact} skipFirstRounds={skipFirstRounds} />
