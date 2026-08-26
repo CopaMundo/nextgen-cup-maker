@@ -30,20 +30,33 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
           const Icon = tab.icon;
 
           if (tab.isCenter) {
+            const logoSrc = favTeam?.logo_url || tournament.logo_url;
+            const isWc26 = bStyle === "wc26";
+
             return (
               <div key={tab.id} className="h-12 w-full">
                 <button
                   onClick={() => setActiveTab(tab.id)}
-                  className={`absolute left-1/2 top-1 flex h-14 w-14 -translate-x-1/2 -translate-y-3 transform-gpu items-center justify-center rounded-2xl shadow-lg transition-colors border-2 ${
-                    isActive ? ds(bStyle, "navCenterActive") : ds(bStyle, "navCenter")
+                  className={`absolute left-1/2 top-1 -translate-x-1/2 -translate-y-3 transform-gpu items-center justify-center shadow-lg transition-colors ${
+                    isWc26
+                      ? `wc26-home-btn flex h-[72px] w-12 rounded-[6px] border-2 bg-black ${
+                          isActive ? "border-primary" : "border-[hsl(var(--broadcast-gold))]"
+                        }`
+                      : `flex h-14 w-14 rounded-2xl border-2 ${
+                          isActive ? ds(bStyle, "navCenterActive") : ds(bStyle, "navCenter")
+                        }`
                   }`}
                 >
-                  {favTeam?.logo_url ? (
-                    <img src={favTeam.logo_url} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
-                  ) : tournament.logo_url ? (
-                    <img src={tournament.logo_url} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
+                  {logoSrc ? (
+                    <img
+                      src={logoSrc}
+                      alt=""
+                      width={isWc26 ? 36 : 32}
+                      height={isWc26 ? 36 : 32}
+                      className={`object-contain ${isWc26 ? "h-9 w-9" : "h-8 w-8"}`}
+                    />
                   ) : (
-                    <Icon className="h-6 w-6" />
+                    <Icon className={`${isWc26 ? "h-7 w-7 text-white" : "h-6 w-6"}`} />
                   )}
                 </button>
               </div>
