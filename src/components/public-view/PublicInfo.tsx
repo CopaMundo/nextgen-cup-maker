@@ -111,8 +111,14 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             <div className="flex-1 flex justify-end pb-1">
               <button onClick={onToggleDarkMode}
                 className={`flex items-center gap-1.5 border border-border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-all shadow-sm ${controlFrameShape}`}>
-                {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                {darkMode ? "Light" : "Dark"}
+                {bStyle === "teletext" ? (
+                  <span className="tabular-nums">P{darkMode ? "601" : "101"}</span>
+                ) : (
+                  <>
+                    {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                    {darkMode ? "Light" : "Dark"}
+                  </>
+                )}
               </button>
             </div>
           ) : null}
