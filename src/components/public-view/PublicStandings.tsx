@@ -239,7 +239,7 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
                         </div>
                       </div>
                       <div className="overflow-hidden">
-                        <table className="w-full text-xs table-auto">
+                        <table className="ttx-standings-table w-full text-xs table-auto">
                           <thead>
                             <tr className={ds(bStyle, "tableHeader")}>
                               <th className="w-8 px-1.5 py-1.5 text-left">#</th>
