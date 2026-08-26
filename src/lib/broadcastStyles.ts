@@ -1346,7 +1346,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
   teletext: {
     sectionDot: "hidden",
     sectionTitle: "ttx-section-title ttx-bar-blue px-2 font-['VT323'] text-[26px] leading-[1.15] uppercase tracking-[0.06em]",
-    sectionMeta: "font-['VT323'] text-[12px] uppercase tracking-[0.12em] text-muted-foreground",
+    sectionMeta: "ttx-section-meta font-['VT323'] text-[12px] uppercase tracking-[0.12em]",
     sectionLine: "ttx-section-line ttx-bar-blue flex-1 self-stretch",
     card: "ttx-panel overflow-hidden",
     matchCardWrapper: "ttx-panel overflow-hidden",
