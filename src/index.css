@@ -935,6 +935,11 @@ input[type="number"] {
   text-shadow: 0 0 12px hsl(var(--primary) / 0.45);
 }
 
+/* Dark mode: use the full Copa Mundo accent on the winner marker. */
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-winner {
+  border-left-color: hsl(var(--primary));
+}
+
 /* ── BROADCAST #2: EUROPEAN NIGHTS ─────────────────────────────────────────
    Kick-of-light inspired: night blue base + electric blue, cyan, violet en
    magenta als prismatische lichtaccenten. Display: Roboto Condensed — Body: Inter
