@@ -2982,68 +2982,51 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── Teletekst P501 — Belgische versie ───────────────────────────
-   Effen donkerblauw scherm (geen puur zwart), cyan/witte tekst,
-   volvlakke blauwe sectiebalken met witte tekst, gele highlights,
-   rode navigatie onderaan. De groepsfase-standen zijn de blauwdruk:
-   blauwe kolomkop, cyan posities, witte teamnamen, gele punten.   */
+   Oorspronkelijke teletekst-look (cyan primary, gele scores, witte
+   tekst) maar op een effen LICHTZWART scherm i.p.v. puur zwart.   */
 [data-broadcast="teletext"][data-ttx-variant="501"] {
-  --background: 240 62% 7%;
+  --background: 0 0% 10%;
   --foreground: 0 0% 100%;
-  --card: 240 62% 7%;
+  --card: 0 0% 10%;
   --card-foreground: 0 0% 100%;
-  --popover: 240 58% 11%;
+  --popover: 0 0% 14%;
   --popover-foreground: 0 0% 100%;
   --primary: 180 100% 50%;
-  --primary-foreground: 240 62% 7%;
-  --secondary: 240 58% 12%;
-  --secondary-foreground: 0 0% 92%;
-  --muted: 240 58% 12%;
-  --muted-foreground: 195 55% 78%;
+  --primary-foreground: 0 0% 10%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 75%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 75%;
   --accent: 60 100% 50%;
   --accent-foreground: 0 0% 0%;
-  --border: 235 55% 32%;
-  --input: 235 55% 32%;
+  --destructive: 0 100% 59%;
+  --destructive-foreground: 0 0% 0%;
+  --border: 0 0% 26%;
+  --input: 0 0% 26%;
   --ring: 180 100% 50%;
 
-  --broadcast-bg: 240 62% 7%;
-  --broadcast-night: 240 62% 7%;
-  --broadcast-paper: 240 62% 7%;
-  --broadcast-surface: 240 62% 7%;
-  --broadcast-surface-secondary: 240 58% 12%;
-  --broadcast-surface-elevated: 240 55% 16%;
+  --broadcast-bg: 0 0% 10%;
+  --broadcast-night: 0 0% 10%;
+  --broadcast-paper: 0 0% 10%;
+  --broadcast-surface: 0 0% 10%;
+  --broadcast-surface-secondary: 0 0% 14%;
+  --broadcast-surface-elevated: 0 0% 18%;
   --broadcast-text: 0 0% 100%;
-  --broadcast-text-secondary: 195 55% 78%;
-  --broadcast-text-muted: 195 40% 70%;
-  --broadcast-border: 235 55% 32%;
+  --broadcast-text-secondary: 0 0% 75%;
+  --broadcast-text-muted: 0 0% 75%;
+  --broadcast-border: 0 0% 26%;
   --broadcast-primary: 180 100% 50%;
-  --broadcast-primary-contrast: 240 62% 7%;
+  --broadcast-primary-contrast: 0 0% 10%;
   --broadcast-score: 60 100% 50%;
+  --broadcast-bright: 0 0% 100%;
   --broadcast-gold: 60 100% 50%;
-  --broadcast-navy: 228 100% 44%;
+  --broadcast-navy: 218 100% 50%;
   --broadcast-cyan: 180 100% 50%;
-  --broadcast-violet: 228 100% 44%;
+  --broadcast-violet: 218 100% 50%;
+  --broadcast-magenta: 0 100% 59%;
+  --broadcast-danger: 0 100% 59%;
+  --broadcast-success: 120 100% 50%;
   --broadcast-cream: 0 0% 100%;
-}
-/* Sectiebalken = volvlakke blauwe teletextbalk met witte tekst */
-[data-broadcast="teletext"][data-ttx-variant="501"] .ttx-bar-cyan {
-  background-color: hsl(228 100% 44%);
-  color: hsl(0 0% 100%);
-}
-[data-broadcast="teletext"][data-ttx-variant="501"] .ttx-bar-blue {
-  background-color: hsl(228 100% 44%);
-  color: hsl(0 0% 100%);
-}
-[data-broadcast="teletext"][data-ttx-variant="501"] .ttx-bar-yellow {
-  background-color: hsl(60 100% 50%);
-  color: hsl(0 0% 0%);
-}
-[data-broadcast="teletext"][data-ttx-variant="501"] .ttx-panel {
-  background-color: transparent;
-  border-top-color: hsl(228 100% 44%);
-  border-bottom-color: hsl(228 100% 44%);
-}
-[data-broadcast="teletext"][data-ttx-variant="501"] .ttx-connector line {
-  stroke: hsl(180 100% 50%);
 }
 
 /* ── Teletekst P801 — Nederlandse versie ─────────────────────────
