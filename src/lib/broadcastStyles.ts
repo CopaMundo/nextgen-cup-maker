@@ -1159,7 +1159,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     matchFooter: "flex items-center justify-between px-3 py-1.5 border-t border-[hsl(var(--broadcast-border))]",
     navBar: "bg-[hsl(var(--broadcast-night))] border-t border-[hsl(var(--broadcast-night))]",
     navCenter: "lrosa-home-btn rounded-none",
-    navCenterActive: "rounded-none bg-[hsl(var(--broadcast-night))] text-primary border-primary",
+    navCenterActive: "lrosa-home-btn rounded-none !border-primary",
     navTab: "text-white/60 hover:text-white",
     navTabActive: "text-primary",
     navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-primary",
