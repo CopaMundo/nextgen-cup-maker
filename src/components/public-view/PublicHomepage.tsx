@@ -576,16 +576,18 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {/* Tab switcher: Wedstrijden / Standen */}
             {(lastFavMatch || nextFavMatch || showCurrentKnockout || showBracketInstead || showNextGroupInstead || (favGroup && favStandings.length > 0)) && (
-              <div className="grid grid-cols-2 gap-0 border-b border-border">
+              <div className="ttx-myteam-tabs grid grid-cols-2 gap-0 border-b border-border">
                 <button
                   onClick={() => setFavTab("matches")}
-                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "matches" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  data-active={favTab === "matches"}
+                  className={`ttx-myteam-tab py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "matches" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Wedstrijden
                 </button>
                 <button
                   onClick={() => setFavTab("standings")}
-                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "standings" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  data-active={favTab === "standings"}
+                  className={`ttx-myteam-tab py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "standings" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Standen
                 </button>
