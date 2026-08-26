@@ -915,21 +915,19 @@ input[type="number"] {
 
 /* ── Copa Mundo broadcast card text & score overrides ── */
 /* Light mode: match card / bracket text and scores in primary blue */
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchContextText,
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchTeamName,
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchScore,
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchScoreWin,
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchScoreLose {
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-context,
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-name,
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-score {
   color: hsl(var(--primary));
 }
 
 /* Dark mode: only scores get a soft yellow glow */
-:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .matchScore,
-:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .matchScoreLose {
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-score {
   color: hsl(var(--primary) / 0.85);
   text-shadow: 0 0 8px hsl(var(--primary) / 0.3);
 }
-:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .matchScoreWin {
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-score.font-bold,
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .cm-match-score:has(.font-bold) {
   color: hsl(var(--primary));
   text-shadow: 0 0 12px hsl(var(--primary) / 0.45);
 }
