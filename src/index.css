@@ -3382,3 +3382,71 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-variant-toggle * {
   color: hsl(0 0% 100%) !important;
 }
+
+/* ── P800 kleurregels (Nederlandse versie) ───────────────────────── */
+/* Infopagina: datum/locatie-badges rood-oranje met gele tekst */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-info .ttx-info-badge {
+  background-color: hsl(14 100% 48%);
+  border-color: hsl(14 100% 48%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-info .ttx-info-badge,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-info .ttx-info-badge * {
+  color: hsl(60 100% 50%);
+}
+/* Divisiekeuze: groene tekst */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-division-trigger > span,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-select-content [role="option"] {
+  color: hsl(120 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-select-content [role="option"] * {
+  color: inherit !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-select-content [role="option"][data-highlighted],
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-select-content [role="option"][data-state="checked"] {
+  background-color: hsl(0 100% 50%);
+  color: hsl(120 100% 50%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-variant-toggle,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-variant-toggle * {
+  color: hsl(60 100% 50%) !important;
+}
+
+/* Meta-teller ("24 teams", "108 wedstrijden") in het geel */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-meta,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-stats-toggle,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-stats-toggle:hover {
+  color: hsl(60 100% 50%);
+}
+
+/* Teamsraster: kader zoals P500, teamnaam groen, paginanummer geel */
+[data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button {
+  background-color: hsl(0 0% 14%);
+  border-color: hsl(0 0% 26%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button .text-foreground {
+  color: hsl(120 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button::before {
+  color: hsl(60 100% 50%);
+}
+
+/* Mijn team-balk: lichtblauwe tekst (zoals P500) */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-header,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-header * {
+  color: hsl(180 100% 50%) !important;
+}
+
+/* Wedstrijdkaarten + knockoutbrackets: infobalktekst en scores groen,
+   teamnamen geel, geen rode boven-/onderrand */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-panel {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  --broadcast-score: 120 100% 50%;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-panel [class*="text-muted-foreground"] {
+  color: hsl(120 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-panel .ttx-bar-cyan,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-panel .ttx-bar-cyan * {
+  color: hsl(120 100% 50%);
+}
