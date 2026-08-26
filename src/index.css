@@ -3075,6 +3075,7 @@ body[data-broadcast="teletext"] {
   --broadcast-danger: 0 100% 50%;
   --broadcast-success: 120 100% 50%;
   --broadcast-cream: 60 100% 50%;
+  --ttx-line: 120 45% 26%;
 }
 /* Sectiebalken = volvlakke rode teletextbalk met gele tekst */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-bar-cyan,
