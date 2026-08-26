@@ -913,6 +913,27 @@ input[type="number"] {
   --broadcast-success: 152 54% 39%;
 }
 
+/* ── Copa Mundo broadcast card text & score overrides ── */
+/* Light mode: match card / bracket text and scores in primary blue */
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchContextText,
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchTeamName,
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchScore,
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchScoreWin,
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .matchScoreLose {
+  color: hsl(var(--primary));
+}
+
+/* Dark mode: only scores get a soft yellow glow */
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .matchScore,
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .matchScoreLose {
+  color: hsl(var(--primary) / 0.85);
+  text-shadow: 0 0 8px hsl(var(--primary) / 0.3);
+}
+:is([data-broadcast="copa_mundo_bc"][data-mode="dark"]) .matchScoreWin {
+  color: hsl(var(--primary));
+  text-shadow: 0 0 12px hsl(var(--primary) / 0.45);
+}
+
 /* ── BROADCAST #2: EUROPEAN NIGHTS ─────────────────────────────────────────
    Kick-of-light inspired: night blue base + electric blue, cyan, violet en
    magenta als prismatische lichtaccenten. Display: Roboto Condensed — Body: Inter
