@@ -942,7 +942,7 @@ input[type="number"] {
 
 /* Light mode: brighter theme-blue winner marker so it doesn't blend into the info bar. */
 :is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-winner {
-  background-color: hsl(var(--primary) / 0.12);
+  background-color: hsl(var(--primary) / 0.20);
   border-left-color: hsl(var(--primary));
 }
 
