@@ -3360,3 +3360,16 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-title * {
   color: hsl(60 100% 50%) !important;
 }
+
+/* P500: divisie-opties in het geel, P500-variantlabel in het wit */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-select-content [role="option"],
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-select-content [role="option"] * {
+  color: hsl(60 100% 50%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-division-trigger [data-radix-select-value] {
+  color: hsl(60 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-variant-toggle,
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-variant-toggle * {
+  color: hsl(0 0% 100%) !important;
+}
