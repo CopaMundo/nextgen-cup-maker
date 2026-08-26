@@ -940,6 +940,14 @@ input[type="number"] {
   border-left-color: hsl(var(--primary));
 }
 
+/* Copa Mundo cover overlay: subtle gradient that keeps the logo readable. */
+.cm-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, hsl(var(--background) / 0.25) 0%, hsl(var(--background) / 0.55) 60%, hsl(var(--background)) 100%);
+}
+
 /* ── BROADCAST #2: EUROPEAN NIGHTS ─────────────────────────────────────────
    Kick-of-light inspired: night blue base + electric blue, cyan, violet en
    magenta als prismatische lichtaccenten. Display: Roboto Condensed — Body: Inter
@@ -1936,6 +1944,17 @@ body[data-broadcast="wc26"] {
 }
 [data-broadcast="wc26"][data-mode="dark"] .en-prism-line {
   background: hsl(var(--broadcast-primary));
+}
+
+/* Cover-streep voor Copa Mundo: volle themakleur met gloed */
+[data-broadcast="copa_mundo_bc"] .en-prism-line {
+  background: hsl(var(--broadcast-primary));
+  height: 3px;
+  box-shadow: 0 0 14px hsl(var(--broadcast-primary) / 0.55);
+}
+[data-broadcast="copa_mundo_bc"][data-mode="light"] .en-prism-line {
+  background: hsl(var(--broadcast-primary));
+  box-shadow: 0 0 12px hsl(var(--broadcast-primary) / 0.45);
 }
 
 
