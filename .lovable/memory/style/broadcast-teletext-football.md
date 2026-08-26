@@ -24,3 +24,8 @@ geen floating cards. In plaats daarvan platte `.ttx-panel` regels met boven/onde
 Extra tokens: `.ttx-qual` (groene inset kwalificatiemarker), `.ttx-connector` (rechte cyan bracketlijnen,
 crispEdges), `.ttx-cover` (cover in video-window met scanline-dither en 4-kleuren teletextbalk onderaan),
 teamsraster met teletext pagenummers (201, 202, …) via counters.
+
+Varianten (schakelaar i.p.v. light/dark): P500 (Belgisch, data-ttx-variant="500", cyan-dominant, gele scores,
+witte teamnummers vanaf 501, donkerblauwe prismalijn/sectionLine/tijdsblokken met witte tekst) en P800
+(Nederlands, data-ttx-variant="801", groene koppen, rode balken, teamnummers vanaf 801 via counter-reset 800,
+oranje prismalijn + oranje info-icoontjes/tekst op infopagina).
