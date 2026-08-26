@@ -3244,16 +3244,17 @@ body[data-broadcast="teletext"] {
    Infopagina: prismalijn donkerblauw (zoals klassement-headers),
    toernooinaam geel. Tijdsblokken: donkerblauw met witte tekst.  */
 [data-broadcast="teletext"][data-ttx-variant="500"] .en-prism-line {
-  background: hsl(218 100% 50%);
+  background: hsl(180 100% 50%);
   height: 3px;
 }
+/* Uurbalk: donkerblauw met lichtblauwe tekst */
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-timeslot {
   background-color: hsl(218 100% 50%);
-  color: hsl(0 0% 100%);
+  color: hsl(180 100% 50%);
 }
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-timeslot,
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-timeslot * {
-  color: hsl(0 0% 100%);
+  color: hsl(180 100% 50%);
 }
 [data-broadcast="teletext"][data-ttx-variant="500"] h1 {
   color: hsl(60 100% 50%);
@@ -3319,16 +3320,37 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="500"] .grid-cols-3 > button .text-foreground {
   color: hsl(180 100% 50%);
 }
-/* P500: infopagina-inhoud donkerblauw met lichtblauwe tekst */
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .ttx-panel,
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info [class*="bg-secondary"] {
+/* P500: enkel de datum/locatie-badges op infopagina donkerblauw met lichtblauwe tekst */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .ttx-info-badge {
   background-color: hsl(218 100% 50%);
   border-color: hsl(218 100% 50%);
 }
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .text-foreground,
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .text-muted-foreground,
-[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .ttx-panel [class*="text-muted-foreground"] {
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .ttx-info-badge,
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-info .ttx-info-badge * {
   color: hsl(180 100% 50%);
+}
+/* P500: Mijn team-header donkerblauw met lichtblauwe tekst */
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-myteam-header {
+  background-color: hsl(218 100% 50%);
+}
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-myteam-header,
+[data-broadcast="teletext"][data-ttx-variant="500"] .ttx-myteam-header * {
+  color: hsl(180 100% 50%);
+}
+/* Teletekst: statistieken-toggle in blauwe kader (zoals "24 teams") */
+[data-broadcast="teletext"] .ttx-stats-toggle {
+  background-color: hsl(var(--broadcast-navy));
+  color: hsl(0 0% 100%);
+  align-self: stretch;
+  border-radius: 0;
+}
+[data-broadcast="teletext"] .ttx-stats-toggle:hover {
+  background-color: hsl(var(--broadcast-navy));
+  color: hsl(0 0% 100%);
+}
+/* Teletekst: losse titel zonder doorgetrokken lijn (bracketnamen) */
+[data-broadcast="teletext"] .ttx-title-solo {
+  margin-right: 0 !important;
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-title,
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-line {

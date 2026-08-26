@@ -151,7 +151,7 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
         <div className={ds(bStyle, "sectionLine")} />
         <button
           onClick={() => setSubTab(subTab === "standings" ? "stats" : "standings")}
-          className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+          className="ttx-stats-toggle shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
           aria-label={subTab === "standings" ? "Statistieken openen" : "Standen openen"}
           title={subTab === "standings" ? "Statistieken" : "Standen"}
         >

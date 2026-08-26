@@ -542,7 +542,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
       {favoriteTeam && favTeamObj && (
         <div className={`${ds(bStyle, "card")}`}>
           {/* Colored header bar */}
-          <div className={`flex items-center justify-between ${homeHeaderCls}`}>
+          <div className={`flex items-center justify-between ${homeHeaderCls} ttx-myteam-header`}>
             <div className="flex items-center gap-2">
               <Star className="h-3.5 w-3.5" />
               <h2 className={homeHeaderTitleCls}>Mijn team</h2>
