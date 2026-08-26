@@ -76,7 +76,7 @@ const PublicView = () => {
     // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 501 en 801.
     if (style === "teletext") {
       document.documentElement.setAttribute("data-mode", "dark");
-      document.documentElement.setAttribute("data-ttx-variant", darkMode ? "501" : "801");
+      document.documentElement.setAttribute("data-ttx-variant", darkMode ? "500" : "801");
     } else {
       document.documentElement.setAttribute("data-mode", darkMode ? "dark" : "light");
       document.documentElement.removeAttribute("data-ttx-variant");
