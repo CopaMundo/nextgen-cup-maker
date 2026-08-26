@@ -914,11 +914,15 @@ input[type="number"] {
 }
 
 /* ── Copa Mundo broadcast card text & score overrides ── */
-/* Light mode: match card / bracket text and scores in primary blue */
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-context,
-:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-name,
+/* Light mode: teamnamen/context in hun normale kleur, enkel scores blauw met
+   zachte gloed — winnaar feller dan verliezer. */
 :is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-score {
+  color: hsl(var(--primary) / 0.55);
+  text-shadow: 0 0 6px hsl(var(--primary) / 0.18);
+}
+:is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-score.font-bold {
   color: hsl(var(--primary));
+  text-shadow: 0 0 10px hsl(var(--primary) / 0.32);
 }
 
 /* Dark mode: only scores get a soft yellow glow */
