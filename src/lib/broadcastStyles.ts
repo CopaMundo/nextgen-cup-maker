@@ -832,8 +832,9 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     matchTimeBadge: "inline-flex items-center rounded-[3px] bg-primary px-2 py-0.5 font-['Roboto_Condensed'] text-[13px] font-extrabold text-primary-foreground tabular-nums",
     matchFooter: "flex items-center justify-between px-3 py-1 bg-secondary/60 border-t border-border",
     navBar: "bg-secondary/95 backdrop-blur-md border-t border-border",
-    navCenter: "bg-card text-muted-foreground border-border rounded-[3px]",
-    navCenterActive: "bg-card text-primary border-primary rounded-[3px] scale-105 shadow-[0_0_16px_hsl(var(--primary)/0.4)]",
+    navCenter: "en-home-btn text-muted-foreground border-border !rounded-full",
+    navCenterActive: "en-home-btn text-primary border-primary !rounded-full scale-105 shadow-[0_0_16px_hsl(var(--primary)/0.4)]",
+
     navTab: "text-muted-foreground hover:text-foreground",
     navTabActive: "text-primary",
     navIndicator: "absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-[3px] bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.8)]",
