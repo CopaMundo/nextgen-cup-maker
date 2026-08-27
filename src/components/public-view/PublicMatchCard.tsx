@@ -101,28 +101,31 @@ const PublicMatchCard = ({
           <div className="flex h-full w-full items-center justify-center bg-secondary text-[10px] font-black text-muted-foreground">{name.charAt(0)}</div>
         )}
       </div>
-      <span className={`ttx-team-name flex-1 truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? `ttx-fav-team ${ds(bStyle, "matchTeamNameFav")}` : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
-        {name}
-      </span>
-      {tournament?.show_country && country && (
-        <span className="inline-flex h-2.5 w-3.5 flex-shrink-0 items-center justify-center">
-          <CountryFlag country={country} className="h-full w-full object-contain" />
+      <div className="flex min-w-0 flex-1 items-center gap-1.5">
+        <span className={`ttx-team-name truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? `ttx-fav-team ${ds(bStyle, "matchTeamNameFav")}` : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
+          {name}
         </span>
-      )}
-      {typeof position === "number" && (
-        <span className="w-4 text-right text-[10px] font-black tabular-nums text-muted-foreground flex-shrink-0">{position}</span>
-      )}
-      <div className="relative flex items-center">
-        {m.is_played ? (
-          <>
-            <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
-            {hasPenalties && (
-              <span className="absolute left-full ml-0.5 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
-            )}
-          </>
-        ) : null}
+        {tournament?.show_country && country && (
+          <span className="inline-flex h-2.5 w-3.5 flex-shrink-0 items-center justify-center">
+            <CountryFlag country={country} className="h-full w-full object-contain" />
+          </span>
+        )}
       </div>
-
+      <div className="flex flex-shrink-0 items-center gap-1.5">
+        {typeof position === "number" && (
+          <span className="w-4 text-right text-[10px] font-black tabular-nums text-muted-foreground">{position}</span>
+        )}
+        <div className="relative flex items-center">
+          {m.is_played ? (
+            <>
+              <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
+              {hasPenalties && (
+                <span className="absolute left-full ml-0.5 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
+              )}
+            </>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 
