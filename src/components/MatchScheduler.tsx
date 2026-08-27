@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry } from "@/lib/dateUtils";
-import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, CalendarDays, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import CalendarXIcon from "@/components/icons/CalendarXIcon";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
