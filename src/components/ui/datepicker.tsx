@@ -132,6 +132,7 @@ export function DatePicker({
   };
 
   const handleFocus = () => {
+    selectAllRef.current = true;
     inputRef.current?.select();
   };
 

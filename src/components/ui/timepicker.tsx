@@ -183,8 +183,8 @@ export function TimePicker({
           value={displayValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => inputRef.current?.select()}
-          onClick={() => inputRef.current?.select()}
+          onFocus={() => { selectAllRef.current = true; inputRef.current?.select(); }}
+          onClick={() => { selectAllRef.current = true; inputRef.current?.select(); }}
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"
