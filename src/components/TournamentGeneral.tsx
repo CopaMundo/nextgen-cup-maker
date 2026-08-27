@@ -908,11 +908,12 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         onCheckedChange={(value) => {
                           const updates: any = { [key]: value };
                           if (key === "enable_yellow_cards") updates.enable_red_cards = value;
-                          updates[publicKey] = value;
+                          if (publicKey) updates[publicKey] = value;
                           saveToDb(updates);
                         }}
                       />
                     </div>
+                    {publicKey && (
                     <div className={cn("space-y-2", !isEnabled && "opacity-50")}>
                       <span className="block text-xs leading-snug text-muted-foreground">{publicLabel}</span>
                       <div className="grid h-9 grid-cols-2 rounded-md border border-border bg-secondary p-1">
@@ -934,6 +935,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
                   );
                 })}
