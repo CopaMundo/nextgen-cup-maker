@@ -222,8 +222,8 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
   );
 };
 
-const TeamMatchList = ({ team, teamMatches, teams, phases, groups, slots, tournament }: {
-  team: any; teamMatches: any[]; teams: any[]; phases: any[]; groups: any[]; slots: any[]; tournament: any;
+const TeamMatchList = ({ team, teamMatches, teams, phases, groups, slots, tournament, groupTeams, matches, scoringSystems }: {
+  team: any; teamMatches: any[]; teams: any[]; phases: any[]; groups: any[]; slots: any[]; tournament: any; groupTeams?: any[]; matches?: any[]; scoringSystems?: any[];
 }) => {
   const bStyle = useBroadcastStyle();
   return (
