@@ -279,7 +279,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Geboortedatum</Label>
-                  <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" />
+                  <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" autoFocus />
                 </div>
               </div>
             </div>
