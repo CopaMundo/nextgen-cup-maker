@@ -205,11 +205,13 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const fetchLocations = async () => {
     const { data } = await supabase
       .from("tournament_locations")
-      .select("id, name")
+      .select("id, name, sort_order")
       .eq("tournament_id", tournament.id)
+      .order("sort_order")
       .order("created_at");
-    if (data) setLocations(data);
+    if (data) setLocations(data as Location[]);
   };
+
 
   const fetchCategories = async () => {
     const { data } = await supabase
