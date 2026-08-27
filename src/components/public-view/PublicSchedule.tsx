@@ -42,7 +42,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
-  let lastDate = "";
 
   useEffect(() => {
     if (!firstUnplayedMatchId) return;
@@ -106,64 +105,61 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
       </div>
 
       <div className="pt-3 space-y-3">
-        {timeslots.map(slot => {
-          const showDateHeader = slot.date !== lastDate;
-          lastDate = slot.date;
-
-          return (
-            <div key={slot.key}>
-              {showDateHeader && (
-                <div
-                  data-schedule-date={slot.date}
-                  className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
-                  style={{ top: headerHeight }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={ds(bStyle, "dateHeader")}>
-                      {formatDate(slot.date)}
-                    </div>
-                    {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
-                  </div>
+        {uniqueDates.map(date => (
+          <div key={date} data-schedule-date={date} className="space-y-3">
+            {/* Sticky date header — spans the whole day group */}
+            <div
+              className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
+              style={{ top: headerHeight }}
+            >
+              <div className="flex items-center gap-2">
+                <div className={ds(bStyle, "dateHeader")}>
+                  {formatDate(date)}
                 </div>
-              )}
-              <div className={ds(bStyle, "card")}>
-                {/* Timeslot header */}
-                <div className={ds(bStyle, "timeslotHeader")}>
-                  {slot.time && (
-                    <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
-                      {slot.time.slice(0, 5)}
-                    </span>
-                  )}
-                  <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
-                    {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
-                  </span>
-                </div>
-                {/* Match cards — each in its own style-aware container with spacing */}
-                <div className="p-2 space-y-2">
-                  {slot.matches.map((m: any) => (
-                    <div
-                      key={m.id}
-                      ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
-                      className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
-                    >
-                      <PublicMatchCard
-                        match={m}
-                        teams={teams}
-                        phases={phases}
-                        groups={groups}
-                        slots={slots}
-                        tournament={tournament}
-                        allMatches={matches}
-                        favoriteTeam={favoriteTeam}
-                        hideRoundNumber
-                      />
-                    </div>
-                  ))}
-                </div>
+                {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
               </div>
             </div>
-          );
-        })}
+            {timeslots.filter(s => s.date === date).map(slot => (
+              <div key={slot.key}>
+                <div className={ds(bStyle, "card")}>
+                  {/* Timeslot header */}
+                  <div className={ds(bStyle, "timeslotHeader")}>
+                    {slot.time && (
+                      <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
+                        {slot.time.slice(0, 5)}
+                      </span>
+                    )}
+                    <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
+                      {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
+                    </span>
+                  </div>
+                  {/* Match cards — each in its own style-aware container with spacing */}
+                  <div className="p-2 space-y-2">
+                    {slot.matches.map((m: any) => (
+                      <div
+                        key={m.id}
+                        ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
+                        className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
+                      >
+                        <PublicMatchCard
+                          match={m}
+                          teams={teams}
+                          phases={phases}
+                          groups={groups}
+                          slots={slots}
+                          tournament={tournament}
+                          allMatches={matches}
+                          favoriteTeam={favoriteTeam}
+                          hideRoundNumber
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
 
       {matches.length === 0 && (
