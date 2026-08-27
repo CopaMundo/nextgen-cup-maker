@@ -65,6 +65,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   }, []);
 
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
+  const scheduledCount = matches.filter(m => m.match_date).length;
 
   return (
     <div className="px-3 pb-4">
@@ -77,7 +78,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Schema</h2>
           <div className={ds(bStyle, "sectionLine")} />
-          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{matches.length} wedstrijden</span>
+          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{scheduledCount} wedstrijden</span>
 
           {uniqueDates.length > 1 && (
             <div className="relative ml-auto shrink-0">
@@ -162,7 +163,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         ))}
       </div>
 
-      {matches.length === 0 && (
+      {scheduledCount === 0 && (
         <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
           <p className="text-sm text-muted-foreground font-medium">Nog geen wedstrijden gepland.</p>
         </div>
