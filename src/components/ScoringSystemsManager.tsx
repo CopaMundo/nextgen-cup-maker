@@ -1478,26 +1478,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                 )}
               </div>
             ))}
-            {(() => {
-              const available = TIEBREAKER_OPTIONS.filter((o) => !tiebreakerDraft.includes(o.value));
-              if (available.length === 0) return null;
-              return (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button type="button" variant="outline" size="sm" className="mt-1">
-                      <Plus className="h-3.5 w-3.5 mr-1" /> Criterium toevoegen
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    {available.map((o) => (
-                      <DropdownMenuItem key={o.value} onClick={() => addTb(o.value)}>
-                        {getTbLabel(o.value, editingIsSets)}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              );
-            })()}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setTiebreakerEditId(null)}>Annuleren</Button>
