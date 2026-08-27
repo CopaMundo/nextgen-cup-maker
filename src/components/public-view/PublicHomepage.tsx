@@ -43,6 +43,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   });
   const [favTab, setFavTab] = useState<"matches" | "standings">("matches");
   const [globalTab, setGlobalTab] = useState<"results" | "next">("next");
+  const [programmaExpanded, setProgrammaExpanded] = useState(false);
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
@@ -731,61 +732,76 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
       )}
 
       {/* === GLOBAL: Programma (Resultaten / Volgende wedstrijden) === */}
-      {(lastBlockMatches.length > 0 || nextBlockMatchesAll.length > 0) && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className={ds(bStyle, "sectionDot")} />
-            <h2 className={ds(bStyle, "sectionTitle")}>Programma</h2>
-            <div className={ds(bStyle, "sectionLine")} />
-          </div>
-          <div className={ds(bStyle, "card")}>
-            {lastBlockMatches.length > 0 && nextBlockMatchesAll.length > 0 && (
-              <div className="grid grid-cols-2 gap-0 border-b border-border">
-                <button
-                  onClick={() => setGlobalTab("next")}
-                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
-                >
-                  Volgende wedstrijden
-                </button>
-                <button
-                  onClick={() => setGlobalTab("results")}
-                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
-                >
-                  Resultaten
-                </button>
-              </div>
-            )}
-            {(globalTab === "next" || lastBlockMatches.length === 0) && nextBlockMatchesAll.length > 0 && (
-              <div
-                className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedGrid("next-block")}
-              >
-                <div className="px-3 py-3">
-                  <MatchListView matches={nextBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
-                </div>
-                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-                  Alles bekijken
-                  <ChevronRight className="h-3 w-3 rotate-90" />
-                </div>
-              </div>
-            )}
-            {(globalTab === "results" || nextBlockMatchesAll.length === 0) && lastBlockMatches.length > 0 && (
-              <div
-                className="cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedGrid("last-results")}
-              >
-                <div className="px-3 py-3">
-                  <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
-                </div>
-                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-                  Alles bekijken
-                  <ChevronRight className="h-3 w-3 rotate-90" />
-                </div>
-              </div>
-            )}
-          </div>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className={ds(bStyle, "sectionDot")} />
+          <h2 className={ds(bStyle, "sectionTitle")}>Programma</h2>
+          <div className={ds(bStyle, "sectionLine")} />
         </div>
-      )}
+
+        {/* Tabs */}
+        <div className={ds(bStyle, "card")}>
+          <div className="grid grid-cols-2 gap-0 border-b border-border">
+            <button
+              onClick={() => { setGlobalTab("next"); setProgrammaExpanded(false); }}
+              className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Volgende wedstrijden
+            </button>
+            <button
+              onClick={() => { setGlobalTab("results"); setProgrammaExpanded(false); }}
+              className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Resultaten
+            </button>
+          </div>
+
+          {/* Default view: current/next or last-played time slot */}
+          {!programmaExpanded && (
+            <div className="px-3 py-3 space-y-2">
+              {globalTab === "next" && nextBlockMatchesAll.length > 0 && (
+                <MatchListView matches={nextBlockMatchesAll} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+              )}
+              {globalTab === "results" && lastBlockMatches.length > 0 && (
+                <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+              )}
+              {((globalTab === "next" && nextBlockMatchesAll.length === 0) || (globalTab === "results" && lastBlockMatches.length === 0)) && (
+                <p className="text-sm text-muted-foreground font-medium text-center py-4">
+                  {globalTab === "next" ? "Geen komende wedstrijden." : "Nog geen resultaten."}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Expanded view: all time slots for active tab */}
+          {programmaExpanded && (
+            <div className="p-2 space-y-3">
+              <ProgrammaTimeslotList
+                matches={globalTab === "next" ? upcomingMatches : playedMatches}
+                teams={teams}
+                phases={phases}
+                groups={groups}
+                slots={slots}
+                tournament={tournament}
+                favoriteTeam={favoriteTeam}
+                bStyle={bStyle}
+                scrollToLatest={globalTab === "results"}
+              />
+            </div>
+          )}
+
+          {/* Toggle */}
+          {((globalTab === "next" && nextBlockMatchesAll.length > 0) || (globalTab === "results" && lastBlockMatches.length > 0)) && (
+            <button
+              onClick={() => setProgrammaExpanded(v => !v)}
+              className="w-full py-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1"
+            >
+              {programmaExpanded ? "Toon enkel huidig tijdslot" : "Alles bekijken"}
+              <ChevronRight className={`h-3 w-3 transition-transform ${programmaExpanded ? "-rotate-90" : "rotate-90"}`} />
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* === Polls === */}
       {polls.length > 0 && (
@@ -1228,6 +1244,109 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
           </tbody>
         </table>
       </div>
+    </div>
+  );
+};
+
+// Expanded Programma timeslot list (homepage inline view)
+const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tournament, favoriteTeam, bStyle, scrollToLatest }: any) => {
+  const targetRef = useRef<HTMLDivElement>(null);
+  const sorted = [...matches].sort((a: any, b: any) => {
+    const dateA = a.match_date || "9999";
+    const dateB = b.match_date || "9999";
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    const timeA = a.match_time || "99:99";
+    const timeB = b.match_time || "99:99";
+    if (timeA !== timeB) return timeA.localeCompare(timeB);
+    return (a.field || "").localeCompare(b.field || "");
+  });
+
+  const timeslots: { key: string; date: string; time: string; matches: any[] }[] = [];
+  const slotMap: Record<string, any[]> = {};
+  sorted.forEach((m: any) => {
+    const key = `${m.match_date || "nodate"}_${m.match_time || "notime"}`;
+    if (!slotMap[key]) {
+      slotMap[key] = [];
+      timeslots.push({ key, date: m.match_date || "", time: m.match_time || "", matches: slotMap[key] });
+    }
+    slotMap[key].push(m);
+  });
+
+  const targetMatchId = scrollToLatest
+    ? sorted[sorted.length - 1]?.id
+    : sorted.find((m: any) => !m.is_played)?.id || sorted[0]?.id;
+
+  const formatDate = (d: string) => {
+    if (!d) return "Geen datum";
+    return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
+  };
+
+  useEffect(() => {
+    if (!targetMatchId) return;
+    const raf = requestAnimationFrame(() => {
+      setTimeout(() => {
+        const el = targetRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const scrollY = window.scrollY + rect.top - 120;
+        window.scrollTo({ top: Math.max(0, scrollY), behavior: "instant" });
+      }, 100);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [targetMatchId]);
+
+  let lastDate = "";
+
+  return (
+    <div className="space-y-3">
+      {timeslots.map(slot => {
+        const showDateHeader = slot.date !== lastDate;
+        lastDate = slot.date;
+        return (
+          <div key={slot.key} className="space-y-1">
+            {showDateHeader && (
+              <div className="flex items-center gap-2 py-1">
+                <div className={ds(bStyle, "dateHeader")}>{formatDate(slot.date)}</div>
+                {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
+              </div>
+            )}
+            <div className={ds(bStyle, "card")}>
+              <div className={ds(bStyle, "timeslotHeader")}>
+                {slot.time && (
+                  <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>{slot.time.slice(0, 5)}</span>
+                )}
+                <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
+                  {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
+                </span>
+              </div>
+              <div className="p-2 space-y-2">
+                {slot.matches.map((m: any) => (
+                  <div
+                    key={m.id}
+                    ref={m.id === targetMatchId ? targetRef : undefined}
+                    className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
+                  >
+                    <PublicMatchCard
+                      match={m}
+                      teams={teams}
+                      phases={phases}
+                      groups={groups}
+                      slots={slots}
+                      tournament={tournament}
+                      allMatches={matches}
+                      favoriteTeam={favoriteTeam}
+                      hideRoundNumber
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {timeslots.length === 0 && (
+        <p className="text-sm text-muted-foreground font-medium text-center py-4">Geen wedstrijden gevonden.</p>
+      )}
     </div>
   );
 };

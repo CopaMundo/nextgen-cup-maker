@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicMatchCard from "./PublicMatchCard";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
@@ -6,14 +6,10 @@ import { ds } from "@/lib/broadcastStyles";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
-  const lastPlayedRef = useRef<HTMLDivElement>(null);
   const { teams, matches, phases, groups, slots, tournament } = data;
   const bStyle = useBroadcastStyle();
 
-  const [activeTab, setActiveTab] = useState<"next" | "results">("next");
-  const [viewAll, setViewAll] = useState(false);
-
-  const sorted = useMemo(() => [...matches].sort((a, b) => {
+  const sorted = [...matches].sort((a, b) => {
     const dateA = a.match_date || "9999";
     const dateB = b.match_date || "9999";
     if (dateA !== dateB) return dateA.localeCompare(dateB);
@@ -21,49 +17,35 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     const timeB = b.match_time || "99:99";
     if (timeA !== timeB) return timeA.localeCompare(timeB);
     return (a.field || "").localeCompare(b.field || "");
-  }), [matches]);
+  });
 
-  const timeslots = useMemo(() => {
-    const list: { key: string; date: string; time: string; matches: any[] }[] = [];
-    const slotMap: Record<string, any[]> = {};
-    sorted.forEach(m => {
-      const key = `${m.match_date || "nodate"}_${m.match_time || "notime"}`;
-      if (!slotMap[key]) {
-        slotMap[key] = [];
-        list.push({ key, date: m.match_date || "", time: m.match_time || "", matches: slotMap[key] });
-      }
-      slotMap[key].push(m);
-    });
-    return list;
-  }, [sorted]);
+  const timeslots: { key: string; date: string; time: string; matches: any[] }[] = [];
+  const slotMap: Record<string, any[]> = {};
 
-  const firstUnplayedMatchId = sorted.find(m => !m.is_played)?.id || null;
-  const lastPlayedMatchId = [...sorted].reverse().find(m => m.is_played)?.id || null;
-
-  const nextTimeslot = timeslots.find(s => s.matches.some(m => !m.is_played));
-  const lastPlayedTimeslot = [...timeslots].reverse().find(s => s.matches.some(m => m.is_played));
-
-  const visibleTimeslots = useMemo(() => {
-    if (activeTab === "next") {
-      if (viewAll) return timeslots.filter(s => s.matches.some(m => !m.is_played));
-      return nextTimeslot ? [nextTimeslot] : [];
+  sorted.forEach(m => {
+    const key = `${m.match_date || "nodate"}_${m.match_time || "notime"}`;
+    if (!slotMap[key]) {
+      slotMap[key] = [];
+      timeslots.push({ key, date: m.match_date || "", time: m.match_time || "", matches: slotMap[key] });
     }
-    if (viewAll) return timeslots.filter(s => s.matches.some(m => m.is_played));
-    return lastPlayedTimeslot ? [lastPlayedTimeslot] : [];
-  }, [activeTab, viewAll, timeslots, nextTimeslot, lastPlayedTimeslot]);
+    slotMap[key].push(m);
+  });
+
+  // Find the first unplayed match id across all sorted matches
+  const firstUnplayedMatchId = sorted.find(m => !m.is_played)?.id || null;
 
   const formatDate = (d: string) => {
     if (!d) return "Geen datum";
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
-  // Scroll to first unplayed match when next-tab is active; scroll to last played match when results-tab is active
+  let lastDate = "";
+
   useEffect(() => {
-    const targetId = activeTab === "next" ? firstUnplayedMatchId : lastPlayedMatchId;
-    if (!targetId) return;
+    if (!firstUnplayedMatchId) return;
     const raf = requestAnimationFrame(() => {
       setTimeout(() => {
-        const el = activeTab === "next" ? firstUnplayedRef.current : lastPlayedRef.current;
+        const el = firstUnplayedRef.current;
         if (!el) return;
         const rect = el.getBoundingClientRect();
         const scrollY = window.scrollY + rect.top - 120;
@@ -71,16 +53,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
       }, 100);
     });
     return () => cancelAnimationFrame(raf);
-  }, [activeTab, firstUnplayedMatchId, lastPlayedMatchId, viewAll]);
-
-  const tabButtonCls = (isActive: boolean) => {
-    const base = ds(bStyle, "tabButton") || "px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-md border transition-colors";
-    return isActive
-      ? `${base} ${ds(bStyle, "tabButtonActive") || "bg-primary text-primary-foreground border-primary"}`
-      : `${base} ${ds(bStyle, "tabButtonInactive") || "bg-muted text-muted-foreground border-transparent hover:bg-muted/80"}`;
-  };
-
-  let lastDate = "";
+  }, [firstUnplayedMatchId]);
 
   return (
     <div className="pt-4 space-y-3 px-3">
@@ -92,29 +65,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{matches.length} wedstrijden</span>
       </div>
 
-      {/* Tab toggle */}
-      <div className="flex items-center gap-2">
-        <button onClick={() => { setActiveTab("next"); setViewAll(false); }} className={tabButtonCls(activeTab === "next")}>
-          Volgende wedstrijden
-        </button>
-        <button onClick={() => { setActiveTab("results"); setViewAll(false); }} className={tabButtonCls(activeTab === "results")}>
-          Resultaten
-        </button>
-      </div>
-
-      {/* View-all toggle */}
-      {visibleTimeslots.length > 0 && (
-        <div className="flex justify-end">
-          <button
-            onClick={() => setViewAll(v => !v)}
-            className={ds(bStyle, "viewAllButton") || "text-xs font-bold uppercase tracking-wider text-primary hover:underline"}
-          >
-            {viewAll ? "Toon enkel huidig tijdslot" : "Alles bekijken"}
-          </button>
-        </div>
-      )}
-
-      {visibleTimeslots.map(slot => {
+      {timeslots.map(slot => {
         const showDateHeader = slot.date !== lastDate;
         lastDate = slot.date;
 
@@ -142,43 +93,36 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
                 </span>
               </div>
-              {/* Match cards */}
+              {/* Match cards — each in its own style-aware container with spacing */}
               <div className="p-2 space-y-2">
-                {slot.matches.map((m: any) => {
-                  const isTarget =
-                    (activeTab === "next" && m.id === firstUnplayedMatchId) ||
-                    (activeTab === "results" && m.id === lastPlayedMatchId);
-                  return (
-                    <div
-                      key={m.id}
-                      ref={isTarget ? (activeTab === "next" ? firstUnplayedRef : lastPlayedRef) : undefined}
-                      className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
-                    >
-                      <PublicMatchCard
-                        match={m}
-                        teams={teams}
-                        phases={phases}
-                        groups={groups}
-                        slots={slots}
-                        tournament={tournament}
-                        allMatches={matches}
-                        favoriteTeam={favoriteTeam}
-                        hideRoundNumber
-                      />
-                    </div>
-                  );
-                })}
+                {slot.matches.map((m: any) => (
+                  <div
+                    key={m.id}
+                    ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
+                    className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
+                  >
+                    <PublicMatchCard
+                      match={m}
+                      teams={teams}
+                      phases={phases}
+                      groups={groups}
+                      slots={slots}
+                      tournament={tournament}
+                      allMatches={matches}
+                      favoriteTeam={favoriteTeam}
+                      hideRoundNumber
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         );
       })}
 
-      {visibleTimeslots.length === 0 && (
+      {matches.length === 0 && (
         <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
-          <p className="text-sm text-muted-foreground font-medium">
-            {activeTab === "next" ? "Geen komende wedstrijden gevonden." : "Nog geen resultaten beschikbaar."}
-          </p>
+          <p className="text-sm text-muted-foreground font-medium">Nog geen wedstrijden gepland.</p>
         </div>
       )}
     </div>
