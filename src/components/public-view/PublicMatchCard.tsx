@@ -40,6 +40,7 @@ const PublicMatchCard = ({
   hideContext,
   extraContext,
   hideRoundNumber,
+  onCardClick,
 }: PublicMatchCardProps) => {
   const bStyle = useBroadcastStyle();
   const phase = phases.find((p) => p.id === m.phase_id);
