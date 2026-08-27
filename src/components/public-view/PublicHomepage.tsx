@@ -641,7 +641,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 <p className="text-xs font-black text-foreground uppercase tracking-wide truncate">{favTeamObj.name}</p>
               </div>
               {favTeamObj.country && (
-                <CountryFlag country={favTeamObj.country} className="h-4 w-6 shrink-0" />
+                <CountryFlag country={favTeamObj.country} className="h-5 w-7 shrink-0" />
               )}
             </div>
 
@@ -1246,7 +1246,7 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
           </div>
           <div className="flex items-center gap-1 flex-1 min-w-0">
             <span className={`font-bold truncate ${favoriteTeam === row.team?.id ? "text-primary" : "text-foreground"}`}>{row.team?.name}</span>
-            {tournament?.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain flex-shrink-0" />}
+            {tournament?.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-3 w-4 object-contain flex-shrink-0" />}
           </div>
           <span className="w-5 text-center text-muted-foreground">{row.gp}</span>
           <span className="w-8 text-center">
@@ -1330,7 +1330,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                           <div className="flex h-full w-full items-center justify-center text-[8px] font-black text-muted-foreground bg-secondary">{row.team?.name?.charAt(0)}</div>}
                       </div>
                       <span className={`font-bold ${favoriteTeam === row.team?.id ? "ttx-fav-team text-primary" : "text-foreground"}`}>{row.team?.name}</span>
-                      {tournament?.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain" />}
+                      {tournament?.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-3 w-4 object-contain" />}
                     </div>
                   </td>
                   <td className="text-center px-0.5 py-2 text-muted-foreground">{row.gp}</td>
