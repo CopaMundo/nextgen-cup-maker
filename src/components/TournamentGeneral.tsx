@@ -955,11 +955,10 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </DialogHeader>
           <div className="space-y-2">
             <Label>Datum</Label>
-            <Input
-              type="date"
+            <DatePicker
               value={newMatchDay}
-              onChange={(e) => setNewMatchDay(e.target.value)}
-              autoFocus
+              onChange={(date) => setNewMatchDay(date)}
+              placeholder="Kies een datum"
             />
           </div>
           <DialogFooter>
@@ -978,11 +977,19 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           <div className="space-y-3">
             <div className="space-y-1">
               <Label className="text-xs">Startdatum</Label>
-              <Input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} autoFocus />
+              <DatePicker
+                value={periodStart}
+                onChange={(date) => setPeriodStart(date)}
+                placeholder="Startdatum"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Einddatum</Label>
-              <Input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
+              <DatePicker
+                value={periodEnd}
+                onChange={(date) => setPeriodEnd(date)}
+                placeholder="Einddatum"
+              />
             </div>
           </div>
           <DialogFooter>
@@ -1124,7 +1131,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </DialogHeader>
           <div className="space-y-2">
             <Label>Datum</Label>
-            <Input type="date" value={editMatchDayValue} onChange={(e) => setEditMatchDayValue(e.target.value)} autoFocus />
+            <DatePicker
+              value={editMatchDayValue}
+              onChange={(date) => setEditMatchDayValue(date)}
+              placeholder="Kies een datum"
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditMatchDayIdx(null)}>Annuleren</Button>
@@ -1149,11 +1160,19 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           <div className="space-y-3">
             <div className="space-y-1">
               <Label className="text-xs">Startdatum</Label>
-              <Input type="date" value={editPeriodStart} onChange={(e) => setEditPeriodStart(e.target.value)} autoFocus />
+              <DatePicker
+                value={editPeriodStart}
+                onChange={(date) => setEditPeriodStart(date)}
+                placeholder="Startdatum"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Einddatum</Label>
-              <Input type="date" value={editPeriodEnd} onChange={(e) => setEditPeriodEnd(e.target.value)} />
+              <DatePicker
+                value={editPeriodEnd}
+                onChange={(date) => setEditPeriodEnd(date)}
+                placeholder="Einddatum"
+              />
             </div>
           </div>
           <DialogFooter>
