@@ -897,7 +897,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                   { key: "enable_yellow_cards", publicKey: null, label: "Kaarten", publicLabel: null },
                 ].map(({ key, publicKey, label, publicLabel }) => {
                   const isEnabled = form[key as keyof typeof form] as boolean;
-                  const isPublic = form[publicKey as keyof typeof form] as boolean;
+                  const isPublic = publicKey ? (form[publicKey as keyof typeof form] as boolean) : false;
 
                   return (
                   <div key={key} className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
