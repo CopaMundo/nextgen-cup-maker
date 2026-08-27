@@ -61,6 +61,9 @@ export function DatePicker({
   placeholder = "Kies een datum",
   className,
   autoFocus,
+  hideInput,
+  availableDates,
+  onInvalidPick,
 }: DatePickerProps) {
   const date = value ? parseISO(value) : undefined;
   const validDate = date && isValid(date) ? date : undefined;
