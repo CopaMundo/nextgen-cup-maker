@@ -112,9 +112,6 @@ const PublicMatchCard = ({
           )}
       </div>
       <div className="flex flex-shrink-0 items-center gap-1.5">
-        {typeof position === "number" && (
-          <span className="w-4 text-right text-[10px] font-black tabular-nums text-muted-foreground">{position}</span>
-        )}
         <div className="relative flex items-center">
           {m.is_played ? (
             <>
