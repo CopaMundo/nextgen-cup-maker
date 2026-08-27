@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MapPin } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
+import CountryFlag from "@/components/CountryFlag";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import { getMatchSideDisplayName } from "@/lib/slotLabels";
@@ -27,6 +28,7 @@ interface PublicMatchCardProps {
 
 const getTeamName = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.name || "–";
 const getTeamLogo = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.logo_url;
+const getTeamCountry = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.country;
 
 const PublicMatchCard = ({
   match: m,
@@ -77,12 +79,14 @@ const PublicMatchCard = ({
   const awayName = getMatchSideDisplayName(m, "away", teams, { slots, phases, groups, emptyLabel: "TBD" });
   const homeLogo = getTeamLogo(teams, m.home_team_id);
   const awayLogo = getTeamLogo(teams, m.away_team_id);
+  const homeCountry = getTeamCountry(teams, m.home_team_id);
+  const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   const hasPenalties = m.home_penalties != null && m.away_penalties != null;
   const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
   const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
 
-  const renderTeamRow = (name: string, logo: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean) => (
+  const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean) => (
     <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
@@ -94,6 +98,7 @@ const PublicMatchCard = ({
       <span className={`ttx-team-name flex-1 truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? `ttx-fav-team ${ds(bStyle, "matchTeamNameFav")}` : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
         {name}
       </span>
+      {country && <CountryFlag country={country} className="h-3 w-4 flex-shrink-0" />}
       <div className="relative flex items-center">
         {m.is_played ? (
           <>
@@ -172,7 +177,7 @@ const PublicMatchCard = ({
 
         {/* Match body */}
         <div className="relative px-3 py-2">
-          {renderTeamRow(homeName, homeLogo, m.home_team_id, m.home_penalties, m.home_score, homeWin)}
+          {renderTeamRow(homeName, homeLogo, homeCountry, m.home_team_id, m.home_penalties, m.home_score, homeWin)}
 
           {/* Time/VS badge — absolutely positioned to keep card height identical to played cards */}
           {!m.is_played && (
@@ -183,7 +188,7 @@ const PublicMatchCard = ({
             </div>
           )}
 
-          {renderTeamRow(awayName, awayLogo, m.away_team_id, m.away_penalties, m.away_score, awayWin)}
+          {renderTeamRow(awayName, awayLogo, awayCountry, m.away_team_id, m.away_penalties, m.away_score, awayWin)}
         </div>
       </div>
 
