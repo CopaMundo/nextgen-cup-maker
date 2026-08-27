@@ -10,7 +10,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const { teams, matches, phases, groups, slots, tournament } = data;
+  const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
 
   const sorted = [...matches].sort((a, b) => {
