@@ -17,6 +17,10 @@ import SportIcon from "@/components/SportIcon";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, MatchDayEntry } from "@/lib/dateUtils";
 import TiebreakerManager from "./TiebreakerManager";
 import ScoringSystemsManager from "./ScoringSystemsManager";
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -44,8 +48,41 @@ interface Attachment {
   file_size: number | null;
 }
 
+const SortableCategoryRow = ({ cat, onRename, onDelete }: { cat: Category; onRename: () => void; onDelete: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={cn(
+        "flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2",
+        isDragging && "opacity-70 shadow-lg z-10 relative",
+      )}
+    >
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Divisie verplaatsen"
+          className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <span className="text-foreground font-medium">{cat.name}</span>
+        <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
+      </div>
+      <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+    </div>
+  );
+};
+
 const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate: (t: any) => void }) => {
   const { toast } = useToast();
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
@@ -313,6 +350,20 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     }
   };
 
+  const handleCategoryDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(categories, oldIndex, newIndex).map((c, i) => ({ ...c, sort_order: i }));
+    setCategories(reordered);
+    await Promise.all(
+      reordered.map((c) => supabase.from("tournament_categories").update({ sort_order: c.sort_order }).eq("id", c.id)),
+    );
+    toast({ title: "Volgorde divisies opgeslagen" });
+  };
+
   const saveCategoryRename = async () => {
     if (!editingCatId || !editCatName.trim()) return;
     await supabase.from("tournament_categories").update({ name: editCatName.trim() }).eq("id", editingCatId);
@@ -327,7 +378,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     setEditingLocId(null);
   };
 
-  const saveMatchDays = async (entries: MatchDayEntry[]) => {
+  const saveMatchDays = async (rawEntries: MatchDayEntry[]) => {
+    const entryStart = (e: MatchDayEntry) => (typeof e === "string" ? e : e.start);
+    const entries = [...rawEntries].sort((a, b) => entryStart(a).localeCompare(entryStart(b)));
     setForm((prev) => ({ ...prev, match_days: entries }));
 
     const { error } = await supabase
@@ -744,17 +797,24 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </p>
 
             {categories.length > 0 && (
-              <div className="space-y-1">
-                {categories.map((cat) => (
-                  <div key={cat.id} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-foreground font-medium">{cat.name}</span>
-                      <button onClick={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
-                    </div>
-                    <button onClick={() => setDeleteCatId(cat.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+              <DndContext
+                sensors={dndSensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleCategoryDragEnd}
+              >
+                <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-1">
+                    {categories.map((cat) => (
+                      <SortableCategoryRow
+                        key={cat.id}
+                        cat={cat}
+                        onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
+                        onDelete={() => setDeleteCatId(cat.id)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
 
             <Button variant="outline" size="sm" onClick={() => { setNewCategoryName(""); setShowAddCategory(true); }}>
