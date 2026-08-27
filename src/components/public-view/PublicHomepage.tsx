@@ -712,7 +712,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            )}
+
 
             {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
               <button
