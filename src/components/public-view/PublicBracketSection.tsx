@@ -1278,6 +1278,45 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
 
   const structure = useMemo(() => detectBracketStructure(groups, matches, bracketGroupMap, phaseMatchType), [groups, matches, bracketGroupMap, phaseMatchType]);
 
+  // Auto-selecteer de (sub)bracket waarin het favoriete team zit
+  const autoSelectedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (showAllOnly || !favoriteTeam) return;
+    if (autoSelectedRef.current === favoriteTeam) return;
+    const hasFav = (rounds: any[]) =>
+      (rounds || []).some((r: any) =>
+        (r.matches || []).some((m: any) => m?.home_team_id === favoriteTeam || m?.away_team_id === favoriteTeam),
+      );
+
+    if (hasFav(structure.mainRounds) || hasFav(structure.placementRounds)) {
+      autoSelectedRef.current = favoriteTeam;
+      setSelectedTopTab("main");
+      setSelectedSubTab("all");
+      return;
+    }
+
+    const findIn = (prefix: string): string | null => {
+      if (hasFav(structure.loserBrackets[prefix] || []) || hasFav(structure.loserPlacementRounds[prefix] || [])) return prefix;
+      for (const child of structure.loserBracketChildren[prefix] || []) {
+        const found = findIn(child);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    for (const key of structure.topLevelLoserKeys) {
+      const found = findIn(key);
+      if (found) {
+        autoSelectedRef.current = favoriteTeam;
+        setSelectedTopTab(key);
+        setSelectedSubTab(found === key ? `main-${key}` : `bracket-${found}`);
+        return;
+      }
+    }
+  }, [favoriteTeam, structure, showAllOnly]);
+
+
+
   // Top-level tabs: Hoofdbracket + each top-level loser bracket (5-8, 9-16, etc.)
   const topLevelTabs = useMemo(() => {
     const result: { id: string; label: string }[] = [];
