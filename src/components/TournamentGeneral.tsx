@@ -314,15 +314,30 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     toast({ title: "Omslagfoto geüpload" });
   };
 
+  const handleLocationDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = locations.findIndex((l) => l.id === active.id);
+    const newIndex = locations.findIndex((l) => l.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(locations, oldIndex, newIndex).map((l, i) => ({ ...l, sort_order: i }));
+    setLocations(reordered);
+    await Promise.all(
+      reordered.map((l) => supabase.from("tournament_locations").update({ sort_order: l.sort_order } as any).eq("id", l.id)),
+    );
+    toast({ title: "Volgorde locaties opgeslagen" });
+  };
+
   const addLocation = async () => {
     if (!newLocationName.trim()) return;
     const { data } = await supabase
       .from("tournament_locations")
-      .insert({ tournament_id: tournament.id, name: newLocationName.trim() })
-      .select("id, name")
+      .insert({ tournament_id: tournament.id, name: newLocationName.trim(), sort_order: locations.length } as any)
+      .select("id, name, sort_order")
       .single();
     if (data) {
-      setLocations((prev) => [...prev, data]);
+      setLocations((prev) => [...prev, data as Location]);
+
       setNewLocationName("");
       setShowAddLocation(false);
     }
