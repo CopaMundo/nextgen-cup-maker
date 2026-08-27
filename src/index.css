@@ -3466,7 +3466,10 @@ body[data-broadcast="teletext"] {
   border-bottom-color: hsl(120 100% 50%) !important;
 }
 
-/* P800: favoriete team in wedstrijdkaarten lichtblauw */
+/* P800: teamnamen in wedstrijdkaarten geel, favoriete team lichtblauw */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-team-name {
+  color: hsl(60 100% 50%) !important;
+}
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-fav-team {
   color: hsl(180 100% 50%) !important;
 }
