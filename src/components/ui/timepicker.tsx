@@ -135,6 +135,26 @@ export function TimePicker({
     setOpen(false);
   };
 
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const draggingRef = React.useRef(false);
+
+  const pickFromPointer = (clientX: number, clientY: number) => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 100 - 50;
+    const y = ((clientY - rect.top) / rect.height) * 100 - 50;
+    let angle = (Math.atan2(y, x) * 180) / Math.PI + 90;
+    if (angle < 0) angle += 360;
+    const radius = Math.hypot(x, y);
+    if (view === "hours") {
+      const idx = Math.round(angle / 30) % 12;
+      setDraftH(radius < 32 ? INNER_HOURS[idx] : OUTER_HOURS[idx]);
+    } else {
+      setDraftM(Math.round(angle / 6) % 60);
+    }
+  };
+
   const handIndex = view === "hours" ? draftH % 12 : draftM / 5;
   const handRadius = view === "hours" && (draftH === 0 || draftH > 12) ? 25 : 38;
   const handEnd = posOnCircle(handIndex, handRadius);
