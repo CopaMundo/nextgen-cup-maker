@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
 
-type StatTab = "scorers" | "assists" | "fairplay";
+type StatTab = "scorers" | "assists" | "fairplay" | "cards";
 
 const OWN_GOAL_LABEL = "Eigen doelpunt";
 
@@ -124,9 +124,44 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
   };
 
+  // Kaarten per speler (individueel): geel, 2x geel, rood
+  type PlayerCardsRow = {
+    name: string;
+    teamId: string;
+    yellows: number;
+    secondYellows: number;
+    reds: number;
+    totalPoints: number; // negatief, voor sortering
+  };
+
+  const cardsPerPlayer = (): PlayerCardsRow[] => {
+    const map: Record<string, PlayerCardsRow> = {};
+    stats.forEach((s) => {
+      if (!s.player_name || s.player_name === "Onbekend") return;
+      const key = `${s.player_name}__${s.team_id}`;
+      if (!map[key]) {
+        map[key] = { name: s.player_name, teamId: s.team_id, yellows: 0, secondYellows: 0, reds: 0, totalPoints: 0 };
+      }
+      const row = map[key];
+      if (s.stat_type === "yellow_card") row.yellows++;
+      else if (s.stat_type === "straight_red") row.reds++;
+      else if (s.stat_type === "red_card") row.reds++;
+    });
+    // 2x geel paren per speler
+    Object.values(map).forEach((row) => {
+      row.secondYellows = Math.floor(row.yellows / 2);
+      row.yellows = row.yellows % 2;
+      row.totalPoints = -(row.yellows * 1 + row.secondYellows * 3 + row.reds * 5);
+    });
+    return Object.values(map)
+      .filter((r) => r.yellows + r.secondYellows + r.reds > 0)
+      .sort((a, b) => a.totalPoints - b.totalPoints || a.name.localeCompare(b.name));
+  };
+
   const goals = useMemo(() => withRank(playerCountAgg("goal")), [stats]);
   const assists = useMemo(() => withRank(playerCountAgg("assist")), [stats]);
   const fairplay = useMemo(() => fairplayWithRank(fairplayPerTeam()), [stats, teams]);
+  const playerCards = useMemo(() => cardsPerPlayer(), [stats]);
 
   const showGoals = tournament.enable_goalscorers;
   const showAssists = tournament.enable_assists;
@@ -136,6 +171,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
     ...(showAssists ? [{ id: "assists" as StatTab, label: "Meeste assists" }] : []),
     ...(showFairplay ? [{ id: "fairplay" as StatTab, label: "Fair-playklassement" }] : []),
+    ...(showFairplay ? [{ id: "cards" as StatTab, label: "Kaarten per speler" }] : []),
   ];
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
@@ -151,7 +187,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   if (tabs.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border py-12 text-center">
-        <p className="text-muted-foreground">Geen statistieken ingeschakeld voor dit toernooi.</p>
+        <p className="text-muted-foreground">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
       </div>
     );
   }
@@ -250,6 +286,44 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     )
   );
 
+  const renderCardsTable = (data: PlayerCardsRow[]) => (
+    data.length === 0 ? (
+      <div className="rounded-xl border border-dashed border-border py-8 text-center">
+        <p className="text-sm text-muted-foreground">Nog geen kaarten uitgedeeld.</p>
+      </div>
+    ) : (
+      <div className="rounded-xl border border-border overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs">Speler</TableHead>
+              <TableHead className="text-xs">Team</TableHead>
+              <TableHead className="w-12 text-center text-xs"><YellowIcon /></TableHead>
+              <TableHead className="w-12 text-center text-xs"><SecondYellowIcon /></TableHead>
+              <TableHead className="w-12 text-center text-xs"><RedIcon /></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((row) => (
+              <TableRow key={`${row.name}-${row.teamId}`}>
+                <TableCell className="text-sm font-medium text-foreground">{row.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1.5">
+                    {teamLogo(row.teamId) && <img src={teamLogo(row.teamId)!} className="h-4 w-4 object-contain" alt="" />}
+                    <span className="text-xs text-muted-foreground">{teamName(row.teamId)}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center text-sm tabular-nums">{row.yellows}</TableCell>
+                <TableCell className="text-center text-sm tabular-nums">{row.secondYellows}</TableCell>
+                <TableCell className="text-center text-sm tabular-nums">{row.reds}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    )
+  );
+
   return (
     <div className="space-y-6 w-full">
       <div className="flex justify-center border-b border-border flex-wrap">
@@ -272,6 +346,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
       {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
       {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+      {activeTab === "cards" && showFairplay && renderCardsTable(playerCards)}
     </div>
   );
 };
