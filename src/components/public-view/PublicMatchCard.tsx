@@ -128,11 +128,11 @@ const PublicMatchCard = ({
   return (
     <>
       <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setOpen(true)}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(true); } }}
-        className="relative overflow-hidden cursor-pointer transition-colors hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        role={onCardClick ? undefined : "button"}
+        tabIndex={onCardClick ? undefined : 0}
+        onClick={() => { if (onCardClick) onCardClick(); else setOpen(true); }}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (onCardClick) onCardClick(); else setOpen(true); } }}
+        className={`relative overflow-hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${onCardClick ? "cursor-pointer" : "cursor-pointer hover:bg-secondary/40"}`}
       >
         {/* Context: format name + detail line */}
         {(formatName || detailLine || m.field || m.referee) && (
