@@ -3,7 +3,7 @@ import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicMatchCard from "./PublicMatchCard";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
-import { getMatchTeamPositions } from "@/lib/standingsCalculator";
+
 import { ChevronDown } from "lucide-react";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
