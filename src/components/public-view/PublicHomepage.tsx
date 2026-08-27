@@ -380,7 +380,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
             <ArrowLeft className="h-4 w-4" /> Terug
           </button>
-          <PublicStandings data={data} initialPhaseId={favGroup.phase_id} initialGroupId={favGroup.id} />
+          <PublicStandings data={data} initialPhaseId={favGroup.phase_id} initialGroupId={favGroup.id} favoriteTeam={favoriteTeam} />
         </div>
       );
     }
@@ -391,7 +391,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
             <ArrowLeft className="h-4 w-4" /> Terug
           </button>
-          <PublicStandings data={data} initialPhaseId={nextGroupPhaseGroup.phase_id} initialGroupId={nextGroupPhaseGroup.id} />
+          <PublicStandings data={data} initialPhaseId={nextGroupPhaseGroup.phase_id} initialGroupId={nextGroupPhaseGroup.id} favoriteTeam={favoriteTeam} />
         </div>
       );
     }
@@ -410,7 +410,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
               <ArrowLeft className="h-4 w-4" /> Terug
             </button>
-            <PublicStandings data={data} initialPhaseId={koPhase.id} initialGroupId={favKoGroup?.id} />
+            <PublicStandings data={data} initialPhaseId={koPhase.id} initialGroupId={favKoGroup?.id} favoriteTeam={favoriteTeam} />
           </div>
         );
       }
