@@ -1232,7 +1232,7 @@ const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, grou
 };
 
 // Main component - Two-level tab navigation
-const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [], tournament, phases, showAllOnly, favoriteTeam, scrollToGroupId, formatName, hideSectionDividers = false, presentationCompact = false, skipFirstRounds = 0 }: BracketSectionProps) => {
+const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [], tournament, phases, showAllOnly, favoriteTeam, scrollToGroupId, formatName, hideSectionDividers = false, presentationCompact = false, skipFirstRounds = 0, groupTeams = [], scoringSystems = [] }: BracketSectionProps) => {
   const bStyle = useBroadcastStyle();
   const [selectedTopTab, setSelectedTopTab] = useState<string>("all");
   const [selectedSubTab, setSelectedSubTab] = useState<string>("all");
