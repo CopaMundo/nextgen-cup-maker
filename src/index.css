@@ -3487,9 +3487,11 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-phase-tab-container .ttx-phase-tab[data-active="true"]::after {
   background-color: hsl(120 100% 50%) !important;
 }
-[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-phase-tab.ttx-bar-yellow {
-  background-color: hsl(120 100% 50%) !important;
-  color: hsl(0 0% 0%) !important;
+
+/* P800: klassement groepsfase — rijscheidingen zoals P500 (grijs) */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody > tr > td,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody > tr {
+  border-color: hsl(0 0% 26%) !important;
 }
 
 /* P800: klassement groepsfase — teamnamen geel, posities + statistieken groen */
