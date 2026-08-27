@@ -465,7 +465,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
         return (
           <div className="pt-4 space-y-4">
             {showScorers && <PlayerRanking title="Topscorers" iconSrc={trophyIconAsset.url} data={playerAgg("goal")} teams={teams} />}
-            {showAssists && <PlayerRanking title="Meeste assists" iconSrc={bootsIconAsset.url} data={playerAgg("assist")} teams={teams} />}
+            {showAssists && <PlayerRanking title="Assists" iconSrc={bootsIconAsset.url} data={playerAgg("assist")} teams={teams} />}
             {showFairplay && <FairplayRanking data={fairplayAgg()} teams={teams} />}
             {!hasAny && (
               <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">

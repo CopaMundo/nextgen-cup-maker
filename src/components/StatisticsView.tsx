@@ -169,7 +169,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   const tabs: { id: StatTab; label: string }[] = [
     ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
-    ...(showAssists ? [{ id: "assists" as StatTab, label: "Meeste assists" }] : []),
+    ...(showAssists ? [{ id: "assists" as StatTab, label: "Assists" }] : []),
     ...(showFairplay ? [{ id: "fairplay" as StatTab, label: "Kaarten" }] : []),
     ...(showFairplay ? [{ id: "cards" as StatTab, label: "Kaarten per speler" }] : []),
   ];
