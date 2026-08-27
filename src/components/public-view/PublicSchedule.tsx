@@ -65,6 +65,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   }, []);
 
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
+  const scheduledCount = matches.filter(m => m.match_date).length;
 
   return (
     <div className="px-3 pb-4">
