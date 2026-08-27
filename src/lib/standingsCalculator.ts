@@ -483,3 +483,37 @@ export const calculateGroupStandings = (
   rows.forEach((r, i) => (r.pos = i + 1));
   return rows;
 };
+
+/**
+ * Calculate the current group position for the home and away teams of a match.
+ * Returns undefined positions for non-group phases or when data is unavailable.
+ */
+export const getMatchTeamPositions = (
+  match: StandingMatch,
+  groupTeams: StandingGroupTeam[],
+  matches: StandingMatch[],
+  groups: StandingGroup[],
+  phases: StandingPhase[],
+  scoringSystems: ScoringSystem[],
+  tournament: TournamentDefaults | null | undefined,
+): { homePosition?: number; awayPosition?: number } => {
+  if (!match.group_id) return {};
+  const group = groups.find((g) => g.id === match.group_id);
+  const phase = phases.find((p) => p.id === match.phase_id);
+  if (!group || (phase?.phase_type !== "group" && phase?.phase_type !== "round_robin")) return {};
+
+  const standings = calculateGroupStandings(
+    match.group_id,
+    groupTeams,
+    matches,
+    groups,
+    phases,
+    scoringSystems,
+    tournament,
+  );
+
+  return {
+    homePosition: standings.find((r) => r.teamId === match.home_team_id)?.pos,
+    awayPosition: standings.find((r) => r.teamId === match.away_team_id)?.pos,
+  };
+};
