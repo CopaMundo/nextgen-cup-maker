@@ -185,6 +185,12 @@ export function TimePicker({
           onKeyDown={handleKeyDown}
           onFocus={() => { selectAllRef.current = true; inputRef.current?.select(); }}
           onClick={() => { selectAllRef.current = true; inputRef.current?.select(); }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            inputRef.current?.focus();
+            selectAllRef.current = true;
+            inputRef.current?.select();
+          }}
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"

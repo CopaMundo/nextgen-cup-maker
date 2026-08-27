@@ -136,6 +136,14 @@ export function DatePicker({
     inputRef.current?.select();
   };
 
+  const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
+    // Prevent the browser from placing the caret after mouseup; keep full selection.
+    event.preventDefault();
+    inputRef.current?.focus();
+    selectAllRef.current = true;
+    inputRef.current?.select();
+  };
+
   const handleBlur = () => {
     if (validDate) {
       setDigits(format(validDate, "ddMMyyyy"));
