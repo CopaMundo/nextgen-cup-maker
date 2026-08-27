@@ -17,6 +17,10 @@ import SportIcon from "@/components/SportIcon";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, MatchDayEntry } from "@/lib/dateUtils";
 import TiebreakerManager from "./TiebreakerManager";
 import ScoringSystemsManager from "./ScoringSystemsManager";
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
