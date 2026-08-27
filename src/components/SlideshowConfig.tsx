@@ -46,7 +46,7 @@ import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import { detectBracketStructure } from "@/components/public-view/PublicBracketSection";
-import { BROADCAST_STYLES, type BroadcastStyle } from "@/lib/broadcastStyles";
+import { BROADCAST_STYLES, SELECTABLE_BROADCAST_STYLES, type BroadcastStyle } from "@/lib/broadcastStyles";
 import {
   type Slide,
   type SlideBlock,
@@ -66,7 +66,7 @@ interface Props {
   onUpdate: (t: any) => void;
 }
 
-const STYLE_KEYS = Object.keys(BROADCAST_STYLES) as BroadcastStyle[];
+const STYLE_KEYS = SELECTABLE_BROADCAST_STYLES;
 
 const newId = () =>
   (typeof crypto !== "undefined" && "randomUUID" in crypto

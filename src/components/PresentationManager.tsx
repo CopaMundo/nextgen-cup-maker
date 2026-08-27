@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BROADCAST_STYLES, NEW_BROADCAST_STYLES, type BroadcastStyle } from "@/lib/broadcastStyles";
+import { BROADCAST_STYLES, SELECTABLE_BROADCAST_STYLES, type BroadcastStyle } from "@/lib/broadcastStyles";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
@@ -244,10 +244,9 @@ const PresentationManager = ({
                   toast({ title: `Stijl '${name}' ingesteld` });
                 };
                 const entries = (Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
-                  .filter(([key]) => !["world_cup_mexico", "world_cup_canada", "world_cup_usa"].includes(key));
+                  .filter(([key]) => SELECTABLE_BROADCAST_STYLES.includes(key));
                 const renderCard = ([key, info]: [BroadcastStyle, { name: string; description: string; preview: string }]) => {
-                  const wcKeys: BroadcastStyle[] = ["world_cup", "world_cup_mexico", "world_cup_canada", "world_cup_usa"];
-                  const isActive = key === "world_cup" ? wcKeys.includes(displayStyle) : displayStyle === key;
+                  const isActive = displayStyle === key;
                   return (
                     <button key={key} onClick={() => applyStyle(key, info.name)}
                       className={`rounded-lg border p-3 text-left transition-colors ${
@@ -263,18 +262,10 @@ const PresentationManager = ({
                     </button>
                   );
                 };
-                const newGen = entries.filter(([k]) => NEW_BROADCAST_STYLES.includes(k));
-                const legacy = entries.filter(([k]) => !NEW_BROADCAST_STYLES.includes(k));
                 return (
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Broadcast styles (nieuw)</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{newGen.map(renderCard)}</div>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Legacy thema's</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{legacy.map(renderCard)}</div>
-                    </div>
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Broadcast styles</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{entries.map(renderCard)}</div>
                   </div>
                 );
               })()}
