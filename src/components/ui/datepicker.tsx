@@ -106,9 +106,9 @@ export function DatePicker({
   };
 
   const handleFocus = () => {
-    if (inputRef.current) {
-      inputRef.current.select();
-    }
+    window.setTimeout(() => {
+      inputRef.current?.select();
+    }, 0);
   };
 
   const handleBlur = () => {
