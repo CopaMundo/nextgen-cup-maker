@@ -9,6 +9,27 @@ import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
+import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
+import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
+
+// Themed mask icon: takes the theme's primary color in every broadcast style
+const ThemedStatIcon = ({ src, label }: { src: string; label: string }) => (
+  <span
+    role="img"
+    aria-label={label}
+    className="inline-block h-4 w-4 bg-primary"
+    style={{
+      maskImage: `url(${src})`,
+      maskSize: "contain",
+      maskRepeat: "no-repeat",
+      maskPosition: "center",
+      WebkitMaskImage: `url(${src})`,
+      WebkitMaskSize: "contain",
+      WebkitMaskRepeat: "no-repeat",
+      WebkitMaskPosition: "center",
+    }}
+  />
+);
 
 const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }: { data: PublicTournamentData; initialPhaseId?: string; initialGroupId?: string; favoriteTeam?: string | null }) => {
   const { tournament, phases, groups, teams, matches, groupTeams, slots, standingColors, stats, scoringSystems } = data;
