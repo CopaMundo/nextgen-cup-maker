@@ -640,6 +640,45 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               )}
             </div>
 
+            {/* Teamstatistieken */}
+            {favPlayed.length > 0 && (
+              <div className="px-3 py-2.5 flex items-center justify-between gap-3">
+                <div className="grid grid-cols-4 flex-1 gap-1 text-center">
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Gesp.</p>
+                    <p className="text-sm font-black text-foreground tabular-nums">{favPlayed.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">W-G-V</p>
+                    <p className="text-sm font-black text-foreground tabular-nums">{favW}-{favD}-{favL}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Voor</p>
+                    <p className="text-sm font-black text-foreground tabular-nums">{favGF}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Tegen</p>
+                    <p className="text-sm font-black text-foreground tabular-nums">{favGA}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-1 shrink-0">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Vorm</p>
+                  <div className="flex gap-0.5">
+                    {getForm().map((f, i) => (
+                      <span
+                        key={i}
+                        className={`flex h-4 w-4 items-center justify-center rounded-sm text-[9px] font-black ${
+                          f === "W" ? "bg-green-500/20 text-green-500" : f === "G" ? "bg-muted text-muted-foreground" : "bg-red-500/20 text-red-500"
+                        }`}
+                      >
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Tab switcher: Wedstrijden / Standen */}
             {(lastFavMatch || nextFavMatch || showCurrentKnockout || showBracketInstead || showNextGroupInstead || (favGroup && favStandings.length > 0)) && (
               <div className="ttx-myteam-tabs grid grid-cols-2 gap-0 border-b border-border">
