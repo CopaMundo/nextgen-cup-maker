@@ -400,10 +400,13 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     if (expandedGrid.startsWith("fav-standing-knockout:")) {
       const koPhaseId = expandedGrid.replace("fav-standing-knockout:", "");
       const koPhase = phases.find((p: any) => p.id === koPhaseId);
-      const favKoGroup = favoriteTeam ? groups.find((g: any) =>
+      const koGroupHasFav = (g: any, onlyUnplayed: boolean) =>
         g.phase_id === koPhaseId &&
-        matches.some((m: any) => m.group_id === g.id && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam))
-      ) : null;
+        matches.some((m: any) => m.group_id === g.id && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam) && (!onlyUnplayed || !m.is_played));
+      const favKoGroup = favoriteTeam
+        ? groups.find((g: any) => koGroupHasFav(g, true)) || groups.find((g: any) => koGroupHasFav(g, false))
+        : null;
+
       if (koPhase) {
         return (
           <div className="px-3 pt-4 space-y-4">
