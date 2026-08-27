@@ -79,6 +79,8 @@ const PublicMatchCard = ({
   const awayName = getMatchSideDisplayName(m, "away", teams, { slots, phases, groups, emptyLabel: "TBD" });
   const homeLogo = getTeamLogo(teams, m.home_team_id);
   const awayLogo = getTeamLogo(teams, m.away_team_id);
+  const homeCountry = getTeamCountry(teams, m.home_team_id);
+  const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   const hasPenalties = m.home_penalties != null && m.away_penalties != null;
   const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
