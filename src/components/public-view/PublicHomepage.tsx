@@ -37,6 +37,9 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
   const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
+
+  const matchPositions = (m: any) => getMatchTeamPositions(m, groupTeams as any, matches as any, groups as any, phases as any, scoringSystems as any, tournament);
+
   const [expandedGrid, setExpandedGridState] = useState<string | null>(() => {
     const hash = window.location.hash.replace("#", "");
     return hash.startsWith("grid-") ? hash.replace("grid-", "") : null;
