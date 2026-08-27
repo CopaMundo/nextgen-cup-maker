@@ -151,7 +151,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   if (tabs.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border py-12 text-center">
-        <p className="text-muted-foreground">Geen statistieken ingeschakeld voor dit toernooi.</p>
+        <p className="text-muted-foreground">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
       </div>
     );
   }
