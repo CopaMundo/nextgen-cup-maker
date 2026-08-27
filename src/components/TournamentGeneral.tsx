@@ -746,17 +746,24 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </p>
 
             {categories.length > 0 && (
-              <div className="space-y-1">
-                {categories.map((cat) => (
-                  <div key={cat.id} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-foreground font-medium">{cat.name}</span>
-                      <button onClick={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
-                    </div>
-                    <button onClick={() => setDeleteCatId(cat.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+              <DndContext
+                sensors={dndSensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleCategoryDragEnd}
+              >
+                <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-1">
+                    {categories.map((cat) => (
+                      <SortableCategoryRow
+                        key={cat.id}
+                        cat={cat}
+                        onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
+                        onDelete={() => setDeleteCatId(cat.id)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
 
             <Button variant="outline" size="sm" onClick={() => { setNewCategoryName(""); setShowAddCategory(true); }}>
