@@ -43,7 +43,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   });
   const [favTab, setFavTab] = useState<"matches" | "standings">("matches");
   const [globalTab, setGlobalTab] = useState<"results" | "next">("next");
-  const [programmaExpanded, setProgrammaExpanded] = useState(false);
+  
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
