@@ -350,6 +350,20 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     }
   };
 
+  const handleCategoryDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(categories, oldIndex, newIndex).map((c, i) => ({ ...c, sort_order: i }));
+    setCategories(reordered);
+    await Promise.all(
+      reordered.map((c) => supabase.from("tournament_categories").update({ sort_order: c.sort_order }).eq("id", c.id)),
+    );
+    toast({ title: "Volgorde divisies opgeslagen" });
+  };
+
   const saveCategoryRename = async () => {
     if (!editingCatId || !editCatName.trim()) return;
     await supabase.from("tournament_categories").update({ name: editCatName.trim() }).eq("id", editingCatId);
