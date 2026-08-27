@@ -106,9 +106,7 @@ export function DatePicker({
   };
 
   const handleFocus = () => {
-    window.setTimeout(() => {
-      inputRef.current?.select();
-    }, 0);
+    inputRef.current?.select();
   };
 
   const handleBlur = () => {
@@ -169,7 +167,7 @@ export function DatePicker({
           {displayValue.split("").map((char, i) => (
             <span
               key={i}
-              className={i < partialValue.length ? "text-transparent" : "text-white"}
+              className={i < partialValue.length ? "text-transparent" : "text-foreground"}
             >
               {char}
             </span>

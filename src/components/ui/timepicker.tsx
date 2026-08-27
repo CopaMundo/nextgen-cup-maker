@@ -183,7 +183,7 @@ export function TimePicker({
           {displayValue.split("").map((char, i) => (
             <span
               key={i}
-              className={i < partialValue.length ? "text-transparent" : "text-white"}
+              className={i < partialValue.length ? "text-transparent" : "text-foreground"}
             >
               {char}
             </span>
