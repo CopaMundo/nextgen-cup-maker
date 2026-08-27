@@ -5,6 +5,7 @@ import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
+import PublicStandings from "@/components/public-view/PublicStandings";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import { getPhaseLabel } from "@/lib/phaseLabel";
@@ -318,36 +319,25 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     let title = "";
     let matchList: any[] = [];
 
+    // Volledig klassement: toon de Standen-view (met fases en formattabs) inline op de hoofdpagina
     if (expandedGrid === "fav-standing" && favGroup) {
-      const standings = calcStandings(favGroup.id);
       return (
         <div className="px-3 pt-4 space-y-4">
           <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
             <ArrowLeft className="h-4 w-4" /> Terug
           </button>
-          <div className="flex items-center gap-2">
-            <div className={ds(bStyle, "sectionDot")} />
-            <h2 className={ds(bStyle, "sectionTitle")}>{favGroup.name}</h2>
-            <div className={ds(bStyle, "sectionLine")} />
-          </div>
-          <StandingTable standings={standings} favoriteTeam={favoriteTeam} tournament={tournament} standingColors={standingColors} phaseId={favGroup.phase_id} />
+          <PublicStandings data={data} initialPhaseId={favGroup.phase_id} />
         </div>
       );
     }
 
     if (expandedGrid === "fav-standing-next" && nextGroupPhaseGroup) {
-      const standings = calcStandings(nextGroupPhaseGroup.id);
       return (
         <div className="px-3 pt-4 space-y-4">
           <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
             <ArrowLeft className="h-4 w-4" /> Terug
           </button>
-          <div className="flex items-center gap-2">
-            <div className={ds(bStyle, "sectionDot")} />
-            <h2 className={ds(bStyle, "sectionTitle")}>{nextGroupPhaseGroup.name}</h2>
-            <div className={ds(bStyle, "sectionLine")} />
-          </div>
-          <StandingTable standings={standings} favoriteTeam={favoriteTeam} tournament={tournament} standingColors={standingColors} phaseId={nextGroupPhaseGroup.phase_id} />
+          <PublicStandings data={data} initialPhaseId={nextGroupPhaseGroup.phase_id} />
         </div>
       );
     }
