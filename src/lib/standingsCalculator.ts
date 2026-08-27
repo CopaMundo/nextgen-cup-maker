@@ -500,7 +500,7 @@ export const getMatchTeamPositions = (
   if (!match.group_id) return {};
   const group = groups.find((g) => g.id === match.group_id);
   const phase = phases.find((p) => p.id === match.phase_id);
-  if (!group || (phase?.phase_type !== "group" && phase?.phase_type !== "round_robin")) return {};
+  if (!group || ((phase as any)?.phase_type !== "group" && (phase as any)?.phase_type !== "round_robin")) return {};
 
   const standings = calculateGroupStandings(
     match.group_id,
