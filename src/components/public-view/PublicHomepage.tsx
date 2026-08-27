@@ -1075,7 +1075,7 @@ const InlineBracketView = ({ backAction, bStyle, phaseNumberSet, allKnockoutPhas
 };
 
 // Knockout preview
-const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches, phases, groups, tournament }: { matches: any[]; teams: any[]; slots?: any[]; favoriteTeam: string | null; allMatches?: any[]; phases?: any[]; groups?: any[]; tournament?: any }) => {
+const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches, phases, groups, tournament, groupTeams, scoringSystems }: { matches: any[]; teams: any[]; slots?: any[]; favoriteTeam: string | null; allMatches?: any[]; phases?: any[]; groups?: any[]; tournament?: any; groupTeams?: any[]; scoringSystems?: any[] }) => {
   const bStyle = useBroadcastStyle();
   const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
 
