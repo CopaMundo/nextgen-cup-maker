@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
 
-type StatTab = "scorers" | "assists" | "fairplay";
+type StatTab = "scorers" | "assists" | "fairplay" | "cards";
 
 const OWN_GOAL_LABEL = "Eigen doelpunt";
 
