@@ -48,8 +48,41 @@ interface Attachment {
   file_size: number | null;
 }
 
+const SortableCategoryRow = ({ cat, onRename, onDelete }: { cat: Category; onRename: () => void; onDelete: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={cn(
+        "flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2",
+        isDragging && "opacity-70 shadow-lg z-10 relative",
+      )}
+    >
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Divisie verplaatsen"
+          className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <span className="text-foreground font-medium">{cat.name}</span>
+        <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
+      </div>
+      <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+    </div>
+  );
+};
+
 const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate: (t: any) => void }) => {
   const { toast } = useToast();
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
