@@ -20,6 +20,16 @@ interface Props {
   homeResetKey?: number;
 }
 
+/** Venster van max 5 posities rond het favoriete team (team steeds 3de, tenzij 1ste/2de of onderaan). */
+const windowStandings = (rows: any[], favoriteTeam: string | null) => {
+  if (rows.length <= 5) return rows;
+  const idx = rows.findIndex((r: any) => r.team?.id === favoriteTeam);
+  if (idx < 0) return rows.slice(0, 5);
+  const start = Math.min(Math.max(idx - 2, 0), rows.length - 5);
+  return rows.slice(start, start + 5);
+};
+
+
 const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, homeResetKey }: Props) => {
   const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
@@ -514,46 +524,32 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         </div>
       </div>
 
-      {/* No favorite chosen → prompt */}
-      {!favoriteTeam && (
-        <div className={`${ds(bStyle, "card")} p-4`}>
-          <label className={`${ds(bStyle, "label")} mb-2 block flex items-center gap-1.5`}>
-            <Star className="h-3 w-3" /> Kies je favoriete team
-          </label>
-          <Select value="" onValueChange={(v) => toggleFavorite(v)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecteer je favoriete team" />
-            </SelectTrigger>
-            <SelectContent>
-              {teams.map((t: any) => (
-                <SelectItem key={t.id} value={t.id}>
-                  <div className="flex items-center gap-2">
-                    {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain" alt="" />}
-                    {t.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {/* === MIJN TEAM: titel + teamkiezer rechts === */}
+      <div className="flex items-center gap-2">
+        <div className={ds(bStyle, "sectionDot")} />
+        <h2 className={ds(bStyle, "sectionTitle")}>Mijn team</h2>
+        <div className={`${ds(bStyle, "sectionLine")} flex-1`} />
+        <Select value={favoriteTeam || ""} onValueChange={(v) => { if (v !== favoriteTeam) { if (favoriteTeam) toggleFavorite(favoriteTeam); toggleFavorite(v); } }}>
+          <SelectTrigger className="h-7 w-auto min-w-[110px] max-w-[150px] text-[10px] font-black uppercase tracking-wider">
+            <SelectValue placeholder="Kies uw team" />
+          </SelectTrigger>
+          <SelectContent>
+            {teams.map((t: any) => (
+              <SelectItem key={t.id} value={t.id}>
+                <div className="flex items-center gap-2">
+                  {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain" alt="" />}
+                  {t.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* === FAVORITE TEAM BLOCK (everything about my team grouped together in one container) === */}
       {favoriteTeam && favTeamObj && (
         <div className={`${ds(bStyle, "card")}`}>
-          {/* Colored header bar */}
-          <div className={`flex items-center justify-between ${homeHeaderCls} ttx-myteam-header`}>
-            <div className="flex items-center gap-2">
-              <Star className="h-3.5 w-3.5" />
-              <h2 className={homeHeaderTitleCls}>Mijn team</h2>
-            </div>
-            <button
-              onClick={() => toggleFavorite(favoriteTeam)}
-              className={`${homeHeaderTitleCls} opacity-80 hover:opacity-100`}
-            >
-              Wijzigen
-            </button>
-          </div>
+
 
           {/* Body */}
           <div className="divide-y divide-border">
@@ -701,30 +697,32 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             )}
 
             {favTab === "standings" && !showCurrentKnockout && !showBracketInstead && !showNextGroupInstead && favGroup && favStandings.length > 0 && (
-              <button
-                onClick={() => setExpandedGrid("fav-standing")}
-                className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
-              >
-                <div className="flex items-center gap-2">
-                  <Trophy className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-black uppercase tracking-wider text-foreground">{favGroup.name} – Klassement</span>
+              <div className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedGrid("fav-standing")}>
+                <div className="px-3 pt-3 pb-2 space-y-2">
+                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-primary italic">{favGroup.name}</div>
+                  <StandingTable standings={windowStandings(favStandings, favoriteTeam)} favoriteTeam={favoriteTeam} tournament={tournament} standingColors={standingColors} phaseId={favGroup.phase_id} />
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
+                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                  Volledig klassement
+                  <ChevronRight className="h-3 w-3 rotate-90" />
+                </div>
+              </div>
             )}
 
             {favTab === "standings" && !showCurrentKnockout && showNextGroupInstead && nextGroupPhaseGroup && (
-              <button
-                onClick={() => setExpandedGrid("fav-standing-next")}
-                className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
-              >
-                <div className="flex items-center gap-2">
-                  <Trophy className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-black uppercase tracking-wider text-foreground">{nextGroupPhaseGroup.name} – Klassement</span>
+              <div className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedGrid("fav-standing-next")}>
+                <div className="px-3 pt-3 pb-2 space-y-2">
+                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-primary italic">{nextGroupPhaseGroup.name}</div>
+                  <StandingTable standings={windowStandings(calcStandings(nextGroupPhaseGroup.id), favoriteTeam)} favoriteTeam={favoriteTeam} tournament={tournament} standingColors={standingColors} phaseId={nextGroupPhaseGroup.phase_id} />
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
+                <div className="flex items-center justify-center gap-1 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                  Volledig klassement
+                  <ChevronRight className="h-3 w-3 rotate-90" />
+                </div>
+              </div>
             )}
+
+
 
             {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
               <button
