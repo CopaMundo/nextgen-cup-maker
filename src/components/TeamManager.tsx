@@ -212,7 +212,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
               <label className="cursor-pointer relative group block">
                 {team.team_photo_url ? (
                   <div className="relative rounded-xl overflow-hidden">
-                    <img src={team.team_photo_url} alt="Ploegfoto" className="w-full max-h-64 object-cover rounded-xl" />
+                    <img src={team.team_photo_url} alt="Ploegfoto" className="w-full h-auto object-contain rounded-xl" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
                       <Camera className="h-8 w-8 text-white" />
                     </div>
