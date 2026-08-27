@@ -28,24 +28,24 @@ interface DatePickerProps {
   className?: string;
 }
 
-const MASK = "DD/MM/JJJJ";
+const MASK = "dd/mm/jjjj";
 
 const buildDisplayValue = (digits: string) => {
   const d = digits.padEnd(8, " ");
-  const day1 = d[0] === " " ? "D" : d[0];
-  const day2 = d[1] === " " ? "D" : d[1];
-  const mon1 = d[2] === " " ? "M" : d[2];
-  const mon2 = d[3] === " " ? "M" : d[3];
-  const yr1 = d[4] === " " ? "J" : d[4];
-  const yr2 = d[5] === " " ? "J" : d[5];
-  const yr3 = d[6] === " " ? "J" : d[6];
-  const yr4 = d[7] === " " ? "J" : d[7];
+  const day1 = d[0] === " " ? "d" : d[0];
+  const day2 = d[1] === " " ? "d" : d[1];
+  const mon1 = d[2] === " " ? "m" : d[2];
+  const mon2 = d[3] === " " ? "m" : d[3];
+  const yr1 = d[4] === " " ? "j" : d[4];
+  const yr2 = d[5] === " " ? "j" : d[5];
+  const yr3 = d[6] === " " ? "j" : d[6];
+  const yr4 = d[7] === " " ? "j" : d[7];
   return `${day1}${day2}/${mon1}${mon2}/${yr1}${yr2}${yr3}${yr4}`;
 };
 
 const extractDigits = (raw: string) => raw.replace(/\D/g, "").slice(0, 8);
 
-const isPlaceholder = (char: string) => char === "D" || char === "M" || char === "J";
+const isPlaceholder = (char: string) => char === "d" || char === "m" || char === "j";
 
 const getCursorPos = (length: number) => {
   if (length <= 2) return length;
@@ -161,7 +161,7 @@ export function DatePicker({
           placeholder=""
           autoComplete="off"
           aria-label={placeholder}
-          className="h-full w-full pr-10 text-primary"
+          className="h-full w-full pr-10"
         />
         <div
           aria-hidden="true"
@@ -195,7 +195,7 @@ export function DatePicker({
           size="icon"
           aria-label="Open kalender"
           onClick={openDialog}
-          className="absolute right-0 top-0 h-full w-10 bg-transparent text-primary hover:bg-transparent hover:text-primary dark:text-white dark:hover:bg-transparent dark:hover:text-white"
+          className="absolute right-0 top-0 h-full w-10 bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white"
         >
           <CalendarIcon className="h-4 w-4" />
         </Button>
