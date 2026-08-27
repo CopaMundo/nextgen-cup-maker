@@ -2733,21 +2733,21 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                               className={`rounded-t-lg bg-secondary border border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
                             >
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1">
-                                  <h4 className="font-display text-sm font-bold text-foreground">{field.name}</h4>
+                                <h4 className="font-display text-sm font-bold text-foreground">{field.name}</h4>
+                                <div className="flex items-center gap-2">
                                   <button
                                     onClick={(e) => { e.stopPropagation(); setEditFieldIdx(fields.indexOf(field)); }}
                                     className="text-muted-foreground hover:text-foreground"
                                   >
                                     <Pencil className="h-3 w-3" />
                                   </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setDeleteFieldIdx(fields.indexOf(field)); }}
+                                    className="text-muted-foreground hover:text-destructive"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </button>
                                 </div>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setDeleteFieldIdx(fields.indexOf(field)); }}
-                                  className="text-muted-foreground hover:text-destructive"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </button>
                               </div>
                               <p className="text-[10px] text-muted-foreground">{field.startTime}</p>
                               {isMobile && mobileSelectedMatchId && (
@@ -3693,7 +3693,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                 <Button variant="outline" size="sm" onClick={() => { setClearFieldIdx(editFieldIdx); }} className="text-xs gap-1">
                   <RotateCcw className="h-3 w-3" /> Veld leegmaken
                 </Button>
-                <Button variant="ghost" onClick={() => setEditFieldIdx(null)} className="text-xs">Sluiten</Button>
+                <Button onClick={() => setEditFieldIdx(null)} className="text-xs">Opslaan</Button>
               </div>
             </div>
           )}
