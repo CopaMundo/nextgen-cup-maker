@@ -63,8 +63,18 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
   // Keep selectedPhaseNum in sync when data changes (e.g. phase undo)
   useEffect(() => {
     setSelectedPhaseNum(autoPhaseNum);
-    setSelectedFormatId(null);
-  }, [autoPhaseNum]);
+    setSelectedFormatId(initialPhaseId || null);
+  }, [autoPhaseNum, initialPhaseId]);
+
+  // Auto-scroll naar de groep van het favoriete team
+  useEffect(() => {
+    if (!initialGroupId) return;
+    const timer = setTimeout(() => {
+      const el = document.querySelector(`[data-standings-group="${initialGroupId}"]`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [initialGroupId]);
 
   const activePhaseNum = selectedPhaseNum ?? allPhaseNumbers[0] ?? null;
   const phasesInActiveNum = phases.filter((p: any) => p.phase_number === activePhaseNum);
