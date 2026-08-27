@@ -188,14 +188,14 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
         </button>
         <div className="flex items-center gap-6">
           <label className="cursor-pointer relative group">
-            <div className="h-24 w-24 overflow-hidden rounded-2xl bg-secondary flex-shrink-0">
+            <div className="h-24 w-24 overflow-hidden flex-shrink-0">
               {team.logo_url ? (
                 <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
+                <div className="flex h-full w-full items-center justify-center rounded-2xl bg-secondary text-3xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
               )}
             </div>
-            <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
               <Upload className="h-6 w-6 text-foreground" />
             </div>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadLogo(team.id, e.target.files[0])} />
@@ -254,11 +254,11 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {teams.map(team => (
           <div key={team.id} className={`rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-3 group relative ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
-            <div className="h-20 w-20 overflow-hidden rounded-xl bg-secondary flex-shrink-0">
+            <div className="h-20 w-20 overflow-hidden flex-shrink-0">
               {team.logo_url ? (
                 <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
+                <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
               )}
             </div>
             <div className="text-center">
@@ -324,14 +324,14 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
               <h3 className="font-display text-lg font-bold text-foreground">{singularLabel} bewerken</h3>
               <div className="flex justify-center">
                 <label className="cursor-pointer relative group">
-                  <div className="h-24 w-24 overflow-hidden rounded-xl bg-secondary flex-shrink-0">
+                  <div className="h-24 w-24 overflow-hidden flex-shrink-0">
                     {team.logo_url ? (
                       <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-muted-foreground">{editTeam.name.charAt(0) || team.name.charAt(0)}</div>
+                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-3xl font-bold text-muted-foreground">{editTeam.name.charAt(0) || team.name.charAt(0)}</div>
                     )}
                   </div>
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Upload className="h-6 w-6 text-foreground" />
                   </div>
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) uploadLogo(team.id, e.target.files[0]); }} />
