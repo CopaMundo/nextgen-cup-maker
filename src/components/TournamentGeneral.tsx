@@ -1094,7 +1094,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingLocId(null)}>Annuleren</Button>
+            <Button variant="outline" onClick={() => setEditingLocId(null)}>Sluiten</Button>
             <Button onClick={saveLocationRename} disabled={!editLocName.trim()}>Opslaan</Button>
           </DialogFooter>
         </DialogContent>
