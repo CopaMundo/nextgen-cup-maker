@@ -22,6 +22,10 @@ interface PublicMatchCardProps {
   hideContext?: boolean;
   extraContext?: string;
   hideRoundNumber?: boolean;
+  /** Current group position for the home team (shown before the score). */
+  homePosition?: number;
+  /** Current group position for the away team (shown before the score). */
+  awayPosition?: number;
   /** When provided, overrides the default match-detail dialog open. */
   onCardClick?: () => void;
 }
