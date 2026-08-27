@@ -437,7 +437,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
       )}
 
       {subTab === "stats" && (
-        <div className="space-y-4">
+        <div className="pt-4 space-y-4">
           <TeamStatsSection teams={teams} matches={matches} />
           {tournament.enable_goalscorers && tournament.show_public_top_scorers && <PlayerRanking title="Topscorers" icon="⚽" data={playerAgg("goal")} teams={teams} />}
           {tournament.enable_assists && tournament.show_public_assists && <PlayerRanking title="Meeste assists" icon="🅰️" data={playerAgg("assist")} teams={teams} />}
