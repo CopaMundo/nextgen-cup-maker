@@ -725,6 +725,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                           allMatches={matches}
                           favoriteTeam={favoriteTeam}
                           hideRoundNumber
+                          {...matchPositions(lastFavMatch)}
                         />
                       </div>
                     </div>
