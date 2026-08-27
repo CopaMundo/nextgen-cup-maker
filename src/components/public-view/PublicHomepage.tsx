@@ -749,7 +749,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {/* Standen tab — inline weergave (klassement of bracket), terug-knop houdt op homepage */}
             {favTab === "standings" && showCurrentKnockout && activeKnockout && (
               <button
-                onClick={() => setExpandedGrid(`fav-bracket:${activeKnockout.id}`)}
+                onClick={() => setExpandedGrid(`fav-standing-knockout:${activeKnockout.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -790,7 +790,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
               <button
-                onClick={() => setExpandedGrid(`fav-bracket:${nextKnockoutPhase.id}`)}
+                onClick={() => setExpandedGrid(`fav-standing-knockout:${nextKnockoutPhase.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
