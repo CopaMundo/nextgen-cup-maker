@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Pencil, Upload, User } from "lucide-react";
@@ -193,7 +194,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Geboortedatum</Label>
-                  <Input type="date" value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} />
+                  <DatePicker value={form.birth_date} onChange={(v) => setForm({ ...form, birth_date: v })} placeholder="Kies datum" />
                 </div>
               </div>
               <div className="space-y-1">
@@ -278,7 +279,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Geboortedatum</Label>
-                  <Input type="date" value={editForm.birth_date} onChange={(e) => setEditForm({ ...editForm, birth_date: e.target.value })} />
+                  <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" />
                 </div>
               </div>
             </div>

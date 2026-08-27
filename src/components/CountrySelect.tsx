@@ -24,6 +24,8 @@ const COUNTRIES = [
   "Verenigde Staten","Verenigd Koninkrijk","Vietnam","Wales","Zambia","Zimbabwe","Zuid-Afrika","Zuid-Korea","Zuid-Soedan","Zweden","Zwitserland"
 ];
 
+const SORTED_COUNTRIES = [...COUNTRIES].sort((a, b) => a.localeCompare(b, "nl"));
+
 const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
   return (
     <select
@@ -32,7 +34,7 @@ const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: strin
       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
     >
       <option value="">Selecteer land</option>
-      {COUNTRIES.map((c) => (
+      {SORTED_COUNTRIES.map((c) => (
         <option key={c} value={c}>{c}</option>
       ))}
     </select>
