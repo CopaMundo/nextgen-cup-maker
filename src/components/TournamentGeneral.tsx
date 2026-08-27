@@ -759,18 +759,28 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             {!form.is_esport && (
               <>
                 {locations.length > 0 && (
-                  <div className="space-y-1">
-                    {locations.map((loc) => (
-                      <div key={loc.id} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-foreground font-medium">{loc.name}</span>
-                          <button onClick={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
-                        </div>
-                        <button onClick={() => setDeleteLocId(loc.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                  <DndContext
+                    sensors={dndSensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleLocationDragEnd}
+                  >
+                    <SortableContext items={locations.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+                      <div className="space-y-1">
+                        {locations.map((loc) => (
+                          <SortableRow
+                            key={loc.id}
+                            id={loc.id}
+                            label={loc.name}
+                            dragLabel="Locatie verplaatsen"
+                            onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
+                            onDelete={() => setDeleteLocId(loc.id)}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 )}
+
                 <Button variant="outline" size="sm" onClick={() => { setNewLocationName(""); setShowAddLocation(true); }}>
                   <Plus className="h-3.5 w-3.5 mr-1" /> Locatie toevoegen
                 </Button>
