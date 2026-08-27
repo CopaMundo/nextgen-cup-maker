@@ -346,6 +346,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
       {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
       {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+      {activeTab === "cards" && showFairplay && renderCardsTable(playerCards)}
     </div>
   );
 };
