@@ -1073,7 +1073,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingCatId(null)}>Annuleren</Button>
+            <Button variant="outline" onClick={() => setEditingCatId(null)}>Sluiten</Button>
             <Button onClick={saveCategoryRename} disabled={!editCatName.trim()}>Opslaan</Button>
           </DialogFooter>
         </DialogContent>
