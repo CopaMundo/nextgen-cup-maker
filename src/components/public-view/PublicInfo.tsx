@@ -13,9 +13,10 @@ interface Props {
   onCategoryChange?: (id: string) => void;
   darkMode?: boolean;
   onToggleDarkMode?: () => void;
+  onSetDarkMode?: (value: boolean) => void;
 }
 
-const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onToggleDarkMode }: Props) => {
+const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onToggleDarkMode, onSetDarkMode }: Props) => {
   const { tournament, attachments, sponsors, locations, categories } = data;
   const bStyle = useBroadcastStyle();
   const wrapperToken = ds(bStyle, "matchCardWrapper");
@@ -109,17 +110,30 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
           {onToggleDarkMode ? (
             <div className="flex-1 flex justify-end pb-1">
-              <button onClick={onToggleDarkMode}
-                className={`ttx-variant-toggle flex items-center gap-1.5 border border-border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-all shadow-sm ${controlFrameShape}`}>
-                {bStyle === "teletext" ? (
-                  <span className="tabular-nums">P{darkMode ? "500" : "800"}</span>
-                ) : (
-                  <>
-                    {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                    {darkMode ? "Light" : "Dark"}
-                  </>
-                )}
-              </button>
+              {bStyle === "teletext" && onSetDarkMode ? (
+                <div className={`ttx-variant-group flex items-center gap-1 border border-border bg-card p-1 shadow-sm ${controlFrameShape}`}>
+                  <button
+                    onClick={() => onSetDarkMode(true)}
+                    data-active={darkMode === true}
+                    className="ttx-variant-btn ttx-variant-500 px-2.5 py-1 text-xs font-bold transition-all"
+                  >
+                    P500
+                  </button>
+                  <button
+                    onClick={() => onSetDarkMode(false)}
+                    data-active={darkMode === false}
+                    className="ttx-variant-btn ttx-variant-800 px-2.5 py-1 text-xs font-bold transition-all"
+                  >
+                    P800
+                  </button>
+                </div>
+              ) : (
+                <button onClick={onToggleDarkMode}
+                  className={`ttx-variant-toggle flex items-center gap-1.5 border border-border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-all shadow-sm ${controlFrameShape}`}>
+                  {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                  {darkMode ? "Light" : "Dark"}
+                </button>
+              )}
             </div>
           ) : null}
         </div>

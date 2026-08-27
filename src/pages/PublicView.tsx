@@ -98,6 +98,11 @@ const PublicView = () => {
     });
   }, [token]);
 
+  const setDarkModeValue = useCallback((value: boolean) => {
+    setDarkMode(value);
+    localStorage.setItem(`dark-${token}`, String(value));
+  }, [token]);
+
   // Realtime
   useEffect(() => {
     if (!data?.tournament) return;
@@ -229,7 +234,7 @@ const PublicView = () => {
   return (
     <BroadcastStyleContext.Provider value={displayStyle}>
       <div className="min-h-screen bg-background pb-20" data-broadcast={displayStyle}>
-        {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />}
+        {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} onSetDarkMode={setDarkModeValue} />}
         {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} />}
         {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} homeResetKey={homeResetKey} />}
         {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} />}
