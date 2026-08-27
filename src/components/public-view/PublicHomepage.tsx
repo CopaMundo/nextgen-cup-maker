@@ -396,6 +396,26 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
       );
     }
 
+    // Volledige standen-view voor knockout / enkele wedstrijd (met fases en formattabs)
+    if (expandedGrid.startsWith("fav-standing-knockout:")) {
+      const koPhaseId = expandedGrid.replace("fav-standing-knockout:", "");
+      const koPhase = phases.find((p: any) => p.id === koPhaseId);
+      const favKoGroup = favoriteTeam ? groups.find((g: any) =>
+        g.phase_id === koPhaseId &&
+        matches.some((m: any) => m.group_id === g.id && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam))
+      ) : null;
+      if (koPhase) {
+        return (
+          <div className="px-3 pt-4 space-y-4">
+            <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
+              <ArrowLeft className="h-4 w-4" /> Terug
+            </button>
+            <PublicStandings data={data} initialPhaseId={koPhase.id} initialGroupId={favKoGroup?.id} />
+          </div>
+        );
+      }
+    }
+
     // Inline bracket view for knockout phases
     if (expandedGrid.startsWith("fav-bracket:")) {
       const bracketPhaseId = expandedGrid.replace("fav-bracket:", "");
@@ -729,7 +749,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
             {/* Standen tab — inline weergave (klassement of bracket), terug-knop houdt op homepage */}
             {favTab === "standings" && showCurrentKnockout && activeKnockout && (
               <button
-                onClick={() => setExpandedGrid(`fav-bracket:${activeKnockout.id}`)}
+                onClick={() => setExpandedGrid(`fav-standing-knockout:${activeKnockout.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
@@ -770,7 +790,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {favTab === "standings" && !showCurrentKnockout && showBracketInstead && nextKnockoutPhase && (
               <button
-                onClick={() => setExpandedGrid(`fav-bracket:${nextKnockoutPhase.id}`)}
+                onClick={() => setExpandedGrid(`fav-standing-knockout:${nextKnockoutPhase.id}`)}
                 className="w-full px-3 py-4 text-left hover:bg-muted/30 transition-colors flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
