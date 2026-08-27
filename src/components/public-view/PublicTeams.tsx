@@ -193,11 +193,13 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
   // Team grid - broadcast style
   return (
     <div className="px-3 pt-4 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className={ds(bStyle, "sectionDot")} />
-        <h2 className={ds(bStyle, "sectionTitle")}>Teams</h2>
-        <div className={ds(bStyle, "sectionLine")} />
-        <span className="ttx-section-meta text-[10px] font-bold text-muted-foreground uppercase">{teams.length} teams</span>
+      <div className="sticky top-0 z-10 -mx-3 px-3 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border/40">
+        <div className="flex items-center gap-3">
+          <div className={ds(bStyle, "sectionDot")} />
+          <h2 className={ds(bStyle, "sectionTitle")}>Teams</h2>
+          <div className={ds(bStyle, "sectionLine")} />
+          <span className="ttx-section-meta text-[10px] font-bold text-muted-foreground uppercase">{teams.length} teams</span>
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-2.5">
         {teams.map((t: any) => (
