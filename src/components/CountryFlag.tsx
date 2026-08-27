@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { countryToFlagUrl } from "@/lib/countryFlags";
 
 interface CountryFlagProps {
@@ -6,10 +7,10 @@ interface CountryFlagProps {
 }
 
 /** Renders a country flag as an <img> using flagcdn.com SVGs – works on all platforms including Windows desktop */
-const CountryFlag = ({ country, className = "h-4 w-5 object-contain inline-block" }: CountryFlagProps) => {
+const CountryFlag = ({ country, className }: CountryFlagProps) => {
   const url = countryToFlagUrl(country);
   if (!url) return null;
-  return <img src={url} alt={country || ""} className={className} loading="lazy" />;
+  return <img src={url} alt={country || ""} className={cn("h-4 w-5 object-contain inline-block", className, "rounded-[3px]")} loading="lazy" />;
 };
 
 export default CountryFlag;
