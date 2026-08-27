@@ -320,6 +320,59 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     let title = "";
     let matchList: any[] = [];
 
+    // Volledig programma: eigen pagina met terugknop, tabs en volledige tijdslotlijst
+    if (expandedGrid.startsWith("programma:")) {
+      const listMatches = globalTab === "next" ? upcomingMatches : playedMatches;
+      return (
+        <div className="px-3 pt-4 space-y-4">
+          <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
+            <ArrowLeft className="h-4 w-4" /> Terug
+          </button>
+          <div className="flex items-center gap-2">
+            <div className={ds(bStyle, "sectionDot")} />
+            <h2 className={ds(bStyle, "sectionTitle")}>Programma</h2>
+            <div className={ds(bStyle, "sectionLine")} />
+          </div>
+          <div className={ds(bStyle, "card")}>
+            <div className="grid grid-cols-2 gap-0 border-b border-border">
+              <button
+                onClick={() => setGlobalTab("next")}
+                className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Volgende wedstrijden
+              </button>
+              <button
+                onClick={() => setGlobalTab("results")}
+                className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Resultaten
+              </button>
+            </div>
+            <div className="p-2 space-y-3">
+              {listMatches.length > 0 ? (
+                <ProgrammaTimeslotList
+                  matches={listMatches}
+                  teams={teams}
+                  phases={phases}
+                  groups={groups}
+                  slots={slots}
+                  tournament={tournament}
+                  favoriteTeam={favoriteTeam}
+                  bStyle={bStyle}
+                  scrollToLatest={globalTab === "results"}
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground font-medium text-center py-4">
+                  {globalTab === "next" ? "Geen komende wedstrijden." : "Nog geen resultaten."}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+
     // Volledig klassement: toon de Standen-view (met fases en formattabs) inline op de hoofdpagina
     if (expandedGrid === "fav-standing" && favGroup) {
       return (
