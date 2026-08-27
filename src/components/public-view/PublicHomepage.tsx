@@ -812,10 +812,30 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           {/* Default view: current/next or last-played time slot */}
           <div className="px-3 py-3 space-y-2">
             {globalTab === "next" && nextBlockMatchesAll.length > 0 && (
-              <MatchListView matches={nextBlockMatchesAll} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+              <MatchListView
+                matches={nextBlockMatchesAll}
+                teams={teams}
+                phases={phases}
+                groups={groups}
+                slots={slots}
+                favoriteTeam={favoriteTeam}
+                compact
+                tournament={tournament}
+                onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+              />
             )}
             {globalTab === "results" && lastBlockMatches.length > 0 && (
-              <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+              <MatchListView
+                matches={lastBlockMatches}
+                teams={teams}
+                phases={phases}
+                groups={groups}
+                slots={slots}
+                favoriteTeam={favoriteTeam}
+                compact
+                tournament={tournament}
+                onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+              />
             )}
             {((globalTab === "next" && nextBlockMatchesAll.length === 0) || (globalTab === "results" && lastBlockMatches.length === 0)) && (
               <p className="text-sm text-muted-foreground font-medium text-center py-4">
@@ -1196,8 +1216,9 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
 };
 
 // Match list view — each card wrapped in its own rounded container with spacing
-const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament }: {
+const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament, onCardClick }: {
   matches: any[]; teams: any[]; phases: any[]; groups: any[]; slots?: any[]; favoriteTeam: string | null; compact?: boolean; tournament?: any;
+  onCardClick?: () => void;
 }) => {
   const bStyle = useBroadcastStyle();
   return (
@@ -1213,6 +1234,7 @@ const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTea
             tournament={tournament}
             allMatches={matches}
             favoriteTeam={favoriteTeam}
+            onCardClick={onCardClick}
           />
         </div>
       ))}
