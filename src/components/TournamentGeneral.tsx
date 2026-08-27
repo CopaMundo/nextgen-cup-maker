@@ -1196,7 +1196,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditPeriodIdx(null)}>Annuleren</Button>
+            <Button variant="outline" onClick={() => setEditPeriodIdx(null)}>Sluiten</Button>
             <Button onClick={() => {
               if (editPeriodIdx === null || !editPeriodStart || !editPeriodEnd) return;
               if (editPeriodStart > editPeriodEnd) {
