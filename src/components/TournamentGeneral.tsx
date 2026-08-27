@@ -825,12 +825,15 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                   <div className="space-y-1">
                     {categories.map((cat) => (
-                      <SortableCategoryRow
+                      <SortableRow
                         key={cat.id}
-                        cat={cat}
+                        id={cat.id}
+                        label={cat.name}
+                        dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
                       />
+
                     ))}
                   </div>
                 </SortableContext>
