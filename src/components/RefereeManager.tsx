@@ -262,36 +262,62 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
         <p className="text-sm text-muted-foreground ml-auto">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
       </div>
 
-      {/* Grid of referees */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {referees.map((r, i) => (
-          <div key={i} className="rounded-xl border border-border bg-card px-3 py-2.5">
-            <div className="flex items-center gap-2">
-              <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="flex-1 text-sm font-medium text-foreground truncate">{r.name}</span>
-              <button onClick={() => openEdit(i)} className="text-muted-foreground hover:text-foreground transition-colors shrink-0" title="Bewerken">
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
-              <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0" title="Verwijderen">
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <div className="mt-2 space-y-0.5">
-              {summarizeRefereeLabeled(r, { locations: locationNames, fields: fieldOnlyNames, teamName }).map(line => (
-                <p key={line.label} className="text-[10px] leading-snug text-muted-foreground">
-                  <span className="font-medium text-foreground/80">{line.label} =</span> {line.value}
-                </p>
-              ))}
-            </div>
-          </div>
-        ))}
+      {/* List of referees */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-sm">
+            <thead>
+              <tr className="border-b border-border bg-secondary/40">
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Scheidsrechter</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Locaties/velden</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Beschikbaarheid</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Max wedstrijden</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Uitgesloten</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Rol 1-5</th>
+                <th className="px-3 py-2" />
+              </tr>
+            </thead>
+            <tbody>
+              {referees.map((r, i) => {
+                const lines = summarizeRefereeLabeled(r, { locations: locationNames, fields: fieldOnlyNames, teamName });
+                const val = (label: string) => lines.find(l => l.label.startsWith(label))?.value || "/";
+                return (
+                  <tr key={i} className="border-b border-border/60 last:border-b-0">
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="font-medium text-foreground">{r.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Locaties")}</td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Beschikbaarheid")}</td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Max aantal")}</td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Uitgesloten")}</td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Rol")}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-3">
+                        <button onClick={() => openEdit(i)} className="text-muted-foreground hover:text-foreground transition-colors" title="Bewerken">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors" title="Verwijderen">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         <button
           onClick={() => { setNewRef(""); setShowAdd(true); }}
-          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card/50 px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+          className="flex w-full items-center justify-center gap-2 border-t border-dashed border-border px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
         >
-          <Plus className="h-3.5 w-3.5" /> Scheidsrechter
+          <Plus className="h-3.5 w-3.5" /> Scheidsrechter toevoegen
         </button>
       </div>
+
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
