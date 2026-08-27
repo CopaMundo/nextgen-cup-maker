@@ -166,7 +166,7 @@ export function TimePicker({
           ref={inputRef}
           type="text"
           inputMode="numeric"
-          value={partialValue}
+          value={displayValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => inputRef.current?.select()}
@@ -177,19 +177,6 @@ export function TimePicker({
           aria-label={placeholder}
           className="h-full w-full pr-10 text-foreground"
         />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-3 right-10 flex select-none items-center overflow-hidden text-sm"
-        >
-          {displayValue.split("").map((char, i) => (
-            <span
-              key={i}
-              className={i < partialValue.length ? "text-transparent" : "text-foreground"}
-            >
-              {char}
-            </span>
-          ))}
-        </div>
         <Button
           type="button"
           variant="ghost"

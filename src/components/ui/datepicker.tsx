@@ -71,10 +71,12 @@ export function DatePicker({
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
+    if (!autoFocus) return;
+    const frame = window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [autoFocus]);
 
   React.useEffect(() => {
@@ -159,7 +161,7 @@ export function DatePicker({
           ref={inputRef}
           type="text"
           inputMode="numeric"
-          value={partialValue}
+          value={displayValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
@@ -167,22 +169,10 @@ export function DatePicker({
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"
+          autoFocus={autoFocus}
           aria-label={placeholder}
           className="h-full w-full pr-10 text-foreground"
         />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-3 right-10 flex select-none items-center overflow-hidden text-sm"
-        >
-          {displayValue.split("").map((char, i) => (
-            <span
-              key={i}
-              className={i < partialValue.length ? "text-transparent" : "text-foreground"}
-            >
-              {char}
-            </span>
-          ))}
-        </div>
         <Button
           type="button"
           variant="ghost"
