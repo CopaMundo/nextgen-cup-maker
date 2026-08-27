@@ -237,34 +237,6 @@ const DateStripNav = ({
   const showNav = dates.length > windowSize;
 
   const dateSet = new Set(dates);
-  // Build LOCAL Date objects (not UTC) so DayPicker selection matches without timezone drift
-  const isoToLocalDate = (iso: string): Date | null => {
-    const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) return null;
-    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  };
-  const localDateToIso = (d: Date): string => {
-    const y = d.getFullYear();
-    const mo = String(d.getMonth() + 1).padStart(2, "0");
-    const da = String(d.getDate()).padStart(2, "0");
-    return `${y}-${mo}-${da}`;
-  };
-
-  const selectedDate = isoToLocalDate(activeDate) || undefined;
-  const allParsed = dates.map(isoToLocalDate).filter(Boolean) as Date[];
-  const minDate = allParsed[0];
-  const maxDate = allParsed[allParsed.length - 1];
-
-  const handlePick = (date: Date | undefined) => {
-    if (!date) return;
-    const iso = localDateToIso(date);
-    setPickerOpen(false);
-    if (!dateSet.has(iso)) {
-      onInvalidPick(iso);
-      return;
-    }
-    onSelect(iso);
-  };
 
   return (
     <div className="flex items-center justify-center gap-2">
