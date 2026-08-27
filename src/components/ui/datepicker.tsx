@@ -150,7 +150,12 @@ export function DatePicker({
 
   const confirm = () => {
     if (draft && isValid(draft)) {
-      onChange(format(draft, "yyyy-MM-dd"));
+      const iso = format(draft, "yyyy-MM-dd");
+      if (availableDates && !availableDates.includes(iso)) {
+        onInvalidPick?.(iso);
+      } else {
+        onChange(iso);
+      }
     }
     setOpen(false);
   };
