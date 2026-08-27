@@ -1,11 +1,14 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicMatchCard from "./PublicMatchCard";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
+import { ChevronDown } from "lucide-react";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const { teams, matches, phases, groups, slots, tournament } = data;
   const bStyle = useBroadcastStyle();
 
@@ -55,70 +58,113 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return () => cancelAnimationFrame(raf);
   }, [firstUnplayedMatchId]);
 
+  useEffect(() => {
+    const update = () => setHeaderHeight(headerRef.current?.offsetHeight || 56);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
+
   return (
-    <div className="pt-4 space-y-3 px-3">
-      {/* Section header */}
-      <div className="flex items-center gap-3">
-        <div className={ds(bStyle, "sectionDot")} />
-        <h2 className={ds(bStyle, "sectionTitle")}>Schema</h2>
-        <div className={ds(bStyle, "sectionLine")} />
-        <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{matches.length} wedstrijden</span>
+    <div className="px-3 pb-4">
+      {/* Sticky section header */}
+      <div
+        ref={headerRef}
+        className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 space-y-3 bg-background/95 backdrop-blur-sm border-b border-border/30"
+      >
+        <div className="flex items-center gap-3">
+          <div className={ds(bStyle, "sectionDot")} />
+          <h2 className={ds(bStyle, "sectionTitle")}>Schema</h2>
+          <div className={ds(bStyle, "sectionLine")} />
+          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{matches.length} wedstrijden</span>
+
+          {uniqueDates.length > 1 && (
+            <div className="relative ml-auto shrink-0">
+              <select
+                value=""
+                onChange={(e) => {
+                  const date = e.target.value;
+                  const el = document.querySelector(`[data-schedule-date="${date}"]`);
+                  if (el) {
+                    const top = el.getBoundingClientRect().top + window.scrollY - headerHeight;
+                    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+                  }
+                }}
+                className="appearance-none bg-secondary text-foreground text-[10px] font-bold uppercase rounded-md pl-2 pr-6 py-1.5 cursor-pointer"
+              >
+                <option value="" disabled>Dag</option>
+                {uniqueDates.map(d => (
+                  <option key={d} value={d}>{formatDate(d)}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+            </div>
+          )}
+        </div>
       </div>
 
-      {timeslots.map(slot => {
-        const showDateHeader = slot.date !== lastDate;
-        lastDate = slot.date;
+      <div className="pt-3 space-y-3">
+        {timeslots.map(slot => {
+          const showDateHeader = slot.date !== lastDate;
+          lastDate = slot.date;
 
-        return (
-          <div key={slot.key}>
-            {showDateHeader && (
-              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-2 mb-1">
-                <div className="flex items-center gap-2">
-                  <div className={ds(bStyle, "dateHeader")}>
-                    {formatDate(slot.date)}
+          return (
+            <div key={slot.key}>
+              {showDateHeader && (
+                <div
+                  data-schedule-date={slot.date}
+                  className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
+                  style={{ top: headerHeight }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={ds(bStyle, "dateHeader")}>
+                      {formatDate(slot.date)}
+                    </div>
+                    {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
                   </div>
-                  {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
+                </div>
+              )}
+              <div className={ds(bStyle, "card")}>
+                {/* Timeslot header */}
+                <div className={ds(bStyle, "timeslotHeader")}>
+                  {slot.time && (
+                    <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
+                      {slot.time.slice(0, 5)}
+                    </span>
+                  )}
+                  <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
+                    {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
+                  </span>
+                </div>
+                {/* Match cards — each in its own style-aware container with spacing */}
+                <div className="p-2 space-y-2">
+                  {slot.matches.map((m: any) => (
+                    <div
+                      key={m.id}
+                      ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
+                      className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
+                    >
+                      <PublicMatchCard
+                        match={m}
+                        teams={teams}
+                        phases={phases}
+                        groups={groups}
+                        slots={slots}
+                        tournament={tournament}
+                        allMatches={matches}
+                        favoriteTeam={favoriteTeam}
+                        hideRoundNumber
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-            <div className={ds(bStyle, "card")}>
-              {/* Timeslot header */}
-              <div className={ds(bStyle, "timeslotHeader")}>
-                {slot.time && (
-                  <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
-                    {slot.time.slice(0, 5)}
-                  </span>
-                )}
-                <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
-                  {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
-                </span>
-              </div>
-              {/* Match cards — each in its own style-aware container with spacing */}
-              <div className="p-2 space-y-2">
-                {slot.matches.map((m: any) => (
-                  <div
-                    key={m.id}
-                    ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
-                    className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
-                  >
-                    <PublicMatchCard
-                      match={m}
-                      teams={teams}
-                      phases={phases}
-                      groups={groups}
-                      slots={slots}
-                      tournament={tournament}
-                      allMatches={matches}
-                      favoriteTeam={favoriteTeam}
-                      hideRoundNumber
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
 
       {matches.length === 0 && (
         <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
