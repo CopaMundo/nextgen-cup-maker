@@ -162,7 +162,7 @@ export function DatePicker({
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-3 right-10 flex items-center overflow-hidden text-sm"
+          className="pointer-events-none absolute inset-y-0 left-3 right-10 flex select-none items-center overflow-hidden text-sm"
         >
           {displayValue.split("").map((char, i) => (
             <span
