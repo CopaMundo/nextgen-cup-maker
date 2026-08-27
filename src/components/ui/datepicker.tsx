@@ -28,7 +28,7 @@ interface DatePickerProps {
   className?: string;
 }
 
-const MASK = "DD/MM/JJJJ";
+const MASK = "dd/mm/jjjj";
 
 const maskFromDigits = (raw: string) => {
   const digits = raw.replace(/\D/g, "").slice(0, 8);
@@ -123,7 +123,7 @@ export function DatePicker({
           size="icon"
           aria-label="Open kalender"
           onClick={openDialog}
-          className="absolute right-0 top-0 h-full w-10 text-primary hover:bg-transparent dark:text-white"
+          className="absolute right-0 top-0 h-full w-10 bg-transparent text-primary hover:bg-transparent hover:text-primary dark:text-white dark:hover:bg-transparent dark:hover:text-white"
         >
           <CalendarIcon className="h-4 w-4" />
         </Button>
