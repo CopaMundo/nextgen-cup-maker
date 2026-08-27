@@ -124,9 +124,44 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
   };
 
+  // Kaarten per speler (individueel): geel, 2x geel, rood
+  type PlayerCardsRow = {
+    name: string;
+    teamId: string;
+    yellows: number;
+    secondYellows: number;
+    reds: number;
+    totalPoints: number; // negatief, voor sortering
+  };
+
+  const cardsPerPlayer = (): PlayerCardsRow[] => {
+    const map: Record<string, PlayerCardsRow> = {};
+    stats.forEach((s) => {
+      if (!s.player_name || s.player_name === "Onbekend") return;
+      const key = `${s.player_name}__${s.team_id}`;
+      if (!map[key]) {
+        map[key] = { name: s.player_name, teamId: s.team_id, yellows: 0, secondYellows: 0, reds: 0, totalPoints: 0 };
+      }
+      const row = map[key];
+      if (s.stat_type === "yellow_card") row.yellows++;
+      else if (s.stat_type === "straight_red") row.reds++;
+      else if (s.stat_type === "red_card") row.reds++;
+    });
+    // 2x geel paren per speler
+    Object.values(map).forEach((row) => {
+      row.secondYellows = Math.floor(row.yellows / 2);
+      row.yellows = row.yellows % 2;
+      row.totalPoints = -(row.yellows * 1 + row.secondYellows * 3 + row.reds * 5);
+    });
+    return Object.values(map)
+      .filter((r) => r.yellows + r.secondYellows + r.reds > 0)
+      .sort((a, b) => a.totalPoints - b.totalPoints || a.name.localeCompare(b.name));
+  };
+
   const goals = useMemo(() => withRank(playerCountAgg("goal")), [stats]);
   const assists = useMemo(() => withRank(playerCountAgg("assist")), [stats]);
   const fairplay = useMemo(() => fairplayWithRank(fairplayPerTeam()), [stats, teams]);
+  const playerCards = useMemo(() => cardsPerPlayer(), [stats]);
 
   const showGoals = tournament.enable_goalscorers;
   const showAssists = tournament.enable_assists;
@@ -136,6 +171,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
     ...(showAssists ? [{ id: "assists" as StatTab, label: "Meeste assists" }] : []),
     ...(showFairplay ? [{ id: "fairplay" as StatTab, label: "Fair-playklassement" }] : []),
+    ...(showFairplay ? [{ id: "cards" as StatTab, label: "Kaarten per speler" }] : []),
   ];
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
