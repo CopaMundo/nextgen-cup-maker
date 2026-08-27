@@ -133,7 +133,7 @@ const PublicMatchCard = ({
       >
         {/* Context: format name + detail line */}
         {(formatName || detailLine || m.field || m.referee) && (
-          <div className={ds(bStyle, "matchContext")}>
+          <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`}>
             <div className="flex items-start justify-between w-full">
               <div className="flex items-start gap-1.5">
                 {phase?.logo_url && (
