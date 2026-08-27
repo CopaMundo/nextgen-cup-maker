@@ -199,7 +199,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs">Naam *</Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Bijv. Jan Janssen" />
+                <Input ref={nameInputRef} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Bijv. Jan Janssen" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -208,7 +208,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Geboortedatum</Label>
-                  <DatePicker value={form.birth_date} onChange={(v) => setForm({ ...form, birth_date: v })} placeholder="Kies datum" autoFocus />
+                  <DatePicker value={form.birth_date} onChange={(v) => setForm({ ...form, birth_date: v })} placeholder="Kies datum" />
                 </div>
               </div>
               <div className="space-y-1">
@@ -284,7 +284,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs">Naam *</Label>
-                <Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
+                <Input ref={editNameInputRef} value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -293,7 +293,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Geboortedatum</Label>
-                  <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" autoFocus />
+                  <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" />
                 </div>
               </div>
             </div>
