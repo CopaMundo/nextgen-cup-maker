@@ -460,7 +460,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
 
 const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: string; data: any[]; teams: any[] }) => {
   const bStyle = useBroadcastStyle();
-  if (data.length === 0) return null;
   const tName = (id: string) => teams.find((t: any) => t.id === id)?.name || "?";
   const tLogo = (id: string) => teams.find((t: any) => t.id === id)?.logo_url;
 
@@ -470,21 +469,27 @@ const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: stri
         <span>{icon}</span>
         <h3 className={ds(bStyle, "cardHeaderTitle")}>{title}</h3>
       </div>
-      <div className="divide-y divide-border/50">
-        {data.slice(0, 10).map((row, i) => (
-          <div key={`${row.name}-${row.teamId}`} className={`flex items-center gap-3 px-4 py-2.5 ${i % 2 === 1 ? "bg-secondary/20" : ""}`}>
-            <span className="w-6 text-center text-xs font-black text-primary">{i + 1}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground truncate">{row.name}</p>
-              <div className="flex items-center gap-1">
-                {tLogo(row.teamId) && <img src={tLogo(row.teamId)!} className="h-3 w-3 object-contain" alt="" />}
-                <span className="text-[10px] text-muted-foreground">{tName(row.teamId)}</span>
+      {data.length === 0 ? (
+        <div className="px-4 py-6 text-center">
+          <p className="text-sm text-muted-foreground">Nog geen gegevens beschikbaar.</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-border/50">
+          {data.slice(0, 10).map((row, i) => (
+            <div key={`${row.name}-${row.teamId}`} className={`flex items-center gap-3 px-4 py-2.5 ${i % 2 === 1 ? "bg-secondary/20" : ""}`}>
+              <span className="w-6 text-center text-xs font-black text-primary">{i + 1}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-foreground truncate">{row.name}</p>
+                <div className="flex items-center gap-1">
+                  {tLogo(row.teamId) && <img src={tLogo(row.teamId)!} className="h-3 w-3 object-contain" alt="" />}
+                  <span className="text-[10px] text-muted-foreground">{tName(row.teamId)}</span>
+                </div>
               </div>
+              <span className="text-sm font-black text-foreground">{row.count}</span>
             </div>
-            <span className="text-sm font-black text-foreground">{row.count}</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
