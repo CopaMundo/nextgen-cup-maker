@@ -1162,13 +1162,16 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
     );
   }
 
+  const nextPositions = nextFavMatch ? getMatchTeamPositions(nextFavMatch, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament) : {};
+  const otherPositions = otherMatch ? getMatchTeamPositions(otherMatch, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament) : {};
+
   return (
     <div className="space-y-2">
       {nextFavMatch && (
         <div>
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-primary mb-1">Jouw wedstrijd</p>
           <div className={matchCardWrapperCls}>
-            <PublicMatchCard match={nextFavMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+            <PublicMatchCard match={nextFavMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext {...nextPositions} />
           </div>
         </div>
       )}
@@ -1176,7 +1179,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
         <div className="pt-2 border-t border-border">
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-1">Mogelijke tegenstander</p>
           <div className={matchCardWrapperCls}>
-            <PublicMatchCard match={otherMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+            <PublicMatchCard match={otherMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext {...otherPositions} />
           </div>
         </div>
       )}
