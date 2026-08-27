@@ -436,14 +436,24 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
         </div>
       )}
 
-      {subTab === "stats" && (
-        <div className="pt-4 space-y-4">
-          <TeamStatsSection teams={teams} matches={matches} />
-          {tournament.enable_goalscorers && tournament.show_public_top_scorers && <PlayerRanking title="Topscorers" icon="⚽" data={playerAgg("goal")} teams={teams} />}
-          {tournament.enable_assists && tournament.show_public_assists && <PlayerRanking title="Meeste assists" icon="🅰️" data={playerAgg("assist")} teams={teams} />}
-          {(tournament.enable_yellow_cards || tournament.enable_red_cards) && tournament.show_public_fairplay && <FairplayRanking data={fairplayAgg()} teams={teams} />}
-        </div>
-      )}
+      {subTab === "stats" && (() => {
+        const showScorers = tournament.enable_goalscorers && tournament.show_public_top_scorers;
+        const showAssists = tournament.enable_assists && tournament.show_public_assists;
+        const showFairplay = (tournament.enable_yellow_cards || tournament.enable_red_cards) && tournament.show_public_fairplay;
+        const hasAny = showScorers || showAssists || showFairplay;
+        return (
+          <div className="pt-4 space-y-4">
+            {showScorers && <PlayerRanking title="Topscorers" icon="⚽" data={playerAgg("goal")} teams={teams} />}
+            {showAssists && <PlayerRanking title="Meeste assists" icon="🅰️" data={playerAgg("assist")} teams={teams} />}
+            {showFairplay && <FairplayRanking data={fairplayAgg()} teams={teams} />}
+            {!hasAny && (
+              <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
+                <p className="text-sm text-muted-foreground font-medium">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 };
