@@ -396,6 +396,26 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
       );
     }
 
+    // Volledige standen-view voor knockout / enkele wedstrijd (met fases en formattabs)
+    if (expandedGrid.startsWith("fav-standing-knockout:")) {
+      const koPhaseId = expandedGrid.replace("fav-standing-knockout:", "");
+      const koPhase = phases.find((p: any) => p.id === koPhaseId);
+      const favKoGroup = favoriteTeam ? groups.find((g: any) =>
+        g.phase_id === koPhaseId &&
+        matches.some((m: any) => m.group_id === g.id && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam))
+      ) : null;
+      if (koPhase) {
+        return (
+          <div className="px-3 pt-4 space-y-4">
+            <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
+              <ArrowLeft className="h-4 w-4" /> Terug
+            </button>
+            <PublicStandings data={data} initialPhaseId={koPhase.id} initialGroupId={favKoGroup?.id} />
+          </div>
+        );
+      }
+    }
+
     // Inline bracket view for knockout phases
     if (expandedGrid.startsWith("fav-bracket:")) {
       const bracketPhaseId = expandedGrid.replace("fav-bracket:", "");
