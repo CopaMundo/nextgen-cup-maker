@@ -2511,7 +2511,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 {name}
               </span>
               {tournament?.show_country && (isHome ? match.home_team_id : match.away_team_id) && (
-                <CountryFlag country={getTeamCountry(isHome ? match.home_team_id : match.away_team_id)} className="h-2.5 w-3.5 object-contain flex-shrink-0 align-middle" />
+                <CountryFlag country={getTeamCountry(isHome ? match.home_team_id : match.away_team_id)} className="h-3 w-4 object-contain flex-shrink-0 align-middle" />
               )}
             </div>
             {canPickTeam && !(isHome ? match.home_team_id : match.away_team_id) && <ChevronDown className="h-3 w-3 text-muted-foreground" />}

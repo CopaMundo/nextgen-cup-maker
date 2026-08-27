@@ -275,7 +275,7 @@ const StandingsTable = ({ tournamentId, tournament, categoryId }: { tournamentId
                                     {row.team.name}
                                   </span>
                                   {showCountry && row.team.country && (
-                                    <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain flex-shrink-0 align-middle" />
+                                    <CountryFlag country={row.team.country} className="h-3 w-4 object-contain flex-shrink-0 align-middle" />
                                   )}
                                 </div>
                               </TableCell>
