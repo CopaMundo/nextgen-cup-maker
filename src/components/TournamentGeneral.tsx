@@ -327,7 +327,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     setEditingLocId(null);
   };
 
-  const saveMatchDays = async (entries: MatchDayEntry[]) => {
+  const saveMatchDays = async (rawEntries: MatchDayEntry[]) => {
+    const entryStart = (e: MatchDayEntry) => (typeof e === "string" ? e : e.start);
+    const entries = [...rawEntries].sort((a, b) => entryStart(a).localeCompare(entryStart(b)));
     setForm((prev) => ({ ...prev, match_days: entries }));
 
     const { error } = await supabase
