@@ -27,6 +27,9 @@ interface DatePickerProps {
   placeholder?: string;
   className?: string;
   autoFocus?: boolean;
+  hideInput?: boolean;
+  availableDates?: string[];
+  onInvalidPick?: (iso: string) => void;
 }
 
 const MASK = "dd/mm/jjjj";
