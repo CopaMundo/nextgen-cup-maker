@@ -177,7 +177,7 @@ const PublicMatchCard = ({
 
         {/* Match body */}
         <div className="relative px-3 py-2">
-          {renderTeamRow(homeName, homeLogo, m.home_team_id, m.home_penalties, m.home_score, homeWin)}
+          {renderTeamRow(homeName, homeLogo, homeCountry, m.home_team_id, m.home_penalties, m.home_score, homeWin)}
 
           {/* Time/VS badge — absolutely positioned to keep card height identical to played cards */}
           {!m.is_played && (
@@ -188,7 +188,7 @@ const PublicMatchCard = ({
             </div>
           )}
 
-          {renderTeamRow(awayName, awayLogo, m.away_team_id, m.away_penalties, m.away_score, awayWin)}
+          {renderTeamRow(awayName, awayLogo, awayCountry, m.away_team_id, m.away_penalties, m.away_score, awayWin)}
         </div>
       </div>
 
