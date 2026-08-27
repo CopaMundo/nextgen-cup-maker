@@ -636,7 +636,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 <p className="text-xs font-black text-foreground uppercase tracking-wide truncate">{favTeamObj.name}</p>
               </div>
               {favTeamObj.country && (
-                <CountryFlag country={favTeamObj.country} className="h-4 w-6 rounded-sm shrink-0" />
+                <CountryFlag country={favTeamObj.country} className="h-4 w-6 shrink-0" />
               )}
             </div>
 
