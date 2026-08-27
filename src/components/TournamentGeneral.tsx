@@ -1009,7 +1009,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 value={periodEnd}
                 onChange={(date) => setPeriodEnd(date)}
                 placeholder="Einddatum"
-                autoFocus
               />
             </div>
           </div>
