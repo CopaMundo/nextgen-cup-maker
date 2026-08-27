@@ -146,7 +146,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
     Object.values(map).forEach(r => {
       r.points = r.yellows * 1 + r.secondYellows * 3 + r.straightReds * 5 + r.legacyReds * 3;
     });
-    return Object.values(map).filter(r => r.points > 0).sort((a, b) => b.points - a.points);
+    return Object.values(map).sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
   };
 
 
