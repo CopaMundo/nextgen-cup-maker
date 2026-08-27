@@ -202,8 +202,9 @@ export function DatePicker({
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-[340px] gap-0 overflow-hidden p-0">
-          <div data-mode="light" className="bg-popover text-popover-foreground">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[340px] gap-0 overflow-hidden border border-border bg-popover p-0 text-popover-foreground">
+          <div className="bg-popover text-popover-foreground">
+
             {/* Material-style header */}
             <div className="bg-primary px-4 pb-3 pt-4 text-primary-foreground">
               <DialogTitle className="text-[11px] font-medium uppercase tracking-wide opacity-80">
