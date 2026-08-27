@@ -266,12 +266,12 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
               {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 object-contain" />}
             </div>
             <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-              <button onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title={`${singularLabel} bewerken`}>
-                <Pencil className="h-3 w-3" />
+              <button onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title={`${singularLabel} bewerken`}>
+                <Pencil className="h-4 w-4" />
               </button>
               {!isPlayers && (
-                <button onClick={() => setSelectedTeamId(team.id)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Teammanagement">
-                  <Users className="h-3 w-3" />
+                <button onClick={() => setSelectedTeamId(team.id)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title="Teammanagement">
+                  <Users className="h-4 w-4" />
                 </button>
               )}
             </div>
