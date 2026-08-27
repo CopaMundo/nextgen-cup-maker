@@ -46,6 +46,8 @@ const PublicMatchCard = ({
   hideContext,
   extraContext,
   hideRoundNumber,
+  homePosition,
+  awayPosition,
   onCardClick,
 }: PublicMatchCardProps) => {
   const bStyle = useBroadcastStyle();
