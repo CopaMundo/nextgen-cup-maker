@@ -715,43 +715,6 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
               </div>
             )}
 
-            {/* Statistieken onder wedstrijden tab */}
-            {favTab === "matches" && favPlayed.length > 0 && (
-              <div className="px-3 py-3 space-y-2">
-                <div className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-1.5">
-                  <BarChart3 className="h-3 w-3" /> Statistieken
-                </div>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {[
-                    { label: "GS", value: favPlayed.length },
-                    { label: "W-G-V", value: `${favW}-${favD}-${favL}` },
-                    { label: "DV", value: favGF },
-                    { label: "DT", value: favGA },
-                  ].map((s) => (
-                    <div key={s.label} className={`${ds(bStyle, "matchCardWrapper") || "rounded-md border border-border/60"} bg-card py-2 text-center`}>
-                      <div className="text-base font-black text-foreground leading-none">{s.value}</div>
-                      <div className="text-[9px] font-black uppercase tracking-[0.18em] text-muted-foreground mt-1">{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-                {form.length > 0 && (
-                  <div className="flex items-center gap-1.5 pt-1">
-                    <span className="text-[9px] font-black uppercase tracking-[0.18em] text-muted-foreground">Vorm</span>
-                    {form.map((f, i) => (
-                      <span
-                        key={i}
-                        className={`inline-flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-black text-white ${
-                          f === "W" ? "bg-green-600" : f === "G" ? "bg-yellow-500" : "bg-red-600"
-                        }`}
-                      >
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Standen tab — inline weergave (klassement of bracket), terug-knop houdt op homepage */}
             {favTab === "standings" && showCurrentKnockout && activeKnockout && (
               <button
