@@ -3363,6 +3363,10 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-myteam-header * {
   color: hsl(180 100% 50%);
 }
+/* P500: statistiek-icoontjes zwart zodat ze op de cyan balk zichtbaar zijn */
+[data-broadcast="teletext"][data-ttx-variant="500"] .themed-stat-icon {
+  background-color: #000 !important;
+}
 /* Teletekst: statistieken-toggle in blauwe kader (zoals "24 teams") */
 [data-broadcast="teletext"] .ttx-stats-toggle {
   background-color: hsl(var(--broadcast-navy));
