@@ -234,7 +234,9 @@ const TeamMatchList = ({ team, teamMatches, teams, phases, groups, slots, tourna
         <div className={ds(bStyle, "sectionLine")} />
       </div>
       <div className="space-y-2">
-        {teamMatches.map((m: any) => (
+        {teamMatches.map((m: any) => {
+          const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+          return (
           <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
             <PublicMatchCard
               match={m}
@@ -246,9 +248,10 @@ const TeamMatchList = ({ team, teamMatches, teams, phases, groups, slots, tourna
               allMatches={teamMatches}
               favoriteTeam={team.id}
               hideRoundNumber
+              {...positions}
             />
           </div>
-        ))}
+        );})}
         {teamMatches.length === 0 && (
           <div className="p-6 text-center text-sm text-muted-foreground font-medium">Nog geen wedstrijden</div>
         )}
