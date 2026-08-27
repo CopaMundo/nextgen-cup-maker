@@ -165,15 +165,16 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
         <div className="space-y-1.5">
           {/* Phase tabs — admin Format-stijl (Deelnemers-stijl) */}
           {allPhaseNumbers.length > 1 && (
-            <div className="flex justify-center border-b border-border flex-wrap overflow-x-auto">
+            <div className="ttx-phase-tab-container flex justify-center border-b border-border flex-wrap overflow-x-auto">
               {allPhaseNumbers.map(pn => {
                 const isActive = activePhaseNum === pn;
                 return (
                   <button
                     key={pn}
+                    data-active={isActive}
                     onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
                     className={
-                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
+                      "ttx-phase-tab px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
                       (isActive
                         ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
                         : "text-muted-foreground hover:text-foreground")
@@ -188,14 +189,17 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
 
           {/* Format tabs — narrower, scrollable */}
           {showFormatsAsTabs && phasesInActiveNum.length > 1 && (
-            <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none px-1">
-              {phasesInActiveNum.map((f: any) => (
-                <button key={f.id} onClick={() => { setSelectedFormatId(f.id); }}
-                  className={`shrink-0 ${ds(bStyle, "phaseTab")} ${activeFormat?.id === f.id ? ds(bStyle, "phaseTabActive") : ds(bStyle, "phaseTabInactive")} flex items-center gap-1`}>
-                  {f.logo_url && <img src={f.logo_url} alt="" className="h-4 w-4 object-contain flex-shrink-0 rounded-sm" />}
-                  {!f.logo_url && f.emoji ? `${f.emoji} ` : ""}{f.name}
-                </button>
-              ))}
+            <div className="ttx-phase-tab-container flex gap-1 overflow-x-auto pb-0.5 scrollbar-none px-1">
+              {phasesInActiveNum.map((f: any) => {
+                const isActive = activeFormat?.id === f.id;
+                return (
+                  <button key={f.id} data-active={isActive} onClick={() => { setSelectedFormatId(f.id); }}
+                    className={`ttx-phase-tab shrink-0 ${ds(bStyle, "phaseTab")} ${isActive ? ds(bStyle, "phaseTabActive") : ds(bStyle, "phaseTabInactive")} flex items-center gap-1`}>
+                    {f.logo_url && <img src={f.logo_url} alt="" className="h-4 w-4 object-contain flex-shrink-0 rounded-sm" />}
+                    {!f.logo_url && f.emoji ? `${f.emoji} ` : ""}{f.name}
+                  </button>
+                );
+              })}
             </div>
           )}
 

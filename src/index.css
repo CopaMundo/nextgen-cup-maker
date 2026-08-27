@@ -3474,6 +3474,24 @@ body[data-broadcast="teletext"] {
   color: hsl(180 100% 50%) !important;
 }
 
+/* P800: infobalk wedstrijdkaarten en knockout brackets volledig groen */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-match-context,
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-match-context * {
+  color: hsl(120 100% 50%) !important;
+}
+
+/* P800: actieve fase-tab groen */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-phase-tab-container .ttx-phase-tab[data-active="true"] {
+  color: hsl(120 100% 50%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-phase-tab-container .ttx-phase-tab[data-active="true"]::after {
+  background-color: hsl(120 100% 50%) !important;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-phase-tab.ttx-bar-yellow {
+  background-color: hsl(120 100% 50%) !important;
+  color: hsl(0 0% 0%) !important;
+}
+
 /* P800: klassement groepsfase — teamnamen geel, posities + statistieken groen */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td:first-child span {
   color: hsl(120 100% 50%) !important;
