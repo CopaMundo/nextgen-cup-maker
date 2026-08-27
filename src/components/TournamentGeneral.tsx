@@ -747,11 +747,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         <span className="text-foreground font-medium">{formatDate(entry.start)} – {formatDate(entry.end)}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }} className="text-muted-foreground hover:text-foreground">
-                          <Pencil className="h-3.5 w-3.5" />
+                        <button onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }} className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Bewerken">
+                          <Pencil className="h-4 w-4" />
                         </button>
-                        <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive">
-                          <Trash2 className="h-3.5 w-3.5" />
+                        <button onClick={() => setDeleteMatchDayIdx(idx)} className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Verwijderen">
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
