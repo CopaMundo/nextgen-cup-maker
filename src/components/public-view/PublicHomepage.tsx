@@ -1416,7 +1416,9 @@ const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tourname
                 </span>
               </div>
               <div className="p-2 space-y-2">
-                {slot.matches.map((m: any) => (
+                {slot.matches.map((m: any) => {
+                  const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+                  return (
                   <div
                     key={m.id}
                     ref={m.id === targetMatchId ? targetRef : undefined}
@@ -1432,9 +1434,10 @@ const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tourname
                       allMatches={matches}
                       favoriteTeam={favoriteTeam}
                       hideRoundNumber
+                      {...positions}
                     />
                   </div>
-                ))}
+                );})}
               </div>
             </div>
           </div>
