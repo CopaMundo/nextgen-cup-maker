@@ -180,11 +180,11 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
             )}
 
             {teamTab === "wedstrijden" && (
-              <TeamMatchList team={team} teamMatches={teamMatches} teams={teams} phases={phases} groups={groups} slots={slots} tournament={tournament} />
+              <TeamMatchList team={team} teamMatches={teamMatches} teams={teams} phases={phases} groups={groups} slots={slots} tournament={tournament} groupTeams={groupTeams} matches={matches} scoringSystems={scoringSystems} />
             )}
           </>
         ) : (
-          <TeamMatchList team={team} teamMatches={teamMatches} teams={teams} phases={phases} groups={groups} slots={slots} tournament={tournament} />
+          <TeamMatchList team={team} teamMatches={teamMatches} teams={teams} phases={phases} groups={groups} slots={slots} tournament={tournament} groupTeams={groupTeams} matches={matches} scoringSystems={scoringSystems} />
         )}
       </div>
     );
