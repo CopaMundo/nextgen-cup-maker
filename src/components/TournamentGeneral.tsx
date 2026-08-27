@@ -887,20 +887,19 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               <div className="space-y-2">
                 <h3 className="font-display text-base font-bold text-foreground">Spelersstatistieken</h3>
                 <p className="text-xs text-muted-foreground max-w-3xl">
-                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Voor doelpuntenmakers en assists bepaal je ook of deze zichtbaar zijn op de publieke toernooiwebsite. Kaarten kun je enkel aanvinken; daarvan wordt geen klassement weergegeven op de toernooisite.
+                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Doelpuntenmakers en assists worden automatisch zichtbaar op de publieke toernooiwebsite zodra je ze aanvinkt. Kaarten kun je enkel aanvinken; daarvan wordt geen klassement weergegeven op de toernooisite.
                 </p>
               </div>
               <div className="grid gap-3 lg:grid-cols-3">
                 {[
-                  { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers", publicLabel: "Topscorerslijst tonen op publieke website" },
-                  { key: "enable_assists", publicKey: "show_public_assists", label: "Assists", publicLabel: "Assist-klassement tonen op publieke website" },
-                  { key: "enable_yellow_cards", publicKey: null, label: "Kaarten", publicLabel: null },
-                ].map(({ key, publicKey, label, publicLabel }) => {
+                  { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers" },
+                  { key: "enable_assists", publicKey: "show_public_assists", label: "Assists" },
+                  { key: "enable_yellow_cards", publicKey: null, label: "Kaarten" },
+                ].map(({ key, publicKey, label }) => {
                   const isEnabled = form[key as keyof typeof form] as boolean;
-                  const isPublic = publicKey ? (form[publicKey as keyof typeof form] as boolean) : false;
 
                   return (
-                  <div key={key} className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
+                  <div key={key} className="rounded-lg border border-border bg-background/40 p-4">
                     <div className="flex items-center justify-between gap-3">
                       <h4 className="text-sm font-semibold text-foreground">{label}</h4>
                       <Switch
@@ -913,29 +912,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         }}
                       />
                     </div>
-                    {publicKey && (
-                    <div className={cn("space-y-2", !isEnabled && "opacity-50")}>
-                      <span className="block text-xs leading-snug text-muted-foreground">{publicLabel}</span>
-                      <div className="grid h-9 grid-cols-2 rounded-md border border-border bg-secondary p-1">
-                        {[false, true].map((value) => (
-                          <button
-                            key={String(value)}
-                            type="button"
-                            disabled={!isEnabled}
-                            onClick={() => saveToDb({ [publicKey]: value } as any)}
-                            className={cn(
-                              "rounded-sm text-xs font-semibold uppercase transition-colors disabled:cursor-not-allowed",
-                              isPublic === value
-                                ? "bg-primary text-primary-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground"
-                            )}
-                          >
-                            {value ? "Ja" : "Nee"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    )}
                   </div>
                   );
                 })}
