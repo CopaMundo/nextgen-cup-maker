@@ -45,8 +45,6 @@ const buildDisplayValue = (digits: string) => {
 
 const extractDigits = (raw: string) => raw.replace(/\D/g, "").slice(0, 8);
 
-const isPlaceholder = (char: string) => char === "d" || char === "m" || char === "j";
-
 const buildPartialValue = (digits: string) => {
   if (digits.length <= 2) return digits;
   if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;

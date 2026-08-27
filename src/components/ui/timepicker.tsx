@@ -29,9 +29,8 @@ const buildDisplayValue = (digits: string) => {
   return `${h1}${h2}:${m1}${m2}`;
 };
 
-const isPlaceholder = (char: string) => char === "u" || char === "m";
-
-const getCursorPos = (length: number) => (length <= 2 ? length : length + 1);
+const buildPartialValue = (digits: string) =>
+  digits.length <= 2 ? digits : `${digits.slice(0, 2)}:${digits.slice(2)}`;
 
 /** Clamp digits so hours stay 00-23 and minutes 00-59 while typing. */
 const clampDigits = (digits: string) => {
@@ -92,6 +91,7 @@ export function TimePicker({
   }, [value]);
 
   const displayValue = React.useMemo(() => buildDisplayValue(digits), [digits]);
+  const partialValue = React.useMemo(() => buildPartialValue(digits), [digits]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newDigits = clampDigits(extractDigits(event.target.value));
@@ -117,7 +117,7 @@ export function TimePicker({
 
   React.useEffect(() => {
     if (inputRef.current && document.activeElement === inputRef.current) {
-      const pos = getCursorPos(digits.length);
+      const pos = buildPartialValue(digits).length;
       inputRef.current.setSelectionRange(pos, pos);
     }
   }, [digits]);
@@ -146,7 +146,7 @@ export function TimePicker({
           ref={inputRef}
           type="text"
           inputMode="numeric"
-          value={displayValue}
+          value={partialValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => inputRef.current?.select()}
@@ -163,7 +163,7 @@ export function TimePicker({
           {displayValue.split("").map((char, i) => (
             <span
               key={i}
-              className={char === ":" || isPlaceholder(char) ? "text-muted-foreground" : "text-transparent"}
+              className={i < partialValue.length ? "text-transparent" : "text-muted-foreground"}
             >
               {char}
             </span>
