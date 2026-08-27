@@ -10,7 +10,7 @@ interface CountryFlagProps {
 const CountryFlag = ({ country, className }: CountryFlagProps) => {
   const url = countryToFlagUrl(country);
   if (!url) return null;
-  return <img src={url} alt={country || ""} className={cn("h-4 w-5 object-contain inline-block", className, "rounded-[3px]")} loading="lazy" />;
+  return <img src={url} alt={country || ""} className={cn("country-flag-img h-4 w-5 object-contain inline-block", className, "rounded-[3px]")} loading="lazy" />;
 };
 
 export default CountryFlag;
