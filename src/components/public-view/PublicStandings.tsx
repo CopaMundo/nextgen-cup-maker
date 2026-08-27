@@ -139,38 +139,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
     return Object.values(map).sort((a, b) => b.count - a.count);
   };
 
-  // Fair-play aggregation: yellow=1, 2x yellow (auto red)=3, straight_red=5, legacy red_card=3
-  const fairplayAgg = () => {
-    const map: Record<string, { name: string; teamId: string; yellows: number; secondYellows: number; straightReds: number; legacyReds: number; points: number }> = {};
-    const ensure = (name: string, teamId: string) => {
-      const key = `${name}__${teamId}`;
-      if (!map[key]) map[key] = { name, teamId, yellows: 0, secondYellows: 0, straightReds: 0, legacyReds: 0, points: 0 };
-      return map[key];
-    };
-    const yellowMap: Record<string, number> = {};
-    stats.forEach((s: any) => {
-      if (s.stat_type === "yellow_card") {
-        const key = `${s.player_name}__${s.team_id}`;
-        yellowMap[key] = (yellowMap[key] || 0) + 1;
-      }
-    });
-    Object.entries(yellowMap).forEach(([key, total]) => {
-      const [name, teamId] = key.split("__");
-      const row = ensure(name, teamId);
-      row.secondYellows = Math.floor(total / 2);
-      row.yellows = total % 2;
-    });
-    stats.forEach((s: any) => {
-      if (s.stat_type === "straight_red") ensure(s.player_name, s.team_id).straightReds++;
-      else if (s.stat_type === "red_card") ensure(s.player_name, s.team_id).legacyReds++;
-    });
-    Object.values(map).forEach(r => {
-      r.points = r.yellows * 1 + r.secondYellows * 3 + r.straightReds * 5 + r.legacyReds * 3;
-    });
-    return Object.values(map).sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
-  };
-
-
   return (
     <div className="px-3 pb-4">
       {/* Sticky header: title, phases, subformats */}
@@ -508,60 +476,6 @@ const PlayerRanking = ({ title, iconSrc, data, teams }: { title: string; iconSrc
                 </div>
               </div>
               <span className="text-sm font-black text-foreground">{row.count}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const FairplayRanking = ({ data, teams }: { data: any[]; teams: any[] }) => {
-  const bStyle = useBroadcastStyle();
-  const tName = (id: string) => teams.find((t: any) => t.id === id)?.name || "?";
-  const tLogo = (id: string) => teams.find((t: any) => t.id === id)?.logo_url;
-
-  return (
-    <div className={ds(bStyle, "card")}>
-      <div className={ds(bStyle, "cardHeader")}>
-        <span className="flex items-center gap-0.5">
-          <div className="h-3.5 w-2.5 rounded-sm bg-yellow-400" />
-          <div className="h-3.5 w-2.5 rounded-sm bg-red-500" />
-        </span>
-        <h3 className={ds(bStyle, "cardHeaderTitle")}>Kaarten</h3>
-      </div>
-      {data.length === 0 ? (
-        <div className="px-4 py-6 text-center">
-          <p className="text-sm text-muted-foreground">Nog geen kaarten uitgedeeld.</p>
-        </div>
-      ) : (
-        <div className="divide-y divide-border/50">
-          {data.slice(0, 10).map((row, i) => (
-            <div key={`${row.name}-${row.teamId}`} className={`flex items-center gap-3 px-4 py-2.5 ${i % 2 === 1 ? "bg-secondary/20" : ""}`}>
-              <span className="w-6 text-center text-xs font-black text-primary">{i + 1}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-foreground truncate">{row.name}</p>
-                <div className="flex items-center gap-1">
-                  {tLogo(row.teamId) && <img src={tLogo(row.teamId)!} className="h-3 w-3 object-contain" alt="" />}
-                  <span className="text-[10px] text-muted-foreground">{tName(row.teamId)}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: row.yellows }).map((_, idx) => (
-                  <div key={`y-${idx}`} className="h-3 w-2 rounded-sm bg-yellow-400" />
-                ))}
-                {Array.from({ length: row.secondYellows }).map((_, idx) => (
-                  <span key={`2y-${idx}`} className="flex items-center gap-0.5">
-                    <div className="h-3 w-2 rounded-sm bg-yellow-400" />
-                    <div className="h-3 w-2 rounded-sm bg-yellow-400" />
-                    <div className="h-3 w-2 rounded-sm bg-red-500" />
-                  </span>
-                ))}
-                {Array.from({ length: row.straightReds + row.legacyReds }).map((_, idx) => (
-                  <div key={`r-${idx}`} className="h-3 w-2 rounded-sm bg-red-500" />
-                ))}
-              </div>
-              <span className="text-sm font-black text-foreground">{row.points}</span>
             </div>
           ))}
         </div>
