@@ -163,7 +163,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         ))}
       </div>
 
-      {matches.length === 0 && (
+      {scheduledCount === 0 && (
         <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
           <p className="text-sm text-muted-foreground font-medium">Nog geen wedstrijden gepland.</p>
         </div>
