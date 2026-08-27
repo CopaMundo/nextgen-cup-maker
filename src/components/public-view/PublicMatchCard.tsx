@@ -28,6 +28,7 @@ interface PublicMatchCardProps {
 
 const getTeamName = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.name || "–";
 const getTeamLogo = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.logo_url;
+const getTeamCountry = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.country;
 
 const PublicMatchCard = ({
   match: m,
