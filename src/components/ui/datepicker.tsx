@@ -45,12 +45,10 @@ const buildDisplayValue = (digits: string) => {
 
 const extractDigits = (raw: string) => raw.replace(/\D/g, "").slice(0, 8);
 
-const isPlaceholder = (char: string) => char === "d" || char === "m" || char === "j";
-
-const getCursorPos = (length: number) => {
-  if (length <= 2) return length;
-  if (length <= 4) return length + 1;
-  return length + 2;
+const buildPartialValue = (digits: string) => {
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 };
 
 export function DatePicker({
@@ -75,6 +73,7 @@ export function DatePicker({
   }, [value]);
 
   const displayValue = React.useMemo(() => buildDisplayValue(digits), [digits]);
+  const partialValue = React.useMemo(() => buildPartialValue(digits), [digits]);
 
   const commit = (newDigits: string) => {
     if (newDigits.length !== 8) {
@@ -122,7 +121,7 @@ export function DatePicker({
 
   React.useEffect(() => {
     if (inputRef.current && document.activeElement === inputRef.current) {
-      const pos = getCursorPos(digits.length);
+      const pos = buildPartialValue(digits).length;
       inputRef.current.setSelectionRange(pos, pos);
     }
   }, [digits]);
@@ -153,7 +152,7 @@ export function DatePicker({
           ref={inputRef}
           type="text"
           inputMode="numeric"
-          value={displayValue}
+          value={partialValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
@@ -167,27 +166,14 @@ export function DatePicker({
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 left-3 right-10 flex items-center overflow-hidden text-sm"
         >
-          {displayValue.split("").map((char, i) => {
-            if (char === "/") {
-              return (
-                <span key={i} className="text-muted-foreground">
-                  /
-                </span>
-              );
-            }
-            if (isPlaceholder(char)) {
-              return (
-                <span key={i} className="text-muted-foreground">
-                  {char}
-                </span>
-              );
-            }
-            return (
-              <span key={i} className="text-transparent">
-                {char}
-              </span>
-            );
-          })}
+          {displayValue.split("").map((char, i) => (
+            <span
+              key={i}
+              className={i < partialValue.length ? "text-transparent" : "text-muted-foreground"}
+            >
+              {char}
+            </span>
+          ))}
         </div>
         <Button
           type="button"

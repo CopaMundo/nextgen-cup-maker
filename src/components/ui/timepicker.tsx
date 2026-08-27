@@ -29,9 +29,8 @@ const buildDisplayValue = (digits: string) => {
   return `${h1}${h2}:${m1}${m2}`;
 };
 
-const isPlaceholder = (char: string) => char === "u" || char === "m";
-
-const getCursorPos = (length: number) => (length <= 2 ? length : length + 1);
+const buildPartialValue = (digits: string) =>
+  digits.length <= 2 ? digits : `${digits.slice(0, 2)}:${digits.slice(2)}`;
 
 /** Clamp digits so hours stay 00-23 and minutes 00-59 while typing. */
 const clampDigits = (digits: string) => {
@@ -92,6 +91,7 @@ export function TimePicker({
   }, [value]);
 
   const displayValue = React.useMemo(() => buildDisplayValue(digits), [digits]);
+  const partialValue = React.useMemo(() => buildPartialValue(digits), [digits]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newDigits = clampDigits(extractDigits(event.target.value));
@@ -117,7 +117,7 @@ export function TimePicker({
 
   React.useEffect(() => {
     if (inputRef.current && document.activeElement === inputRef.current) {
-      const pos = getCursorPos(digits.length);
+      const pos = buildPartialValue(digits).length;
       inputRef.current.setSelectionRange(pos, pos);
     }
   }, [digits]);
@@ -135,6 +135,26 @@ export function TimePicker({
     setOpen(false);
   };
 
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const draggingRef = React.useRef(false);
+
+  const pickFromPointer = (clientX: number, clientY: number) => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 100 - 50;
+    const y = ((clientY - rect.top) / rect.height) * 100 - 50;
+    let angle = (Math.atan2(y, x) * 180) / Math.PI + 90;
+    if (angle < 0) angle += 360;
+    const radius = Math.hypot(x, y);
+    if (view === "hours") {
+      const idx = Math.round(angle / 30) % 12;
+      setDraftH(radius < 32 ? INNER_HOURS[idx] : OUTER_HOURS[idx]);
+    } else {
+      setDraftM(Math.round(angle / 6) % 60);
+    }
+  };
+
   const handIndex = view === "hours" ? draftH % 12 : draftM / 5;
   const handRadius = view === "hours" && (draftH === 0 || draftH > 12) ? 25 : 38;
   const handEnd = posOnCircle(handIndex, handRadius);
@@ -146,7 +166,7 @@ export function TimePicker({
           ref={inputRef}
           type="text"
           inputMode="numeric"
-          value={displayValue}
+          value={partialValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => inputRef.current?.select()}
@@ -163,7 +183,7 @@ export function TimePicker({
           {displayValue.split("").map((char, i) => (
             <span
               key={i}
-              className={char === ":" || isPlaceholder(char) ? "text-muted-foreground" : "text-transparent"}
+              className={i < partialValue.length ? "text-transparent" : "text-muted-foreground"}
             >
               {char}
             </span>
@@ -210,7 +230,23 @@ export function TimePicker({
 
             {/* Analog clock */}
             <div className="p-4">
-              <svg viewBox="0 0 100 100" className="mx-auto h-64 w-64 select-none">
+              <svg
+                ref={svgRef}
+                viewBox="0 0 100 100"
+                className="mx-auto h-64 w-64 touch-none select-none cursor-pointer"
+                onPointerDown={(e) => {
+                  draggingRef.current = true;
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  pickFromPointer(e.clientX, e.clientY);
+                }}
+                onPointerMove={(e) => {
+                  if (draggingRef.current) pickFromPointer(e.clientX, e.clientY);
+                }}
+                onPointerUp={() => {
+                  draggingRef.current = false;
+                  if (view === "hours") setView("minutes");
+                }}
+              >
                 <circle cx="50" cy="50" r="48" className="fill-secondary/40" />
                 <line
                   x1="50"
@@ -223,15 +259,15 @@ export function TimePicker({
                 <circle cx="50" cy="50" r="2" className="fill-primary" />
                 <circle cx={handEnd.x} cy={handEnd.y} r="7" className="fill-primary" />
 
-                {view === "hours" ? (
-                  <>
-                    {OUTER_HOURS.map((h, i) => {
-                      const p = posOnCircle(i, 38);
-                      const active = draftH === h;
-                      return (
-                        <g key={`o${h}`} onClick={() => { setDraftH(h); setView("minutes"); }} className="cursor-pointer">
-                          <circle cx={p.x} cy={p.y} r="7" fill="transparent" />
+                <g className="pointer-events-none">
+                  {view === "hours" ? (
+                    <>
+                      {OUTER_HOURS.map((h, i) => {
+                        const p = posOnCircle(i, 38);
+                        const active = draftH === h;
+                        return (
                           <text
+                            key={`o${h}`}
                             x={p.x}
                             y={p.y}
                             textAnchor="middle"
@@ -241,16 +277,14 @@ export function TimePicker({
                           >
                             {pad(h)}
                           </text>
-                        </g>
-                      );
-                    })}
-                    {INNER_HOURS.map((h, i) => {
-                      const p = posOnCircle(i, 25);
-                      const active = draftH === h;
-                      return (
-                        <g key={`i${h}`} onClick={() => { setDraftH(h); setView("minutes"); }} className="cursor-pointer">
-                          <circle cx={p.x} cy={p.y} r="6" fill="transparent" />
+                        );
+                      })}
+                      {INNER_HOURS.map((h, i) => {
+                        const p = posOnCircle(i, 25);
+                        const active = draftH === h;
+                        return (
                           <text
+                            key={`i${h}`}
                             x={p.x}
                             y={p.y}
                             textAnchor="middle"
@@ -260,18 +294,16 @@ export function TimePicker({
                           >
                             {pad(h)}
                           </text>
-                        </g>
-                      );
-                    })}
-                  </>
-                ) : (
-                  MINUTES.map((m, i) => {
-                    const p = posOnCircle(i, 38);
-                    const active = draftM === m;
-                    return (
-                      <g key={m} onClick={() => setDraftM(m)} className="cursor-pointer">
-                        <circle cx={p.x} cy={p.y} r="7" fill="transparent" />
+                        );
+                      })}
+                    </>
+                  ) : (
+                    MINUTES.map((m, i) => {
+                      const p = posOnCircle(i, 38);
+                      const active = draftM === m;
+                      return (
                         <text
+                          key={m}
                           x={p.x}
                           y={p.y}
                           textAnchor="middle"
@@ -281,24 +313,13 @@ export function TimePicker({
                         >
                           {pad(m)}
                         </text>
-                      </g>
-                    );
-                  })
-                )}
+                      );
+                    })
+                  )}
+                </g>
               </svg>
-
-              {view === "minutes" && (
-                <div className="mt-2 flex items-center justify-center gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => setDraftM((m) => (m + 59) % 60)}>
-                    −1
-                  </Button>
-                  <span className="text-xs text-muted-foreground">minuut fijnregeling</span>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setDraftM((m) => (m + 1) % 60)}>
-                    +1
-                  </Button>
-                </div>
-              )}
             </div>
+
 
             <DialogFooter className="flex-row justify-end gap-2 border-t border-border px-3 py-2">
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
