@@ -21,13 +21,13 @@ interface Props {
   homeResetKey?: number;
 }
 
-/** Venster van max 5 posities rond het favoriete team (team steeds 3de, tenzij 1ste/2de of onderaan). */
+/** Venster van max 6 posities rond het favoriete team. Tot 6 teams = alles tonen. Vanaf 7 teams max 5, met 2 boven en 2 onder het favoriete team, tenzij deze 1ste of 2de staat. */
 const windowStandings = (rows: any[], favoriteTeam: string | null) => {
-  if (rows.length <= 5) return rows;
+  if (rows.length <= 6) return rows;
   const idx = rows.findIndex((r: any) => r.team?.id === favoriteTeam);
   if (idx < 0) return rows.slice(0, 5);
-  const start = Math.min(Math.max(idx - 2, 0), rows.length - 5);
-  return rows.slice(start, start + 5);
+  if (idx <= 1) return rows.slice(0, 5); // 1ste of 2de: toon top 5
+  return rows.slice(idx - 2, idx + 3); // 2 boven, favoriet, 2 onder
 };
 
 
