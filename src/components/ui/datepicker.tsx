@@ -53,13 +53,15 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleSelect}
-          initialFocus
-          className={cn("p-3 pointer-events-auto bg-white text-black")}
-        />
+        <div data-mode="light" className="rounded-md">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={handleSelect}
+            initialFocus
+            className={cn("p-3 pointer-events-auto")}
+          />
+        </div>
       </PopoverContent>
     </Popover>
   );
