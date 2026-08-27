@@ -7,7 +7,7 @@ import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
-import { calculateGroupStandings } from "@/lib/standingsCalculator";
+import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
 import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
 import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
