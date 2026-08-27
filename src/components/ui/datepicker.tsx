@@ -28,14 +28,29 @@ interface DatePickerProps {
   className?: string;
 }
 
-const MASK = "dd/mm/jjjj";
+const MASK = "DD/MM/JJJJ";
 
-const maskFromDigits = (raw: string) => {
-  const digits = raw.replace(/\D/g, "").slice(0, 8);
-  let masked = digits.slice(0, 2);
-  if (digits.length >= 3) masked += "/" + digits.slice(2, 4);
-  if (digits.length >= 5) masked += "/" + digits.slice(4, 8);
-  return masked;
+const buildDisplayValue = (digits: string) => {
+  const d = digits.padEnd(8, " ");
+  const day1 = d[0] === " " ? "D" : d[0];
+  const day2 = d[1] === " " ? "D" : d[1];
+  const mon1 = d[2] === " " ? "M" : d[2];
+  const mon2 = d[3] === " " ? "M" : d[3];
+  const yr1 = d[4] === " " ? "J" : d[4];
+  const yr2 = d[5] === " " ? "J" : d[5];
+  const yr3 = d[6] === " " ? "J" : d[6];
+  const yr4 = d[7] === " " ? "J" : d[7];
+  return `${day1}${day2}/${mon1}${mon2}/${yr1}${yr2}${yr3}${yr4}`;
+};
+
+const extractDigits = (raw: string) => raw.replace(/\D/g, "").slice(0, 8);
+
+const isPlaceholder = (char: string) => char === "D" || char === "M" || char === "J";
+
+const getCursorPos = (length: number) => {
+  if (length <= 2) return length;
+  if (length <= 4) return length + 1;
+  return length + 2;
 };
 
 export function DatePicker({
@@ -47,30 +62,70 @@ export function DatePicker({
   const date = value ? parseISO(value) : undefined;
   const validDate = date && isValid(date) ? date : undefined;
 
-  const [inputValue, setInputValue] = React.useState(
-    validDate ? format(validDate, "dd/MM/yyyy") : ""
+  const [digits, setDigits] = React.useState(
+    validDate ? format(validDate, "ddMMyyyy") : ""
   );
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<Date | undefined>(validDate);
   const [month, setMonth] = React.useState<Date>(validDate ?? new Date());
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    setInputValue(validDate ? format(validDate, "dd/MM/yyyy") : "");
+    setDigits(validDate ? format(validDate, "ddMMyyyy") : "");
   }, [value]);
 
-  // Persistent mask: everything not typed yet stays visible as DD/MM/JJJJ.
-  const remainder = MASK.slice(inputValue.length);
+  const displayValue = React.useMemo(() => buildDisplayValue(digits), [digits]);
 
-  const commitInput = (typedValue: string) => {
-    if (!typedValue.trim()) {
-      onChange("");
+  const commit = (newDigits: string) => {
+    if (newDigits.length !== 8) {
+      if (newDigits.length === 0) onChange("");
       return;
     }
-    const parsed = parse(typedValue, "dd/MM/yyyy", new Date());
-    if (isValid(parsed) && format(parsed, "dd/MM/yyyy") === typedValue) {
+    const display = buildDisplayValue(newDigits);
+    const parsed = parse(display, "dd/MM/yyyy", new Date());
+    if (isValid(parsed) && format(parsed, "dd/MM/yyyy") === display) {
       onChange(format(parsed, "yyyy-MM-dd"));
     }
   };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newDigits = extractDigits(event.target.value);
+    setDigits(newDigits);
+    commit(newDigits);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowed = [
+      "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+      "Home", "End", "Delete", "Backspace", "Tab", "Enter", "Escape"
+    ];
+    if (allowed.includes(event.key)) return;
+    if (event.ctrlKey || event.metaKey) return;
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  };
+
+  const handleFocus = () => {
+    if (inputRef.current) {
+      inputRef.current.select();
+    }
+  };
+
+  const handleBlur = () => {
+    if (validDate) {
+      setDigits(format(validDate, "ddMMyyyy"));
+    } else {
+      setDigits("");
+    }
+  };
+
+  React.useEffect(() => {
+    if (inputRef.current && document.activeElement === inputRef.current) {
+      const pos = getCursorPos(digits.length);
+      inputRef.current.setSelectionRange(pos, pos);
+    }
+  }, [digits]);
 
   const openDialog = () => {
     const base = validDate ?? new Date();
@@ -80,7 +135,9 @@ export function DatePicker({
   };
 
   const confirm = () => {
-    if (draft && isValid(draft)) onChange(format(draft, "yyyy-MM-dd"));
+    if (draft && isValid(draft)) {
+      onChange(format(draft, "yyyy-MM-dd"));
+    }
     setOpen(false);
   };
 
@@ -93,30 +150,45 @@ export function DatePicker({
     <>
       <div className={cn("relative h-10 w-full", className)}>
         <Input
+          ref={inputRef}
           type="text"
           inputMode="numeric"
-          value={inputValue}
-          onChange={(event) => {
-            const typedValue = maskFromDigits(event.target.value);
-            setInputValue(typedValue);
-            commitInput(typedValue);
-          }}
-          onBlur={() => {
-            if (validDate) setInputValue(format(validDate, "dd/MM/yyyy"));
-          }}
+          value={displayValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder=""
+          autoComplete="off"
           aria-label={placeholder}
-          className="h-full w-full pr-10"
+          className="h-full w-full pr-10 text-primary"
         />
-        {remainder && (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-3 right-10 flex items-center overflow-hidden text-sm"
-          >
-            <span className="invisible whitespace-pre">{inputValue}</span>
-            <span className="whitespace-pre text-muted-foreground/60">{remainder}</span>
-          </div>
-        )}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-3 right-10 flex items-center overflow-hidden text-sm"
+        >
+          {displayValue.split("").map((char, i) => {
+            if (char === "/") {
+              return (
+                <span key={i} className="text-muted-foreground">
+                  /
+                </span>
+              );
+            }
+            if (isPlaceholder(char)) {
+              return (
+                <span key={i} className="text-muted-foreground">
+                  {char}
+                </span>
+              );
+            }
+            return (
+              <span key={i} className="text-transparent">
+                {char}
+              </span>
+            );
+          })}
+        </div>
         <Button
           type="button"
           variant="ghost"
