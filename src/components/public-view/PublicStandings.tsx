@@ -429,8 +429,8 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
       )}
 
       {subTab === "stats" && (() => {
-        const showScorers = tournament.enable_goalscorers && tournament.show_public_top_scorers;
-        const showAssists = tournament.enable_assists && tournament.show_public_assists;
+        const showScorers = tournament.enable_goalscorers;
+        const showAssists = tournament.enable_assists;
         const hasAny = showScorers || showAssists;
         return (
           <div className="pt-4 space-y-4">
