@@ -138,7 +138,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   {/* Match cards — each in its own style-aware container with spacing */}
                   <div className="p-2 space-y-2">
                     {slot.matches.map((m: any) => {
-                      const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
                       return (
                       <div
                         key={m.id}
