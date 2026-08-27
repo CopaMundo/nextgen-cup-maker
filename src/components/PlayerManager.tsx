@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,8 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const { toast } = useToast();
   const [deletePlayerId, setDeletePlayerId] = useState<string | null>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const editNameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchPlayers(); }, [teamId]);
 
