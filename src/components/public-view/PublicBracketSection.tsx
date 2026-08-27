@@ -11,6 +11,7 @@ import { getMatchSideDisplayName } from "@/lib/slotLabels";
 import PublicMatchDetailDialog from "@/components/public-view/PublicMatchDetailDialog";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
+import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 
 interface BracketSectionProps {
   groups: any[];
