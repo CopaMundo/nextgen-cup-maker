@@ -210,7 +210,23 @@ export function TimePicker({
 
             {/* Analog clock */}
             <div className="p-4">
-              <svg viewBox="0 0 100 100" className="mx-auto h-64 w-64 select-none">
+              <svg
+                ref={svgRef}
+                viewBox="0 0 100 100"
+                className="mx-auto h-64 w-64 touch-none select-none cursor-pointer"
+                onPointerDown={(e) => {
+                  draggingRef.current = true;
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  pickFromPointer(e.clientX, e.clientY);
+                }}
+                onPointerMove={(e) => {
+                  if (draggingRef.current) pickFromPointer(e.clientX, e.clientY);
+                }}
+                onPointerUp={() => {
+                  draggingRef.current = false;
+                  if (view === "hours") setView("minutes");
+                }}
+              >
                 <circle cx="50" cy="50" r="48" className="fill-secondary/40" />
                 <line
                   x1="50"
@@ -223,15 +239,15 @@ export function TimePicker({
                 <circle cx="50" cy="50" r="2" className="fill-primary" />
                 <circle cx={handEnd.x} cy={handEnd.y} r="7" className="fill-primary" />
 
-                {view === "hours" ? (
-                  <>
-                    {OUTER_HOURS.map((h, i) => {
-                      const p = posOnCircle(i, 38);
-                      const active = draftH === h;
-                      return (
-                        <g key={`o${h}`} onClick={() => { setDraftH(h); setView("minutes"); }} className="cursor-pointer">
-                          <circle cx={p.x} cy={p.y} r="7" fill="transparent" />
+                <g className="pointer-events-none">
+                  {view === "hours" ? (
+                    <>
+                      {OUTER_HOURS.map((h, i) => {
+                        const p = posOnCircle(i, 38);
+                        const active = draftH === h;
+                        return (
                           <text
+                            key={`o${h}`}
                             x={p.x}
                             y={p.y}
                             textAnchor="middle"
@@ -241,16 +257,14 @@ export function TimePicker({
                           >
                             {pad(h)}
                           </text>
-                        </g>
-                      );
-                    })}
-                    {INNER_HOURS.map((h, i) => {
-                      const p = posOnCircle(i, 25);
-                      const active = draftH === h;
-                      return (
-                        <g key={`i${h}`} onClick={() => { setDraftH(h); setView("minutes"); }} className="cursor-pointer">
-                          <circle cx={p.x} cy={p.y} r="6" fill="transparent" />
+                        );
+                      })}
+                      {INNER_HOURS.map((h, i) => {
+                        const p = posOnCircle(i, 25);
+                        const active = draftH === h;
+                        return (
                           <text
+                            key={`i${h}`}
                             x={p.x}
                             y={p.y}
                             textAnchor="middle"
@@ -260,18 +274,16 @@ export function TimePicker({
                           >
                             {pad(h)}
                           </text>
-                        </g>
-                      );
-                    })}
-                  </>
-                ) : (
-                  MINUTES.map((m, i) => {
-                    const p = posOnCircle(i, 38);
-                    const active = draftM === m;
-                    return (
-                      <g key={m} onClick={() => setDraftM(m)} className="cursor-pointer">
-                        <circle cx={p.x} cy={p.y} r="7" fill="transparent" />
+                        );
+                      })}
+                    </>
+                  ) : (
+                    MINUTES.map((m, i) => {
+                      const p = posOnCircle(i, 38);
+                      const active = draftM === m;
+                      return (
                         <text
+                          key={m}
                           x={p.x}
                           y={p.y}
                           textAnchor="middle"
@@ -281,24 +293,13 @@ export function TimePicker({
                         >
                           {pad(m)}
                         </text>
-                      </g>
-                    );
-                  })
-                )}
+                      );
+                    })
+                  )}
+                </g>
               </svg>
-
-              {view === "minutes" && (
-                <div className="mt-2 flex items-center justify-center gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => setDraftM((m) => (m + 59) % 60)}>
-                    −1
-                  </Button>
-                  <span className="text-xs text-muted-foreground">minuut fijnregeling</span>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setDraftM((m) => (m + 1) % 60)}>
-                    +1
-                  </Button>
-                </div>
-              )}
             </div>
+
 
             <DialogFooter className="flex-row justify-end gap-2 border-t border-border px-3 py-2">
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
