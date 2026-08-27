@@ -286,6 +286,44 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     )
   );
 
+  const renderCardsTable = (data: PlayerCardsRow[]) => (
+    data.length === 0 ? (
+      <div className="rounded-xl border border-dashed border-border py-8 text-center">
+        <p className="text-sm text-muted-foreground">Nog geen kaarten uitgedeeld.</p>
+      </div>
+    ) : (
+      <div className="rounded-xl border border-border overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs">Speler</TableHead>
+              <TableHead className="text-xs">Team</TableHead>
+              <TableHead className="w-12 text-center text-xs"><YellowIcon /></TableHead>
+              <TableHead className="w-12 text-center text-xs"><SecondYellowIcon /></TableHead>
+              <TableHead className="w-12 text-center text-xs"><RedIcon /></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((row) => (
+              <TableRow key={`${row.name}-${row.teamId}`}>
+                <TableCell className="text-sm font-medium text-foreground">{row.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1.5">
+                    {teamLogo(row.teamId) && <img src={teamLogo(row.teamId)!} className="h-4 w-4 object-contain" alt="" />}
+                    <span className="text-xs text-muted-foreground">{teamName(row.teamId)}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center text-sm tabular-nums">{row.yellows}</TableCell>
+                <TableCell className="text-center text-sm tabular-nums">{row.secondYellows}</TableCell>
+                <TableCell className="text-center text-sm tabular-nums">{row.reds}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    )
+  );
+
   return (
     <div className="space-y-6 w-full">
       <div className="flex justify-center border-b border-border flex-wrap">
