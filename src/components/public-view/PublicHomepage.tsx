@@ -1196,8 +1196,9 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
 };
 
 // Match list view — each card wrapped in its own rounded container with spacing
-const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament }: {
+const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament, onCardClick }: {
   matches: any[]; teams: any[]; phases: any[]; groups: any[]; slots?: any[]; favoriteTeam: string | null; compact?: boolean; tournament?: any;
+  onCardClick?: () => void;
 }) => {
   const bStyle = useBroadcastStyle();
   return (
@@ -1213,6 +1214,7 @@ const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTea
             tournament={tournament}
             allMatches={matches}
             favoriteTeam={favoriteTeam}
+            onCardClick={onCardClick}
           />
         </div>
       ))}
