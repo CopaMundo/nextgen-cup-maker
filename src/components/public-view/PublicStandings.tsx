@@ -10,7 +10,7 @@ import { ds } from "@/lib/broadcastStyles";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
 
-const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: PublicTournamentData; initialPhaseId?: string; initialGroupId?: string }) => {
+const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }: { data: PublicTournamentData; initialPhaseId?: string; initialGroupId?: string; favoriteTeam?: string | null }) => {
   const { tournament, phases, groups, teams, matches, groupTeams, slots, standingColors, stats, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const [subTab, setSubTab] = useState<"standings" | "stats">("standings");
@@ -411,6 +411,8 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId }: { data: Publi
                     tournament={tournament}
                     phases={phases}
                     showAllOnly
+                    favoriteTeam={format.id === selectedFormatId || !selectedFormatId ? favoriteTeam : null}
+                    scrollToGroupId={format.id === selectedFormatId || !selectedFormatId ? initialGroupId : undefined}
                     formatName={format.name}
                     hideSectionDividers={!showFormatsAsTabs}
                   />
