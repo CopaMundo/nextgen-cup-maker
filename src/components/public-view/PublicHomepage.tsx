@@ -20,6 +20,16 @@ interface Props {
   homeResetKey?: number;
 }
 
+/** Venster van max 5 posities rond het favoriete team (team steeds 3de, tenzij 1ste/2de of onderaan). */
+const windowStandings = (rows: any[], favoriteTeam: string | null) => {
+  if (rows.length <= 5) return rows;
+  const idx = rows.findIndex((r: any) => r.team?.id === favoriteTeam);
+  if (idx < 0) return rows.slice(0, 5);
+  const start = Math.min(Math.max(idx - 2, 0), rows.length - 5);
+  return rows.slice(start, start + 5);
+};
+
+
 const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, homeResetKey }: Props) => {
   const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
