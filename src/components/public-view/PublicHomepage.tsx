@@ -1345,7 +1345,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
 };
 
 // Expanded Programma timeslot list (homepage inline view)
-const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tournament, favoriteTeam, bStyle, scrollToLatest }: any) => {
+const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tournament, favoriteTeam, bStyle, scrollToLatest, groupTeams, scoringSystems }: any) => {
   const targetRef = useRef<HTMLDivElement>(null);
   const sorted = [...matches].sort((a: any, b: any) => {
     const dateA = a.match_date || "9999";
