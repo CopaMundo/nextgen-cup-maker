@@ -98,7 +98,11 @@ const PublicMatchCard = ({
       <span className={`ttx-team-name flex-1 truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? `ttx-fav-team ${ds(bStyle, "matchTeamNameFav")}` : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
         {name}
       </span>
-      {country && <CountryFlag country={country} className="h-3 w-4 flex-shrink-0" />}
+      {tournament?.show_country && country && (
+        <span className="inline-flex h-2.5 w-3.5 flex-shrink-0 items-center justify-center">
+          <CountryFlag country={country} className="h-full w-full object-contain" />
+        </span>
+      )}
       <div className="relative flex items-center">
         {m.is_played ? (
           <>
