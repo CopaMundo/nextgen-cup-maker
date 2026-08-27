@@ -79,16 +79,31 @@ export const countryToFlag = (country: string | null | undefined): string => {
   return "";
 };
 
-/** Returns a flagcdn.com SVG URL for the given country name or ISO code */
+/** Twemoji codepoint sequences for subdivision flags (black flag + tag sequence) */
+const SUBDIVISION_TWEMOJI: Record<string, string> = {
+  "gb-eng": "1f3f4-e0067-e0062-e0065-e006e-e0067-e007f",
+  "gb-sct": "1f3f4-e0067-e0062-e0073-e0063-e0074-e007f",
+  "gb-wls": "1f3f4-e0067-e0062-e0077-e006c-e0073-e007f",
+  "gb-nir": "1f1ec-1f1e7",
+};
+
+const TWEMOJI_BASE = "https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg";
+
+/** Returns a Twemoji SVG URL (rounded, flat style) for the given country name or ISO code */
 export const countryToFlagUrl = (country: string | null | undefined): string | null => {
   if (!country) return null;
   // Check subdivision first
-  if (SUBDIVISION_ISO[country]) {
-    return `https://flagcdn.com/w40/${SUBDIVISION_ISO[country]}.png`;
+  const sub = SUBDIVISION_ISO[country];
+  if (sub && SUBDIVISION_TWEMOJI[sub]) {
+    return `${TWEMOJI_BASE}/${SUBDIVISION_TWEMOJI[sub]}.svg`;
   }
   const iso = COUNTRY_TO_ISO[country] || country;
   if (iso.length === 2) {
-    return `https://flagcdn.com/w40/${iso.toLowerCase()}.png`;
+    const codepoints = [...iso.toUpperCase()]
+      .map(c => (0x1f1e6 + c.charCodeAt(0) - 65).toString(16))
+      .join("-");
+    return `${TWEMOJI_BASE}/${codepoints}.svg`;
   }
   return null;
 };
+
