@@ -5,7 +5,7 @@ import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
-import { calculateGroupStandings } from "@/lib/standingsCalculator";
+import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 
 const POSITION_ORDER = ["goalkeeper", "defender", "midfielder", "attacker"];
 const POSITION_LABELS: Record<string, string> = {
