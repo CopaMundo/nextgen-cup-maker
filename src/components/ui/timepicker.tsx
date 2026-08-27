@@ -92,9 +92,17 @@ export function TimePicker({
 
   const displayValue = React.useMemo(() => buildDisplayValue(digits), [digits]);
   const partialValue = React.useMemo(() => buildPartialValue(digits), [digits]);
+  const selectAllRef = React.useRef(false);
+  const pendingSelectRef = React.useRef<[number, number] | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newDigits = clampDigits(extractDigits(event.target.value));
+    let newDigits = clampDigits(extractDigits(event.target.value));
+    // Full value selected + one digit typed: replace first digit, keep rest selected.
+    if (selectAllRef.current && newDigits.length === 1 && digits.length === 4) {
+      newDigits = clampDigits(newDigits + digits.slice(1));
+      pendingSelectRef.current = [1, buildDisplayValue(newDigits).length];
+    }
+    selectAllRef.current = false;
     setDigits(newDigits);
     if (newDigits.length === 4) onChange(digitsToTime(newDigits));
     else if (newDigits.length === 0) onChange("");
@@ -117,6 +125,12 @@ export function TimePicker({
 
   React.useEffect(() => {
     if (inputRef.current && document.activeElement === inputRef.current) {
+      const pending = pendingSelectRef.current;
+      pendingSelectRef.current = null;
+      if (pending) {
+        inputRef.current.setSelectionRange(pending[0], pending[1]);
+        return;
+      }
       const pos = buildPartialValue(digits).length;
       inputRef.current.setSelectionRange(pos, pos);
     }
@@ -169,8 +183,14 @@ export function TimePicker({
           value={displayValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => inputRef.current?.select()}
-          onClick={() => inputRef.current?.select()}
+          onFocus={() => { selectAllRef.current = true; inputRef.current?.select(); }}
+          onClick={() => { selectAllRef.current = true; inputRef.current?.select(); }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            inputRef.current?.focus();
+            selectAllRef.current = true;
+            inputRef.current?.select();
+          }}
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"

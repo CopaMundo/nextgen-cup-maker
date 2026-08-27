@@ -104,8 +104,17 @@ export function DatePicker({
     }
   };
 
+  const selectAllRef = React.useRef(false);
+  const pendingSelectRef = React.useRef<[number, number] | null>(null);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newDigits = extractDigits(event.target.value);
+    let newDigits = extractDigits(event.target.value);
+    // Full value selected + one digit typed: replace first digit, keep rest selected.
+    if (selectAllRef.current && newDigits.length === 1 && digits.length === 8) {
+      newDigits = newDigits + digits.slice(1);
+      pendingSelectRef.current = [1, buildDisplayValue(newDigits).length];
+    }
+    selectAllRef.current = false;
     setDigits(newDigits);
     commit(newDigits);
   };
@@ -123,6 +132,15 @@ export function DatePicker({
   };
 
   const handleFocus = () => {
+    selectAllRef.current = true;
+    inputRef.current?.select();
+  };
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
+    // Prevent the browser from placing the caret after mouseup; keep full selection.
+    event.preventDefault();
+    inputRef.current?.focus();
+    selectAllRef.current = true;
     inputRef.current?.select();
   };
 
@@ -136,6 +154,12 @@ export function DatePicker({
 
   React.useEffect(() => {
     if (inputRef.current && document.activeElement === inputRef.current) {
+      const pending = pendingSelectRef.current;
+      pendingSelectRef.current = null;
+      if (pending) {
+        inputRef.current.setSelectionRange(pending[0], pending[1]);
+        return;
+      }
       const pos = buildPartialValue(digits).length;
       inputRef.current.setSelectionRange(pos, pos);
     }
@@ -177,6 +201,7 @@ export function DatePicker({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           onClick={handleFocus}
+          onMouseDown={handleMouseDown}
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"
