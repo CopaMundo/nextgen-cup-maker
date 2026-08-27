@@ -11,11 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry } from "@/lib/dateUtils";
-import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, CalendarDays, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import CalendarXIcon from "@/components/icons/CalendarXIcon";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { DatePicker } from "@/components/ui/datepicker";
 import { parseIsoDate, formatIsoDate } from "@/lib/dateUtils";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
@@ -218,7 +217,6 @@ const DateStripNav = ({
 }) => {
   const windowSize = useResponsiveWindowSize();
   const [windowStart, setWindowStart] = useState(0);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Keep the active date visible — only when the active date itself changes,
   // so manual scrolling/paging through dates is not auto-corrected back.
@@ -239,34 +237,6 @@ const DateStripNav = ({
   const showNav = dates.length > windowSize;
 
   const dateSet = new Set(dates);
-  // Build LOCAL Date objects (not UTC) so DayPicker selection matches without timezone drift
-  const isoToLocalDate = (iso: string): Date | null => {
-    const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) return null;
-    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  };
-  const localDateToIso = (d: Date): string => {
-    const y = d.getFullYear();
-    const mo = String(d.getMonth() + 1).padStart(2, "0");
-    const da = String(d.getDate()).padStart(2, "0");
-    return `${y}-${mo}-${da}`;
-  };
-
-  const selectedDate = isoToLocalDate(activeDate) || undefined;
-  const allParsed = dates.map(isoToLocalDate).filter(Boolean) as Date[];
-  const minDate = allParsed[0];
-  const maxDate = allParsed[allParsed.length - 1];
-
-  const handlePick = (date: Date | undefined) => {
-    if (!date) return;
-    const iso = localDateToIso(date);
-    setPickerOpen(false);
-    if (!dateSet.has(iso)) {
-      onInvalidPick(iso);
-      return;
-    }
-    onSelect(iso);
-  };
 
   return (
     <div className="flex items-center justify-center gap-2">
@@ -328,34 +298,19 @@ const DateStripNav = ({
         )}
       </div>
 
-      <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="shrink-0 p-1.5 text-muted-foreground hover:text-foreground transition-colors ml-1"
-            aria-label="Kies een datum"
-          >
-            <CalendarDays className="h-4 w-4" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 pointer-events-auto" align="end">
-          <CalendarPicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={handlePick}
-            defaultMonth={selectedDate || minDate}
-            modifiers={{ available: allParsed }}
-            modifiersClassNames={{ available: "font-bold text-primary" }}
-            initialFocus
-            className="p-3 pointer-events-auto"
-          />
-          {minDate && maxDate && (
-            <div className="px-3 pb-3 text-[10px] text-muted-foreground text-center">
-              Toernooi: {formatIsoDateForLocale(localDateToIso(minDate), "nl-BE", { day: "numeric", month: "short" })} – {formatIsoDateForLocale(localDateToIso(maxDate), "nl-BE", { day: "numeric", month: "short" })}
-            </div>
-          )}
-        </PopoverContent>
-      </Popover>
+      <DatePicker
+        value={activeDate}
+        onChange={(iso) => {
+          if (!dateSet.has(iso)) {
+            onInvalidPick(iso);
+            return;
+          }
+          onSelect(iso);
+        }}
+        hideInput
+        availableDates={dates}
+        onInvalidPick={onInvalidPick}
+      />
     </div>
   );
 };

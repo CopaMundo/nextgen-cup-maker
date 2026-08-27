@@ -27,6 +27,9 @@ interface DatePickerProps {
   placeholder?: string;
   className?: string;
   autoFocus?: boolean;
+  hideInput?: boolean;
+  availableDates?: string[];
+  onInvalidPick?: (iso: string) => void;
 }
 
 const MASK = "dd/mm/jjjj";
@@ -58,6 +61,9 @@ export function DatePicker({
   placeholder = "Kies een datum",
   className,
   autoFocus,
+  hideInput,
+  availableDates,
+  onInvalidPick,
 }: DatePickerProps) {
   const date = value ? parseISO(value) : undefined;
   const validDate = date && isValid(date) ? date : undefined;
@@ -144,7 +150,12 @@ export function DatePicker({
 
   const confirm = () => {
     if (draft && isValid(draft)) {
-      onChange(format(draft, "yyyy-MM-dd"));
+      const iso = format(draft, "yyyy-MM-dd");
+      if (availableDates && !availableDates.includes(iso)) {
+        onInvalidPick?.(iso);
+      } else {
+        onChange(iso);
+      }
     }
     setOpen(false);
   };
@@ -156,7 +167,7 @@ export function DatePicker({
 
   return (
     <>
-      <div className={cn("relative h-10 w-full", className)}>
+      <div className={cn("relative", hideInput ? "h-auto w-auto" : "h-10 w-full", className)}>
         <Input
           ref={inputRef}
           type="text"
@@ -171,7 +182,10 @@ export function DatePicker({
           autoComplete="off"
           autoFocus={autoFocus}
           aria-label={placeholder}
-          className="h-full w-full pr-10 text-foreground"
+          className={cn(
+            "h-full text-foreground",
+            hideInput ? "sr-only" : "w-full pr-10"
+          )}
         />
         <Button
           type="button"
@@ -179,7 +193,10 @@ export function DatePicker({
           size="icon"
           aria-label="Open kalender"
           onClick={openDialog}
-          className="absolute right-0 top-0 h-full w-10 bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white"
+          className={cn(
+            "bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white",
+            hideInput ? "relative h-8 w-8" : "absolute right-0 top-0 h-full w-10"
+          )}
         >
           <CalendarIcon className="h-4 w-4" />
         </Button>
