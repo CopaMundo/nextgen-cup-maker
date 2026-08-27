@@ -335,7 +335,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                                           <div className="flex h-full w-full items-center justify-center bg-secondary text-[8px] font-black text-muted-foreground">{row.team?.name?.charAt(0)}</div>}
                                       </div>
                                       <span className="font-bold text-foreground truncate min-w-0">{row.team?.name}</span>
-                                      {tournament.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain flex-shrink-0" />}
+                                      {tournament.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-3 w-4 object-contain flex-shrink-0" />}
                                     </div>
                                   </td>
                                   {setsMode ? (

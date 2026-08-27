@@ -1484,7 +1484,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       {row.team.logo_url && <img src={row.team.logo_url} alt="" className="h-4 w-4 object-contain flex-shrink-0" />}
                       <span className="font-medium text-foreground text-xs">{row.team.name}</span>
                       {tournament?.show_country && row.team.country && (
-                        <CountryFlag country={row.team.country} className="h-2 w-3 object-contain flex-shrink-0 align-middle" />
+                        <CountryFlag country={row.team.country} className="h-3 w-4 object-contain flex-shrink-0 align-middle" />
                       )}
                     </div>
                   </TableCell>

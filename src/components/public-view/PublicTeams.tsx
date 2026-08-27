@@ -213,7 +213,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
             </div>
             <div className="text-center min-w-0 w-full">
               <p className="text-xs font-bold text-foreground truncate">{t.name}</p>
-              {t.country && <CountryFlag country={t.country} className="h-3 w-4 object-contain inline-block mt-0.5" />}
+              {t.country && <CountryFlag country={t.country} className="h-3.5 w-5 object-contain inline-block mt-0.5" />}
             </div>
           </button>
         ))}

@@ -577,8 +577,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const fsName = Math.round(11 * scale);
     const fsScore = Math.round(12 * scale);
     const logoSize = Math.round(16 * scale);
-    const flagW = Math.round(14 * scale);
-    const flagH = Math.round(10 * scale);
+    const flagW = Math.round(16 * scale);
+    const flagH = Math.round(12 * scale);
     // H&A: detect per-match (works also when phase is single_leg but match has Heen/Terug pair)
     const matchIsHA = isMatchHA(match);
     const pairedMatch = matchIsHA ? findPairedMatch(match) : null;
@@ -657,7 +657,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               style={isCompactPretty ? { fontSize: fsName, lineHeight: `${fsName + 3}px` } : tightSide ? { fontSize: 7, lineHeight: "12px" } : undefined}
             >{name}</span>
             {tournament?.show_country && country && (!compactTree || isCompactPretty) && (
-              <span className="inline-flex items-center justify-center flex-shrink-0" style={isCompactPretty ? { height: flagH, width: flagW } : tightSide ? { height: 8, width: 12 } : { height: 10, width: 14 }}>
+              <span className="inline-flex items-center justify-center flex-shrink-0" style={isCompactPretty ? { height: flagH, width: flagW } : tightSide ? { height: 10, width: 14 } : { height: 12, width: 16 }}>
                 <CountryFlag country={country} className="w-full h-full object-contain" />
               </span>
             )}
