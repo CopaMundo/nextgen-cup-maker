@@ -1249,14 +1249,16 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
 };
 
 // Match list view — each card wrapped in its own rounded container with spacing
-const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament, onCardClick }: {
+const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament, onCardClick, groupTeams, scoringSystems }: {
   matches: any[]; teams: any[]; phases: any[]; groups: any[]; slots?: any[]; favoriteTeam: string | null; compact?: boolean; tournament?: any;
-  onCardClick?: () => void;
+  onCardClick?: () => void; groupTeams?: any[]; scoringSystems?: any[];
 }) => {
   const bStyle = useBroadcastStyle();
   return (
     <div className="space-y-2">
-      {matches.map((m: any) => (
+      {matches.map((m: any) => {
+        const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+        return (
         <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
           <PublicMatchCard
             match={m}
@@ -1268,9 +1270,10 @@ const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTea
             allMatches={matches}
             favoriteTeam={favoriteTeam}
             onCardClick={onCardClick}
+            {...positions}
           />
         </div>
-      ))}
+      );})}
     </div>
   );
 };
