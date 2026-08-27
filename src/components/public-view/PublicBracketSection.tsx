@@ -1198,7 +1198,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 };
 
 // List view for a set of rounds - using unified match card
-const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, groups, allMatches }: { rounds: any[]; teams: any[]; slots?: any[]; tournament: any; phases?: any[]; groups?: any[]; allMatches?: any[] }) => {
+const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, groups, allMatches, groupTeams = [], scoringSystems = [] }: { rounds: any[]; teams: any[]; slots?: any[]; tournament: any; phases?: any[]; groups?: any[]; allMatches?: any[]; groupTeams?: any[]; scoringSystems?: any[] }) => {
   const bStyle = useBroadcastStyle();
   return (
     <div className="space-y-4">
@@ -1211,7 +1211,9 @@ const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, grou
               <h4 className={ds(bStyle, "cardHeaderTitle")}>{round.name}</h4>
             </div>
             <div className="divide-y divide-border">
-              {round.matches.map((m: any) => (
+              {round.matches.map((m: any) => {
+                const positions = getMatchTeamPositions(m, groupTeams, allMatches || [], groups, phases, scoringSystems, tournament);
+                return (
                 <PublicMatchCard
                   key={m.id}
                   match={m}
@@ -1221,8 +1223,9 @@ const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, grou
                   slots={slots}
                   tournament={tournament}
                   allMatches={allMatches}
+                  {...positions}
                 />
-              ))}
+              );})}
             </div>
           </div>
         );
