@@ -80,8 +80,8 @@ const SortableRow = ({
         <span className="text-foreground font-medium truncate">{label}</span>
       </div>
       <div className="flex items-center gap-1 shrink-0">
-        <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
-        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+        <button onClick={onRename} className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Bewerken"><Pencil className="h-4 w-4" /></button>
+        <button onClick={onDelete} className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Verwijderen"><Trash2 className="h-4 w-4" /></button>
       </div>
     </div>
   );
