@@ -194,7 +194,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Geboortedatum</Label>
-                  <DatePicker value={form.birth_date} onChange={(v) => setForm({ ...form, birth_date: v })} placeholder="Kies datum" />
+                  <DatePicker value={form.birth_date} onChange={(v) => setForm({ ...form, birth_date: v })} placeholder="Kies datum" autoFocus />
                 </div>
               </div>
               <div className="space-y-1">
