@@ -1158,7 +1158,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditMatchDayIdx(null)}>Annuleren</Button>
+            <Button variant="outline" onClick={() => setEditMatchDayIdx(null)}>Sluiten</Button>
             <Button onClick={() => {
               if (editMatchDayIdx === null || !editMatchDayValue) return;
               const updated = [...(form.match_days || [])];
