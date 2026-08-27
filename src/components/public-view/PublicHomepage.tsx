@@ -855,6 +855,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 compact
                 tournament={tournament}
                 onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+                groupTeams={groupTeams}
+                scoringSystems={scoringSystems}
               />
             )}
             {globalTab === "results" && lastBlockMatches.length > 0 && (
