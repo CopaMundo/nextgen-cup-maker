@@ -34,6 +34,7 @@ import {
 interface Location {
   id: string;
   name: string;
+  sort_order?: number;
 }
 
 interface Category {
@@ -49,34 +50,43 @@ interface Attachment {
   file_size: number | null;
 }
 
-const SortableCategoryRow = ({ cat, onRename, onDelete }: { cat: Category; onRename: () => void; onDelete: () => void }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id });
+const SortableRow = ({
+  id,
+  label,
+  dragLabel,
+  onRename,
+  onDelete,
+}: { id: string; label: string; dragLabel: string; onRename: () => void; onDelete: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   return (
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2",
+        "flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-3 py-2",
         isDragging && "opacity-70 shadow-lg z-10 relative",
       )}
     >
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 min-w-0">
         <button
           type="button"
           {...attributes}
           {...listeners}
-          aria-label="Divisie verplaatsen"
+          aria-label={dragLabel}
           className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none"
         >
           <GripVertical className="h-4 w-4" />
         </button>
-        <span className="text-foreground font-medium">{cat.name}</span>
-        <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
+        <span className="text-foreground font-medium truncate">{label}</span>
       </div>
-      <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+      <div className="flex items-center gap-1 shrink-0">
+        <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+      </div>
     </div>
   );
 };
+
 
 const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate: (t: any) => void }) => {
   const { toast } = useToast();
@@ -195,11 +205,13 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const fetchLocations = async () => {
     const { data } = await supabase
       .from("tournament_locations")
-      .select("id, name")
+      .select("id, name, sort_order")
       .eq("tournament_id", tournament.id)
+      .order("sort_order")
       .order("created_at");
-    if (data) setLocations(data);
+    if (data) setLocations(data as Location[]);
   };
+
 
   const fetchCategories = async () => {
     const { data } = await supabase
@@ -302,15 +314,30 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     toast({ title: "Omslagfoto geüpload" });
   };
 
+  const handleLocationDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = locations.findIndex((l) => l.id === active.id);
+    const newIndex = locations.findIndex((l) => l.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(locations, oldIndex, newIndex).map((l, i) => ({ ...l, sort_order: i }));
+    setLocations(reordered);
+    await Promise.all(
+      reordered.map((l) => supabase.from("tournament_locations").update({ sort_order: l.sort_order } as any).eq("id", l.id)),
+    );
+    toast({ title: "Volgorde locaties opgeslagen" });
+  };
+
   const addLocation = async () => {
     if (!newLocationName.trim()) return;
     const { data } = await supabase
       .from("tournament_locations")
-      .insert({ tournament_id: tournament.id, name: newLocationName.trim() })
-      .select("id, name")
+      .insert({ tournament_id: tournament.id, name: newLocationName.trim(), sort_order: locations.length } as any)
+      .select("id, name, sort_order")
       .single();
     if (data) {
-      setLocations((prev) => [...prev, data]);
+      setLocations((prev) => [...prev, data as Location]);
+
       setNewLocationName("");
       setShowAddLocation(false);
     }
@@ -749,18 +776,28 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             {!form.is_esport && (
               <>
                 {locations.length > 0 && (
-                  <div className="space-y-1">
-                    {locations.map((loc) => (
-                      <div key={loc.id} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-foreground font-medium">{loc.name}</span>
-                          <button onClick={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3 w-3" /></button>
-                        </div>
-                        <button onClick={() => setDeleteLocId(loc.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                  <DndContext
+                    sensors={dndSensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleLocationDragEnd}
+                  >
+                    <SortableContext items={locations.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+                      <div className="space-y-1">
+                        {locations.map((loc) => (
+                          <SortableRow
+                            key={loc.id}
+                            id={loc.id}
+                            label={loc.name}
+                            dragLabel="Locatie verplaatsen"
+                            onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
+                            onDelete={() => setDeleteLocId(loc.id)}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 )}
+
                 <Button variant="outline" size="sm" onClick={() => { setNewLocationName(""); setShowAddLocation(true); }}>
                   <Plus className="h-3.5 w-3.5 mr-1" /> Locatie toevoegen
                 </Button>
@@ -815,12 +852,15 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                   <div className="space-y-1">
                     {categories.map((cat) => (
-                      <SortableCategoryRow
+                      <SortableRow
                         key={cat.id}
-                        cat={cat}
+                        id={cat.id}
+                        label={cat.name}
+                        dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
                       />
+
                     ))}
                   </div>
                 </SortableContext>
