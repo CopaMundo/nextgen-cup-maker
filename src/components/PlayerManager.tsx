@@ -46,6 +46,18 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
 
   useEffect(() => { fetchPlayers(); }, [teamId]);
 
+  useEffect(() => {
+    if (showAdd) {
+      setTimeout(() => nameInputRef.current?.focus(), 0);
+    }
+  }, [showAdd]);
+
+  useEffect(() => {
+    if (editingId) {
+      setTimeout(() => editNameInputRef.current?.focus(), 0);
+    }
+  }, [editingId]);
+
   const fetchPlayers = async () => {
     const { data } = await supabase
       .from("players")
