@@ -193,7 +193,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
   // Team grid - broadcast style
   return (
     <div className="px-3 pt-4 space-y-4">
-      <div className="sticky top-0 z-10 -mx-3 px-3 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border/40">
+      <div className="sticky top-0 z-10 -mx-3 px-3 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="flex items-center gap-3">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Teams</h2>
