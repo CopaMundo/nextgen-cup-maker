@@ -496,7 +496,6 @@ const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: stri
 
 const FairplayRanking = ({ data, teams }: { data: any[]; teams: any[] }) => {
   const bStyle = useBroadcastStyle();
-  if (data.length === 0) return null;
   const tName = (id: string) => teams.find((t: any) => t.id === id)?.name || "?";
   const tLogo = (id: string) => teams.find((t: any) => t.id === id)?.logo_url;
 
@@ -509,36 +508,42 @@ const FairplayRanking = ({ data, teams }: { data: any[]; teams: any[] }) => {
         </span>
         <h3 className={ds(bStyle, "cardHeaderTitle")}>Fair-playklassement</h3>
       </div>
-      <div className="divide-y divide-border/50">
-        {data.slice(0, 10).map((row, i) => (
-          <div key={`${row.name}-${row.teamId}`} className={`flex items-center gap-3 px-4 py-2.5 ${i % 2 === 1 ? "bg-secondary/20" : ""}`}>
-            <span className="w-6 text-center text-xs font-black text-primary">{i + 1}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground truncate">{row.name}</p>
-              <div className="flex items-center gap-1">
-                {tLogo(row.teamId) && <img src={tLogo(row.teamId)!} className="h-3 w-3 object-contain" alt="" />}
-                <span className="text-[10px] text-muted-foreground">{tName(row.teamId)}</span>
+      {data.length === 0 ? (
+        <div className="px-4 py-6 text-center">
+          <p className="text-sm text-muted-foreground">Nog geen kaarten uitgedeeld.</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-border/50">
+          {data.slice(0, 10).map((row, i) => (
+            <div key={`${row.name}-${row.teamId}`} className={`flex items-center gap-3 px-4 py-2.5 ${i % 2 === 1 ? "bg-secondary/20" : ""}`}>
+              <span className="w-6 text-center text-xs font-black text-primary">{i + 1}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-foreground truncate">{row.name}</p>
+                <div className="flex items-center gap-1">
+                  {tLogo(row.teamId) && <img src={tLogo(row.teamId)!} className="h-3 w-3 object-contain" alt="" />}
+                  <span className="text-[10px] text-muted-foreground">{tName(row.teamId)}</span>
+                </div>
               </div>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: row.yellows }).map((_, idx) => (
+                  <div key={`y-${idx}`} className="h-3 w-2 rounded-sm bg-yellow-400" />
+                ))}
+                {Array.from({ length: row.secondYellows }).map((_, idx) => (
+                  <span key={`2y-${idx}`} className="flex items-center gap-0.5">
+                    <div className="h-3 w-2 rounded-sm bg-yellow-400" />
+                    <div className="h-3 w-2 rounded-sm bg-yellow-400" />
+                    <div className="h-3 w-2 rounded-sm bg-red-500" />
+                  </span>
+                ))}
+                {Array.from({ length: row.straightReds + row.legacyReds }).map((_, idx) => (
+                  <div key={`r-${idx}`} className="h-3 w-2 rounded-sm bg-red-500" />
+                ))}
+              </div>
+              <span className="text-sm font-black text-foreground">{row.points}</span>
             </div>
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: row.yellows }).map((_, idx) => (
-                <div key={`y-${idx}`} className="h-3 w-2 rounded-sm bg-yellow-400" />
-              ))}
-              {Array.from({ length: row.secondYellows }).map((_, idx) => (
-                <span key={`2y-${idx}`} className="flex items-center gap-0.5">
-                  <div className="h-3 w-2 rounded-sm bg-yellow-400" />
-                  <div className="h-3 w-2 rounded-sm bg-yellow-400" />
-                  <div className="h-3 w-2 rounded-sm bg-red-500" />
-                </span>
-              ))}
-              {Array.from({ length: row.straightReds + row.legacyReds }).map((_, idx) => (
-                <div key={`r-${idx}`} className="h-3 w-2 rounded-sm bg-red-500" />
-              ))}
-            </div>
-            <span className="text-sm font-black text-foreground">{row.points}</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
