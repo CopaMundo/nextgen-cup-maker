@@ -514,46 +514,32 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         </div>
       </div>
 
-      {/* No favorite chosen → prompt */}
-      {!favoriteTeam && (
-        <div className={`${ds(bStyle, "card")} p-4`}>
-          <label className={`${ds(bStyle, "label")} mb-2 block flex items-center gap-1.5`}>
-            <Star className="h-3 w-3" /> Kies je favoriete team
-          </label>
-          <Select value="" onValueChange={(v) => toggleFavorite(v)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecteer je favoriete team" />
-            </SelectTrigger>
-            <SelectContent>
-              {teams.map((t: any) => (
-                <SelectItem key={t.id} value={t.id}>
-                  <div className="flex items-center gap-2">
-                    {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain" alt="" />}
-                    {t.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {/* === MIJN TEAM: titel + teamkiezer rechts === */}
+      <div className="flex items-center gap-2">
+        <div className={ds(bStyle, "sectionDot")} />
+        <h2 className={ds(bStyle, "sectionTitle")}>Mijn team</h2>
+        <div className={`${ds(bStyle, "sectionLine")} flex-1`} />
+        <Select value={favoriteTeam || ""} onValueChange={(v) => { if (v !== favoriteTeam) { if (favoriteTeam) toggleFavorite(favoriteTeam); toggleFavorite(v); } }}>
+          <SelectTrigger className="h-7 w-auto min-w-[110px] max-w-[150px] text-[10px] font-black uppercase tracking-wider">
+            <SelectValue placeholder="Kies uw team" />
+          </SelectTrigger>
+          <SelectContent>
+            {teams.map((t: any) => (
+              <SelectItem key={t.id} value={t.id}>
+                <div className="flex items-center gap-2">
+                  {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain" alt="" />}
+                  {t.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* === FAVORITE TEAM BLOCK (everything about my team grouped together in one container) === */}
       {favoriteTeam && favTeamObj && (
         <div className={`${ds(bStyle, "card")}`}>
-          {/* Colored header bar */}
-          <div className={`flex items-center justify-between ${homeHeaderCls} ttx-myteam-header`}>
-            <div className="flex items-center gap-2">
-              <Star className="h-3.5 w-3.5" />
-              <h2 className={homeHeaderTitleCls}>Mijn team</h2>
-            </div>
-            <button
-              onClick={() => toggleFavorite(favoriteTeam)}
-              className={`${homeHeaderTitleCls} opacity-80 hover:opacity-100`}
-            >
-              Wijzigen
-            </button>
-          </div>
+
 
           {/* Body */}
           <div className="divide-y divide-border">
