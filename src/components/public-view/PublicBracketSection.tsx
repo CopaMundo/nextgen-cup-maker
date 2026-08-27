@@ -1278,42 +1278,55 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
 
   const structure = useMemo(() => detectBracketStructure(groups, matches, bracketGroupMap, phaseMatchType), [groups, matches, bracketGroupMap, phaseMatchType]);
 
-  // Auto-selecteer de (sub)bracket waarin het favoriete team zit
+  // Auto-selecteer de (sub)bracket met de eerstvolgende ONGESPEELDE wedstrijd van het favoriete team
   const autoSelectedRef = useRef<string | null>(null);
   useEffect(() => {
     if (showAllOnly || !favoriteTeam) return;
     if (autoSelectedRef.current === favoriteTeam) return;
-    const hasFav = (rounds: any[]) =>
+    const isFav = (m: any) => m?.home_team_id === favoriteTeam || m?.away_team_id === favoriteTeam;
+    const hasFav = (rounds: any[], onlyUnplayed: boolean) =>
       (rounds || []).some((r: any) =>
-        (r.matches || []).some((m: any) => m?.home_team_id === favoriteTeam || m?.away_team_id === favoriteTeam),
+        (r.matches || []).some((m: any) => isFav(m) && (!onlyUnplayed || !m.is_played)),
       );
 
-    if (hasFav(structure.mainRounds) || hasFav(structure.placementRounds)) {
-      autoSelectedRef.current = favoriteTeam;
-      setSelectedTopTab("main");
-      setSelectedSubTab("all");
-      return;
-    }
+    const apply = (onlyUnplayed: boolean): boolean => {
+      const findIn = (prefix: string): string | null => {
+        if (
+          hasFav(structure.loserBrackets[prefix] || [], onlyUnplayed) ||
+          hasFav(structure.loserPlacementRounds[prefix] || [], onlyUnplayed)
+        )
+          return prefix;
+        for (const child of structure.loserBracketChildren[prefix] || []) {
+          const found = findIn(child);
+          if (found) return found;
+        }
+        return null;
+      };
 
-    const findIn = (prefix: string): string | null => {
-      if (hasFav(structure.loserBrackets[prefix] || []) || hasFav(structure.loserPlacementRounds[prefix] || [])) return prefix;
-      for (const child of structure.loserBracketChildren[prefix] || []) {
-        const found = findIn(child);
-        if (found) return found;
+      // Loser/placement brackets eerst: als het team daar nog moet spelen, is dat de actuele plek
+      for (const key of structure.topLevelLoserKeys) {
+        const found = findIn(key);
+        if (found) {
+          autoSelectedRef.current = favoriteTeam;
+          setSelectedTopTab(key);
+          setSelectedSubTab(found === key ? `main-${key}` : `bracket-${found}`);
+          return true;
+        }
       }
-      return null;
+
+      if (hasFav(structure.mainRounds, onlyUnplayed) || hasFav(structure.placementRounds, onlyUnplayed)) {
+        autoSelectedRef.current = favoriteTeam;
+        setSelectedTopTab("main");
+        setSelectedSubTab("all");
+        return true;
+      }
+      return false;
     };
 
-    for (const key of structure.topLevelLoserKeys) {
-      const found = findIn(key);
-      if (found) {
-        autoSelectedRef.current = favoriteTeam;
-        setSelectedTopTab(key);
-        setSelectedSubTab(found === key ? `main-${key}` : `bracket-${found}`);
-        return;
-      }
-    }
+    if (apply(true)) return;
+    apply(false);
   }, [favoriteTeam, structure, showAllOnly]);
+
 
 
 
