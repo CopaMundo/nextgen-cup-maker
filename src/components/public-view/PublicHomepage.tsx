@@ -7,7 +7,7 @@ import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import PublicStandings from "@/components/public-view/PublicStandings";
 import type { PublicTournamentData } from "@/pages/PublicView";
-import { calculateGroupStandings } from "@/lib/standingsCalculator";
+import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { getPhaseLabel } from "@/lib/phaseLabel";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -37,6 +37,9 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
   const homeHeaderTitleCls = ds(bStyle, "homeCardHeaderTitle") || ds(bStyle, "cardHeaderTitle");
   const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
+
+  const matchPositions = (m: any) => getMatchTeamPositions(m, groupTeams as any, matches as any, groups as any, phases as any, scoringSystems as any, tournament);
+
   const [expandedGrid, setExpandedGridState] = useState<string | null>(() => {
     const hash = window.location.hash.replace("#", "");
     return hash.startsWith("grid-") ? hash.replace("grid-", "") : null;
@@ -360,6 +363,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                   favoriteTeam={favoriteTeam}
                   bStyle={bStyle}
                   scrollToLatest={globalTab === "results"}
+                  groupTeams={groupTeams}
+                  scoringSystems={scoringSystems}
                 />
               ) : (
                 <p className="text-sm text-muted-foreground font-medium text-center py-4">
@@ -559,7 +564,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           <h2 className={ds(bStyle, "sectionTitle")}>{title}</h2>
           <div className={ds(bStyle, "sectionLine")} />
         </div>
-        <MatchListView matches={matchList} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} tournament={tournament} />
+        <MatchListView matches={matchList} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} tournament={tournament} groupTeams={groupTeams} scoringSystems={scoringSystems} />
       </div>
     );
   }
@@ -722,6 +727,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                           allMatches={matches}
                           favoriteTeam={favoriteTeam}
                           hideRoundNumber
+                          {...matchPositions(lastFavMatch)}
                         />
                       </div>
                     </div>
@@ -742,6 +748,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                           allMatches={matches}
                           favoriteTeam={favoriteTeam}
                           hideRoundNumber
+                          {...matchPositions(nextFavMatch)}
                         />
                       </div>
                     </div>
@@ -850,6 +857,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 compact
                 tournament={tournament}
                 onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+                groupTeams={groupTeams}
+                scoringSystems={scoringSystems}
               />
             )}
             {globalTab === "results" && lastBlockMatches.length > 0 && (
@@ -863,6 +872,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                 compact
                 tournament={tournament}
                 onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+                groupTeams={groupTeams}
+                scoringSystems={scoringSystems}
               />
             )}
             {((globalTab === "next" && nextBlockMatchesAll.length === 0) || (globalTab === "results" && lastBlockMatches.length === 0)) && (
@@ -1064,7 +1075,7 @@ const InlineBracketView = ({ backAction, bStyle, phaseNumberSet, allKnockoutPhas
 };
 
 // Knockout preview
-const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches, phases, groups, tournament }: { matches: any[]; teams: any[]; slots?: any[]; favoriteTeam: string | null; allMatches?: any[]; phases?: any[]; groups?: any[]; tournament?: any }) => {
+const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches, phases, groups, tournament, groupTeams, scoringSystems }: { matches: any[]; teams: any[]; slots?: any[]; favoriteTeam: string | null; allMatches?: any[]; phases?: any[]; groups?: any[]; tournament?: any; groupTeams?: any[]; scoringSystems?: any[] }) => {
   const bStyle = useBroadcastStyle();
   const matchCardWrapperCls = ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm";
 
@@ -1140,14 +1151,19 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
     const fallback = favMatches.length > 0 ? favMatches.slice(0, 3) : matches.slice(0, 3);
     return (
       <div className="space-y-2">
-        {fallback.map((m: any) => (
+          {fallback.map((m: any) => {
+            const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+            return (
           <div key={m.id} className={matchCardWrapperCls}>
-            <PublicMatchCard match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+            <PublicMatchCard match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext {...positions} />
           </div>
-        ))}
+        );})}
       </div>
     );
   }
+
+  const nextPositions = nextFavMatch ? getMatchTeamPositions(nextFavMatch, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament) : {};
+  const otherPositions = otherMatch ? getMatchTeamPositions(otherMatch, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament) : {};
 
   return (
     <div className="space-y-2">
@@ -1155,7 +1171,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
         <div>
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-primary mb-1">Jouw wedstrijd</p>
           <div className={matchCardWrapperCls}>
-            <PublicMatchCard match={nextFavMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+            <PublicMatchCard match={nextFavMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext {...nextPositions} />
           </div>
         </div>
       )}
@@ -1163,7 +1179,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
         <div className="pt-2 border-t border-border">
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-1">Mogelijke tegenstander</p>
           <div className={matchCardWrapperCls}>
-            <PublicMatchCard match={otherMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
+            <PublicMatchCard match={otherMatch} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext {...otherPositions} />
           </div>
         </div>
       )}
@@ -1244,14 +1260,16 @@ const CompactStanding = ({ standings, favoriteTeam, tournament }: { standings: a
 };
 
 // Match list view — each card wrapped in its own rounded container with spacing
-const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament, onCardClick }: {
+const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTeam, compact, tournament, onCardClick, groupTeams, scoringSystems }: {
   matches: any[]; teams: any[]; phases: any[]; groups: any[]; slots?: any[]; favoriteTeam: string | null; compact?: boolean; tournament?: any;
-  onCardClick?: () => void;
+  onCardClick?: () => void; groupTeams?: any[]; scoringSystems?: any[];
 }) => {
   const bStyle = useBroadcastStyle();
   return (
     <div className="space-y-2">
-      {matches.map((m: any) => (
+      {matches.map((m: any) => {
+        const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+        return (
         <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
           <PublicMatchCard
             match={m}
@@ -1263,9 +1281,10 @@ const MatchListView = ({ matches, teams, phases, groups, slots = [], favoriteTea
             allMatches={matches}
             favoriteTeam={favoriteTeam}
             onCardClick={onCardClick}
+            {...positions}
           />
         </div>
-      ))}
+      );})}
     </div>
   );
 };
@@ -1333,7 +1352,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
 };
 
 // Expanded Programma timeslot list (homepage inline view)
-const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tournament, favoriteTeam, bStyle, scrollToLatest }: any) => {
+const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tournament, favoriteTeam, bStyle, scrollToLatest, groupTeams, scoringSystems }: any) => {
   const targetRef = useRef<HTMLDivElement>(null);
   const sorted = [...matches].sort((a: any, b: any) => {
     const dateA = a.match_date || "9999";
@@ -1404,7 +1423,9 @@ const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tourname
                 </span>
               </div>
               <div className="p-2 space-y-2">
-                {slot.matches.map((m: any) => (
+                {slot.matches.map((m: any) => {
+                  const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+                  return (
                   <div
                     key={m.id}
                     ref={m.id === targetMatchId ? targetRef : undefined}
@@ -1420,9 +1441,10 @@ const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tourname
                       allMatches={matches}
                       favoriteTeam={favoriteTeam}
                       hideRoundNumber
+                      {...positions}
                     />
                   </div>
-                ))}
+                );})}
               </div>
             </div>
           </div>

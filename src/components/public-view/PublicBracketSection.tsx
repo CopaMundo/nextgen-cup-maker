@@ -11,6 +11,7 @@ import { getMatchSideDisplayName } from "@/lib/slotLabels";
 import PublicMatchDetailDialog from "@/components/public-view/PublicMatchDetailDialog";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
+import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 
 interface BracketSectionProps {
   groups: any[];
@@ -34,6 +35,8 @@ interface BracketSectionProps {
    * bracket logica (winnaar-doorstroming) intact blijft.
    */
   skipFirstRounds?: number;
+  groupTeams?: any[];
+  scoringSystems?: any[];
 }
 
 // --- Bracket structure detection (mirrors BracketView.tsx logic) ---
@@ -1196,7 +1199,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 };
 
 // List view for a set of rounds - using unified match card
-const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, groups, allMatches }: { rounds: any[]; teams: any[]; slots?: any[]; tournament: any; phases?: any[]; groups?: any[]; allMatches?: any[] }) => {
+const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, groups, allMatches, groupTeams = [], scoringSystems = [] }: { rounds: any[]; teams: any[]; slots?: any[]; tournament: any; phases?: any[]; groups?: any[]; allMatches?: any[]; groupTeams?: any[]; scoringSystems?: any[] }) => {
   const bStyle = useBroadcastStyle();
   return (
     <div className="space-y-4">
@@ -1209,7 +1212,9 @@ const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, grou
               <h4 className={ds(bStyle, "cardHeaderTitle")}>{round.name}</h4>
             </div>
             <div className="divide-y divide-border">
-              {round.matches.map((m: any) => (
+              {round.matches.map((m: any) => {
+                const positions = getMatchTeamPositions(m, groupTeams, allMatches || [], groups, phases, scoringSystems, tournament);
+                return (
                 <PublicMatchCard
                   key={m.id}
                   match={m}
@@ -1219,8 +1224,9 @@ const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, grou
                   slots={slots}
                   tournament={tournament}
                   allMatches={allMatches}
+                  {...positions}
                 />
-              ))}
+              );})}
             </div>
           </div>
         );
@@ -1230,7 +1236,7 @@ const BracketListRounds = ({ rounds, teams, slots = [], tournament, phases, grou
 };
 
 // Main component - Two-level tab navigation
-const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [], tournament, phases, showAllOnly, favoriteTeam, scrollToGroupId, formatName, hideSectionDividers = false, presentationCompact = false, skipFirstRounds = 0 }: BracketSectionProps) => {
+const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [], tournament, phases, showAllOnly, favoriteTeam, scrollToGroupId, formatName, hideSectionDividers = false, presentationCompact = false, skipFirstRounds = 0, groupTeams = [], scoringSystems = [] }: BracketSectionProps) => {
   const bStyle = useBroadcastStyle();
   const [selectedTopTab, setSelectedTopTab] = useState<string>("all");
   const [selectedSubTab, setSelectedSubTab] = useState<string>("all");

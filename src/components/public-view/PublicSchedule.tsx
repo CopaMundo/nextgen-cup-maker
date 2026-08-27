@@ -3,13 +3,14 @@ import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicMatchCard from "./PublicMatchCard";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
+import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { ChevronDown } from "lucide-react";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const { teams, matches, phases, groups, slots, tournament } = data;
+  const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
 
   const sorted = [...matches].sort((a, b) => {
@@ -136,7 +137,9 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   </div>
                   {/* Match cards — each in its own style-aware container with spacing */}
                   <div className="p-2 space-y-2">
-                    {slot.matches.map((m: any) => (
+                    {slot.matches.map((m: any) => {
+                      const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+                      return (
                       <div
                         key={m.id}
                         ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
@@ -152,9 +155,10 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                           allMatches={matches}
                           favoriteTeam={favoriteTeam}
                           hideRoundNumber
+                          {...positions}
                         />
                       </div>
-                    ))}
+                    );})}
                   </div>
                 </div>
               </div>

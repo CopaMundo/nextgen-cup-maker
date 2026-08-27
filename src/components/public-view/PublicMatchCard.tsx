@@ -22,6 +22,10 @@ interface PublicMatchCardProps {
   hideContext?: boolean;
   extraContext?: string;
   hideRoundNumber?: boolean;
+  /** Current group position for the home team (shown before the score). */
+  homePosition?: number;
+  /** Current group position for the away team (shown before the score). */
+  awayPosition?: number;
   /** When provided, overrides the default match-detail dialog open. */
   onCardClick?: () => void;
 }
@@ -42,6 +46,8 @@ const PublicMatchCard = ({
   hideContext,
   extraContext,
   hideRoundNumber,
+  homePosition,
+  awayPosition,
   onCardClick,
 }: PublicMatchCardProps) => {
   const bStyle = useBroadcastStyle();
@@ -86,7 +92,7 @@ const PublicMatchCard = ({
   const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
   const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
 
-  const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean) => (
+  const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean, position?: number) => (
     <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
@@ -102,6 +108,9 @@ const PublicMatchCard = ({
         <span className="inline-flex h-2.5 w-3.5 flex-shrink-0 items-center justify-center">
           <CountryFlag country={country} className="h-full w-full object-contain" />
         </span>
+      )}
+      {typeof position === "number" && (
+        <span className="w-4 text-right text-[10px] font-black tabular-nums text-muted-foreground flex-shrink-0">{position}</span>
       )}
       <div className="relative flex items-center">
         {m.is_played ? (
@@ -181,7 +190,7 @@ const PublicMatchCard = ({
 
         {/* Match body */}
         <div className="relative px-3 py-2">
-          {renderTeamRow(homeName, homeLogo, homeCountry, m.home_team_id, m.home_penalties, m.home_score, homeWin)}
+          {renderTeamRow(homeName, homeLogo, homeCountry, m.home_team_id, m.home_penalties, m.home_score, homeWin, homePosition)}
 
           {/* Time/VS badge — absolutely positioned to keep card height identical to played cards */}
           {!m.is_played && (
@@ -192,7 +201,7 @@ const PublicMatchCard = ({
             </div>
           )}
 
-          {renderTeamRow(awayName, awayLogo, awayCountry, m.away_team_id, m.away_penalties, m.away_score, awayWin)}
+          {renderTeamRow(awayName, awayLogo, awayCountry, m.away_team_id, m.away_penalties, m.away_score, awayWin, awayPosition)}
         </div>
       </div>
 

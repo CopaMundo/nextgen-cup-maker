@@ -7,7 +7,7 @@ import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
-import { calculateGroupStandings } from "@/lib/standingsCalculator";
+import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
 import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
 import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
@@ -404,9 +404,11 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                                 </div>
                               )}
                               <div className="p-2 space-y-2">
-                                {groupMatches
+                              {groupMatches
                                   .filter((m: any) => selectedRoundFilter === "all" || String(m.round_number) === selectedRoundFilter)
-                                  .map((m: any) => (
+                                  .map((m: any) => {
+                                    const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
+                                    return (
                                     <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
                                       <PublicMatchCard
                                         match={m}
@@ -417,9 +419,10 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                                         tournament={tournament}
                                         allMatches={matches}
                                         hideRoundNumber
+                                        {...positions}
                                       />
                                     </div>
-                                ))}
+                                );})}
                               </div>
                             </div>
                           )}
