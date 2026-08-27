@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, BarChart3, MessageCircle } from "lucide-react";
+import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, MessageCircle } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
