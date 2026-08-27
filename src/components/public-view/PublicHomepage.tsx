@@ -446,10 +446,13 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         return [...favGs, ...otherGs];
       };
 
-      // Find the bracket group containing the favorite team to scroll to
-      const favGroupForScroll = favoriteTeam ? groups.find((g: any) =>
-        matches.some((m: any) => m.phase_id === bracketPhaseId && m.group_id === g.id && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam))
-      ) : null;
+      // Find the bracket group containing the favorite team's next unplayed match to scroll to
+      const bracketGroupHasFav = (g: any, onlyUnplayed: boolean) =>
+        matches.some((m: any) => m.phase_id === bracketPhaseId && m.group_id === g.id && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam) && (!onlyUnplayed || !m.is_played));
+      const favGroupForScroll = favoriteTeam
+        ? groups.find((g: any) => bracketGroupHasFav(g, true)) || groups.find((g: any) => bracketGroupHasFav(g, false))
+        : null;
+
 
       // Find the best phase to land on: the one where the fav team has an unplayed match
       const bestPhaseForFav = (() => {
