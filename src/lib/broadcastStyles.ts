@@ -1404,6 +1404,9 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
 export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "joga_bonito", "retro_bw", "old_newspaper", "modern_bw", "wc26", "la_rosa", "soccertec", "old_clubhouse", "sticker_album", "teletext"];
 
+/** Enkel deze 6 stijlen zijn kiesbaar in de UI. */
+export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw"];
+
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
   (Object.keys(BROADCAST_STYLES) as BroadcastStyle[]).map((k) => [k, NEW_BROADCAST_STYLES.includes(k) ? "broadcast" : "legacy"])
