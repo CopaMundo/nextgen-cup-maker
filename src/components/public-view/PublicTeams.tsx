@@ -67,9 +67,9 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
         {/* Team header - broadcast style */}
         <div className="flex items-center gap-4">
-          <div className={`h-16 w-16 overflow-hidden flex-shrink-0 border-2 border-primary/20 shadow-sm rounded-xl`}>
+          <div className="h-16 w-16 overflow-hidden flex-shrink-0">
             {team.logo_url ? <img src={team.logo_url} alt="" className="h-full w-full object-contain" /> :
-              <div className="flex h-full w-full items-center justify-center bg-secondary text-2xl font-black text-muted-foreground">{team.name?.charAt(0)}</div>}
+              <div className="flex h-full w-full items-center justify-center bg-secondary text-2xl font-black text-muted-foreground rounded-xl">{team.name?.charAt(0)}</div>}
           </div>
           <div>
             <h2 className="font-display text-xl font-black text-foreground uppercase tracking-wide">{team.name}</h2>
@@ -225,12 +225,13 @@ const TeamMatchList = ({ team, teamMatches, teams, phases, groups, slots, tourna
 }) => {
   const bStyle = useBroadcastStyle();
   return (
-    <div className={ds(bStyle, "card")}>
-      <div className={ds(bStyle, "cardHeader")}>
-        <div className={ds(bStyle, "cardHeaderDot")} />
-        <h3 className={ds(bStyle, "cardHeaderTitle")}>Wedstrijden</h3>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <div className={ds(bStyle, "sectionDot")} />
+        <h3 className={ds(bStyle, "sectionTitle")}>Wedstrijden</h3>
+        <div className={ds(bStyle, "sectionLine")} />
       </div>
-      <div className="p-2 space-y-2">
+      <div className="space-y-2">
         {teamMatches.map((m: any) => (
           <div key={m.id} className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
             <PublicMatchCard
