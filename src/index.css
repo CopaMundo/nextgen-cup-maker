@@ -1449,6 +1449,29 @@ body[data-broadcast="retro_bw"] {
   box-shadow: none !important;
 }
 
+/* Homeknop: lichtzwarte achtergrond in light mode */
+[data-broadcast="retro_bw"][data-mode="light"] .rbw-home-btn {
+  background-color: hsl(0 0% 14%) !important;
+  border-color: hsl(0 0% 8%) !important;
+}
+
+/* Knockout bracket: doorstotende ploeg witter in dark, zwarter in light */
+[data-broadcast="retro_bw"][data-mode="dark"] .rbw-bracket-winner {
+  background-color: hsl(0 0% 24%) !important;
+}
+[data-broadcast="retro_bw"][data-mode="dark"] .rbw-bracket-qualbar {
+  background-color: hsl(0 0% 100%) !important;
+}
+[data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-winner {
+  background-color: hsl(0 0% 16%) !important;
+  color: hsl(0 0% 96%) !important;
+  border-color: hsl(0 0% 96%) !important;
+}
+[data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-winner [class*="text-"],
+[data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-winner .tabular-nums {
+  color: hsl(0 0% 96%) !important;
+}
+
 /* Zwarte brush-stroke achter belangrijke titels/datums */
 .rbw-brush {
   position: relative;
