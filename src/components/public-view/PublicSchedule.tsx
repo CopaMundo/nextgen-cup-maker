@@ -58,6 +58,15 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return () => cancelAnimationFrame(raf);
   }, [firstUnplayedMatchId]);
 
+  useEffect(() => {
+    const update = () => setHeaderHeight(headerRef.current?.offsetHeight || 56);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
+
   return (
     <div className="pt-4 space-y-3 px-3">
       {/* Section header */}
