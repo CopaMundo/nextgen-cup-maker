@@ -812,10 +812,30 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           {/* Default view: current/next or last-played time slot */}
           <div className="px-3 py-3 space-y-2">
             {globalTab === "next" && nextBlockMatchesAll.length > 0 && (
-              <MatchListView matches={nextBlockMatchesAll} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+              <MatchListView
+                matches={nextBlockMatchesAll}
+                teams={teams}
+                phases={phases}
+                groups={groups}
+                slots={slots}
+                favoriteTeam={favoriteTeam}
+                compact
+                tournament={tournament}
+                onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+              />
             )}
             {globalTab === "results" && lastBlockMatches.length > 0 && (
-              <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+              <MatchListView
+                matches={lastBlockMatches}
+                teams={teams}
+                phases={phases}
+                groups={groups}
+                slots={slots}
+                favoriteTeam={favoriteTeam}
+                compact
+                tournament={tournament}
+                onCardClick={() => setExpandedGrid(`programma:${globalTab}`)}
+              />
             )}
             {((globalTab === "next" && nextBlockMatchesAll.length === 0) || (globalTab === "results" && lastBlockMatches.length === 0)) && (
               <p className="text-sm text-muted-foreground font-medium text-center py-4">
