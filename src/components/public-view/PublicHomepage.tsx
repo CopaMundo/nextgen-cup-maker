@@ -796,13 +796,13 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         <div className={ds(bStyle, "card")}>
           <div className="grid grid-cols-2 gap-0 border-b border-border">
             <button
-              onClick={() => { setGlobalTab("next"); setProgrammaExpanded(false); }}
+              onClick={() => setGlobalTab("next")}
               className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
             >
               Volgende wedstrijden
             </button>
             <button
-              onClick={() => { setGlobalTab("results"); setProgrammaExpanded(false); }}
+              onClick={() => setGlobalTab("results")}
               className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
             >
               Resultaten
