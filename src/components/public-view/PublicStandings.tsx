@@ -9,6 +9,27 @@ import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import { calculateGroupStandings } from "@/lib/standingsCalculator";
 import { isSetsGroup, computeSetPointTotals, formatSigned, resolveStandingsColumns } from "@/lib/standingsDisplay";
+import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
+import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
+
+// Themed mask icon: takes the theme's primary color in every broadcast style
+const ThemedStatIcon = ({ src, label }: { src: string; label: string }) => (
+  <span
+    role="img"
+    aria-label={label}
+    className="inline-block h-4 w-4 bg-primary"
+    style={{
+      maskImage: `url(${src})`,
+      maskSize: "contain",
+      maskRepeat: "no-repeat",
+      maskPosition: "center",
+      WebkitMaskImage: `url(${src})`,
+      WebkitMaskSize: "contain",
+      WebkitMaskRepeat: "no-repeat",
+      WebkitMaskPosition: "center",
+    }}
+  />
+);
 
 const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }: { data: PublicTournamentData; initialPhaseId?: string; initialGroupId?: string; favoriteTeam?: string | null }) => {
   const { tournament, phases, groups, teams, matches, groupTeams, slots, standingColors, stats, scoringSystems } = data;
@@ -443,8 +464,8 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
         const hasAny = showScorers || showAssists || showFairplay;
         return (
           <div className="pt-4 space-y-4">
-            {showScorers && <PlayerRanking title="Topscorers" icon="⚽" data={playerAgg("goal")} teams={teams} />}
-            {showAssists && <PlayerRanking title="Meeste assists" icon="🅰️" data={playerAgg("assist")} teams={teams} />}
+            {showScorers && <PlayerRanking title="Topscorers" iconSrc={trophyIconAsset.url} data={playerAgg("goal")} teams={teams} />}
+            {showAssists && <PlayerRanking title="Meeste assists" iconSrc={bootsIconAsset.url} data={playerAgg("assist")} teams={teams} />}
             {showFairplay && <FairplayRanking data={fairplayAgg()} teams={teams} />}
             {!hasAny && (
               <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
@@ -458,7 +479,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   );
 };
 
-const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: string; data: any[]; teams: any[] }) => {
+const PlayerRanking = ({ title, iconSrc, data, teams }: { title: string; iconSrc: string; data: any[]; teams: any[] }) => {
   const bStyle = useBroadcastStyle();
   const tName = (id: string) => teams.find((t: any) => t.id === id)?.name || "?";
   const tLogo = (id: string) => teams.find((t: any) => t.id === id)?.logo_url;
@@ -466,7 +487,7 @@ const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: stri
   return (
     <div className={ds(bStyle, "card")}>
       <div className={ds(bStyle, "cardHeader")}>
-        <span>{icon}</span>
+        <ThemedStatIcon src={iconSrc} label={title} />
         <h3 className={ds(bStyle, "cardHeaderTitle")}>{title}</h3>
       </div>
       {data.length === 0 ? (
