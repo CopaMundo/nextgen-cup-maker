@@ -78,7 +78,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Schema</h2>
           <div className={ds(bStyle, "sectionLine")} />
-          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{matches.length} wedstrijden</span>
+          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{scheduledCount} wedstrijden</span>
 
           {uniqueDates.length > 1 && (
             <div className="relative ml-auto shrink-0">
