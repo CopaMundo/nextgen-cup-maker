@@ -479,7 +479,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   );
 };
 
-const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: string; data: any[]; teams: any[] }) => {
+const PlayerRanking = ({ title, iconSrc, data, teams }: { title: string; iconSrc: string; data: any[]; teams: any[] }) => {
   const bStyle = useBroadcastStyle();
   const tName = (id: string) => teams.find((t: any) => t.id === id)?.name || "?";
   const tLogo = (id: string) => teams.find((t: any) => t.id === id)?.logo_url;
@@ -487,7 +487,7 @@ const PlayerRanking = ({ title, icon, data, teams }: { title: string; icon: stri
   return (
     <div className={ds(bStyle, "card")}>
       <div className={ds(bStyle, "cardHeader")}>
-        <span>{icon}</span>
+        <ThemedStatIcon src={iconSrc} label={title} />
         <h3 className={ds(bStyle, "cardHeaderTitle")}>{title}</h3>
       </div>
       {data.length === 0 ? (
