@@ -3574,8 +3574,11 @@ body[data-broadcast="teletext"] {
   color: hsl(120 100% 50%) !important;
 }
 
-/* Landenvlaggen altijd afgerond, ook in thema's die rechte hoeken afdwingen */
+/* Landenvlaggen: Twemoji-stijl (afgeronde hoeken zitten in de SVG zelf) */
 .country-flag-img,
 [data-broadcast] .country-flag-img {
-  border-radius: 3px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
+
