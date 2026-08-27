@@ -125,6 +125,12 @@ export function TimePicker({
 
   React.useEffect(() => {
     if (inputRef.current && document.activeElement === inputRef.current) {
+      const pending = pendingSelectRef.current;
+      pendingSelectRef.current = null;
+      if (pending) {
+        inputRef.current.setSelectionRange(pending[0], pending[1]);
+        return;
+      }
       const pos = buildPartialValue(digits).length;
       inputRef.current.setSelectionRange(pos, pos);
     }

@@ -104,8 +104,17 @@ export function DatePicker({
     }
   };
 
+  const selectAllRef = React.useRef(false);
+  const pendingSelectRef = React.useRef<[number, number] | null>(null);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newDigits = extractDigits(event.target.value);
+    let newDigits = extractDigits(event.target.value);
+    // Full value selected + one digit typed: replace first digit, keep rest selected.
+    if (selectAllRef.current && newDigits.length === 1 && digits.length === 8) {
+      newDigits = newDigits + digits.slice(1);
+      pendingSelectRef.current = [1, buildDisplayValue(newDigits).length];
+    }
+    selectAllRef.current = false;
     setDigits(newDigits);
     commit(newDigits);
   };
