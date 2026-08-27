@@ -34,6 +34,8 @@ interface BracketSectionProps {
    * bracket logica (winnaar-doorstroming) intact blijft.
    */
   skipFirstRounds?: number;
+  groupTeams?: any[];
+  scoringSystems?: any[];
 }
 
 // --- Bracket structure detection (mirrors BracketView.tsx logic) ---
