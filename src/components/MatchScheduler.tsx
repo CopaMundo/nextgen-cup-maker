@@ -217,7 +217,6 @@ const DateStripNav = ({
 }) => {
   const windowSize = useResponsiveWindowSize();
   const [windowStart, setWindowStart] = useState(0);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Keep the active date visible — only when the active date itself changes,
   // so manual scrolling/paging through dates is not auto-corrected back.
