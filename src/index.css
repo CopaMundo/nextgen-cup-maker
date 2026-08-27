@@ -1455,7 +1455,7 @@ body[data-broadcast="retro_bw"] {
   border-color: hsl(0 0% 8%) !important;
 }
 
-/* Knockout bracket: doorstotende ploeg witter in dark, zwarter in light */
+/* Knockout bracket: doorstotende ploeg witter in dark, lichtzwart in light met zwarte accentbalk */
 [data-broadcast="retro_bw"][data-mode="dark"] .rbw-bracket-winner {
   background-color: hsl(0 0% 24%) !important;
 }
@@ -1463,13 +1463,16 @@ body[data-broadcast="retro_bw"] {
   background-color: hsl(0 0% 100%) !important;
 }
 [data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-winner {
-  background-color: hsl(0 0% 16%) !important;
-  color: hsl(0 0% 96%) !important;
-  border-color: hsl(0 0% 96%) !important;
+  background-color: hsl(0 0% 92%) !important;
+  color: hsl(0 0% 5%) !important;
+  border-color: hsl(0 0% 5%) !important;
 }
 [data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-winner [class*="text-"],
 [data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-winner .tabular-nums {
-  color: hsl(0 0% 96%) !important;
+  color: hsl(0 0% 5%) !important;
+}
+[data-broadcast="retro_bw"][data-mode="light"] .rbw-bracket-qualbar {
+  background-color: hsl(0 0% 5%) !important;
 }
 
 /* Zwarte brush-stroke achter belangrijke titels/datums */
