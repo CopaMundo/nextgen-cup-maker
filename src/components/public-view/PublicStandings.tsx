@@ -165,15 +165,16 @@ const PublicStandings = ({ data, initialPhaseId }: { data: PublicTournamentData;
         <div className="space-y-1.5">
           {/* Phase tabs — admin Format-stijl (Deelnemers-stijl) */}
           {allPhaseNumbers.length > 1 && (
-            <div className="flex justify-center border-b border-border flex-wrap overflow-x-auto">
+            <div className="ttx-phase-tab-container flex justify-center border-b border-border flex-wrap overflow-x-auto">
               {allPhaseNumbers.map(pn => {
                 const isActive = activePhaseNum === pn;
                 return (
                   <button
                     key={pn}
+                    data-active={isActive}
                     onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
                     className={
-                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
+                      "ttx-phase-tab px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
                       (isActive
                         ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
                         : "text-muted-foreground hover:text-foreground")
