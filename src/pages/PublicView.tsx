@@ -122,7 +122,7 @@ const PublicView = () => {
 
     const [pRes, gRes, tRes, mRes, gtRes, attRes, spRes, locRes, stRes, plRes, slotsRes, scRes, pollRes, pvRes, catRes, staffRes, ssRes] = await Promise.all([
       supabase.from("tournament_phases").select("*").eq("tournament_id", t.id).order("phase_number").order("sort_order"),
-      supabase.from("groups").select("*").eq("tournament_id", t.id),
+      supabase.from("groups").select("*").eq("tournament_id", t.id).order("sort_order").order("name").order("created_at"),
       supabase.from("teams").select("*").eq("tournament_id", t.id),
       fetchTournamentMatches({ tournamentId: t.id, orders: [{ column: "match_date" }, { column: "match_time" }, { column: "round_number" }, { column: "created_at" }], maxRows: 5000 }),
       supabase.from("group_teams").select("*").eq("tournament_id", t.id),
