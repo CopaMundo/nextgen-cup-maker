@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Pencil, Trash2, Download } from "lucide-react";
@@ -433,9 +434,9 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                         </Select>
                         {mode === "times" && win && (
                           <div className="flex items-center gap-1">
-                            <Input type="time" value={win.from} onChange={(e) => updateWindow(d, "from", e.target.value)} className="h-8 w-[92px] text-xs" />
+                            <TimePicker value={win.from} onChange={(v) => updateWindow(d, "from", v)} className="h-8 w-[110px] text-xs" />
                             <span className="text-xs text-muted-foreground">tot</span>
-                            <Input type="time" value={win.to} onChange={(e) => updateWindow(d, "to", e.target.value)} className="h-8 w-[92px] text-xs" />
+                            <TimePicker value={win.to} onChange={(v) => updateWindow(d, "to", v)} className="h-8 w-[110px] text-xs" />
                           </div>
                         )}
                       </div>

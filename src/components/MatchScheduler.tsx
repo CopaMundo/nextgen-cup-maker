@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import { Input } from "@/components/ui/input";
+import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -3662,7 +3663,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
             </div>
             <div className="space-y-1">
               <Label className="text-sm">Starttijd</Label>
-              <Input type="time" value={newFieldStartTime} onChange={(e) => setNewFieldStartTime(e.target.value)} className="h-9" />
+              <TimePicker value={newFieldStartTime} onChange={(v) => setNewFieldStartTime(v)} className="h-9" />
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setShowAddFieldDialog(false)}>Annuleren</Button>
@@ -3686,7 +3687,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
               </div>
               <div className="space-y-1">
                 <Label className="text-sm">Starttijd</Label>
-                <Input type="time" value={fields[editFieldIdx].startTime} onChange={(e) => updateFieldConfig(editFieldIdx, "startTime", e.target.value)} className="h-9" />
+                <TimePicker value={fields[editFieldIdx].startTime} onChange={(v) => updateFieldConfig(editFieldIdx, "startTime", v)} className="h-9" />
               </div>
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" size="sm" onClick={() => { setClearFieldIdx(editFieldIdx); }} className="text-xs gap-1">

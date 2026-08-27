@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import { Input } from "@/components/ui/input";
+import { TimePicker } from "@/components/ui/timepicker";
 import { DatePicker } from "@/components/ui/datepicker";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Save, Zap, Trash2 } from "lucide-react";
@@ -278,7 +279,7 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
                     </div>
                     <div className="grid grid-cols-4 gap-2">
                       <DatePicker value={match.match_date || ""} onChange={(date) => updateMatch(match.id, { match_date: date || null })} placeholder="dd/mm/jjjj" className="h-8 text-xs" />
-                      <Input type="time" value={match.match_time || ""} onChange={(e) => updateMatch(match.id, { match_time: e.target.value || null })} className="h-8 text-xs" />
+                      <TimePicker value={match.match_time || ""} onChange={(v) => updateMatch(match.id, { match_time: v || null })} className="h-8 text-xs" />
                       <Input value={match.field || ""} onChange={(e) => updateMatch(match.id, { field: e.target.value || null })} placeholder="Veld" className="h-8 text-xs" />
                       <Input value={match.referee || ""} onChange={(e) => updateMatch(match.id, { referee: e.target.value || null })} placeholder="Scheidsrechter" className="h-8 text-xs" />
                     </div>
