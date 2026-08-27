@@ -17,7 +17,7 @@ const ThemedStatIcon = ({ src, label }: { src: string; label: string }) => (
   <span
     role="img"
     aria-label={label}
-    className="inline-block h-4 w-4 bg-primary"
+    className="themed-stat-icon inline-block h-4 w-4 bg-primary"
     style={{
       maskImage: `url(${src})`,
       maskSize: "contain",
