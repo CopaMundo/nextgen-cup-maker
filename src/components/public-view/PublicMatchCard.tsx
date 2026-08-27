@@ -92,7 +92,7 @@ const PublicMatchCard = ({
   const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
   const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
 
-  const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean) => (
+  const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean, position?: number) => (
     <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
@@ -108,6 +108,9 @@ const PublicMatchCard = ({
         <span className="inline-flex h-2.5 w-3.5 flex-shrink-0 items-center justify-center">
           <CountryFlag country={country} className="h-full w-full object-contain" />
         </span>
+      )}
+      {typeof position === "number" && (
+        <span className="w-4 text-right text-[10px] font-black tabular-nums text-muted-foreground flex-shrink-0">{position}</span>
       )}
       <div className="relative flex items-center">
         {m.is_played ? (
