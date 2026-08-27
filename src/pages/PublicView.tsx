@@ -98,6 +98,11 @@ const PublicView = () => {
     });
   }, [token]);
 
+  const setDarkModeValue = useCallback((value: boolean) => {
+    setDarkMode(value);
+    localStorage.setItem(`dark-${token}`, String(value));
+  }, [token]);
+
   // Realtime
   useEffect(() => {
     if (!data?.tournament) return;
