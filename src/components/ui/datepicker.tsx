@@ -43,6 +43,17 @@ export function DatePicker({
     return masked;
   };
 
+  const maskRemainder = (() => {
+    const digits = inputValue.replace(/\D/g, "").length;
+    if (digits === 0) return "dd/mm/jjjj";
+    if (digits === 1) return "d/mm/jjjj";
+    if (digits === 2) return "/mm/jjjj";
+    if (digits === 3) return "m/jjjj";
+    if (digits === 4) return "/jjjj";
+    if (digits < 8) return "j".repeat(8 - digits);
+    return "";
+  })();
+
   const commitInput = (typedValue: string) => {
     if (!typedValue.trim()) {
       onChange("");
@@ -76,27 +87,38 @@ export function DatePicker({
           onBlur={() => {
             if (date && isValid(date)) setInputValue(format(date, "dd/MM/yyyy"));
           }}
-          placeholder="dd/mm/jjjj"
+          placeholder=""
           aria-label={placeholder}
-          className="h-full w-full pr-10"
+          className="peer h-full w-full pr-10"
         />
+        {maskRemainder && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-3 right-10 flex items-center overflow-hidden text-sm"
+          >
+            <span className="invisible whitespace-pre">{inputValue}</span>
+            <span className="whitespace-pre text-muted-foreground/70">{maskRemainder}</span>
+          </div>
+        )}
         <PopoverTrigger asChild>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             aria-label="Open kalender"
-            className="absolute right-0 top-0 flex h-full w-10 items-center justify-center text-primary dark:text-white"
+            className="absolute right-0 top-0 h-full w-10 text-primary hover:bg-transparent dark:text-white"
           >
             <CalendarIcon className="h-4 w-4" />
-          </button>
+          </Button>
         </PopoverTrigger>
       </div>
       <PopoverContent
-        className="z-[100] w-auto max-w-[calc(100vw-2rem)] overflow-visible p-0 pointer-events-auto"
+        className="z-[100] w-auto max-w-[calc(100vw-1rem)] overflow-visible p-0 pointer-events-auto"
         align="end"
         side="bottom"
         avoidCollisions
         sideOffset={8}
-        collisionPadding={16}
+        collisionPadding={8}
       >
         <div data-mode="light" className="rounded-md bg-popover text-popover-foreground">
           <Calendar

@@ -23,8 +23,7 @@ function CustomCaption(props: CaptionProps) {
     label: format(new Date(2024, i), "LLLL", { locale: nl }),
   }));
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 91 }, (_, i) => currentYear - 75 + i);
+  const years = Array.from({ length: 201 }, (_, i) => 1900 + i);
 
   return (
     <div className="flex items-center justify-between px-1 gap-1">
@@ -35,7 +34,7 @@ function CustomCaption(props: CaptionProps) {
         <SelectTrigger className="h-7 text-xs font-medium flex-1 min-w-0">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="pointer-events-auto">
+        <SelectContent className="z-[120] max-h-72 pointer-events-auto">
           {months.map((m) => (
             <SelectItem key={m.value} value={m.value} className="text-xs">
               {m.label}
@@ -50,7 +49,7 @@ function CustomCaption(props: CaptionProps) {
         <SelectTrigger className="h-7 text-xs font-medium w-[72px]">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="pointer-events-auto">
+        <SelectContent className="z-[120] max-h-72 pointer-events-auto">
           {years.map((y) => (
             <SelectItem key={y} value={y.toString()} className="text-xs">
               {y}
