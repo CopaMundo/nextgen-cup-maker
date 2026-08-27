@@ -977,6 +977,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={newMatchDay}
               onChange={(date) => setNewMatchDay(date)}
               placeholder="Kies een datum"
+              autoFocus
             />
           </div>
           <DialogFooter>
@@ -999,6 +1000,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 value={periodStart}
                 onChange={(date) => setPeriodStart(date)}
                 placeholder="Startdatum"
+                autoFocus
               />
             </div>
             <div className="space-y-1">
@@ -1007,6 +1009,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 value={periodEnd}
                 onChange={(date) => setPeriodEnd(date)}
                 placeholder="Einddatum"
+                autoFocus
               />
             </div>
           </div>

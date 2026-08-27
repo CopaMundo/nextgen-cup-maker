@@ -26,6 +26,7 @@ interface DatePickerProps {
   onChange: (date: string) => void;
   placeholder?: string;
   className?: string;
+  autoFocus?: boolean;
 }
 
 const MASK = "dd/mm/jjjj";
@@ -56,6 +57,7 @@ export function DatePicker({
   onChange,
   placeholder = "Kies een datum",
   className,
+  autoFocus,
 }: DatePickerProps) {
   const date = value ? parseISO(value) : undefined;
   const validDate = date && isValid(date) ? date : undefined;
@@ -67,6 +69,13 @@ export function DatePicker({
   const [draft, setDraft] = React.useState<Date | undefined>(validDate);
   const [month, setMonth] = React.useState<Date>(validDate ?? new Date());
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [autoFocus]);
 
   React.useEffect(() => {
     setDigits(validDate ? format(validDate, "ddMMyyyy") : "");
