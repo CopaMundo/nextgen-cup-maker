@@ -21,6 +21,8 @@ interface PublicMatchCardProps {
   hideContext?: boolean;
   extraContext?: string;
   hideRoundNumber?: boolean;
+  /** When provided, overrides the default match-detail dialog open. */
+  onCardClick?: () => void;
 }
 
 const getTeamName = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.name || "–";
