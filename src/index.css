@@ -3573,3 +3573,9 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td.text-center span {
   color: hsl(120 100% 50%) !important;
 }
+
+/* Landenvlaggen altijd afgerond, ook in thema's die rechte hoeken afdwingen */
+.country-flag-img,
+[data-broadcast] .country-flag-img {
+  border-radius: 3px !important;
+}
