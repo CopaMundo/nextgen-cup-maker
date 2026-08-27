@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import { defaultAppearanceForStyle, type BroadcastStyle } from "@/lib/broadcastStyles";
+import { defaultAppearanceForStyle, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import PublicBottomNav from "@/components/public-view/PublicBottomNav";
 import PublicInfo from "@/components/public-view/PublicInfo";
@@ -65,14 +65,14 @@ const PublicView = () => {
   useEffect(() => {
     if (!data?.tournament) return;
     if (localStorage.getItem(`dark-${token}`) !== null) return;
-    const style = (data.tournament.view_display_style || "copa_mundo") as BroadcastStyle;
+    const style = normalizeBroadcastStyle(data.tournament.view_display_style);
     setDarkMode(defaultAppearanceForStyle(style) === "dark");
   }, [data?.tournament?.view_display_style, token]);
 
 
   useEffect(() => {
     if (!data?.tournament) return;
-    const style = data.tournament.view_display_style || "copa_mundo";
+    const style = normalizeBroadcastStyle(data.tournament.view_display_style);
     // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 500 en 800.
     if (style === "teletext") {
       document.documentElement.setAttribute("data-mode", "dark");
@@ -229,7 +229,7 @@ const PublicView = () => {
     filteredData.standingColors = data.standingColors.filter((sc: any) => catPhaseIds.includes(sc.phase_id));
   }
 
-  const displayStyle = (data.tournament.view_display_style || "copa_mundo") as BroadcastStyle;
+  const displayStyle = normalizeBroadcastStyle(data.tournament.view_display_style);
 
   return (
     <BroadcastStyleContext.Provider value={displayStyle}>

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import { type BroadcastStyle } from "@/lib/broadcastStyles";
+import { type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import {
   type SlideshowRow,
   type Slide,
@@ -384,7 +384,7 @@ const TournamentSlideshow = () => {
   // Force light-mode + active broadcast style on the slideshow page (same as PublicView)
   useEffect(() => {
     if (!tournament) return;
-    const style = tournament.view_display_style || "espn";
+    const style = normalizeBroadcastStyle(tournament.view_display_style);
     const prevMode = document.documentElement.getAttribute("data-mode");
     const prevBroadcast = document.documentElement.getAttribute("data-broadcast");
     document.documentElement.setAttribute("data-mode", "light");
@@ -446,7 +446,7 @@ const TournamentSlideshow = () => {
     );
   }
 
-  const broadcastStyle = (tournament.view_display_style || "espn") as BroadcastStyle;
+  const broadcastStyle = normalizeBroadcastStyle(tournament.view_display_style);
   const opts = activeShow?.options;
   const sponsorBarOn = !!activeShow?.sponsor_bar?.enabled && sponsors.length > 0;
   // Build one fixed-width sponsor set wider than the 1920px canvas, then duplicate it.
