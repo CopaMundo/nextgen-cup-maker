@@ -3,8 +3,7 @@ const COUNTRIES = [
   "Bahama's","Bahrein","Bangladesh","Barbados","België","Belize","Benin","Bhutan","Bolivia","Bosnië en Herzegovina",
   "Botswana","Brazilië","Brunei","Bulgarije","Burkina Faso","Burundi","Cambodja","Cameroen","Canada","Chili",
   "China","Colombia","Comoren","Congo","Costa Rica","Kroatië","Cuba","Cyprus","Denemarken","Djibouti",
-  "Engeland",
-  "Dominica","Dominicaanse Republiek","Duitsland","Ecuador","Egypte","El Salvador","Equatoriaal-Guinea",
+  "Dominica","Dominicaanse Republiek","Duitsland","Ecuador","Egypte","El Salvador","Engeland","Equatoriaal-Guinea",
   "Eritrea","Estland","Eswatini","Ethiopië","Fiji","Filipijnen","Finland","Frankrijk","Gabon","Gambia",
   "Georgië","Ghana","Griekenland","Grenada","Guatemala","Guinee","Guinee-Bissau","Guyana","Haïti","Honduras",
   "Hongarije","Ierland","IJsland","India","Indonesië","Irak","Iran","Israël","Italië","Ivoorkust","Jamaica",
@@ -24,8 +23,6 @@ const COUNTRIES = [
   "Verenigde Staten","Verenigd Koninkrijk","Vietnam","Wales","Zambia","Zimbabwe","Zuid-Afrika","Zuid-Korea","Zuid-Soedan","Zweden","Zwitserland"
 ];
 
-const SORTED_COUNTRIES = [...COUNTRIES].sort((a, b) => a.localeCompare(b, "nl"));
-
 const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
   return (
     <select
@@ -34,7 +31,7 @@ const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: strin
       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
     >
       <option value="">Selecteer land</option>
-      {SORTED_COUNTRIES.map((c) => (
+      {COUNTRIES.map((c) => (
         <option key={c} value={c}>{c}</option>
       ))}
     </select>

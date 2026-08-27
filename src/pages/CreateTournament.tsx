@@ -5,11 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Info, CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Trash2, Info } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -19,34 +19,6 @@ import SportIcon from "@/components/SportIcon";
 const TOTAL_STEPS = 3;
 
 type DateMode = "single" | "period";
-
-const DatePickerField = ({
-  value,
-  onChange,
-  placeholder = "Kies een datum",
-}: {
-  value: string;
-  onChange: (val: string) => void;
-  placeholder?: string;
-}) => {
-  return (
-    <div className="relative">
-      <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background",
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-          "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          !value && "text-muted-foreground"
-        )}
-      />
-    </div>
-  );
-};
 
 const CreateTournament = () => {
   const { user } = useAuth();
@@ -293,7 +265,7 @@ const CreateTournament = () => {
                   {form.match_days.map((day, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="flex-1">
-                        <DatePickerField
+                        <DatePicker
                           value={day}
                           onChange={(val) => {
                             const days = [...form.match_days];
@@ -337,7 +309,7 @@ const CreateTournament = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label>Startdatum</Label>
-                      <DatePickerField
+                      <DatePicker
                         value={form.start_date}
                         onChange={(val) => setForm({ ...form, start_date: val })}
                         placeholder="Startdatum"
@@ -345,7 +317,7 @@ const CreateTournament = () => {
                     </div>
                     <div className="space-y-2">
                       <Label>Einddatum</Label>
-                      <DatePickerField
+                      <DatePicker
                         value={form.end_date}
                         onChange={(val) => setForm({ ...form, end_date: val })}
                         placeholder="Einddatum"
