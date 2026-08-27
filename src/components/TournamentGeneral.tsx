@@ -689,34 +689,43 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
         {generalSubTab === "wedstrijddagen" && (
           <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <p className="text-xs text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe.</p>
+            <p className="text-xs text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde.</p>
 
             {(form.match_days || []).length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-1">
                 {(form.match_days as MatchDayEntry[]).map((entry, idx) => {
                   if (typeof entry === "string") {
                     return (
-                      <div key={`day-${idx}`} className="flex items-center gap-1 rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm">
-                        <span className="text-foreground font-medium">{formatDate(entry)}</span>
-                        <button onClick={() => { setEditMatchDayIdx(idx); setEditMatchDayValue(entry); }} className="text-muted-foreground hover:text-foreground ml-1">
-                          <Pencil className="h-3 w-3" />
-                        </button>
-                        <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive ml-0.5">
-                          <Trash2 className="h-3 w-3" />
-                        </button>
+                      <div key={`day-${idx}`} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <CalendarPlus className="h-4 w-4 text-primary" />
+                          <span className="text-foreground font-medium">{formatDate(entry)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { setEditMatchDayIdx(idx); setEditMatchDayValue(entry); }} className="text-muted-foreground hover:text-foreground">
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </div>
                     );
                   }
                   return (
-                    <div key={`period-${idx}`} className="flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm">
-                      <CalendarPlus className="h-3.5 w-3.5 text-primary mr-1" />
-                      <span className="text-foreground font-medium">{formatDate(entry.start)} – {formatDate(entry.end)}</span>
-                      <button onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }} className="text-muted-foreground hover:text-foreground ml-1">
-                        <Pencil className="h-3 w-3" />
-                      </button>
-                      <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive ml-0.5">
-                        <Trash2 className="h-3 w-3" />
-                      </button>
+                    <div key={`period-${idx}`} className="flex items-center justify-between text-sm rounded-lg border border-primary/30 bg-primary/5 px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <CalendarPlus className="h-4 w-4 text-primary" />
+                        <span className="text-foreground font-medium">{formatDate(entry.start)} – {formatDate(entry.end)}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }} className="text-muted-foreground hover:text-foreground">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
