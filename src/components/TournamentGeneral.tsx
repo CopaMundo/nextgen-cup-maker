@@ -894,7 +894,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 {[
                   { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers", publicLabel: "Topscorerslijst tonen op publieke website" },
                   { key: "enable_assists", publicKey: "show_public_assists", label: "Assists", publicLabel: "Assist-klassement tonen op publieke website" },
-                  { key: "enable_yellow_cards", publicKey: "show_public_fairplay", label: "Kaarten", publicLabel: "Fair-play klassement tonen op publieke website" },
+                  { key: "enable_yellow_cards", publicKey: null, label: "Kaarten", publicLabel: null },
                 ].map(({ key, publicKey, label, publicLabel }) => {
                   const isEnabled = form[key as keyof typeof form] as boolean;
                   const isPublic = form[publicKey as keyof typeof form] as boolean;
