@@ -154,6 +154,7 @@ export function DatePicker({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
+          onClick={handleFocus}
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"

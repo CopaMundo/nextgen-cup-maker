@@ -170,6 +170,7 @@ export function TimePicker({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => inputRef.current?.select()}
+          onClick={() => inputRef.current?.select()}
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"
