@@ -327,34 +327,19 @@ const DateStripNav = ({
         )}
       </div>
 
-      <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="shrink-0 p-1.5 text-muted-foreground hover:text-foreground transition-colors ml-1"
-            aria-label="Kies een datum"
-          >
-            <CalendarDays className="h-4 w-4" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 pointer-events-auto" align="end">
-          <CalendarPicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={handlePick}
-            defaultMonth={selectedDate || minDate}
-            modifiers={{ available: allParsed }}
-            modifiersClassNames={{ available: "font-bold text-primary" }}
-            initialFocus
-            className="p-3 pointer-events-auto"
-          />
-          {minDate && maxDate && (
-            <div className="px-3 pb-3 text-[10px] text-muted-foreground text-center">
-              Toernooi: {formatIsoDateForLocale(localDateToIso(minDate), "nl-BE", { day: "numeric", month: "short" })} – {formatIsoDateForLocale(localDateToIso(maxDate), "nl-BE", { day: "numeric", month: "short" })}
-            </div>
-          )}
-        </PopoverContent>
-      </Popover>
+      <DatePicker
+        value={activeDate}
+        onChange={(iso) => {
+          if (!dateSet.has(iso)) {
+            onInvalidPick(iso);
+            return;
+          }
+          onSelect(iso);
+        }}
+        hideInput
+        availableDates={dates}
+        onInvalidPick={onInvalidPick}
+      />
     </div>
   );
 };
