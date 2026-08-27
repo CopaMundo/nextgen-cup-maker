@@ -576,16 +576,18 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
             {/* Tab switcher: Wedstrijden / Standen */}
             {(lastFavMatch || nextFavMatch || showCurrentKnockout || showBracketInstead || showNextGroupInstead || (favGroup && favStandings.length > 0)) && (
-              <div className="grid grid-cols-2 gap-0 border-b border-border">
+              <div className="ttx-myteam-tabs grid grid-cols-2 gap-0 border-b border-border">
                 <button
                   onClick={() => setFavTab("matches")}
-                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "matches" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  data-active={favTab === "matches"}
+                  className={`ttx-myteam-tab py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "matches" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Wedstrijden
                 </button>
                 <button
                   onClick={() => setFavTab("standings")}
-                  className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "standings" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  data-active={favTab === "standings"}
+                  className={`ttx-myteam-tab py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${favTab === "standings" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   Standen
                 </button>
@@ -1190,7 +1192,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
   return (
     <div className={ds(bStyle, "card") || "rounded-xl border border-border overflow-hidden bg-card shadow-sm"}>
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="ttx-standings-table w-full text-xs">
           <thead>
             <tr className={ds(bStyle, "tableHeader") || "bg-primary/10 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b-2 border-primary/30"}>
               <th className="w-8 px-1.5 py-2.5 text-left">#</th>
@@ -1220,7 +1222,7 @@ const StandingTable = ({ standings, favoriteTeam, tournament, standingColors, ph
                         {row.team?.logo_url ? <img src={row.team.logo_url} alt="" className="h-full w-full object-contain" /> :
                           <div className="flex h-full w-full items-center justify-center text-[8px] font-black text-muted-foreground bg-secondary">{row.team?.name?.charAt(0)}</div>}
                       </div>
-                      <span className={`font-bold ${favoriteTeam === row.team?.id ? "text-primary" : "text-foreground"}`}>{row.team?.name}</span>
+                      <span className={`font-bold ${favoriteTeam === row.team?.id ? "ttx-fav-team text-primary" : "text-foreground"}`}>{row.team?.name}</span>
                       {tournament?.show_country && row.team?.country && <CountryFlag country={row.team.country} className="h-2.5 w-3.5 object-contain" />}
                     </div>
                   </td>
