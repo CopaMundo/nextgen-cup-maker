@@ -42,7 +42,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
-  let lastDate = "";
 
   useEffect(() => {
     if (!firstUnplayedMatchId) return;
