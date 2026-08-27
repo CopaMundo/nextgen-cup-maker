@@ -7,6 +7,8 @@ import { ChevronDown } from "lucide-react";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const { teams, matches, phases, groups, slots, tournament } = data;
   const bStyle = useBroadcastStyle();
 
