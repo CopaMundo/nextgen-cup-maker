@@ -154,7 +154,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                           allMatches={matches}
                           favoriteTeam={favoriteTeam}
                           hideRoundNumber
-                          {...positions}
+
                         />
                       </div>
                     );})}
