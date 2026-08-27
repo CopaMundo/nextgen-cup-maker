@@ -71,6 +71,13 @@ export function DatePicker({
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [autoFocus]);
+
+  React.useEffect(() => {
     setDigits(validDate ? format(validDate, "ddMMyyyy") : "");
   }, [value]);
 
