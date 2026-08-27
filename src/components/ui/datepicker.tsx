@@ -169,7 +169,7 @@ export function DatePicker({
           {displayValue.split("").map((char, i) => (
             <span
               key={i}
-              className={i < partialValue.length ? "text-transparent" : "text-muted-foreground"}
+              className={i < partialValue.length ? "text-transparent" : "text-white"}
             >
               {char}
             </span>
