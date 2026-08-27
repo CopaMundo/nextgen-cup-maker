@@ -13,9 +13,10 @@ interface Props {
   onCategoryChange?: (id: string) => void;
   darkMode?: boolean;
   onToggleDarkMode?: () => void;
+  onSetDarkMode?: (value: boolean) => void;
 }
 
-const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onToggleDarkMode }: Props) => {
+const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onToggleDarkMode, onSetDarkMode }: Props) => {
   const { tournament, attachments, sponsors, locations, categories } = data;
   const bStyle = useBroadcastStyle();
   const wrapperToken = ds(bStyle, "matchCardWrapper");
