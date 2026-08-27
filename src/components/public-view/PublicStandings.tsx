@@ -527,7 +527,7 @@ const FairplayRanking = ({ data, teams }: { data: any[]; teams: any[] }) => {
           <div className="h-3.5 w-2.5 rounded-sm bg-yellow-400" />
           <div className="h-3.5 w-2.5 rounded-sm bg-red-500" />
         </span>
-        <h3 className={ds(bStyle, "cardHeaderTitle")}>Fair-playklassement</h3>
+        <h3 className={ds(bStyle, "cardHeaderTitle")}>Kaarten</h3>
       </div>
       {data.length === 0 ? (
         <div className="px-4 py-6 text-center">
