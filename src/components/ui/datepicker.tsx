@@ -167,7 +167,7 @@ export function DatePicker({
 
   return (
     <>
-      <div className={cn("relative h-10 w-full", className)}>
+      <div className={cn("relative", hideInput ? "h-auto w-auto" : "h-10 w-full", className)}>
         <Input
           ref={inputRef}
           type="text"
@@ -182,7 +182,10 @@ export function DatePicker({
           autoComplete="off"
           autoFocus={autoFocus}
           aria-label={placeholder}
-          className="h-full w-full pr-10 text-foreground"
+          className={cn(
+            "h-full text-foreground",
+            hideInput ? "sr-only" : "w-full pr-10"
+          )}
         />
         <Button
           type="button"
@@ -190,7 +193,10 @@ export function DatePicker({
           size="icon"
           aria-label="Open kalender"
           onClick={openDialog}
-          className="absolute right-0 top-0 h-full w-10 bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white"
+          className={cn(
+            "bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white",
+            hideInput ? "relative h-8 w-8" : "absolute right-0 top-0 h-full w-10"
+          )}
         >
           <CalendarIcon className="h-4 w-4" />
         </Button>
