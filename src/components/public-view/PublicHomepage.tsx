@@ -363,6 +363,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
                   favoriteTeam={favoriteTeam}
                   bStyle={bStyle}
                   scrollToLatest={globalTab === "results"}
+                  groupTeams={groupTeams}
+                  scoringSystems={scoringSystems}
                 />
               ) : (
                 <p className="text-sm text-muted-foreground font-medium text-center py-4">
