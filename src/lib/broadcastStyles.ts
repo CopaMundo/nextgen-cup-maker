@@ -420,3 +420,10 @@ export const STYLE_DEFAULT_APPEARANCE: Partial<Record<BroadcastStyle, "light" | 
 export function defaultAppearanceForStyle(style: BroadcastStyle): "light" | "dark" {
   return STYLE_DEFAULT_APPEARANCE[style] ?? "dark";
 }
+
+/** Zet elke (verwijderde/legacy) stijl om naar een geldige, kiesbare stijl. Fallback = Copa Mundo. */
+export function normalizeBroadcastStyle(style: string | null | undefined): BroadcastStyle {
+  return SELECTABLE_BROADCAST_STYLES.includes(style as BroadcastStyle)
+    ? (style as BroadcastStyle)
+    : "copa_mundo_bc";
+}
