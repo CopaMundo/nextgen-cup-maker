@@ -113,16 +113,17 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
           return (
             <div key={slot.key}>
               {showDateHeader && (
-                <div
-                  data-schedule-date={slot.date}
-                  className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
-                  style={{ top: headerHeight }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={ds(bStyle, "dateHeader")}>
-                      {formatDate(slot.date)}
+                <div data-schedule-date={slot.date} className="contents">
+                  <div
+                    className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
+                    style={{ top: headerHeight }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={ds(bStyle, "dateHeader")}>
+                        {formatDate(slot.date)}
+                      </div>
+                      {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
                     </div>
-                    {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
                   </div>
                 </div>
               )}
