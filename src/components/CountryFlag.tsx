@@ -6,11 +6,12 @@ interface CountryFlagProps {
   className?: string;
 }
 
-/** Renders a country flag as an <img> using flagcdn.com SVGs – works on all platforms including Windows desktop */
+/** Renders a country flag as an <img> using Twemoji SVGs – flat style with rounded corners, identical shape for every country */
 const CountryFlag = ({ country, className }: CountryFlagProps) => {
   const url = countryToFlagUrl(country);
   if (!url) return null;
-  return <img src={url} alt={country || ""} className={cn("country-flag-img h-4 w-5 object-contain inline-block", className, "rounded-[3px]")} loading="lazy" />;
+  return <img src={url} alt={country || ""} className={cn("country-flag-img h-4 w-5 object-cover inline-block", className)} loading="lazy" />;
 };
+
 
 export default CountryFlag;
