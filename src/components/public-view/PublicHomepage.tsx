@@ -562,7 +562,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           <h2 className={ds(bStyle, "sectionTitle")}>{title}</h2>
           <div className={ds(bStyle, "sectionLine")} />
         </div>
-        <MatchListView matches={matchList} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} tournament={tournament} />
+        <MatchListView matches={matchList} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} tournament={tournament} groupTeams={groupTeams} scoringSystems={scoringSystems} />
       </div>
     );
   }
