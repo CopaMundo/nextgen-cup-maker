@@ -174,7 +174,7 @@ export function TimePicker({
           placeholder=""
           autoComplete="off"
           aria-label={placeholder}
-          className="h-full w-full pr-10"
+          className="h-full w-full pr-10 text-foreground"
         />
         <div
           aria-hidden="true"
