@@ -1,8 +1,9 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import PublicMatchCard from "./PublicMatchCard";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
+import { ChevronDown } from "lucide-react";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
