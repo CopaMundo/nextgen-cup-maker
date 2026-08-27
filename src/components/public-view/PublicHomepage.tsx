@@ -1147,7 +1147,7 @@ const KnockoutPreview = ({ matches, teams, slots = [], favoriteTeam, allMatches,
       <div className="space-y-2">
           {fallback.map((m: any) => (
           <div key={m.id} className={matchCardWrapperCls}>
-            <PublicMatchCard match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext {...matchPositions(m)} />
+            <PublicMatchCard match={m} teams={teams} phases={phases || []} groups={groups || []} slots={slots} tournament={tournament} allMatches={matches} favoriteTeam={favoriteTeam} hideContext />
           </div>
         ))}
       </div>
