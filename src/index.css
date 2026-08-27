@@ -3430,6 +3430,25 @@ body[data-broadcast="teletext"] {
   color: hsl(60 100% 50%) !important;
 }
 
+/* P800: beide variant-knoppen zichtbaar; actieve is ingekleurd */
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-variant-group {
+  background-color: hsl(0 0% 14%);
+  border-color: hsl(0 0% 26%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-variant-btn {
+  color: hsl(60 100% 50%);
+  background-color: transparent;
+  border-radius: 0;
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-variant-btn.ttx-variant-500[data-active="true"] {
+  background-color: hsl(218 100% 50%);
+  color: hsl(0 0% 100%);
+}
+[data-broadcast="teletext"][data-ttx-variant="801"] .ttx-variant-btn.ttx-variant-800[data-active="true"] {
+  background-color: hsl(14 100% 48%);
+  color: hsl(0 0% 100%);
+}
+
 /* Meta-teller ("24 teams", "108 wedstrijden") in het geel */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-meta,
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-stats-toggle,
