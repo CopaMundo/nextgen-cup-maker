@@ -1260,6 +1260,7 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
     return ((phase?.match_config as any)?.bracketGroupMap || {}) as Record<string, string>;
   }, [groups, phases]);
 
+
   const bracketNames = useMemo(() => {
     const pid = groups.length > 0 ? groups[0]?.phase_id : null;
     const phase = pid && phases ? phases.find((p: any) => p.id === pid) : null;
