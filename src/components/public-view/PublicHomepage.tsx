@@ -43,7 +43,7 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   });
   const [favTab, setFavTab] = useState<"matches" | "standings">("matches");
   const [globalTab, setGlobalTab] = useState<"results" | "next">("next");
-  const [programmaExpanded, setProgrammaExpanded] = useState(false);
+  
   const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
     try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
   });
@@ -319,6 +319,59 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   if (expandedGrid) {
     let title = "";
     let matchList: any[] = [];
+
+    // Volledig programma: eigen pagina met terugknop, tabs en volledige tijdslotlijst
+    if (expandedGrid.startsWith("programma:")) {
+      const listMatches = globalTab === "next" ? upcomingMatches : playedMatches;
+      return (
+        <div className="px-3 pt-4 space-y-4">
+          <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
+            <ArrowLeft className="h-4 w-4" /> Terug
+          </button>
+          <div className="flex items-center gap-2">
+            <div className={ds(bStyle, "sectionDot")} />
+            <h2 className={ds(bStyle, "sectionTitle")}>Programma</h2>
+            <div className={ds(bStyle, "sectionLine")} />
+          </div>
+          <div className={ds(bStyle, "card")}>
+            <div className="grid grid-cols-2 gap-0 border-b border-border">
+              <button
+                onClick={() => setGlobalTab("next")}
+                className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Volgende wedstrijden
+              </button>
+              <button
+                onClick={() => setGlobalTab("results")}
+                className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Resultaten
+              </button>
+            </div>
+            <div className="p-2 space-y-3">
+              {listMatches.length > 0 ? (
+                <ProgrammaTimeslotList
+                  matches={listMatches}
+                  teams={teams}
+                  phases={phases}
+                  groups={groups}
+                  slots={slots}
+                  tournament={tournament}
+                  favoriteTeam={favoriteTeam}
+                  bStyle={bStyle}
+                  scrollToLatest={globalTab === "results"}
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground font-medium text-center py-4">
+                  {globalTab === "next" ? "Geen komende wedstrijden." : "Nog geen resultaten."}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
 
     // Volledig klassement: toon de Standen-view (met fases en formattabs) inline op de hoofdpagina
     if (expandedGrid === "fav-standing" && favGroup) {
@@ -743,13 +796,13 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         <div className={ds(bStyle, "card")}>
           <div className="grid grid-cols-2 gap-0 border-b border-border">
             <button
-              onClick={() => { setGlobalTab("next"); setProgrammaExpanded(false); }}
+              onClick={() => setGlobalTab("next")}
               className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "next" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
             >
               Volgende wedstrijden
             </button>
             <button
-              onClick={() => { setGlobalTab("results"); setProgrammaExpanded(false); }}
+              onClick={() => setGlobalTab("results")}
               className={`py-2 text-[11px] font-black uppercase tracking-wider transition-colors ${globalTab === "results" ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
             >
               Resultaten
@@ -757,47 +810,28 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
           </div>
 
           {/* Default view: current/next or last-played time slot */}
-          {!programmaExpanded && (
-            <div className="px-3 py-3 space-y-2">
-              {globalTab === "next" && nextBlockMatchesAll.length > 0 && (
-                <MatchListView matches={nextBlockMatchesAll} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
-              )}
-              {globalTab === "results" && lastBlockMatches.length > 0 && (
-                <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
-              )}
-              {((globalTab === "next" && nextBlockMatchesAll.length === 0) || (globalTab === "results" && lastBlockMatches.length === 0)) && (
-                <p className="text-sm text-muted-foreground font-medium text-center py-4">
-                  {globalTab === "next" ? "Geen komende wedstrijden." : "Nog geen resultaten."}
-                </p>
-              )}
-            </div>
-          )}
+          <div className="px-3 py-3 space-y-2">
+            {globalTab === "next" && nextBlockMatchesAll.length > 0 && (
+              <MatchListView matches={nextBlockMatchesAll} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+            )}
+            {globalTab === "results" && lastBlockMatches.length > 0 && (
+              <MatchListView matches={lastBlockMatches} teams={teams} phases={phases} groups={groups} slots={slots} favoriteTeam={favoriteTeam} compact tournament={tournament} />
+            )}
+            {((globalTab === "next" && nextBlockMatchesAll.length === 0) || (globalTab === "results" && lastBlockMatches.length === 0)) && (
+              <p className="text-sm text-muted-foreground font-medium text-center py-4">
+                {globalTab === "next" ? "Geen komende wedstrijden." : "Nog geen resultaten."}
+              </p>
+            )}
+          </div>
 
-          {/* Expanded view: all time slots for active tab */}
-          {programmaExpanded && (
-            <div className="p-2 space-y-3">
-              <ProgrammaTimeslotList
-                matches={globalTab === "next" ? upcomingMatches : playedMatches}
-                teams={teams}
-                phases={phases}
-                groups={groups}
-                slots={slots}
-                tournament={tournament}
-                favoriteTeam={favoriteTeam}
-                bStyle={bStyle}
-                scrollToLatest={globalTab === "results"}
-              />
-            </div>
-          )}
-
-          {/* Toggle */}
+          {/* Toggle: opent volledig programma op eigen pagina */}
           {((globalTab === "next" && nextBlockMatchesAll.length > 0) || (globalTab === "results" && lastBlockMatches.length > 0)) && (
             <button
-              onClick={() => setProgrammaExpanded(v => !v)}
+              onClick={() => setExpandedGrid(`programma:${globalTab}`)}
               className="w-full py-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1"
             >
-              {programmaExpanded ? "Toon enkel huidig tijdslot" : "Alles bekijken"}
-              <ChevronRight className={`h-3 w-3 transition-transform ${programmaExpanded ? "-rotate-90" : "rotate-90"}`} />
+              Alles bekijken
+              <ChevronRight className="h-3 w-3 rotate-90" />
             </button>
           )}
         </div>
