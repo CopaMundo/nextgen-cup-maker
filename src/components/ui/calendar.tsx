@@ -24,7 +24,7 @@ function CustomCaption(props: CaptionProps) {
   }));
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 21 }, (_, i) => currentYear - 5 + i);
+  const years = Array.from({ length: 91 }, (_, i) => currentYear - 75 + i);
 
   return (
     <div className="flex items-center justify-between px-1 gap-1">

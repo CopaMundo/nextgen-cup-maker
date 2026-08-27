@@ -35,6 +35,14 @@ export function DatePicker({
     setInputValue(nextDate && isValid(nextDate) ? format(nextDate, "dd/MM/yyyy") : "");
   }, [value]);
 
+  const maskInput = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 8);
+    let masked = digits.slice(0, 2);
+    if (digits.length >= 3) masked += "/" + digits.slice(2, 4);
+    if (digits.length >= 5) masked += "/" + digits.slice(4, 8);
+    return masked;
+  };
+
   const commitInput = (typedValue: string) => {
     if (!typedValue.trim()) {
       onChange("");
@@ -55,38 +63,38 @@ export function DatePicker({
 
   return (
     <Popover>
-      <div className={cn("flex h-10 w-full", className)}>
+      <div className={cn("relative h-10 w-full", className)}>
         <Input
           type="text"
           inputMode="numeric"
           value={inputValue}
           onChange={(event) => {
-            const typedValue = event.target.value;
+            const typedValue = maskInput(event.target.value);
             setInputValue(typedValue);
             commitInput(typedValue);
           }}
           onBlur={() => {
             if (date && isValid(date)) setInputValue(format(date, "dd/MM/yyyy"));
           }}
-          placeholder={placeholder === "Kies een datum" ? "dd/mm/jjjj" : placeholder}
+          placeholder="dd/mm/jjjj"
           aria-label={placeholder}
-          className="h-full min-w-0 rounded-r-none border-r-0"
+          className="h-full w-full pr-10"
         />
         <PopoverTrigger asChild>
-          <Button
+          <button
             type="button"
-            variant="default"
-            size="icon"
             aria-label="Open kalender"
-            className="h-full w-10 shrink-0 rounded-l-none"
+            className="absolute right-0 top-0 flex h-full w-10 items-center justify-center text-primary dark:text-white"
           >
             <CalendarIcon className="h-4 w-4" />
-          </Button>
+          </button>
         </PopoverTrigger>
       </div>
       <PopoverContent
         className="z-[100] w-auto max-w-[calc(100vw-2rem)] overflow-visible p-0 pointer-events-auto"
         align="end"
+        side="bottom"
+        avoidCollisions
         sideOffset={8}
         collisionPadding={16}
       >
@@ -95,6 +103,7 @@ export function DatePicker({
             mode="single"
             selected={date}
             onSelect={handleSelect}
+            defaultMonth={date && isValid(date) ? date : undefined}
             initialFocus
             className={cn("p-3 pointer-events-auto")}
           />
