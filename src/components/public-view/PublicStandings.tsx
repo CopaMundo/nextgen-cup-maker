@@ -151,65 +151,72 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
 
 
   return (
-    <div className="px-3 pt-4 space-y-4">
-      {/* Section header with stats toggle icon (icon at far right) */}
-      <div className="flex items-center gap-3">
-        <div className={ds(bStyle, "sectionDot")} />
-        <h2 className={ds(bStyle, "sectionTitle")}>
-          {subTab === "standings" ? "Standen" : "Statistieken"}
-        </h2>
-        <div className={ds(bStyle, "sectionLine")} />
-        <button
-          onClick={() => setSubTab(subTab === "standings" ? "stats" : "standings")}
-          className="ttx-stats-toggle shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-          aria-label={subTab === "standings" ? "Statistieken openen" : "Standen openen"}
-          title={subTab === "standings" ? "Statistieken" : "Standen"}
-        >
-          {subTab === "standings"
-            ? <BarChart3 className="h-4 w-4" />
-            : <ListOrdered className="h-4 w-4" />}
-        </button>
+    <div className="px-3 pb-4">
+      {/* Sticky header: title, phases, subformats */}
+      <div className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 space-y-3 bg-background/95 backdrop-blur-sm border-b border-border/30">
+        {/* Section header with stats toggle icon (icon at far right) */}
+        <div className="flex items-center gap-3">
+          <div className={ds(bStyle, "sectionDot")} />
+          <h2 className={ds(bStyle, "sectionTitle")}>
+            {subTab === "standings" ? "Standen" : "Statistieken"}
+          </h2>
+          <div className={ds(bStyle, "sectionLine")} />
+          <button
+            onClick={() => setSubTab(subTab === "standings" ? "stats" : "standings")}
+            className="ttx-stats-toggle shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            aria-label={subTab === "standings" ? "Statistieken openen" : "Standen openen"}
+            title={subTab === "standings" ? "Statistieken" : "Standen"}
+          >
+            {subTab === "standings"
+              ? <BarChart3 className="h-4 w-4" />
+              : <ListOrdered className="h-4 w-4" />}
+          </button>
+        </div>
+
+        {subTab === "standings" && (
+          <div className="space-y-1.5">
+            {/* Phase tabs — admin Format-stijl (Deelnemers-stijl) */}
+            {allPhaseNumbers.length > 1 && (
+              <div className="ttx-phase-tab-container flex justify-center border-b border-border flex-wrap overflow-x-auto">
+                {allPhaseNumbers.map(pn => {
+                  const isActive = activePhaseNum === pn;
+                  return (
+                    <button
+                      key={pn}
+                      data-active={isActive}
+                      onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
+                      className={
+                        "ttx-phase-tab px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
+                        (isActive
+                          ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                          : "text-muted-foreground hover:text-foreground")
+                      }
+                    >
+                      {getPhaseLabel(pn, phases)}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Format tabs — narrower, scrollable */}
+            {showFormatsAsTabs && phasesInActiveNum.length > 1 && (
+              <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none px-1">
+                {phasesInActiveNum.map((f: any) => (
+                  <button key={f.id} onClick={() => { setSelectedFormatId(f.id); }}
+                    className={`shrink-0 ${ds(bStyle, "phaseTab")} ${activeFormat?.id === f.id ? ds(bStyle, "phaseTabActive") : ds(bStyle, "phaseTabInactive")} flex items-center gap-1`}>
+                    {f.logo_url && <img src={f.logo_url} alt="" className="h-4 w-4 object-contain flex-shrink-0 rounded-sm" />}
+                    {!f.logo_url && f.emoji ? `${f.emoji} ` : ""}{f.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {subTab === "standings" && (
-        <div className="space-y-1.5">
-          {/* Phase tabs — admin Format-stijl (Deelnemers-stijl) */}
-          {allPhaseNumbers.length > 1 && (
-            <div className="ttx-phase-tab-container flex justify-center border-b border-border flex-wrap overflow-x-auto">
-              {allPhaseNumbers.map(pn => {
-                const isActive = activePhaseNum === pn;
-                return (
-                  <button
-                    key={pn}
-                    data-active={isActive}
-                    onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
-                    className={
-                      "ttx-phase-tab px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
-                      (isActive
-                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                        : "text-muted-foreground hover:text-foreground")
-                    }
-                  >
-                    {getPhaseLabel(pn, phases)}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Format tabs — narrower, scrollable */}
-          {showFormatsAsTabs && phasesInActiveNum.length > 1 && (
-            <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none px-1">
-              {phasesInActiveNum.map((f: any) => (
-                <button key={f.id} onClick={() => { setSelectedFormatId(f.id); }}
-                  className={`shrink-0 ${ds(bStyle, "phaseTab")} ${activeFormat?.id === f.id ? ds(bStyle, "phaseTabActive") : ds(bStyle, "phaseTabInactive")} flex items-center gap-1`}>
-                  {f.logo_url && <img src={f.logo_url} alt="" className="h-4 w-4 object-contain flex-shrink-0 rounded-sm" />}
-                  {!f.logo_url && f.emoji ? `${f.emoji} ` : ""}{f.name}
-                </button>
-              ))}
-            </div>
-          )}
-
+        <div className="pt-4 space-y-4">
           {visibleFormats.map((format: any, formatIndex: number) => {
             const isGroupFormat = format.phase_type === "group" || format.phase_type === "round_robin";
             const isKnockoutFormat = format.phase_type === "knockout" || format.phase_type === "single_match";
