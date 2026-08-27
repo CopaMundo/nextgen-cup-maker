@@ -26,6 +26,7 @@ interface DatePickerProps {
   onChange: (date: string) => void;
   placeholder?: string;
   className?: string;
+  autoFocus?: boolean;
 }
 
 const MASK = "dd/mm/jjjj";
@@ -56,6 +57,7 @@ export function DatePicker({
   onChange,
   placeholder = "Kies een datum",
   className,
+  autoFocus,
 }: DatePickerProps) {
   const date = value ? parseISO(value) : undefined;
   const validDate = date && isValid(date) ? date : undefined;
