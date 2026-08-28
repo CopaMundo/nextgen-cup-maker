@@ -592,7 +592,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
     const locList = (locRows || []) as { id: string; name: string }[];
     setLocations(locList);
     registerFieldLocations([catFields], locList);
-    setSelectedLocation(prev => (prev && locList.some(l => l.name === prev) ? prev : null));
+    setSelectedLocation(prev => (prev === "__unassigned" || (prev && locList.some(l => l.name === prev)) ? prev : null));
     setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
@@ -687,7 +687,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
     registerFieldLocations([updated], locations);
   };
   /** Standaardlocatie voor een nieuw veld: de gekozen locatie, of de enige locatie. */
-  const defaultFieldLocation = () => selectedLocation ?? (locations.length === 1 ? locations[0].name : null);
+  const defaultFieldLocation = () =>
+    (selectedLocation && selectedLocation !== "__unassigned" ? selectedLocation : null) ??
+    (locations.length === 1 ? locations[0].name : null);
   const addField = async () => {
     const fieldNum = fields.length + 1;
     const newField: FieldConfig = { name: `Veld ${fieldNum}`, startTime: "09:00", location: defaultFieldLocation() };
@@ -1023,9 +1025,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === PLANNER HELPERS ===
-  const plannerFields = selectedLocation
-    ? fields.filter(f => (f.location || null) === selectedLocation)
-    : fields;
+  const plannerFields = !selectedLocation
+    ? fields
+    : selectedLocation === "__unassigned"
+      ? fields.filter(f => !f.location)
+      : fields.filter(f => (f.location || null) === selectedLocation);
 
   const getFieldTimeSlots = (field: FieldConfig) => {
     const result: { time: string; minuteStart: number }[] = [];
