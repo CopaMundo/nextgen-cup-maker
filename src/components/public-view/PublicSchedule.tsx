@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getFieldLocation } from "@/lib/fieldLocations";
 
 const publicScheduleLocationKey = (token: string) => `public-schedule-location:${token}`;
-const publicScheduleDayKey = (token: string) => `public-schedule-day:${token}`;
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
@@ -26,10 +25,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     const stored = localStorage.getItem(publicScheduleLocationKey(token));
     return stored && validLocationNames.includes(stored) ? stored : "";
   });
-  const [selectedDate, setSelectedDateState] = useState<string>(() => {
-    if (typeof window === "undefined" || !token) return "";
-    return localStorage.getItem(publicScheduleDayKey(token)) || "";
-  });
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
   const setLocationFilter = (value: string) => {
@@ -37,13 +33,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     if (typeof window !== "undefined" && token) {
       if (value) localStorage.setItem(publicScheduleLocationKey(token), value);
       else localStorage.removeItem(publicScheduleLocationKey(token));
-    }
-  };
-  const setSelectedDate = (value: string) => {
-    setSelectedDateState(value);
-    if (typeof window !== "undefined" && token) {
-      if (value) localStorage.setItem(publicScheduleDayKey(token), value);
-      else localStorage.removeItem(publicScheduleDayKey(token));
     }
   };
 
@@ -109,18 +98,18 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  // Initial scroll: prefer remembered day, otherwise first unplayed match.
+  // Initial scroll: center the first unplayed match in the viewport.
   useEffect(() => {
     if (hasInitialScrolled || headerHeight === 0 || !sorted.length) return;
     const raf = requestAnimationFrame(() => {
       setTimeout(() => {
-        if (selectedDate && uniqueDates.includes(selectedDate)) {
-          jumpToDate(selectedDate, "instant");
-        } else if (firstUnplayedMatchId) {
+        if (firstUnplayedMatchId) {
           const el = firstUnplayedRef.current;
           if (el) {
             const rect = el.getBoundingClientRect();
-            const scrollY = window.scrollY + rect.top - 120;
+            const elCenter = rect.top + rect.height / 2;
+            const viewportCenter = window.innerHeight / 2;
+            const scrollY = window.scrollY + elCenter - viewportCenter;
             window.scrollTo({ top: Math.max(0, scrollY), behavior: "instant" });
           }
         }
@@ -129,7 +118,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     });
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId, selectedDate, uniqueDates.join(",")]);
+  }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId]);
 
 
 
