@@ -83,6 +83,12 @@ const TournamentDetail = () => {
     setSelectedCategoryIdState(stored);
   }, [id]);
 
+  useEffect(() => {
+    if (!id) return;
+    const stored = localStorage.getItem(locationStorageKey(id));
+    setSelectedLocationState(stored);
+  }, [id]);
+
   // For single-category tournaments, auto-select the lone category
   // For multi-category tournaments, validate / pick the first
   useEffect(() => {
