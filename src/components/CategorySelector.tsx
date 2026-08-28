@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 interface Category {
   id: string;
@@ -12,11 +13,13 @@ const CategorySelector = ({
   isMultiCategory,
   selectedCategoryId,
   onSelect,
+  className,
 }: {
   tournamentId: string;
   isMultiCategory: boolean;
   selectedCategoryId: string | null;
   onSelect: (id: string | null) => void;
+  className?: string;
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -52,7 +55,8 @@ const CategorySelector = ({
   if (!isMultiCategory || categories.length === 0) return null;
 
   return (
-    <div className="mb-4">
+    <div className={cn("flex items-center gap-2", className)}>
+      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
       <select
         value={selectedCategoryId || ""}
         onChange={(e) => onSelect(e.target.value || null)}
