@@ -80,7 +80,8 @@ interface Match {
   home_slot_label: string | null;
   away_slot_label: string | null;
   match_name: string | null;
-  created_at: string;
+  duration_minutes?: number | null;
+
 }
 
 interface Team { id: string; name: string; logo_url: string | null; }
