@@ -172,10 +172,11 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             ) : (
               <button
                 onClick={() => setShowLocations(true)}
-                className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm transition-colors hover:bg-secondary ${controlFrameShape}`}
+                className={`ttx-info-badge group flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm transition-all hover:bg-primary hover:border-primary/30 hover:shadow-sm ${controlFrameShape}`}
               >
-                <MapPin className="h-4 w-4 text-primary" />
-                <span className="text-foreground font-bold text-xs">{locations.length} locaties</span>
+                <MapPin className="h-4 w-4 text-primary group-hover:text-primary-foreground shrink-0" />
+                <span className="text-foreground font-bold text-xs group-hover:text-primary-foreground">Bekijk {locations.length} locaties</span>
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary-foreground transition-transform group-hover:translate-x-0.5" />
               </button>
             )
           )}
