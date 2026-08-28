@@ -98,18 +98,18 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  // Initial scroll: prefer remembered day, otherwise first unplayed match.
+  // Initial scroll: center the first unplayed match in the viewport.
   useEffect(() => {
     if (hasInitialScrolled || headerHeight === 0 || !sorted.length) return;
     const raf = requestAnimationFrame(() => {
       setTimeout(() => {
-        if (selectedDate && uniqueDates.includes(selectedDate)) {
-          jumpToDate(selectedDate, "instant");
-        } else if (firstUnplayedMatchId) {
+        if (firstUnplayedMatchId) {
           const el = firstUnplayedRef.current;
           if (el) {
             const rect = el.getBoundingClientRect();
-            const scrollY = window.scrollY + rect.top - 120;
+            const elCenter = rect.top + rect.height / 2;
+            const viewportCenter = window.innerHeight / 2;
+            const scrollY = window.scrollY + elCenter - viewportCenter;
             window.scrollTo({ top: Math.max(0, scrollY), behavior: "instant" });
           }
         }
@@ -118,7 +118,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     });
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId, selectedDate, uniqueDates.join(",")]);
+  }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId]);
 
 
 
