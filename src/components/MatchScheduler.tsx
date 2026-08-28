@@ -81,6 +81,8 @@ interface Match {
   away_slot_label: string | null;
   match_name: string | null;
   duration_minutes?: number | null;
+  created_at: string;
+
 
 }
 
