@@ -933,7 +933,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </div>
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addLocationDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Locatie toevoegen</DialogTitle>
           </DialogHeader>
@@ -944,7 +944,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               onChange={(e) => setNewLocationName(e.target.value)}
               placeholder="Bijv. Sporthal Centrum"
               onKeyDown={(e) => e.key === "Enter" && addLocation()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -955,7 +954,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddCategory} onOpenChange={setShowAddCategory}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addCategoryDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Divisie toevoegen</DialogTitle>
           </DialogHeader>
@@ -966,7 +965,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Bijv. U13, Seniors"
               onKeyDown={(e) => e.key === "Enter" && addCategory()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -977,7 +975,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddMatchDay} onOpenChange={setShowAddMatchDay}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addMatchDayDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Wedstrijddag toevoegen</DialogTitle>
             <DialogDescription>Kies een datum waarop er gespeeld wordt.</DialogDescription>
@@ -988,7 +986,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={newMatchDay}
               onChange={(date) => setNewMatchDay(date)}
               placeholder="Kies een datum"
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -999,7 +996,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddPeriod} onOpenChange={setShowAddPeriod}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addPeriodDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Periode toevoegen</DialogTitle>
             <DialogDescription>Alle dagen binnen deze periode worden toegevoegd als extra wedstrijddagen.</DialogDescription>
@@ -1011,7 +1008,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 value={periodStart}
                 onChange={(date) => setPeriodStart(date)}
                 placeholder="Startdatum"
-                autoFocus
               />
             </div>
             <div className="space-y-1">
