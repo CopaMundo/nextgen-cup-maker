@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getFieldLocation } from "@/lib/fieldLocations";
 
 const publicScheduleLocationKey = (token: string) => `public-schedule-location:${token}`;
-const publicScheduleDayKey = (token: string) => `public-schedule-day:${token}`;
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
@@ -26,10 +25,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     const stored = localStorage.getItem(publicScheduleLocationKey(token));
     return stored && validLocationNames.includes(stored) ? stored : "";
   });
-  const [selectedDate, setSelectedDateState] = useState<string>(() => {
-    if (typeof window === "undefined" || !token) return "";
-    return localStorage.getItem(publicScheduleDayKey(token)) || "";
-  });
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
   const setLocationFilter = (value: string) => {
@@ -37,13 +33,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     if (typeof window !== "undefined" && token) {
       if (value) localStorage.setItem(publicScheduleLocationKey(token), value);
       else localStorage.removeItem(publicScheduleLocationKey(token));
-    }
-  };
-  const setSelectedDate = (value: string) => {
-    setSelectedDateState(value);
-    if (typeof window !== "undefined" && token) {
-      if (value) localStorage.setItem(publicScheduleDayKey(token), value);
-      else localStorage.removeItem(publicScheduleDayKey(token));
     }
   };
 
