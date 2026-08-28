@@ -44,7 +44,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return stored && validLocationNames.includes(stored) ? stored : "";
   });
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const dateObserverRef = useRef<IntersectionObserver | null>(null);
 
   const setLocationFilter = (value: string) => {
     setLocationFilterState(value);
