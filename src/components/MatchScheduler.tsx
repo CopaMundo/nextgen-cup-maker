@@ -21,6 +21,7 @@ import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee } from "@/lib/refereeConfig";
+import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel } from "@/lib/fieldLocations";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -571,18 +572,27 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
       if (catRow) {
         const savedFields = catRow.fields as any;
         if (Array.isArray(savedFields) && savedFields.length > 0) {
-          catFields = savedFields.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" }));
+          catFields = parseFieldEntries(savedFields);
         }
         catReferees = parseReferees(catRow.referees);
       }
     } else {
       const saved = tournament.fields as any;
       if (Array.isArray(saved) && saved.length > 0) {
-        catFields = saved.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" }));
+        catFields = parseFieldEntries(saved);
       }
       catReferees = parseReferees(tournament.referees);
     }
     setFields(catFields);
+    const { data: locRows } = await supabase
+      .from("tournament_locations")
+      .select("id, name")
+      .eq("tournament_id", tournamentId)
+      .order("sort_order");
+    const locList = (locRows || []) as { id: string; name: string }[];
+    setLocations(locList);
+    registerFieldLocations([catFields], locList);
+    setSelectedLocation(prev => (prev && locList.some(l => l.name === prev) ? prev : null));
     setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
@@ -667,27 +677,32 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   // === FIELD MANAGEMENT ===
   const saveFields = async (updated: FieldConfig[]) => {
+    const payload = serializeFieldEntries(updated as any) as any;
     if (categoryId) {
-      await supabase.from("tournament_categories").update({ fields: updated as any }).eq("id", categoryId);
+      await supabase.from("tournament_categories").update({ fields: payload }).eq("id", categoryId);
     } else {
-      await supabase.from("tournaments").update({ fields: updated as any }).eq("id", tournamentId);
+      await supabase.from("tournaments").update({ fields: payload }).eq("id", tournamentId);
     }
     setFields(updated);
+    registerFieldLocations([updated], locations);
   };
+  /** Standaardlocatie voor een nieuw veld: de gekozen locatie, of de enige locatie. */
+  const defaultFieldLocation = () => selectedLocation ?? (locations.length === 1 ? locations[0].name : null);
   const addField = async () => {
     const fieldNum = fields.length + 1;
-    const newField: FieldConfig = { name: `Veld ${fieldNum}`, startTime: "09:00" };
+    const newField: FieldConfig = { name: `Veld ${fieldNum}`, startTime: "09:00", location: defaultFieldLocation() };
     const updated = [...fields, newField];
     await saveFields(updated);
     toast({ title: `Veld ${fieldNum} toegevoegd` });
   };
   const addFieldFromDialog = async () => {
     const name = newFieldName.trim() || `Veld ${fields.length + 1}`;
-    const newField: FieldConfig = { name, startTime: newFieldStartTime };
+    const newField: FieldConfig = { name, startTime: newFieldStartTime, location: newFieldLocation ?? defaultFieldLocation() };
     const updated = [...fields, newField];
     await saveFields(updated);
     setShowAddFieldDialog(false);
     setNewFieldName("");
+    setNewFieldLocation(null);
     setNewFieldStartTime("09:00");
     toast({ title: `${name} toegevoegd` });
   };
@@ -752,7 +767,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const importFieldsFrom = async (catId: string) => {
     const cat = allCategories.find(c => c.id === catId);
     if (!cat) return;
-    const imported = Array.isArray(cat.fields) ? cat.fields.map((f: any) => ({ name: f.name || f, startTime: f.startTime || "09:00" })) : [];
+    const imported = parseFieldEntries(cat.fields);
     if (imported.length === 0) { toast({ title: "Deze divisie heeft geen velden", variant: "destructive" }); return; }
     await saveFields(imported);
     setShowImportFields(false);
@@ -1008,7 +1023,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === PLANNER HELPERS ===
-  const plannerFields = fields;
+  const plannerFields = selectedLocation
+    ? fields.filter(f => (f.location || null) === selectedLocation)
+    : fields;
 
   const getFieldTimeSlots = (field: FieldConfig) => {
     const result: { time: string; minuteStart: number }[] = [];
@@ -2704,7 +2721,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                 <h4 className="font-display text-sm font-bold text-foreground">{field.name}</h4>
                                 <div className="flex items-center gap-2">
                                   <button
-                                    onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: field.name, startTime: field.startTime ?? "" }); setEditFieldIdx(fields.indexOf(field)); }}
+                                    onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: field.name, startTime: field.startTime ?? "", location: field.location ?? null }); setEditFieldIdx(fields.indexOf(field)); }}
                                     className="text-muted-foreground hover:text-foreground"
                                   >
                                     <Pencil className="h-3 w-3" />
@@ -2717,7 +2734,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                   </button>
                                 </div>
                               </div>
-                              <p className="text-[10px] text-muted-foreground">{field.startTime}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                {locations.length > 1 && field.location ? `${field.location} · ${field.startTime}` : field.startTime}
+                              </p>
                               {isMobile && mobileSelectedMatchId && (
                                 <span className="text-[9px] text-primary font-medium">Tap om hier te plaatsen</span>
                               )}
@@ -3629,6 +3648,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
               <Label className="text-sm">Naam</Label>
               <Input value={newFieldName} onChange={(e) => setNewFieldName(e.target.value)} placeholder={`Veld ${fields.length + 1}`} className="h-9" />
             </div>
+            {locations.length > 1 && (
+              <div className="space-y-1">
+                <Label className="text-sm">Locatie</Label>
+                <Select value={newFieldLocation ?? defaultFieldLocation() ?? "__none"} onValueChange={(v) => setNewFieldLocation(v === "__none" ? null : v)}>
+                  <SelectTrigger className="h-9"><SelectValue placeholder="Kies locatie" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none">Geen locatie</SelectItem>
+                    {locations.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-1">
               <Label className="text-sm">Starttijd</Label>
               <TimePicker value={newFieldStartTime} onChange={(v) => setNewFieldStartTime(v)} className="h-9" />
