@@ -123,6 +123,10 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         if (el.getBoundingClientRect().top <= headerHeight + 60) active = date;
         else break;
       }
+      // Bij volledig naar beneden gescrold (of te korte laatste sectie): laatste dag actief.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+        active = allDates[allDates.length - 1];
+      }
       setSelectedDate(prev => (prev === active ? prev : active));
     };
     updateActiveDate();

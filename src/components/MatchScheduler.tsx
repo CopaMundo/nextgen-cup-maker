@@ -3553,7 +3553,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       <Dialog open={!!editMatchId} onOpenChange={(open) => { if (!open) setEditMatchId(null); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm">Wedstrijd bewerken</DialogTitle>
+            <DialogTitle>Wedstrijd bewerken</DialogTitle>
           </DialogHeader>
           {editMatchId && (() => {
             const m = matches.find(x => x.id === editMatchId);
@@ -3567,9 +3567,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   {getMatchLabel(m.home_team_id, m.home_slot_label)} vs {getMatchLabel(m.away_team_id, m.away_slot_label)}
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">Scheidsrechter</Label>
+                  <Label className="text-sm">Scheidsrechter</Label>
                   <Select value={editMatchReferee || "__none__"} onValueChange={(v) => setEditMatchReferee(v === "__none__" ? "" : v)}>
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-9">
                       <SelectValue placeholder="Kies scheidsrechter" />
                     </SelectTrigger>
                     <SelectContent>
@@ -3579,37 +3579,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       ))}
                     </SelectContent>
                   </Select>
-                  {showEditMatchNewRef ? (
-                    <div className="flex items-center gap-2 pt-1">
-                      <Input
-                        autoFocus
-                        value={editMatchNewRef}
-                        onChange={(e) => setEditMatchNewRef(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRefereeFromMatchDialog(); } }}
-                        placeholder="Naam scheidsrechter"
-                        className="h-8 text-xs"
-                      />
-                      <Button size="sm" className="h-8 text-xs" onClick={addRefereeFromMatchDialog} disabled={!editMatchNewRef.trim()}>Toevoegen</Button>
-                    </div>
-                  ) : (
-                    <Button size="sm" variant="outline" className="h-7 text-xs mt-1" onClick={() => setShowEditMatchNewRef(true)}>
-                      + Scheidsrechter
-                    </Button>
-                  )}
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">Aangepaste wedstrijdduur (min)</Label>
+                  <Label className="text-sm">Aangepaste wedstrijdduur (min)</Label>
                   <Input
                     type="number"
                     min={1}
                     value={editMatchDuration}
                     onChange={(e) => setEditMatchDuration(e.target.value)}
                     placeholder={String(defaultDur)}
-                    className="h-8 text-xs"
+                    className="h-9"
                   />
                   <p className="text-[11px] text-muted-foreground">Leeg = standaardduur ({defaultDur} min).</p>
                 </div>
-                <Button size="sm" onClick={saveMatchEdit} className="w-full">Opslaan</Button>
+                <div className="flex gap-2 justify-end">
+                  <Button onClick={saveMatchEdit} className="text-xs">Opslaan</Button>
+                </div>
               </div>
             );
           })()}
