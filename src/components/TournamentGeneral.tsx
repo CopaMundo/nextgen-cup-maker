@@ -1147,7 +1147,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Match Day Dialog */}
       <Dialog open={editMatchDayIdx !== null} onOpenChange={(open) => !open && setEditMatchDayIdx(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editMatchDayDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Wedstrijddag bewerken</DialogTitle>
             <DialogDescription>Pas de datum aan.</DialogDescription>
@@ -1175,7 +1175,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Period Dialog */}
       <Dialog open={editPeriodIdx !== null} onOpenChange={(open) => !open && setEditPeriodIdx(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editPeriodDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Periode bewerken</DialogTitle>
             <DialogDescription>Pas de start- en einddatum aan.</DialogDescription>
