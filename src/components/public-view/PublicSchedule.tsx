@@ -84,14 +84,20 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return (a.field || "").localeCompare(b.field || "");
   });
 
-  const firstUnplayedIndex = sorted.findIndex(m => !m.is_played);
-  const playedMatches = firstUnplayedIndex === -1 ? sorted : sorted.slice(0, firstUnplayedIndex);
-  const nextMatch = firstUnplayedIndex === -1 ? null : sorted[firstUnplayedIndex];
-  const upcomingMatches = firstUnplayedIndex === -1 ? [] : sorted.slice(firstUnplayedIndex + 1);
+  const firstUnplayedId = sorted.find(m => !m.is_played)?.id || null;
+  const { timeslots, uniqueDates } = groupIntoTimeslots(sorted);
+  const allDates = uniqueDates;
+  const didInitialPosition = useRef(false);
 
-  const { timeslots: playedTimeslots, uniqueDates: playedDates } = groupIntoTimeslots(playedMatches);
-  const { timeslots: upcomingTimeslots, uniqueDates: upcomingDates } = groupIntoTimeslots(upcomingMatches);
-  const allDates = [...new Set([...playedDates, ...upcomingDates])].filter(Boolean);
+  // Bij laden: één keer direct (zonder animatie) op de eerstvolgende wedstrijd staan, gecentreerd.
+  useEffect(() => {
+    if (didInitialPosition.current) return;
+    if (!firstUnplayedId) return;
+    const el = document.querySelector(`[data-match-id="${firstUnplayedId}"]`);
+    if (!el) return;
+    didInitialPosition.current = true;
+    el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+  }, [firstUnplayedId]);
 
   const formatDate = (d: string) => {
     if (!d) return "Geen datum";
