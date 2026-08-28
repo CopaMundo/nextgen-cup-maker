@@ -41,6 +41,7 @@ const DialogContent = React.forwardRef<
         if (event.defaultPrevented) return;
         event.preventDefault();
         const content = event.currentTarget;
+        if (!(content instanceof HTMLElement)) return;
         window.setTimeout(() => focusFirstDialogField(content), 0);
         window.setTimeout(() => focusFirstDialogField(content), 60);
       }}
