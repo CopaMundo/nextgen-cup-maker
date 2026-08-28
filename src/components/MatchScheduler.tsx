@@ -592,7 +592,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
     const locList = (locRows || []) as { id: string; name: string }[];
     setLocations(locList);
     registerFieldLocations([catFields], locList);
-    setSelectedLocation(prev => (prev === "__unassigned" || (prev && locList.some(l => l.name === prev)) ? prev : null));
+    setSelectedLocation(prev =>
+      prev && locList.some(l => l.name === prev) ? prev : (locList[0]?.name ?? null)
+    );
     setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
