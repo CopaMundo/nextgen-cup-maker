@@ -202,7 +202,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         ref={headerRef}
         className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 space-y-1.5 bg-background/95 backdrop-blur-sm border-b border-border/30"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 h-9">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Schema</h2>
           <div className={ds(bStyle, "sectionLine")} />

@@ -194,7 +194,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
   return (
     <div className="px-3 pb-4">
       <div className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 bg-background/95 backdrop-blur-sm border-b border-border/30">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 h-9">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Teams</h2>
           <div className={ds(bStyle, "sectionLine")} />

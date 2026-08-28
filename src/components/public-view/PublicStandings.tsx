@@ -144,7 +144,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
       {/* Sticky header: title, phases, subformats */}
       <div className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 space-y-3 bg-background/95 backdrop-blur-sm border-b border-border/30">
         {/* Section header with stats toggle icon (icon at far right) */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 h-9">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>
             {subTab === "standings" ? "Standen" : "Statistieken"}
