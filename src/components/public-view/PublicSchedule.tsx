@@ -122,21 +122,31 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                 {formatDate(date)}
               </div>
               {allDates.length > 1 && (
-                <Select value={selectedDate || allDates[0]} onValueChange={(v) => { setSelectedDate(v); jumpToDate(v); }}>
-                  <SelectTrigger
-                    aria-label="Kies dag"
-                    className="shrink-0 h-6 w-auto min-w-[90px] max-w-[140px] text-[10px] font-black uppercase tracking-wider bg-transparent border-border"
-                  >
-                    <SelectValue placeholder="Kies dag" />
-                  </SelectTrigger>
-                  <SelectContent align="start">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Kies dag"
+                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md border border-border bg-transparent text-foreground hover:bg-secondary/50"
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="z-50">
                     {allDates.map(d => (
-                      <SelectItem key={d} value={d} className="text-xs font-bold uppercase">
+                      <DropdownMenuItem
+                        key={d}
+                        onClick={() => {
+                          setSelectedDate(d);
+                          jumpToDate(d);
+                        }}
+                        className="text-xs font-bold uppercase"
+                      >
                         {formatDate(d)}
-                      </SelectItem>
+                      </DropdownMenuItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
               {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
             </div>
