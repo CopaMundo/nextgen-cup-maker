@@ -3684,6 +3684,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                 <Label className="text-sm">Naam</Label>
                 <Input value={editFieldDraft.name} onChange={(e) => setEditFieldDraft(d => ({ ...d, name: e.target.value }))} className="h-9" />
               </div>
+              {locations.length > 1 && (
+                <div className="space-y-1">
+                  <Label className="text-sm">Locatie</Label>
+                  <Select value={editFieldDraft.location ?? "__none"} onValueChange={(v) => setEditFieldDraft(d => ({ ...d, location: v === "__none" ? null : v }))}>
+                    <SelectTrigger className="h-9"><SelectValue placeholder="Kies locatie" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none">Geen locatie</SelectItem>
+                      {locations.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="space-y-1">
                 <Label className="text-sm">Starttijd</Label>
                 <TimePicker value={editFieldDraft.startTime} onChange={(v) => setEditFieldDraft(d => ({ ...d, startTime: v }))} className="h-9" />
