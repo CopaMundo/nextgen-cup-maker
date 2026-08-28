@@ -18,6 +18,7 @@ import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, MatchDa
 import TiebreakerManager from "./TiebreakerManager";
 import ScoringSystemsManager from "./ScoringSystemsManager";
 import { DatePicker } from "@/components/ui/datepicker";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -98,18 +99,24 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [editCatName, setEditCatName] = useState("");
+  const editCategoryDialogRef = useDialogFocus(!!editingCatId);
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [editLocName, setEditLocName] = useState("");
+  const editLocationDialogRef = useDialogFocus(!!editingLocId);
 
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
+  const addLocationDialogRef = useDialogFocus(showAddLocation);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const addCategoryDialogRef = useDialogFocus(showAddCategory);
   const [showAddMatchDay, setShowAddMatchDay] = useState(false);
   const [newMatchDay, setNewMatchDay] = useState("");
+  const addMatchDayDialogRef = useDialogFocus(showAddMatchDay);
   const [showAddPeriod, setShowAddPeriod] = useState(false);
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
+  const addPeriodDialogRef = useDialogFocus(showAddPeriod);
 
   const [deleteLocId, setDeleteLocId] = useState<string | null>(null);
   const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
@@ -121,15 +128,19 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   // Edit name/description dialogs
   const [showEditName, setShowEditName] = useState(false);
   const [editName, setEditName] = useState("");
+  const editNameDialogRef = useDialogFocus(showEditName);
   const [showEditDesc, setShowEditDesc] = useState(false);
   const [editDesc, setEditDesc] = useState("");
+  const editDescDialogRef = useDialogFocus(showEditDesc);
 
   // Edit match day/period
   const [editMatchDayIdx, setEditMatchDayIdx] = useState<number | null>(null);
   const [editMatchDayValue, setEditMatchDayValue] = useState("");
+  const editMatchDayDialogRef = useDialogFocus(editMatchDayIdx !== null);
   const [editPeriodIdx, setEditPeriodIdx] = useState<number | null>(null);
   const [editPeriodStart, setEditPeriodStart] = useState("");
   const [editPeriodEnd, setEditPeriodEnd] = useState("");
+  const editPeriodDialogRef = useDialogFocus(editPeriodIdx !== null);
   const [deleteMatchDayIdx, setDeleteMatchDayIdx] = useState<number | null>(null);
   const [showEsportWarning, setShowEsportWarning] = useState(false);
   const [showSportPicker, setShowSportPicker] = useState(false);
@@ -922,7 +933,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </div>
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addLocationDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Locatie toevoegen</DialogTitle>
           </DialogHeader>
@@ -933,7 +944,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               onChange={(e) => setNewLocationName(e.target.value)}
               placeholder="Bijv. Sporthal Centrum"
               onKeyDown={(e) => e.key === "Enter" && addLocation()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -944,7 +954,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddCategory} onOpenChange={setShowAddCategory}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addCategoryDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Divisie toevoegen</DialogTitle>
           </DialogHeader>
@@ -955,7 +965,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Bijv. U13, Seniors"
               onKeyDown={(e) => e.key === "Enter" && addCategory()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -966,7 +975,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddMatchDay} onOpenChange={setShowAddMatchDay}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addMatchDayDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Wedstrijddag toevoegen</DialogTitle>
             <DialogDescription>Kies een datum waarop er gespeeld wordt.</DialogDescription>
@@ -977,7 +986,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={newMatchDay}
               onChange={(date) => setNewMatchDay(date)}
               placeholder="Kies een datum"
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -988,7 +996,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddPeriod} onOpenChange={setShowAddPeriod}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={addPeriodDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Periode toevoegen</DialogTitle>
             <DialogDescription>Alle dagen binnen deze periode worden toegevoegd als extra wedstrijddagen.</DialogDescription>
@@ -1000,7 +1008,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 value={periodStart}
                 onChange={(date) => setPeriodStart(date)}
                 placeholder="Startdatum"
-                autoFocus
               />
             </div>
             <div className="space-y-1">
@@ -1059,7 +1066,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </AlertDialog>
 
       <Dialog open={!!editingCatId} onOpenChange={(open) => !open && setEditingCatId(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editCategoryDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Divisie bewerken</DialogTitle>
           </DialogHeader>
@@ -1069,7 +1076,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editCatName}
               onChange={(e) => setEditCatName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && saveCategoryRename()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1080,7 +1086,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={!!editingLocId} onOpenChange={(open) => !open && setEditingLocId(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editLocationDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Locatie bewerken</DialogTitle>
           </DialogHeader>
@@ -1090,7 +1096,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editLocName}
               onChange={(e) => setEditLocName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && saveLocationRename()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1102,7 +1107,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Name Dialog */}
       <Dialog open={showEditName} onOpenChange={setShowEditName}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editNameDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Toernooinaam</DialogTitle>
           </DialogHeader>
@@ -1111,7 +1116,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") { saveToDb({ name: editName }); setShowEditName(false); } }}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1123,7 +1127,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Description Dialog */}
       <Dialog open={showEditDesc} onOpenChange={setShowEditDesc}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent ref={editDescDialogRef} className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Beschrijving</DialogTitle>
           </DialogHeader>
@@ -1132,7 +1136,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
               rows={10}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1144,7 +1147,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Match Day Dialog */}
       <Dialog open={editMatchDayIdx !== null} onOpenChange={(open) => !open && setEditMatchDayIdx(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editMatchDayDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Wedstrijddag bewerken</DialogTitle>
             <DialogDescription>Pas de datum aan.</DialogDescription>
@@ -1172,7 +1175,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Period Dialog */}
       <Dialog open={editPeriodIdx !== null} onOpenChange={(open) => !open && setEditPeriodIdx(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editPeriodDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Periode bewerken</DialogTitle>
             <DialogDescription>Pas de start- en einddatum aan.</DialogDescription>

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { CheckCircle2, RotateCcw, BarChart3, ChevronDown, ChevronRight, ChevronUp, Plus, Minus, MapPin, ListOrdered, Users } from "lucide-react";
 import rankingPodium from "@/assets/ranking-podium.png";
 import WhistleIcon from "@/components/icons/WhistleIcon";
@@ -111,6 +112,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
   const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
   const [savingAssign, setSavingAssign] = useState(false);
+  const assignMatchDialogRef = useDialogFocus(!!assigningMatchId);
   const { toast } = useToast();
 
 
@@ -2307,7 +2309,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Teams wijzigen aan een wedstrijd */}
       <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
-        <DialogContent className="max-w-md">
+        <DialogContent ref={assignMatchDialogRef} className="max-w-md">
           <DialogHeader>
             <DialogTitle>Teams wijzigen</DialogTitle>
             <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>

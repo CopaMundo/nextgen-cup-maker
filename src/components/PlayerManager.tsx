@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Pencil, Upload, User } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
@@ -41,22 +42,10 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const { toast } = useToast();
   const [deletePlayerId, setDeletePlayerId] = useState<string | null>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const editNameInputRef = useRef<HTMLInputElement>(null);
+  const addDialogRef = useDialogFocus(showAdd);
+  const editDialogRef = useDialogFocus(!!editingId);
 
   useEffect(() => { fetchPlayers(); }, [teamId]);
-
-  useEffect(() => {
-    if (showAdd) {
-      setTimeout(() => nameInputRef.current?.focus(), 0);
-    }
-  }, [showAdd]);
-
-  useEffect(() => {
-    if (editingId) {
-      setTimeout(() => editNameInputRef.current?.focus(), 0);
-    }
-  }, [editingId]);
 
   const fetchPlayers = async () => {
     const { data } = await supabase
@@ -194,12 +183,12 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
     <div className="space-y-3">
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => { setShowAdd(false); setPhotoFile(null); }}>
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div ref={addDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Speler toevoegen</h3>
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs">Naam *</Label>
-                <Input ref={nameInputRef} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Bijv. Jan Janssen" />
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Bijv. Jan Janssen" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -279,12 +268,12 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
 
       {editingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setEditingId(null)}>
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div ref={editDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Speler bewerken</h3>
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs">Naam *</Label>
-                <Input ref={editNameInputRef} value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
+                <Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">

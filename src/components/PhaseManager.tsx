@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -55,6 +56,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
   const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null);
   const [editPhaseNumber, setEditPhaseNumber] = useState<number | null>(null);
   const [editPhaseLabel, setEditPhaseLabel] = useState("");
+  const addFormatDialogRef = useDialogFocus(showAddFormat !== null);
+  const editPhaseDialogRef = useDialogFocus(editPhaseNumber !== null);
   /** Labels voor fases die (nog) geen formats hebben; worden toegepast bij het eerste format. */
   const [pendingPhaseLabels, setPendingPhaseLabels] = useState<Record<number, string>>({});
   const [savingPhaseEdit, setSavingPhaseEdit] = useState(false);
@@ -1280,7 +1283,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           setNewFormatScoringSystemId(null);
         }
       }}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent ref={addFormatDialogRef} className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Format toevoegen{showAddFormat !== null && containers.some(c => c.phaseNumber === showAddFormat) ? ` aan Fase ${showAddFormat}` : ` — Fase ${showAddFormat}`}</DialogTitle>
           </DialogHeader>
@@ -1323,7 +1326,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
 
       {/* Edit phase dialog */}
       <Dialog open={editPhaseNumber !== null} onOpenChange={(open) => { if (!open) setEditPhaseNumber(null); }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent ref={editPhaseDialogRef} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Fase bewerken</DialogTitle>
           </DialogHeader>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Upload, Pencil } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
@@ -94,6 +95,7 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>;
 
   const editingSponsor = sponsors.find(s => s.id === editingId);
+  const editDialogRef = useDialogFocus(!!editingSponsor);
 
   return (
     <div className="space-y-6 w-full">
@@ -155,7 +157,7 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
       {/* Edit sponsor dialog */}
       {editingSponsor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setEditingId(null)}>
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div ref={editDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Sponsor bewerken</h3>
             <div className="flex justify-center">
               <label className="cursor-pointer relative group">

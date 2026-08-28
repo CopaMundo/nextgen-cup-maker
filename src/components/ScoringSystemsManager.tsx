@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +129,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   // Scoring edit dialog state
   const [scoringEditId, setScoringEditId] = useState<string | null>(null);
   const [scoringDraft, setScoringDraft] = useState<ScoringDraft | null>(null);
+  const scoringEditDialogRef = useDialogFocus(!!scoringEditId);
+  const tiebreakerDialogRef = useDialogFocus(!!tiebreakerEditId);
 
   // Confirmation alert state
   const [confirmAction, setConfirmAction] = useState<{
@@ -1041,7 +1044,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
       {/* Scoring Edit Dialog */}
       <Dialog open={!!scoringEditId} onOpenChange={(open) => { if (!open) { setScoringEditId(null); setScoringDraft(null); } }}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogContent ref={scoringEditDialogRef} className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{scoringDraft?.scoring_type === "sets" ? "Sets aanpassen" : "Puntentelling aanpassen"}</DialogTitle>
             <DialogDescription>
@@ -1394,7 +1397,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
       {/* Tiebreaker Edit Dialog */}
       <Dialog open={!!tiebreakerEditId} onOpenChange={(open) => { if (!open) setTiebreakerEditId(null); }}>
-        <DialogContent className="max-w-md">
+        <DialogContent ref={tiebreakerDialogRef} className="max-w-md">
           <DialogHeader>
             <DialogTitle>Criteria bij gelijke punten</DialogTitle>
             <DialogDescription>

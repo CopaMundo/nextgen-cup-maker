@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -74,6 +75,8 @@ const GroupManager = ({
   // Dialog state
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const createDialogRef = useDialogFocus(createOpen);
+  const editDialogRef = useDialogFocus(editOpen);
   const [dialogName, setDialogName] = useState("");
   const [dialogSlots, setDialogSlots] = useState(4);
   const [dialogMatchType, setDialogMatchType] = useState<MatchType>("single_leg");
@@ -941,7 +944,7 @@ const GroupManager = ({
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent ref={createDialogRef} className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{addLabel} toevoegen</DialogTitle>
           </DialogHeader>
@@ -985,7 +988,7 @@ const GroupManager = ({
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={(open) => { setEditOpen(open); if (!open) setEditingGroup(null); }}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent ref={editDialogRef} className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{addLabel} bewerken</DialogTitle>
           </DialogHeader>
