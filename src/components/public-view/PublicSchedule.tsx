@@ -44,6 +44,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return stored && validLocationNames.includes(stored) ? stored : "";
   });
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const dateObserverRef = useRef<IntersectionObserver | null>(null);
 
   const setLocationFilter = (value: string) => {
     setLocationFilterState(value);
@@ -104,6 +105,11 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
+  const formatDateShort = (d: string) => {
+    if (!d) return "Geen datum";
+    return new Date(d).toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short" });
+  };
+
   const jumpToDate = (date: string, behavior: ScrollBehavior = "smooth") => {
     const el = document.querySelector(`[data-schedule-date="${date}"]`);
     if (el) {
@@ -111,6 +117,34 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
       window.scrollTo({ top: Math.max(0, top), behavior });
     }
   };
+
+  // Track which date section is currently sticking at the header.
+  useEffect(() => {
+    if (!allDates.length) return;
+    if (dateObserverRef.current) {
+      dateObserverRef.current.disconnect();
+    }
+    dateObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length) {
+          const date = visible[0].target.getAttribute("data-schedule-date") || "";
+          setSelectedDate(date);
+        }
+      },
+      {
+        rootMargin: `-${headerHeight + 4}px 0px 0px 0px`,
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      }
+    );
+    allDates.forEach(date => {
+      const el = document.querySelector(`[data-schedule-date="${date}"]`);
+      if (el) dateObserverRef.current?.observe(el);
+    });
+    return () => dateObserverRef.current?.disconnect();
+  }, [allDates.join(","), headerHeight]);
 
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
