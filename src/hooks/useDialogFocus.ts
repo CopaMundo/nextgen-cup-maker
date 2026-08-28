@@ -20,6 +20,20 @@ export function useDialogFocus(open: boolean) {
       const firstField = container.querySelector<HTMLElement>(selector);
       if (firstField) {
         firstField.focus({ preventScroll: true });
+        // Empty field: caret at start. Field with value: caret behind the text.
+        // Date/time inputs keep their own select-all behaviour.
+        const el = firstField as HTMLInputElement | HTMLTextAreaElement;
+        const isDateOrTime =
+          el.tagName === "INPUT" &&
+          ["date", "time", "datetime-local", "month", "week"].includes((el as HTMLInputElement).type);
+        if (!isDateOrTime && typeof el.setSelectionRange === "function" && el.value) {
+          try {
+            const end = el.value.length;
+            el.setSelectionRange(end, end);
+          } catch {
+            // some input types don't support selection ranges
+          }
+        }
       }
     }, 0);
 
