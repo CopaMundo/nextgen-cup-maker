@@ -9,13 +9,52 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { getFieldLocation } from "@/lib/fieldLocations";
 
+const publicScheduleLocationKey = (token: string) => `public-schedule-location:${token}`;
+const publicScheduleDayKey = (token: string) => `public-schedule-day:${token}`;
+
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems, locations } = data;
   const bStyle = useBroadcastStyle();
-  const [locationFilter, setLocationFilter] = useState<string>("");
+  const token = tournament?.view_link_token || "";
+  const validLocationNames = (locations || []).map((l: any) => l.name);
+
+  const [locationFilter, setLocationFilterState] = useState<string>(() => {
+    if (typeof window === "undefined" || !token) return "";
+    const stored = localStorage.getItem(publicScheduleLocationKey(token));
+    return stored && validLocationNames.includes(stored) ? stored : "";
+  });
+  const [selectedDate, setSelectedDateState] = useState<string>(() => {
+    if (typeof window === "undefined" || !token) return "";
+    return localStorage.getItem(publicScheduleDayKey(token)) || "";
+  });
+  const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
+
+  const setLocationFilter = (value: string) => {
+    setLocationFilterState(value);
+    if (typeof window !== "undefined" && token) {
+      if (value) localStorage.setItem(publicScheduleLocationKey(token), value);
+      else localStorage.removeItem(publicScheduleLocationKey(token));
+    }
+  };
+  const setSelectedDate = (value: string) => {
+    setSelectedDateState(value);
+    if (typeof window !== "undefined" && token) {
+      if (value) localStorage.setItem(publicScheduleDayKey(token), value);
+      else localStorage.removeItem(publicScheduleDayKey(token));
+    }
+  };
+
+  // If the stored location no longer exists, fall back to all locations.
+  useEffect(() => {
+    if (locationFilter && !validLocationNames.includes(locationFilter)) {
+      setLocationFilterState("");
+      if (token) localStorage.removeItem(publicScheduleLocationKey(token));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validLocationNames.join(",")]);
 
   const hasMultiLocations = (locations?.length ?? 0) > 1;
   const visibleMatches = hasMultiLocations && locationFilter
@@ -52,20 +91,13 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
-
-  useEffect(() => {
-    if (!firstUnplayedMatchId) return;
-    const raf = requestAnimationFrame(() => {
-      setTimeout(() => {
-        const el = firstUnplayedRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const scrollY = window.scrollY + rect.top - 120;
-        window.scrollTo({ top: Math.max(0, scrollY), behavior: "instant" });
-      }, 100);
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [firstUnplayedMatchId]);
+  const jumpToDate = (date: string, behavior: ScrollBehavior = "smooth") => {
+    const el = document.querySelector(`[data-schedule-date="${date}"]`);
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior });
+    }
+  };
 
   useEffect(() => {
     const update = () => setHeaderHeight(headerRef.current?.offsetHeight || 56);
@@ -74,16 +106,31 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  // Initial scroll: prefer remembered day, otherwise first unplayed match.
+  useEffect(() => {
+    if (hasInitialScrolled || headerHeight === 0 || !sorted.length) return;
+    const raf = requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (selectedDate && uniqueDates.includes(selectedDate)) {
+          jumpToDate(selectedDate, "instant");
+        } else if (firstUnplayedMatchId) {
+          const el = firstUnplayedRef.current;
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            const scrollY = window.scrollY + rect.top - 120;
+            window.scrollTo({ top: Math.max(0, scrollY), behavior: "instant" });
+          }
+        }
+        setHasInitialScrolled(true);
+      }, 100);
+    });
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId, selectedDate, uniqueDates.join(",")]);
+
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  const jumpToDate = (date: string) => {
-    const el = document.querySelector(`[data-schedule-date="${date}"]`);
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
-      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    }
-  };
 
   return (
     <div className="px-3 pb-4">
