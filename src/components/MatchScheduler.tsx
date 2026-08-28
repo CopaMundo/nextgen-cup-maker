@@ -2780,7 +2780,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 </div>
                               </div>
                               <p className="text-[10px] text-muted-foreground">
-                                {locations.length > 1 && field.location ? `${field.location} · ${field.startTime}` : field.startTime}
+                                {field.startTime}
                               </p>
                               {isMobile && mobileSelectedMatchId && (
                                 <span className="text-[9px] text-primary font-medium">Tap om hier te plaatsen</span>
