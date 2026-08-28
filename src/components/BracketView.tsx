@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info } from "lucide-react";
@@ -149,6 +150,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const [matchSettingsMatchType, setMatchSettingsMatchType] = useState<"single_leg" | "home_away">("single_leg");
   const [matchSettingsEncounters, setMatchSettingsEncounters] = useState(1);
   const [matchSettingsScoringSystemId, setMatchSettingsScoringSystemId] = useState<string | null>(null);
+  const bracketNameDialogRef = useDialogFocus(editingBracketName !== null);
+  const roundNameDialogRef = useDialogFocus(editingRoundName !== null);
+  const matchSettingsDialogRef = useDialogFocus(matchSettingsOpen !== null);
   const [swappedTiers, setSwappedTiers] = useState<Set<string>>(new Set());
   const pickerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -3317,7 +3321,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       </AlertDialog>
 
       <Dialog open={!!matchSettingsOpen} onOpenChange={(open) => { if (!open) setMatchSettingsOpen(null); }}>
-        <DialogContent className="sm:max-w-md" onClick={e => e.stopPropagation()}>
+        <DialogContent ref={matchSettingsDialogRef} className="sm:max-w-md" onClick={e => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Wedstrijd instellingen</DialogTitle>
           </DialogHeader>
@@ -3418,7 +3422,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
       {/* Bracket name edit dialog */}
       <Dialog open={!!editingBracketName} onOpenChange={(open) => { if (!open) setEditingBracketName(null); }}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={bracketNameDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Naam bewerken</DialogTitle>
           </DialogHeader>
@@ -3436,7 +3440,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
       {/* Round name edit dialog */}
       <Dialog open={!!editingRoundName} onOpenChange={(open) => { if (!open) setEditingRoundName(null); }}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={roundNameDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Rondenaam bewerken</DialogTitle>
           </DialogHeader>

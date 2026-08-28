@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Pencil, Trash2, Download } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
@@ -48,6 +49,9 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [otherCategories, setOtherCategories] = useState<{ id: string; name: string; referees: RefereeConfig[] }[]>([]);
+  const addDialogRef = useDialogFocus(showAdd);
+  const editDialogRef = useDialogFocus(editIdx !== null);
+  const importDialogRef = useDialogFocus(showImport);
 
   useEffect(() => {
     fetchAll();
@@ -322,10 +326,10 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogContent className="max-w-sm">
+        <DialogContent ref={addDialogRef} className="max-w-sm">
           <DialogHeader><DialogTitle>Scheidsrechter toevoegen</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam scheidsrechter" onKeyDown={(e) => e.key === "Enter" && addReferee()} autoFocus />
+            <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam scheidsrechter" onKeyDown={(e) => e.key === "Enter" && addReferee()} />
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
               <Button onClick={addReferee} className="bg-foreground text-background hover:bg-foreground/90">Toevoegen</Button>
@@ -336,14 +340,14 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
       {/* Edit dialog */}
       <Dialog open={editIdx !== null} onOpenChange={(open) => { if (!open) closeEdit(); }}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent ref={editDialogRef} className="max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Scheidsrechter bewerken</DialogTitle></DialogHeader>
           {draft && (
             <div className="space-y-5">
               {/* Naam */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold uppercase tracking-wide">Naam</Label>
-                <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Naam scheidsrechter" autoFocus />
+                <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Naam scheidsrechter" />
               </div>
 
               {/* Locaties en velden */}

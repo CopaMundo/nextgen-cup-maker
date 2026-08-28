@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry } from "@/lib/dateUtils";
 import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
@@ -345,6 +346,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [globalBreakDuration, setGlobalBreakDuration] = useState(tournament.break_duration || 5);
   const [loading, setLoading] = useState(true);
   const [showDurationDialog, setShowDurationDialog] = useState(false);
+  const durationDialogRef = useDialogFocus(showDurationDialog);
   const [perFormatDurationEnabled, setPerFormatDurationEnabled] = useState(() => {
     return phases.some(p => {
       const cfg = (p.match_config as any) || {};
@@ -371,6 +373,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   // UI toggles
   const [showRefAdd, setShowRefAdd] = useState(false);
   const [newRef, setNewRef] = useState("");
+  const addFieldDialogRef = useDialogFocus(showAddFieldDialog);
+  const editFieldDialogRef = useDialogFocus(editFieldIdx !== null);
+  const addRefDialogRef = useDialogFocus(showRefAdd);
+  const editRefDialogRef = useDialogFocus(editRefIdx !== null);
 
   // Planner state
   const [plannerDate, setPlannerDateRaw] = useState<string>(() => {
@@ -446,6 +452,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
   const [pauzeModalDuration, setPauzeModalDuration] = useState(20);
+  const pauzeDialogRef = useDialogFocus(!!showPauzeModal);
 
   const setPlannerDate = (date: string) => {
     setPlannerDateRaw(date);
@@ -2524,7 +2531,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
             }
             setShowDurationDialog(open);
           }}>
-            <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
+            <DialogContent ref={durationDialogRef} className="sm:max-w-md max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Wedstrijdduur</DialogTitle>
               </DialogHeader>
@@ -3490,12 +3497,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Scheidsrechter toevoegen dialog */}
       <Dialog open={showRefAdd} onOpenChange={(open) => { if (!open) { setShowRefAdd(false); setNewRef(""); } }}>
-        <DialogContent className="max-w-xs">
+        <DialogContent ref={addRefDialogRef} className="max-w-xs">
           <DialogHeader>
             <DialogTitle className="text-sm">Scheidsrechter toevoegen</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam" className="h-9 text-sm" onKeyDown={(e) => e.key === "Enter" && addReferee()} autoFocus />
+            <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam" className="h-9 text-sm" onKeyDown={(e) => e.key === "Enter" && addReferee()} />
             <Button size="sm" onClick={addReferee} disabled={!newRef.trim()} className="w-full">Toevoegen</Button>
           </div>
         </DialogContent>
@@ -3503,12 +3510,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Scheidsrechter bewerken dialog */}
       <Dialog open={editRefIdx !== null} onOpenChange={(open) => { if (!open) { setEditRefIdx(null); setEditRefName(""); } }}>
-        <DialogContent className="max-w-xs">
+        <DialogContent ref={editRefDialogRef} className="max-w-xs">
           <DialogHeader>
             <DialogTitle className="text-sm">Scheidsrechter bewerken</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <Input value={editRefName} onChange={(e) => setEditRefName(e.target.value)} placeholder="Naam" className="h-9 text-sm" onKeyDown={(e) => e.key === "Enter" && editReferee()} autoFocus />
+            <Input value={editRefName} onChange={(e) => setEditRefName(e.target.value)} placeholder="Naam" className="h-9 text-sm" onKeyDown={(e) => e.key === "Enter" && editReferee()} />
             <Button size="sm" onClick={editReferee} disabled={!editRefName.trim()} className="w-full">Opslaan</Button>
           </div>
         </DialogContent>
@@ -3581,7 +3588,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Pauze toevoegen modal */}
       <Dialog open={!!showPauzeModal} onOpenChange={(open) => { if (!open) setShowPauzeModal(null); }}>
-        <DialogContent className="max-w-sm">
+        <DialogContent ref={pauzeDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Pauze toevoegen</DialogTitle>
           </DialogHeader>
@@ -3607,7 +3614,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Add field dialog */}
       <Dialog open={showAddFieldDialog} onOpenChange={setShowAddFieldDialog}>
-        <DialogContent className="max-w-sm">
+        <DialogContent ref={addFieldDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Veld toevoegen</DialogTitle>
           </DialogHeader>
@@ -3630,7 +3637,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Edit field dialog */}
       <Dialog open={editFieldIdx !== null} onOpenChange={(open) => { if (!open) setEditFieldIdx(null); }}>
-        <DialogContent className="max-w-sm">
+        <DialogContent ref={editFieldDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Veld bewerken</DialogTitle>
           </DialogHeader>

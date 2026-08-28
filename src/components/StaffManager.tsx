@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Upload, User, Pencil } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
@@ -30,6 +31,8 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const { toast } = useToast();
   const [deleteStaffId, setDeleteStaffId] = useState<string | null>(null);
+  const addDialogRef = useDialogFocus(showAdd);
+  const editDialogRef = useDialogFocus(!!editingId);
 
   useEffect(() => { fetchStaff(); }, [teamId]);
 
@@ -103,7 +106,7 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
       {/* Add staff modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => { setShowAdd(false); setPhotoFile(null); }}>
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div ref={addDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Stafflid toevoegen</h3>
             <div className="space-y-3">
               <div className="space-y-1">
@@ -178,7 +181,7 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
       {/* Edit staff dialog */}
       {editingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setEditingId(null)}>
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div ref={editDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Stafflid bewerken</h3>
             <div className="space-y-3">
               <div className="space-y-1">

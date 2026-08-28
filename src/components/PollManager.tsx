@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, BarChart3, X } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -33,6 +34,7 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
   const [showAdd, setShowAdd] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { toast } = useToast();
+  const addDialogRef = useDialogFocus(showAdd);
 
   useEffect(() => { fetchData(); }, [tournamentId]);
 
@@ -156,7 +158,7 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
       {/* Add poll modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowAdd(false)}>
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div ref={addDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Poll toevoegen</h3>
             <div className="space-y-1">
               <Label className="text-xs">Vraag</Label>
