@@ -10,8 +10,7 @@ export function useDialogFocus(open: boolean) {
   useEffect(() => {
     if (!open || !ref.current) return;
 
-    // Wait until the dialog content is rendered and any Radix focus trap settled.
-    const timer = setTimeout(() => {
+    const placeCaret = () => {
       const container = ref.current;
       if (!container) return;
 
@@ -20,12 +19,11 @@ export function useDialogFocus(open: boolean) {
       const firstField = container.querySelector<HTMLElement>(selector);
       if (firstField) {
         firstField.focus({ preventScroll: true });
-        // Empty field: caret at start. Field with value: caret behind the text.
-        // Date/time inputs keep their own select-all behaviour.
         const el = firstField as HTMLInputElement | HTMLTextAreaElement;
         const isDateOrTime =
-          el.tagName === "INPUT" &&
-          ["date", "time", "datetime-local", "month", "week"].includes((el as HTMLInputElement).type);
+          el.dataset.dialogSelectAll === "true" ||
+          (el.tagName === "INPUT" &&
+            ["date", "time", "datetime-local", "month", "week"].includes((el as HTMLInputElement).type));
         if (!isDateOrTime && typeof el.setSelectionRange === "function" && el.value) {
           try {
             const end = el.value.length;
@@ -35,9 +33,16 @@ export function useDialogFocus(open: boolean) {
           }
         }
       }
-    }, 0);
+    };
 
-    return () => clearTimeout(timer);
+    // Run after both the custom dialog and Radix focus handling have settled.
+    const timer = window.setTimeout(placeCaret, 0);
+    const delayedTimer = window.setTimeout(placeCaret, 60);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(delayedTimer);
+    };
   }, [open]);
 
   return ref;

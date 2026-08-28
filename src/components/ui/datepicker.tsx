@@ -206,6 +206,7 @@ export function DatePicker({
           placeholder=""
           autoComplete="off"
           autoFocus={autoFocus}
+          data-dialog-select-all="true"
           aria-label={placeholder}
           className={cn(
             "h-full text-foreground",

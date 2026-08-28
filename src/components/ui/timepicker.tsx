@@ -194,6 +194,7 @@ export function TimePicker({
           onBlur={handleBlur}
           placeholder=""
           autoComplete="off"
+          data-dialog-select-all="true"
           aria-label={placeholder}
           className="h-full w-full pr-10 text-foreground"
         />
