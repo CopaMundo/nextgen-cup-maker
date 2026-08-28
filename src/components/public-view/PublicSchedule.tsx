@@ -106,6 +106,9 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
+  const scheduledCount = visibleMatches.filter(m => m.match_date).length;
+
   // Initial scroll: prefer remembered day, otherwise first unplayed match.
   useEffect(() => {
     if (hasInitialScrolled || headerHeight === 0 || !sorted.length) return;
@@ -128,8 +131,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId, selectedDate, uniqueDates.join(",")]);
 
-  const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
-  const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
 
   return (
