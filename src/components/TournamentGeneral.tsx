@@ -128,15 +128,19 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   // Edit name/description dialogs
   const [showEditName, setShowEditName] = useState(false);
   const [editName, setEditName] = useState("");
+  const editNameDialogRef = useDialogFocus(showEditName);
   const [showEditDesc, setShowEditDesc] = useState(false);
   const [editDesc, setEditDesc] = useState("");
+  const editDescDialogRef = useDialogFocus(showEditDesc);
 
   // Edit match day/period
   const [editMatchDayIdx, setEditMatchDayIdx] = useState<number | null>(null);
   const [editMatchDayValue, setEditMatchDayValue] = useState("");
+  const editMatchDayDialogRef = useDialogFocus(editMatchDayIdx !== null);
   const [editPeriodIdx, setEditPeriodIdx] = useState<number | null>(null);
   const [editPeriodStart, setEditPeriodStart] = useState("");
   const [editPeriodEnd, setEditPeriodEnd] = useState("");
+  const editPeriodDialogRef = useDialogFocus(editPeriodIdx !== null);
   const [deleteMatchDayIdx, setDeleteMatchDayIdx] = useState<number | null>(null);
   const [showEsportWarning, setShowEsportWarning] = useState(false);
   const [showSportPicker, setShowSportPicker] = useState(false);
