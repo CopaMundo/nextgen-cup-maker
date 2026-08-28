@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { registerFieldLocations } from "@/lib/fieldLocations";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
@@ -163,6 +164,10 @@ const PublicView = () => {
       categories: catRes.data || [],
       scoringSystems: (ssRes as any).data || [],
     });
+    registerFieldLocations(
+      [(t as any).fields, ...((catRes.data || []) as any[]).map((c: any) => c.fields)],
+      (locRes.data || []) as any[]
+    );
     setLoading(false);
   };
 
