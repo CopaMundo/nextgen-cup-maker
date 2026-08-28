@@ -592,7 +592,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
     const locList = (locRows || []) as { id: string; name: string }[];
     setLocations(locList);
     registerFieldLocations([catFields], locList);
-    setSelectedLocation(prev => (prev === "__unassigned" || (prev && locList.some(l => l.name === prev)) ? prev : null));
+    setSelectedLocation(prev =>
+      prev && locList.some(l => l.name === prev) ? prev : (locList[0]?.name ?? null)
+    );
     setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
@@ -1025,11 +1027,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === PLANNER HELPERS ===
+  // Velden zonder locatie horen bij de eerste locatie (bestaande toernooien)
   const plannerFields = !selectedLocation
     ? fields
-    : selectedLocation === "__unassigned"
-      ? fields.filter(f => !f.location)
-      : fields.filter(f => (f.location || null) === selectedLocation);
+    : fields.filter(f =>
+        f.location
+          ? f.location === selectedLocation
+          : locations[0]?.name === selectedLocation
+      );
 
   const getFieldTimeSlots = (field: FieldConfig) => {
     const result: { time: string; minuteStart: number }[] = [];
@@ -2537,34 +2542,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {/* Locatiekiezer — enkel bij meerdere locaties */}
           {locations.length > 1 && (
-            <div className="flex items-center gap-2 flex-wrap py-2 print:hidden border-b border-border">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">Locatie</span>
-              <button
-                onClick={() => setSelectedLocation(null)}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedLocation === null ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+            <div className="flex items-center gap-2 py-2 print:hidden border-b border-border">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
+              <select
+                value={selectedLocation || ""}
+                onChange={(e) => setSelectedLocation(e.target.value || null)}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
               >
-                Alle locaties
-              </button>
-              {locations.map(l => {
-                const count = fields.filter(f => (f.location || null) === l.name).length;
-                return (
-                  <button
-                    key={l.id}
-                    onClick={() => setSelectedLocation(l.name)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedLocation === l.name ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
-                  >
-                    {l.name} <span className="opacity-60">({count})</span>
-                  </button>
-                );
-              })}
-              {fields.some(f => !f.location) && (
-                <button
-                  onClick={() => setSelectedLocation("__unassigned")}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedLocation === "__unassigned" ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
-                >
-                  Zonder locatie <span className="opacity-60">({fields.filter(f => !f.location).length})</span>
-                </button>
-              )}
+                {locations.map(l => (
+                  <option key={l.id} value={l.name}>{l.name}</option>
+                ))}
+              </select>
             </div>
           )}
 
