@@ -12,7 +12,6 @@ import { getFieldLocation } from "@/lib/fieldLocations";
 const publicScheduleLocationKey = (token: string) => `public-schedule-location:${token}`;
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
-  const firstUnplayedRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems, locations } = data;
