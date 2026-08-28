@@ -105,11 +105,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
-  const formatDateShort = (d: string) => {
-    if (!d) return "Geen datum";
-    return new Date(d).toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short" });
-  };
-
   const jumpToDate = (date: string, behavior: ScrollBehavior = "smooth") => {
     const el = document.querySelector(`[data-schedule-date="${date}"]`);
     if (el) {
@@ -161,6 +156,33 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
               <div className={ds(bStyle, "dateHeader")}>
                 {formatDate(date)}
               </div>
+              {allDates.length > 1 && selectedDate === date && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Kies dag"
+                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md border border-border bg-transparent text-foreground hover:bg-secondary/50"
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="z-50">
+                    {allDates.map(d => (
+                      <DropdownMenuItem
+                        key={d}
+                        onClick={() => {
+                          setSelectedDate(d);
+                          jumpToDate(d);
+                        }}
+                        className="text-xs font-bold uppercase"
+                      >
+                        {formatDate(d)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
             </div>
           </div>
@@ -233,35 +255,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                 ))}
               </SelectContent>
             </Select>
-          )}
-
-          {allDates.length > 1 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="Kies dag"
-                  className="shrink-0 h-7 px-2 flex items-center justify-center gap-1 rounded-md border border-border bg-transparent text-[10px] font-black uppercase tracking-wider text-foreground hover:bg-secondary/50"
-                >
-                  <span>{selectedDate ? formatDateShort(selectedDate) : "Dag"}</span>
-                  <ChevronDown className="h-3.5 w-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="z-50">
-                {allDates.map(d => (
-                  <DropdownMenuItem
-                    key={d}
-                    onClick={() => {
-                      setSelectedDate(d);
-                      jumpToDate(d);
-                    }}
-                    className="text-xs font-bold uppercase"
-                  >
-                    {formatDate(d)}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           )}
         </div>
         <div className="flex justify-end">
