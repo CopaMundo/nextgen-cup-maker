@@ -18,6 +18,7 @@ import ResultsManager from "@/components/ResultsManager";
 import PresentationManager from "@/components/PresentationManager";
 import RefereeManager from "@/components/RefereeManager";
 import CategorySelector from "@/components/CategorySelector";
+import LocationSelector from "@/components/LocationSelector";
 import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
@@ -51,6 +52,7 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   // Persist category selection per tournament
   const setSelectedCategoryId = (categoryId: string | null) => {
@@ -139,6 +141,7 @@ const TournamentDetail = () => {
       isMultiCategory={tournament.is_multi_category}
       selectedCategoryId={selectedCategoryId}
       onSelect={setSelectedCategoryId}
+      className="mb-4"
     />
   );
 
@@ -200,9 +203,27 @@ const TournamentDetail = () => {
       case "schedule":
         return (
           <>
-            {categorySelector}
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <CategorySelector
+                tournamentId={id!}
+                isMultiCategory={tournament.is_multi_category}
+                selectedCategoryId={selectedCategoryId}
+                onSelect={setSelectedCategoryId}
+              />
+              <LocationSelector
+                tournamentId={id!}
+                selectedLocation={selectedLocation}
+                onSelect={setSelectedLocation}
+              />
+            </div>
             {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <MatchScheduler tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              <MatchScheduler
+                tournamentId={id!}
+                tournament={tournament}
+                categoryId={effectiveCategoryId}
+                selectedLocation={selectedLocation}
+                onLocationChange={setSelectedLocation}
+              />
             )}
           </>
         );

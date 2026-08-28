@@ -318,7 +318,7 @@ const DateStripNav = ({
   );
 };
 
-const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId: string; tournament: any; categoryId?: string | null }) => {
+const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
 
@@ -329,7 +329,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [internalSelectedLocation, setInternalSelectedLocation] = useState<string | null>(null);
+  const isLocationControlled = selectedLocationProp !== undefined;
+  const selectedLocation = isLocationControlled ? selectedLocationProp : internalSelectedLocation;
+  const updateSelectedLocation = (loc: string | null) => {
+    if (isLocationControlled) onLocationChange?.(loc);
+    else setInternalSelectedLocation(loc);
+  };
   const [editFieldIdx, setEditFieldIdx] = useState<number | null>(null);
   const [editFieldDraft, setEditFieldDraft] = useState<{ name: string; startTime: string; location: string | null }>({ name: "", startTime: "", location: null });
 
@@ -592,9 +598,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
     const locList = (locRows || []) as { id: string; name: string }[];
     setLocations(locList);
     registerFieldLocations([catFields], locList);
-    setSelectedLocation(prev =>
-      prev && locList.some(l => l.name === prev) ? prev : (locList[0]?.name ?? null)
-    );
+    const nextLocation = selectedLocation && locList.some(l => l.name === selectedLocation) ? selectedLocation : (locList[0]?.name ?? null);
+    updateSelectedLocation(nextLocation);
     setRefereeConfigs(catReferees);
     setCategoryData(catData);
     // Load persisted planner breaks — use a short-lived session snapshot to survive fast tab switches
@@ -2540,13 +2545,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
             </div>
           )}
 
-          {/* Locatiekiezer — enkel bij meerdere locaties */}
-          {locations.length > 1 && (
+          {/* Locatiekiezer — enkel bij meerdere locaties (fallback wanneer niet via TournamentDetail bestuurd) */}
+          {!isLocationControlled && locations.length > 1 && (
             <div className="flex items-center gap-2 py-2 print:hidden border-b border-border">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
               <select
                 value={selectedLocation || ""}
-                onChange={(e) => setSelectedLocation(e.target.value || null)}
+                onChange={(e) => updateSelectedLocation(e.target.value || null)}
                 className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
               >
                 {locations.map(l => (
