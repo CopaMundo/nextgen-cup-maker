@@ -44,7 +44,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return stored && validLocationNames.includes(stored) ? stored : "";
   });
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const dateObserverRef = useRef<IntersectionObserver | null>(null);
 
   const setLocationFilter = (value: string) => {
     setLocationFilterState(value);
@@ -116,29 +115,23 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   // Track which date section is currently sticking at the header.
   useEffect(() => {
     if (!allDates.length) return;
-    if (dateObserverRef.current) {
-      dateObserverRef.current.disconnect();
-    }
-    dateObserverRef.current = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible.length) {
-          const date = visible[0].target.getAttribute("data-schedule-date") || "";
-          setSelectedDate(date);
-        }
-      },
-      {
-        rootMargin: `-${headerHeight + 4}px 0px 0px 0px`,
-        threshold: [0, 0.25, 0.5, 0.75, 1],
+    const updateActiveDate = () => {
+      let active = allDates[0];
+      for (const date of allDates) {
+        const el = document.querySelector(`[data-schedule-date="${date}"]`);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= headerHeight + 60) active = date;
+        else break;
       }
-    );
-    allDates.forEach(date => {
-      const el = document.querySelector(`[data-schedule-date="${date}"]`);
-      if (el) dateObserverRef.current?.observe(el);
-    });
-    return () => dateObserverRef.current?.disconnect();
+      setSelectedDate(prev => (prev === active ? prev : active));
+    };
+    updateActiveDate();
+    window.addEventListener("scroll", updateActiveDate, { passive: true });
+    window.addEventListener("resize", updateActiveDate);
+    return () => {
+      window.removeEventListener("scroll", updateActiveDate);
+      window.removeEventListener("resize", updateActiveDate);
+    };
   }, [allDates.join(","), headerHeight]);
 
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
