@@ -112,6 +112,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
   const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
   const [savingAssign, setSavingAssign] = useState(false);
+  const assignMatchDialogRef = useDialogFocus(!!assigningMatchId);
   const { toast } = useToast();
 
 
