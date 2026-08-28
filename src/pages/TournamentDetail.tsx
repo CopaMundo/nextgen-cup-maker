@@ -58,6 +58,15 @@ const TournamentDetail = () => {
     return localStorage.getItem(locationStorageKey(id));
   });
 
+  // Persist location selection per tournament
+  const setSelectedLocation = (location: string | null) => {
+    setSelectedLocationState(location);
+    if (typeof window !== "undefined" && id) {
+      if (location) localStorage.setItem(locationStorageKey(id), location);
+      else localStorage.removeItem(locationStorageKey(id));
+    }
+  };
+
   // Persist category selection per tournament
   const setSelectedCategoryId = (categoryId: string | null) => {
     setSelectedCategoryIdState(categoryId);
