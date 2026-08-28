@@ -327,6 +327,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [editFieldIdx, setEditFieldIdx] = useState<number | null>(null);
+  const [editFieldDraft, setEditFieldDraft] = useState<{ name: string; startTime: string }>({ name: "", startTime: "" });
+
   const [showAddFieldDialog, setShowAddFieldDialog] = useState(false);
   const [newFieldName, setNewFieldName] = useState("");
   const [newFieldStartTime, setNewFieldStartTime] = useState("09:00");
