@@ -141,6 +141,7 @@ const TournamentDetail = () => {
       isMultiCategory={tournament.is_multi_category}
       selectedCategoryId={selectedCategoryId}
       onSelect={setSelectedCategoryId}
+      className="mb-4"
     />
   );
 
@@ -202,9 +203,27 @@ const TournamentDetail = () => {
       case "schedule":
         return (
           <>
-            {categorySelector}
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <CategorySelector
+                tournamentId={id!}
+                isMultiCategory={tournament.is_multi_category}
+                selectedCategoryId={selectedCategoryId}
+                onSelect={setSelectedCategoryId}
+              />
+              <LocationSelector
+                tournamentId={id!}
+                selectedLocation={selectedLocation}
+                onSelect={setSelectedLocation}
+              />
+            </div>
             {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <MatchScheduler tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              <MatchScheduler
+                tournamentId={id!}
+                tournament={tournament}
+                categoryId={effectiveCategoryId}
+                selectedLocation={selectedLocation}
+                onLocationChange={setSelectedLocation}
+              />
             )}
           </>
         );
