@@ -1066,7 +1066,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </AlertDialog>
 
       <Dialog open={!!editingCatId} onOpenChange={(open) => !open && setEditingCatId(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editCategoryDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Divisie bewerken</DialogTitle>
           </DialogHeader>
@@ -1076,7 +1076,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editCatName}
               onChange={(e) => setEditCatName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && saveCategoryRename()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1087,7 +1086,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={!!editingLocId} onOpenChange={(open) => !open && setEditingLocId(null)}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editLocationDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Locatie bewerken</DialogTitle>
           </DialogHeader>
@@ -1097,7 +1096,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editLocName}
               onChange={(e) => setEditLocName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && saveLocationRename()}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1109,7 +1107,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Name Dialog */}
       <Dialog open={showEditName} onOpenChange={setShowEditName}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent ref={editNameDialogRef} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Toernooinaam</DialogTitle>
           </DialogHeader>
@@ -1118,7 +1116,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") { saveToDb({ name: editName }); setShowEditName(false); } }}
-              autoFocus
             />
           </div>
           <DialogFooter>
@@ -1130,7 +1127,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Description Dialog */}
       <Dialog open={showEditDesc} onOpenChange={setShowEditDesc}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent ref={editDescDialogRef} className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Beschrijving</DialogTitle>
           </DialogHeader>
@@ -1139,7 +1136,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
               rows={10}
-              autoFocus
             />
           </div>
           <DialogFooter>
