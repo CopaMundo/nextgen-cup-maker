@@ -261,35 +261,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
               </SelectContent>
             </Select>
           )}
-
-          {allDates.length > 1 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="Kies dag"
-                  className="shrink-0 h-7 px-2 flex items-center justify-center gap-1 rounded-md border border-border bg-transparent text-[10px] font-black uppercase tracking-wider text-foreground hover:bg-secondary/50"
-                >
-                  <span>{selectedDate ? formatDateShort(selectedDate) : "Dag"}</span>
-                  <ChevronDown className="h-3.5 w-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="z-50">
-                {allDates.map(d => (
-                  <DropdownMenuItem
-                    key={d}
-                    onClick={() => {
-                      setSelectedDate(d);
-                      jumpToDate(d);
-                    }}
-                    className="text-xs font-bold uppercase"
-                  >
-                    {formatDate(d)}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
         </div>
         <div className="flex justify-end">
           <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{scheduledCount} wedstrijden</span>
