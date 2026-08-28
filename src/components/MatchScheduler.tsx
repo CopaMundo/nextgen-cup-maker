@@ -459,8 +459,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [editMatchId, setEditMatchId] = useState<string | null>(null);
   const [editMatchReferee, setEditMatchReferee] = useState("");
   const [editMatchDuration, setEditMatchDuration] = useState("");
-  const [editMatchNewRef, setEditMatchNewRef] = useState("");
-  const [showEditMatchNewRef, setShowEditMatchNewRef] = useState(false);
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
 
   // Mobile touch move state
@@ -2441,16 +2439,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     toast({ title: "Wedstrijd bijgewerkt" });
   };
 
-  const addRefereeFromMatchDialog = async () => {
-    const name = editMatchNewRef.trim();
-    if (!name) return;
-    if (!referees.includes(name)) {
-      await saveReferees([...refereeConfigs, { name, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }]);
-    }
-    setEditMatchReferee(name);
-    setEditMatchNewRef("");
-    setShowEditMatchNewRef(false);
-  };
 
   // === MOBILE TAP-TO-PLACE ===
   const handleMobileTapMatch = (matchId: string) => {
