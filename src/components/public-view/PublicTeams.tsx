@@ -219,6 +219,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
           </button>
         ))}
       </div>
+      </div>
     </div>
   );
 };
