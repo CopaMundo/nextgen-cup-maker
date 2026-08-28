@@ -114,7 +114,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
 
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  const renderScheduleSection = (timeslots: Timeslot[], uniqueDates: string[]) => (
+  const renderScheduleSection = () => (
     <div className="space-y-3">
       {uniqueDates.map(date => (
         <div key={date} data-schedule-date={date} className="space-y-3">
