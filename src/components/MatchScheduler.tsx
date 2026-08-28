@@ -2545,13 +2545,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             </div>
           )}
 
-          {/* Locatiekiezer — enkel bij meerdere locaties */}
-          {locations.length > 1 && (
+          {/* Locatiekiezer — enkel bij meerdere locaties (fallback wanneer niet via TournamentDetail bestuurd) */}
+          {!isLocationControlled && locations.length > 1 && (
             <div className="flex items-center gap-2 py-2 print:hidden border-b border-border">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
               <select
                 value={selectedLocation || ""}
-                onChange={(e) => setSelectedLocation(e.target.value || null)}
+                onChange={(e) => updateSelectedLocation(e.target.value || null)}
                 className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
               >
                 {locations.map(l => (
