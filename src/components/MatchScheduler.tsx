@@ -2531,6 +2531,39 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
             </div>
           )}
 
+          {/* Locatiekiezer — enkel bij meerdere locaties */}
+          {locations.length > 1 && (
+            <div className="flex items-center gap-2 flex-wrap py-2 print:hidden border-b border-border">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">Locatie</span>
+              <button
+                onClick={() => setSelectedLocation(null)}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedLocation === null ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+              >
+                Alle locaties
+              </button>
+              {locations.map(l => {
+                const count = fields.filter(f => (f.location || null) === l.name).length;
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => setSelectedLocation(l.name)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedLocation === l.name ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {l.name} <span className="opacity-60">({count})</span>
+                  </button>
+                );
+              })}
+              {fields.some(f => !f.location) && (
+                <button
+                  onClick={() => setSelectedLocation("__unassigned")}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedLocation === "__unassigned" ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+                >
+                  Zonder locatie <span className="opacity-60">({fields.filter(f => !f.location).length})</span>
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Print header */}
           <div className="hidden print:block mb-4">
             <h2 className="text-xl font-bold">{tournament.name} — Planning</h2>
