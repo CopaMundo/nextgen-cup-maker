@@ -161,6 +161,33 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
               <div className={ds(bStyle, "dateHeader")}>
                 {formatDate(date)}
               </div>
+              {allDates.length > 1 && selectedDate === date && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Kies dag"
+                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md border border-border bg-transparent text-foreground hover:bg-secondary/50"
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="z-50">
+                    {allDates.map(d => (
+                      <DropdownMenuItem
+                        key={d}
+                        onClick={() => {
+                          setSelectedDate(d);
+                          jumpToDate(d);
+                        }}
+                        className="text-xs font-bold uppercase"
+                      >
+                        {formatDate(d)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
             </div>
           </div>
