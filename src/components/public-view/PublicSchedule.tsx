@@ -122,31 +122,21 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                 {formatDate(date)}
               </div>
               {allDates.length > 1 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label="Kies dag"
-                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md bg-secondary text-foreground"
-                    >
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="z-50">
+                <Select value={selectedDate || allDates[0]} onValueChange={(v) => { setSelectedDate(v); jumpToDate(v); }}>
+                  <SelectTrigger
+                    aria-label="Kies dag"
+                    className="shrink-0 h-6 w-auto min-w-[90px] max-w-[140px] text-[10px] font-black uppercase tracking-wider bg-transparent border-border"
+                  >
+                    <SelectValue placeholder="Kies dag" />
+                  </SelectTrigger>
+                  <SelectContent align="start">
                     {allDates.map(d => (
-                      <DropdownMenuItem
-                        key={d}
-                        onClick={() => {
-                          setSelectedDate(d);
-                          jumpToDate(d);
-                        }}
-                        className="text-xs font-bold uppercase"
-                      >
+                      <SelectItem key={d} value={d} className="text-xs font-bold uppercase">
                         {formatDate(d)}
-                      </DropdownMenuItem>
+                      </SelectItem>
                     ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </SelectContent>
+                </Select>
               )}
               {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
             </div>
