@@ -2900,7 +2900,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 )}
                                               </div>
                                               <button
-                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : ""); setShowEditMatchNewRef(false); setEditMatchNewRef(""); }}
+                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
                                                 className="text-muted-foreground hover:text-foreground print:hidden"
                                               >
                                                 <Pencil className="h-2.5 w-2.5" />
