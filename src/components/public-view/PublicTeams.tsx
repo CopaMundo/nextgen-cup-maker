@@ -192,8 +192,8 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
   // Team grid - broadcast style
   return (
-    <div className="px-3 pt-4 space-y-4">
-      <div className="sticky top-0 z-10 -mx-3 px-3 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <div className="px-3 pb-4">
+      <div className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 bg-background/95 backdrop-blur-sm border-b border-border/30">
         <div className="flex items-center gap-3">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Teams</h2>
@@ -201,6 +201,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
           <span className="ttx-section-meta text-[10px] font-bold text-muted-foreground uppercase">{teams.length} teams</span>
         </div>
       </div>
+      <div className="pt-4 space-y-4">
       <div className="grid grid-cols-3 gap-2.5">
         {teams.map((t: any) => (
           <button key={t.id} onClick={() => { setSelectedTeam(t.id); setTeamTab("selectie"); }}
@@ -217,6 +218,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
             </div>
           </button>
         ))}
+      </div>
       </div>
     </div>
   );

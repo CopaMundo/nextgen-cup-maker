@@ -127,7 +127,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                     <button
                       type="button"
                       aria-label="Kies dag"
-                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md bg-secondary text-foreground"
+                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md border border-border bg-transparent text-foreground hover:bg-secondary/50"
                     >
                       <ChevronDown className="h-3.5 w-3.5" />
                     </button>
