@@ -67,12 +67,23 @@ export const getFieldLocation = (field?: string | null): string | null =>
 
 export const hasMultipleLocations = () => locationCount > 1;
 
+/** Verwijder een eventueel opgeslagen "Locatie · " prefix uit een veldnaam. */
+export const stripLocationPrefix = (field: string, loc?: string | null): string =>
+  loc && field.startsWith(`${loc} · `) ? field.slice(loc.length + 3) : field;
+
+/** Zichtbare veldnaam (zonder interne locatie-prefix). */
+export const displayFieldName = (field?: string | null): string => {
+  if (!field) return "";
+  return stripLocationPrefix(field, getFieldLocation(field));
+};
+
 /** "Locatie · Veld" bij meerdere locaties, anders enkel de veldnaam. */
 export const formatFieldLabel = (field?: string | null): string => {
   if (!field) return "";
   const loc = getFieldLocation(field);
-  if (locationCount > 1 && loc && loc !== field) return `${loc} · ${field}`;
-  return field;
+  const bare = stripLocationPrefix(field, loc);
+  if (locationCount > 1 && loc && loc !== bare) return `${loc} · ${bare}`;
+  return bare;
 };
 
 const subscribe = (cb: () => void) => {

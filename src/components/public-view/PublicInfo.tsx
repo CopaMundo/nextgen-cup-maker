@@ -7,7 +7,6 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { parseFieldEntries } from "@/lib/fieldLocations";
 
 interface Props {
   data: PublicTournamentData;
@@ -28,12 +27,8 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
   const divisionRef = useRef<HTMLDivElement>(null);
   const [showLocations, setShowLocations] = useState(false);
 
-  // Velden per locatie (uit toernooi- en divisieconfiguratie)
-  const allFieldEntries = parseFieldEntries(tournament.fields).concat(
-    (categories || []).flatMap((c: any) => parseFieldEntries(c.fields))
-  );
-  const fieldsForLocation = (name: string) =>
-    Array.from(new Set(allFieldEntries.filter(f => f.location === name).map(f => f.name)));
+  // Velden worden niet weergegeven op de infopagina
+
   const isMultiCat = tournament.is_multi_category && categories.length > 1;
   const needsSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
 
@@ -175,7 +170,7 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
                 className={`ttx-info-badge group flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm transition-all hover:bg-primary hover:border-primary/30 hover:shadow-sm ${controlFrameShape}`}
               >
                 <MapPin className="h-4 w-4 text-primary group-hover:text-primary-foreground shrink-0" />
-                <span className="text-foreground font-bold text-xs group-hover:text-primary-foreground">Bekijk {locations.length} locaties</span>
+                <span className="text-foreground font-bold text-xs group-hover:text-primary-foreground">{locations.length} locaties</span>
                 <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary-foreground transition-transform group-hover:translate-x-0.5" />
               </button>
             )
@@ -189,20 +184,15 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
               <DialogTitle className="text-base">Locaties</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
-              {locations.map((l: any) => {
-                const flds = fieldsForLocation(l.name);
-                return (
-                  <div key={l.id} className={`p-3 ${cardFrame}`}>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary shrink-0" />
-                      <span className="text-sm font-bold text-foreground">{l.name}</span>
-                    </div>
-                    {flds.length > 0 && (
-                      <p className="mt-1 pl-6 text-xs text-muted-foreground">{flds.join(" · ")}</p>
-                    )}
+              {locations.map((l: any) => (
+                <div key={l.id} className={`p-3 ${cardFrame}`}>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary shrink-0" />
+                    <span className="text-sm font-bold text-foreground">{l.name}</span>
                   </div>
-                );
-              })}
+                </div>
+              ))}
+
             </div>
           </DialogContent>
         </Dialog>
