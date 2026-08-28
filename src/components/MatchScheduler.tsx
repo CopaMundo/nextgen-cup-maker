@@ -21,7 +21,7 @@ import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee } from "@/lib/refereeConfig";
-import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel } from "@/lib/fieldLocations";
+import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix } from "@/lib/fieldLocations";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -697,23 +697,38 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const defaultFieldLocation = () =>
     (selectedLocation && selectedLocation !== "__unassigned" ? selectedLocation : null) ??
     (locations.length === 1 ? locations[0].name : null);
+  /** Interne veldnaam: uniek over alle locaties, maar per locatie mag dezelfde zichtbare naam bestaan. */
+  const uniqueFieldName = (bare: string, loc: string | null, ignoreIdx?: number) => {
+    const taken = fields.some((f, i) => i !== ignoreIdx && f.name === bare);
+    if (!taken) return bare;
+    if (loc) {
+      const qualified = `${loc} · ${bare}`;
+      if (!fields.some((f, i) => i !== ignoreIdx && f.name === qualified)) return qualified;
+    }
+    let n = 2;
+    while (fields.some((f, i) => i !== ignoreIdx && f.name === `${bare} (${n})`)) n++;
+    return `${bare} (${n})`;
+  };
   const addField = async () => {
     const fieldNum = fields.length + 1;
-    const newField: FieldConfig = { name: `Veld ${fieldNum}`, startTime: "09:00", location: defaultFieldLocation() };
+    const loc0 = defaultFieldLocation();
+    const newField: FieldConfig = { name: uniqueFieldName(`Veld ${fieldNum}`, loc0), startTime: "09:00", location: loc0 };
     const updated = [...fields, newField];
     await saveFields(updated);
     toast({ title: `Veld ${fieldNum} toegevoegd` });
   };
   const addFieldFromDialog = async () => {
-    const name = newFieldName.trim() || `Veld ${fields.length + 1}`;
-    const newField: FieldConfig = { name, startTime: newFieldStartTime, location: newFieldLocation ?? defaultFieldLocation() };
+    const bare = newFieldName.trim() || `Veld ${fields.length + 1}`;
+    const loc = defaultFieldLocation();
+    const name = uniqueFieldName(bare, loc);
+    const newField: FieldConfig = { name, startTime: newFieldStartTime, location: loc };
     const updated = [...fields, newField];
     await saveFields(updated);
     setShowAddFieldDialog(false);
     setNewFieldName("");
     setNewFieldLocation(null);
     setNewFieldStartTime("09:00");
-    toast({ title: `${name} toegevoegd` });
+    toast({ title: `${bare} toegevoegd` });
   };
   const removeField = async (idx: number) => { await saveFields(fields.filter((_, i) => i !== idx)); };
   const clearFieldMatches = async (idx: number) => {
@@ -2748,10 +2763,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               className={`rounded-t-lg bg-secondary border border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
                             >
                               <div className="flex items-center justify-between">
-                                <h4 className="font-display text-sm font-bold text-foreground">{field.name}</h4>
+                                <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
                                 <div className="flex items-center gap-2">
                                   <button
-                                    onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: field.name, startTime: field.startTime ?? "", location: field.location ?? null }); setEditFieldIdx(fields.indexOf(field)); }}
+                                    onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: stripLocationPrefix(field.name, field.location), startTime: field.startTime ?? "", location: field.location ?? null }); setEditFieldIdx(fields.indexOf(field)); }}
                                     className="text-muted-foreground hover:text-foreground"
                                   >
                                     <Pencil className="h-3 w-3" />
@@ -3678,18 +3693,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <Label className="text-sm">Naam</Label>
               <Input value={newFieldName} onChange={(e) => setNewFieldName(e.target.value)} placeholder={`Veld ${fields.length + 1}`} className="h-9" />
             </div>
-            {locations.length > 1 && (
-              <div className="space-y-1">
-                <Label className="text-sm">Locatie</Label>
-                <Select value={newFieldLocation ?? defaultFieldLocation() ?? "__none"} onValueChange={(v) => setNewFieldLocation(v === "__none" ? null : v)}>
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Kies locatie" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none">Geen locatie</SelectItem>
-                    {locations.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             <div className="space-y-1">
               <Label className="text-sm">Starttijd</Label>
               <TimePicker value={newFieldStartTime} onChange={(v) => setNewFieldStartTime(v)} className="h-9" />
@@ -3714,18 +3717,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 <Label className="text-sm">Naam</Label>
                 <Input value={editFieldDraft.name} onChange={(e) => setEditFieldDraft(d => ({ ...d, name: e.target.value }))} className="h-9" />
               </div>
-              {locations.length > 1 && (
-                <div className="space-y-1">
-                  <Label className="text-sm">Locatie</Label>
-                  <Select value={editFieldDraft.location ?? "__none"} onValueChange={(v) => setEditFieldDraft(d => ({ ...d, location: v === "__none" ? null : v }))}>
-                    <SelectTrigger className="h-9"><SelectValue placeholder="Kies locatie" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none">Geen locatie</SelectItem>
-                      {locations.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
               <div className="space-y-1">
                 <Label className="text-sm">Starttijd</Label>
                 <TimePicker value={editFieldDraft.startTime} onChange={(v) => setEditFieldDraft(d => ({ ...d, startTime: v }))} className="h-9" />
@@ -3738,7 +3729,15 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   onClick={async () => {
                     const idx = editFieldIdx;
                     setEditFieldIdx(null);
-                    await saveFields(fields.map((f, i) => i === idx ? { ...f, name: editFieldDraft.name, startTime: editFieldDraft.startTime, location: editFieldDraft.location } : f));
+                    if (idx === null) return;
+                    const loc = fields[idx].location ?? defaultFieldLocation();
+                    const nextName = uniqueFieldName(editFieldDraft.name.trim() || fields[idx].name, loc, idx);
+                    const prevName = fields[idx].name;
+                    await saveFields(fields.map((f, i) => i === idx ? { ...f, name: nextName, startTime: editFieldDraft.startTime, location: loc } : f));
+                    if (nextName !== prevName) {
+                      await supabase.from("matches").update({ field: nextName }).eq("tournament_id", tournamentId).eq("field", prevName);
+                      setMatches(prev => prev.map(m => m.field === prevName ? { ...m, field: nextName } : m));
+                    }
                   }}
                   className="text-xs"
                 >
