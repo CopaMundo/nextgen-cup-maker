@@ -973,7 +973,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const matchStart = timeToMinutes(match.match_time!);
     const matchPhase = phases.find(p => p.id === match.phase_id);
     const matchMc = (matchPhase?.match_config as any) || {};
-    const matchDur = matchMc.phaseDuration ?? globalMatchDuration;
+    const matchDur = match.duration_minutes ?? matchMc.phaseDuration ?? globalMatchDuration;
     const matchEnd = matchStart + matchDur;
 
     // Find all matches that overlap in time (not just exact same time)
@@ -1439,7 +1439,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const m = matches.find(mm => mm.id === orderedMatchIds[i]);
       const mp = m ? phases.find(pp => pp.id === m.phase_id) : undefined;
       const mc = (mp?.match_config as any) || {};
-      current += (mc.phaseDuration ?? globalMatchDuration) + (mc.phaseBreak ?? globalBreakDuration);
+      current += (m?.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration) + (mc.phaseBreak ?? globalBreakDuration);
       const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
       if (breakHere) current += breakHere.duration;
     }
@@ -1816,7 +1816,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const getMatchDur = (m: Match) => {
       const mp = phases.find(p => p.id === m.phase_id);
       const mc = (mp?.match_config as any) || {};
-      return mc.phaseDuration ?? globalMatchDuration;
+      return m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
     };
     for (const m of matches.filter(x => x.match_date === plannerDate && x.match_time && x.field)) {
       if (!m.match_time) continue;
@@ -2006,7 +2006,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const getMatchDurLocal = (m: Match) => {
       const mp = phases.find(p => p.id === m.phase_id);
       const mc = (mp?.match_config as any) || {};
-      return mc.phaseDuration ?? globalMatchDuration;
+      return m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
     };
     // Always track team busy times to prevent double-booking
     const teamBusyUntil: Record<string, number> = {};
