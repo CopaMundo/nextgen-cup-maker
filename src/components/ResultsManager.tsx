@@ -2309,7 +2309,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {/* Teams wijzigen aan een wedstrijd */}
       <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
-        <DialogContent className="max-w-md">
+        <DialogContent ref={assignMatchDialogRef} className="max-w-md">
           <DialogHeader>
             <DialogTitle>Teams wijzigen</DialogTitle>
             <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>
