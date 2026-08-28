@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeRefereeLabeled,
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
