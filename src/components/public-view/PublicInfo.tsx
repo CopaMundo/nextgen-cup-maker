@@ -28,12 +28,8 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
   const divisionRef = useRef<HTMLDivElement>(null);
   const [showLocations, setShowLocations] = useState(false);
 
-  // Velden per locatie (uit toernooi- en divisieconfiguratie)
-  const allFieldEntries = parseFieldEntries(tournament.fields).concat(
-    (categories || []).flatMap((c: any) => parseFieldEntries(c.fields))
-  );
-  const fieldsForLocation = (name: string) =>
-    Array.from(new Set(allFieldEntries.filter(f => f.location === name).map(f => f.name)));
+  // Velden worden niet weergegeven op de infopagina
+
   const isMultiCat = tournament.is_multi_category && categories.length > 1;
   const needsSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
 
