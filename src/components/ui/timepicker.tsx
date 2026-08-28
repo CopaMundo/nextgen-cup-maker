@@ -101,17 +101,17 @@ export function TimePicker({
   const pendingSelectRef = React.useRef<[number, number] | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let newDigits = clampDigits(extractDigits(event.target.value));
-    // Full value selected + one digit typed: replace first digit, keep rest selected.
-    if (selectAllRef.current && newDigits.length === 1 && digits.length === 4) {
-      newDigits = clampDigits(newDigits + digits.slice(1));
-      pendingSelectRef.current = [1, buildDisplayValue(newDigits).length];
-    }
+    const raw = extractDigits(event.target.value);
+    // Full value selected: typing starts a fresh time from the first digit.
+    const newDigits = clampDigits(
+      selectAllRef.current && raw.length > 0 ? raw.slice(0, 1) : raw
+    );
     selectAllRef.current = false;
     setDigits(newDigits);
     if (newDigits.length === 4) onChange(digitsToTime(newDigits));
     else if (newDigits.length === 0) onChange("");
   };
+
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const allowed = [
