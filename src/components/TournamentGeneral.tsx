@@ -104,13 +104,17 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
+  const addLocationDialogRef = useDialogFocus(showAddLocation);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const addCategoryDialogRef = useDialogFocus(showAddCategory);
   const [showAddMatchDay, setShowAddMatchDay] = useState(false);
   const [newMatchDay, setNewMatchDay] = useState("");
+  const addMatchDayDialogRef = useDialogFocus(showAddMatchDay);
   const [showAddPeriod, setShowAddPeriod] = useState(false);
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
+  const addPeriodDialogRef = useDialogFocus(showAddPeriod);
 
   const [deleteLocId, setDeleteLocId] = useState<string | null>(null);
   const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
