@@ -2700,7 +2700,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                 <h4 className="font-display text-sm font-bold text-foreground">{field.name}</h4>
                                 <div className="flex items-center gap-2">
                                   <button
-                                    onClick={(e) => { e.stopPropagation(); setEditFieldIdx(fields.indexOf(field)); }}
+                                    onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: field.name, startTime: field.startTime ?? "" }); setEditFieldIdx(fields.indexOf(field)); }}
                                     className="text-muted-foreground hover:text-foreground"
                                   >
                                     <Pencil className="h-3 w-3" />
