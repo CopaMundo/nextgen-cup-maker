@@ -327,6 +327,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [editFieldIdx, setEditFieldIdx] = useState<number | null>(null);
+  const [editFieldDraft, setEditFieldDraft] = useState<{ name: string; startTime: string }>({ name: "", startTime: "" });
+
   const [showAddFieldDialog, setShowAddFieldDialog] = useState(false);
   const [newFieldName, setNewFieldName] = useState("");
   const [newFieldStartTime, setNewFieldStartTime] = useState("09:00");
@@ -2698,7 +2700,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                                 <h4 className="font-display text-sm font-bold text-foreground">{field.name}</h4>
                                 <div className="flex items-center gap-2">
                                   <button
-                                    onClick={(e) => { e.stopPropagation(); setEditFieldIdx(fields.indexOf(field)); }}
+                                    onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: field.name, startTime: field.startTime ?? "" }); setEditFieldIdx(fields.indexOf(field)); }}
                                     className="text-muted-foreground hover:text-foreground"
                                   >
                                     <Pencil className="h-3 w-3" />
@@ -3645,20 +3647,30 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
             <div className="space-y-4">
               <div className="space-y-1">
                 <Label className="text-sm">Naam</Label>
-                <Input value={fields[editFieldIdx].name} onChange={(e) => updateFieldConfig(editFieldIdx, "name", e.target.value)} className="h-9" />
+                <Input value={editFieldDraft.name} onChange={(e) => setEditFieldDraft(d => ({ ...d, name: e.target.value }))} className="h-9" />
               </div>
               <div className="space-y-1">
                 <Label className="text-sm">Starttijd</Label>
-                <TimePicker value={fields[editFieldIdx].startTime} onChange={(v) => updateFieldConfig(editFieldIdx, "startTime", v)} className="h-9" />
+                <TimePicker value={editFieldDraft.startTime} onChange={(v) => setEditFieldDraft(d => ({ ...d, startTime: v }))} className="h-9" />
               </div>
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" size="sm" onClick={() => { setClearFieldIdx(editFieldIdx); }} className="text-xs gap-1">
                   <RotateCcw className="h-3 w-3" /> Veld leegmaken
                 </Button>
-                <Button onClick={() => setEditFieldIdx(null)} className="text-xs">Opslaan</Button>
+                <Button
+                  onClick={async () => {
+                    const idx = editFieldIdx;
+                    setEditFieldIdx(null);
+                    await saveFields(fields.map((f, i) => i === idx ? { ...f, name: editFieldDraft.name, startTime: editFieldDraft.startTime } : f));
+                  }}
+                  className="text-xs"
+                >
+                  Opslaan
+                </Button>
               </div>
             </div>
           )}
+
         </DialogContent>
       </Dialog>
 

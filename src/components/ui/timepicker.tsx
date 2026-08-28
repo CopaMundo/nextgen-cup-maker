@@ -32,14 +32,19 @@ const buildDisplayValue = (digits: string) => {
 const buildPartialValue = (digits: string) =>
   digits.length <= 2 ? digits : `${digits.slice(0, 2)}:${digits.slice(2)}`;
 
-/** Clamp digits so hours stay 00-23 and minutes 00-59 while typing. */
-const clampDigits = (digits: string) => {
+/**
+ * Normalize typed digits: hours 00-23, minutes 00-59.
+ * A first digit above 2 is auto-prefixed with a 0 (typing 9 -> 09:mm).
+ */
+const clampDigits = (input: string) => {
+  let digits = input;
+  if (digits.length >= 1 && Number(digits[0]) > 2) digits = `0${digits}`.slice(0, 4);
   const out = digits.split("");
-  if (out.length >= 1 && Number(out[0]) > 2) out[0] = "2";
   if (out.length >= 2 && Number(out[0]) === 2 && Number(out[1]) > 3) out[1] = "3";
   if (out.length >= 3 && Number(out[2]) > 5) out[2] = "5";
   return out.join("");
 };
+
 
 const digitsToTime = (digits: string) =>
   digits.length === 4 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : "";
@@ -96,17 +101,17 @@ export function TimePicker({
   const pendingSelectRef = React.useRef<[number, number] | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let newDigits = clampDigits(extractDigits(event.target.value));
-    // Full value selected + one digit typed: replace first digit, keep rest selected.
-    if (selectAllRef.current && newDigits.length === 1 && digits.length === 4) {
-      newDigits = clampDigits(newDigits + digits.slice(1));
-      pendingSelectRef.current = [1, buildDisplayValue(newDigits).length];
-    }
+    const raw = extractDigits(event.target.value);
+    // Full value selected: typing starts a fresh time from the first digit.
+    const newDigits = clampDigits(
+      selectAllRef.current && raw.length > 0 ? raw.slice(0, 1) : raw
+    );
     selectAllRef.current = false;
     setDigits(newDigits);
     if (newDigits.length === 4) onChange(digitsToTime(newDigits));
     else if (newDigits.length === 0) onChange("");
   };
+
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const allowed = [
