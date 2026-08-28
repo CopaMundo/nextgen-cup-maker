@@ -12,7 +12,6 @@ import { getFieldLocation } from "@/lib/fieldLocations";
 const publicScheduleLocationKey = (token: string) => `public-schedule-location:${token}`;
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
-  const firstUnplayedRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems, locations } = data;
@@ -98,23 +97,17 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  // Initial scroll: center the first unplayed match in the viewport.
+  // Position the page on the first unplayed match without animation.
   useEffect(() => {
     if (hasInitialScrolled || headerHeight === 0 || !sorted.length) return;
     const raf = requestAnimationFrame(() => {
       setTimeout(() => {
-        if (firstUnplayedMatchId) {
-          const el = firstUnplayedRef.current;
-          if (el) {
-            const rect = el.getBoundingClientRect();
-            const elCenter = rect.top + rect.height / 2;
-            const viewportCenter = window.innerHeight / 2;
-            const scrollY = window.scrollY + elCenter - viewportCenter;
-            window.scrollTo({ top: Math.max(0, scrollY), behavior: "instant" });
-          }
+        const el = document.querySelector('[data-first-unplayed="true"]') as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({ block: "center", behavior: "instant" });
         }
         setHasInitialScrolled(true);
-      }, 100);
+      }, 0);
     });
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -216,7 +209,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                       return (
                       <div
                         key={m.id}
-                        ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
+                        data-first-unplayed={m.id === firstUnplayedMatchId ? "true" : undefined}
                         className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
                       >
                         <PublicMatchCard
