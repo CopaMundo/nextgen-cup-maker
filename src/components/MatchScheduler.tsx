@@ -327,11 +327,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [slots, setSlots] = useState<SlotEntry[]>([]);
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [editFieldIdx, setEditFieldIdx] = useState<number | null>(null);
-  const [editFieldDraft, setEditFieldDraft] = useState<{ name: string; startTime: string }>({ name: "", startTime: "" });
+  const [editFieldDraft, setEditFieldDraft] = useState<{ name: string; startTime: string; location: string | null }>({ name: "", startTime: "", location: null });
 
   const [showAddFieldDialog, setShowAddFieldDialog] = useState(false);
   const [newFieldName, setNewFieldName] = useState("");
+  const [newFieldLocation, setNewFieldLocation] = useState<string | null>(null);
   const [newFieldStartTime, setNewFieldStartTime] = useState("09:00");
   const [deleteFieldIdx, setDeleteFieldIdx] = useState<number | null>(null);
   const [clearFieldIdx, setClearFieldIdx] = useState<number | null>(null);
