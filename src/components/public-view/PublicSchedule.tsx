@@ -189,7 +189,14 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="z-50">
                       {uniqueDates.map(d => (
-                        <DropdownMenuItem key={d} onClick={() => jumpToDate(d)} className="text-xs font-bold uppercase">
+                        <DropdownMenuItem
+                          key={d}
+                          onClick={() => {
+                            setSelectedDate(d);
+                            jumpToDate(d);
+                          }}
+                          className="text-xs font-bold uppercase"
+                        >
                           {formatDate(d)}
                         </DropdownMenuItem>
                       ))}
