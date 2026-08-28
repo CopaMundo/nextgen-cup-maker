@@ -84,14 +84,20 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return (a.field || "").localeCompare(b.field || "");
   });
 
-  const firstUnplayedIndex = sorted.findIndex(m => !m.is_played);
-  const playedMatches = firstUnplayedIndex === -1 ? sorted : sorted.slice(0, firstUnplayedIndex);
-  const nextMatch = firstUnplayedIndex === -1 ? null : sorted[firstUnplayedIndex];
-  const upcomingMatches = firstUnplayedIndex === -1 ? [] : sorted.slice(firstUnplayedIndex + 1);
+  const firstUnplayedId = sorted.find(m => !m.is_played)?.id || null;
+  const { timeslots, uniqueDates } = groupIntoTimeslots(sorted);
+  const allDates = uniqueDates;
+  const didInitialPosition = useRef(false);
 
-  const { timeslots: playedTimeslots, uniqueDates: playedDates } = groupIntoTimeslots(playedMatches);
-  const { timeslots: upcomingTimeslots, uniqueDates: upcomingDates } = groupIntoTimeslots(upcomingMatches);
-  const allDates = [...new Set([...playedDates, ...upcomingDates])].filter(Boolean);
+  // Bij laden: één keer direct (zonder animatie) op de eerstvolgende wedstrijd staan, gecentreerd.
+  useEffect(() => {
+    if (didInitialPosition.current) return;
+    if (!firstUnplayedId) return;
+    const el = document.querySelector(`[data-match-id="${firstUnplayedId}"]`);
+    if (!el) return;
+    didInitialPosition.current = true;
+    el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+  }, [firstUnplayedId]);
 
   const formatDate = (d: string) => {
     if (!d) return "Geen datum";
@@ -108,7 +114,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
 
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  const renderScheduleSection = (timeslots: Timeslot[], uniqueDates: string[]) => (
+  const renderScheduleSection = () => (
     <div className="space-y-3">
       {uniqueDates.map(date => (
         <div key={date} data-schedule-date={date} className="space-y-3">
@@ -171,6 +177,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                   {slot.matches.map((m: any) => (
                     <div
                       key={m.id}
+                      data-match-id={m.id}
                       className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
                     >
                       <PublicMatchCard
@@ -226,45 +233,8 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         </div>
       </div>
 
-      <div className="pt-3 space-y-6">
-        {/* Past results */}
-        {playedMatches.length > 0 && (
-          <div className="space-y-3">
-            <div className={ds(bStyle, "sectionTitle") || "text-xs font-bold uppercase text-muted-foreground"}>Resultaten</div>
-            {renderScheduleSection(playedTimeslots, playedDates)}
-          </div>
-        )}
-
-        {/* Next match — visually centered */}
-        {nextMatch && (
-          <div className="flex flex-col items-center">
-            <div className={ds(bStyle, "sectionTitle") || "text-xs font-bold uppercase text-primary"}>Volgende wedstrijd</div>
-            <div className={ds(bStyle, "sectionLine")} />
-            <div className="w-full max-w-md py-2">
-              <div className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
-                <PublicMatchCard
-                  match={nextMatch}
-                  teams={teams}
-                  phases={phases}
-                  groups={groups}
-                  slots={slots}
-                  tournament={tournament}
-                  allMatches={matches}
-                  favoriteTeam={favoriteTeam}
-                  hideRoundNumber
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Upcoming schedule */}
-        {upcomingMatches.length > 0 && (
-          <div className="space-y-3">
-            <div className={ds(bStyle, "sectionTitle") || "text-xs font-bold uppercase text-muted-foreground"}>Programma</div>
-            {renderScheduleSection(upcomingTimeslots, upcomingDates)}
-          </div>
-        )}
+      <div className="pt-3">
+        {renderScheduleSection()}
       </div>
 
       {scheduledCount === 0 && (
