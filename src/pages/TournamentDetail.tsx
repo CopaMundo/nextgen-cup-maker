@@ -40,6 +40,7 @@ const sidebarItems = [
 type TabId = typeof sidebarItems[number]["id"];
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
+const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
 
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,7 +53,10 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
+    if (typeof window === "undefined" || !id) return null;
+    return localStorage.getItem(locationStorageKey(id));
+  });
 
   // Persist category selection per tournament
   const setSelectedCategoryId = (categoryId: string | null) => {
