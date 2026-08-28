@@ -11,6 +11,25 @@ import { getFieldLocation } from "@/lib/fieldLocations";
 
 const publicScheduleLocationKey = (token: string) => `public-schedule-location:${token}`;
 
+type Timeslot = { key: string; date: string; time: string; matches: any[] };
+
+const groupIntoTimeslots = (matchList: any[]): { timeslots: Timeslot[]; uniqueDates: string[] } => {
+  const timeslots: Timeslot[] = [];
+  const slotMap: Record<string, any[]> = {};
+
+  matchList.forEach(m => {
+    const key = `${m.match_date || "nodate"}_${m.match_time || "notime"}`;
+    if (!slotMap[key]) {
+      slotMap[key] = [];
+      timeslots.push({ key, date: m.match_date || "", time: m.match_time || "", matches: slotMap[key] });
+    }
+    slotMap[key].push(m);
+  });
+
+  const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
+  return { timeslots, uniqueDates };
+};
+
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -25,7 +44,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return stored && validLocationNames.includes(stored) ? stored : "";
   });
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
   const setLocationFilter = (value: string) => {
     setLocationFilterState(value);
@@ -44,6 +62,13 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validLocationNames.join(",")]);
 
+  useEffect(() => {
+    const update = () => setHeaderHeight(headerRef.current?.offsetHeight || 56);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   const hasMultiLocations = (locations?.length ?? 0) > 1;
   const visibleMatches = hasMultiLocations && locationFilter
     ? matches.filter(m => getFieldLocation(m.field) === locationFilter)
@@ -59,20 +84,14 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return (a.field || "").localeCompare(b.field || "");
   });
 
-  const timeslots: { key: string; date: string; time: string; matches: any[] }[] = [];
-  const slotMap: Record<string, any[]> = {};
+  const firstUnplayedIndex = sorted.findIndex(m => !m.is_played);
+  const playedMatches = firstUnplayedIndex === -1 ? sorted : sorted.slice(0, firstUnplayedIndex);
+  const nextMatch = firstUnplayedIndex === -1 ? null : sorted[firstUnplayedIndex];
+  const upcomingMatches = firstUnplayedIndex === -1 ? [] : sorted.slice(firstUnplayedIndex + 1);
 
-  sorted.forEach(m => {
-    const key = `${m.match_date || "nodate"}_${m.match_time || "notime"}`;
-    if (!slotMap[key]) {
-      slotMap[key] = [];
-      timeslots.push({ key, date: m.match_date || "", time: m.match_time || "", matches: slotMap[key] });
-    }
-    slotMap[key].push(m);
-  });
-
-  // Find the first unplayed match id across all sorted matches
-  const firstUnplayedMatchId = sorted.find(m => !m.is_played)?.id || null;
+  const { timeslots: playedTimeslots, uniqueDates: playedDates } = groupIntoTimeslots(playedMatches);
+  const { timeslots: upcomingTimeslots, uniqueDates: upcomingDates } = groupIntoTimeslots(upcomingMatches);
+  const allDates = [...new Set([...playedDates, ...upcomingDates])].filter(Boolean);
 
   const formatDate = (d: string) => {
     if (!d) return "Geen datum";
@@ -87,33 +106,94 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     }
   };
 
-  useEffect(() => {
-    const update = () => setHeaderHeight(headerRef.current?.offsetHeight || 56);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
-  // Position the page on the first unplayed match without animation.
-  useEffect(() => {
-    if (hasInitialScrolled || headerHeight === 0 || !sorted.length) return;
-    const raf = requestAnimationFrame(() => {
-      setTimeout(() => {
-        const el = document.querySelector('[data-first-unplayed="true"]') as HTMLElement | null;
-        if (el) {
-          el.scrollIntoView({ block: "center", behavior: "instant" });
-        }
-        setHasInitialScrolled(true);
-      }, 0);
-    });
-    return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInitialScrolled, headerHeight, sorted.length, firstUnplayedMatchId]);
+  const renderScheduleSection = (timeslots: Timeslot[], uniqueDates: string[]) => (
+    <div className="space-y-3">
+      {uniqueDates.map(date => (
+        <div key={date} data-schedule-date={date} className="space-y-3">
+          {/* Sticky date header */}
+          <div
+            className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
+            style={{ top: headerHeight }}
+          >
+            <div className="flex items-center gap-2">
+              <div className={ds(bStyle, "dateHeader")}>
+                {formatDate(date)}
+              </div>
+              {allDates.length > 1 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Kies dag"
+                      className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md bg-secondary text-foreground"
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="z-50">
+                    {allDates.map(d => (
+                      <DropdownMenuItem
+                        key={d}
+                        onClick={() => {
+                          setSelectedDate(d);
+                          jumpToDate(d);
+                        }}
+                        className="text-xs font-bold uppercase"
+                      >
+                        {formatDate(d)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
+            </div>
+          </div>
 
-
+          {timeslots.filter(s => s.date === date).map(slot => (
+            <div key={slot.key}>
+              <div className={ds(bStyle, "card")}>
+                {/* Timeslot header */}
+                <div className={ds(bStyle, "timeslotHeader")}>
+                  {slot.time && (
+                    <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
+                      {slot.time.slice(0, 5)}
+                    </span>
+                  )}
+                  <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
+                    {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
+                  </span>
+                </div>
+                {/* Match cards */}
+                <div className="p-2 space-y-2">
+                  {slot.matches.map((m: any) => (
+                    <div
+                      key={m.id}
+                      className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
+                    >
+                      <PublicMatchCard
+                        match={m}
+                        teams={teams}
+                        phases={phases}
+                        groups={groups}
+                        slots={slots}
+                        tournament={tournament}
+                        allMatches={matches}
+                        favoriteTeam={favoriteTeam}
+                        hideRoundNumber
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="px-3 pb-4">
@@ -146,92 +226,45 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
         </div>
       </div>
 
-      <div className="pt-3 space-y-3">
-        {uniqueDates.map(date => (
-          <div key={date} data-schedule-date={date} className="space-y-3">
-            {/* Sticky date header — spans the whole day group */}
-            <div
-              className="sticky z-10 bg-background/95 backdrop-blur-sm py-2 mb-1"
-              style={{ top: headerHeight }}
-            >
-              <div className="flex items-center gap-2">
-                <div className={ds(bStyle, "dateHeader")}>
-                  {formatDate(date)}
-                </div>
-                {uniqueDates.length > 1 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="Kies dag"
-                        className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md bg-secondary text-foreground"
-                      >
-                        <ChevronDown className="h-3.5 w-3.5" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="z-50">
-                      {uniqueDates.map(d => (
-                        <DropdownMenuItem
-                          key={d}
-                          onClick={() => {
-                            setSelectedDate(d);
-                            jumpToDate(d);
-                          }}
-                          className="text-xs font-bold uppercase"
-                        >
-                          {formatDate(d)}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-                {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
+      <div className="pt-3 space-y-6">
+        {/* Past results */}
+        {playedMatches.length > 0 && (
+          <div className="space-y-3">
+            <div className={ds(bStyle, "sectionTitle") || "text-xs font-bold uppercase text-muted-foreground"}>Resultaten</div>
+            {renderScheduleSection(playedTimeslots, playedDates)}
+          </div>
+        )}
+
+        {/* Next match — visually centered */}
+        {nextMatch && (
+          <div className="flex flex-col items-center">
+            <div className={ds(bStyle, "sectionTitle") || "text-xs font-bold uppercase text-primary"}>Volgende wedstrijd</div>
+            <div className={ds(bStyle, "sectionLine")} />
+            <div className="w-full max-w-md py-2">
+              <div className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}>
+                <PublicMatchCard
+                  match={nextMatch}
+                  teams={teams}
+                  phases={phases}
+                  groups={groups}
+                  slots={slots}
+                  tournament={tournament}
+                  allMatches={matches}
+                  favoriteTeam={favoriteTeam}
+                  hideRoundNumber
+                />
               </div>
             </div>
-
-            {timeslots.filter(s => s.date === date).map(slot => (
-              <div key={slot.key}>
-                <div className={ds(bStyle, "card")}>
-                  {/* Timeslot header */}
-                  <div className={ds(bStyle, "timeslotHeader")}>
-                    {slot.time && (
-                      <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
-                        {slot.time.slice(0, 5)}
-                      </span>
-                    )}
-                    <span className={ds(bStyle, "timeslotHeaderMeta") || "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"}>
-                      {slot.matches.length} wedstrijd{slot.matches.length !== 1 ? "en" : ""}
-                    </span>
-                  </div>
-                  {/* Match cards — each in its own style-aware container with spacing */}
-                  <div className="p-2 space-y-2">
-                    {slot.matches.map((m: any) => {
-                      return (
-                      <div
-                        key={m.id}
-                        data-first-unplayed={m.id === firstUnplayedMatchId ? "true" : undefined}
-                        className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
-                      >
-                        <PublicMatchCard
-                          match={m}
-                          teams={teams}
-                          phases={phases}
-                          groups={groups}
-                          slots={slots}
-                          tournament={tournament}
-                          allMatches={matches}
-                          favoriteTeam={favoriteTeam}
-                          hideRoundNumber
-
-                        />
-                      </div>
-                    );})}
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
-        ))}
+        )}
+
+        {/* Upcoming schedule */}
+        {upcomingMatches.length > 0 && (
+          <div className="space-y-3">
+            <div className={ds(bStyle, "sectionTitle") || "text-xs font-bold uppercase text-muted-foreground"}>Programma</div>
+            {renderScheduleSection(upcomingTimeslots, upcomingDates)}
+          </div>
+        )}
       </div>
 
       {scheduledCount === 0 && (
