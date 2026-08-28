@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useFieldLabel } from "@/lib/fieldLocations";
 import { MapPin } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import CountryFlag from "@/components/CountryFlag";
@@ -173,7 +174,7 @@ const PublicMatchCard = ({
                 <div className="flex flex-col items-end text-[9px] text-muted-foreground flex-shrink-0">
                   {m.field && (
                     <span className="flex items-center gap-0.5 font-bold">
-                      <MapPin className="h-2.5 w-2.5" /> {m.field}
+                      <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
                     </span>
                   )}
                   {m.referee && (

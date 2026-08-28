@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatFieldLabel } from "@/lib/fieldLocations";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MatchStatsEditor from "./MatchStatsEditor";
@@ -127,7 +128,7 @@ const MatchDetailDialog = ({ open, onClose, match, tournament, teams, scoreEdita
           )}
           {match.field && (
             <div className="flex items-center gap-2 rounded bg-secondary/30 px-3 py-2">
-              <span className="text-xs text-foreground">{match.field}</span>
+              <span className="text-xs text-foreground">{formatFieldLabel(match.field)}</span>
             </div>
           )}
           {match.referee && (
