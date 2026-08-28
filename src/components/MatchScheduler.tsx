@@ -458,6 +458,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // Match edit dialog
   const [editMatchId, setEditMatchId] = useState<string | null>(null);
   const [editMatchReferee, setEditMatchReferee] = useState("");
+  const [editMatchDuration, setEditMatchDuration] = useState("");
+  const [editMatchNewRef, setEditMatchNewRef] = useState("");
+  const [showEditMatchNewRef, setShowEditMatchNewRef] = useState(false);
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
 
   // Mobile touch move state
@@ -2431,9 +2434,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   const saveMatchEdit = async () => {
     if (!editMatchId) return;
-    await updateMatch(editMatchId, { referee: editMatchReferee || null });
+    const parsed = editMatchDuration.trim() === "" ? null : parseInt(editMatchDuration, 10);
+    const dur = parsed != null && !isNaN(parsed) && parsed > 0 ? parsed : null;
+    await updateMatch(editMatchId, { referee: editMatchReferee || null, duration_minutes: dur } as any);
     setEditMatchId(null);
-    toast({ title: "Scheidsrechter bijgewerkt" });
+    toast({ title: "Wedstrijd bijgewerkt" });
+  };
+
+  const addRefereeFromMatchDialog = async () => {
+    const name = editMatchNewRef.trim();
+    if (!name) return;
+    if (!referees.includes(name)) {
+      await saveReferees([...refereeConfigs, { name, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }]);
+    }
+    setEditMatchReferee(name);
+    setEditMatchNewRef("");
+    setShowEditMatchNewRef(false);
   };
 
   // === MOBILE TAP-TO-PLACE ===
@@ -2896,7 +2912,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 )}
                                               </div>
                                               <button
-                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); }}
+                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : ""); setShowEditMatchNewRef(false); setEditMatchNewRef(""); }}
                                                 className="text-muted-foreground hover:text-foreground print:hidden"
                                               >
                                                 <Pencil className="h-2.5 w-2.5" />
@@ -3533,15 +3549,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         </div>
       </div>
 
-      {/* Match edit dialog — referee only */}
+      {/* Match edit dialog */}
       <Dialog open={!!editMatchId} onOpenChange={(open) => { if (!open) setEditMatchId(null); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm">Scheidsrechter toewijzen</DialogTitle>
+            <DialogTitle className="text-sm">Wedstrijd bewerken</DialogTitle>
           </DialogHeader>
           {editMatchId && (() => {
             const m = matches.find(x => x.id === editMatchId);
             if (!m) return null;
+            const phase = phases.find(p => p.id === m.phase_id);
+            const mc = (phase?.match_config as any) || {};
+            const defaultDur = mc.phaseDuration ?? globalMatchDuration;
             return (
               <div className="space-y-3">
                 <div className="text-xs text-muted-foreground">
@@ -3560,6 +3579,35 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       ))}
                     </SelectContent>
                   </Select>
+                  {showEditMatchNewRef ? (
+                    <div className="flex items-center gap-2 pt-1">
+                      <Input
+                        autoFocus
+                        value={editMatchNewRef}
+                        onChange={(e) => setEditMatchNewRef(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRefereeFromMatchDialog(); } }}
+                        placeholder="Naam scheidsrechter"
+                        className="h-8 text-xs"
+                      />
+                      <Button size="sm" className="h-8 text-xs" onClick={addRefereeFromMatchDialog} disabled={!editMatchNewRef.trim()}>Toevoegen</Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="outline" className="h-7 text-xs mt-1" onClick={() => setShowEditMatchNewRef(true)}>
+                      + Scheidsrechter
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Aangepaste wedstrijdduur (min)</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={editMatchDuration}
+                    onChange={(e) => setEditMatchDuration(e.target.value)}
+                    placeholder={String(defaultDur)}
+                    className="h-8 text-xs"
+                  />
+                  <p className="text-[11px] text-muted-foreground">Leeg = standaardduur ({defaultDur} min).</p>
                 </div>
                 <Button size="sm" onClick={saveMatchEdit} className="w-full">Opslaan</Button>
               </div>
