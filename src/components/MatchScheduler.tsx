@@ -1027,11 +1027,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   // === PLANNER HELPERS ===
+  // Velden zonder locatie horen bij de eerste locatie (bestaande toernooien)
   const plannerFields = !selectedLocation
     ? fields
-    : selectedLocation === "__unassigned"
-      ? fields.filter(f => !f.location)
-      : fields.filter(f => (f.location || null) === selectedLocation);
+    : fields.filter(f =>
+        f.location
+          ? f.location === selectedLocation
+          : locations[0]?.name === selectedLocation
+      );
 
   const getFieldTimeSlots = (field: FieldConfig) => {
     const result: { time: string; minuteStart: number }[] = [];
