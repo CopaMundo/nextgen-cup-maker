@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MapPin, CalendarDays, Download, FileText, Sun, Moon, AlertCircle } from "lucide-react";
+import { MapPin, CalendarDays, Download, FileText, Sun, Moon, AlertCircle, ChevronRight } from "lucide-react";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
