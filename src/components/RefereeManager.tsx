@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, summarizeRefereeLabeled,
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
@@ -253,12 +253,58 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
+  // ==== detail-weergave per scheidsrechter ====
+  const locationLines = (r: RefereeConfig): string[] => {
+    if (locationNames.length === 0) {
+      if (fieldOnlyNames.length === 0) return ["Alle velden"];
+      if (r.allowedFields === null) return ["Alle velden"];
+      const sel = fieldOnlyNames.filter(f => r.allowedFields!.includes(f));
+      if (sel.length === 0) return ["Geen"];
+      if (sel.length === fieldOnlyNames.length) return ["Alle velden"];
+      return sel;
+    }
+    return locationNames.map(loc => {
+      const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
+      if (mode === "none") return `${loc}: Geen`;
+      if (mode === "all" || fieldOnlyNames.length === 0) return `${loc}: Alle velden`;
+      const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
+      return `${loc}: ${sel.length > 0 ? sel.join(", ") : "Geen"}`;
+    });
+  };
+
+  const availabilityLines = (r: RefereeConfig): string[] => {
+    if (days.length === 0) return ["Hele dag"];
+    return days.map(d => {
+      const label = formatIsoDateForLocale(d);
+      if (!r.availability) return `${label}: Hele dag`;
+      const win = r.availability.find(a => a.date === d);
+      if (!win) return `${label}: Niet beschikbaar`;
+      if (win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to) return `${label}: Hele dag`;
+      return `${label}: Vanaf ${win.from} Tot ${win.to}`;
+    });
+  };
+
+  const excludedLines = (r: RefereeConfig): string[] =>
+    r.excludedTeams.length === 0 ? ["/"] : r.excludedTeams.map(teamName);
+
+  const roleLine = (r: RefereeConfig): string => {
+    if (!r.roles || r.roles.length === 0 || r.roles.length >= ALL_ROLES.length) return "Alle rollen";
+    return [...r.roles].sort((a, b) => a - b).map(n => `${n}e`).join(", ");
+  };
+
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
 
   return (
     <div className="space-y-4">
       {/* Actions row */}
       <div className="flex items-center gap-2 flex-wrap">
+        <Button
+          size="sm"
+          onClick={() => { setNewRef(""); setShowAdd(true); }}
+          className="gap-1 bg-foreground text-background hover:bg-foreground/90"
+        >
+          <Plus className="h-3.5 w-3.5" /> Scheidsrechter
+        </Button>
         {categoryId && (
           <Button variant="outline" size="sm" onClick={openImport} className="gap-1">
             <Download className="h-3.5 w-3.5" /> Importeer uit divisies
@@ -270,58 +316,62 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       {/* List of referees */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[860px] text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/40">
                 <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Scheidsrechter</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Locaties/velden</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Beschikbaarheid</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Max wedstrijden</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Uitgesloten</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Rol 1-5</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Locaties en velden</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Beschikbaarheid (Dagen en tijden)</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Max. aantal wedstrijden</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Uitgesloten teams/spelers</th>
+                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Rol (1-5)</th>
                 <th className="px-3 py-2" />
               </tr>
             </thead>
             <tbody>
-              {referees.map((r, i) => {
-                const lines = summarizeRefereeLabeled(r, { locations: locationNames, fields: fieldOnlyNames, teamName });
-                const val = (label: string) => lines.find(l => l.label.startsWith(label))?.value || "/";
-                return (
-                  <tr key={i} className="border-b border-border/60 last:border-b-0">
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="font-medium text-foreground">{r.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Locaties")}</td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Beschikbaarheid")}</td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Max aantal")}</td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Uitgesloten")}</td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">{val("Rol")}</td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center justify-end gap-3">
-                        <button onClick={() => openEdit(i)} className="text-muted-foreground hover:text-foreground transition-colors" title="Bewerken">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors" title="Verwijderen">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {referees.map((r, i) => (
+                <tr key={i} className="border-b border-border/60 last:border-b-0 align-top">
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="font-medium text-foreground">{r.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                    {locationLines(r).map((l, k) => <div key={k} className="whitespace-nowrap">{l}</div>)}
+                  </td>
+                  <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                    {availabilityLines(r).map((l, k) => <div key={k} className="whitespace-nowrap">{l}</div>)}
+                  </td>
+                  <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">
+                    {r.maxMatches ?? "Geen limiet"}
+                  </td>
+                  <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                    {excludedLines(r).map((l, k) => <div key={k}>{l}</div>)}
+                  </td>
+                  <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{roleLine(r)}</td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center justify-end gap-3">
+                      <button onClick={() => openEdit(i)} className="text-muted-foreground hover:text-foreground transition-colors" title="Bewerken">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors" title="Verwijderen">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {referees.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-3 py-6 text-center text-sm text-muted-foreground">Nog geen scheidsrechters toegevoegd.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-        <button
-          onClick={() => { setNewRef(""); setShowAdd(true); }}
-          className="flex w-full items-center justify-center gap-2 border-t border-dashed border-border px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
-        >
-          <Plus className="h-3.5 w-3.5" /> Scheidsrechter toevoegen
-        </button>
       </div>
+
 
 
       {/* Add dialog */}
