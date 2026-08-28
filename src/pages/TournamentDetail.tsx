@@ -18,6 +18,7 @@ import ResultsManager from "@/components/ResultsManager";
 import PresentationManager from "@/components/PresentationManager";
 import RefereeManager from "@/components/RefereeManager";
 import CategorySelector from "@/components/CategorySelector";
+import LocationSelector from "@/components/LocationSelector";
 import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
