@@ -105,11 +105,6 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
     return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
   };
 
-  const formatDateShort = (d: string) => {
-    if (!d) return "Geen datum";
-    return new Date(d).toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short" });
-  };
-
   const jumpToDate = (date: string, behavior: ScrollBehavior = "smooth") => {
     const el = document.querySelector(`[data-schedule-date="${date}"]`);
     if (el) {
