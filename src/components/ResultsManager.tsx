@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { formatFieldLabel } from "@/lib/fieldLocations";
 import { getPhaseLabel } from "@/lib/phaseLabel";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -1655,7 +1656,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               <div className="flex items-center gap-1.5 mt-0.5">
                 {match.field && (
                   <span className="text-[9px] text-muted-foreground flex items-center gap-0.5 truncate">
-                    <MapPin className="h-2 w-2 shrink-0" />{match.field}
+                    <MapPin className="h-2 w-2 shrink-0" />{formatFieldLabel(match.field)}
                   </span>
                 )}
                 {match.referee && (

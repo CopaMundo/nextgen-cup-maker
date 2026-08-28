@@ -5,15 +5,22 @@ import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 
 import { ChevronDown } from "lucide-react";
+import { getFieldLocation } from "@/lib/fieldLocations";
 
 const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; favoriteTeam: string | null }) => {
   const firstUnplayedRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems } = data;
+  const { teams, matches, phases, groups, slots, tournament, groupTeams, scoringSystems, locations } = data;
   const bStyle = useBroadcastStyle();
+  const [locationFilter, setLocationFilter] = useState<string>("");
 
-  const sorted = [...matches].sort((a, b) => {
+  const hasMultiLocations = (locations?.length ?? 0) > 1;
+  const visibleMatches = hasMultiLocations && locationFilter
+    ? matches.filter(m => getFieldLocation(m.field) === locationFilter)
+    : matches;
+
+  const sorted = [...visibleMatches].sort((a, b) => {
     const dateA = a.match_date || "9999";
     const dateB = b.match_date || "9999";
     if (dateA !== dateB) return dateA.localeCompare(dateB);
@@ -66,7 +73,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   }, []);
 
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
-  const scheduledCount = matches.filter(m => m.match_date).length;
+  const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
   return (
     <div className="px-3 pb-4">
@@ -81,8 +88,24 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
           <div className={ds(bStyle, "sectionLine")} />
           <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{scheduledCount} wedstrijden</span>
 
-          {uniqueDates.length > 1 && (
+          {hasMultiLocations && (
             <div className="relative ml-auto shrink-0">
+              <select
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="appearance-none bg-secondary text-foreground text-[10px] font-bold uppercase rounded-md pl-2 pr-6 py-1.5 cursor-pointer"
+              >
+                <option value="">Alle locaties</option>
+                {locations.map((l: any) => (
+                  <option key={l.id} value={l.name}>{l.name}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+            </div>
+          )}
+
+          {uniqueDates.length > 1 && (
+            <div className={`relative shrink-0 ${hasMultiLocations ? "" : "ml-auto"}`}>
               <select
                 value=""
                 onChange={(e) => {

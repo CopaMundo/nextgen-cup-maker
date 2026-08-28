@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatFieldLabel } from "@/lib/fieldLocations";
 import { Calendar, Clock, MapPin, ChevronDown } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -189,7 +190,7 @@ const PublicMatchDetailDialog = ({
   const MetaRow = ({ m }: { m: any }) => {
     const dateStr = formatDate(m?.match_date);
     const timeStr = formatTime(m?.match_time);
-    const fld = m?.field;
+    const fld = formatFieldLabel(m?.field);
     const ref = m?.referee;
     if (!dateStr && !timeStr && !fld && !ref) return null;
     return (
@@ -221,7 +222,7 @@ const PublicMatchDetailDialog = ({
   const LegHeader = ({ m, label }: { m: any; label: string }) => {
     const dateStr = formatDate(m?.match_date);
     const timeStr = formatTime(m?.match_time);
-    const fld = m?.field;
+    const fld = formatFieldLabel(m?.field);
     const ref = m?.referee;
     return (
       <div className="flex items-start justify-between gap-2 mb-2">

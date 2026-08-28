@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { loadFieldLocations } from "@/lib/fieldLocations";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,6 +108,7 @@ const TournamentDetail = () => {
   const fetchTournament = async () => {
     const { data } = await supabase.from("tournaments").select("*").eq("id", id!).single();
     setTournament(data);
+    if (id) void loadFieldLocations(id);
     setLoading(false);
   };
 

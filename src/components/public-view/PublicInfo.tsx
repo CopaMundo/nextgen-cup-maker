@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapPin, CalendarDays, Download, FileText, Sun, Moon, AlertCircle } from "lucide-react";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
@@ -6,6 +6,8 @@ import { ds } from "@/lib/broadcastStyles";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { parseFieldEntries } from "@/lib/fieldLocations";
 
 interface Props {
   data: PublicTournamentData;
@@ -24,6 +26,14 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
   const largeFrameShape = "rounded-2xl";
   const controlFrameShape = "rounded-lg";
   const divisionRef = useRef<HTMLDivElement>(null);
+  const [showLocations, setShowLocations] = useState(false);
+
+  // Velden per locatie (uit toernooi- en divisieconfiguratie)
+  const allFieldEntries = parseFieldEntries(tournament.fields).concat(
+    (categories || []).flatMap((c: any) => parseFieldEntries(c.fields))
+  );
+  const fieldsForLocation = (name: string) =>
+    Array.from(new Set(allFieldEntries.filter(f => f.location === name).map(f => f.name)));
   const isMultiCat = tournament.is_multi_category && categories.length > 1;
   const needsSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
 
@@ -154,12 +164,47 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
             </div>
           )}
           {locations.length > 0 && (
-            <div className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-foreground font-bold text-xs">{locations.map(l => l.name).join(", ")}</span>
-            </div>
+            locations.length === 1 ? (
+              <div className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
+                <MapPin className="h-4 w-4 text-primary" />
+                <span className="text-foreground font-bold text-xs">{locations[0].name}</span>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLocations(true)}
+                className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm transition-colors hover:bg-secondary ${controlFrameShape}`}
+              >
+                <MapPin className="h-4 w-4 text-primary" />
+                <span className="text-foreground font-bold text-xs">{locations.length} locaties</span>
+              </button>
+            )
           )}
         </div>
+
+        {/* Locatie-overzicht */}
+        <Dialog open={showLocations} onOpenChange={setShowLocations}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-base">Locaties</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              {locations.map((l: any) => {
+                const flds = fieldsForLocation(l.name);
+                return (
+                  <div key={l.id} className={`p-3 ${cardFrame}`}>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary shrink-0" />
+                      <span className="text-sm font-bold text-foreground">{l.name}</span>
+                    </div>
+                    {flds.length > 0 && (
+                      <p className="mt-1 pl-6 text-xs text-muted-foreground">{flds.join(" · ")}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Description */}
         {tournament.description && (
