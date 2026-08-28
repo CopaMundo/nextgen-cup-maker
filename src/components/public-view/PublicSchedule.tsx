@@ -209,7 +209,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                       return (
                       <div
                         key={m.id}
-                        ref={m.id === firstUnplayedMatchId ? firstUnplayedRef : undefined}
+                        data-first-unplayed={m.id === firstUnplayedMatchId ? "true" : undefined}
                         className={ds(bStyle, "matchCardWrapper") || "rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm"}
                       >
                         <PublicMatchCard
