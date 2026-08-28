@@ -45,6 +45,7 @@ const getMinSeedFromSlots = (m: { home_slot_label?: string | null; away_slot_lab
 interface FieldConfig {
   name: string;
   startTime: string;
+  location?: string | null;
 }
 
 interface PlannerBreak {
