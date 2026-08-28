@@ -1027,7 +1027,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
       for (const other of samePhaseMatches) {
         const otherStart = timeToMinutes(other.match_time!);
-        const otherDur = matchMc.phaseDuration ?? globalMatchDuration;
+        const otherDur = other.duration_minutes ?? matchMc.phaseDuration ?? globalMatchDuration;
         const otherEnd = otherStart + otherDur;
 
         // Check if this match depends on the other match (other must finish first)
@@ -1770,7 +1770,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         const mStart = timeToMinutes(m.match_time!);
         const mp = phases.find(p => p.id === m.phase_id);
         const mc = (mp?.match_config as any) || {};
-        const dur = mc.phaseDuration ?? globalMatchDuration;
+        const dur = m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
         const brk = mc.phaseBreak ?? globalBreakDuration;
         const end = mStart + dur + brk;
         if (end > latestEnd) latestEnd = end;
@@ -1994,7 +1994,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         const mStart = timeToMinutes(m.match_time!);
         const mp = phases.find(p => p.id === m.phase_id);
         const mc = (mp?.match_config as any) || {};
-        const dur = mc.phaseDuration ?? globalMatchDuration;
+        const dur = m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
         const brk = mc.phaseBreak ?? globalBreakDuration;
         const end = mStart + dur + brk;
         if (end > latestEnd) latestEnd = end;
@@ -2705,7 +2705,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     items.push({ kind: "match", startMin: currentTime, idx: i, match: fieldMatches[i] });
                     const matchPhase = phases.find(p => p.id === fieldMatches[i].phase_id);
                     const matchCfg = (matchPhase?.match_config as any) || {};
-                    const dur = matchCfg.phaseDuration ?? globalMatchDuration;
+                    const dur = fieldMatches[i].duration_minutes ?? matchCfg.phaseDuration ?? globalMatchDuration;
                     const brk = matchCfg.phaseBreak ?? globalBreakDuration;
                     currentTime += dur + brk;
                     const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
