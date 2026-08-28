@@ -52,6 +52,7 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   // Persist category selection per tournament
   const setSelectedCategoryId = (categoryId: string | null) => {
