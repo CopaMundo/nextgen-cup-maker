@@ -189,20 +189,15 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
               <DialogTitle className="text-base">Locaties</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
-              {locations.map((l: any) => {
-                const flds = fieldsForLocation(l.name);
-                return (
-                  <div key={l.id} className={`p-3 ${cardFrame}`}>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary shrink-0" />
-                      <span className="text-sm font-bold text-foreground">{l.name}</span>
-                    </div>
-                    {flds.length > 0 && (
-                      <p className="mt-1 pl-6 text-xs text-muted-foreground">{flds.join(" · ")}</p>
-                    )}
+              {locations.map((l: any) => (
+                <div key={l.id} className={`p-3 ${cardFrame}`}>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary shrink-0" />
+                    <span className="text-sm font-bold text-foreground">{l.name}</span>
                   </div>
-                );
-              })}
+                </div>
+              ))}
+
             </div>
           </DialogContent>
         </Dialog>
