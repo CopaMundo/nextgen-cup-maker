@@ -80,7 +80,10 @@ interface Match {
   home_slot_label: string | null;
   away_slot_label: string | null;
   match_name: string | null;
+  duration_minutes?: number | null;
   created_at: string;
+
+
 }
 
 interface Team { id: string; name: string; logo_url: string | null; }
@@ -455,6 +458,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // Match edit dialog
   const [editMatchId, setEditMatchId] = useState<string | null>(null);
   const [editMatchReferee, setEditMatchReferee] = useState("");
+  const [editMatchDuration, setEditMatchDuration] = useState("");
+  const [editMatchNewRef, setEditMatchNewRef] = useState("");
+  const [showEditMatchNewRef, setShowEditMatchNewRef] = useState(false);
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
 
   // Mobile touch move state
@@ -970,7 +976,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const matchStart = timeToMinutes(match.match_time!);
     const matchPhase = phases.find(p => p.id === match.phase_id);
     const matchMc = (matchPhase?.match_config as any) || {};
-    const matchDur = matchMc.phaseDuration ?? globalMatchDuration;
+    const matchDur = match.duration_minutes ?? matchMc.phaseDuration ?? globalMatchDuration;
     const matchEnd = matchStart + matchDur;
 
     // Find all matches that overlap in time (not just exact same time)
@@ -1024,7 +1030,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
       for (const other of samePhaseMatches) {
         const otherStart = timeToMinutes(other.match_time!);
-        const otherDur = matchMc.phaseDuration ?? globalMatchDuration;
+        const otherDur = other.duration_minutes ?? matchMc.phaseDuration ?? globalMatchDuration;
         const otherEnd = otherStart + otherDur;
 
         // Check if this match depends on the other match (other must finish first)
@@ -1436,7 +1442,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const m = matches.find(mm => mm.id === orderedMatchIds[i]);
       const mp = m ? phases.find(pp => pp.id === m.phase_id) : undefined;
       const mc = (mp?.match_config as any) || {};
-      current += (mc.phaseDuration ?? globalMatchDuration) + (mc.phaseBreak ?? globalBreakDuration);
+      current += (m?.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration) + (mc.phaseBreak ?? globalBreakDuration);
       const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
       if (breakHere) current += breakHere.duration;
     }
@@ -1767,7 +1773,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         const mStart = timeToMinutes(m.match_time!);
         const mp = phases.find(p => p.id === m.phase_id);
         const mc = (mp?.match_config as any) || {};
-        const dur = mc.phaseDuration ?? globalMatchDuration;
+        const dur = m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
         const brk = mc.phaseBreak ?? globalBreakDuration;
         const end = mStart + dur + brk;
         if (end > latestEnd) latestEnd = end;
@@ -1813,7 +1819,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const getMatchDur = (m: Match) => {
       const mp = phases.find(p => p.id === m.phase_id);
       const mc = (mp?.match_config as any) || {};
-      return mc.phaseDuration ?? globalMatchDuration;
+      return m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
     };
     for (const m of matches.filter(x => x.match_date === plannerDate && x.match_time && x.field)) {
       if (!m.match_time) continue;
@@ -1991,7 +1997,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         const mStart = timeToMinutes(m.match_time!);
         const mp = phases.find(p => p.id === m.phase_id);
         const mc = (mp?.match_config as any) || {};
-        const dur = mc.phaseDuration ?? globalMatchDuration;
+        const dur = m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
         const brk = mc.phaseBreak ?? globalBreakDuration;
         const end = mStart + dur + brk;
         if (end > latestEnd) latestEnd = end;
@@ -2003,7 +2009,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const getMatchDurLocal = (m: Match) => {
       const mp = phases.find(p => p.id === m.phase_id);
       const mc = (mp?.match_config as any) || {};
-      return mc.phaseDuration ?? globalMatchDuration;
+      return m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
     };
     // Always track team busy times to prevent double-booking
     const teamBusyUntil: Record<string, number> = {};
@@ -2428,9 +2434,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   const saveMatchEdit = async () => {
     if (!editMatchId) return;
-    await updateMatch(editMatchId, { referee: editMatchReferee || null });
+    const parsed = editMatchDuration.trim() === "" ? null : parseInt(editMatchDuration, 10);
+    const dur = parsed != null && !isNaN(parsed) && parsed > 0 ? parsed : null;
+    await updateMatch(editMatchId, { referee: editMatchReferee || null, duration_minutes: dur } as any);
     setEditMatchId(null);
-    toast({ title: "Scheidsrechter bijgewerkt" });
+    toast({ title: "Wedstrijd bijgewerkt" });
+  };
+
+  const addRefereeFromMatchDialog = async () => {
+    const name = editMatchNewRef.trim();
+    if (!name) return;
+    if (!referees.includes(name)) {
+      await saveReferees([...refereeConfigs, { name, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }]);
+    }
+    setEditMatchReferee(name);
+    setEditMatchNewRef("");
+    setShowEditMatchNewRef(false);
   };
 
   // === MOBILE TAP-TO-PLACE ===
@@ -2702,7 +2721,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     items.push({ kind: "match", startMin: currentTime, idx: i, match: fieldMatches[i] });
                     const matchPhase = phases.find(p => p.id === fieldMatches[i].phase_id);
                     const matchCfg = (matchPhase?.match_config as any) || {};
-                    const dur = matchCfg.phaseDuration ?? globalMatchDuration;
+                    const dur = fieldMatches[i].duration_minutes ?? matchCfg.phaseDuration ?? globalMatchDuration;
                     const brk = matchCfg.phaseBreak ?? globalBreakDuration;
                     currentTime += dur + brk;
                     const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
@@ -2893,7 +2912,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 )}
                                               </div>
                                               <button
-                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); }}
+                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : ""); setShowEditMatchNewRef(false); setEditMatchNewRef(""); }}
                                                 className="text-muted-foreground hover:text-foreground print:hidden"
                                               >
                                                 <Pencil className="h-2.5 w-2.5" />
@@ -3530,15 +3549,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         </div>
       </div>
 
-      {/* Match edit dialog — referee only */}
+      {/* Match edit dialog */}
       <Dialog open={!!editMatchId} onOpenChange={(open) => { if (!open) setEditMatchId(null); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm">Scheidsrechter toewijzen</DialogTitle>
+            <DialogTitle className="text-sm">Wedstrijd bewerken</DialogTitle>
           </DialogHeader>
           {editMatchId && (() => {
             const m = matches.find(x => x.id === editMatchId);
             if (!m) return null;
+            const phase = phases.find(p => p.id === m.phase_id);
+            const mc = (phase?.match_config as any) || {};
+            const defaultDur = mc.phaseDuration ?? globalMatchDuration;
             return (
               <div className="space-y-3">
                 <div className="text-xs text-muted-foreground">
@@ -3557,6 +3579,35 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       ))}
                     </SelectContent>
                   </Select>
+                  {showEditMatchNewRef ? (
+                    <div className="flex items-center gap-2 pt-1">
+                      <Input
+                        autoFocus
+                        value={editMatchNewRef}
+                        onChange={(e) => setEditMatchNewRef(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRefereeFromMatchDialog(); } }}
+                        placeholder="Naam scheidsrechter"
+                        className="h-8 text-xs"
+                      />
+                      <Button size="sm" className="h-8 text-xs" onClick={addRefereeFromMatchDialog} disabled={!editMatchNewRef.trim()}>Toevoegen</Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="outline" className="h-7 text-xs mt-1" onClick={() => setShowEditMatchNewRef(true)}>
+                      + Scheidsrechter
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Aangepaste wedstrijdduur (min)</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={editMatchDuration}
+                    onChange={(e) => setEditMatchDuration(e.target.value)}
+                    placeholder={String(defaultDur)}
+                    className="h-8 text-xs"
+                  />
+                  <p className="text-[11px] text-muted-foreground">Leeg = standaardduur ({defaultDur} min).</p>
                 </div>
                 <Button size="sm" onClick={saveMatchEdit} className="w-full">Opslaan</Button>
               </div>

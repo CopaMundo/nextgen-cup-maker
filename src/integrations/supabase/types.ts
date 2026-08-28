@@ -183,6 +183,7 @@ export type Database = {
           away_slot_label: string | null
           away_team_id: string | null
           created_at: string
+          duration_minutes: number | null
           field: string | null
           group_id: string | null
           home_penalties: number | null
@@ -207,6 +208,7 @@ export type Database = {
           away_slot_label?: string | null
           away_team_id?: string | null
           created_at?: string
+          duration_minutes?: number | null
           field?: string | null
           group_id?: string | null
           home_penalties?: number | null
@@ -231,6 +233,7 @@ export type Database = {
           away_slot_label?: string | null
           away_team_id?: string | null
           created_at?: string
+          duration_minutes?: number | null
           field?: string | null
           group_id?: string | null
           home_penalties?: number | null
