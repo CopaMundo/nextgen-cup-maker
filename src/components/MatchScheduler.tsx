@@ -3708,7 +3708,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId }: { tournamentId
                   onClick={async () => {
                     const idx = editFieldIdx;
                     setEditFieldIdx(null);
-                    await saveFields(fields.map((f, i) => i === idx ? { ...f, name: editFieldDraft.name, startTime: editFieldDraft.startTime } : f));
+                    await saveFields(fields.map((f, i) => i === idx ? { ...f, name: editFieldDraft.name, startTime: editFieldDraft.startTime, location: editFieldDraft.location } : f));
                   }}
                   className="text-xs"
                 >
