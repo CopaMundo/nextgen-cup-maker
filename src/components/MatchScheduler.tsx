@@ -329,7 +329,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [internalSelectedLocation, setInternalSelectedLocation] = useState<string | null>(null);
+  const isLocationControlled = selectedLocationProp !== undefined;
+  const selectedLocation = isLocationControlled ? selectedLocationProp : internalSelectedLocation;
+  const updateSelectedLocation = (loc: string | null) => {
+    if (isLocationControlled) onLocationChange?.(loc);
+    else setInternalSelectedLocation(loc);
+  };
   const [editFieldIdx, setEditFieldIdx] = useState<number | null>(null);
   const [editFieldDraft, setEditFieldDraft] = useState<{ name: string; startTime: string; location: string | null }>({ name: "", startTime: "", location: null });
 
