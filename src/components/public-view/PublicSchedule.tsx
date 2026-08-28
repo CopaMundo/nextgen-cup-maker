@@ -75,57 +75,42 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
   const uniqueDates = [...new Set(timeslots.map(s => s.date))].filter(Boolean);
   const scheduledCount = visibleMatches.filter(m => m.match_date).length;
 
+  const jumpToDate = (date: string) => {
+    const el = document.querySelector(`[data-schedule-date="${date}"]`);
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="px-3 pb-4">
       {/* Sticky section header */}
       <div
         ref={headerRef}
-        className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 space-y-3 bg-background/95 backdrop-blur-sm border-b border-border/30"
+        className="sticky top-0 z-20 -mx-3 px-3 pt-4 pb-3 space-y-1.5 bg-background/95 backdrop-blur-sm border-b border-border/30"
       >
         <div className="flex items-center gap-3">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>Schema</h2>
           <div className={ds(bStyle, "sectionLine")} />
-          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{scheduledCount} wedstrijden</span>
 
           {hasMultiLocations && (
-            <div className="relative ml-auto shrink-0">
-              <select
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                className="appearance-none bg-secondary text-foreground text-[10px] font-bold uppercase rounded-md pl-2 pr-6 py-1.5 cursor-pointer"
-              >
-                <option value="">Alle locaties</option>
+            <Select value={locationFilter || "__all"} onValueChange={(v) => setLocationFilter(v === "__all" ? "" : v)}>
+              <SelectTrigger className="h-7 w-auto min-w-[110px] max-w-[160px] text-[10px] font-black uppercase tracking-wider">
+                <SelectValue placeholder="Alle locaties" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all">Alle locaties</SelectItem>
                 {locations.map((l: any) => (
-                  <option key={l.id} value={l.name}>{l.name}</option>
+                  <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>
                 ))}
-              </select>
-              <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-            </div>
+              </SelectContent>
+            </Select>
           )}
-
-          {uniqueDates.length > 1 && (
-            <div className={`relative shrink-0 ${hasMultiLocations ? "" : "ml-auto"}`}>
-              <select
-                value=""
-                onChange={(e) => {
-                  const date = e.target.value;
-                  const el = document.querySelector(`[data-schedule-date="${date}"]`);
-                  if (el) {
-                    const top = el.getBoundingClientRect().top + window.scrollY - headerHeight;
-                    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-                  }
-                }}
-                className="appearance-none bg-secondary text-foreground text-[10px] font-bold uppercase rounded-md pl-2 pr-6 py-1.5 cursor-pointer"
-              >
-                <option value="" disabled>Dag</option>
-                {uniqueDates.map(d => (
-                  <option key={d} value={d}>{formatDate(d)}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-            </div>
-          )}
+        </div>
+        <div className="flex justify-end">
+          <span className={ds(bStyle, "sectionMeta") || "text-[10px] font-bold text-muted-foreground uppercase"}>{scheduledCount} wedstrijden</span>
         </div>
       </div>
 
@@ -141,9 +126,30 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                 <div className={ds(bStyle, "dateHeader")}>
                   {formatDate(date)}
                 </div>
+                {uniqueDates.length > 1 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="Kies dag"
+                        className="shrink-0 h-6 w-6 flex items-center justify-center rounded-md bg-secondary text-foreground"
+                      >
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="z-50">
+                      {uniqueDates.map(d => (
+                        <DropdownMenuItem key={d} onClick={() => jumpToDate(d)} className="text-xs font-bold uppercase">
+                          {formatDate(d)}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
                 {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
               </div>
             </div>
+
             {timeslots.filter(s => s.date === date).map(slot => (
               <div key={slot.key}>
                 <div className={ds(bStyle, "card")}>
