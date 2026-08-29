@@ -91,8 +91,12 @@ const PublicMatchCard = ({
   const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   const hasPenalties = m.home_penalties != null && m.away_penalties != null;
-  const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
-  const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
+  // Scores worden weergegeven zodra ze zijn ingevuld, ook als een beslissende
+  // score nog ontbreekt (wedstrijd nog niet officieel afgerond).
+  const showScores = m.is_played || (m.home_score != null && m.away_score != null);
+  const homeWin = showScores && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
+  const awayWin = showScores && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
+
 
   const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean, position?: number) => (
     <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
@@ -115,7 +119,7 @@ const PublicMatchCard = ({
       </div>
       <div className="flex flex-shrink-0 items-center gap-1.5">
         <div className="relative flex items-center">
-          {m.is_played ? (
+          {showScores ? (
             <>
               <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
               {hasPenalties && (
@@ -195,7 +199,7 @@ const PublicMatchCard = ({
           {renderTeamRow(homeName, homeLogo, homeCountry, m.home_team_id, m.home_penalties, m.home_score, homeWin, homePosition)}
 
           {/* Time/VS badge — absolutely positioned to keep card height identical to played cards */}
-          {!m.is_played && (
+          {!showScores && (
             <div className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 z-10">
               <span className={ds(bStyle, "matchTimeBadge")}>
                 {m.match_time?.slice(0, 5) || "VS"}

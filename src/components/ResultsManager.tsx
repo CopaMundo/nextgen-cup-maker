@@ -261,9 +261,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return updated;
   };
 
-  const resolveMatchNeedsDecider = (match: Match): boolean => {
-    const isTied = match.home_score !== null && match.away_score !== null && match.home_score === match.away_score;
-    if (!isTied) return false;
+  /** Kan deze wedstrijd een beslissende score hebben (ongeacht huidige stand)? */
+  const matchAllowsDecider = (match: Match): boolean => {
     const phase = phases.find(p => p.id === match.phase_id);
     const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
     if (isKnockout) return true;
@@ -278,9 +277,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const sys = sysId
       ? scoringSystems.find(s => s.id === sysId)
       : scoringSystems[0];
-    if (sys?.no_draws) return true;
-    return false;
+    return !!sys?.no_draws;
   };
+
+  const resolveMatchNeedsDecider = (match: Match): boolean => {
+    const isTied = match.home_score !== null && match.away_score !== null && match.home_score === match.away_score;
+    if (!isTied) return false;
+    return matchAllowsDecider(match);
+  };
+
 
   const saveScore = async (match: Match) => {
     const isPlayed = match.home_score !== null && match.away_score !== null;
@@ -1612,7 +1617,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 tournamentId={tournamentId}
                 phaseId={format.id}
                 editable={false}
-                scoreEditable={canEditFormat(format)}
+                scoreEditable={false}
                 showRandomAssign={false}
                 tournament={tournament}
                 refreshKey={resultsRefreshKey}
@@ -1880,7 +1885,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   tournamentId={tournamentId}
                   phaseId={openFormat.id}
                   editable={false}
-                  scoreEditable={openFormat ? canEditFormat(openFormat) : false}
+                  scoreEditable={false}
                   showRandomAssign={false}
                   tournament={tournament}
                   refreshKey={resultsRefreshKey}
@@ -2033,6 +2038,21 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)]">
               <div className="space-y-4 min-w-0">
                 <h3 className="font-display text-sm font-bold text-foreground">{completePreview.selectedFormat.name}</h3>
+                {(() => {
+                  const tieGroups = completePreview.formatPreviews
+                    .flatMap(({ groupPreviews }) => groupPreviews.map(({ group }) => group))
+                    .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
+                  if (tieGroups.length === 0) return null;
+                  return (
+                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-1">
+                      <p className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">Loting vereist</p>
+                      <p className="text-xs text-foreground">
+                        In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig met de pijltjes (▲▼) naast de betrokken teams hieronder.
+                      </p>
+                    </div>
+                  );
+                })()}
+
                 {completePreview.formatPreviews.length > 0 ? (
                   completePreview.formatPreviews.map(({ format, groupPreviews }) => (
                     <div key={format.id} className="space-y-3">
@@ -2243,7 +2263,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         // Voor H&A: needsPenalties altijd true in knockout/single_match (zodra aggregate tied is)
         const phase = phases.find(p => p.id === sem.phase_id);
         const isKnockoutLike = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
-        const needsPen = isHALeg && isKnockoutLike ? true : resolveMatchNeedsDecider(sem);
+        const needsPen = isHALeg && isKnockoutLike ? true : matchAllowsDecider(sem);
 
         return (
           <ScoreEntryDialog
