@@ -636,7 +636,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         ? (side === "home" ? haTotal.homeTotal : haTotal.awayTotal)
         : (side === "home" ? match.home_score : match.away_score);
 
-      const isPlayedish = match.is_played || (matchIsHA && haTotal?.anyScored);
+      const isPlayedish = match.is_played
+        || (match.home_score != null && match.away_score != null)
+        || (matchIsHA && haTotal?.anyScored);
+
 
       return (
         <div
