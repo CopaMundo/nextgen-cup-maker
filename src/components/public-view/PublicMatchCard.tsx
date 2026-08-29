@@ -91,8 +91,12 @@ const PublicMatchCard = ({
   const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   const hasPenalties = m.home_penalties != null && m.away_penalties != null;
-  const homeWin = m.is_played && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
-  const awayWin = m.is_played && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
+  // Scores worden weergegeven zodra ze zijn ingevuld, ook als een beslissende
+  // score nog ontbreekt (wedstrijd nog niet officieel afgerond).
+  const showScores = m.is_played || (m.home_score != null && m.away_score != null);
+  const homeWin = showScores && ((m.home_score ?? 0) > (m.away_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.home_penalties ?? 0) > (m.away_penalties ?? 0)));
+  const awayWin = showScores && ((m.away_score ?? 0) > (m.home_score ?? 0) || ((m.home_score ?? 0) === (m.away_score ?? 0) && hasPenalties && (m.away_penalties ?? 0) > (m.home_penalties ?? 0)));
+
 
   const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean, position?: number) => (
     <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
