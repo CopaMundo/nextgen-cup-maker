@@ -2038,6 +2038,21 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)]">
               <div className="space-y-4 min-w-0">
                 <h3 className="font-display text-sm font-bold text-foreground">{completePreview.selectedFormat.name}</h3>
+                {(() => {
+                  const tieGroups = completePreview.formatPreviews
+                    .flatMap(({ groupPreviews }) => groupPreviews.map(({ group }) => group))
+                    .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
+                  if (tieGroups.length === 0) return null;
+                  return (
+                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-1">
+                      <p className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">Loting vereist</p>
+                      <p className="text-xs text-foreground">
+                        In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig met de pijltjes (▲▼) naast de betrokken teams hieronder.
+                      </p>
+                    </div>
+                  );
+                })()}
+
                 {completePreview.formatPreviews.length > 0 ? (
                   completePreview.formatPreviews.map(({ format, groupPreviews }) => (
                     <div key={format.id} className="space-y-3">
