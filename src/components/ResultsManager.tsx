@@ -1617,7 +1617,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 tournamentId={tournamentId}
                 phaseId={format.id}
                 editable={false}
-                scoreEditable={canEditFormat(format)}
+                scoreEditable={false}
                 showRandomAssign={false}
                 tournament={tournament}
                 refreshKey={resultsRefreshKey}
@@ -1885,7 +1885,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   tournamentId={tournamentId}
                   phaseId={openFormat.id}
                   editable={false}
-                  scoreEditable={openFormat ? canEditFormat(openFormat) : false}
+                  scoreEditable={false}
                   showRandomAssign={false}
                   tournament={tournament}
                   refreshKey={resultsRefreshKey}
@@ -2248,7 +2248,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         // Voor H&A: needsPenalties altijd true in knockout/single_match (zodra aggregate tied is)
         const phase = phases.find(p => p.id === sem.phase_id);
         const isKnockoutLike = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
-        const needsPen = isHALeg && isKnockoutLike ? true : resolveMatchNeedsDecider(sem);
+        const needsPen = isHALeg && isKnockoutLike ? true : matchAllowsDecider(sem);
 
         return (
           <ScoreEntryDialog
