@@ -261,9 +261,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return updated;
   };
 
-  const resolveMatchNeedsDecider = (match: Match): boolean => {
-    const isTied = match.home_score !== null && match.away_score !== null && match.home_score === match.away_score;
-    if (!isTied) return false;
+  /** Kan deze wedstrijd een beslissende score hebben (ongeacht huidige stand)? */
+  const matchAllowsDecider = (match: Match): boolean => {
     const phase = phases.find(p => p.id === match.phase_id);
     const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
     if (isKnockout) return true;
@@ -278,9 +277,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const sys = sysId
       ? scoringSystems.find(s => s.id === sysId)
       : scoringSystems[0];
-    if (sys?.no_draws) return true;
-    return false;
+    return !!sys?.no_draws;
   };
+
+  const resolveMatchNeedsDecider = (match: Match): boolean => {
+    const isTied = match.home_score !== null && match.away_score !== null && match.home_score === match.away_score;
+    if (!isTied) return false;
+    return matchAllowsDecider(match);
+  };
+
 
   const saveScore = async (match: Match) => {
     const isPlayed = match.home_score !== null && match.away_score !== null;
