@@ -119,7 +119,7 @@ const PublicMatchCard = ({
       </div>
       <div className="flex flex-shrink-0 items-center gap-1.5">
         <div className="relative flex items-center">
-          {m.is_played ? (
+          {showScores ? (
             <>
               <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
               {hasPenalties && (
@@ -199,7 +199,7 @@ const PublicMatchCard = ({
           {renderTeamRow(homeName, homeLogo, homeCountry, m.home_team_id, m.home_penalties, m.home_score, homeWin, homePosition)}
 
           {/* Time/VS badge — absolutely positioned to keep card height identical to played cards */}
-          {!m.is_played && (
+          {!showScores && (
             <div className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 z-10">
               <span className={ds(bStyle, "matchTimeBadge")}>
                 {m.match_time?.slice(0, 5) || "VS"}
