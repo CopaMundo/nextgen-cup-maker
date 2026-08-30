@@ -100,6 +100,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [loading, setLoading] = useState(true);
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
   const [phaseActionDialog, setPhaseActionDialog] = useState<"format-complete" | "format-undo" | "format-incomplete" | null>(null);
+  const [lotsDialogGroupId, setLotsDialogGroupId] = useState<string | null>(null);
   const [selectedFormatActionId, setSelectedFormatActionId] = useState<string | null>(null);
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
   const [expandedFormats, setExpandedFormats] = useState<Set<string>>(new Set());
@@ -2044,11 +2045,24 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                     .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
                   if (tieGroups.length === 0) return null;
                   return (
-                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-1">
+                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-2">
                       <p className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">Loting vereist</p>
                       <p className="text-xs text-foreground">
-                        In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig met de pijltjes (▲▼) naast de betrokken teams hieronder.
+                        In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig voor de betrokken teams.
                       </p>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {tieGroups.map(g => (
+                          <Button
+                            key={g.id}
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
+                            onClick={() => setLotsDialogGroupId(g.id)}
+                          >
+                            <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: volgorde bepalen
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   );
                 })()}
