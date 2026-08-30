@@ -336,9 +336,25 @@ const applyTiebreakers = (
   // First sort by points (always primary)
   rows.sort((a, b) => b.pts - a.pts);
 
+  // Mark a still-tied subset as requiring drawing lots, honouring manual positions
+  const markDrawingLots = (subset: StandingRow[]): StandingRow[] => {
+    subset.forEach((r) => { r.needsDrawingLots = true; });
+    const hasManual = subset.some((r) => r.manualPosition != null);
+    if (hasManual) {
+      subset.sort((a, b) => {
+        const am = a.manualPosition ?? Number.MAX_SAFE_INTEGER;
+        const bm = b.manualPosition ?? Number.MAX_SAFE_INTEGER;
+        return am - bm;
+      });
+    }
+    return subset;
+  };
+
   // Recursively resolve groups that are tied on points using the rules sequence
   const resolveTied = (subset: StandingRow[], ruleIdx: number): StandingRow[] => {
-    if (subset.length <= 1 || ruleIdx >= rules.length) return subset;
+    if (subset.length <= 1) return subset;
+    // All configured criteria exhausted but teams are still tied: fall back to drawing lots
+    if (ruleIdx >= rules.length) return markDrawingLots(subset);
     const rule = rules[ruleIdx];
 
     if (rule === "head_to_head") {
@@ -385,17 +401,7 @@ const applyTiebreakers = (
 
     if (rule === "drawing_lots") {
       // Mark all still-tied teams as requiring a manual draw.
-      // If the user has assigned manual positions, sort by them; otherwise keep current order.
-      subset.forEach((r) => { r.needsDrawingLots = true; });
-      const hasManual = subset.some((r) => r.manualPosition != null);
-      if (hasManual) {
-        subset.sort((a, b) => {
-          const am = a.manualPosition ?? Number.MAX_SAFE_INTEGER;
-          const bm = b.manualPosition ?? Number.MAX_SAFE_INTEGER;
-          return am - bm;
-        });
-      }
-      return subset;
+      return markDrawingLots(subset);
     }
 
     // fairplay & least_cards: lower is better
