@@ -485,12 +485,7 @@ export const calculateGroupStandings = (
     };
   });
 
-  const { rules: baseRules, h2hSubRules } = resolveGroupTiebreakers(groupId, matches, groups, phases, scoringSystems);
-  // When fair play is enabled for the tournament, always apply it as the final
-  // criterion before the (implicit) drawing of lots.
-  const rules = tournament?.enable_fairplay && !baseRules.includes("fairplay")
-    ? [...baseRules, "fairplay"]
-    : baseRules;
+  const { rules, h2hSubRules } = resolveGroupTiebreakers(groupId, matches, groups, phases, scoringSystems);
   rows = applyTiebreakers(rows, rules, h2hSubRules, groupMatches, groups, phases, scoringSystems, tournament);
   rows.forEach((r, i) => (r.pos = i + 1));
   return rows;

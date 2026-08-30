@@ -8,9 +8,7 @@ const TIEBREAKER_OPTIONS = [
   { value: "goal_difference", label: "Doelpuntensaldo" },
   { value: "goals_scored", label: "Doelpunten gemaakt" },
   { value: "head_to_head", label: "Onderling duel" },
-  { value: "least_cards", label: "Minst kaarten" },
   { value: "wins", label: "Meeste overwinningen" },
-  { value: "drawing_lots", label: "Loting" },
 ];
 
 const TiebreakerManager = ({ tournamentId }: { tournamentId: string }) => {
