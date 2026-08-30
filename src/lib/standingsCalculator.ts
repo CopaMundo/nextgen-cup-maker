@@ -67,6 +67,7 @@ export interface TournamentDefaults {
   points_win?: number | null;
   points_draw?: number | null;
   points_loss?: number | null;
+  enable_fairplay?: boolean | null;
 }
 
 /**
@@ -336,9 +337,25 @@ const applyTiebreakers = (
   // First sort by points (always primary)
   rows.sort((a, b) => b.pts - a.pts);
 
+  // Mark a still-tied subset as requiring drawing lots, honouring manual positions
+  const markDrawingLots = (subset: StandingRow[]): StandingRow[] => {
+    subset.forEach((r) => { r.needsDrawingLots = true; });
+    const hasManual = subset.some((r) => r.manualPosition != null);
+    if (hasManual) {
+      subset.sort((a, b) => {
+        const am = a.manualPosition ?? Number.MAX_SAFE_INTEGER;
+        const bm = b.manualPosition ?? Number.MAX_SAFE_INTEGER;
+        return am - bm;
+      });
+    }
+    return subset;
+  };
+
   // Recursively resolve groups that are tied on points using the rules sequence
   const resolveTied = (subset: StandingRow[], ruleIdx: number): StandingRow[] => {
-    if (subset.length <= 1 || ruleIdx >= rules.length) return subset;
+    if (subset.length <= 1) return subset;
+    // All configured criteria exhausted but teams are still tied: fall back to drawing lots
+    if (ruleIdx >= rules.length) return markDrawingLots(subset);
     const rule = rules[ruleIdx];
 
     if (rule === "head_to_head") {
@@ -385,17 +402,7 @@ const applyTiebreakers = (
 
     if (rule === "drawing_lots") {
       // Mark all still-tied teams as requiring a manual draw.
-      // If the user has assigned manual positions, sort by them; otherwise keep current order.
-      subset.forEach((r) => { r.needsDrawingLots = true; });
-      const hasManual = subset.some((r) => r.manualPosition != null);
-      if (hasManual) {
-        subset.sort((a, b) => {
-          const am = a.manualPosition ?? Number.MAX_SAFE_INTEGER;
-          const bm = b.manualPosition ?? Number.MAX_SAFE_INTEGER;
-          return am - bm;
-        });
-      }
-      return subset;
+      return markDrawingLots(subset);
     }
 
     // fairplay & least_cards: lower is better
@@ -478,7 +485,12 @@ export const calculateGroupStandings = (
     };
   });
 
-  const { rules, h2hSubRules } = resolveGroupTiebreakers(groupId, matches, groups, phases, scoringSystems);
+  const { rules: baseRules, h2hSubRules } = resolveGroupTiebreakers(groupId, matches, groups, phases, scoringSystems);
+  // When fair play is enabled for the tournament, always apply it as the final
+  // criterion before the (implicit) drawing of lots.
+  const rules = tournament?.enable_fairplay && !baseRules.includes("fairplay")
+    ? [...baseRules, "fairplay"]
+    : baseRules;
   rows = applyTiebreakers(rows, rules, h2hSubRules, groupMatches, groups, phases, scoringSystems, tournament);
   rows.forEach((r, i) => (r.pos = i + 1));
   return rows;
