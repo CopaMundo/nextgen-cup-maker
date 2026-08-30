@@ -2141,6 +2141,72 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         </DialogContent>
       </Dialog>
 
+      {/* Loting bepalen: sub-popup bovenop de voltooiingspopup */}
+      <Dialog
+        open={lotsDialogGroupId !== null}
+        onOpenChange={(open) => { if (!open) setLotsDialogGroupId(null); }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Loting bepalen — {groups.find(g => g.id === lotsDialogGroupId)?.name ?? ""}</DialogTitle>
+            <DialogDescription>
+              Deze teams zijn volledig gelijk geëindigd. Bepaal handmatig de eindvolgorde met de pijltjes.
+            </DialogDescription>
+          </DialogHeader>
+          {lotsDialogGroupId && (() => {
+            const standings = calcStandings(lotsDialogGroupId);
+            const tied = standings.filter(s => s.needsDrawingLots);
+            if (tied.length === 0) {
+              return <p className="text-sm text-muted-foreground">Er zijn geen teams meer die een loting vereisen in deze groep.</p>;
+            }
+            return (
+              <ul className="space-y-1.5">
+                {tied.map((row) => {
+                  const idx = standings.findIndex(s => s.team.id === row.team.id);
+                  const canUp = idx > 0 && !!standings[idx - 1]?.needsDrawingLots;
+                  const canDown = idx < standings.length - 1 && !!standings[idx + 1]?.needsDrawingLots;
+                  return (
+                    <li key={row.team.id} className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-2 py-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-bold text-muted-foreground text-xs w-5 text-center flex-shrink-0">{row.pos}</span>
+                        {row.team.logo_url && <img src={row.team.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0" />}
+                        <span className="truncate font-medium text-foreground text-sm">{row.team.name}</span>
+                        {tournament?.show_country && row.team.country && (
+                          <CountryFlag country={row.team.country} className="h-3 w-4 object-contain flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="flex flex-col flex-shrink-0 -my-0.5">
+                        <button
+                          type="button"
+                          aria-label="Omhoog verplaatsen"
+                          className="hover:text-foreground text-muted-foreground disabled:opacity-30 disabled:pointer-events-none leading-none"
+                          disabled={!canUp}
+                          onClick={() => moveDrawingLotsTeam(lotsDialogGroupId, row.team.id, -1)}
+                        >
+                          <ChevronUp className="!h-3.5 !w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Omlaag verplaatsen"
+                          className="hover:text-foreground text-muted-foreground disabled:opacity-30 disabled:pointer-events-none leading-none"
+                          disabled={!canDown}
+                          onClick={() => moveDrawingLotsTeam(lotsDialogGroupId, row.team.id, 1)}
+                        >
+                          <ChevronDown className="!h-3.5 !w-3.5" />
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLotsDialogGroupId(null)}>Sluiten</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Undo format AlertDialog */}
       <AlertDialog
         open={phaseActionDialog === "format-undo"}
