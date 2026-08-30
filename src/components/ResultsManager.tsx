@@ -628,20 +628,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
     const standingsMap: Record<string, { teamId: string; position: number }[]> = {};
 
-    // Check for unresolved drawing_lots before completing
+    // Tied teams are ordered manually in the completion dialog; use current order
     for (const format of groupFormats) {
       const formatGroups = groups.filter(g => g.phase_id === format.id);
       for (const group of formatGroups) {
         const standings = calcStandings(group.id);
-        if (standings.some(s => s.needsDrawingLots)) {
-          toast({
-            title: "Loting vereist",
-            description: `In ${group.name} zijn er teams gelijk geëindigd waarvoor loting nodig is. Bepaal eerst de volgorde via de pijltjes in het klassement voordat je dit format kunt voltooien.`,
-            variant: "destructive",
-          });
-          setPhaseActionDialog(null);
-          return;
-        }
         standingsMap[group.id] = standings.map(s => ({ teamId: s.team.id, position: s.pos }));
       }
     }
