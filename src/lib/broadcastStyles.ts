@@ -445,7 +445,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
 export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", "serie_a"];
 
 /** Enkel deze 6 stijlen zijn kiesbaar in de UI. */
-export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", serie_a"];
+export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", "serie_a"];
 
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
