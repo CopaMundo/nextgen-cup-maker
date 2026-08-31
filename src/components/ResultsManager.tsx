@@ -2137,7 +2137,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         open={lotsDialogGroupId !== null}
         onOpenChange={(open) => { if (!open) setLotsDialogGroupId(null); }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Loting bepalen — {groups.find(g => g.id === lotsDialogGroupId)?.name ?? ""}</DialogTitle>
             <DialogDescription>
@@ -2151,22 +2151,28 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               return <p className="text-sm text-muted-foreground">Er zijn geen teams meer die een loting vereisen in deze groep.</p>;
             }
             return (
-              <ul className="space-y-1.5">
+              <ul className="space-y-2">
                 {tied.map((row) => {
                   const idx = standings.findIndex(s => s.team.id === row.team.id);
                   const canUp = idx > 0 && !!standings[idx - 1]?.needsDrawingLots;
                   const canDown = idx < standings.length - 1 && !!standings[idx + 1]?.needsDrawingLots;
                   return (
-                    <li key={row.team.id} className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-2 py-1.5">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-bold text-muted-foreground text-xs w-5 text-center flex-shrink-0">{row.pos}</span>
-                        {row.team.logo_url && <img src={row.team.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0" />}
+                    <li key={row.team.id} className="flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded bg-muted text-xs font-bold text-foreground">
+                          {row.pos}
+                        </span>
+                        <img
+                          src={row.team.logo_url || "/placeholder.svg"}
+                          alt=""
+                          className="h-8 w-8 object-contain flex-shrink-0"
+                        />
                         <span className="truncate font-medium text-foreground text-sm">{row.team.name}</span>
                         {tournament?.show_country && row.team.country && (
-                          <CountryFlag country={row.team.country} className="h-3 w-4 object-contain flex-shrink-0" />
+                          <CountryFlag country={row.team.country} className="h-4 w-5 object-contain flex-shrink-0" />
                         )}
                       </div>
-                      <div className="flex flex-col flex-shrink-0 -my-0.5">
+                      <div className="flex flex-col flex-shrink-0 -my-1">
                         <button
                           type="button"
                           aria-label="Omhoog verplaatsen"
@@ -2174,7 +2180,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                           disabled={!canUp}
                           onClick={() => moveDrawingLotsTeam(lotsDialogGroupId, row.team.id, -1)}
                         >
-                          <ChevronUp className="!h-3.5 !w-3.5" />
+                          <ChevronUp className="!h-4 !w-4" />
                         </button>
                         <button
                           type="button"
@@ -2183,7 +2189,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                           disabled={!canDown}
                           onClick={() => moveDrawingLotsTeam(lotsDialogGroupId, row.team.id, 1)}
                         >
-                          <ChevronDown className="!h-3.5 !w-3.5" />
+                          <ChevronDown className="!h-4 !w-4" />
                         </button>
                       </div>
                     </li>
@@ -2193,7 +2199,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             );
           })()}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setLotsDialogGroupId(null)}>Sluiten</Button>
+            <Button variant="outline" onClick={() => setLotsDialogGroupId(null)}>Klaar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
