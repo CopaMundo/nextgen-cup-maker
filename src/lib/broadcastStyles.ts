@@ -15,7 +15,8 @@ export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; descriptio
   la_rosa: { name: "La Rosa", description: "Broadcast Style #8 — moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
   teletext: { name: "Teletext Football", description: "Broadcast Style #12 — klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
   retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
-};  serie_a: { name: "Serie A", description: "Broadcast Style #13 — Italiaanse topflight scoreboardlook: diepe navy met een felgroen-naar-turquoise gradient-accent, scherpe hoeken en Barlow Condensed typografie", preview: "🟢" },
+  serie_a: { name: "Serie A", description: "Broadcast Style #13 — Italiaanse topflight scoreboardlook: diepe navy met een felgroen-naar-turquoise gradient-accent, scherpe hoeken en Barlow Condensed typografie", preview: "🟢" },
+};
 
 
 const STYLES: Record<BroadcastStyle, Record<string, string>> = {
@@ -444,7 +445,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
 export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", "serie_a"];
 
 /** Enkel deze 6 stijlen zijn kiesbaar in de UI. */
-export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", serie_a"];
+export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", "serie_a"];
 
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
