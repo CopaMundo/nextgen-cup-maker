@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
 
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
@@ -13,14 +14,16 @@ const OWN_GOAL_LABEL = "Eigen doelpunt";
 const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId: string; tournament: any; categoryId?: string | null }) => {
   const [stats, setStats] = useState<MatchStat[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [matches, setMatches] = useState<FairplayMatch[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [sRes, tRes] = await Promise.all([
+      const [sRes, tRes, mRes] = await Promise.all([
         supabase.from("match_stats").select("id, match_id, stat_type, player_name, team_id").eq("tournament_id", tournamentId),
         supabase.from("teams").select("id, name, logo_url, category_id").eq("tournament_id", tournamentId),
+        supabase.from("matches").select("id, home_team_id, away_team_id, is_played").eq("tournament_id", tournamentId),
       ]);
       const allTeams = (tRes.data || []) as (Team & { category_id: string | null })[];
       const filteredTeams = categoryId ? allTeams.filter(t => t.category_id === categoryId) : allTeams;
@@ -29,9 +32,11 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       const filteredStats = categoryId ? allStats.filter(s => teamIds.has(s.team_id)) : allStats;
       setTeams(filteredTeams);
       setStats(filteredStats);
+      setMatches(((mRes.data || []) as FairplayMatch[]).filter(m => !categoryId || (m.home_team_id && teamIds.has(m.home_team_id)) || (m.away_team_id && teamIds.has(m.away_team_id))));
       setLoading(false);
     })();
   }, [tournamentId, categoryId]);
+
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
   const teamLogo = (id: string) => teams.find(t => t.id === id)?.logo_url || null;
