@@ -2219,7 +2219,17 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             );
           })()}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setLotsDialogGroupId(null)}>Klaar</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (lotsDialogGroupId) {
+                  setConfirmedLotsGroups(prev => new Set(prev).add(lotsDialogGroupId));
+                }
+                setLotsDialogGroupId(null);
+              }}
+            >
+              Klaar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
