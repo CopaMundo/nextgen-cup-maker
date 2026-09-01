@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -101,6 +102,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
   const [phaseActionDialog, setPhaseActionDialog] = useState<"format-complete" | "format-undo" | "format-incomplete" | null>(null);
   const [lotsDialogGroupId, setLotsDialogGroupId] = useState<string | null>(null);
+  const [confirmedLotsGroups, setConfirmedLotsGroups] = useState<Set<string>>(new Set());
   const [selectedFormatActionId, setSelectedFormatActionId] = useState<string | null>(null);
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
   const [expandedFormats, setExpandedFormats] = useState<Set<string>>(new Set());
@@ -154,6 +156,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     }
     setSelectedFormatActionId(format.id);
     setExpandedFormats(new Set());
+    setConfirmedLotsGroups(new Set());
     const formatMatches = matches.filter(match => match.phase_id === format.id);
     const hasUnplayedMatches = formatMatches.some(match => !match.is_played);
     setPhaseActionDialog(options?.confirmIncomplete && hasUnplayedMatches ? "format-incomplete" : "format-complete");
@@ -2017,7 +2020,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       {/* Complete format preview */}
       <Dialog
         open={phaseActionDialog === "format-complete"}
-        onOpenChange={(open) => { if (!open) { setPhaseActionDialog(null); setSelectedFormatActionId(null); } }}
+        onOpenChange={(open) => { if (!open) { setPhaseActionDialog(null); setSelectedFormatActionId(null); setConfirmedLotsGroups(new Set()); } }}
       >
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
@@ -2035,24 +2038,41 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                     .flatMap(({ groupPreviews }) => groupPreviews.map(({ group }) => group))
                     .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
                   if (tieGroups.length === 0) return null;
+                  const allConfirmed = tieGroups.every(g => confirmedLotsGroups.has(g.id));
                   return (
-                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-2">
-                      <p className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">Loting vereist</p>
+                    <div className={cn(
+                      "rounded-lg border p-3 space-y-2",
+                      allConfirmed
+                        ? "border-green-500/50 bg-green-500/10"
+                        : "border-amber-500/50 bg-amber-500/10"
+                    )}>
+                      <p className={cn(
+                        "text-xs font-bold uppercase tracking-wide",
+                        allConfirmed ? "text-green-700 dark:text-green-400" : "text-amber-700 dark:text-amber-400"
+                      )}>Loting vereist</p>
                       <p className="text-xs text-foreground">
                         In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig voor de betrokken teams.
                       </p>
                       <div className="flex flex-wrap gap-2 pt-1">
-                        {tieGroups.map(g => (
-                          <Button
-                            key={g.id}
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
-                            onClick={() => setLotsDialogGroupId(g.id)}
-                          >
-                            <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: volgorde bepalen
-                          </Button>
-                        ))}
+                        {tieGroups.map(g => {
+                          const confirmed = confirmedLotsGroups.has(g.id);
+                          return (
+                            <Button
+                              key={g.id}
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "h-7 text-xs",
+                                confirmed
+                                  ? "border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/20"
+                                  : "border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
+                              )}
+                              onClick={() => setLotsDialogGroupId(g.id)}
+                            >
+                              <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: {confirmed ? "volgorde wijzigen" : "volgorde bepalen"}
+                            </Button>
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -2199,7 +2219,17 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             );
           })()}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setLotsDialogGroupId(null)}>Klaar</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (lotsDialogGroupId) {
+                  setConfirmedLotsGroups(prev => new Set(prev).add(lotsDialogGroupId));
+                }
+                setLotsDialogGroupId(null);
+              }}
+            >
+              Klaar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
