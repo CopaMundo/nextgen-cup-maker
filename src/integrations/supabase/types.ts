@@ -1169,6 +1169,7 @@ export type Database = {
           enable_red_cards: boolean
           enable_yellow_cards: boolean
           end_date: string | null
+          fairplay_config: Json
           fields: Json | null
           format_display_mode: string
           full_placement: boolean
@@ -1221,6 +1222,7 @@ export type Database = {
           enable_red_cards?: boolean
           enable_yellow_cards?: boolean
           end_date?: string | null
+          fairplay_config?: Json
           fields?: Json | null
           format_display_mode?: string
           full_placement?: boolean
@@ -1273,6 +1275,7 @@ export type Database = {
           enable_red_cards?: boolean
           enable_yellow_cards?: boolean
           end_date?: string | null
+          fairplay_config?: Json
           fields?: Json | null
           format_display_mode?: string
           full_placement?: boolean
@@ -1354,6 +1357,7 @@ export type Database = {
           enable_red_cards: boolean
           enable_yellow_cards: boolean
           end_date: string | null
+          fairplay_config: Json
           fields: Json | null
           format_display_mode: string
           full_placement: boolean
