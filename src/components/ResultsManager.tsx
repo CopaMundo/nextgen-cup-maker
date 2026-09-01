@@ -155,6 +155,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     }
     setSelectedFormatActionId(format.id);
     setExpandedFormats(new Set());
+    setConfirmedLotsGroups(new Set());
     const formatMatches = matches.filter(match => match.phase_id === format.id);
     const hasUnplayedMatches = formatMatches.some(match => !match.is_played);
     setPhaseActionDialog(options?.confirmIncomplete && hasUnplayedMatches ? "format-incomplete" : "format-complete");
