@@ -2019,7 +2019,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       {/* Complete format preview */}
       <Dialog
         open={phaseActionDialog === "format-complete"}
-        onOpenChange={(open) => { if (!open) { setPhaseActionDialog(null); setSelectedFormatActionId(null); } }}
+        onOpenChange={(open) => { if (!open) { setPhaseActionDialog(null); setSelectedFormatActionId(null); setConfirmedLotsGroups(new Set()); } }}
       >
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
