@@ -69,51 +69,22 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
   };
 
+  const fpConfig = useMemo(() => getFairplayConfig(tournament), [tournament]);
+
   type TeamFairplayRow = {
     teamId: string;
     yellows: number;
     secondYellows: number;
-    straightReds: number;
-    legacyReds: number;
-    points: number; // negative
+    reds: number;
+    cleanMatches: number;
+    penalty: number;
+    total: number;
   };
 
   const fairplayPerTeam = (): TeamFairplayRow[] => {
-    // Build map for ALL teams so they appear with 0 even without cards
-    const teamMap: Record<string, TeamFairplayRow> = {};
-    teams.forEach(t => {
-      teamMap[t.id] = { teamId: t.id, yellows: 0, secondYellows: 0, straightReds: 0, legacyReds: 0, points: 0 };
-    });
-
-    // Compute 2nd-yellows per (team, player) by pairing yellow cards
-    const yellowMap: Record<string, number> = {};
-    stats.forEach(s => {
-      if (s.stat_type === "yellow_card") {
-        const key = `${s.team_id}__${s.player_name}`;
-        yellowMap[key] = (yellowMap[key] || 0) + 1;
-      }
-    });
-    Object.entries(yellowMap).forEach(([key, total]) => {
-      const teamId = key.split("__")[0];
-      if (!teamMap[teamId]) return;
-      teamMap[teamId].secondYellows += Math.floor(total / 2);
-      teamMap[teamId].yellows += total % 2;
-    });
-
-    stats.forEach(s => {
-      if (!teamMap[s.team_id]) return;
-      if (s.stat_type === "straight_red") teamMap[s.team_id].straightReds++;
-      else if (s.stat_type === "red_card") teamMap[s.team_id].legacyReds++;
-    });
-
-    // Negative points: yellow -1, 2x-yellow/red -3, straight red -5, legacy red -3
-    Object.values(teamMap).forEach(r => {
-      r.points = -(r.yellows * 1 + r.secondYellows * 3 + r.straightReds * 5 + r.legacyReds * 3);
-    });
-
-    // Sort: highest points first (closest to 0), then by team name
-    return Object.values(teamMap).sort((a, b) => {
-      if (b.points !== a.points) return b.points - a.points;
+    const rows = computeFairplayRows(teams.map(t => t.id), stats, matches, fpConfig);
+    return rows.sort((a, b) => {
+      if (b.total !== a.total) return b.total - a.total;
       return teamName(a.teamId).localeCompare(teamName(b.teamId));
     });
   };
@@ -122,12 +93,13 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     let lastPoints = Number.NaN;
     let lastRank = 0;
     return rows.map((r, i) => {
-      const rank = r.points === lastPoints ? lastRank : i + 1;
-      lastPoints = r.points;
+      const rank = r.total === lastPoints ? lastRank : i + 1;
+      lastPoints = r.total;
       lastRank = rank;
       return { ...r, rank };
     });
   };
+
 
   // Kaarten per speler (individueel): geel, 2x geel, rood
   type PlayerCardsRow = {
