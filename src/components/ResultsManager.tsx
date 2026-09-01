@@ -101,6 +101,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
   const [phaseActionDialog, setPhaseActionDialog] = useState<"format-complete" | "format-undo" | "format-incomplete" | null>(null);
   const [lotsDialogGroupId, setLotsDialogGroupId] = useState<string | null>(null);
+  const [confirmedLotsGroups, setConfirmedLotsGroups] = useState<Set<string>>(new Set());
   const [selectedFormatActionId, setSelectedFormatActionId] = useState<string | null>(null);
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
   const [expandedFormats, setExpandedFormats] = useState<Set<string>>(new Set());
