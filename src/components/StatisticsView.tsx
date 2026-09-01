@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
 
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
@@ -13,14 +14,16 @@ const OWN_GOAL_LABEL = "Eigen doelpunt";
 const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId: string; tournament: any; categoryId?: string | null }) => {
   const [stats, setStats] = useState<MatchStat[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [matches, setMatches] = useState<FairplayMatch[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [sRes, tRes] = await Promise.all([
+      const [sRes, tRes, mRes] = await Promise.all([
         supabase.from("match_stats").select("id, match_id, stat_type, player_name, team_id").eq("tournament_id", tournamentId),
         supabase.from("teams").select("id, name, logo_url, category_id").eq("tournament_id", tournamentId),
+        supabase.from("matches").select("id, home_team_id, away_team_id, is_played").eq("tournament_id", tournamentId),
       ]);
       const allTeams = (tRes.data || []) as (Team & { category_id: string | null })[];
       const filteredTeams = categoryId ? allTeams.filter(t => t.category_id === categoryId) : allTeams;
@@ -29,9 +32,11 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       const filteredStats = categoryId ? allStats.filter(s => teamIds.has(s.team_id)) : allStats;
       setTeams(filteredTeams);
       setStats(filteredStats);
+      setMatches(((mRes.data || []) as FairplayMatch[]).filter(m => !categoryId || (m.home_team_id && teamIds.has(m.home_team_id)) || (m.away_team_id && teamIds.has(m.away_team_id))));
       setLoading(false);
     })();
   }, [tournamentId, categoryId]);
+
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
   const teamLogo = (id: string) => teams.find(t => t.id === id)?.logo_url || null;
@@ -64,51 +69,22 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
   };
 
+  const fpConfig = useMemo(() => getFairplayConfig(tournament), [tournament]);
+
   type TeamFairplayRow = {
     teamId: string;
     yellows: number;
     secondYellows: number;
-    straightReds: number;
-    legacyReds: number;
-    points: number; // negative
+    reds: number;
+    cleanMatches: number;
+    penalty: number;
+    total: number;
   };
 
   const fairplayPerTeam = (): TeamFairplayRow[] => {
-    // Build map for ALL teams so they appear with 0 even without cards
-    const teamMap: Record<string, TeamFairplayRow> = {};
-    teams.forEach(t => {
-      teamMap[t.id] = { teamId: t.id, yellows: 0, secondYellows: 0, straightReds: 0, legacyReds: 0, points: 0 };
-    });
-
-    // Compute 2nd-yellows per (team, player) by pairing yellow cards
-    const yellowMap: Record<string, number> = {};
-    stats.forEach(s => {
-      if (s.stat_type === "yellow_card") {
-        const key = `${s.team_id}__${s.player_name}`;
-        yellowMap[key] = (yellowMap[key] || 0) + 1;
-      }
-    });
-    Object.entries(yellowMap).forEach(([key, total]) => {
-      const teamId = key.split("__")[0];
-      if (!teamMap[teamId]) return;
-      teamMap[teamId].secondYellows += Math.floor(total / 2);
-      teamMap[teamId].yellows += total % 2;
-    });
-
-    stats.forEach(s => {
-      if (!teamMap[s.team_id]) return;
-      if (s.stat_type === "straight_red") teamMap[s.team_id].straightReds++;
-      else if (s.stat_type === "red_card") teamMap[s.team_id].legacyReds++;
-    });
-
-    // Negative points: yellow -1, 2x-yellow/red -3, straight red -5, legacy red -3
-    Object.values(teamMap).forEach(r => {
-      r.points = -(r.yellows * 1 + r.secondYellows * 3 + r.straightReds * 5 + r.legacyReds * 3);
-    });
-
-    // Sort: highest points first (closest to 0), then by team name
-    return Object.values(teamMap).sort((a, b) => {
-      if (b.points !== a.points) return b.points - a.points;
+    const rows = computeFairplayRows(teams.map(t => t.id), stats, matches, fpConfig);
+    return rows.sort((a, b) => {
+      if (b.total !== a.total) return b.total - a.total;
       return teamName(a.teamId).localeCompare(teamName(b.teamId));
     });
   };
@@ -117,12 +93,13 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     let lastPoints = Number.NaN;
     let lastRank = 0;
     return rows.map((r, i) => {
-      const rank = r.points === lastPoints ? lastRank : i + 1;
-      lastPoints = r.points;
+      const rank = r.total === lastPoints ? lastRank : i + 1;
+      lastPoints = r.total;
       lastRank = rank;
       return { ...r, rank };
     });
   };
+
 
   // Kaarten per speler (individueel): geel, 2x geel, rood
   type PlayerCardsRow = {
@@ -252,7 +229,9 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
               <TableHead className="w-16 text-center text-xs"><YellowIcon /></TableHead>
               <TableHead className="w-16 text-center text-xs"><SecondYellowIcon /></TableHead>
               <TableHead className="w-16 text-center text-xs"><RedIcon /></TableHead>
-              <TableHead className="w-20 text-center text-xs">Punten</TableHead>
+              {fpConfig.clean_match != null && <TableHead className="w-24 text-center text-xs">Zonder kaart</TableHead>}
+              <TableHead className="w-20 text-center text-xs">Strafpunten</TableHead>
+              {showFairplayRanking && <TableHead className="w-20 text-center text-xs">Totaal</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -267,21 +246,38 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
                 </TableCell>
                 <TableCell className="text-center text-sm tabular-nums">{row.yellows}</TableCell>
                 <TableCell className="text-center text-sm tabular-nums">{row.secondYellows}</TableCell>
-                <TableCell className="text-center text-sm tabular-nums">{row.straightReds + row.legacyReds}</TableCell>
-                <TableCell className={cn("text-center text-base font-bold tabular-nums", row.points < 0 ? "text-destructive" : "text-foreground")}>
-                  {row.points}
+                <TableCell className="text-center text-sm tabular-nums">{row.reds}</TableCell>
+                {fpConfig.clean_match != null && <TableCell className="text-center text-sm tabular-nums">{row.cleanMatches}</TableCell>}
+                <TableCell className={cn("text-center text-sm font-semibold tabular-nums", row.penalty > 0 ? "text-destructive" : "text-muted-foreground")}>
+                  {row.penalty > 0 ? `-${row.penalty}` : 0}
                 </TableCell>
+                {showFairplayRanking && (
+                  <TableCell className="text-center text-base font-bold tabular-nums text-foreground">{row.total}</TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
         </Table>
         <div className="border-t border-border bg-secondary/30 px-4 py-2 text-[11px] text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span className="inline-flex items-center gap-1.5"><YellowIcon /> = -1 pt</span>
+          <span className="inline-flex items-center gap-1.5"><YellowIcon /> = -{fpConfig.yellow} pt</span>
           <span>·</span>
-          <span className="inline-flex items-center gap-1.5"><SecondYellowIcon /> = -3 pt</span>
+          <span className="inline-flex items-center gap-1.5"><SecondYellowIcon /> = -{fpConfig.second_yellow} pt</span>
           <span>·</span>
-          <span className="inline-flex items-center gap-1.5"><RedIcon /> = -5 pt</span>
+          <span className="inline-flex items-center gap-1.5"><RedIcon /> = -{fpConfig.red} pt</span>
+          {fpConfig.clean_match != null && (
+            <>
+              <span>·</span>
+              <span>Wedstrijd zonder kaart = +{fpConfig.clean_match} pt</span>
+            </>
+          )}
+          {showFairplayRanking && (
+            <>
+              <span>·</span>
+              <span>Startpunten = {fpConfig.start}</span>
+            </>
+          )}
         </div>
+
       </div>
     )
   );

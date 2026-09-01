@@ -1,0 +1,1 @@
+ALTER TABLE public.tournaments ADD COLUMN IF NOT EXISTS fairplay_config jsonb NOT NULL DEFAULT '{}'::jsonb;
