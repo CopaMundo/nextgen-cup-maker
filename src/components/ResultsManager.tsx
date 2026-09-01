@@ -2037,24 +2037,41 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                     .flatMap(({ groupPreviews }) => groupPreviews.map(({ group }) => group))
                     .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
                   if (tieGroups.length === 0) return null;
+                  const allConfirmed = tieGroups.every(g => confirmedLotsGroups.has(g.id));
                   return (
-                    <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-2">
-                      <p className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">Loting vereist</p>
+                    <div className={cn(
+                      "rounded-lg border p-3 space-y-2",
+                      allConfirmed
+                        ? "border-green-500/50 bg-green-500/10"
+                        : "border-amber-500/50 bg-amber-500/10"
+                    )}>
+                      <p className={cn(
+                        "text-xs font-bold uppercase tracking-wide",
+                        allConfirmed ? "text-green-700 dark:text-green-400" : "text-amber-700 dark:text-amber-400"
+                      )}>Loting vereist</p>
                       <p className="text-xs text-foreground">
                         In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig voor de betrokken teams.
                       </p>
                       <div className="flex flex-wrap gap-2 pt-1">
-                        {tieGroups.map(g => (
-                          <Button
-                            key={g.id}
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
-                            onClick={() => setLotsDialogGroupId(g.id)}
-                          >
-                            <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: volgorde bepalen
-                          </Button>
-                        ))}
+                        {tieGroups.map(g => {
+                          const confirmed = confirmedLotsGroups.has(g.id);
+                          return (
+                            <Button
+                              key={g.id}
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "h-7 text-xs",
+                                confirmed
+                                  ? "border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/20"
+                                  : "border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
+                              )}
+                              onClick={() => setLotsDialogGroupId(g.id)}
+                            >
+                              <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: {confirmed ? "volgorde wijzigen" : "volgorde bepalen"}
+                            </Button>
+                          );
+                        })}
                       </div>
                     </div>
                   );
