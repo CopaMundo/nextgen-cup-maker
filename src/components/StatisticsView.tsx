@@ -229,7 +229,9 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
               <TableHead className="w-16 text-center text-xs"><YellowIcon /></TableHead>
               <TableHead className="w-16 text-center text-xs"><SecondYellowIcon /></TableHead>
               <TableHead className="w-16 text-center text-xs"><RedIcon /></TableHead>
-              <TableHead className="w-20 text-center text-xs">Punten</TableHead>
+              {fpConfig.clean_match != null && <TableHead className="w-24 text-center text-xs">Zonder kaart</TableHead>}
+              <TableHead className="w-20 text-center text-xs">Strafpunten</TableHead>
+              {showFairplayRanking && <TableHead className="w-20 text-center text-xs">Totaal</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -244,21 +246,38 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
                 </TableCell>
                 <TableCell className="text-center text-sm tabular-nums">{row.yellows}</TableCell>
                 <TableCell className="text-center text-sm tabular-nums">{row.secondYellows}</TableCell>
-                <TableCell className="text-center text-sm tabular-nums">{row.straightReds + row.legacyReds}</TableCell>
-                <TableCell className={cn("text-center text-base font-bold tabular-nums", row.points < 0 ? "text-destructive" : "text-foreground")}>
-                  {row.points}
+                <TableCell className="text-center text-sm tabular-nums">{row.reds}</TableCell>
+                {fpConfig.clean_match != null && <TableCell className="text-center text-sm tabular-nums">{row.cleanMatches}</TableCell>}
+                <TableCell className={cn("text-center text-sm font-semibold tabular-nums", row.penalty > 0 ? "text-destructive" : "text-muted-foreground")}>
+                  {row.penalty > 0 ? `-${row.penalty}` : 0}
                 </TableCell>
+                {showFairplayRanking && (
+                  <TableCell className="text-center text-base font-bold tabular-nums text-foreground">{row.total}</TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
         </Table>
         <div className="border-t border-border bg-secondary/30 px-4 py-2 text-[11px] text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span className="inline-flex items-center gap-1.5"><YellowIcon /> = -1 pt</span>
+          <span className="inline-flex items-center gap-1.5"><YellowIcon /> = -{fpConfig.yellow} pt</span>
           <span>·</span>
-          <span className="inline-flex items-center gap-1.5"><SecondYellowIcon /> = -3 pt</span>
+          <span className="inline-flex items-center gap-1.5"><SecondYellowIcon /> = -{fpConfig.second_yellow} pt</span>
           <span>·</span>
-          <span className="inline-flex items-center gap-1.5"><RedIcon /> = -5 pt</span>
+          <span className="inline-flex items-center gap-1.5"><RedIcon /> = -{fpConfig.red} pt</span>
+          {fpConfig.clean_match != null && (
+            <>
+              <span>·</span>
+              <span>Wedstrijd zonder kaart = +{fpConfig.clean_match} pt</span>
+            </>
+          )}
+          {showFairplayRanking && (
+            <>
+              <span>·</span>
+              <span>Startpunten = {fpConfig.start}</span>
+            </>
+          )}
         </div>
+
       </div>
     )
   );
