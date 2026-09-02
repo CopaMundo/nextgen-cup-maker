@@ -1051,6 +1051,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                   )}
                 </div>
               )}
+              </div>
+
             </div>
           </div>
         )}
