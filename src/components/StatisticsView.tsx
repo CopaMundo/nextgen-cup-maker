@@ -142,16 +142,16 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   const showGoals = tournament.enable_goalscorers;
   const showAssists = tournament.enable_assists;
-  const showFairplay = tournament.enable_yellow_cards || tournament.enable_red_cards;
   const showFairplayRanking = !!tournament.enable_fairplay;
+  const showFairplay = showFairplayRanking;
 
 
   const tabs: { id: StatTab; label: string }[] = [
     ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
     ...(showAssists ? [{ id: "assists" as StatTab, label: "Assists" }] : []),
-    ...(showFairplay ? [{ id: "fairplay" as StatTab, label: showFairplayRanking ? "Fairplayklassement" : "Kaarten" }] : []),
-    ...(showFairplay ? [{ id: "cards" as StatTab, label: "Kaarten per speler" }] : []),
+    ...(showFairplayRanking ? [{ id: "fairplay" as StatTab, label: "Fairplayklassement" }] : []),
   ];
+
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
 
