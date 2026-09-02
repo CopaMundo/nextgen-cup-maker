@@ -22,7 +22,9 @@ const TIEBREAKER_OPTIONS = [
   { value: "goals_scored", label: "Aantal doelpunten gescoord" },
   { value: "head_to_head", label: "Onderling resultaat" },
   { value: "wins", label: "Aantal overwinningen" },
+  { value: "fairplay", label: "Fairplay" },
 ];
+
 
 interface SetResultPoints {
   [outcome: string]: { win: number; loss: number; draw?: number };
