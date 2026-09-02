@@ -163,6 +163,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     enable_assists: tournament.enable_assists ?? false,
     enable_yellow_cards: tournament.enable_yellow_cards ?? false,
     enable_red_cards: tournament.enable_red_cards ?? false,
+    enable_fairplay: tournament.enable_fairplay ?? false,
+
     show_public_top_scorers: tournament.show_public_top_scorers ?? false,
     show_public_assists: tournament.show_public_assists ?? false,
     show_public_fairplay: tournament.show_public_fairplay ?? false,
