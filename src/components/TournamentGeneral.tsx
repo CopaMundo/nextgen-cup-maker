@@ -948,7 +948,10 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         checked={isEnabled}
                         onCheckedChange={(value) => {
                           const updates: any = { [key]: value };
-                          if (key === "enable_yellow_cards") updates.enable_red_cards = value;
+                          if (key === "enable_yellow_cards") {
+                            updates.enable_red_cards = value;
+                            if (!value) updates.enable_fairplay = false;
+                          }
                           if (publicKey) updates[publicKey] = value;
                           saveToDb(updates);
                         }}
