@@ -932,11 +932,10 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                   Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Doelpuntenmakers en assists worden automatisch zichtbaar op de publieke toernooiwebsite zodra je ze aanvinkt. Kaarten kun je enkel aanvinken; daarvan wordt geen klassement weergegeven op de toernooisite.
                 </p>
               </div>
-              <div className="grid gap-3 lg:grid-cols-3">
+              <div className="grid gap-3 lg:grid-cols-2">
                 {[
                   { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers" },
                   { key: "enable_assists", publicKey: "show_public_assists", label: "Assists" },
-                  { key: "enable_yellow_cards", publicKey: null, label: "Kaarten" },
                 ].map(({ key, publicKey, label }) => {
                   const isEnabled = form[key as keyof typeof form] as boolean;
 
@@ -948,10 +947,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         checked={isEnabled}
                         onCheckedChange={(value) => {
                           const updates: any = { [key]: value };
-                          if (key === "enable_yellow_cards") {
-                            updates.enable_red_cards = value;
-                            if (!value) updates.enable_fairplay = false;
-                          }
                           if (publicKey) updates[publicKey] = value;
                           saveToDb(updates);
                         }}
@@ -962,8 +957,21 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 })}
               </div>
 
+              <div className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h4 className="text-sm font-semibold text-foreground">Kaarten</h4>
+                  <Switch
+                    checked={form.enable_yellow_cards}
+                    onCheckedChange={(value) => {
+                      const updates: any = { enable_yellow_cards: value, enable_red_cards: value };
+                      if (!value) updates.enable_fairplay = false;
+                      saveToDb(updates);
+                    }}
+                  />
+                </div>
+
               {form.enable_yellow_cards && (
-                <div className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-semibold text-foreground">Fairplayklassement</h4>
@@ -978,6 +986,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                       }}
                     />
                   </div>
+
 
                   {form.enable_fairplay && (
                     <div className="space-y-3">
