@@ -143,6 +143,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   const showGoals = tournament.enable_goalscorers;
   const showAssists = tournament.enable_assists;
   const showFairplay = tournament.enable_yellow_cards || tournament.enable_red_cards;
+  const showFairplayRanking = !!tournament.enable_fairplay;
+
 
   const tabs: { id: StatTab; label: string }[] = [
     ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
