@@ -927,6 +927,87 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                   );
                 })}
               </div>
+
+              {form.enable_yellow_cards && (
+                <div className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground">Fairplayklassement</h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">Alleen zichtbaar in de beheeromgeving, niet op de publieke toernooiwebsite.</p>
+                    </div>
+                    <Switch
+                      checked={form.enable_fairplay}
+                      onCheckedChange={(value) => {
+                        const updates: any = { enable_fairplay: value };
+                        if (value && !tournament.fairplay_config) updates.fairplay_config = { ...FAIRPLAY_DEFAULTS };
+                        saveToDb(updates);
+                      }}
+                    />
+                  </div>
+
+                  {form.enable_fairplay && (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground">Bepaal hoeveel strafpunten elke kaart kost. Een gele kaart gevolgd door een rechtstreekse rode kaart in dezelfde wedstrijd telt op (standaard 1 + 5 = 6 strafpunten).</p>
+                      <TooltipProvider delayDuration={150}>
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          {([
+                            { key: "yellow", icon: <div className="h-4 w-3 rounded-sm bg-yellow-400" />, tip: "Gele kaart" },
+                            { key: "second_yellow", icon: (
+                              <span className="inline-flex items-center">
+                                <div className="h-4 w-3 rounded-sm bg-yellow-400" />
+                                <div className="h-4 w-3 rounded-sm bg-red-500 -ml-1" />
+                              </span>
+                            ), tip: "Tweede gele kaart → rood" },
+                            { key: "red", icon: <div className="h-4 w-3 rounded-sm bg-red-500" />, tip: "Rechtstreekse rode kaart" },
+                          ] as const).map(({ key, icon, tip }) => (
+                            <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex items-center cursor-help">{icon}</span>
+                                </TooltipTrigger>
+                                <TooltipContent>{tip}</TooltipContent>
+                              </Tooltip>
+                              <span className="text-xs text-muted-foreground flex-1">strafpunten</span>
+                              <Input
+                                type="number"
+                                min={0}
+                                className="h-8 w-16 text-center"
+                                value={fpDraft[key]}
+                                onChange={(e) => setFpDraft((p) => ({ ...p, [key]: e.target.value }))}
+                                onBlur={() => saveFairplayConfig()}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </TooltipProvider>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs">Punten voor een wedstrijd zonder kaarten</Label>
+                          <Input
+                            type="number"
+                            className="h-8"
+                            placeholder="Niet gebruiken"
+                            value={fpDraft.clean_match}
+                            onChange={(e) => setFpDraft((p) => ({ ...p, clean_match: e.target.value }))}
+                            onBlur={() => saveFairplayConfig()}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs">Startpuntentotaal</Label>
+                          <Input
+                            type="number"
+                            className="h-8"
+                            value={fpDraft.start}
+                            onChange={(e) => setFpDraft((p) => ({ ...p, start: e.target.value }))}
+                            onBlur={() => saveFairplayConfig()}
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Je kunt "Fairplay" daarna toevoegen als extra criterium bij gelijke punten. Blijft alles gelijk, dan volgt nog steeds de loting.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
