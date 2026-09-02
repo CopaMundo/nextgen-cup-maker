@@ -1481,6 +1481,28 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                 )}
               </div>
             ))}
+            {(() => {
+              const available = TIEBREAKER_OPTIONS.filter(
+                (o) => !tiebreakerDraft.includes(o.value) && (o.value !== "fairplay" || !!tournament?.enable_fairplay),
+              );
+              if (available.length === 0) return null;
+              return (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button type="button" className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
+                      <Plus className="h-3 w-3" /> Criterium toevoegen
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {available.map((o) => (
+                      <DropdownMenuItem key={o.value} onClick={() => addTb(o.value)}>
+                        {getTbLabel(o.value, editingIsSets)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            })()}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setTiebreakerEditId(null)}>Annuleren</Button>
