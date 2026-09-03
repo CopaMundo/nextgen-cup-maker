@@ -126,10 +126,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const [deleting, setDeleting] = useState(false);
   const [playedCount, setPlayedCount] = useState(0);
 
-  // Scoring edit dialog state
-  const [scoringEditId, setScoringEditId] = useState<string | null>(null);
-  const [scoringDraft, setScoringDraft] = useState<ScoringDraft | null>(null);
-  const scoringEditDialogRef = useDialogFocus(!!scoringEditId);
+  // Tiebreaker dialog focus
+
   const tiebreakerDialogRef = useDialogFocus(!!tiebreakerEditId);
 
   // Confirmation alert state
