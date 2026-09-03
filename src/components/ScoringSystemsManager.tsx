@@ -535,8 +535,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                   type="number"
                                   className="flex-1"
                                   value={sys.points_big_win ?? ""}
-                                  onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                  onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                                  onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                                  onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value) })}
                                 />
                                 <Select
                                   value={String(sys.big_win_threshold ?? 2)}
@@ -561,8 +561,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <Input
                             type="number"
                             value={sys.points_win ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
                           />
                         </div>
 
@@ -573,8 +573,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               type="number"
                               disabled={!sys.no_draws}
                               value={sys.points_win_overtime ?? ""}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                              onBlur={(e) => applyUpdate(sys.id, { points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win_overtime: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_win_overtime: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value) })}
                             />
                           </div>
                         )}
@@ -585,8 +585,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
                             />
                           </div>
                         )}
@@ -598,8 +598,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               <Input
                                 type="number"
                                 value={sys.points_draw_with_goals ?? ""}
-                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_with_goals: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                                onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? (sys.points_draw ?? 1) : parseInt(e.target.value) })}
                               />
                             </div>
                             <div className="space-y-1">
@@ -607,8 +607,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               <Input
                                 type="number"
                                 value={sys.points_draw_no_goals ?? ""}
-                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onBlur={(e) => applyUpdate(sys.id, { points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_no_goals: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                                onBlur={(e) => applyUpdate(sys.id, { points_draw_no_goals: e.target.value === "" ? (sys.points_draw ?? 1) : parseInt(e.target.value) })}
                               />
                             </div>
                           </>
@@ -619,7 +619,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <Input
                             type="number"
                             value={sys.points_loss ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                           />
                         </div>
@@ -632,8 +632,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 type="number"
                                 disabled={!sys.no_draws}
                                 value={sys.points_loss_overtime ?? ""}
-                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss_overtime: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                                onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? (sys.points_loss ?? 0) : parseInt(e.target.value) })}
                               />
                             </div>
                             <div className="pt-2 border-t border-border">
@@ -787,8 +787,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_win ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             />
                           </div>
                           <div className="space-y-1">
@@ -796,8 +796,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             />
                           </div>
                           <div className="space-y-1">
@@ -806,7 +806,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               type="number"
                               value={sys.points_loss ?? ""}
                               onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             />
                           </div>
                         </div>
@@ -874,8 +874,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_win ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             />
                           </div>
                           <div className="space-y-1">
@@ -883,8 +883,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             />
                           </div>
                           <div className="space-y-1">
@@ -893,7 +893,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               type="number"
                               value={sys.points_loss ?? ""}
                               onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                             />
                           </div>
                         </div>
