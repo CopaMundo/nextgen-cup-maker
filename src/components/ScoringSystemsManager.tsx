@@ -103,7 +103,6 @@ const hasAdvancedSettings = (sys: ScoringSystem): boolean => {
   return false;
 };
 
-type ScoringDraft = Omit<ScoringSystem, 'id' | 'tournament_id' | 'name' | 'sort_order' | 'tiebreaker_rules'>;
 
 const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournamentId: string; tournament?: any; onUpdate?: (t: any) => void }) => {
   const { toast } = useToast();
