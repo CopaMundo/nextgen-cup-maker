@@ -103,7 +103,6 @@ const hasAdvancedSettings = (sys: ScoringSystem): boolean => {
   return false;
 };
 
-type ScoringDraft = Omit<ScoringSystem, 'id' | 'tournament_id' | 'name' | 'sort_order' | 'tiebreaker_rules'>;
 
 const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournamentId: string; tournament?: any; onUpdate?: (t: any) => void }) => {
   const { toast } = useToast();
@@ -126,10 +125,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const [deleting, setDeleting] = useState(false);
   const [playedCount, setPlayedCount] = useState(0);
 
-  // Scoring edit dialog state
-  const [scoringEditId, setScoringEditId] = useState<string | null>(null);
-  const [scoringDraft, setScoringDraft] = useState<ScoringDraft | null>(null);
-  const scoringEditDialogRef = useDialogFocus(!!scoringEditId);
+  // Tiebreaker dialog focus
+
   const tiebreakerDialogRef = useDialogFocus(!!tiebreakerEditId);
 
   // Confirmation alert state
@@ -201,64 +198,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     }
   };
 
-  /** When played matches exist, redirect any inline edit attempt to the full dialog */
-  const guardInlineEdit = (sys: ScoringSystem, e?: React.FocusEvent<HTMLInputElement>) => {
-    if (playedCount > 0) {
-      e?.target.blur();
-      openScoringEdit(sys);
-      return true;
-    }
-    return false;
-  };
 
-  /** Open scoring edit dialog */
-  const openScoringEdit = (sys: ScoringSystem) => {
-    setScoringEditId(sys.id);
-    setScoringDraft({
-      scoring_type: sys.scoring_type,
-      points_win: sys.points_win,
-      points_draw: sys.points_draw,
-      points_loss: sys.points_loss,
-      points_big_win: sys.points_big_win,
-      big_win_threshold: sys.big_win_threshold,
-      points_win_overtime: sys.points_win_overtime,
-      points_draw_with_goals: sys.points_draw_with_goals,
-      points_draw_no_goals: sys.points_draw_no_goals,
-      points_loss_overtime: sys.points_loss_overtime,
-      no_draws: sys.no_draws,
-      h2h_sub_rules: sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"],
-      num_sets: sys.num_sets,
-      playoff_mode: sys.playoff_mode,
-      decisive_set: sys.decisive_set,
-      decisive_set_goal_diff: sys.decisive_set_goal_diff,
-      set_points_mode: sys.set_points_mode,
-      set_result_points: sys.set_result_points ?? {},
-    });
-  };
 
-  /** Save scoring edit dialog */
-  const saveScoringEdit = async () => {
-    if (!scoringEditId || !scoringDraft) return;
-    const id = scoringEditId;
-    const updates = { ...scoringDraft };
-
-    const count = await checkPlayedMatches();
-    if (count > 0) {
-      setConfirmAction({
-        title: "Puntentelling aanpassen?",
-        description: `Er ${count === 1 ? "is" : "zijn"} al ${count} gespeelde wedstrijd${count !== 1 ? "en" : ""}. De standen worden herberekend op basis van de nieuwe instellingen.`,
-        onConfirm: async () => {
-          await applyUpdate(id, updates);
-          toast({ title: "Opgeslagen", description: "Standen worden herberekend." });
-        },
-      });
-    } else {
-      await applyUpdate(id, updates);
-      toast({ title: "Opgeslagen" });
-    }
-    setScoringEditId(null);
-    setScoringDraft(null);
-  };
 
   /** Handle scoring type change (punten <-> sets) */
   const handleTypeChange = async (sys: ScoringSystem, newType: "points" | "sets") => {
@@ -285,7 +226,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     }
   };
 
-  /** Handle advanced toggle */
+  /** Handle advanced toggle — direct, no confirmation popup */
   const handleAdvancedToggle = async (sys: ScoringSystem, checked: boolean) => {
     if (checked) {
       setShowAdvancedId(sys.id);
@@ -301,22 +242,10 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
       points_loss_overtime: sys.points_loss,
       no_draws: false,
     };
-    const count = await checkPlayedMatches();
-    if (count > 0) {
-      setConfirmAction({
-        title: "Geavanceerde instellingen uitschakelen?",
-        description: `Er ${count === 1 ? "is" : "zijn"} al ${count} gespeelde wedstrijd${count !== 1 ? "en" : ""}. Alle geavanceerde waarden worden teruggezet en de standen worden herberekend.`,
-        onConfirm: async () => {
-          setShowAdvancedId(null);
-          await applyUpdate(sys.id, resetUpdates);
-          toast({ title: "Opgeslagen", description: "Geavanceerde instellingen gereset. Standen worden herberekend." });
-        },
-      });
-    } else {
-      setShowAdvancedId(null);
-      await applyUpdate(sys.id, resetUpdates);
-    }
+    setShowAdvancedId(null);
+    await applyUpdate(sys.id, resetUpdates);
   };
+
 
   const addSystem = async () => {
     const nextOrder = systems.length;
@@ -589,7 +518,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <Switch
                             id={`adv-${sys.id}`}
                             checked={showAdv}
-                            onCheckedChange={(checked) => { if (playedCount > 0) { openScoringEdit(sys); return; } handleAdvancedToggle(sys, checked); }}
+                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
                           />
                         </div>
 
@@ -607,12 +536,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                   className="flex-1"
                                   value={sys.points_big_win ?? ""}
                                   onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                  onFocus={(e) => guardInlineEdit(sys, e)}
                                   onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                                 />
                                 <Select
                                   value={String(sys.big_win_threshold ?? 2)}
-                                  onValueChange={(v) => { if (guardInlineEdit(sys)) return; applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
+                                  onValueChange={(v) => { applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
                                 >
                                   <SelectTrigger className="w-[120px]">
                                     <SelectValue />
@@ -634,7 +562,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             type="number"
                             value={sys.points_win ?? ""}
                             onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                            onFocus={(e) => guardInlineEdit(sys, e)}
                             onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                           />
                         </div>
@@ -647,7 +574,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               disabled={!sys.no_draws}
                               value={sys.points_win_overtime ?? ""}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                             />
                           </div>
@@ -660,7 +586,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               type="number"
                               value={sys.points_draw ?? ""}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                             />
                           </div>
@@ -674,7 +599,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 type="number"
                                 value={sys.points_draw_with_goals ?? ""}
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onFocus={(e) => guardInlineEdit(sys, e)}
                                 onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               />
                             </div>
@@ -684,7 +608,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 type="number"
                                 value={sys.points_draw_no_goals ?? ""}
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onFocus={(e) => guardInlineEdit(sys, e)}
                                 onBlur={(e) => applyUpdate(sys.id, { points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               />
                             </div>
@@ -697,7 +620,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             type="number"
                             value={sys.points_loss ?? ""}
                             onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                            onFocus={(e) => guardInlineEdit(sys, e)}
                             onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                           />
                         </div>
@@ -711,7 +633,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 disabled={!sys.no_draws}
                                 value={sys.points_loss_overtime ?? ""}
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onFocus={(e) => guardInlineEdit(sys, e)}
                                 onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               />
                             </div>
@@ -726,7 +647,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 <Switch
                                   checked={sys.no_draws}
                                   onCheckedChange={async (checked) => {
-                                    if (playedCount > 0) { openScoringEdit(sys); return; }
                                     await applyUpdate(sys.id, { no_draws: checked });
                                   }}
                                   className="mt-1 shrink-0"
@@ -781,7 +701,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         <Select
                           value={String(sys.num_sets)}
                           onValueChange={(v) => {
-                            if (playedCount > 0) { openScoringEdit(sys); return; }
                             applyUpdate(sys.id, { num_sets: parseInt(v) });
                           }}
                         >
@@ -804,7 +723,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Switch
                               checked={sys.decisive_set}
                               onCheckedChange={(checked) => {
-                                if (playedCount > 0) { openScoringEdit(sys); return; }
                                 applyUpdate(sys.id, { decisive_set: checked });
                               }}
                             />
@@ -815,7 +733,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               <Switch
                                 checked={sys.decisive_set_goal_diff}
                                 onCheckedChange={(checked) => {
-                                  if (playedCount > 0) { openScoringEdit(sys); return; }
                                   applyUpdate(sys.id, { decisive_set_goal_diff: checked });
                                 }}
                               />
@@ -834,7 +751,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Switch
                               checked={sys.playoff_mode}
                               onCheckedChange={(checked) => {
-                                if (playedCount > 0) { openScoringEdit(sys); return; }
                                 applyUpdate(sys.id, { playoff_mode: checked });
                               }}
                             />
@@ -849,7 +765,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <Select
                             value={sys.set_points_mode}
                             onValueChange={(v) => {
-                              if (playedCount > 0) { openScoringEdit(sys); return; }
                               applyUpdate(sys.id, { set_points_mode: v as "per_set" | "total_result" });
                             }}
                           >
@@ -872,7 +787,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_win ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -882,7 +796,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -892,7 +805,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_loss ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -917,7 +829,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                       <Input
                                         type="number"
                                         value={pts.draw ?? 1}
-                                        onFocus={(e) => guardInlineEdit(sys, e)}
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
@@ -934,7 +845,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                       <Input
                                         type="number"
                                         value={pts.win ?? ""}
-                                        onFocus={(e) => guardInlineEdit(sys, e)}
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
@@ -944,7 +854,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                       <Input
                                         type="number"
                                         value={pts.loss ?? ""}
-                                        onFocus={(e) => guardInlineEdit(sys, e)}
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
@@ -965,7 +874,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_win ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -975,7 +883,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -985,7 +892,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_loss ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -1041,359 +947,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
           <Plus className="h-4 w-4 mr-1" /> Puntentelling toevoegen
         </Button>
       </div>
-
-      {/* Scoring Edit Dialog */}
-      <Dialog open={!!scoringEditId} onOpenChange={(open) => { if (!open) { setScoringEditId(null); setScoringDraft(null); } }}>
-        <DialogContent ref={scoringEditDialogRef} className="max-w-md max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{scoringDraft?.scoring_type === "sets" ? "Sets aanpassen" : "Puntentelling aanpassen"}</DialogTitle>
-            <DialogDescription>
-              {scoringDraft?.scoring_type === "sets"
-                ? "Pas de set-instellingen en puntenwaarden aan en druk op Opslaan."
-                : "Pas de puntenwaarden aan en druk op Opslaan."}
-            </DialogDescription>
-          </DialogHeader>
-          {scoringDraft && (() => {
-            const sys = systems.find((s) => s.id === scoringEditId);
-            const isAdvanced = showAdvancedId === scoringEditId;
-            const isSets = scoringDraft.scoring_type === "sets";
-
-            if (isSets) {
-              const outcomes = generateSetOutcomes(scoringDraft.num_sets, scoringDraft.playoff_mode, scoringDraft.decisive_set);
-              const resultPts: SetResultPoints = scoringDraft.set_result_points || {};
-              return (
-                <div className="space-y-4 py-2">
-                  {/* Aantal sets */}
-                  <div className="space-y-1">
-                    <Label className="text-xs">Aantal sets</Label>
-                    <Select
-                      value={String(scoringDraft.num_sets)}
-                      onValueChange={(v) => setScoringDraft((d) => d ? { ...d, num_sets: parseInt(v) } : d)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 36 }, (_, i) => i + 1).map((n) => (
-                          <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Beslissende set (even sets) */}
-                  {scoringDraft.num_sets % 2 === 0 && (
-                    <div className="space-y-3 pt-2 border-t border-border">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground">Beslissende set</span>
-                        <Switch
-                          checked={scoringDraft.decisive_set}
-                          onCheckedChange={(checked) => setScoringDraft((d) => d ? { ...d, decisive_set: checked } : d)}
-                        />
-                      </div>
-                      {scoringDraft.decisive_set && (
-                        <div className="flex items-center justify-between pl-2">
-                          <span className="text-sm text-foreground">Laat beslissende set meetellen in doelsaldo</span>
-                          <Switch
-                            checked={scoringDraft.decisive_set_goal_diff}
-                            onCheckedChange={(checked) => setScoringDraft((d) => d ? { ...d, decisive_set_goal_diff: checked } : d)}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Playoff modus (odd sets >= 3, only when NOT per_set scoring) */}
-                  {scoringDraft.num_sets >= 3 && scoringDraft.num_sets % 2 === 1 && scoringDraft.set_points_mode !== "per_set" && (
-                    <div className="pt-2 border-t border-border">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground">
-                          Playoff modus (beste van {scoringDraft.num_sets})
-                        </span>
-                        <Switch
-                          checked={scoringDraft.playoff_mode}
-                          onCheckedChange={(checked) => setScoringDraft((d) => d ? { ...d, playoff_mode: checked } : d)}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Punten toekennen */}
-                  {scoringDraft.num_sets >= 2 && (
-                    <div className="space-y-1 pt-2 border-t border-border">
-                      <Label className="text-xs">Punten toekennen per team tijdens de groepsfase</Label>
-                      <Select
-                        value={scoringDraft.set_points_mode}
-                        onValueChange={(v) => setScoringDraft((d) => d ? { ...d, set_points_mode: v as "per_set" | "total_result" } : d)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="per_set">Per set</SelectItem>
-                          <SelectItem value="total_result">Op basis van totale uitslag</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {/* Per set: W/D/L */}
-                  {scoringDraft.num_sets >= 2 && scoringDraft.set_points_mode === "per_set" && (
-                    <>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Bij winst</Label>
-                        <Input
-                          type="number"
-                          value={scoringDraft.points_win ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Bij gelijkspel</Label>
-                        <Input
-                          type="number"
-                          value={scoringDraft.points_draw ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Bij verlies</Label>
-                        <Input
-                          type="number"
-                          value={scoringDraft.points_loss ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Total result: outcome-based */}
-                  {scoringDraft.num_sets >= 2 && scoringDraft.set_points_mode === "total_result" && outcomes.length > 0 && (
-                    <div className="space-y-4">
-                      {outcomes.map(({ key: oc, isDraw }) => {
-                        const pts = resultPts[oc] || { win: 2, loss: 0, draw: 1 };
-                        if (isDraw) {
-                          return (
-                            <div key={oc} className="space-y-1">
-                              <Label className="text-xs">Punten bij gelijkspel {oc}</Label>
-                              <div className="space-y-0.5">
-                                <span className="text-[10px] text-muted-foreground">Beide teams</span>
-                                <Input
-                                  type="number"
-                                  value={pts.draw ?? 1}
-                                  onChange={(e) => {
-                                    const newPts = { ...resultPts, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } };
-                                    setScoringDraft((d) => d ? { ...d, set_result_points: newPts } : d);
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        }
-                        return (
-                          <div key={oc} className="space-y-1">
-                            <Label className="text-xs">Punten bij uitslag {oc}</Label>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-0.5">
-                                <span className="text-[10px] text-muted-foreground">Winnaar</span>
-                                <Input
-                                  type="number"
-                                  value={pts.win ?? ""}
-                                  onChange={(e) => {
-                                    const newPts = { ...resultPts, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } };
-                                    setScoringDraft((d) => d ? { ...d, set_result_points: newPts } : d);
-                                  }}
-                                />
-                              </div>
-                              <div className="space-y-0.5">
-                                <span className="text-[10px] text-muted-foreground">Verliezer</span>
-                                <Input
-                                  type="number"
-                                  value={pts.loss ?? ""}
-                                  onChange={(e) => {
-                                    const newPts = { ...resultPts, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } };
-                                    setScoringDraft((d) => d ? { ...d, set_result_points: newPts } : d);
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* For 1 set: standard W/D/L points */}
-                  {scoringDraft.num_sets === 1 && (
-                    <>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Bij winst</Label>
-                        <Input
-                          type="number"
-                          value={scoringDraft.points_win ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Bij gelijkspel</Label>
-                        <Input
-                          type="number"
-                          value={scoringDraft.points_draw ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Bij verlies</Label>
-                        <Input
-                          type="number"
-                          value={scoringDraft.points_loss ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            }
-
-            // Points mode dialog (existing)
-            return (
-              <div className="space-y-4 py-2">
-                <div className="flex items-center justify-between pb-2 border-b border-border">
-                  <Label className="text-sm font-medium cursor-pointer">Geavanceerde instellingen</Label>
-                  <Switch
-                    checked={isAdvanced}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setShowAdvancedId(scoringEditId);
-                      } else {
-                        setShowAdvancedId(null);
-                      }
-                    }}
-                  />
-                </div>
-                {isAdvanced && (
-                  <>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Bij een grote overwinning</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          className="flex-1"
-                          value={scoringDraft.points_big_win ?? ""}
-                          onChange={(e) => setScoringDraft((d) => d ? { ...d, points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                        />
-                        <Select
-                          value={String(scoringDraft.big_win_threshold ?? 2)}
-                          onValueChange={(v) => setScoringDraft((d) => d ? { ...d, big_win_threshold: parseInt(v) } : d)}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[2, 3, 4, 5].map((n) => (
-                              <SelectItem key={n} value={String(n)}>+ {n} goals</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div className="space-y-1">
-                  <Label className="text-xs">Bij winst</Label>
-                  <Input
-                    type="number"
-                    value={scoringDraft.points_win ?? ""}
-                    onChange={(e) => setScoringDraft((d) => d ? { ...d, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                  />
-                </div>
-                {isAdvanced && (
-                  <div className={cn("space-y-1", !scoringDraft.no_draws && "opacity-50")}>
-                    <Label className="text-xs">Bij winst na verlenging, strafschoppen of golden goal</Label>
-                    <Input
-                      type="number"
-                      disabled={!scoringDraft.no_draws}
-                      value={scoringDraft.points_win_overtime ?? ""}
-                      onChange={(e) => setScoringDraft((d) => d ? { ...d, points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                    />
-                  </div>
-                )}
-                {!isAdvanced && (
-                  <div className="space-y-1">
-                    <Label className="text-xs">Bij gelijkspel</Label>
-                    <Input
-                      type="number"
-                      value={scoringDraft.points_draw ?? ""}
-                      onChange={(e) => setScoringDraft((d) => d ? { ...d, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                    />
-                  </div>
-                )}
-                {isAdvanced && !scoringDraft.no_draws && (
-                  <>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Bij gelijkspel met doelpunten</Label>
-                      <Input
-                        type="number"
-                        value={scoringDraft.points_draw_with_goals ?? ""}
-                        onChange={(e) => setScoringDraft((d) => d ? { ...d, points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Bij gelijkspel zonder doelpunten</Label>
-                      <Input
-                        type="number"
-                        value={scoringDraft.points_draw_no_goals ?? ""}
-                        onChange={(e) => setScoringDraft((d) => d ? { ...d, points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                      />
-                    </div>
-                  </>
-                )}
-                <div className="space-y-1">
-                  <Label className="text-xs">Bij verlies</Label>
-                  <Input
-                    type="number"
-                    value={scoringDraft.points_loss ?? ""}
-                    onChange={(e) => setScoringDraft((d) => d ? { ...d, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                  />
-                </div>
-                {isAdvanced && (
-                  <div className={cn("space-y-1", !scoringDraft.no_draws && "opacity-50")}>
-                    <Label className="text-xs">Bij verlies na verlenging, strafschoppen of golden goal</Label>
-                    <Input
-                      type="number"
-                      disabled={!scoringDraft.no_draws}
-                      value={scoringDraft.points_loss_overtime ?? ""}
-                      onChange={(e) => setScoringDraft((d) => d ? { ...d, points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : d)}
-                    />
-                  </div>
-                )}
-                {isAdvanced && (
-                  <div className="pt-2 border-t border-border">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">Poulewedstrijden mogen niet eindigen in een gelijkspel</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand.
-                        </p>
-                      </div>
-                      <Switch
-                        checked={scoringDraft.no_draws ?? false}
-                        onCheckedChange={(checked) => setScoringDraft((d) => d ? { ...d, no_draws: checked } : d)}
-                        className="mt-1 shrink-0"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => { setScoringEditId(null); setScoringDraft(null); }}>Annuleren</Button>
-            <Button type="button" onClick={saveScoringEdit}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Tiebreaker Edit Dialog */}
       <Dialog open={!!tiebreakerEditId} onOpenChange={(open) => { if (!open) setTiebreakerEditId(null); }}>
