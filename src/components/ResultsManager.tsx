@@ -1511,7 +1511,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       {pc.d  && <TableCell className="text-center px-0.5 py-1 text-xs">{row.d}</TableCell>}
                       {pc.l  && <TableCell className="text-center px-0.5 py-1 text-xs">{row.l}</TableCell>}
                       {pc.gf && <TableCell className="text-center px-0.5 py-1 text-xs">{formatSigned(row.gf)}</TableCell>}
-                      {pc.ga && <TableCell className="text-center px-0.5 py-1 text-xs">-{row.ga}</TableCell>}
+                      {pc.ga && <TableCell className="text-center px-0.5 py-1 text-xs">{row.ga}</TableCell>}
                       {pc.gd && <TableCell className="text-center px-0.5 py-1 text-xs font-medium">{formatSigned(row.gd)}</TableCell>}
                     </>
                   )}
