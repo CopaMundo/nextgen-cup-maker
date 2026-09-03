@@ -201,64 +201,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     }
   };
 
-  /** When played matches exist, redirect any inline edit attempt to the full dialog */
-  const guardInlineEdit = (sys: ScoringSystem, e?: React.FocusEvent<HTMLInputElement>) => {
-    if (playedCount > 0) {
-      e?.target.blur();
-      openScoringEdit(sys);
-      return true;
-    }
-    return false;
-  };
 
-  /** Open scoring edit dialog */
-  const openScoringEdit = (sys: ScoringSystem) => {
-    setScoringEditId(sys.id);
-    setScoringDraft({
-      scoring_type: sys.scoring_type,
-      points_win: sys.points_win,
-      points_draw: sys.points_draw,
-      points_loss: sys.points_loss,
-      points_big_win: sys.points_big_win,
-      big_win_threshold: sys.big_win_threshold,
-      points_win_overtime: sys.points_win_overtime,
-      points_draw_with_goals: sys.points_draw_with_goals,
-      points_draw_no_goals: sys.points_draw_no_goals,
-      points_loss_overtime: sys.points_loss_overtime,
-      no_draws: sys.no_draws,
-      h2h_sub_rules: sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"],
-      num_sets: sys.num_sets,
-      playoff_mode: sys.playoff_mode,
-      decisive_set: sys.decisive_set,
-      decisive_set_goal_diff: sys.decisive_set_goal_diff,
-      set_points_mode: sys.set_points_mode,
-      set_result_points: sys.set_result_points ?? {},
-    });
-  };
 
-  /** Save scoring edit dialog */
-  const saveScoringEdit = async () => {
-    if (!scoringEditId || !scoringDraft) return;
-    const id = scoringEditId;
-    const updates = { ...scoringDraft };
-
-    const count = await checkPlayedMatches();
-    if (count > 0) {
-      setConfirmAction({
-        title: "Puntentelling aanpassen?",
-        description: `Er ${count === 1 ? "is" : "zijn"} al ${count} gespeelde wedstrijd${count !== 1 ? "en" : ""}. De standen worden herberekend op basis van de nieuwe instellingen.`,
-        onConfirm: async () => {
-          await applyUpdate(id, updates);
-          toast({ title: "Opgeslagen", description: "Standen worden herberekend." });
-        },
-      });
-    } else {
-      await applyUpdate(id, updates);
-      toast({ title: "Opgeslagen" });
-    }
-    setScoringEditId(null);
-    setScoringDraft(null);
-  };
 
   /** Handle scoring type change (punten <-> sets) */
   const handleTypeChange = async (sys: ScoringSystem, newType: "points" | "sets") => {
