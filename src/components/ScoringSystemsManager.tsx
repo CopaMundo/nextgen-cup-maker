@@ -589,7 +589,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <Switch
                             id={`adv-${sys.id}`}
                             checked={showAdv}
-                            onCheckedChange={(checked) => { if (playedCount > 0) { openScoringEdit(sys); return; } handleAdvancedToggle(sys, checked); }}
+                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
                           />
                         </div>
 
@@ -607,12 +607,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                   className="flex-1"
                                   value={sys.points_big_win ?? ""}
                                   onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                  onFocus={(e) => guardInlineEdit(sys, e)}
                                   onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                                 />
                                 <Select
                                   value={String(sys.big_win_threshold ?? 2)}
-                                  onValueChange={(v) => { if (guardInlineEdit(sys)) return; applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
+                                  onValueChange={(v) => { applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
                                 >
                                   <SelectTrigger className="w-[120px]">
                                     <SelectValue />
@@ -634,7 +633,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             type="number"
                             value={sys.points_win ?? ""}
                             onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                            onFocus={(e) => guardInlineEdit(sys, e)}
                             onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                           />
                         </div>
@@ -647,7 +645,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               disabled={!sys.no_draws}
                               value={sys.points_win_overtime ?? ""}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_win_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                             />
                           </div>
@@ -660,7 +657,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               type="number"
                               value={sys.points_draw ?? ""}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                             />
                           </div>
@@ -674,7 +670,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 type="number"
                                 value={sys.points_draw_with_goals ?? ""}
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onFocus={(e) => guardInlineEdit(sys, e)}
                                 onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               />
                             </div>
@@ -684,7 +679,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 type="number"
                                 value={sys.points_draw_no_goals ?? ""}
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onFocus={(e) => guardInlineEdit(sys, e)}
                                 onBlur={(e) => applyUpdate(sys.id, { points_draw_no_goals: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               />
                             </div>
@@ -697,7 +691,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             type="number"
                             value={sys.points_loss ?? ""}
                             onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                            onFocus={(e) => guardInlineEdit(sys, e)}
                             onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                           />
                         </div>
@@ -711,7 +704,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 disabled={!sys.no_draws}
                                 value={sys.points_loss_overtime ?? ""}
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
-                                onFocus={(e) => guardInlineEdit(sys, e)}
                                 onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               />
                             </div>
@@ -726,7 +718,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 <Switch
                                   checked={sys.no_draws}
                                   onCheckedChange={async (checked) => {
-                                    if (playedCount > 0) { openScoringEdit(sys); return; }
                                     await applyUpdate(sys.id, { no_draws: checked });
                                   }}
                                   className="mt-1 shrink-0"
@@ -781,7 +772,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         <Select
                           value={String(sys.num_sets)}
                           onValueChange={(v) => {
-                            if (playedCount > 0) { openScoringEdit(sys); return; }
                             applyUpdate(sys.id, { num_sets: parseInt(v) });
                           }}
                         >
@@ -804,7 +794,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Switch
                               checked={sys.decisive_set}
                               onCheckedChange={(checked) => {
-                                if (playedCount > 0) { openScoringEdit(sys); return; }
                                 applyUpdate(sys.id, { decisive_set: checked });
                               }}
                             />
@@ -815,7 +804,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               <Switch
                                 checked={sys.decisive_set_goal_diff}
                                 onCheckedChange={(checked) => {
-                                  if (playedCount > 0) { openScoringEdit(sys); return; }
                                   applyUpdate(sys.id, { decisive_set_goal_diff: checked });
                                 }}
                               />
@@ -834,7 +822,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Switch
                               checked={sys.playoff_mode}
                               onCheckedChange={(checked) => {
-                                if (playedCount > 0) { openScoringEdit(sys); return; }
                                 applyUpdate(sys.id, { playoff_mode: checked });
                               }}
                             />
@@ -849,7 +836,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <Select
                             value={sys.set_points_mode}
                             onValueChange={(v) => {
-                              if (playedCount > 0) { openScoringEdit(sys); return; }
                               applyUpdate(sys.id, { set_points_mode: v as "per_set" | "total_result" });
                             }}
                           >
@@ -872,7 +858,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_win ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -882,7 +867,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -892,7 +876,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_loss ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -917,7 +900,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                       <Input
                                         type="number"
                                         value={pts.draw ?? 1}
-                                        onFocus={(e) => guardInlineEdit(sys, e)}
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
@@ -934,7 +916,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                       <Input
                                         type="number"
                                         value={pts.win ?? ""}
-                                        onFocus={(e) => guardInlineEdit(sys, e)}
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
@@ -944,7 +925,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                       <Input
                                         type="number"
                                         value={pts.loss ?? ""}
-                                        onFocus={(e) => guardInlineEdit(sys, e)}
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
@@ -965,7 +945,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_win ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -975,7 +954,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
@@ -985,7 +963,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             <Input
                               type="number"
                               value={sys.points_loss ?? ""}
-                              onFocus={(e) => guardInlineEdit(sys, e)}
                               onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
                               onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) } : s))}
                             />
