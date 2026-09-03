@@ -285,7 +285,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     }
   };
 
-  /** Handle advanced toggle */
+  /** Handle advanced toggle — direct, no confirmation popup */
   const handleAdvancedToggle = async (sys: ScoringSystem, checked: boolean) => {
     if (checked) {
       setShowAdvancedId(sys.id);
@@ -301,22 +301,10 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
       points_loss_overtime: sys.points_loss,
       no_draws: false,
     };
-    const count = await checkPlayedMatches();
-    if (count > 0) {
-      setConfirmAction({
-        title: "Geavanceerde instellingen uitschakelen?",
-        description: `Er ${count === 1 ? "is" : "zijn"} al ${count} gespeelde wedstrijd${count !== 1 ? "en" : ""}. Alle geavanceerde waarden worden teruggezet en de standen worden herberekend.`,
-        onConfirm: async () => {
-          setShowAdvancedId(null);
-          await applyUpdate(sys.id, resetUpdates);
-          toast({ title: "Opgeslagen", description: "Geavanceerde instellingen gereset. Standen worden herberekend." });
-        },
-      });
-    } else {
-      setShowAdvancedId(null);
-      await applyUpdate(sys.id, resetUpdates);
-    }
+    setShowAdvancedId(null);
+    await applyUpdate(sys.id, resetUpdates);
   };
+
 
   const addSystem = async () => {
     const nextOrder = systems.length;
