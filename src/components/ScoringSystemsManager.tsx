@@ -201,29 +201,82 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
 
 
+  /**
+   * Count played matches whose effective scoring system is `sysId`
+   * (match > group > phase, with the first system as tournament default).
+   */
+  const checkPlayedMatchesForSystem = async (sysId: string): Promise<number> => {
+    const [matchesRes, groupsRes, phasesRes] = await Promise.all([
+      supabase
+        .from("matches")
+        .select("id, group_id, phase_id, scoring_system_id")
+        .eq("tournament_id", tournamentId)
+        .eq("is_played", true),
+      supabase.from("groups").select("id, scoring_system_id").eq("tournament_id", tournamentId),
+      supabase.from("tournament_phases").select("id, scoring_system_id").eq("tournament_id", tournamentId),
+    ]);
+    const groupMap = new Map((groupsRes.data || []).map((g: any) => [g.id, g.scoring_system_id ?? null]));
+    const phaseMap = new Map((phasesRes.data || []).map((p: any) => [p.id, p.scoring_system_id ?? null]));
+    const defaultId = [...systems].sort((a, b) => a.sort_order - b.sort_order)[0]?.id ?? null;
+    return (matchesRes.data || []).filter((m: any) => {
+      const effective =
+        m.scoring_system_id ??
+        (m.group_id ? groupMap.get(m.group_id) : null) ??
+        phaseMap.get(m.phase_id) ??
+        defaultId;
+      return effective === sysId;
+    }).length;
+  };
+
   /** Handle scoring type change (punten <-> sets) */
   const handleTypeChange = async (sys: ScoringSystem, newType: "points" | "sets") => {
     if (sys.scoring_type === newType) return;
-    const count = await checkPlayedMatches();
-    if (count > 0) {
-      setConfirmAction({
-        title: newType === "sets" ? "Overschakelen naar Sets?" : "Overschakelen naar Punten?",
-        description: `Er ${count === 1 ? "is" : "zijn"} al ${count} gespeelde wedstrijd${count !== 1 ? "en" : ""}. Alle resultaten worden gewist bij het wisselen van type.`,
-        destructive: true,
-        onConfirm: async () => {
-          // Reset all played matches (incl. set_scores)
+    const applyType = () =>
+      applyUpdate(sys.id, { scoring_type: newType, ...(newType === "sets" ? { num_sets: Math.max(1, sys.num_sets), set_points_mode: "total_result" } : {}) });
+
+    // Only warn when matches that actually use THIS scoring system are played.
+    const count = await checkPlayedMatchesForSystem(sys.id);
+    if (count === 0) {
+      await applyType();
+      return;
+    }
+    setConfirmAction({
+      title: newType === "sets" ? "Overschakelen naar Sets?" : "Overschakelen naar Punten?",
+      description: `Er ${count === 1 ? "is" : "zijn"} al ${count} gespeelde wedstrijd${count !== 1 ? "en" : ""} met deze puntentelling. Deze resultaten worden gewist bij het wisselen van type.`,
+      destructive: true,
+      onConfirm: async () => {
+        const { data: played } = await supabase
+          .from("matches")
+          .select("id, group_id, phase_id, scoring_system_id")
+          .eq("tournament_id", tournamentId)
+          .eq("is_played", true);
+        const [groupsRes, phasesRes] = await Promise.all([
+          supabase.from("groups").select("id, scoring_system_id").eq("tournament_id", tournamentId),
+          supabase.from("tournament_phases").select("id, scoring_system_id").eq("tournament_id", tournamentId),
+        ]);
+        const groupMap = new Map((groupsRes.data || []).map((g: any) => [g.id, g.scoring_system_id ?? null]));
+        const phaseMap = new Map((phasesRes.data || []).map((p: any) => [p.id, p.scoring_system_id ?? null]));
+        const defaultId = [...systems].sort((a, b) => a.sort_order - b.sort_order)[0]?.id ?? null;
+        const ids = (played || [])
+          .filter((m: any) => {
+            const effective =
+              m.scoring_system_id ??
+              (m.group_id ? groupMap.get(m.group_id) : null) ??
+              phaseMap.get(m.phase_id) ??
+              defaultId;
+            return effective === sys.id;
+          })
+          .map((m: any) => m.id);
+        if (ids.length > 0) {
           await supabase
             .from("matches")
             .update({ home_score: null, away_score: null, home_penalties: null, away_penalties: null, set_scores: null, is_played: false } as any)
-            .eq("tournament_id", tournamentId)
-            .eq("is_played", true);
-          await applyUpdate(sys.id, { scoring_type: newType, ...(newType === "sets" ? { num_sets: Math.max(1, sys.num_sets), set_points_mode: "total_result" } : {}) });
-          toast({ title: "Type gewijzigd", description: "Alle resultaten zijn gewist." });
-        },
-      });
-    } else {
-      await applyUpdate(sys.id, { scoring_type: newType, ...(newType === "sets" ? { num_sets: Math.max(1, sys.num_sets), set_points_mode: "total_result" } : {}) });
-    }
+            .in("id", ids);
+        }
+        await applyType();
+        toast({ title: "Type gewijzigd", description: `${ids.length} resultaat/resultaten gewist.` });
+      },
+    });
   };
 
   /** Handle advanced toggle — direct, no confirmation popup */
