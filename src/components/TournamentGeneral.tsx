@@ -990,7 +990,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
                   {form.enable_fairplay && (
                     <div className="space-y-3">
-                      <p className="text-xs text-muted-foreground">Bepaal hoeveel strafpunten elke kaart kost. Een gele kaart gevolgd door een rechtstreekse rode kaart in dezelfde wedstrijd telt op (standaard 1 + 5 = 6 strafpunten).</p>
+                      <p className="text-xs text-muted-foreground">Bepaal hoeveel strafpunten elke kaart kost. Een gele kaart gevolgd door een rechtstreekse rode kaart voor dezelfde speler telt op (standaard 1 + 5 = 6 strafpunten).</p>
                       <TooltipProvider delayDuration={150}>
                         <div className="grid gap-3 sm:grid-cols-3">
                           {([
