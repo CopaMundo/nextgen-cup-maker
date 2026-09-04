@@ -185,19 +185,26 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     yellow: String(initialFp.yellow),
     second_yellow: String(initialFp.second_yellow),
     red: String(initialFp.red),
-    clean_match: initialFp.clean_match == null ? "" : String(initialFp.clean_match),
+    clean_match: String(initialFp.clean_match ?? 0),
     start: String(initialFp.start),
   });
 
   const saveFairplayConfig = async () => {
-    const num = (v: string, fallback: number) => (v.trim() === "" ? fallback : Number(v));
+    const num = (v: string) => (v.trim() === "" ? 0 : Number(v));
     const config = {
-      yellow: num(fpDraft.yellow, FAIRPLAY_DEFAULTS.yellow),
-      second_yellow: num(fpDraft.second_yellow, FAIRPLAY_DEFAULTS.second_yellow),
-      red: num(fpDraft.red, FAIRPLAY_DEFAULTS.red),
-      clean_match: fpDraft.clean_match.trim() === "" ? null : Number(fpDraft.clean_match),
-      start: num(fpDraft.start, FAIRPLAY_DEFAULTS.start),
+      yellow: num(fpDraft.yellow),
+      second_yellow: num(fpDraft.second_yellow),
+      red: num(fpDraft.red),
+      clean_match: num(fpDraft.clean_match),
+      start: num(fpDraft.start),
     };
+    setFpDraft({
+      yellow: String(config.yellow),
+      second_yellow: String(config.second_yellow),
+      red: String(config.red),
+      clean_match: String(config.clean_match),
+      start: String(config.start),
+    });
     const { error } = await supabase.from("tournaments").update({ fairplay_config: config } as any).eq("id", tournament.id);
     if (error) {
       toast({ title: "Opslaan mislukt", description: error.message, variant: "destructive" });
@@ -205,6 +212,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       onUpdate({ ...tournament, ...form, fairplay_config: config });
     }
   };
+
 
 
   const saveToDb = async (updates: Partial<typeof form>) => {
@@ -929,7 +937,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               <div className="space-y-2">
                 <h3 className="font-display text-base font-bold text-foreground">Spelersstatistieken</h3>
                 <p className="text-xs text-muted-foreground max-w-3xl">
-                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Doelpuntenmakers en assists worden automatisch zichtbaar op de publieke toernooiwebsite zodra je ze aanvinkt. Kaarten kun je enkel aanvinken; daarvan wordt geen klassement weergegeven op de toernooisite.
+                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
                 </p>
               </div>
               <div className="grid gap-3 lg:grid-cols-2">
@@ -990,7 +998,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
                   {form.enable_fairplay && (
                     <div className="space-y-3">
-                      <p className="text-xs text-muted-foreground">Bepaal hoeveel strafpunten elke kaart kost. Een gele kaart gevolgd door een rechtstreekse rode kaart in dezelfde wedstrijd telt op (standaard 1 + 5 = 6 strafpunten).</p>
+                      <p className="text-xs text-muted-foreground">Bepaal hoeveel strafpunten elke kaart kost. Een gele kaart gevolgd door een rechtstreekse rode kaart voor dezelfde speler telt op (standaard 1 + 5 = 6 strafpunten).</p>
                       <TooltipProvider delayDuration={150}>
                         <div className="grid gap-3 sm:grid-cols-3">
                           {([
@@ -1029,7 +1037,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                           <Input
                             type="number"
                             className="h-8"
-                            placeholder="Niet gebruiken"
+                            placeholder="0"
                             value={fpDraft.clean_match}
                             onChange={(e) => setFpDraft((p) => ({ ...p, clean_match: e.target.value }))}
                             onBlur={() => saveFairplayConfig()}

@@ -115,6 +115,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const [h2hSubOpen, setH2hSubOpen] = useState(false);
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const nameDialogRef = useDialogFocus(!!editingNameId);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteUsage, setDeleteUsage] = useState<{
     phases: { id: string; name: string }[];
@@ -500,41 +502,28 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                 >
                   {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </button>
-                {editingNameId === sys.id ? (
-                  <div className="flex items-center gap-1 flex-1">
-                    <Input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") saveName(sys.id); if (e.key === "Escape") setEditingNameId(null); }}
-                      autoFocus
-                      className="h-8"
-                    />
-                    <button type="button" onClick={() => saveName(sys.id)} className="text-primary hover:opacity-80"><Check className="h-4 w-4" /></button>
-                    <button type="button" onClick={() => setEditingNameId(null)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-                  </div>
-                ) : (
-                  <>
-                    <span className="text-sm font-semibold text-foreground flex-1">{sys.name}</span>
+                <>
+                  <span className="text-sm font-semibold text-foreground flex-1">{sys.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => { setEditName(sys.name); setEditingNameId(sys.id); }}
+                    className="text-muted-foreground hover:text-foreground"
+                    aria-label="Naam bewerken"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  {sysIdx > 0 && (
                     <button
                       type="button"
-                      onClick={() => { setEditName(sys.name); setEditingNameId(sys.id); }}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label="Naam bewerken"
+                      onClick={() => openDelete(sys.id)}
+                      className="text-muted-foreground hover:text-destructive"
+                      aria-label="Verwijderen"
                     >
-                      <Pencil className="h-3.5 w-3.5" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
-                    {sysIdx > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => openDelete(sys.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                        aria-label="Verwijderen"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </>
-                )}
+                  )}
+                </>
+
               </div>
 
               {isOpen && (
@@ -1000,6 +989,27 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
           <Plus className="h-4 w-4 mr-1" /> Puntentelling toevoegen
         </Button>
       </div>
+
+      {/* Naam bewerken Dialog */}
+      <Dialog open={!!editingNameId} onOpenChange={(open) => { if (!open) setEditingNameId(null); }}>
+        <DialogContent ref={nameDialogRef} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Puntentelling bewerken</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Naam</Label>
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && editingNameId) saveName(editingNameId); }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingNameId(null)}>Annuleren</Button>
+            <Button onClick={() => editingNameId && saveName(editingNameId)}>Opslaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Tiebreaker Edit Dialog */}
       <Dialog open={!!tiebreakerEditId} onOpenChange={(open) => { if (!open) setTiebreakerEditId(null); }}>
