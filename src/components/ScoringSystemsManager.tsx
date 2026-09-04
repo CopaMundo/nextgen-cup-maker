@@ -1017,86 +1017,103 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
           <DialogHeader>
             <DialogTitle>Criteria bij gelijke punten</DialogTitle>
             <DialogDescription>
-              Gebruik de pijlen om de volgorde te bepalen die wordt toegepast als teams gelijk eindigen.
+              Sleep de criteria met de greep om de volgorde te bepalen die wordt toegepast als teams gelijk eindigen.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 py-2">
-            {tiebreakerDraft.map((rule, idx) => (
-              <div key={`draft-${rule}`}>
-                <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
-                  <span className="text-xs font-bold text-muted-foreground w-5">{idx + 1}.</span>
-                  <span className="text-sm text-foreground flex-1">{getTbLabel(rule, editingIsSets)}</span>
-                  <button type="button" onClick={() => moveTbUp(idx)} disabled={idx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                    <ArrowUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" onClick={() => moveTbDown(idx)} disabled={idx === tiebreakerDraft.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                    <ArrowDown className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" onClick={() => removeTb(idx)} className="text-muted-foreground hover:text-destructive" aria-label="Criterium verwijderen">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                {rule === "head_to_head" && (
-                  <div className="ml-6 mt-1.5 mb-1">
-                    <button
-                      type="button"
-                      onClick={() => setH2hSubOpen(!h2hSubOpen)}
-                      className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium"
-                    >
-                      {h2hSubOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                      Subcriteria aanpassen
-                      <span className="relative group/info">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                        <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-56 px-2.5 py-1.5 rounded-md bg-popover border border-border text-xs text-popover-foreground shadow-md opacity-0 group-hover/info:opacity-100 pointer-events-none z-50 transition-opacity">
-                          Bij een gelijk aantal punten worden alleen de onderlinge duels tussen de betrokken teams bekeken. De subcriteria bepalen de volgorde van vergelijking.
-                        </span>
-                      </span>
-                    </button>
-                    {h2hSubOpen && (
-                      <>
-                        <div className="space-y-1 mt-1.5">
-                          {h2hSubDraft.map((sub, sIdx) => (
-                            <div key={`h2h-${sub}`} className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5">
-                              <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
-                              <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
-                              <button type="button" onClick={() => moveH2hUp(sIdx)} disabled={sIdx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                                <ArrowUp className="h-3 w-3" />
-                              </button>
-                              <button type="button" onClick={() => moveH2hDown(sIdx)} disabled={sIdx === h2hSubDraft.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                                <ArrowDown className="h-3 w-3" />
-                              </button>
-                              <button type="button" onClick={() => removeH2h(sIdx)} className="text-muted-foreground hover:text-destructive" aria-label="Subcriterium verwijderen">
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                        {(() => {
-                          const available = H2H_SUB_OPTIONS.filter((o) => !h2hSubDraft.includes(o.value));
-                          if (available.length === 0) return null;
-                          return (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button type="button" className="mt-1.5 flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
-                                  <Plus className="h-3 w-3" /> Subcriterium toevoegen
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start">
-                                {available.map((o) => (
-                                  <DropdownMenuItem key={o.value} onClick={() => addH2h(o.value)}>
-                                    {getH2hLabel(o.value, editingIsSets)}
-                                  </DropdownMenuItem>
+            <SortableVerticalList
+              items={tiebreakerDraft}
+              getId={(r) => r}
+              onReorder={(next) => setTiebreakerDraft(next)}
+              className="space-y-2"
+            >
+              {tiebreakerDraft.map((rule, idx) => (
+                <SortableRowShell key={`draft-${rule}`} id={rule} dragLabel="Criterium verplaatsen">
+                  {(handle) => (
+                    <>
+                      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                        {handle}
+                        <span className="text-xs font-bold text-muted-foreground w-5">{idx + 1}.</span>
+                        <span className="text-sm text-foreground flex-1">{getTbLabel(rule, editingIsSets)}</span>
+                        <button type="button" onClick={() => removeTb(idx)} className="text-muted-foreground hover:text-destructive" aria-label="Criterium verwijderen">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      {rule === "head_to_head" && (
+                        <div className="ml-6 mt-1.5 mb-1">
+                          <button
+                            type="button"
+                            onClick={() => setH2hSubOpen(!h2hSubOpen)}
+                            className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium"
+                          >
+                            {h2hSubOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                            Subcriteria aanpassen
+                            <span className="relative group/info">
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-56 px-2.5 py-1.5 rounded-md bg-popover border border-border text-xs text-popover-foreground shadow-md opacity-0 group-hover/info:opacity-100 pointer-events-none z-50 transition-opacity">
+                                Bij een gelijk aantal punten worden alleen de onderlinge duels tussen de betrokken teams bekeken. De subcriteria bepalen de volgorde van vergelijking.
+                              </span>
+                            </span>
+                          </button>
+                          {h2hSubOpen && (
+                            <>
+                              <SortableVerticalList
+                                items={h2hSubDraft}
+                                getId={(s) => s}
+                                onReorder={(next) => setH2hSubDraft(next)}
+                                className="space-y-1 mt-1.5"
+                              >
+                                {h2hSubDraft.map((sub, sIdx) => (
+                                  <SortableRowShell
+                                    key={`h2h-${sub}`}
+                                    id={sub}
+                                    dragLabel="Subcriterium verplaatsen"
+                                    className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5"
+                                    handleClassName="[&>svg]:h-3 [&>svg]:w-3"
+                                  >
+                                    {(subHandle) => (
+                                      <>
+                                        {subHandle}
+                                        <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
+                                        <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
+                                        <button type="button" onClick={() => removeH2h(sIdx)} className="text-muted-foreground hover:text-destructive" aria-label="Subcriterium verwijderen">
+                                          <X className="h-3 w-3" />
+                                        </button>
+                                      </>
+                                    )}
+                                  </SortableRowShell>
                                 ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          );
-                        })()}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+                              </SortableVerticalList>
+                              {(() => {
+                                const available = H2H_SUB_OPTIONS.filter((o) => !h2hSubDraft.includes(o.value));
+                                if (available.length === 0) return null;
+                                return (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <button type="button" className="mt-1.5 flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
+                                        <Plus className="h-3 w-3" /> Subcriterium toevoegen
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start">
+                                      {available.map((o) => (
+                                        <DropdownMenuItem key={o.value} onClick={() => addH2h(o.value)}>
+                                          {getH2hLabel(o.value, editingIsSets)}
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                );
+                              })()}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </SortableRowShell>
+              ))}
+            </SortableVerticalList>
+
             {(() => {
               const available = TIEBREAKER_OPTIONS.filter(
                 (o) => !tiebreakerDraft.includes(o.value) && (o.value !== "fairplay" || !!tournament?.enable_fairplay),
