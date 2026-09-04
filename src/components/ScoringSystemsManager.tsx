@@ -500,41 +500,28 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                 >
                   {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </button>
-                {editingNameId === sys.id ? (
-                  <div className="flex items-center gap-1 flex-1">
-                    <Input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") saveName(sys.id); if (e.key === "Escape") setEditingNameId(null); }}
-                      autoFocus
-                      className="h-8"
-                    />
-                    <button type="button" onClick={() => saveName(sys.id)} className="text-primary hover:opacity-80"><Check className="h-4 w-4" /></button>
-                    <button type="button" onClick={() => setEditingNameId(null)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-                  </div>
-                ) : (
-                  <>
-                    <span className="text-sm font-semibold text-foreground flex-1">{sys.name}</span>
+                <>
+                  <span className="text-sm font-semibold text-foreground flex-1">{sys.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => { setEditName(sys.name); setEditingNameId(sys.id); }}
+                    className="text-muted-foreground hover:text-foreground"
+                    aria-label="Naam bewerken"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  {sysIdx > 0 && (
                     <button
                       type="button"
-                      onClick={() => { setEditName(sys.name); setEditingNameId(sys.id); }}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label="Naam bewerken"
+                      onClick={() => openDelete(sys.id)}
+                      className="text-muted-foreground hover:text-destructive"
+                      aria-label="Verwijderen"
                     >
-                      <Pencil className="h-3.5 w-3.5" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
-                    {sysIdx > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => openDelete(sys.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                        aria-label="Verwijderen"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </>
-                )}
+                  )}
+                </>
+
               </div>
 
               {isOpen && (
