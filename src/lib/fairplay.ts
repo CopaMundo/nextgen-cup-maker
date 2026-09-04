@@ -20,7 +20,7 @@ export const FAIRPLAY_DEFAULTS: FairplayConfig = {
   yellow: 1,
   second_yellow: 3,
   red: 5,
-  clean_match: null,
+  clean_match: 0,
   start: 100,
 };
 
@@ -30,10 +30,11 @@ export const getFairplayConfig = (tournament: any): FairplayConfig => {
     yellow: raw.yellow ?? FAIRPLAY_DEFAULTS.yellow,
     second_yellow: raw.second_yellow ?? FAIRPLAY_DEFAULTS.second_yellow,
     red: raw.red ?? FAIRPLAY_DEFAULTS.red,
-    clean_match: raw.clean_match ?? null,
+    clean_match: raw.clean_match ?? FAIRPLAY_DEFAULTS.clean_match,
     start: raw.start ?? FAIRPLAY_DEFAULTS.start,
   };
 };
+
 
 export interface FairplayStat {
   match_id: string;
