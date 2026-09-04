@@ -929,7 +929,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               <div className="space-y-2">
                 <h3 className="font-display text-base font-bold text-foreground">Spelersstatistieken</h3>
                 <p className="text-xs text-muted-foreground max-w-3xl">
-                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Doelpuntenmakers en assists worden automatisch zichtbaar op de publieke toernooiwebsite zodra je ze aanvinkt. Kaarten kun je enkel aanvinken; daarvan wordt geen klassement weergegeven op de toernooisite.
+                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
                 </p>
               </div>
               <div className="grid gap-3 lg:grid-cols-2">
