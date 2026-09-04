@@ -1037,7 +1037,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                           <Input
                             type="number"
                             className="h-8"
-                            placeholder="Niet gebruiken"
+                            placeholder="0"
                             value={fpDraft.clean_match}
                             onChange={(e) => setFpDraft((p) => ({ ...p, clean_match: e.target.value }))}
                             onBlur={() => saveFairplayConfig()}
