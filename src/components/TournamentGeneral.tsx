@@ -1054,7 +1054,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                           />
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">Je kunt "Fairplay" daarna toevoegen als extra criterium bij gelijke punten. Blijft alles gelijk, dan volgt nog steeds de loting.</p>
+                      
                     </div>
                   )}
                 </div>
