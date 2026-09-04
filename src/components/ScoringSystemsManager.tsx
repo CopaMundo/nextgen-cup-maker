@@ -988,6 +988,27 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
         </Button>
       </div>
 
+      {/* Naam bewerken Dialog */}
+      <Dialog open={!!editingNameId} onOpenChange={(open) => { if (!open) setEditingNameId(null); }}>
+        <DialogContent ref={nameDialogRef} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Puntentelling bewerken</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Naam</Label>
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && editingNameId) saveName(editingNameId); }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingNameId(null)}>Annuleren</Button>
+            <Button onClick={() => editingNameId && saveName(editingNameId)}>Opslaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Tiebreaker Edit Dialog */}
       <Dialog open={!!tiebreakerEditId} onOpenChange={(open) => { if (!open) setTiebreakerEditId(null); }}>
         <DialogContent ref={tiebreakerDialogRef} className="max-w-md">
