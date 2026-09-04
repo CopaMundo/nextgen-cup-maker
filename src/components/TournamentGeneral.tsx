@@ -185,7 +185,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     yellow: String(initialFp.yellow),
     second_yellow: String(initialFp.second_yellow),
     red: String(initialFp.red),
-    clean_match: initialFp.clean_match == null ? "" : String(initialFp.clean_match),
+    clean_match: String(initialFp.clean_match ?? 0),
     start: String(initialFp.start),
   });
 
