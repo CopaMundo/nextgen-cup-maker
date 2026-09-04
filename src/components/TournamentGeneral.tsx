@@ -190,14 +190,21 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   });
 
   const saveFairplayConfig = async () => {
-    const num = (v: string, fallback: number) => (v.trim() === "" ? fallback : Number(v));
+    const num = (v: string) => (v.trim() === "" ? 0 : Number(v));
     const config = {
-      yellow: num(fpDraft.yellow, FAIRPLAY_DEFAULTS.yellow),
-      second_yellow: num(fpDraft.second_yellow, FAIRPLAY_DEFAULTS.second_yellow),
-      red: num(fpDraft.red, FAIRPLAY_DEFAULTS.red),
-      clean_match: fpDraft.clean_match.trim() === "" ? null : Number(fpDraft.clean_match),
-      start: num(fpDraft.start, FAIRPLAY_DEFAULTS.start),
+      yellow: num(fpDraft.yellow),
+      second_yellow: num(fpDraft.second_yellow),
+      red: num(fpDraft.red),
+      clean_match: num(fpDraft.clean_match),
+      start: num(fpDraft.start),
     };
+    setFpDraft({
+      yellow: String(config.yellow),
+      second_yellow: String(config.second_yellow),
+      red: String(config.red),
+      clean_match: String(config.clean_match),
+      start: String(config.start),
+    });
     const { error } = await supabase.from("tournaments").update({ fairplay_config: config } as any).eq("id", tournament.id);
     if (error) {
       toast({ title: "Opslaan mislukt", description: error.message, variant: "destructive" });
@@ -205,6 +212,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       onUpdate({ ...tournament, ...form, fairplay_config: config });
     }
   };
+
 
 
   const saveToDb = async (updates: Partial<typeof form>) => {
