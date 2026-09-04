@@ -115,6 +115,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const [h2hSubOpen, setH2hSubOpen] = useState(false);
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const nameDialogRef = useDialogFocus(!!editingNameId);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteUsage, setDeleteUsage] = useState<{
     phases: { id: string; name: string }[];
