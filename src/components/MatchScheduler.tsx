@@ -987,14 +987,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         timeToMinutes(o.match_time) + durOf(o) > start
       );
       if (overlapping.length > 0) {
-        const showLoc = locations.length > 1;
+        const fieldLoc = (fieldName: string | null) => {
+          const f = fields.find(f => f.name === fieldName);
+          return f?.location || getFieldLocation(fieldName);
+        };
+        const currentLoc = fieldLoc(match.field);
         return {
           level: "error",
           reasons: [
             `Dubbel geboekt: fluit tegelijk op ${overlapping
               .map(o => {
-                const loc = showLoc ? getFieldLocation(o.field) : null;
-                return `${o.match_time?.slice(0, 5)}${o.field ? ` – ${o.field}` : ""}${loc ? ` (${loc})` : ""}`;
+                const loc = fieldLoc(o.field);
+                const showLoc = locations.length > 1 || (!!loc && loc !== currentLoc);
+                const fieldLabel = o.field ? displayFieldName(o.field) : "";
+                return `${o.match_time?.slice(0, 5)}${fieldLabel ? ` – ${fieldLabel}` : ""}${showLoc && loc ? ` (${loc})` : ""}`;
               })
               .join(", ")}`,
           ],
