@@ -775,8 +775,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         if (homeTotal > awayTotal) winnerId = heenM.home_team_id;
         else if (awayTotal > homeTotal) winnerId = heenM.away_team_id;
         else {
-          if ((heenM.home_penalties ?? 0) > (heenM.away_penalties ?? 0)) winnerId = heenM.home_team_id;
-          else if ((heenM.away_penalties ?? 0) > (heenM.home_penalties ?? 0)) winnerId = heenM.away_team_id;
+          // Penalties staan op de Terug-wedstrijd, in Terug-oriëntatie
+          if ((terugM.home_penalties ?? 0) > (terugM.away_penalties ?? 0)) winnerId = heenM.away_team_id;
+          else if ((terugM.away_penalties ?? 0) > (terugM.home_penalties ?? 0)) winnerId = heenM.home_team_id;
         }
 
         if (winnerId && baseName) {

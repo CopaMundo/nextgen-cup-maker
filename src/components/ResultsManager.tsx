@@ -293,14 +293,14 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     // totaalscore gelijk is.
     const ha = match.match_name?.match(/^(.+)\s+\((Heen|Terug)\)$/);
     if (ha) {
-      if (ha[2] !== "Heen") return false; // beslissing leeft op de Heen-wedstrijd
-      const terug = list.find(m => m.match_name === `${ha[1]} (Terug)` && m.group_id === match.group_id);
-      if (!terug) return false;
+      if (ha[2] !== "Terug") return false; // beslissing leeft op de Terug-wedstrijd
+      const heen = list.find(m => m.match_name === `${ha[1]} (Heen)` && m.group_id === match.group_id);
+      if (!heen) return false;
       if (match.home_score === null || match.away_score === null) return false;
-      if (terug.home_score === null || terug.away_score === null) return false;
-      // Aggregaat in Heen-oriëntatie: Terug home/away zijn omgewisseld
-      const aggHome = match.home_score + terug.away_score;
-      const aggAway = match.away_score + terug.home_score;
+      if (heen.home_score === null || heen.away_score === null) return false;
+      // Aggregaat in Terug-oriëntatie: Heen home/away zijn omgewisseld
+      const aggHome = match.home_score + heen.away_score;
+      const aggAway = match.away_score + heen.home_score;
       return aggHome === aggAway;
     }
 
@@ -317,7 +317,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         .filter(m => m.phase_id === match.phase_id && m.match_name === match.match_name)
         .sort((a, b) => scheduleKey(a).localeCompare(scheduleKey(b)));
       if (siblings.length > 1) {
-        if (siblings[0].id !== match.id) return false;
+        if (siblings[siblings.length - 1].id !== match.id) return false;
         if (!siblings.every(m => m.home_score !== null && m.away_score !== null)) return false;
         const aggHome = siblings.reduce((s, m) => s + (m.home_score ?? 0), 0);
         const aggAway = siblings.reduce((s, m) => s + (m.away_score ?? 0), 0);
@@ -397,10 +397,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           if (homeTotal > awayTotal) { winnerId = heenM.home_team_id; loserId = heenM.away_team_id; }
           else if (awayTotal > homeTotal) { winnerId = heenM.away_team_id; loserId = heenM.home_team_id; }
           else {
-            const hp = heenM.home_penalties ?? 0;
-            const ap = heenM.away_penalties ?? 0;
-            if (hp > ap) { winnerId = heenM.home_team_id; loserId = heenM.away_team_id; }
-            else if (ap > hp) { winnerId = heenM.away_team_id; loserId = heenM.home_team_id; }
+            // Penalties staan op de Terug-wedstrijd, in Terug-oriëntatie
+            const hp = terugM.home_penalties ?? 0;
+            const ap = terugM.away_penalties ?? 0;
+            if (hp > ap) { winnerId = terugM.home_team_id; loserId = terugM.away_team_id; }
+            else if (ap > hp) { winnerId = terugM.away_team_id; loserId = terugM.home_team_id; }
           }
         }
       } else {
@@ -2388,7 +2389,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const pairedMatch = pairedName
           ? matches.find(m => m.match_name === pairedName && m.group_id === sem.group_id) || null
           : null;
-        const heenMatch = isHALeg ? (currentIsHeen ? sem : pairedMatch) : null;
+        // De beslissende score (penalty's) staat altijd op de Terug-wedstrijd.
+        const terugMatch = isHALeg ? (currentIsHeen ? pairedMatch : sem) : null;
 
         // Voor H&A leggen we 'pairedHomeScore/pairedAwayScore' uit in oriëntatie
         // van de HUIDIGE wedstrijd. In een H&A reeks wisselen home/away tussen legs,
@@ -2403,9 +2405,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             // Wissel: paired.away → current home, paired.home → current away
             pairedHomeScore: pairedPlayed ? pairedMatch.away_score : null,
             pairedAwayScore: pairedPlayed ? pairedMatch.home_score : null,
-            storedHomePenalties: heenMatch?.home_penalties ?? null,
-            storedAwayPenalties: heenMatch?.away_penalties ?? null,
-            currentIsHeen,
+            storedHomePenalties: terugMatch?.home_penalties ?? null,
+            storedAwayPenalties: terugMatch?.away_penalties ?? null,
+            currentIsCarrier: !currentIsHeen,
           };
         }
 
@@ -2442,7 +2444,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             tournament={tournament}
             aggregate={aggregateProp}
             onSave={async (data) => {
-              // Update de huidige leg (zonder penalties bij H&A — die horen op de Heen-match)
+              // Update de huidige leg (zonder penalties bij H&A — die horen op de Terug-match)
               const updatedMatch: Match = {
                 ...sem,
                 home_score: data.homeScore,
@@ -2452,42 +2454,42 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 set_scores: data.setScores,
               };
 
-              // H&A: penalties horen op de Heen-match (in Heen-oriëntatie)
-              let updatedHeen: Match | null = null;
-              if (isHALeg && heenMatch) {
-                const swap = !currentIsHeen;
-                const heenHomePen = swap ? data.awayPenalties : data.homePenalties;
-                const heenAwayPen = swap ? data.homePenalties : data.awayPenalties;
-                const heenBase = heenMatch.id === sem.id ? updatedMatch : heenMatch;
+              // H&A: penalties horen op de Terug-match (in Terug-oriëntatie)
+              let updatedCarrier: Match | null = null;
+              if (isHALeg && terugMatch) {
+                const swap = currentIsHeen;
+                const carrierHomePen = swap ? data.awayPenalties : data.homePenalties;
+                const carrierAwayPen = swap ? data.homePenalties : data.awayPenalties;
+                const carrierBase = terugMatch.id === sem.id ? updatedMatch : terugMatch;
                 if (
-                  heenHomePen !== heenBase.home_penalties ||
-                  heenAwayPen !== heenBase.away_penalties
+                  carrierHomePen !== carrierBase.home_penalties ||
+                  carrierAwayPen !== carrierBase.away_penalties
                 ) {
-                  updatedHeen = {
-                    ...heenBase,
-                    home_penalties: heenHomePen,
-                    away_penalties: heenAwayPen,
+                  updatedCarrier = {
+                    ...carrierBase,
+                    home_penalties: carrierHomePen,
+                    away_penalties: carrierAwayPen,
                   };
                 }
               }
-              if (updatedHeen && updatedHeen.id === sem.id) {
-                updatedMatch.home_penalties = updatedHeen.home_penalties;
-                updatedMatch.away_penalties = updatedHeen.away_penalties;
-                updatedHeen = null;
+              if (updatedCarrier && updatedCarrier.id === sem.id) {
+                updatedMatch.home_penalties = updatedCarrier.home_penalties;
+                updatedMatch.away_penalties = updatedCarrier.away_penalties;
+                updatedCarrier = null;
               }
 
               // Werk alle betrokken wedstrijden in één keer bij, zodat de
               // winnaarbepaling meteen de nieuwe scores én penalties ziet.
               const nextList = matches.map(m => {
                 if (m.id === updatedMatch.id) return updatedMatch;
-                if (updatedHeen && m.id === updatedHeen.id) return updatedHeen;
+                if (updatedCarrier && m.id === updatedCarrier.id) return updatedCarrier;
                 return m;
               });
               setMatches(nextList);
 
               let listAfter = nextList;
-              if (updatedHeen) {
-                listAfter = (await saveScore(updatedHeen, listAfter)) ?? listAfter;
+              if (updatedCarrier) {
+                listAfter = (await saveScore(updatedCarrier, listAfter)) ?? listAfter;
               }
               await saveScore(updatedMatch, listAfter);
             }}

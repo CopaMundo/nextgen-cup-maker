@@ -977,12 +977,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const newTerug = byId.get(oldHeen.id)!;
       newHeen.match_name = `${base} (Heen)`;
       newTerug.match_name = `${base} (Terug)`;
-      // Penalties leven op de Heen-wedstrijd in Heen-oriëntatie. De nieuwe
-      // Heen-wedstrijd heeft omgekeerde thuis/uit, dus de waarden wisselen mee.
-      newHeen.home_penalties = oldHeen.away_penalties;
-      newHeen.away_penalties = oldHeen.home_penalties;
-      newTerug.home_penalties = null;
-      newTerug.away_penalties = null;
+      // Penalties leven op de Terug-wedstrijd in Terug-oriëntatie. De nieuwe
+      // Terug-wedstrijd heeft omgekeerde thuis/uit, dus de waarden wisselen mee.
+      newTerug.home_penalties = oldTerug.away_penalties;
+      newTerug.away_penalties = oldTerug.home_penalties;
+      newHeen.home_penalties = null;
+      newHeen.away_penalties = null;
       swapped.push(newHeen, newTerug);
     }
     if (swapped.length === 0) return;

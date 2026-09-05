@@ -593,9 +593,9 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       const bothPlayed = heenMatch.is_played && terugMatch.is_played;
       const anyScored = heenMatch.home_score !== null || terugMatch.home_score !== null;
       const isTied = homeTotal === awayTotal && bothPlayed;
-      // Penalties: stored on Heen match
-      const homePen = heenMatch.home_penalties ?? 0;
-      const awayPen = heenMatch.away_penalties ?? 0;
+      // Penalties: stored on the Terug (last) match, in Terug orientation
+      const homePen = terugMatch.away_penalties ?? 0;
+      const awayPen = terugMatch.home_penalties ?? 0;
       const hasPenalties = isTied && homePen !== awayPen;
       // Display total: show actual total (no +1), penalties shown separately
       return { homeTotal, awayTotal, bothPlayed, anyScored, isTied, hasPenalties, homePen, awayPen, heenMatch, terugMatch };
