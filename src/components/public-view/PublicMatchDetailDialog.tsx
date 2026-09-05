@@ -146,8 +146,9 @@ const PublicMatchDetailDialog = ({
           heenMatch.home_score !== null || heenMatch.away_score !== null ||
           terugMatch.home_score !== null || terugMatch.away_score !== null;
         const isTied = homeTotal === awayTotal && bothPlayed;
-        const homePen = heenMatch.home_penalties ?? 0;
-        const awayPen = heenMatch.away_penalties ?? 0;
+        // Penalties staan op de Terug-wedstrijd (in Terug-oriëntatie)
+        const homePen = terugMatch.away_penalties ?? 0;
+        const awayPen = terugMatch.home_penalties ?? 0;
         const hasPenalties = isTied && homePen !== awayPen;
         return { homeTotal, awayTotal, bothPlayed, anyScored, isTied, hasPenalties, homePen, awayPen };
       })()
