@@ -3873,19 +3873,39 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   {getMatchLabel(m.home_team_id, m.home_slot_label)} vs {getMatchLabel(m.away_team_id, m.away_slot_label)}
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-sm">Scheidsrechter</Label>
-                  <Select value={editMatchReferee || "__none__"} onValueChange={(v) => setEditMatchReferee(v === "__none__" ? "" : v)}>
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Kies scheidsrechter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— Geen —</SelectItem>
-                      {referees.map(r => (
-                        <SelectItem key={r} value={r}>{r}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-sm">Scheidsrechters</Label>
+                  {editMatchRefs.map((val, i) => (
+                    <div key={i} className="flex items-center gap-1">
+                      <span className="w-4 text-xs font-bold text-primary">{i + 1}</span>
+                      <Select
+                        value={val || "__none__"}
+                        onValueChange={(v) => setEditMatchRefs(prev => prev.map((p, idx) => idx === i ? (v === "__none__" ? "" : v) : p))}
+                      >
+                        <SelectTrigger className="h-9 flex-1">
+                          <SelectValue placeholder="Kies scheidsrechter" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__none__">— Geen —</SelectItem>
+                          {referees.map(r => (
+                            <SelectItem key={r} value={r}>{r}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {editMatchRefs.length > 1 && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setEditMatchRefs(prev => prev.filter((_, idx) => idx !== i))}>
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  {editMatchRefs.length < MAX_REFEREES && (
+                    <Button variant="outline" size="sm" className="gap-1 text-xs h-8" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
+                      <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
+                    </Button>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">De volgorde bepaalt de rol (1, 2, …). Maximaal {MAX_REFEREES}.</p>
                 </div>
+
                 <div className="space-y-1">
                   <Label className="text-sm">Aangepaste wedstrijdduur (min)</Label>
                   <Input
