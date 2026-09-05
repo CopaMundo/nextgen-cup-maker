@@ -444,12 +444,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [dropdownOpenBrackets, setDropdownOpenBrackets] = useState(false);
   const [dropdownOpenRounds, setDropdownOpenRounds] = useState(false);
   const [dropdownOpenFields, setDropdownOpenFields] = useState(false);
-  const dropdownContainerRef = useRef<HTMLDivElement>(null);
+  const dropdownBracketsRef = useRef<HTMLDivElement>(null);
+  const dropdownRoundsRef = useRef<HTMLDivElement>(null);
+  const dropdownFieldsRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns on click outside
+  // Close dropdowns on click outside the specific open dropdown wrapper
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownContainerRef.current && !dropdownContainerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const openRefs = [
+        dropdownOpenBrackets && dropdownBracketsRef.current,
+        dropdownOpenRounds && dropdownRoundsRef.current,
+        dropdownOpenFields && dropdownFieldsRef.current,
+      ].filter(Boolean) as HTMLDivElement[];
+      if (openRefs.length > 0 && !openRefs.some((ref) => ref.contains(target))) {
         setDropdownOpenBrackets(false);
         setDropdownOpenRounds(false);
         setDropdownOpenFields(false);
@@ -457,7 +465,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  }, [dropdownOpenBrackets, dropdownOpenRounds, dropdownOpenFields]);
 
   const openDropdown = (which: "brackets" | "rounds" | "fields") => {
     setDropdownOpenBrackets(which === "brackets" ? v => !v : false);
