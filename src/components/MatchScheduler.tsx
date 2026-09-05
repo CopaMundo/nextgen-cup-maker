@@ -981,7 +981,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!isRefereeDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
-    setRefDropMatchId(null);
+    endRefereeDrag();
     let payload: { name: string; fromMatchId: string | null };
     try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
     const { name, fromMatchId } = payload;
@@ -1047,7 +1047,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!isRefereeDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
-    setRefDropMatchId(null);
+    endRefereeDrag();
     let payload: { name: string; fromMatchId: string | null };
     try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
     const { name, fromMatchId } = payload;
