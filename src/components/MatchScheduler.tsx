@@ -3008,9 +3008,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex gap-0 mt-2">
+          <div className="flex-1 min-h-0 overflow-hidden flex gap-0 mt-2">
             {/* Field columns */}
-            <div className="flex-1 min-w-0 relative">
+            <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden relative">
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
