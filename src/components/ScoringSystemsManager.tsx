@@ -712,12 +712,14 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         </p>
                         <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
                           <ol className="text-sm text-foreground space-y-1">
-                            {sys.tiebreaker_rules.map((rule, idx) => (
-                              <li key={`${sys.id}-${rule}`} className="flex gap-2">
-                                <span className="text-muted-foreground font-medium">{idx + 1}.</span>
-                                <span>{getTbLabel(rule)}</span>
-                              </li>
-                            ))}
+                            {sys.tiebreaker_rules
+                              .filter((rule) => rule !== "fairplay" || tournament?.enable_fairplay)
+                              .map((rule, idx) => (
+                                <li key={`${sys.id}-${rule}`} className="flex gap-2">
+                                  <span className="text-muted-foreground font-medium">{idx + 1}.</span>
+                                  <span>{getTbLabel(rule)}</span>
+                                </li>
+                              ))}
                           </ol>
                         </div>
                         <Button
