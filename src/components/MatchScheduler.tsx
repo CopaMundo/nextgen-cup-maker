@@ -3426,7 +3426,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
             {/* ===== RIGHT SIDEBAR ===== */}
             {!plannerCollapsed && (
-            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden self-start sticky top-0 max-h-screen overflow-y-auto overscroll-contain">
+            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden self-start sticky top-0 h-screen flex flex-col overflow-hidden overscroll-contain">
               {/* Tab icons */}
               <div className="flex border-b border-border">
                 <button
@@ -3452,7 +3452,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 </button>
               </div>
 
-              <div className="p-3 overflow-y-auto max-h-[calc(100vh-200px)]">
+              <div className="p-3 flex-1 min-h-0 flex flex-col overflow-y-auto">
                 {/* ===== PLANNEN TAB ===== */}
                 {rightSidebarTab === "plannen" && (
                   <div className="space-y-4">
@@ -3786,7 +3786,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                 {/* ===== ONGEPLAND TAB ===== */}
                 {rightSidebarTab === "ongepland" && (
-                  <div className="space-y-3" ref={unscheduledZoneRef}>
+                  <div
+                    className={`space-y-3 flex-1 min-h-0 flex flex-col rounded-lg transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "ring-2 ring-primary/50 bg-primary/5" : ""}`}
+                    ref={unscheduledZoneRef}
+                    data-planner-drop-zone="true"
+                    onDragOver={(e) => {
+                      if (!hasPlannerDragData(e)) return;
+                      const inner = (e.target as HTMLElement).closest('[data-planner-drop-zone="true"]');
+                      if (inner && inner !== e.currentTarget) return;
+                      e.preventDefault();
+                      setDragOverField("__unscheduled__");
+                      setDragOverIndex(getUnscheduledMatches().length);
+                    }}
+                    onDrop={(e) => void handleDropToUnscheduled(e, getUnscheduledMatches().length)}
+                  >
                     <h3 className="font-display text-sm font-bold text-foreground">Niet gepland ({getUnscheduledMatches().length}/{matches.length})</h3>
 
                     {/* Sidebar filters */}
@@ -3843,7 +3856,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     )}
 
                     {/* Unscheduled match list */}
-                    <div className="space-y-1 max-h-[500px] overflow-y-auto pr-1">
+                    <div className="space-y-1 flex-1 min-h-0 overflow-y-auto pr-1">
                       {getUnscheduledMatches().map((m, idx) => (
                         <div key={m.id} className="space-y-1">
                           <div
