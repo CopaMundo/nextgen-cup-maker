@@ -1079,8 +1079,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
     const container = e.currentTarget as HTMLElement;
-    const rect = container.getBoundingClientRect();
-    const raw = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    const raw = getRefereeInsertIndex(container, e.clientX, e.clientY);
     const target = matches.find(m => m.id === matchId);
     const names = refNames(target?.referee);
     let index = raw;
@@ -1114,10 +1113,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!target) return;
     const current = refNames(target.referee);
     const container = e.currentTarget as HTMLElement;
-    const rect = container.getBoundingClientRect();
     const insertIndex = refInsert?.matchId === matchId
       ? refInsert.index
-      : getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, current.length);
+      : getRefereeInsertIndex(container, e.clientX, e.clientY);
 
     if (fromMatchId === matchId) {
       const withoutName = current.filter(n => n !== name);
