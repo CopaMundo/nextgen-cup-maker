@@ -3051,32 +3051,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                 return (
                   <div>
-                    {/* Action bar — Wedstrijdduur + planner collapse */}
-                    <div className="sticky top-0 z-10 flex items-center justify-end gap-1 mb-1 bg-background/95 backdrop-blur-sm py-1 print:hidden">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setDraftMatchDuration(globalMatchDuration);
-                        setDraftBreakDuration(globalBreakDuration);
-                        setDraftPerFormat(perFormatDurationEnabled);
-                        setDraftPhaseConfigs(phases.reduce((acc, p) => {
-                          const cfg = (p.match_config as any) || {};
-                          acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
-                          return acc;
-                        }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
-                        setShowDurationDialog(true);
-                      }} className="gap-1 text-xs h-7">
-                        <Settings className="h-3 w-3" /> Wedstrijdduur
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPlannerCollapsed((v) => !v)}
-                        className="gap-1 text-xs h-7"
-                        title={plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
-                      >
-                        {plannerCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
-                        {plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
-                      </Button>
-                    </div>
+
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-0 min-w-0">
