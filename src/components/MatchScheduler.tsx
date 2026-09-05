@@ -2859,12 +2859,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const availableRounds = getAvailableRounds();
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+    <div className="flex flex-col">
       {/* Planner only — no tabs */}
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div className="flex flex-col">
 
         {/* ===== PLANNER VIEW ===== */}
-        <div className="print-planner-area flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div className="print-planner-area flex flex-col">
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
@@ -3008,9 +3008,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex-1 min-h-0 overflow-hidden flex gap-0 mt-2">
+          <div className="flex gap-0 mt-2 items-start">
             {/* Field columns */}
-            <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden relative">
+            <div className="flex-1 min-w-0 relative">
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
