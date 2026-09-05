@@ -3659,7 +3659,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               return `${roundLabel} (${phaseName})`;
                                             }
                                           }
-                                          return phaseName;
+                                          return phaseName ? `Ronde ${r.round} (${phaseName})` : `Ronde ${r.round}`;
                                         })()}
                                       </label>
                                     ))}
@@ -3899,13 +3899,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           {getSidebarRounds().map(r => {
                             const phase = phases.find(p => p.id === r.phaseId);
                             const isKnockout = phase && (phase.phase_type === "knockout" || phase.phase_type === "single_match");
-                            let label = phase?.name || "Wedstrijden";
+                            let label = phase?.name ? `Ronde ${r.round} (${phase.name})` : `Ronde ${r.round}`;
                             if (isKnockout) {
                               const phaseMatches = matches.filter(m => m.phase_id === r.phaseId && m.round_number === r.round);
+                              let base = phase?.name || "Wedstrijden";
                               if (phaseMatches.length > 0 && phaseMatches[0].match_name) {
-                                label = phaseMatches[0].match_name.replace(/\s*\([^)]+\)\s*$/, "").replace(/\s*\d+$/, "");
+                                base = phaseMatches[0].match_name.replace(/\s*\([^)]+\)\s*$/, "").replace(/\s*\d+$/, "");
                               }
-                              label = `${label} (${phase.name})`;
+                              label = `${base} (${phase.name})`;
                             }
                             return <option key={r.key} value={r.key}>{label}</option>;
                           })}
