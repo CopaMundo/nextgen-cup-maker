@@ -104,6 +104,8 @@ input[type="number"] {
     --muted-foreground: 150 8% 50%;
     --accent: 52 100% 60%;
     --accent-foreground: 150 30% 6%;
+    --warning: 32 95% 50%;
+    --warning-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 95%;
     --border: 150 12% 18%;
@@ -139,6 +141,8 @@ input[type="number"] {
     --muted-foreground: 220 10% 40%;
     --accent: 220 80% 35%;
     --accent-foreground: 0 0% 100%;
+    --warning: 32 95% 50%;
+    --warning-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 15% 85%;
@@ -297,6 +301,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 55%;
   --accent: 217 100% 30%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 217 30% 22%;
@@ -318,6 +324,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 42%;
   --accent: 43 65% 52%;
   --accent-foreground: 217 100% 10%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 217 15% 85%;
@@ -341,6 +349,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 50%;
   --accent: 64 100% 50%;
   --accent-foreground: 0 0% 5%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 189 25% 20%;
@@ -362,6 +372,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 42%;
   --accent: 158 100% 35%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 189 15% 85%;
@@ -385,6 +397,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 50%;
   --accent: 0 0% 75%;
   --accent-foreground: 0 0% 5%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 0 0% 20%;
@@ -406,6 +420,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 45%;
   --accent: 0 0% 30%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 0 0% 82%;
@@ -517,6 +533,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 50%;
   --accent: 29 100% 63%;
   --accent-foreground: 0 0% 5%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 225 12% 20%;
@@ -538,6 +556,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 42%;
   --accent: 29 100% 63%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 225 10% 87%;
@@ -561,6 +581,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 35%;
   --accent: 0 75% 45%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 350 18% 82%;
@@ -582,6 +604,8 @@ input[type="number"] {
   --muted-foreground: 350 8% 48%;
   --accent: 0 75% 50%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 350 10% 22%;
@@ -605,6 +629,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 42%;
   --accent: 11 89% 60%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 275 6% 88%;
@@ -626,6 +652,8 @@ input[type="number"] {
   --muted-foreground: 0 0% 48%;
   --accent: 11 89% 60%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 95%;
   --border: 275 8% 20%;
@@ -683,6 +711,8 @@ input[type="number"] {
   --muted-foreground: 225 19% 45%;
   --accent: 227 68% 16%;
   --accent-foreground: 0 0% 100%;
+  --warning: 32 95% 50%;
+  --warning-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 225 30% 86%;
