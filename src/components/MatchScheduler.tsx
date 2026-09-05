@@ -965,6 +965,45 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return [...rest.slice(0, idx), refDragName, ...rest.slice(idx)];
   };
 
+  /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
+  const getRefereeIssue = (match: Match, name: string, roleIdx: number): { level: "error" | "warn"; reasons: string[] } | null => {
+    const cfg = refereeConfigs.find(r => r.name === name);
+    const teamNameOf = (id: string) => teams.find(t => t.id === id)?.name || "dit team";
+    const durOf = (m: Match) => {
+      const mp = phases.find(p => p.id === m.phase_id);
+      const mc = (mp?.match_config as any) || {};
+      return m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
+    };
+
+    // Dubbele boeking: overlappende tijd op dezelfde dag
+    if (match.match_date && match.match_time) {
+      const start = timeToMinutes(match.match_time);
+      const end = start + durOf(match);
+      const overlapping = matches.filter(o =>
+        o.id !== match.id &&
+        o.match_date === match.match_date &&
+        o.match_time &&
+        refNames(o.referee).includes(name) &&
+        timeToMinutes(o.match_time) < end &&
+        timeToMinutes(o.match_time) + durOf(o) > start
+      );
+      if (overlapping.length > 0) {
+        return {
+          level: "error",
+          reasons: [
+            `Dubbel geboekt: fluit tegelijk op ${overlapping
+              .map(o => `${o.match_time?.slice(0, 5)}${o.field ? ` – ${o.field}` : ""}`)
+              .join(", ")}`,
+          ],
+        };
+      }
+    }
+
+    if (!cfg) return null;
+    const assignedCount = matches.filter(m => refNames(m.referee).includes(name)).length;
+    const reasons = refereeViolations(cfg, match, roleIdx + 1, { assignedCount, teamName: teamNameOf });
+    return reasons.length > 0 ? { level: "warn", reasons } : null;
+  };
 
 
   /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
