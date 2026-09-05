@@ -3950,11 +3950,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     </div>
                   ))}
                   {editMatchRefs.length < MAX_REFEREES && (
-                    <Button variant="outline" size="sm" className="gap-1 text-xs h-8" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
-                      <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
-                    </Button>
+                    <div className="pl-5 pt-1">
+                      <Button variant="outline" size="sm" className="gap-1 text-xs h-8 w-full justify-center" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
+                        <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
+                      </Button>
+                    </div>
                   )}
-                  <p className="text-[11px] text-muted-foreground">De volgorde bepaalt de rol (1, 2, …). Maximaal {MAX_REFEREES}.</p>
                 </div>
 
                 <div className="space-y-1">
