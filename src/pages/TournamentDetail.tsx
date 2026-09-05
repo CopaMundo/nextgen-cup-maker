@@ -285,10 +285,10 @@ const TournamentDetail = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <ThemeSwitcher />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
-          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-4 gap-1 print:hidden">
+          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-4 gap-1 print:hidden min-h-0">
             {tournament.logo_url && (
               <div className="mb-3 pb-3 border-b border-border">
                 <img src={tournament.logo_url} alt="" className="h-10 w-10 rounded-lg object-contain" />
