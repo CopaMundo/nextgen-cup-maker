@@ -913,11 +913,10 @@ const phaseOf = (phases: any[], id: string | null | undefined) =>
 const matchSubtitle = (m: any, ctx: Ctx): string | null => {
   // Group phase → group name
   if (m.group_id) return groupNameOf(ctx.groups, m.group_id);
-  // Knockout → format (phase) name + round name (or match_name)
+  // Knockout → format (phase) name + match name
   const p = phaseOf(ctx.phases, m.phase_id);
   const formatName = p?.phase_label || p?.name || "";
-  const roundName = m.match_name || (m.round_number ? `Ronde ${m.round_number}` : "");
-  return [formatName, roundName].filter(Boolean).join(" · ") || null;
+  return [formatName, m.match_name].filter(Boolean).join(" · ") || null;
 };
 
 // Rich match card matching the broadcast layout (see uploaded ESPN-style examples):
@@ -933,8 +932,7 @@ const MatchCardLine = ({ m, context, alt, hideSubtitle }: { m: any; context: Ctx
     "inline-flex items-center justify-center text-base font-black tabular-nums px-3 py-1 rounded bg-primary text-primary-foreground";
   const altRowCls = alt ? ds(context.style, "tableRowAlt") || "bg-muted/30" : "";
 
-  // Field name on the left (e.g. "Veld 1"); falls back to round when no field
-  const fieldLabel = m.field || (m.round_number ? `R${m.round_number}` : "");
+  const fieldLabel = m.field || "";
 
   return (
     <div

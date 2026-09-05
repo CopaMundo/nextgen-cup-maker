@@ -86,9 +86,6 @@ const MatchDetailDialog = ({ open, onClose, match, tournament, teams, scoreEdita
             {match.group_name && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">{match.group_name}</span>
             )}
-            {match.round_number && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">Ronde {match.round_number}</span>
-            )}
           </div>
         </DialogHeader>
 
