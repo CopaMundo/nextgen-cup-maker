@@ -3610,7 +3610,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <div className="space-y-1 relative" ref={dropdownFieldsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer velden</Label>}
                             <button
-                              onClick={() => hasFields && openDropdown("fields")}
+                              onClick={() => hasFields && openDropdown("fields")} data-dd-inside="true"
                               disabled={!hasFields}
                               className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
