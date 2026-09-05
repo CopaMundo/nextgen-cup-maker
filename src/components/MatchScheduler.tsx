@@ -959,15 +959,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.dataTransfer.effectAllowed = "move";
     setRefereeDragImage(e, name);
     setRefDragName(name);
+    setRefDragFromMatchId(fromMatchId || null);
     e.stopPropagation();
   };
 
   const endRefereeDrag = () => {
     setRefDragName(null);
+    setRefDragFromMatchId(null);
     setRefInsert(null);
     setRefDropMatchId(null);
     setRefListDropActive(false);
   };
+
 
   const isRefereeDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes(REF_DRAG_TYPE);
 
