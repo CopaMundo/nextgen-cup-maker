@@ -2708,6 +2708,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const parsed = editMatchDuration.trim() === "" ? null : parseInt(editMatchDuration, 10);
     const dur = parsed != null && !isNaN(parsed) && parsed > 0 ? parsed : null;
     const refs = editMatchRefs.map(r => r.trim()).filter(Boolean);
+    const dupe = refs.find((r, i) => refs.indexOf(r) !== i);
+    if (dupe) {
+      toast({ title: `${dupe} staat op meerdere rollen`, description: "Een scheidsrechter kan maar één rol per wedstrijd hebben.", variant: "destructive" });
+      return;
+    }
     await updateMatch(editMatchId, { referee: refs.length ? refs.join(", ") : null, duration_minutes: dur } as any);
 
     setEditMatchId(null);
