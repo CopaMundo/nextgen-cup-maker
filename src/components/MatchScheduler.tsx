@@ -4015,6 +4015,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Bevestiging: alle scheidsrechters uit schema verwijderen */}
+      <AlertDialog open={showClearRefereesConfirm} onOpenChange={setShowClearRefereesConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alle scheidsrechters uit schema halen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Wil je alle scheidsrechters verwijderen uit het schema van {plannerDate ? formatIsoDateForLocale(plannerDate) : "deze dag"}
+              {selectedLocation ? ` (${selectedLocation})` : ""}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setShowClearRefereesConfirm(false); void clearRefereesFromDay(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {hasAnyStats && (() => {
         const sm = selectedStatsMatchId ? matches.find(m => m.id === selectedStatsMatchId) : null;
         const smPhase = sm ? phases.find(p => p.id === sm.phase_id) : null;
