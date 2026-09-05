@@ -1183,10 +1183,13 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
               className="space-y-2"
             >
               {tiebreakerDraft.map((rule, idx) => (
-                <SortableRowShell key={`draft-${rule}`} id={rule} dragLabel="Criterium verplaatsen">
-                  {(handle) => (
+                <SortableRowShell key={`draft-${rule}`} id={rule} dragLabel="Criterium verplaatsen" manualRowDrag>
+                  {(handle, rowProps) => (
                     <>
-                      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                      <div
+                        {...(({ className: _c, ...rest }) => rest)(rowProps)}
+                        className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 cursor-grab active:cursor-grabbing touch-none"
+                      >
                         {handle}
                         <span className="text-xs font-bold text-muted-foreground w-5">{idx + 1}.</span>
                         <span className="text-sm text-foreground flex-1">{getTbLabel(rule, editingIsSets)}</span>
@@ -1225,10 +1228,14 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                     id={sub}
                                     dragLabel="Subcriterium verplaatsen"
                                     handleClassName="[&>svg]:h-3 [&>svg]:w-3"
+                                    manualRowDrag
                                   >
-                                    {(subHandle) => (
+                                    {(subHandle, subRowProps) => (
                                       <>
-                                        <div className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5">
+                                        <div
+                                          {...(({ className: _c, ...rest }) => rest)(subRowProps)}
+                                          className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5 cursor-grab active:cursor-grabbing touch-none"
+                                        >
                                           {subHandle}
                                           <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
                                           <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
