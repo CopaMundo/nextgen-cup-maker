@@ -987,9 +987,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         timeToMinutes(o.match_time) + durOf(o) > start
       );
       if (overlapping.length > 0) {
-        // Locatie van een veld: expliciet ingesteld, anders via registry, anders de eerste (standaard)locatie
+        // Locatie van een veld: expliciet ingesteld, anders via registry, anders de eerste (standaard)locatie.
+        // Enkel tonen als het toernooi meerdere locaties heeft.
         const fieldLoc = (fieldName: string | null) => {
-          if (!fieldName) return null;
+          if (!fieldName || locations.length <= 1) return null;
           const f = fields.find(f => f.name === fieldName);
           return f?.location || getFieldLocation(fieldName) || locations[0]?.name || null;
         };
