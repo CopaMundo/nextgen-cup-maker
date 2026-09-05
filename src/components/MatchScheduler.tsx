@@ -3426,7 +3426,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
             {/* ===== RIGHT SIDEBAR ===== */}
             {!plannerCollapsed && (
-            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden self-start sticky top-0 max-h-screen overflow-y-auto overscroll-contain">
+            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden self-start sticky top-0 h-screen flex flex-col overflow-hidden overscroll-contain">
               {/* Tab icons */}
               <div className="flex border-b border-border">
                 <button
