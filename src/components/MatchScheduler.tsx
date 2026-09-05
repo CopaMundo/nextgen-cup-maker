@@ -472,7 +472,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   // Match edit dialog
   const [editMatchId, setEditMatchId] = useState<string | null>(null);
-  const [editMatchReferee, setEditMatchReferee] = useState("");
+  const [editMatchRefs, setEditMatchRefs] = useState<string[]>([]);
   const [editMatchDuration, setEditMatchDuration] = useState("");
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
 
