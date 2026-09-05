@@ -58,6 +58,52 @@ interface ScoringSystem {
   set_result_points: SetResultPoints;
 }
 
+/** Criteria die je kunt opsplitsen in totaal / thuis / uit. */
+const SCOPED_RULES = ["goal_difference", "goals_scored", "wins"];
+const SCOPE_OPTIONS = [
+  { value: "total", label: "Totaal" },
+  { value: "home", label: "Thuis" },
+  { value: "away", label: "Uit" },
+];
+
+/** Splits een opgeslagen criterium in basisregel + bereik. */
+const parseRule = (rule: string): { base: string; scope: string } => {
+  if (rule.endsWith("_home")) return { base: rule.slice(0, -5), scope: "home" };
+  if (rule.endsWith("_away")) return { base: rule.slice(0, -5), scope: "away" };
+  return { base: rule, scope: "total" };
+};
+
+/** Zet een platte lijst om in basisregels + bereiken per regel. */
+const expandRules = (flat: string[]): { bases: string[]; scopes: Record<string, string[]> } => {
+  const bases: string[] = [];
+  const scopes: Record<string, string[]> = {};
+  flat.forEach((r) => {
+    const { base, scope } = parseRule(r);
+    if (!bases.includes(base)) bases.push(base);
+    if (!SCOPED_RULES.includes(base)) return;
+    const list = scopes[base] || (scopes[base] = []);
+    if (!list.includes(scope)) list.push(scope);
+  });
+  SCOPED_RULES.forEach((b) => {
+    if (bases.includes(b)) {
+      const list = scopes[b] || (scopes[b] = []);
+      if (!list.includes("total")) list.unshift("total");
+    }
+  });
+  return { bases, scopes };
+};
+
+/** Zet basisregels + bereiken terug om in een platte lijst voor de database. */
+const flattenRules = (bases: string[], scopes: Record<string, string[]>): string[] => {
+  const out: string[] = [];
+  bases.forEach((b) => {
+    if (!SCOPED_RULES.includes(b)) { out.push(b); return; }
+    const list = scopes[b]?.length ? scopes[b] : ["total"];
+    list.forEach((sc) => out.push(sc === "total" ? b : `${b}_${sc}`));
+  });
+  return out;
+};
+
 const H2H_SUB_OPTIONS = [
   { value: "points", label: "Punten" },
   { value: "goal_difference", label: "Doelpuntensaldo" },
@@ -113,6 +159,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const [tiebreakerEditId, setTiebreakerEditId] = useState<string | null>(null);
   const [tiebreakerDraft, setTiebreakerDraft] = useState<string[]>([]);
   const [h2hSubDraft, setH2hSubDraft] = useState<string[]>(["points", "goal_difference", "goals_scored", "wins"]);
+  const [scopeDraft, setScopeDraft] = useState<Record<string, string[]>>({});
+  const [h2hScopeDraft, setH2hScopeDraft] = useState<Record<string, string[]>>({});
+  const [openScopes, setOpenScopes] = useState<string[]>([]);
+  const toggleScopeOpen = (key: string) =>
+    setOpenScopes((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   const [h2hSubOpen, setH2hSubOpen] = useState(false);
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -409,8 +460,13 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
       current.length === defaultPoints.length && current.every((v, i) => v === defaultPoints[i]);
     const initial = isSets && sameAsPointsDefault ? defaultSets : current;
     const fairplayEnabled = !!tournament?.enable_fairplay;
-    setTiebreakerDraft([...initial].filter((r) => r !== "fairplay" || fairplayEnabled));
-    setH2hSubDraft([...(sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"])]);
+    const main = expandRules([...initial].filter((r) => parseRule(r).base !== "fairplay" || fairplayEnabled));
+    setTiebreakerDraft(main.bases);
+    setScopeDraft(main.scopes);
+    const h2h = expandRules([...(sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"])]);
+    setH2hSubDraft(h2h.bases);
+    setH2hScopeDraft(h2h.scopes);
+    setOpenScopes([]);
     setH2hSubOpen(false);
     setTiebreakerEditId(sys.id);
   };
@@ -420,8 +476,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     const id = tiebreakerEditId;
     const fairplayEnabled = !!tournament?.enable_fairplay;
     const updates = {
-      tiebreaker_rules: tiebreakerDraft.filter((r) => r !== "fairplay" || fairplayEnabled),
-      h2h_sub_rules: h2hSubDraft,
+      tiebreaker_rules: flattenRules(
+        tiebreakerDraft.filter((r) => r !== "fairplay" || fairplayEnabled),
+        scopeDraft,
+      ),
+      h2h_sub_rules: flattenRules(h2hSubDraft, h2hScopeDraft),
     };
     const count = await checkPlayedMatches();
     if (count > 0) {
@@ -439,19 +498,24 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     setTiebreakerEditId(null);
   };
 
+  const scopeSuffix = (scope: string) => (scope === "home" ? " (thuis)" : scope === "away" ? " (uit)" : "");
   const getTbLabel = (v: string, isSetsMode = false) => {
+    const { base, scope } = parseRule(v);
+    let label = TIEBREAKER_OPTIONS.find((o) => o.value === base)?.label || base;
     if (isSetsMode) {
-      if (v === "goal_difference") return "Setsaldo";
-      if (v === "goals_scored") return "Puntensaldo in sets";
+      if (base === "goal_difference") label = "Setsaldo";
+      if (base === "goals_scored") label = "Puntensaldo in sets";
     }
-    return TIEBREAKER_OPTIONS.find((o) => o.value === v)?.label || v;
+    return label + scopeSuffix(scope);
   };
   const getH2hLabel = (v: string, isSetsMode = false) => {
+    const { base, scope } = parseRule(v);
+    let label = H2H_SUB_OPTIONS.find((o) => o.value === base)?.label || base;
     if (isSetsMode) {
-      if (v === "goal_difference") return "Setsaldo";
-      if (v === "goals_scored") return "Puntensaldo in sets";
+      if (base === "goal_difference") label = "Setsaldo";
+      if (base === "goals_scored") label = "Puntensaldo in sets";
     }
-    return H2H_SUB_OPTIONS.find((o) => o.value === v)?.label || v;
+    return label + scopeSuffix(scope);
   };
   const editingSystem = systems.find((s) => s.id === tiebreakerEditId);
   const editingIsSets = editingSystem?.scoring_type === "sets";
