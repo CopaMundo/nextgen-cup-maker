@@ -3918,6 +3918,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             const phase = phases.find(p => p.id === m.phase_id);
             const mc = (phase?.match_config as any) || {};
             const defaultDur = mc.phaseDuration ?? globalMatchDuration;
+            const filledRefs = editMatchRefs.map(r => r.trim()).filter(Boolean);
+            const duplicateRef = filledRefs.find((r, i) => filledRefs.indexOf(r) !== i);
             return (
               <div className="space-y-3">
                 <div className="text-xs text-muted-foreground">
@@ -3951,10 +3953,15 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   ))}
                   {editMatchRefs.length < MAX_REFEREES && (
                     <div className="pl-5 pt-1">
-                      <Button variant="outline" size="sm" className="gap-1 text-xs h-8 w-full justify-center" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
+                      <Button variant="outline" size="sm" className="gap-1 text-xs h-8 px-2 justify-start" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
                         <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
                       </Button>
                     </div>
+                  )}
+                  {duplicateRef && (
+                    <p className="text-[11px] text-destructive font-medium pl-5">
+                      {duplicateRef} staat op meerdere rollen. Pas dit aan voor je kunt opslaan.
+                    </p>
                   )}
                 </div>
 
@@ -3971,7 +3978,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   <p className="text-[11px] text-muted-foreground">Leeg = standaardduur ({defaultDur} min).</p>
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <Button onClick={saveMatchEdit} className="text-xs">Opslaan</Button>
+                  <Button onClick={saveMatchEdit} disabled={!!duplicateRef} className="text-xs">Opslaan</Button>
                 </div>
               </div>
             );
