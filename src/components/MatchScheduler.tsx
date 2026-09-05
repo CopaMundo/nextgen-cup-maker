@@ -3093,11 +3093,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               </div>
                                             )}
                                             {refNames(m.referee).length > 0 && (
-                                              <div className="mt-0.5 flex flex-wrap gap-1">
+                                              <div
+                                                className="mt-0.5 flex flex-wrap gap-1"
+                                                onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); } }}
+                                                onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
+                                              >
                                                 {refNames(m.referee).map((name, refIdx, arr) => (
                                                   <span
                                                     key={name}
                                                     draggable
+                                                    data-ref-badge="true"
                                                     onDragStart={(e) => startRefereeDrag(e, name, m.id)}
                                                     onPointerDown={(e) => e.stopPropagation()}
                                                     onClick={(e) => e.stopPropagation()}
@@ -3106,20 +3111,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   >
                                                     {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
                                                     <WhistleIcon className="h-2.5 w-2.5" /> {name}
-                                                    {arr.length > 1 && refIdx > 0 && (
-                                                      <button
-                                                        onPointerDown={(e) => e.stopPropagation()}
-                                                        onClick={(e) => { e.stopPropagation(); moveRefereeInMatch(m.id, refIdx, -1); }}
-                                                        title="Eerder in de volgorde"
-                                                        className="ml-0.5 text-muted-foreground hover:text-primary print:hidden"
-                                                      >
-                                                        <ArrowUp className="h-2.5 w-2.5" />
-                                                      </button>
-                                                    )}
                                                   </span>
                                                 ))}
                                               </div>
                                             )}
+
 
                                           </div>
                                           {/* Mobile actions */}
