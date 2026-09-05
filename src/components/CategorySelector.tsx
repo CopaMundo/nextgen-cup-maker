@@ -71,7 +71,7 @@ const CategorySelector = ({
       >
         {categories.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.name}
+            {truncateName(c.name)}
           </option>
         ))}
       </select>
