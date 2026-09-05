@@ -3354,9 +3354,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </SelectContent>
                     </Select>
 
-                    {/* + Scheidsrechter toevoegen */}
-                    <Button variant="outline" size="sm" onClick={() => { setNewRef(""); setShowRefAdd(true); }} className="w-full gap-1 text-xs">
-                      <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
+                    <Button variant="outline" size="sm" onClick={() => onManageReferees?.()} className="w-full gap-1 text-xs">
+                      <Settings className="h-3 w-3" /> Scheidsrechters beheren
                     </Button>
 
                     {/* Lijst van scheidsrechters */}
