@@ -839,8 +839,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   const autoAssignReferees = async () => {
     if (refereeConfigs.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
-    const scheduled = matches.filter(m => m.match_date && m.match_time && m.field);
-    if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden", variant: "destructive" }); return; }
+    const locFieldNames = getLocationFieldNames(selectedLocation);
+    const scheduled = matches.filter(m =>
+      m.match_date && m.match_time && m.field &&
+      m.match_date === plannerDate &&
+      (!selectedLocation || locFieldNames.has(m.field))
+    );
+    if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden op deze dag en locatie", variant: "destructive" }); return; }
+
     const sorted = [...scheduled].sort((a, b) => {
       if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
       return (a.match_time || "").localeCompare(b.match_time || "");
