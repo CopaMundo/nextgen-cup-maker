@@ -282,13 +282,13 @@ const TournamentDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
       <Navbar />
       <ThemeSwitcher />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
-          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-4 gap-1 print:hidden">
+          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-4 gap-1 print:hidden min-h-0">
             {tournament.logo_url && (
               <div className="mb-3 pb-3 border-b border-border">
                 <img src={tournament.logo_url} alt="" className="h-10 w-10 rounded-lg object-contain" />
@@ -319,14 +319,14 @@ const TournamentDetail = () => {
         </TooltipProvider>
 
         {/* Main content */}
-        <div className="flex-1 overflow-auto">
-          <div className="px-3 sm:px-6 py-4 sm:py-6 w-full">
-            <div className="mb-4 sm:mb-6 flex items-center gap-3 sm:gap-4">
+        <div className="flex-1 overflow-auto min-h-0 flex flex-col">
+          <div className="px-3 sm:px-6 py-4 sm:py-6 w-full flex-1 min-h-0 flex flex-col">
+            <div className="mb-4 sm:mb-6 flex items-center gap-3 sm:gap-4 shrink-0">
               <div>
                 <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">{tournament.name}</h1>
               </div>
             </div>
-            {renderContent()}
+            <div className="flex-1 min-h-0 flex flex-col">{renderContent()}</div>
           </div>
         </div>
       </div>
