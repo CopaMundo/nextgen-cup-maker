@@ -691,16 +691,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     });
   }, [matches]);
 
-  // === CLEAR ALL SCHEDULE ===
-  const clearAllSchedule = async () => {
-    const scheduled = matches.filter(m => m.match_date || m.match_time || m.field);
+  // === CLEAR SCHEDULE (alles of enkel de gekozen dag) ===
+  const clearAllSchedule = async (scope: "all" | "day" = "all") => {
+    const isDay = scope === "day";
+    const scheduled = matches.filter(m =>
+      (m.match_date || m.match_time || m.field) && (!isDay || m.match_date === plannerDate)
+    );
     if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden om te wissen" }); return; }
+    const ids = new Set(scheduled.map(m => m.id));
     for (const m of scheduled) {
       await supabase.from("matches").update({ match_date: null, match_time: null, field: null, referee: null }).eq("id", m.id);
     }
-    setMatches(prev => prev.map(m => ({ ...m, match_date: null, match_time: null, field: null, referee: null })));
-    setPlannerBreaks([]);
-    setSchedFormats([]); setSchedGroups([]); setSchedRounds([]); setSchedFields([]);
+    setMatches(prev => prev.map(m => ids.has(m.id) ? { ...m, match_date: null, match_time: null, field: null, referee: null } : m));
+    if (!isDay) {
+      setPlannerBreaks([]);
+      setSchedFormats([]); setSchedGroups([]); setSchedRounds([]); setSchedFields([]);
+    }
     toast({ title: `${scheduled.length} wedstrijden gewist uit planning` });
   };
 
@@ -1088,8 +1094,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       if (current > endOfDay) break;
       result.push({ time: minutesToTime(current), minuteStart: current });
       current += globalMatchDuration + globalBreakDuration;
-      const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-      if (breakHere) current += breakHere.duration;
+      const breaksHere = fieldBreaks.filter(b => b.afterSlotIndex === i);
+      for (const bh of breaksHere) current += bh.duration;
     }
     return result;
   };
@@ -1459,8 +1465,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const mp = m ? phases.find(pp => pp.id === m.phase_id) : undefined;
       const mc = (mp?.match_config as any) || {};
       current += (m?.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration) + (mc.phaseBreak ?? globalBreakDuration);
-      const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-      if (breakHere) current += breakHere.duration;
+      const breaksHere = fieldBreaks.filter(b => b.afterSlotIndex === i);
+      for (const bh of breaksHere) current += bh.duration;
     }
     return updates;
   };
@@ -2730,10 +2736,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     const dur = fieldMatches[i].duration_minutes ?? matchCfg.phaseDuration ?? globalMatchDuration;
                     const brk = matchCfg.phaseBreak ?? globalBreakDuration;
                     currentTime += dur + brk;
-                    const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-                    if (breakHere) {
-                      items.push({ kind: "break", startMin: currentTime, idx: i, brk: breakHere });
-                      currentTime += breakHere.duration;
+                    const breaksHere = fieldBreaks.filter(b => b.afterSlotIndex === i);
+                    for (const bh of breaksHere) {
+                      items.push({ kind: "break", startMin: currentTime, idx: i, brk: bh });
+                      currentTime += bh.duration;
                     }
                   }
                   return { field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime: minutesToTime(currentTime) };
@@ -3686,17 +3692,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <AlertDialogHeader>
             <AlertDialogTitle>Schema leegmaken?</AlertDialogTitle>
             <AlertDialogDescription>
-              Alle geplande wedstrijden ({matches.filter(m => m.match_date || m.match_time || m.field).length}) worden gewist uit de planning. Scores en resultaten blijven behouden. Dit kan niet ongedaan worden.
+              {tournamentDates.length > 1
+                ? `Kies of je het volledige schema wist (${matches.filter(m => m.match_date || m.match_time || m.field).length} wedstrijden) of enkel ${formatIsoDateForLocale(plannerDate, "nl-BE", { weekday: "long", day: "numeric", month: "long" })} (${matches.filter(m => m.match_date === plannerDate).length} wedstrijden). Scores en resultaten blijven behouden.`
+                : `Alle geplande wedstrijden (${matches.filter(m => m.match_date || m.match_time || m.field).length}) worden gewist uit de planning. Scores en resultaten blijven behouden. Dit kan niet ongedaan worden.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Leegmaken
+            {tournamentDates.length > 1 && (
+              <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule("day"); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Enkel deze dag
+              </AlertDialogAction>
+            )}
+            <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule("all"); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {tournamentDates.length > 1 ? "Volledig schema" : "Leegmaken"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
 
       {/* Pauze toevoegen modal */}
       <Dialog open={!!showPauzeModal} onOpenChange={(open) => { if (!open) setShowPauzeModal(null); }}>
