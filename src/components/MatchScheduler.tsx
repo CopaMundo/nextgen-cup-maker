@@ -451,21 +451,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // Close dropdowns on click outside the specific open dropdown wrapper
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const openRefs = [
-        dropdownOpenBrackets && dropdownBracketsRef.current,
-        dropdownOpenRounds && dropdownRoundsRef.current,
-        dropdownOpenFields && dropdownFieldsRef.current,
-      ].filter(Boolean) as HTMLDivElement[];
-      if (openRefs.length > 0 && !openRefs.some((ref) => ref.contains(target))) {
-        setDropdownOpenBrackets(false);
-        setDropdownOpenRounds(false);
-        setDropdownOpenFields(false);
-      }
+      const target = e.target as HTMLElement | null;
+      const anyOpen = dropdownOpenBrackets || dropdownOpenRounds || dropdownOpenFields;
+      if (!anyOpen) return;
+      // Only clicks on the trigger button or inside the open panel count as "inside"
+      if (target && target.closest('[data-dd-inside="true"]')) return;
+      setDropdownOpenBrackets(false);
+      setDropdownOpenRounds(false);
+      setDropdownOpenFields(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handler, true);
+    return () => document.removeEventListener("mousedown", handler, true);
   }, [dropdownOpenBrackets, dropdownOpenRounds, dropdownOpenFields]);
+
 
   const openDropdown = (which: "brackets" | "rounds" | "fields") => {
     setDropdownOpenBrackets(which === "brackets" ? v => !v : false);
