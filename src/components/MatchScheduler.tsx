@@ -1026,14 +1026,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const target = matches.find(m => m.id === matchId);
     if (!target) return;
     const current = refNames(target.referee);
-    if (!current.includes(name)) {
-      if (current.length >= MAX_REFEREES) {
-        toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
-        return;
-      }
+    if (current.includes(name)) {
+      toast({ title: `${name} staat al bij deze wedstrijd`, variant: "destructive" });
+      return;
+    }
+    if (current.length >= MAX_REFEREES) {
+      toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
+      return;
+    }
+    {
       const next = [...current, name];
       await updateMatch(matchId, { referee: next.join(", ") || null } as any);
     }
+
 
     if (fromMatchId) {
       const source = matches.find(m => m.id === fromMatchId);
