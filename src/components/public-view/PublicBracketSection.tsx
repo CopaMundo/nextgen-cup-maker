@@ -765,9 +765,15 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {renderSide("away")}
           {showOverlayTime && (
             tight ? (
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 font-bold text-muted-foreground text-[10px]">{displayTimeStr}</span>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-end font-bold text-muted-foreground leading-none">
+                <span className="text-[10px]">{displayTimeStr}</span>
+                {heenScoreContext && <span className="text-[7px] font-medium opacity-80 mt-0.5">{heenScoreContext}</span>}
+              </div>
             ) : (
-              <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 ${ds(bStyle, "matchTimeBadge")}`}>{displayTimeStr}</span>
+              <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end leading-none">
+                <span className={ds(bStyle, "matchTimeBadge")}>{displayTimeStr}</span>
+                {heenScoreContext && <span className="text-[9px] font-medium text-muted-foreground mt-0.5">{heenScoreContext}</span>}
+              </div>
             )
           )}
         </div>
