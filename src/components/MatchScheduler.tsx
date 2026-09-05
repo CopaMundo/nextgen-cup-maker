@@ -2905,7 +2905,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           )}
 
           {/* Print header */}
-          <div className="hidden print:block mb-4">
+          <div className="hidden print:block mb-4 shrink-0">
             <h2 className="text-xl font-bold">{tournament.name} — Planning</h2>
             <p className="text-sm text-muted-foreground">
               {new Date(plannerDate + "T00:00:00").toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
