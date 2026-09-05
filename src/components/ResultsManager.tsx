@@ -284,7 +284,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return !!sys?.no_draws;
   };
 
-  const resolveMatchNeedsDecider = (match: Match): boolean => {
+  const resolveMatchNeedsDecider = (match: Match, baseList?: Match[]): boolean => {
+    const list = baseList ?? matches;
     if (!matchAllowsDecider(match)) return false;
 
     // Wedstrijden over meerdere ontmoetingen (Heen/Terug): geen beslissende score
@@ -293,7 +294,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const ha = match.match_name?.match(/^(.+)\s+\((Heen|Terug)\)$/);
     if (ha) {
       if (ha[2] !== "Heen") return false; // beslissing leeft op de Heen-wedstrijd
-      const terug = matches.find(m => m.match_name === `${ha[1]} (Terug)` && m.group_id === match.group_id);
+      const terug = list.find(m => m.match_name === `${ha[1]} (Terug)` && m.group_id === match.group_id);
       if (!terug) return false;
       if (match.home_score === null || match.away_score === null) return false;
       if (terug.home_score === null || terug.away_score === null) return false;
@@ -312,7 +313,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const scheduled = !!(m.match_date && m.match_time && m.field);
         return `${scheduled ? "0" : "1"}|${m.match_date || "9999-12-31"}|${m.match_time || "99:99"}|${String(m.round_number ?? 0).padStart(4, "0")}|${m.id}`;
       };
-      const siblings = matches
+      const siblings = list
         .filter(m => m.phase_id === match.phase_id && m.match_name === match.match_name)
         .sort((a, b) => scheduleKey(a).localeCompare(scheduleKey(b)));
       if (siblings.length > 1) {
@@ -329,17 +330,18 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
 
-  const saveScore = async (match: Match) => {
+  const saveScore = async (match: Match, baseList?: Match[]) => {
+    const base = baseList ?? matches;
     const isPlayed = match.home_score !== null && match.away_score !== null;
     // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Heen-match
     // wanneer alle legs gespeeld zijn en het aggregaat gelijk is.
     const isHALeg = !!match.match_name?.match(/\s+\((Heen|Terug)\)$/);
-    const needsPenalties = resolveMatchNeedsDecider(match);
+    const needsPenalties = resolveMatchNeedsDecider(match, base);
     const hasPenalties = match.home_penalties !== null && match.away_penalties !== null && match.home_penalties !== match.away_penalties;
     const finalIsPlayed = isPlayed && (!needsPenalties || hasPenalties);
 
     // Was de wedstrijd eerder gespeeld? Zo ja en nu niet meer → statistieken wissen
-    const wasPlayed = matches.find(x => x.id === match.id)?.is_played === true;
+    const wasPlayed = base.find(x => x.id === match.id)?.is_played === true;
     if (wasPlayed && !finalIsPlayed) {
       await supabase.from("match_stats").delete().eq("match_id", match.id);
     }
@@ -354,10 +356,10 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     } as any).eq("id", match.id);
     if (error) {
       toast({ title: "Fout", description: error.message, variant: "destructive" });
-      return;
+      return base;
     }
 
-    let updatedMatches = matches.map(x => x.id === match.id ? {
+    let updatedMatches = base.map(x => x.id === match.id ? {
       ...x,
       home_score: match.home_score,
       away_score: match.away_score,
@@ -373,7 +375,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         : match.match_name;
       updatedMatches = await clearDownstreamTeams(baseForClear, updatedMatches, match.phase_id);
       setMatches(updatedMatches);
-      return;
+      return updatedMatches;
     }
 
     if (finalIsPlayed && match.match_name) {
@@ -439,6 +441,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       }
     }
     setMatches(updatedMatches);
+    return updatedMatches;
   };
 
   const updatePhaseCompletionState = async (phaseFormats: Phase[], completed: boolean) => {
@@ -2448,27 +2451,45 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 away_penalties: isHALeg ? sem.away_penalties : data.awayPenalties,
                 set_scores: data.setScores,
               };
-              setMatches(prev => prev.map(m => m.id === sem.id ? updatedMatch : m));
-              await saveScore(updatedMatch);
 
-              // H&A: schrijf penalties altijd naar Heen-match (in Heen-oriëntatie)
+              // H&A: penalties horen op de Heen-match (in Heen-oriëntatie)
+              let updatedHeen: Match | null = null;
               if (isHALeg && heenMatch) {
                 const swap = !currentIsHeen;
                 const heenHomePen = swap ? data.awayPenalties : data.homePenalties;
                 const heenAwayPen = swap ? data.homePenalties : data.awayPenalties;
+                const heenBase = heenMatch.id === sem.id ? updatedMatch : heenMatch;
                 if (
-                  heenHomePen !== heenMatch.home_penalties ||
-                  heenAwayPen !== heenMatch.away_penalties
+                  heenHomePen !== heenBase.home_penalties ||
+                  heenAwayPen !== heenBase.away_penalties
                 ) {
-                  const updatedHeen: Match = {
-                    ...heenMatch,
+                  updatedHeen = {
+                    ...heenBase,
                     home_penalties: heenHomePen,
                     away_penalties: heenAwayPen,
                   };
-                  setMatches(prev => prev.map(m => m.id === heenMatch.id ? updatedHeen : m));
-                  await saveScore(updatedHeen);
                 }
               }
+              if (updatedHeen && updatedHeen.id === sem.id) {
+                updatedMatch.home_penalties = updatedHeen.home_penalties;
+                updatedMatch.away_penalties = updatedHeen.away_penalties;
+                updatedHeen = null;
+              }
+
+              // Werk alle betrokken wedstrijden in één keer bij, zodat de
+              // winnaarbepaling meteen de nieuwe scores én penalties ziet.
+              const nextList = matches.map(m => {
+                if (m.id === updatedMatch.id) return updatedMatch;
+                if (updatedHeen && m.id === updatedHeen.id) return updatedHeen;
+                return m;
+              });
+              setMatches(nextList);
+
+              let listAfter = nextList;
+              if (updatedHeen) {
+                listAfter = (await saveScore(updatedHeen, listAfter)) ?? listAfter;
+              }
+              await saveScore(updatedMatch, listAfter);
             }}
           />
         );
