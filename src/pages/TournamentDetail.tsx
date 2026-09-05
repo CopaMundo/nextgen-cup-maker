@@ -319,14 +319,14 @@ const TournamentDetail = () => {
         </TooltipProvider>
 
         {/* Main content */}
-        <div className="flex-1 overflow-auto">
-          <div className="px-3 sm:px-6 py-4 sm:py-6 w-full">
-            <div className="mb-4 sm:mb-6 flex items-center gap-3 sm:gap-4">
+        <div className="flex-1 overflow-auto min-h-0 flex flex-col">
+          <div className="px-3 sm:px-6 py-4 sm:py-6 w-full flex-1 min-h-0 flex flex-col">
+            <div className="mb-4 sm:mb-6 flex items-center gap-3 sm:gap-4 shrink-0">
               <div>
                 <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">{tournament.name}</h1>
               </div>
             </div>
-            {renderContent()}
+            <div className="flex-1 min-h-0 flex flex-col">{renderContent()}</div>
           </div>
         </div>
       </div>
