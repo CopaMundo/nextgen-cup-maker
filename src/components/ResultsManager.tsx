@@ -285,7 +285,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   const resolveMatchNeedsDecider = (match: Match, baseList?: Match[]): boolean => {
-    const matches = baseList ?? matchesState;
+    const list = baseList ?? matches;
     if (!matchAllowsDecider(match)) return false;
 
     // Wedstrijden over meerdere ontmoetingen (Heen/Terug): geen beslissende score
@@ -294,7 +294,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const ha = match.match_name?.match(/^(.+)\s+\((Heen|Terug)\)$/);
     if (ha) {
       if (ha[2] !== "Heen") return false; // beslissing leeft op de Heen-wedstrijd
-      const terug = matches.find(m => m.match_name === `${ha[1]} (Terug)` && m.group_id === match.group_id);
+      const terug = list.find(m => m.match_name === `${ha[1]} (Terug)` && m.group_id === match.group_id);
       if (!terug) return false;
       if (match.home_score === null || match.away_score === null) return false;
       if (terug.home_score === null || terug.away_score === null) return false;
@@ -313,7 +313,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const scheduled = !!(m.match_date && m.match_time && m.field);
         return `${scheduled ? "0" : "1"}|${m.match_date || "9999-12-31"}|${m.match_time || "99:99"}|${String(m.round_number ?? 0).padStart(4, "0")}|${m.id}`;
       };
-      const siblings = matches
+      const siblings = list
         .filter(m => m.phase_id === match.phase_id && m.match_name === match.match_name)
         .sort((a, b) => scheduleKey(a).localeCompare(scheduleKey(b)));
       if (siblings.length > 1) {
