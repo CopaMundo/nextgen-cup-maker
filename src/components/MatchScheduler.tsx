@@ -3011,6 +3011,35 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <div className="flex gap-0 mt-2 items-start">
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative">
+              {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
+                <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="outline" size="sm" onClick={() => {
+                    setDraftMatchDuration(globalMatchDuration);
+                    setDraftBreakDuration(globalBreakDuration);
+                    setDraftPerFormat(perFormatDurationEnabled);
+                    setDraftPhaseConfigs(phases.reduce((acc, p) => {
+                      const cfg = (p.match_config as any) || {};
+                      acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
+                      return acc;
+                    }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
+                    setShowDurationDialog(true);
+                  }} className="gap-1 text-xs h-7">
+                    <Settings className="h-3 w-3" /> Wedstrijdduur
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPlannerCollapsed((v) => !v)}
+                    className="h-7 w-7 p-0"
+                    title={plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
+                    aria-label={plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
+                  >
+                    {plannerCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
+                  </Button>
+                </div>
+              </div>
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
