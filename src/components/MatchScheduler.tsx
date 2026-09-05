@@ -3264,7 +3264,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefInsert(prev => prev?.matchId === m.id ? null : prev); }}
                                                 onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
                                               >
-                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => (
+                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
+                                                  const issue = getRefereeIssue(m, name, refIdx);
+                                                  return (
                                                   <span key={name} className="contents">
                                                     {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
                                                       <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
@@ -3276,18 +3278,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       onDragEnd={endRefereeDrag}
                                                       onPointerDown={(e) => e.stopPropagation()}
                                                       onClick={(e) => e.stopPropagation()}
-                                                      title={`Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
+                                                      title={issue ? `${issue.reasons.join("\n")}\n\nRol ${refIdx + 1} — sleep om de volgorde te wijzigen` : `Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
                                                         refDragName === name
                                                           ? "border-primary bg-primary/20 text-primary ring-1 ring-primary shadow-sm"
-                                                          : "border-border bg-muted text-muted-foreground"
+                                                          : issue?.level === "error"
+                                                            ? "border-destructive bg-destructive/15 text-destructive"
+                                                            : issue?.level === "warn"
+                                                              ? "border-warning bg-warning/15 text-warning"
+                                                              : "border-border bg-muted text-muted-foreground"
                                                       }`}
                                                     >
-                                                      {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
+                                                      {arr.length > 1 && <span className={issue ? "font-bold" : "text-primary font-bold"}>{refIdx + 1}</span>}
                                                       <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                      {issue && <span aria-hidden>⚠</span>}
                                                     </span>
                                                   </span>
-                                                ))}
+                                                  );
+                                                })}
+
                                                 {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
                                                   <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
                                                 )}
