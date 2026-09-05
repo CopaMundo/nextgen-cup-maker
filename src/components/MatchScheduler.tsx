@@ -4311,7 +4311,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="h-16" />
+      
     </div>
   );
 };
