@@ -945,10 +945,37 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.dataTransfer.setData("text/plain", name);
     e.dataTransfer.effectAllowed = "move";
     setRefereeDragImage(e, name);
+    setRefDragName(name);
     e.stopPropagation();
   };
 
+  const endRefereeDrag = () => {
+    setRefDragName(null);
+    setRefInsert(null);
+    setRefDropMatchId(null);
+    setRefListDropActive(false);
+  };
+
   const isRefereeDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes(REF_DRAG_TYPE);
+
+  /** Verwijder een scheidsrechter uit een wedstrijd (sleep terug naar de lijst). */
+  const dropRefereeOnList = async (e: React.DragEvent) => {
+    if (!isRefereeDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    endRefereeDrag();
+    let payload: { name: string; fromMatchId: string | null };
+    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
+    const { name, fromMatchId } = payload;
+    if (!name || !fromMatchId) return;
+    const source = matches.find(m => m.id === fromMatchId);
+    if (!source) return;
+    const rest = refNames(source.referee).filter(n => n !== name);
+    await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
+    toast({ title: `${name} verwijderd uit de wedstrijd` });
+  };
+
+
 
   const dropRefereeOnMatch = async (e: React.DragEvent, matchId: string) => {
     if (!isRefereeDrag(e)) return;
