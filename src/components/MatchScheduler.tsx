@@ -3627,7 +3627,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && hasFields && (
-                              <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                              <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                                 <label className="flex items-center gap-2 px-3 py-2 text-xs cursor-pointer hover:bg-secondary/50 border-b border-border font-semibold">
                                   <Checkbox checked={allSelected} onCheckedChange={() => setSchedFields(allSelected ? [] : plannerFields.map(f => f.name))} className="h-3.5 w-3.5" />
                                   Alle velden
