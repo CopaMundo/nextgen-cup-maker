@@ -837,8 +837,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     toast({ title: `${imported.length} scheidsrechters geïmporteerd van ${cat.name}` });
   };
 
-  const autoAssignReferees = async () => {
+  const autoAssignReferees = async (overwrite = true) => {
     if (refereeConfigs.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
+
     const locFieldNames = getLocationFieldNames(selectedLocation);
     const scheduled = matches.filter(m =>
       m.match_date && m.match_time && m.field &&
