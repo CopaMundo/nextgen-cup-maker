@@ -968,16 +968,75 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
   };
 
-  /** Volgorde bepaalt de rol (1 = eerste scheidsrechter). */
-  const moveRefereeInMatch = async (matchId: string, index: number, dir: -1 | 1) => {
-    const match = matches.find(m => m.id === matchId);
-    if (!match) return;
-    const names = refNames(match.referee);
-    const target = index + dir;
-    if (target < 0 || target >= names.length) return;
-    [names[index], names[target]] = [names[target], names[index]];
-    await updateMatch(matchId, { referee: names.join(", ") } as any);
+  /** Bepaal de insertiepositie binnen een wedstrijd op basis van de dichtstbijzijnde badge. */
+  const getRefereeInsertIndex = (container: HTMLElement, x: number, y: number, currentLength: number) => {
+    const children = Array.from(container.children).filter(
+      (el): el is HTMLElement => el instanceof HTMLElement && el.dataset.refBadge === "true"
+    );
+    if (children.length === 0) return 0;
+    let nearestIdx = 0;
+    let nearestDist = Infinity;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const cx = child.offsetLeft + child.offsetWidth / 2;
+      const cy = child.offsetTop + child.offsetHeight / 2;
+      const dx = x - cx;
+      const dy = y - cy;
+      const dist = dx * dx + dy * dy;
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearestIdx = i;
+      }
+    }
+    const nearest = children[nearestIdx];
+    const cx = nearest.offsetLeft + nearest.offsetWidth / 2;
+    return x < cx ? nearestIdx : nearestIdx + 1;
   };
+
+  /** Sleep een scheidsrechter naar links/rechts in dezelfde wedstrijd om de rolvolgorde te wijzigen,
+   *  of vanuit de lijst/een andere wedstrijd om hem toe te voegen op die positie. */
+  const handleRefereeBadgeDrop = async (e: React.DragEvent, matchId: string) => {
+    if (!isRefereeDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setRefDropMatchId(null);
+    let payload: { name: string; fromMatchId: string | null };
+    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
+    const { name, fromMatchId } = payload;
+    if (!name) return;
+
+    const target = matches.find(m => m.id === matchId);
+    if (!target) return;
+    const current = refNames(target.referee);
+    const container = e.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const insertIndex = getRefereeInsertIndex(container, x, y, current.length);
+
+    if (fromMatchId === matchId) {
+      const withoutName = current.filter(n => n !== name);
+      const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
+      const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)];
+      await updateMatch(matchId, { referee: next.join(", ") } as any);
+      return;
+    }
+
+    const withoutName = current.filter(n => n !== name);
+    const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
+    const max = Math.max(1, refereesPerMatch);
+    const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)].slice(-max);
+    await updateMatch(matchId, { referee: next.join(", ") || null } as any);
+
+    if (fromMatchId && fromMatchId !== matchId) {
+      const source = matches.find(m => m.id === fromMatchId);
+      if (source) {
+        const rest = refNames(source.referee).filter(n => n !== name);
+        await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
+      }
+    }
+  };
+
 
 
 
@@ -3034,11 +3093,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               </div>
                                             )}
                                             {refNames(m.referee).length > 0 && (
-                                              <div className="mt-0.5 flex flex-wrap gap-1">
+                                              <div
+                                                className="mt-0.5 flex flex-wrap gap-1"
+                                                onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); } }}
+                                                onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
+                                              >
                                                 {refNames(m.referee).map((name, refIdx, arr) => (
                                                   <span
                                                     key={name}
                                                     draggable
+                                                    data-ref-badge="true"
                                                     onDragStart={(e) => startRefereeDrag(e, name, m.id)}
                                                     onPointerDown={(e) => e.stopPropagation()}
                                                     onClick={(e) => e.stopPropagation()}
@@ -3047,20 +3111,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   >
                                                     {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
                                                     <WhistleIcon className="h-2.5 w-2.5" /> {name}
-                                                    {arr.length > 1 && refIdx > 0 && (
-                                                      <button
-                                                        onPointerDown={(e) => e.stopPropagation()}
-                                                        onClick={(e) => { e.stopPropagation(); moveRefereeInMatch(m.id, refIdx, -1); }}
-                                                        title="Eerder in de volgorde"
-                                                        className="ml-0.5 text-muted-foreground hover:text-primary print:hidden"
-                                                      >
-                                                        <ArrowUp className="h-2.5 w-2.5" />
-                                                      </button>
-                                                    )}
                                                   </span>
                                                 ))}
                                               </div>
                                             )}
+
 
                                           </div>
                                           {/* Mobile actions */}
