@@ -17,6 +17,8 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
+import { useDndSensors } from "@/components/SortableList";
 
 interface Group {
   id: string;
