@@ -712,11 +712,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const showInlineTime = matchIsHA && pairedMatch
       ? (!!activeLegMatch && !activeLegMatch.is_played && !!displayTimeStr)
       : (!match.is_played && !!displayTimeStr);
-    // Bij heen en terug staan er al scores van de gespeelde wedstrijd op de kaart.
-    // De tijd van de volgende ontmoeting mag dan niet tussen die scores hangen:
-    // die verhuist naar de kopregel (bij veld/scheidsrechter).
-    const timeInHeader = showInlineTime && matchIsHA && !!pairedMatch && !!haTotal?.anyScored;
-    const showOverlayTime = showInlineTime && !timeInHeader;
+    const showOverlayTime = showInlineTime;
+    // Heen-score als context onder de tijd in de wedstrijdbalk
+    const heenScoreContext = matchIsHA && heenMatch && heenMatch.is_played
+      ? `Heen ${heenMatch.home_score ?? 0}-${heenMatch.away_score ?? 0}`
+      : null;
 
     // Every chip is clickable — H&A opens aggregate dialog, others open match detail dialog
     const isHAClick = matchIsHA && !!pairedMatch;
@@ -747,11 +747,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               )}
             </div>
             <div className="text-right flex-shrink-0 ml-auto">
-              {timeInHeader && (
-                <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                  {activeLegMatch?.match_name?.endsWith("(Terug)") ? "Terug" : "Heen"} {displayTimeStr}
-                </div>
-              )}
               {displayField && (
                 <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
                   <MapPin className="h-2 w-2" /> {displayField}
@@ -770,9 +765,15 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {renderSide("away")}
           {showOverlayTime && (
             tight ? (
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 font-bold text-muted-foreground text-[10px]">{displayTimeStr}</span>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-end font-bold text-muted-foreground leading-none">
+                <span className="text-[10px]">{displayTimeStr}</span>
+                {heenScoreContext && <span className="text-[7px] font-medium opacity-80 mt-0.5">{heenScoreContext}</span>}
+              </div>
             ) : (
-              <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 ${ds(bStyle, "matchTimeBadge")}`}>{displayTimeStr}</span>
+              <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end leading-none">
+                <span className={ds(bStyle, "matchTimeBadge")}>{displayTimeStr}</span>
+                {heenScoreContext && <span className="text-[9px] font-medium text-muted-foreground mt-0.5">{heenScoreContext}</span>}
+              </div>
             )
           )}
         </div>
