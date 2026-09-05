@@ -43,13 +43,15 @@ interface FormatCardProps {
   onMoveDown?: () => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
+  dragHandle?: React.ReactNode;
+  dragRowProps?: Record<string, any>;
   initialExpanded?: boolean;
 }
 
 interface AffectedGroup { id: string; name: string; current: string | null; }
 interface AffectedMatch { id: string; label: string; current: string | null; }
 
-const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, categoryId, refreshKey, onSlotChange, onMoveUp, onMoveDown, canMoveUp, canMoveDown, initialExpanded }: FormatCardProps) => {
+const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, categoryId, refreshKey, onSlotChange, onMoveUp, onMoveDown, canMoveUp, canMoveDown, dragHandle, dragRowProps, initialExpanded }: FormatCardProps) => {
   const [expanded, setExpanded] = useState(initialExpanded ?? false);
   const [uploading, setUploading] = useState(false);
   const [confirmMode, setConfirmMode] = useState<"auto" | "empty" | null>(null);
@@ -316,7 +318,11 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
   return (
     <>
       <div className="rounded-lg border border-border bg-card/50 overflow-hidden">
-        <div className="flex items-center justify-between w-full p-3 hover:bg-foreground/[0.02] transition-colors">
+        <div
+          {...(dragRowProps ? (({ className: _c, ...rest }) => rest)(dragRowProps) : {})}
+          className={`flex items-center justify-between w-full p-3 hover:bg-foreground/[0.02] transition-colors ${dragRowProps ? "cursor-grab active:cursor-grabbing touch-none" : ""}`}
+        >
+          {dragHandle}
            <div
             onClick={() => setExpanded(!expanded)}
             className="flex min-w-0 flex-1 items-center gap-2 text-left cursor-pointer"
@@ -334,12 +340,12 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
             </button>
           </div>
           <div className="ml-3 flex shrink-0 items-center gap-1.5">
-            {canMoveUp && (
+            {!dragHandle && canMoveUp && (
               <button type="button" onClick={onMoveUp} className="text-muted-foreground hover:text-foreground" title="Naar boven">
                 <ArrowUp className="h-3.5 w-3.5" />
               </button>
             )}
-            {canMoveDown && (
+            {!dragHandle && canMoveDown && (
               <button type="button" onClick={onMoveDown} className="text-muted-foreground hover:text-foreground" title="Naar beneden">
                 <ArrowDown className="h-3.5 w-3.5" />
               </button>
