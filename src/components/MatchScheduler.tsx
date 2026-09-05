@@ -2864,7 +2864,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       <div>
 
         {/* ===== PLANNER VIEW ===== */}
-        <div className="print-planner-area">
+        <div className="print-planner-area flex-1 min-h-0 flex flex-col overflow-hidden">
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
