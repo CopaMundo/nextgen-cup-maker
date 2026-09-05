@@ -24,6 +24,7 @@ import { getFairplayConfig, FAIRPLAY_DEFAULTS } from "@/lib/fairplay";
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { SortableRowShell } from "@/components/SortableList";
 import { GripVertical } from "lucide-react";
 
 import {
