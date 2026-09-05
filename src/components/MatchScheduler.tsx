@@ -1459,8 +1459,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const mp = m ? phases.find(pp => pp.id === m.phase_id) : undefined;
       const mc = (mp?.match_config as any) || {};
       current += (m?.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration) + (mc.phaseBreak ?? globalBreakDuration);
-      const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-      if (breakHere) current += breakHere.duration;
+      const breaksHere = fieldBreaks.filter(b => b.afterSlotIndex === i);
+      for (const bh of breaksHere) current += bh.duration;
     }
     return updates;
   };
