@@ -247,6 +247,7 @@ const TournamentDetail = () => {
                 categoryId={effectiveCategoryId}
                 selectedLocation={selectedLocation}
                 onLocationChange={setSelectedLocation}
+                onManageReferees={goToRefereesTab}
               />
             )}
           </>
