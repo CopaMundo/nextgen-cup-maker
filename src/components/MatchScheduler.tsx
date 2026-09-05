@@ -910,6 +910,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     });
   };
 
+  const clearRefereesFromDay = async () => {
+    const locFieldNames = getLocationFieldNames(selectedLocation);
+    const scheduled = matches.filter(m =>
+      m.match_date && m.match_time && m.field &&
+      m.match_date === plannerDate &&
+      (!selectedLocation || locFieldNames.has(m.field)) &&
+      refNames(m.referee).length > 0
+    );
+    if (scheduled.length === 0) { toast({ title: "Geen scheidsrechters ingepland op deze dag en locatie" }); return; }
+    for (const m of scheduled) {
+      await supabase.from("matches").update({ referee: null }).eq("id", m.id);
+    }
+    setMatches(prev => prev.map(m => {
+      if (!scheduled.some(s => s.id === m.id)) return m;
+      return { ...m, referee: null };
+    }));
+    toast({ title: `${scheduled.length} wedstrijden leeggehaald` });
+  };
+
   // === MATCH UPDATE ===
   const updateMatch = async (id: string, updates: Partial<Match>) => {
     await supabase.from("matches").update(updates).eq("id", id);
@@ -3601,7 +3620,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                 {/* ===== SCHEIDSRECHTERS TAB ===== */}
                 {rightSidebarTab === "scheidsrechters" && (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <h3 className="font-display text-sm font-bold text-foreground">Scheidsrechters</h3>
 
                     {/* Dropdown: aantal scheidsrechters per wedstrijd */}
@@ -3626,6 +3645,40 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       <Settings className="h-3 w-3" /> Scheidsrechters beheren
                     </Button>
 
+                    {(() => {
+                      const locFieldNames = getLocationFieldNames(selectedLocation);
+                      const alreadyAssigned = matches.filter(m =>
+                        m.match_date === plannerDate && m.match_time && m.field &&
+                        (!selectedLocation || locFieldNames.has(m.field)) &&
+                        refNames(m.referee).length > 0
+                      ).length;
+                      return (
+                        <div className="space-y-1.5">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (alreadyAssigned > 0) setConfirmAssignOpen(true);
+                              else void autoAssignReferees(true);
+                            }}
+                            className="w-full gap-1 text-xs"
+                          >
+                            <UserCheck className="h-3 w-3" /> Indelen op {plannerDate ? formatIsoDateForLocale(plannerDate) : "schema"}
+                          </Button>
+                          {alreadyAssigned > 0 && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => void clearRefereesFromDay()}
+                              className="w-full gap-1 text-xs text-destructive hover:text-destructive"
+                            >
+                              <RotateCcw className="h-3 w-3" /> Alle scheidsrechters uit schema
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     {/* Lijst van scheidsrechters (sleepbaar naar een wedstrijd, sleep terug om te verwijderen) */}
                     <div
                       onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setRefListDropActive(true); } }}
@@ -3639,22 +3692,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <p className="text-xs text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="space-y-1.5">
                           {refereeConfigs.map((rc, i) => {
                             const r = rc.name;
                             const count = matches.filter(m => refNames(m.referee).includes(r)).length;
                             return (
-                              <span
+                              <div
                                 key={i}
                                 draggable
                                 onDragStart={(e) => startRefereeDrag(e, r)}
                                 onDragEnd={endRefereeDrag}
                                 title="Sleep naar een wedstrijd"
-                                className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground cursor-grab active:cursor-grabbing hover:border-primary/60"
+                                className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors cursor-grab active:cursor-grabbing"
                               >
+                                <span className="font-medium text-foreground truncate">{r}</span>
                                 <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
-                                {r}
-                              </span>
+                              </div>
                             );
                           })}
                         </div>
@@ -3662,29 +3715,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       {refDragName && (
                         <p className="mt-2 text-[10px] text-center text-muted-foreground">Laat hier los om {refDragName} uit de wedstrijd te halen</p>
                       )}
-                    </div>
-
-
-                    {/* Scheidsrechters toewijzen */}
-                    <div className="pt-2 border-t border-border space-y-2">
-                      <h4 className="text-xs font-semibold text-foreground">Scheidsrechters toewijzen</h4>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const locFieldNames = getLocationFieldNames(selectedLocation);
-                          const alreadyAssigned = matches.filter(m =>
-                            m.match_date === plannerDate && m.match_time && m.field &&
-                            (!selectedLocation || locFieldNames.has(m.field)) &&
-                            refNames(m.referee).length > 0
-                          ).length;
-                          if (alreadyAssigned > 0) setConfirmAssignOpen(true);
-                          else void autoAssignReferees(true);
-                        }}
-                        className="w-full gap-1 text-xs"
-                      >
-                        <UserCheck className="h-3 w-3" /> Indelen op {plannerDate ? formatIsoDateForLocale(plannerDate) : "schema"}
-                      </Button>
                     </div>
 
                   </div>
