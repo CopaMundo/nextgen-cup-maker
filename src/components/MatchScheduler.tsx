@@ -921,9 +921,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
   const [refDropMatchId, setRefDropMatchId] = useState<string | null>(null);
   const [refDragName, setRefDragName] = useState<string | null>(null);
+  const [refDragFromMatchId, setRefDragFromMatchId] = useState<string | null>(null);
   const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
   const [refListDropActive, setRefListDropActive] = useState(false);
-  const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
+  const MAX_REFEREES = 5;
+  /** Weergaveorde van de scheidsrechters van een wedstrijd, met live opschuiven tijdens het slepen. */
+  const displayRefNames = (matchId: string, value?: string | null) => {
+    const names = refNames(value);
+    if (!refDragName || refInsert?.matchId !== matchId) return names;
+    if (refDragFromMatchId !== matchId || !names.includes(refDragName)) return names;
+    const rest = names.filter(n => n !== refDragName);
+    const idx = Math.max(0, Math.min(refInsert.index, rest.length));
+    return [...rest.slice(0, idx), refDragName, ...rest.slice(idx)];
+  };
+
 
 
   /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
