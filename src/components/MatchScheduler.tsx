@@ -4211,8 +4211,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const allCount = matches.filter(m => (m.match_date || m.match_time || m.field) && (!selectedLocation || !m.field || locFieldNames.has(m.field))).length;
                 const dayCount = matches.filter(m => m.match_date === plannerDate && (!selectedLocation || !m.field || locFieldNames.has(m.field))).length;
                 return tournamentDates.length > 1
-                  ? `Kies of je het schema ${locScope ? locScope + " " : ""}wist (${allCount} wedstrijden) of enkel ${formatIsoDateForLocale(plannerDate, "nl-BE", { weekday: "long", day: "numeric", month: "long" })} (${dayCount} wedstrijden). Scores en resultaten blijven behouden.`
-                  : `Alle geplande wedstrijden ${locScope} (${allCount}) worden gewist uit de planning. Scores en resultaten blijven behouden. Dit kan niet ongedaan worden.`;
+                  ? `Kies of je het schema ${locScope ? locScope + " " : ""}volledig leeg maakt (${allCount} wedstrijden) of enkel voor ${formatIsoDateForLocale(plannerDate, "nl-BE", { weekday: "long", day: "numeric", month: "long" })} (${dayCount} wedstrijden). Scores en resultaten blijven behouden.`
+                  : `Kies of je het schema ${locScope ? locScope + " " : ""}volledig leeg maakt (${allCount} wedstrijden). Scores en resultaten blijven behouden. Dit kan niet ongedaan worden.`;
               })()}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -4224,7 +4224,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               </AlertDialogAction>
             )}
             <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule("all"); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {tournamentDates.length > 1 ? (locations.length > 1 ? "Volledige locatie" : "Volledig schema") : "Leegmaken"}
+              {locations.length > 1 ? "Volledige locatie" : "Volledig schema"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
