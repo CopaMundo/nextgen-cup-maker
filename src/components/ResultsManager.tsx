@@ -328,6 +328,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const isPlayed = match.home_score !== null && match.away_score !== null;
     // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Heen-match
     // wanneer alle legs gespeeld zijn en het aggregaat gelijk is.
+    const isHALeg = !!match.match_name?.match(/\s+\((Heen|Terug)\)$/);
     const needsPenalties = resolveMatchNeedsDecider(match);
     const hasPenalties = match.home_penalties !== null && match.away_penalties !== null && match.home_penalties !== match.away_penalties;
     const finalIsPlayed = isPlayed && (!needsPenalties || hasPenalties);
