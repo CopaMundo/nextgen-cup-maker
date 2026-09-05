@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { StandingsColumnsInline } from "./StandingsColumnsSettings";
+import { SortableVerticalList, SortableRowShell } from "@/components/SortableList";
 
 const TIEBREAKER_OPTIONS = [
   { value: "goal_difference", label: "Doelpuntensaldo" },
