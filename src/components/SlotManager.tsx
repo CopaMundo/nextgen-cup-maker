@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronDown, User, ArrowRight, X, ArrowLeftRight } from "lucide-react";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { SortableRowShell } from "@/components/SortableList";
 
 interface Slot {
   id: string;
@@ -506,7 +504,6 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
   };
 
   return (
-    <SortableContext items={slots.map((s) => s.id)} strategy={verticalListSortingStrategy}>
     <div className="space-y-1.5">
       {slots.map((slot, slotIndex) => {
         const display = getSlotDisplay(slot);
@@ -514,11 +511,7 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
         const isLastSlot = slotIndex >= slots.length - 1;
 
         return (
-          <SortableRowShell key={slot.id} id={slot.id} dragLabel="Team verplaatsen" className="flex items-start gap-1.5">
-            {(handle) => (
-          <>
-          {handle}
-          <div className="relative flex-1 min-w-0">
+          <div key={slot.id} className="relative">
             <button
               onClick={() => setOpenSlotId(isOpen ? null : slot.id)}
               className={`flex items-center gap-2 w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
@@ -736,9 +729,6 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
               </div>
             )}
           </div>
-          </>
-            )}
-          </SortableRowShell>
         );
       })}
       {slots.length === 0 && (
@@ -747,7 +737,6 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
         </div>
       )}
     </div>
-    </SortableContext>
   );
 };
 

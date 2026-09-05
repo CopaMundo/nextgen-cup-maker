@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import FormatCard from "./FormatCard";
-import { SortableVerticalList, SortableRowShell } from "@/components/SortableList";
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
@@ -802,22 +801,6 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     );
   };
 
-  // Reorder formats within a phase via drag & drop
-  const reorderFormats = async (next: Phase[]) => {
-    const orderMap = new Map(next.map((f, i) => [f.id, i]));
-    setAllFormats(prev =>
-      prev.map(f => orderMap.has(f.id) ? { ...f, sort_order: orderMap.get(f.id)! } : f)
-        .sort((a, b) => a.phase_number - b.phase_number || a.sort_order - b.sort_order)
-    );
-    await Promise.all(
-      next.map((f, i) =>
-        f.sort_order === i
-          ? Promise.resolve(null)
-          : Promise.resolve(supabase.from("tournament_phases").update({ sort_order: i } as any).eq("id", f.id))
-      )
-    );
-  };
-
   // Swap phase positions
   const swapPhases = async (phaseA: number, phaseB: number) => {
     const formatsA = allFormats.filter(f => f.phase_number === phaseA);
@@ -1260,32 +1243,25 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         .map((container) => (
           <div key={container.phaseNumber}>
             <div className="space-y-3">
-              {/* Format cards - sleepbaar binnen de fase */}
-              <SortableVerticalList
-                items={container.formats}
-                getId={(f) => f.id}
-                onReorder={(next) => reorderFormats(next)}
-                className="space-y-3"
-              >
-                {container.formats.map((format) => (
-                  <SortableRowShell key={format.id} id={format.id} dragLabel="Format verplaatsen">
-                    {(handle) => (
-                      <FormatCard
-                        format={format}
-                        tournamentId={tournamentId}
-                        allFormats={allFormats}
-                        onRemove={removeFormat}
-                        onUpdate={updateFormat}
-                        categoryId={categoryId}
-                        refreshKey={slotRefreshKey}
-                        onSlotChange={() => setSlotRefreshKey(k => k + 1)}
-                        initialExpanded={format.id === newlyCreatedId}
-                        dragHandle={container.formats.length > 1 ? handle : undefined}
-                      />
-                    )}
-                  </SortableRowShell>
-                ))}
-              </SortableVerticalList>
+              {/* Format cards - always visible, individually collapsible */}
+              {container.formats.map((format, formatIdx) => (
+                <FormatCard
+                  key={format.id}
+                  format={format}
+                  tournamentId={tournamentId}
+                  allFormats={allFormats}
+                  onRemove={removeFormat}
+                  onUpdate={updateFormat}
+                  categoryId={categoryId}
+                  refreshKey={slotRefreshKey}
+                  onSlotChange={() => setSlotRefreshKey(k => k + 1)}
+                  canMoveUp={formatIdx > 0}
+                  canMoveDown={formatIdx < container.formats.length - 1}
+                  onMoveUp={() => formatIdx > 0 && swapFormats(format, container.formats[formatIdx - 1])}
+                  onMoveDown={() => formatIdx < container.formats.length - 1 && swapFormats(format, container.formats[formatIdx + 1])}
+                  initialExpanded={format.id === newlyCreatedId}
+                />
+              ))}
 
               <div className="flex justify-start">
                 <button
