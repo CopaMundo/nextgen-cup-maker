@@ -76,6 +76,11 @@ const TournamentDetail = () => {
     }
   };
 
+  const goToRefereesTab = () => {
+    setActiveTab("teams");
+    setDeelnemersSubTab("referees");
+  };
+
   // When tournament id changes, hydrate from localStorage
   useEffect(() => {
     if (!id) return;
@@ -242,6 +247,7 @@ const TournamentDetail = () => {
                 categoryId={effectiveCategoryId}
                 selectedLocation={selectedLocation}
                 onLocationChange={setSelectedLocation}
+                onManageReferees={goToRefereesTab}
               />
             )}
           </>

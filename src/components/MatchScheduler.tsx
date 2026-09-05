@@ -339,7 +339,7 @@ const DateStripNav = ({
   );
 };
 
-const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void }) => {
+const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
 
@@ -405,11 +405,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [filterRound, setFilterRound] = useState<string>("all");
 
   // UI toggles
-  const [showRefAdd, setShowRefAdd] = useState(false);
-  const [newRef, setNewRef] = useState("");
   const addFieldDialogRef = useDialogFocus(showAddFieldDialog);
   const editFieldDialogRef = useDialogFocus(editFieldIdx !== null);
-  const addRefDialogRef = useDialogFocus(showRefAdd);
   const editRefDialogRef = useDialogFocus(editRefIdx !== null);
 
   // Planner state
@@ -794,13 +791,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       await supabase.from("tournaments").update({ referees: payload }).eq("id", tournamentId);
     }
     setRefereeConfigs(updated);
-  };
-  const addReferee = async () => {
-    if (!newRef.trim()) return;
-    const updated: RefereeConfig[] = [...refereeConfigs, { name: newRef.trim(), allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }];
-    await saveReferees(updated);
-    setNewRef("");
-    setShowRefAdd(false);
   };
   const editReferee = async () => {
     if (editRefIdx === null || !editRefName.trim()) return;
@@ -3354,9 +3344,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </SelectContent>
                     </Select>
 
-                    {/* + Scheidsrechter toevoegen */}
-                    <Button variant="outline" size="sm" onClick={() => { setNewRef(""); setShowRefAdd(true); }} className="w-full gap-1 text-xs">
-                      <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
+                    <Button variant="outline" size="sm" onClick={() => onManageReferees?.()} className="w-full gap-1 text-xs">
+                      <Settings className="h-3 w-3" /> Scheidsrechters beheren
                     </Button>
 
                     {/* Lijst van scheidsrechters */}
@@ -3621,19 +3610,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               </div>
             );
           })()}
-        </DialogContent>
-      </Dialog>
-
-      {/* Scheidsrechter toevoegen dialog */}
-      <Dialog open={showRefAdd} onOpenChange={(open) => { if (!open) { setShowRefAdd(false); setNewRef(""); } }}>
-        <DialogContent ref={addRefDialogRef} className="max-w-xs">
-          <DialogHeader>
-            <DialogTitle className="text-sm">Scheidsrechter toevoegen</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam" className="h-9 text-sm" onKeyDown={(e) => e.key === "Enter" && addReferee()} />
-            <Button size="sm" onClick={addReferee} disabled={!newRef.trim()} className="w-full">Toevoegen</Button>
-          </div>
         </DialogContent>
       </Dialog>
 
