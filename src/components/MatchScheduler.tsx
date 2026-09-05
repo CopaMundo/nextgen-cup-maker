@@ -104,6 +104,15 @@ interface PlannerDragPayload {
 export const plannerDateStorageKey = (tournamentId: string, categoryId: string | null) =>
   `planner-date:${tournamentId}:${categoryId || "root"}`;
 
+const isInteractivePlannerTarget = (target: EventTarget | null, currentTarget?: EventTarget | null) => {
+  const hit = (target as HTMLElement | null)?.closest?.(
+    "input, textarea, select, button, a, [role='button'], [contenteditable='true'], [data-no-drag]",
+  );
+  if (!hit) return false;
+  if (currentTarget && hit === currentTarget) return false;
+  return true;
+};
+
 const DraggablePlannerItem = ({ id, data, className, children }: {
   id: string;
   data: PlannerDragPayload;
@@ -116,6 +125,14 @@ const DraggablePlannerItem = ({ id, data, className, children }: {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      onPointerDown={(e) => {
+        if (isInteractivePlannerTarget(e.target, e.currentTarget)) return;
+        (listeners as any)?.onPointerDown?.(e);
+      }}
+      onKeyDown={(e) => {
+        if (isInteractivePlannerTarget(e.target, e.currentTarget)) return;
+        (listeners as any)?.onKeyDown?.(e);
+      }}
       className={`${className} cursor-grab active:cursor-grabbing select-none touch-manipulation transition-all duration-200 ease-out ${
         isDragging ? 'opacity-20 scale-[0.97]' : 'hover:-translate-y-0.5'
       }`}
@@ -124,6 +141,7 @@ const DraggablePlannerItem = ({ id, data, className, children }: {
     </div>
   );
 };
+
 
 const PlannerItem = ({ payload, className, children }: {
   payload: PlannerDragPayload;
