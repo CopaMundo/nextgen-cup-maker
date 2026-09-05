@@ -792,13 +792,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
     setRefereeConfigs(updated);
   };
-  const addReferee = async () => {
-    if (!newRef.trim()) return;
-    const updated: RefereeConfig[] = [...refereeConfigs, { name: newRef.trim(), allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null }];
-    await saveReferees(updated);
-    setNewRef("");
-    setShowRefAdd(false);
-  };
   const editReferee = async () => {
     if (editRefIdx === null || !editRefName.trim()) return;
     const updated = refereeConfigs.map((r, i) => i === editRefIdx ? { ...r, name: editRefName.trim() } : r);
