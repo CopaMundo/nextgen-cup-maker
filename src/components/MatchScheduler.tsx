@@ -3693,7 +3693,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <p className="text-xs text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
                         </div>
                       ) : (
-                        <div className="space-y-1.5">
+                        <div className="flex flex-wrap gap-1.5">
                           {refereeConfigs.map((rc, i) => {
                             const r = rc.name;
                             const count = matches.filter(m => refNames(m.referee).includes(r)).length;
@@ -3704,10 +3704,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 onDragStart={(e) => startRefereeDrag(e, r)}
                                 onDragEnd={endRefereeDrag}
                                 title="Sleep naar een wedstrijd"
-                                className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors cursor-grab active:cursor-grabbing"
+                                className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-1 text-[10px] bg-background hover:bg-secondary/50 transition-colors cursor-grab active:cursor-grabbing"
                               >
-                                <span className="font-medium text-foreground truncate">{r}</span>
-                                <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
+                                <span className="font-medium text-foreground truncate max-w-[90px]">{r}</span>
+                                <span className={`text-[9px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
                               </div>
                             );
                           })}
