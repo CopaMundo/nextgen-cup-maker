@@ -36,9 +36,9 @@ const Navbar = () => {
               </Link>
               <button
                 onClick={signOut}
-                className="flex items-center gap-2 rounded-lg border border-primary/20 px-3 sm:px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                className="flex items-center justify-center gap-2 rounded-lg border border-primary/20 h-8 w-8 p-0 text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-3.5 w-3.5" />
               </button>
             </>
           ) : (
