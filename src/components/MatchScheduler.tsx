@@ -507,6 +507,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [activeDragPayload, setActiveDragPayload] = useState<PlannerDragPayload | null>(null);
   const pointerPositionRef = useRef({ x: 0, y: 0 });
   const unscheduledZoneRef = useRef<HTMLDivElement | null>(null);
+  const plannerSidebarRef = useRef<HTMLDivElement | null>(null);
 
   const { toast } = useToast();
   const hasAnyStats = tournament?.enable_goalscorers || tournament?.enable_assists || tournament?.enable_yellow_cards || tournament?.enable_red_cards;
