@@ -225,7 +225,7 @@ const TournamentDetail = () => {
           </>
         );
       case "schedule": {
-        const compactSelect = "h-7 w-44 rounded-md px-2 text-xs";
+        const compactSelect = "h-7 w-auto min-w-fit rounded-md px-2 text-xs";
         const scheduleSelectors = (
           <>
             <CategorySelector
