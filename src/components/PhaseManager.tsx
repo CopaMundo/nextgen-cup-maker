@@ -801,6 +801,22 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     );
   };
 
+  // Reorder formats within a phase via drag & drop
+  const reorderFormats = async (next: Phase[]) => {
+    const orderMap = new Map(next.map((f, i) => [f.id, i]));
+    setAllFormats(prev =>
+      prev.map(f => orderMap.has(f.id) ? { ...f, sort_order: orderMap.get(f.id)! } : f)
+        .sort((a, b) => a.phase_number - b.phase_number || a.sort_order - b.sort_order)
+    );
+    await Promise.all(
+      next.map((f, i) =>
+        f.sort_order === i
+          ? Promise.resolve(null)
+          : Promise.resolve(supabase.from("tournament_phases").update({ sort_order: i } as any).eq("id", f.id))
+      )
+    );
+  };
+
   // Swap phase positions
   const swapPhases = async (phaseA: number, phaseB: number) => {
     const formatsA = allFormats.filter(f => f.phase_number === phaseA);
