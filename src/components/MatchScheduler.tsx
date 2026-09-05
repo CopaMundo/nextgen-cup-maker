@@ -1129,7 +1129,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       return;
     }
 
-    if (!current.includes(name) && current.length >= MAX_REFEREES) {
+    if (current.includes(name)) {
+      toast({ title: `${name} staat al bij deze wedstrijd`, variant: "destructive" });
+      return;
+    }
+    if (current.length >= MAX_REFEREES) {
       toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
       return;
     }
