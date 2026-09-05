@@ -920,6 +920,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const REF_DRAG_TYPE = "application/x-referee";
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
   const [refDropMatchId, setRefDropMatchId] = useState<string | null>(null);
+  const [refDragName, setRefDragName] = useState<string | null>(null);
+  const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
+  const [refListDropActive, setRefListDropActive] = useState(false);
+  const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
+
 
   /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
   const setRefereeDragImage = (e: React.DragEvent, name: string) => {
