@@ -58,6 +58,52 @@ interface ScoringSystem {
   set_result_points: SetResultPoints;
 }
 
+/** Criteria die je kunt opsplitsen in totaal / thuis / uit. */
+const SCOPED_RULES = ["goal_difference", "goals_scored", "wins"];
+const SCOPE_OPTIONS = [
+  { value: "total", label: "Totaal" },
+  { value: "home", label: "Thuis" },
+  { value: "away", label: "Uit" },
+];
+
+/** Splits een opgeslagen criterium in basisregel + bereik. */
+const parseRule = (rule: string): { base: string; scope: string } => {
+  if (rule.endsWith("_home")) return { base: rule.slice(0, -5), scope: "home" };
+  if (rule.endsWith("_away")) return { base: rule.slice(0, -5), scope: "away" };
+  return { base: rule, scope: "total" };
+};
+
+/** Zet een platte lijst om in basisregels + bereiken per regel. */
+const expandRules = (flat: string[]): { bases: string[]; scopes: Record<string, string[]> } => {
+  const bases: string[] = [];
+  const scopes: Record<string, string[]> = {};
+  flat.forEach((r) => {
+    const { base, scope } = parseRule(r);
+    if (!bases.includes(base)) bases.push(base);
+    if (!SCOPED_RULES.includes(base)) return;
+    const list = scopes[base] || (scopes[base] = []);
+    if (!list.includes(scope)) list.push(scope);
+  });
+  SCOPED_RULES.forEach((b) => {
+    if (bases.includes(b)) {
+      const list = scopes[b] || (scopes[b] = []);
+      if (!list.includes("total")) list.unshift("total");
+    }
+  });
+  return { bases, scopes };
+};
+
+/** Zet basisregels + bereiken terug om in een platte lijst voor de database. */
+const flattenRules = (bases: string[], scopes: Record<string, string[]>): string[] => {
+  const out: string[] = [];
+  bases.forEach((b) => {
+    if (!SCOPED_RULES.includes(b)) { out.push(b); return; }
+    const list = scopes[b]?.length ? scopes[b] : ["total"];
+    list.forEach((sc) => out.push(sc === "total" ? b : `${b}_${sc}`));
+  });
+  return out;
+};
+
 const H2H_SUB_OPTIONS = [
   { value: "points", label: "Punten" },
   { value: "goal_difference", label: "Doelpuntensaldo" },
@@ -113,6 +159,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const [tiebreakerEditId, setTiebreakerEditId] = useState<string | null>(null);
   const [tiebreakerDraft, setTiebreakerDraft] = useState<string[]>([]);
   const [h2hSubDraft, setH2hSubDraft] = useState<string[]>(["points", "goal_difference", "goals_scored", "wins"]);
+  const [scopeDraft, setScopeDraft] = useState<Record<string, string[]>>({});
+  const [h2hScopeDraft, setH2hScopeDraft] = useState<Record<string, string[]>>({});
+  const [openScopes, setOpenScopes] = useState<string[]>([]);
+  const toggleScopeOpen = (key: string) =>
+    setOpenScopes((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   const [h2hSubOpen, setH2hSubOpen] = useState(false);
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -409,8 +460,13 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
       current.length === defaultPoints.length && current.every((v, i) => v === defaultPoints[i]);
     const initial = isSets && sameAsPointsDefault ? defaultSets : current;
     const fairplayEnabled = !!tournament?.enable_fairplay;
-    setTiebreakerDraft([...initial].filter((r) => r !== "fairplay" || fairplayEnabled));
-    setH2hSubDraft([...(sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"])]);
+    const main = expandRules([...initial].filter((r) => parseRule(r).base !== "fairplay" || fairplayEnabled));
+    setTiebreakerDraft(main.bases);
+    setScopeDraft(main.scopes);
+    const h2h = expandRules([...(sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"])]);
+    setH2hSubDraft(h2h.bases);
+    setH2hScopeDraft(h2h.scopes);
+    setOpenScopes([]);
     setH2hSubOpen(false);
     setTiebreakerEditId(sys.id);
   };
@@ -420,8 +476,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     const id = tiebreakerEditId;
     const fairplayEnabled = !!tournament?.enable_fairplay;
     const updates = {
-      tiebreaker_rules: tiebreakerDraft.filter((r) => r !== "fairplay" || fairplayEnabled),
-      h2h_sub_rules: h2hSubDraft,
+      tiebreaker_rules: flattenRules(
+        tiebreakerDraft.filter((r) => r !== "fairplay" || fairplayEnabled),
+        scopeDraft,
+      ),
+      h2h_sub_rules: flattenRules(h2hSubDraft, h2hScopeDraft),
     };
     const count = await checkPlayedMatches();
     if (count > 0) {
@@ -439,19 +498,24 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     setTiebreakerEditId(null);
   };
 
+  const scopeSuffix = (scope: string) => (scope === "home" ? " (thuis)" : scope === "away" ? " (uit)" : "");
   const getTbLabel = (v: string, isSetsMode = false) => {
+    const { base, scope } = parseRule(v);
+    let label = TIEBREAKER_OPTIONS.find((o) => o.value === base)?.label || base;
     if (isSetsMode) {
-      if (v === "goal_difference") return "Setsaldo";
-      if (v === "goals_scored") return "Puntensaldo in sets";
+      if (base === "goal_difference") label = "Setsaldo";
+      if (base === "goals_scored") label = "Puntensaldo in sets";
     }
-    return TIEBREAKER_OPTIONS.find((o) => o.value === v)?.label || v;
+    return label + scopeSuffix(scope);
   };
   const getH2hLabel = (v: string, isSetsMode = false) => {
+    const { base, scope } = parseRule(v);
+    let label = H2H_SUB_OPTIONS.find((o) => o.value === base)?.label || base;
     if (isSetsMode) {
-      if (v === "goal_difference") return "Setsaldo";
-      if (v === "goals_scored") return "Puntensaldo in sets";
+      if (base === "goal_difference") label = "Setsaldo";
+      if (base === "goals_scored") label = "Puntensaldo in sets";
     }
-    return H2H_SUB_OPTIONS.find((o) => o.value === v)?.label || v;
+    return label + scopeSuffix(scope);
   };
   const editingSystem = systems.find((s) => s.id === tiebreakerEditId);
   const editingIsSets = editingSystem?.scoring_type === "sets";
@@ -472,6 +536,93 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const removeTb = (idx: number) => setTiebreakerDraft((prev) => prev.filter((_, i) => i !== idx));
   const addTb = (value: string) => setTiebreakerDraft((prev) => [...prev, value]);
   const removeH2h = (idx: number) => setH2hSubDraft((prev) => prev.filter((_, i) => i !== idx));
+
+  /** Subcriteria (totaal / thuis / uit) voor doelsaldo, doelpunten en overwinningen. */
+  const renderScopeEditor = (rule: string, group: "main" | "h2h") => {
+    if (!SCOPED_RULES.includes(rule)) return null;
+    const scopes = group === "main" ? scopeDraft : h2hScopeDraft;
+    const setScopes = group === "main" ? setScopeDraft : setH2hScopeDraft;
+    const list = scopes[rule]?.length ? scopes[rule] : ["total"];
+    const setList = (next: string[]) => setScopes((prev) => ({ ...prev, [rule]: next }));
+    const key = `${group}-${rule}`;
+    const open = openScopes.includes(key);
+    const baseLabel = group === "main" ? getTbLabel(rule, editingIsSets) : getH2hLabel(rule, editingIsSets);
+    const available = SCOPE_OPTIONS.filter((o) => !list.includes(o.value));
+    return (
+      <div className="ml-6 mt-1.5 mb-1">
+        <button
+          type="button"
+          onClick={() => toggleScopeOpen(key)}
+          className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium"
+        >
+          {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          Subcriteria aanpassen
+          <span className="relative group/info">
+            <Info className="h-3 w-3 text-muted-foreground" />
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-60 px-2.5 py-1.5 rounded-md bg-popover border border-border text-xs text-popover-foreground shadow-md opacity-0 group-hover/info:opacity-100 pointer-events-none z-50 transition-opacity">
+              Standaard geldt {baseLabel.toLowerCase()} over alle wedstrijden. Voeg thuis of uit toe om daarna enkel de thuis- of uitwedstrijden te vergelijken.
+            </span>
+          </span>
+        </button>
+        {open && (
+          <>
+            <SortableVerticalList
+              items={list}
+              getId={(sc) => sc}
+              onReorder={(next) => setList(next)}
+              className="space-y-1 mt-1.5"
+            >
+              {list.map((sc, sIdx) => (
+                <SortableRowShell
+                  key={`${key}-${sc}`}
+                  id={sc}
+                  dragLabel="Subcriterium verplaatsen"
+                  className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5"
+                  handleClassName="[&>svg]:h-3 [&>svg]:w-3"
+                >
+                  {(subHandle) => (
+                    <>
+                      {subHandle}
+                      <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
+                      <span className="text-xs text-foreground flex-1">
+                        {baseLabel}{sc === "home" ? " thuis" : sc === "away" ? " uit" : " totaal"}
+                      </span>
+                      {list.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setList(list.filter((_, i) => i !== sIdx))}
+                          className="text-muted-foreground hover:text-destructive"
+                          aria-label="Subcriterium verwijderen"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </SortableRowShell>
+              ))}
+            </SortableVerticalList>
+            {available.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button type="button" className="mt-1.5 flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
+                    <Plus className="h-3 w-3" /> Subcriterium toevoegen
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {available.map((o) => (
+                    <DropdownMenuItem key={o.value} onClick={() => setList([...list, o.value])}>
+                      {baseLabel}{o.value === "home" ? " thuis" : o.value === "away" ? " uit" : " totaal"}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
   const addH2h = (value: string) => setH2hSubDraft((prev) => [...prev, value]);
 
   const saveName = async (id: string) => {
@@ -1047,6 +1198,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <X className="h-3.5 w-3.5" />
                         </button>
                       </div>
+                      {renderScopeEditor(rule, "main")}
                       {rule === "head_to_head" && (
                         <div className="ml-6 mt-1.5 mb-1">
                           <button
@@ -1076,17 +1228,19 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                     key={`h2h-${sub}`}
                                     id={sub}
                                     dragLabel="Subcriterium verplaatsen"
-                                    className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5"
                                     handleClassName="[&>svg]:h-3 [&>svg]:w-3"
                                   >
                                     {(subHandle) => (
                                       <>
-                                        {subHandle}
-                                        <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
-                                        <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
-                                        <button type="button" onClick={() => removeH2h(sIdx)} className="text-muted-foreground hover:text-destructive" aria-label="Subcriterium verwijderen">
-                                          <X className="h-3 w-3" />
-                                        </button>
+                                        <div className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5">
+                                          {subHandle}
+                                          <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
+                                          <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
+                                          <button type="button" onClick={() => removeH2h(sIdx)} className="text-muted-foreground hover:text-destructive" aria-label="Subcriterium verwijderen">
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </div>
+                                        {renderScopeEditor(sub, "h2h")}
                                       </>
                                     )}
                                   </SortableRowShell>
