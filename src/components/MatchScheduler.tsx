@@ -3452,7 +3452,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 </button>
               </div>
 
-              <div className="p-3 overflow-y-auto max-h-[calc(100vh-200px)]">
+              <div className="p-3 flex-1 min-h-0 flex flex-col overflow-y-auto">
                 {/* ===== PLANNEN TAB ===== */}
                 {rightSidebarTab === "plannen" && (
                   <div className="space-y-4">
