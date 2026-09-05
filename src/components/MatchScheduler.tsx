@@ -3035,16 +3035,28 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             )}
                                             {refNames(m.referee).length > 0 && (
                                               <div className="mt-0.5 flex flex-wrap gap-1">
-                                                {refNames(m.referee).map(name => (
+                                                {refNames(m.referee).map((name, refIdx, arr) => (
                                                   <span
                                                     key={name}
                                                     draggable
                                                     onDragStart={(e) => startRefereeDrag(e, name, m.id)}
                                                     onPointerDown={(e) => e.stopPropagation()}
                                                     onClick={(e) => e.stopPropagation()}
+                                                    title={`Rol ${refIdx + 1}`}
                                                     className="inline-flex items-center gap-0.5 rounded border border-border bg-muted px-1 py-0.5 text-[8px] font-semibold text-muted-foreground cursor-grab active:cursor-grabbing print:text-[9px]"
                                                   >
+                                                    {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
                                                     <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                    {arr.length > 1 && refIdx > 0 && (
+                                                      <button
+                                                        onPointerDown={(e) => e.stopPropagation()}
+                                                        onClick={(e) => { e.stopPropagation(); moveRefereeInMatch(m.id, refIdx, -1); }}
+                                                        title="Eerder in de volgorde"
+                                                        className="ml-0.5 text-muted-foreground hover:text-primary print:hidden"
+                                                      >
+                                                        <ArrowUp className="h-2.5 w-2.5" />
+                                                      </button>
+                                                    )}
                                                   </span>
                                                 ))}
                                               </div>
