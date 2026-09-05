@@ -910,6 +910,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     });
   };
 
+  const clearRefereesFromDay = async () => {
+    const locFieldNames = getLocationFieldNames(selectedLocation);
+    const scheduled = matches.filter(m =>
+      m.match_date && m.match_time && m.field &&
+      m.match_date === plannerDate &&
+      (!selectedLocation || locFieldNames.has(m.field)) &&
+      refNames(m.referee).length > 0
+    );
+    if (scheduled.length === 0) { toast({ title: "Geen scheidsrechters ingepland op deze dag en locatie" }); return; }
+    for (const m of scheduled) {
+      await supabase.from("matches").update({ referee: null }).eq("id", m.id);
+    }
+    setMatches(prev => prev.map(m => {
+      if (!scheduled.some(s => s.id === m.id)) return m;
+      return { ...m, referee: null };
+    }));
+    toast({ title: `${scheduled.length} wedstrijden leeggehaald` });
+  };
+
   // === MATCH UPDATE ===
   const updateMatch = async (id: string, updates: Partial<Match>) => {
     await supabase.from("matches").update(updates).eq("id", id);
