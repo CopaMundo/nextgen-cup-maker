@@ -3692,17 +3692,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <AlertDialogHeader>
             <AlertDialogTitle>Schema leegmaken?</AlertDialogTitle>
             <AlertDialogDescription>
-              Alle geplande wedstrijden ({matches.filter(m => m.match_date || m.match_time || m.field).length}) worden gewist uit de planning. Scores en resultaten blijven behouden. Dit kan niet ongedaan worden.
+              {tournamentDates.length > 1
+                ? `Kies of je het volledige schema wist (${matches.filter(m => m.match_date || m.match_time || m.field).length} wedstrijden) of enkel ${formatIsoDateForLocale(plannerDate, "nl-BE", { weekday: "long", day: "numeric", month: "long" })} (${matches.filter(m => m.match_date === plannerDate).length} wedstrijden). Scores en resultaten blijven behouden.`
+                : `Alle geplande wedstrijden (${matches.filter(m => m.match_date || m.match_time || m.field).length}) worden gewist uit de planning. Scores en resultaten blijven behouden. Dit kan niet ongedaan worden.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Leegmaken
+            {tournamentDates.length > 1 && (
+              <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule("day"); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Enkel deze dag
+              </AlertDialogAction>
+            )}
+            <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSchedule("all"); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {tournamentDates.length > 1 ? "Volledig schema" : "Leegmaken"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
 
       {/* Pauze toevoegen modal */}
       <Dialog open={!!showPauzeModal} onOpenChange={(open) => { if (!open) setShowPauzeModal(null); }}>
