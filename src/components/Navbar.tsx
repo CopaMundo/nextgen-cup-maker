@@ -11,7 +11,7 @@ const Navbar = () => {
     <nav className="border-b border-border px-4 sm:px-6 py-2">
       <div className="flex items-center justify-between w-full">
         <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2.5">
-          <img src={trophyLogo} alt="Copa Mundo" className="h-11 w-11 sm:h-14 sm:w-14 object-contain" />
+          <img src={trophyLogo} alt="Copa Mundo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
           <span className="font-display text-lg sm:text-xl font-black tracking-tight text-primary uppercase">
             Copa Mundo
           </span>
