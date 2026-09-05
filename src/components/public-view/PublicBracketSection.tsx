@@ -712,6 +712,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const showInlineTime = matchIsHA && pairedMatch
       ? (!!activeLegMatch && !activeLegMatch.is_played && !!displayTimeStr)
       : (!match.is_played && !!displayTimeStr);
+    // Bij heen en terug staan er al scores van de gespeelde wedstrijd op de kaart.
+    // De tijd van de volgende ontmoeting mag dan niet tussen die scores hangen:
+    // die verhuist naar de kopregel (bij veld/scheidsrechter).
+    const timeInHeader = showInlineTime && matchIsHA && !!pairedMatch && !!haTotal?.anyScored;
+    const showOverlayTime = showInlineTime && !timeInHeader;
 
     // Every chip is clickable — H&A opens aggregate dialog, others open match detail dialog
     const isHAClick = matchIsHA && !!pairedMatch;
