@@ -27,11 +27,11 @@ interface AggregateInfo {
    *  (dus partner-away_score → currentHome bij omgewisselde teams). */
   pairedHomeScore: number | null;
   pairedAwayScore: number | null;
-  /** Bestaande penalty-waarden zoals opgeslagen op de Heen-wedstrijd, in de oriëntatie van de Heen-wedstrijd. */
+  /** Bestaande penalty-waarden zoals opgeslagen op de Terug-wedstrijd (laatste leg), in die oriëntatie. */
   storedHomePenalties: number | null;
   storedAwayPenalties: number | null;
-  /** True als de huidige leg de Heen-wedstrijd is (penalty-oriëntatie = current). False voor Terug (oriëntatie omgedraaid). */
-  currentIsHeen: boolean;
+  /** True als de huidige leg de penalty-drager is (Terug/laatste leg): oriëntatie = current. */
+  currentIsCarrier: boolean;
 }
 
 interface ScoreEntryDialogProps {
@@ -104,10 +104,10 @@ const ScoreEntryDialog = ({
     setHomeScore(match.home_score !== null ? String(match.home_score) : "");
     setAwayScore(match.away_score !== null ? String(match.away_score) : "");
 
-    // H&A: penalty waarden leven altijd op de Heen-wedstrijd. Voor de Terug-leg
-    // moeten we de opgeslagen waarden omdraaien zodat ze bij de juiste teamnaam staan.
+    // H&A: penalty waarden leven altijd op de Terug-wedstrijd (laatste leg). Voor
+    // de andere leg draaien we ze om zodat ze bij de juiste teamnaam staan.
     if (aggregate) {
-      const swap = !aggregate.currentIsHeen;
+      const swap = !aggregate.currentIsCarrier;
       const h = swap ? aggregate.storedAwayPenalties : aggregate.storedHomePenalties;
       const a = swap ? aggregate.storedHomePenalties : aggregate.storedAwayPenalties;
       setHomePen(h !== null ? String(h) : "");
