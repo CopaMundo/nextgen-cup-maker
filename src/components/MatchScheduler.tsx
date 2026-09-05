@@ -21,7 +21,7 @@ import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee, refereeViolations } from "@/lib/refereeConfig";
-import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix } from "@/lib/fieldLocations";
+import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix, getFieldLocation } from "@/lib/fieldLocations";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -987,11 +987,15 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         timeToMinutes(o.match_time) + durOf(o) > start
       );
       if (overlapping.length > 0) {
+        const showLoc = locations.length > 1;
         return {
           level: "error",
           reasons: [
             `Dubbel geboekt: fluit tegelijk op ${overlapping
-              .map(o => `${o.match_time?.slice(0, 5)}${o.field ? ` – ${o.field}` : ""}`)
+              .map(o => {
+                const loc = showLoc ? getFieldLocation(o.field) : null;
+                return `${o.match_time?.slice(0, 5)}${o.field ? ` – ${o.field}` : ""}${loc ? ` (${loc})` : ""}`;
+              })
               .join(", ")}`,
           ],
         };
@@ -3301,7 +3305,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       onDragEnd={endRefereeDrag}
                                                       onPointerDown={(e) => e.stopPropagation()}
                                                       onClick={(e) => e.stopPropagation()}
-                                                      title={issue ? `${issue.reasons.join("\n")}\n\nRol ${refIdx + 1} — sleep om de volgorde te wijzigen` : `Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
+                                                      title={issue?.level === "error" ? issue.reasons.join("\n") : undefined}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
                                                         refDragName === name
                                                           ? "border-primary bg-primary/20 text-primary ring-1 ring-primary shadow-sm"
