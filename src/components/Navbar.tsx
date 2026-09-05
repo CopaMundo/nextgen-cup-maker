@@ -45,16 +45,16 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="flex items-center gap-2 rounded-lg border border-primary/20 px-3 sm:px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/20 h-8 px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
               >
-                <LogIn className="h-4 w-4" />
+                <LogIn className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Login</span>
               </Link>
               <Link
                 to="/register"
-                className="flex items-center gap-2 rounded-lg bg-primary px-3 sm:px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary h-8 px-3 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                <UserPlus className="h-4 w-4" />
+                <UserPlus className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Registreer</span>
               </Link>
             </>
