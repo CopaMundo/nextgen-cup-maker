@@ -307,9 +307,14 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     // enkel de eerste wedstrijd draagt de beslissing, en pas als alles gespeeld
     // is en het totaal gelijk is.
     if (match.match_name) {
+      // Volgorde van ontmoetingen volgt het schema (datum/tijd), niet de aanmaak.
+      const scheduleKey = (m: Match) => {
+        const scheduled = !!(m.match_date && m.match_time && m.field);
+        return `${scheduled ? "0" : "1"}|${m.match_date || "9999-12-31"}|${m.match_time || "99:99"}|${String(m.round_number ?? 0).padStart(4, "0")}|${m.id}`;
+      };
       const siblings = matches
         .filter(m => m.phase_id === match.phase_id && m.match_name === match.match_name)
-        .sort((a, b) => (a.round_number ?? 0) - (b.round_number ?? 0));
+        .sort((a, b) => scheduleKey(a).localeCompare(scheduleKey(b)));
       if (siblings.length > 1) {
         if (siblings[0].id !== match.id) return false;
         if (!siblings.every(m => m.home_score !== null && m.away_score !== null)) return false;
