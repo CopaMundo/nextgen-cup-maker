@@ -3486,7 +3486,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <div className="space-y-1 relative" ref={dropdownBracketsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer poules/brackets</Label>}
                             <button
-                              onClick={() => openDropdown("brackets")}
+                              onClick={() => openDropdown("brackets")} data-dd-inside="true"
                               className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors"
                             >
                               <span className="flex items-center gap-1 truncate">
@@ -3502,7 +3502,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && (
-                              <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                                 {options.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground">Alles is ingepland</div>
                                 ) : (
@@ -3540,7 +3540,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <div className="space-y-1 relative" ref={dropdownRoundsRef}>
                             {hasSelection && !noBracketsSelected && <Label className="text-[10px] text-muted-foreground">Selecteer rondes</Label>}
                             <button
-                              onClick={() => openDropdown("rounds")}
+                              onClick={() => openDropdown("rounds")} data-dd-inside="true"
                               className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors"
                             >
                               <span className="flex items-center gap-1 truncate">
@@ -3556,7 +3556,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && (
-                              <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                                 {unscheduledMatches.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground">Alles is ingepland</div>
                                 ) : noBracketsSelected ? (
