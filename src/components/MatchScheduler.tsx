@@ -2998,7 +2998,23 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-accent/20 text-accent-foreground">{getMatchInfoLabel(m)}</span>
                                               </div>
                                             )}
-                                            {m.referee && <div className="text-[8px] text-muted-foreground mt-0.5 flex items-center gap-0.5 print:text-[9px]"><WhistleIcon className="h-2.5 w-2.5" /> {m.referee}</div>}
+                                            {refNames(m.referee).length > 0 && (
+                                              <div className="mt-0.5 flex flex-wrap gap-1">
+                                                {refNames(m.referee).map(name => (
+                                                  <span
+                                                    key={name}
+                                                    draggable
+                                                    onDragStart={(e) => startRefereeDrag(e, name, m.id)}
+                                                    onPointerDown={(e) => e.stopPropagation()}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="inline-flex items-center gap-0.5 rounded border border-border bg-muted px-1 py-0.5 text-[8px] font-semibold text-muted-foreground cursor-grab active:cursor-grabbing print:text-[9px]"
+                                                  >
+                                                    <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                  </span>
+                                                ))}
+                                              </div>
+                                            )}
+
                                           </div>
                                           {/* Mobile actions */}
                                           {isMobile && mobileSelectedMatchId === m.id && (
