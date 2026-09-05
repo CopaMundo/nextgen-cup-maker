@@ -3158,7 +3158,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 )}
                                               </div>
                                               <button
-                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
+                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
                                                 className="text-muted-foreground hover:text-foreground print:hidden"
                                               >
                                                 <Pencil className="h-2.5 w-2.5" />
