@@ -17,6 +17,8 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
+import { useDndSensors } from "@/components/SortableList";
 
 interface Group {
   id: string;
@@ -290,6 +292,68 @@ const GroupManager = ({
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
     onSlotChange?.();
+  };
+
+  const slotSensors = useDndSensors();
+
+  /** Sleep teams tussen slots — binnen dezelfde groep of naar een andere groep in dit format */
+  const handleSlotDragEnd = async (event: DragEndEvent) => {
+    const activeId = String(event.active.id);
+    const overId = event.over ? String(event.over.id) : null;
+    if (!overId || activeId === overId) return;
+
+    const { data: pair } = await supabase
+      .from("slots")
+      .select("id, group_id, slot_code, team_id, ref_phase_id")
+      .in("id", [activeId, overId]);
+    const from = pair?.find((s) => s.id === activeId);
+    const to = pair?.find((s) => s.id === overId);
+    if (!from || !to) return;
+
+    if (from.ref_phase_id || to.ref_phase_id) {
+      toast({
+        title: "Slepen niet mogelijk",
+        description: "Plekken die gevuld worden door een vorige fase kun je niet slepen.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!from.team_id && !to.team_id) return;
+
+    const syncSlot = async (slot: { id: string; group_id: string | null; slot_code: string }, teamId: string | null) => {
+      await supabase.from("slots").update({ team_id: teamId }).eq("id", slot.id);
+      if (slot.slot_code) {
+        const base = { tournament_id: tournamentId, phase_id: phaseId };
+        const homeQ = slot.group_id
+          ? supabase.from("matches").update({ home_team_id: teamId }).match({ ...base, home_slot_label: slot.slot_code, group_id: slot.group_id })
+          : supabase.from("matches").update({ home_team_id: teamId }).match({ ...base, home_slot_label: slot.slot_code }).is("group_id", null);
+        const awayQ = slot.group_id
+          ? supabase.from("matches").update({ away_team_id: teamId }).match({ ...base, away_slot_label: slot.slot_code, group_id: slot.group_id })
+          : supabase.from("matches").update({ away_team_id: teamId }).match({ ...base, away_slot_label: slot.slot_code }).is("group_id", null);
+        await Promise.all([Promise.resolve(homeQ), Promise.resolve(awayQ)]);
+      }
+    };
+
+    // group_teams opnieuw opbouwen voor de betrokken groepen
+    for (const slot of [from, to]) {
+      if (slot.team_id && slot.group_id) {
+        await supabase.from("group_teams").delete()
+          .eq("group_id", slot.group_id).eq("team_id", slot.team_id).eq("tournament_id", tournamentId);
+      }
+    }
+
+    await syncSlot(from, to.team_id ?? null);
+    await syncSlot(to, from.team_id ?? null);
+
+    const inserts: { group_id: string; team_id: string; tournament_id: string }[] = [];
+    if (to.team_id && from.group_id) inserts.push({ group_id: from.group_id, team_id: to.team_id, tournament_id: tournamentId });
+    if (from.team_id && to.group_id) inserts.push({ group_id: to.group_id, team_id: from.team_id, tournament_id: tournamentId });
+    if (inserts.length > 0) {
+      await supabase.from("group_teams").upsert(inserts, { onConflict: "group_id,team_id" } as any);
+    }
+
+    notifySlotChange();
+    fetchGroups();
   };
 
   const checkAssignedTeams = async () => {
@@ -927,6 +991,7 @@ const GroupManager = ({
         </div>
       ) : (
         <>
+          <DndContext sensors={slotSensors} collisionDetection={closestCenter} onDragEnd={handleSlotDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {groups.map((g) => renderGroupCard(g))}
             {(phaseType === "group" || phaseType === "round_robin") && (
@@ -939,6 +1004,7 @@ const GroupManager = ({
               </button>
             )}
           </div>
+          </DndContext>
         </>
       )}
 
