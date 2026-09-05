@@ -3452,6 +3452,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {/* ===== RIGHT SIDEBAR ===== */}
             {!plannerCollapsed && (
             <div
+              ref={plannerSidebarRef}
               className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 self-start h-[calc(100vh-6rem)] overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
               onDragOver={(e) => {
                 if (!hasPlannerDragData(e)) return;
