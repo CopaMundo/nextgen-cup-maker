@@ -844,9 +844,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const scheduled = matches.filter(m =>
       m.match_date && m.match_time && m.field &&
       m.match_date === plannerDate &&
-      (!selectedLocation || locFieldNames.has(m.field))
+      (!selectedLocation || locFieldNames.has(m.field)) &&
+      (overwrite || refNames(m.referee).length === 0)
     );
-    if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden op deze dag en locatie", variant: "destructive" }); return; }
+    if (scheduled.length === 0) { toast({ title: overwrite ? "Geen geplande wedstrijden op deze dag en locatie" : "Alle wedstrijden hebben al een scheidsrechter", variant: "destructive" }); return; }
+
 
     const sorted = [...scheduled].sort((a, b) => {
       if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
