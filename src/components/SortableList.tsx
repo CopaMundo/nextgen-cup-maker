@@ -62,9 +62,15 @@ export function SortableVerticalList<T>({
 }
 
 /** Elementen waarop een pointerdown NIET als sleep mag starten. */
-const isInteractive = (target: EventTarget | null) => {
+const isInteractive = (target: EventTarget | null, currentTarget?: EventTarget | null) => {
   const el = target as HTMLElement | null;
-  return !!el?.closest?.("input, textarea, select, button, a, [role='button'], [contenteditable='true'], [data-no-drag]");
+  const hit = el?.closest?.(
+    "input, textarea, select, button, a, [role='button'], [contenteditable='true'], [data-no-drag]",
+  );
+  if (!hit) return false;
+  // De rij zelf krijgt role="button" van dnd-kit: dat mag het slepen niet blokkeren.
+  if (currentTarget && hit === currentTarget) return false;
+  return true;
 };
 
 /** Rij binnen een sleeplijst; hele rij is sleepbaar, greep blijft beschikbaar. */
@@ -90,15 +96,16 @@ export const SortableRowShell = ({
     ...attributes,
     ...listeners,
     onPointerDown: (e: React.PointerEvent) => {
-      if (isInteractive(e.target)) return;
+      if (isInteractive(e.target, e.currentTarget)) return;
       (listeners as any)?.onPointerDown?.(e);
     },
     onKeyDown: (e: React.KeyboardEvent) => {
-      if (isInteractive(e.target)) return;
+      if (isInteractive(e.target, e.currentTarget)) return;
       (listeners as any)?.onKeyDown?.(e);
     },
     className: "cursor-grab active:cursor-grabbing touch-none",
   };
+
 
   const handle = (
     <span
