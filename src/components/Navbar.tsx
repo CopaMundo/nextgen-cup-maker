@@ -4,18 +4,32 @@ import { useAuth } from "@/contexts/AuthContext";
 import ChampionsTrophyIcon from "@/components/icons/ChampionsTrophyIcon";
 import trophyLogo from "@/assets/copa-mundo-trophy.png";
 
-const Navbar = () => {
+interface NavbarProps {
+  tournamentName?: string | null;
+}
+
+const Navbar = ({ tournamentName }: NavbarProps) => {
   const { user, signOut } = useAuth();
 
   return (
     <nav className="border-b border-border px-4 sm:px-6 py-2">
-      <div className="flex items-center justify-between w-full">
-        <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2.5">
-          <img src={trophyLogo} alt="Copa Mundo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
-          <span className="font-display text-lg sm:text-xl font-black tracking-tight text-primary uppercase">
-            Copa Mundo
-          </span>
-        </Link>
+      <div className="flex items-center justify-between w-full gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 shrink-0">
+            <img src={trophyLogo} alt="Copa Mundo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
+            <span className="font-display text-lg sm:text-xl font-black tracking-tight text-primary uppercase">
+              Copa Mundo
+            </span>
+          </Link>
+          {tournamentName && (
+            <>
+              <span className="hidden sm:block text-muted-foreground/60">|</span>
+              <span className="font-display text-base sm:text-lg font-semibold text-foreground truncate">
+                {tournamentName}
+              </span>
+            </>
+          )}
+        </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
           {user ? (

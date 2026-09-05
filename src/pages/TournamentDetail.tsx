@@ -289,7 +289,7 @@ const TournamentDetail = () => {
 
   return (
     <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
-      <Navbar />
+      <Navbar tournamentName={tournament?.name} />
       <ThemeSwitcher />
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
@@ -326,12 +326,7 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div className="flex-1 overflow-auto min-h-0 flex flex-col">
-          <div className="px-3 sm:px-6 py-4 sm:py-6 w-full flex flex-col">
-            <div className="mb-4 sm:mb-6 flex items-center gap-3 sm:gap-4 shrink-0">
-              <div>
-                <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">{tournament.name}</h1>
-              </div>
-            </div>
+          <div className="px-3 sm:px-6 py-3 sm:py-4 w-full flex flex-col">
             <div className="flex flex-col">{renderContent()}</div>
           </div>
         </div>
