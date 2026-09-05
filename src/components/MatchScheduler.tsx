@@ -944,6 +944,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
   const [refListDropActive, setRefListDropActive] = useState(false);
   const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
+  const [showClearRefereesConfirm, setShowClearRefereesConfirm] = useState(false);
 
   const MAX_REFEREES = 5;
   /** Weergaveorde van de scheidsrechters van een wedstrijd, met live opschuiven tijdens het slepen. */
@@ -3669,7 +3670,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => void clearRefereesFromDay()}
+                              onClick={() => setShowClearRefereesConfirm(true)}
                               className="w-full gap-1 text-xs text-destructive hover:text-destructive"
                             >
                               <RotateCcw className="h-3 w-3" /> Alle scheidsrechters uit schema
@@ -3692,7 +3693,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <p className="text-xs text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
                         </div>
                       ) : (
-                        <div className="space-y-1.5">
+                        <div className="flex flex-wrap gap-1.5">
                           {refereeConfigs.map((rc, i) => {
                             const r = rc.name;
                             const count = matches.filter(m => refNames(m.referee).includes(r)).length;
@@ -3703,10 +3704,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 onDragStart={(e) => startRefereeDrag(e, r)}
                                 onDragEnd={endRefereeDrag}
                                 title="Sleep naar een wedstrijd"
-                                className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors cursor-grab active:cursor-grabbing"
+                                className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-1 text-[10px] bg-background hover:bg-secondary/50 transition-colors cursor-grab active:cursor-grabbing"
                               >
-                                <span className="font-medium text-foreground truncate">{r}</span>
-                                <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
+                                <span className="font-medium text-foreground truncate max-w-[90px]">{r}</span>
+                                <span className={`text-[9px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
                               </div>
                             );
                           })}
@@ -4009,6 +4010,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             </Button>
             <AlertDialogAction onClick={() => { setConfirmAssignOpen(false); void autoAssignReferees(true); }}>
               Overschrijven
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bevestiging: alle scheidsrechters uit schema verwijderen */}
+      <AlertDialog open={showClearRefereesConfirm} onOpenChange={setShowClearRefereesConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alle scheidsrechters uit schema halen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Wil je alle scheidsrechters verwijderen uit het schema van {plannerDate ? formatIsoDateForLocale(plannerDate) : "deze dag"}
+              {selectedLocation ? ` (${selectedLocation})` : ""}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setShowClearRefereesConfirm(false); void clearRefereesFromDay(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Verwijderen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
