@@ -330,17 +330,18 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
 
-  const saveScore = async (match: Match) => {
+  const saveScore = async (match: Match, baseList?: Match[]) => {
+    const base = baseList ?? matches;
     const isPlayed = match.home_score !== null && match.away_score !== null;
     // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Heen-match
     // wanneer alle legs gespeeld zijn en het aggregaat gelijk is.
     const isHALeg = !!match.match_name?.match(/\s+\((Heen|Terug)\)$/);
-    const needsPenalties = resolveMatchNeedsDecider(match);
+    const needsPenalties = resolveMatchNeedsDecider(match, base);
     const hasPenalties = match.home_penalties !== null && match.away_penalties !== null && match.home_penalties !== match.away_penalties;
     const finalIsPlayed = isPlayed && (!needsPenalties || hasPenalties);
 
     // Was de wedstrijd eerder gespeeld? Zo ja en nu niet meer → statistieken wissen
-    const wasPlayed = matches.find(x => x.id === match.id)?.is_played === true;
+    const wasPlayed = base.find(x => x.id === match.id)?.is_played === true;
     if (wasPlayed && !finalIsPlayed) {
       await supabase.from("match_stats").delete().eq("match_id", match.id);
     }
@@ -358,7 +359,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       return;
     }
 
-    let updatedMatches = matches.map(x => x.id === match.id ? {
+    let updatedMatches = base.map(x => x.id === match.id ? {
       ...x,
       home_score: match.home_score,
       away_score: match.away_score,
@@ -2449,27 +2450,44 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 away_penalties: isHALeg ? sem.away_penalties : data.awayPenalties,
                 set_scores: data.setScores,
               };
-              setMatches(prev => prev.map(m => m.id === sem.id ? updatedMatch : m));
-              await saveScore(updatedMatch);
 
-              // H&A: schrijf penalties altijd naar Heen-match (in Heen-oriëntatie)
+              // H&A: penalties horen op de Heen-match (in Heen-oriëntatie)
+              let updatedHeen: Match | null = null;
               if (isHALeg && heenMatch) {
                 const swap = !currentIsHeen;
                 const heenHomePen = swap ? data.awayPenalties : data.homePenalties;
                 const heenAwayPen = swap ? data.homePenalties : data.awayPenalties;
+                const heenBase = heenMatch.id === sem.id ? updatedMatch : heenMatch;
                 if (
-                  heenHomePen !== heenMatch.home_penalties ||
-                  heenAwayPen !== heenMatch.away_penalties
+                  heenHomePen !== heenBase.home_penalties ||
+                  heenAwayPen !== heenBase.away_penalties
                 ) {
-                  const updatedHeen: Match = {
-                    ...heenMatch,
+                  updatedHeen = {
+                    ...heenBase,
                     home_penalties: heenHomePen,
                     away_penalties: heenAwayPen,
                   };
-                  setMatches(prev => prev.map(m => m.id === heenMatch.id ? updatedHeen : m));
-                  await saveScore(updatedHeen);
                 }
               }
+              if (updatedHeen && updatedHeen.id === sem.id) {
+                updatedMatch.home_penalties = updatedHeen.home_penalties;
+                updatedMatch.away_penalties = updatedHeen.away_penalties;
+                updatedHeen = null;
+              }
+
+              // Werk alle betrokken wedstrijden in één keer bij, zodat de
+              // winnaarbepaling meteen de nieuwe scores én penalties ziet.
+              const nextList = matches.map(m => {
+                if (m.id === updatedMatch.id) return updatedMatch;
+                if (updatedHeen && m.id === updatedHeen.id) return updatedHeen;
+                return m;
+              });
+              setMatches(nextList);
+
+              if (updatedHeen) {
+                await saveScore(updatedHeen, nextList);
+              }
+              await saveScore(updatedMatch, nextList);
             }}
           />
         );
