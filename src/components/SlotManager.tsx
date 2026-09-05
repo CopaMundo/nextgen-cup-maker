@@ -734,6 +734,9 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
               </div>
             )}
           </div>
+          </>
+            )}
+          </SortableRowShell>
         );
       })}
       {slots.length === 0 && (
@@ -742,6 +745,7 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
         </div>
       )}
     </div>
+    </SortableContext>
   );
 };
 
