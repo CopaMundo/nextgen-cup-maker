@@ -3414,8 +3414,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                     {/* Scheduling filters — Tournify-style multi-select dropdowns */}
-                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                    <div className="space-y-3 border-t border-border pt-3" ref={dropdownContainerRef}>
+                    <div className="space-y-3 border-t border-border pt-3">
                       {/* Poules/Brackets dropdown */}
                       {(() => {
                         const options = getUnifiedGroupBracketOptions();
