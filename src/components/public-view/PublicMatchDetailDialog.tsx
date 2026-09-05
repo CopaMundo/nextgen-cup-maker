@@ -29,7 +29,7 @@ interface PublicMatchDetailDialogProps {
   onClose: () => void;
   /** The clicked match (for H&A this can be either Heen or Terug). */
   match: any | null;
-  /** Optional paired match for Home & Away (the other leg). */
+  /** Optional paired match for Heen en terug (the other leg). */
   pairedMatch?: any | null;
   teams: Team[];
   tournament: Tournament | null | undefined;
@@ -56,7 +56,7 @@ const formatTime = (t: string | null | undefined) =>
  * Works for:
  *   - Single matches (knockout or single_match)
  *   - Group matches (with sets/best-of)
- *   - Home & Away pairs (two legs)
+ *   - Heen en terug pairs (two legs)
  *
  * Title rules:
  *   - Group phase  → group name
@@ -101,7 +101,7 @@ const PublicMatchDetailDialog = ({
     scoringSystems as any,
     phases as any,
     groups as any,
-    isHA ? { haPairLabel: "Home & Away", includeLeg: false } : undefined
+    isHA ? { haPairLabel: "Heen en terug", includeLeg: false } : undefined
   );
 
   let titleMain = "";

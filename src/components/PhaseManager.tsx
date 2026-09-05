@@ -945,8 +945,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
             <Label className="text-xs">Competitieformat</Label>
             <div className="grid grid-cols-2 gap-2">
                {[
-                { value: "single_leg", label: "SINGLE LEG", desc: "Elk team speelt één keer tegen elk ander team in de poule" },
-                { value: "home_away", label: "HOME & AWAY", desc: "Elk team speelt twee keer tegen elk ander team in de poule (thuis & uit)" },
+                { value: "single_leg", label: "ENKELE WEDSTRIJD", desc: "Elk team speelt één keer tegen elk ander team in de poule" },
+                { value: "home_away", label: "HEEN EN TERUG", desc: "Elk team speelt twee keer tegen elk ander team in de poule (thuis & uit)" },
                 { value: "multiple", label: "MEERDERE ONTMOETINGEN", desc: "Elk team speelt meerdere keren tegen elke tegenstander in de poule" },
                 { value: "rounds", label: "SPEELRONDES", desc: "Bepaal zelf het totaal aantal wedstrijden dat elk team moet spelen" },
               ].map((opt) => (
@@ -1052,8 +1052,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
             <Label className="text-xs">Wedstrijdformat</Label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { value: "single_leg" as const, label: "SINGLE LEG", desc: "Eén beslissende wedstrijd" },
-                { value: "home_away" as const, label: "HOME & AWAY", desc: "Heen- en terugwedstrijd" },
+                { value: "single_leg" as const, label: "ENKELE WEDSTRIJD", desc: "Eén beslissende wedstrijd" },
+                { value: "home_away" as const, label: "HEEN EN TERUG", desc: "Heen- en terugwedstrijd" },
               ].map((opt) => (
                 <button
                   key={opt.value}
@@ -1162,8 +1162,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
             <Label className="text-xs">Wedstrijdformat</Label>
             <div className="flex gap-2">
               {[
-                { value: "single_leg", label: "SINGLE LEG", desc: "Eén beslissende wedstrijd" },
-                { value: "home_away", label: "HOME & AWAY", desc: "Heen- en terugwedstrijd" },
+                { value: "single_leg", label: "ENKELE WEDSTRIJD", desc: "Eén beslissende wedstrijd" },
+                { value: "home_away", label: "HEEN EN TERUG", desc: "Heen- en terugwedstrijd" },
               ].map((opt) => (
                 <button
                   key={opt.value}
