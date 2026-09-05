@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronDown, User, ArrowRight, X, ArrowLeftRight } from "lucide-react";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableRowShell } from "@/components/SortableList";
 
 interface Slot {
   id: string;
