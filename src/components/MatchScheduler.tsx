@@ -987,20 +987,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         timeToMinutes(o.match_time) + durOf(o) > start
       );
       if (overlapping.length > 0) {
+        // Locatie van een veld: expliciet ingesteld, anders via registry, anders de eerste (standaard)locatie
         const fieldLoc = (fieldName: string | null) => {
+          if (!fieldName) return null;
           const f = fields.find(f => f.name === fieldName);
-          return f?.location || getFieldLocation(fieldName);
+          return f?.location || getFieldLocation(fieldName) || locations[0]?.name || null;
         };
-        const currentLoc = fieldLoc(match.field);
         return {
           level: "error",
           reasons: [
             `Dubbel geboekt: fluit tegelijk op ${overlapping
               .map(o => {
                 const loc = fieldLoc(o.field);
-                const showLoc = !!loc && loc !== currentLoc;
                 const fieldLabel = o.field ? displayFieldName(o.field) : "";
-                return `${o.match_time?.slice(0, 5)}${fieldLabel ? ` – ${fieldLabel}` : ""}${showLoc ? ` (${loc})` : ""}`;
+                return `${o.match_time?.slice(0, 5)}${fieldLabel ? ` – ${fieldLabel}` : ""}${loc ? ` (${loc})` : ""}`;
               })
               .join(", ")}`,
           ],
