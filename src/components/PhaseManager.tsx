@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import FormatCard from "./FormatCard";
+import { SortableVerticalList, SortableRowShell } from "@/components/SortableList";
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
