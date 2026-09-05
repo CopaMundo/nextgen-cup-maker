@@ -172,7 +172,7 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
         .map((m: any) => {
           const label = m.match_name
             || [m.home_slot_label, m.away_slot_label].filter(Boolean).join(" vs ")
-            || `Wedstrijd ${m.round_number ?? ""}`.trim();
+            || "Wedstrijd";
           return { id: m.id, label, current: m.scoring_system_id ?? format.scoring_system_id ?? null };
         });
 

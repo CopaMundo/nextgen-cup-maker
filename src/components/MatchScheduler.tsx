@@ -1633,42 +1633,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return phases.filter(p => unschedPhaseIds.has(p.id));
   };
 
-  // Smart round label: knockout uses match_name + sub-bracket context, group uses R1/R2
-  // subBracket: "_" = Hoofdbracket, otherwise the extracted sub-bracket name (e.g. "Plaats 5-8")
-  const getSmartRoundLabel = (roundNum: number, contextPhaseIds?: string[], showFormatSuffix?: boolean, subBracket?: string) => {
-    const contextMatches = matches.filter(m => {
-      if (m.round_number !== roundNum) return false;
-      if (contextPhaseIds && contextPhaseIds.length > 0 && !contextPhaseIds.includes(m.phase_id)) return false;
-      return true;
-    });
-    const uniquePhaseIds = [...new Set(contextMatches.map(m => m.phase_id))];
-    const phase = uniquePhaseIds.length === 1 ? phases.find(p => p.id === uniquePhaseIds[0]) : null;
-
-    // Knockout / single_match: RoundName (FormatName, Hoofdbracket/sub-bracket)
-    if (phase && (phase.phase_type === "knockout" || phase.phase_type === "single_match")) {
-      // Filter to matches matching this sub-bracket
-      const phaseMatches = contextMatches.filter(m => {
-        if (!subBracket || subBracket === "_") {
-          // Hoofdbracket: matches without parenthetical suffix
-          return !m.match_name || !m.match_name.match(/\([^)]+\)\s*$/);
-        }
-        return m.match_name?.includes(`(${subBracket})`);
-      });
-      let roundName = `R${roundNum}`;
-      if (phaseMatches.length > 0 && phaseMatches[0].match_name) {
-        // Strip trailing number AND parenthetical sub-bracket suffix
-        roundName = phaseMatches[0].match_name.replace(/\s*\([^)]+\)\s*$/, "").replace(/\s*\d+$/, "");
-      }
-      const bracketLabel = (!subBracket || subBracket === "_") ? "Hoofdbracket" : subBracket;
-      return `${roundName} (${phase.name}, ${bracketLabel})`;
-    }
-
-    // Group / round_robin: R1, R2, ...
-    const label = `R${roundNum}`;
-    if (showFormatSuffix && phase) return `${label} (${phase.name})`;
-    return label;
-  };
-
   // Ref for horizontal scrolling of field columns
   const fieldColumnsRef = useState<HTMLDivElement | null>(null);
 
@@ -2148,7 +2112,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (schedFields.length === 0) { toast({ title: "Selecteer minstens één veld", variant: "destructive" }); return; }
     const options = getUnifiedGroupBracketOptions();
     if (options.length > 0 && schedFormats.length === 0 && schedGroups.length === 0) { toast({ title: "Selecteer minstens één groep of bracket", variant: "destructive" }); return; }
-    if (getSchedRounds().length > 0 && schedRounds.length === 0) { toast({ title: "Selecteer minstens één speelronde", variant: "destructive" }); return; }
+    if (getSchedRounds().length > 0 && schedRounds.length === 0) { toast({ title: "Selecteer minstens één groep of bracket", variant: "destructive" }); return; }
 
     let toSchedule = matches.filter(m => !m.match_date || !m.match_time || !m.field);
     if (schedFormats.length > 0 || schedGroups.length > 0) {
@@ -3695,7 +3659,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               return `${roundLabel} (${phaseName})`;
                                             }
                                           }
-                                          return `R${r.round} (${phaseName})`;
+                                          return phaseName;
                                         })()}
                                       </label>
                                     ))}
@@ -3935,14 +3899,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           {getSidebarRounds().map(r => {
                             const phase = phases.find(p => p.id === r.phaseId);
                             const isKnockout = phase && (phase.phase_type === "knockout" || phase.phase_type === "single_match");
-                            let label = `R${r.round}`;
+                            let label = phase?.name || "Wedstrijden";
                             if (isKnockout) {
                               const phaseMatches = matches.filter(m => m.phase_id === r.phaseId && m.round_number === r.round);
                               if (phaseMatches.length > 0 && phaseMatches[0].match_name) {
                                 label = phaseMatches[0].match_name.replace(/\s*\([^)]+\)\s*$/, "").replace(/\s*\d+$/, "");
                               }
-                              label = `${label} (${phase.name})`;
-                            } else if (phases.length > 1 && phase) {
                               label = `${label} (${phase.name})`;
                             }
                             return <option key={r.key} value={r.key}>{label}</option>;

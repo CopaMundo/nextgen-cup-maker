@@ -1162,7 +1162,7 @@ const BracketBlock = ({
   let scopedGroups = allPhaseGroups;
   let title = phase.phase_label || phase.name;
   let firstRoundMatches: any[] = [];
-  let firstRoundName = "Eerste ronde";
+  let firstRoundName = "";
   try {
     const struct = detectBracketStructure(allPhaseGroups, phaseMatches, bracketGroupMap, phaseMatchType);
     const key = bracketKey || "main";
@@ -1183,7 +1183,7 @@ const BracketBlock = ({
     }
     if (bracketRounds.length > 0) {
       firstRoundMatches = bracketRounds[0].matches || [];
-      firstRoundName = bracketRounds[0].name || firstRoundName;
+      firstRoundName = bracketRounds[0].name || "";
     }
   } catch {
     // Bij detectie-fout val terug op alle groepen van de fase
@@ -1202,7 +1202,7 @@ const BracketBlock = ({
   if (view === "r128-results") {
     return (
       <>
-        <BlockHeader title={title} subtitle={`Uitslagen ${firstRoundName}`} style={context.style} />
+        <BlockHeader title={title} subtitle={["Uitslagen", firstRoundName].filter(Boolean).join(" ")} style={context.style} />
         <div className="relative flex-1 min-h-0 overflow-hidden p-4">
           <FirstRoundResultsGrid matches={firstRoundMatches} teams={context.teams} style={context.style} />
         </div>
@@ -1246,7 +1246,7 @@ const BracketBlock = ({
  */
 const FirstRoundResultsGrid = ({ matches, teams, style }: { matches: any[]; teams: any[]; style: BroadcastStyle }) => {
   if (matches.length === 0) {
-    return <EmptyBlock label="Geen wedstrijden in deze ronde" />;
+    return <EmptyBlock label="Geen wedstrijden" />;
   }
   const cardCls = ds(style, "card") || "rounded-md border border-border bg-card";
 
