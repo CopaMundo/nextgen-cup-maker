@@ -4,7 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import ChampionsTrophyIcon from "@/components/icons/ChampionsTrophyIcon";
 import trophyLogo from "@/assets/copa-mundo-trophy.png";
 
-const Navbar = () => {
+interface NavbarProps {
+  tournamentName?: string | null;
+}
+
+const Navbar = ({ tournamentName }: NavbarProps) => {
   const { user, signOut } = useAuth();
 
   return (
