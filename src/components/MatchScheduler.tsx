@@ -839,8 +839,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   const autoAssignReferees = async () => {
     if (refereeConfigs.length === 0) { toast({ title: "Voeg eerst scheidsrechters toe", variant: "destructive" }); return; }
-    const scheduled = matches.filter(m => m.match_date && m.match_time && m.field);
-    if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden", variant: "destructive" }); return; }
+    const locFieldNames = getLocationFieldNames(selectedLocation);
+    const scheduled = matches.filter(m =>
+      m.match_date && m.match_time && m.field &&
+      m.match_date === plannerDate &&
+      (!selectedLocation || locFieldNames.has(m.field))
+    );
+    if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden op deze dag en locatie", variant: "destructive" }); return; }
+
     const sorted = [...scheduled].sort((a, b) => {
       if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
       return (a.match_time || "").localeCompare(b.match_time || "");
@@ -906,6 +912,45 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     await supabase.from("matches").update(updates).eq("id", id);
     setMatches(m => m.map(x => x.id === id ? { ...x, ...updates } : x));
   };
+
+  // === SCHEIDSRECHTER SLEPEN ===
+  const REF_DRAG_TYPE = "application/x-referee";
+  const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
+
+  const startRefereeDrag = (e: React.DragEvent, name: string, fromMatchId?: string) => {
+    e.dataTransfer.setData(REF_DRAG_TYPE, JSON.stringify({ name, fromMatchId: fromMatchId || null }));
+    e.dataTransfer.setData("text/plain", name);
+    e.dataTransfer.effectAllowed = "move";
+    e.stopPropagation();
+  };
+
+  const isRefereeDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes(REF_DRAG_TYPE);
+
+  const dropRefereeOnMatch = async (e: React.DragEvent, matchId: string) => {
+    if (!isRefereeDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    let payload: { name: string; fromMatchId: string | null };
+    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
+    const { name, fromMatchId } = payload;
+    if (!name || fromMatchId === matchId) return;
+
+    const target = matches.find(m => m.id === matchId);
+    if (!target) return;
+    const current = refNames(target.referee);
+    if (!current.includes(name)) {
+      const next = [...current, name].slice(-Math.max(1, refereesPerMatch));
+      await updateMatch(matchId, { referee: next.join(", ") || null } as any);
+    }
+    if (fromMatchId) {
+      const source = matches.find(m => m.id === fromMatchId);
+      if (source) {
+        const rest = refNames(source.referee).filter(n => n !== name);
+        await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
+      }
+    }
+  };
+
 
   const unscheduleMatch = async (id: string) => {
     await updateMatch(id, { match_date: null, match_time: null, field: null });
@@ -2915,7 +2960,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   : "border-border bg-card hover:border-primary/50 hover:shadow-md"
                                           }`}
                                         >
-                                          <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation">
+                                          <div
+                                            onClick={() => handleMobileTapMatch(m.id)}
+                                            className="touch-manipulation"
+                                            onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; } }}
+                                            onDrop={(e) => dropRefereeOnMatch(e, m.id)}
+                                          >
+
                                             {/* Time row */}
                                             <div className="flex items-center justify-between mb-1">
                                               <div className="flex items-center gap-1">
@@ -2947,7 +2998,23 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-accent/20 text-accent-foreground">{getMatchInfoLabel(m)}</span>
                                               </div>
                                             )}
-                                            {m.referee && <div className="text-[8px] text-muted-foreground mt-0.5 flex items-center gap-0.5 print:text-[9px]"><WhistleIcon className="h-2.5 w-2.5" /> {m.referee}</div>}
+                                            {refNames(m.referee).length > 0 && (
+                                              <div className="mt-0.5 flex flex-wrap gap-1">
+                                                {refNames(m.referee).map(name => (
+                                                  <span
+                                                    key={name}
+                                                    draggable
+                                                    onDragStart={(e) => startRefereeDrag(e, name, m.id)}
+                                                    onPointerDown={(e) => e.stopPropagation()}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="inline-flex items-center gap-0.5 rounded border border-border bg-muted px-1 py-0.5 text-[8px] font-semibold text-muted-foreground cursor-grab active:cursor-grabbing print:text-[9px]"
+                                                  >
+                                                    <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                  </span>
+                                                ))}
+                                              </div>
+                                            )}
+
                                           </div>
                                           {/* Mobile actions */}
                                           {isMobile && mobileSelectedMatchId === m.id && (
@@ -3348,37 +3415,33 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       <Settings className="h-3 w-3" /> Scheidsrechters beheren
                     </Button>
 
-                    {/* Lijst van scheidsrechters */}
+                    {/* Lijst van scheidsrechters (sleepbaar naar een wedstrijd) */}
                     {referees.length === 0 ? (
                       <div className="text-center py-6">
                         <WhistleIcon className="h-10 w-10 mx-auto text-muted-foreground/30 mb-2" />
                         <p className="text-xs text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
                       </div>
                     ) : (
-                      <div className="space-y-1">
+                      <div className="flex flex-wrap gap-1.5">
                         {refereeConfigs.map((rc, i) => {
                           const r = rc.name;
-                          const count = matches.filter(m => (m.referee || "").split(",").map(s => s.trim()).includes(r)).length;
+                          const count = matches.filter(m => refNames(m.referee).includes(r)).length;
                           return (
-                            <div key={i} className="rounded-md border border-border px-2.5 py-1.5 text-xs">
-                              <div className="flex items-center gap-2">
-                                <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">{count}</span>
-                                <span className="flex-1 font-medium text-foreground truncate">{r}</span>
-                                <button onClick={() => { setEditRefIdx(i); setEditRefName(r); }} className="text-muted-foreground hover:text-foreground">
-                                  <Pencil className="h-3 w-3" />
-                                </button>
-                                <button onClick={() => setDeleteRefIdx(i)} className="text-muted-foreground hover:text-destructive">
-                                  <Trash2 className="h-3 w-3" />
-                                </button>
-                              </div>
-                              <p className="mt-1 text-[9px] leading-snug text-muted-foreground">
-                                {summarizeReferee(rc, { totalFields: fields.length, teamName: (id) => teams.find(t => t.id === id)?.name || "?" }).join(" · ")}
-                              </p>
-                            </div>
+                            <span
+                              key={i}
+                              draggable
+                              onDragStart={(e) => startRefereeDrag(e, r)}
+                              title="Sleep naar een wedstrijd"
+                              className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground cursor-grab active:cursor-grabbing hover:border-primary/60"
+                            >
+                              <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
+                              {r}
+                            </span>
                           );
                         })}
                       </div>
                     )}
+
 
                     {/* Scheidsrechters toewijzen */}
                     <div className="pt-2 border-t border-border space-y-2">
