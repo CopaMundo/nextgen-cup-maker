@@ -408,7 +408,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     const sameAsPointsDefault =
       current.length === defaultPoints.length && current.every((v, i) => v === defaultPoints[i]);
     const initial = isSets && sameAsPointsDefault ? defaultSets : current;
-    setTiebreakerDraft([...initial]);
+    const fairplayEnabled = !!tournament?.enable_fairplay;
+    setTiebreakerDraft([...initial].filter((r) => r !== "fairplay" || fairplayEnabled));
     setH2hSubDraft([...(sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"])]);
     setH2hSubOpen(false);
     setTiebreakerEditId(sys.id);
