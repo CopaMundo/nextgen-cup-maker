@@ -472,7 +472,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   // Match edit dialog
   const [editMatchId, setEditMatchId] = useState<string | null>(null);
-  const [editMatchReferee, setEditMatchReferee] = useState("");
+  const [editMatchRefs, setEditMatchRefs] = useState<string[]>([]);
   const [editMatchDuration, setEditMatchDuration] = useState("");
   const [selectedStatsMatchId, setSelectedStatsMatchId] = useState<string | null>(null);
 
@@ -921,9 +921,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
   const [refDropMatchId, setRefDropMatchId] = useState<string | null>(null);
   const [refDragName, setRefDragName] = useState<string | null>(null);
+  const [refDragFromMatchId, setRefDragFromMatchId] = useState<string | null>(null);
   const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
   const [refListDropActive, setRefListDropActive] = useState(false);
   const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
+
+  const MAX_REFEREES = 5;
+  /** Weergaveorde van de scheidsrechters van een wedstrijd, met live opschuiven tijdens het slepen. */
+  const displayRefNames = (matchId: string, value?: string | null) => {
+    const names = refNames(value);
+    if (!refDragName || refInsert?.matchId !== matchId) return names;
+    if (refDragFromMatchId !== matchId || !names.includes(refDragName)) return names;
+    const rest = names.filter(n => n !== refDragName);
+    const idx = Math.max(0, Math.min(refInsert.index, rest.length));
+    return [...rest.slice(0, idx), refDragName, ...rest.slice(idx)];
+  };
+
 
 
   /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
@@ -946,15 +959,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.dataTransfer.effectAllowed = "move";
     setRefereeDragImage(e, name);
     setRefDragName(name);
+    setRefDragFromMatchId(fromMatchId || null);
     e.stopPropagation();
   };
 
   const endRefereeDrag = () => {
     setRefDragName(null);
+    setRefDragFromMatchId(null);
     setRefInsert(null);
     setRefDropMatchId(null);
     setRefListDropActive(false);
   };
+
 
   const isRefereeDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes(REF_DRAG_TYPE);
 
@@ -991,9 +1007,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!target) return;
     const current = refNames(target.referee);
     if (!current.includes(name)) {
-      const next = [...current, name].slice(-Math.max(1, refereesPerMatch));
+      if (current.length >= MAX_REFEREES) {
+        toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
+        return;
+      }
+      const next = [...current, name];
       await updateMatch(matchId, { referee: next.join(", ") || null } as any);
     }
+
     if (fromMatchId) {
       const source = matches.find(m => m.id === fromMatchId);
       if (source) {
@@ -1028,7 +1049,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return x < cx ? nearestIdx : nearestIdx + 1;
   };
 
-  /** Toon een duidelijke invoegstreep tussen de scheidsrechters tijdens het slepen. */
+  /** Toon de invoegplek en laat de andere scheidsrechters live opschuiven. */
   const handleRefereeBadgeDragOver = (e: React.DragEvent, matchId: string) => {
     if (!isRefereeDrag(e)) return;
     e.preventDefault();
@@ -1036,10 +1057,23 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.dataTransfer.dropEffect = "move";
     const container = e.currentTarget as HTMLElement;
     const rect = container.getBoundingClientRect();
-    const index = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    const raw = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    const target = matches.find(m => m.id === matchId);
+    const names = refNames(target?.referee);
+    let index = raw;
+    // Binnen dezelfde wedstrijd staat het gesleepte vakje al in de weergave: corrigeer de index.
+    if (refDragName && refDragFromMatchId === matchId && names.includes(refDragName)) {
+      const shown = displayRefNames(matchId, target?.referee);
+      const pos = shown.indexOf(refDragName);
+      if (pos >= 0 && raw > pos) index = raw - 1;
+      index = Math.max(0, Math.min(index, names.length - 1));
+    } else {
+      index = Math.max(0, Math.min(index, names.length));
+    }
     setRefDropMatchId(matchId);
     setRefInsert(prev => (prev && prev.matchId === matchId && prev.index === index ? prev : { matchId, index }));
   };
+
 
   /** Sleep een scheidsrechter naar links/rechts in dezelfde wedstrijd om de rolvolgorde te wijzigen,
    *  of vanuit de lijst/een andere wedstrijd om hem toe te voegen op die positie. */
@@ -1058,9 +1092,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const current = refNames(target.referee);
     const container = e.currentTarget as HTMLElement;
     const rect = container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const insertIndex = getRefereeInsertIndex(container, x, y, current.length);
+    const insertIndex = refInsert?.matchId === matchId
+      ? refInsert.index
+      : getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, current.length);
 
     if (fromMatchId === matchId) {
       const withoutName = current.filter(n => n !== name);
@@ -1070,10 +1104,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       return;
     }
 
+    if (!current.includes(name) && current.length >= MAX_REFEREES) {
+      toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
+      return;
+    }
     const withoutName = current.filter(n => n !== name);
     const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
-    const max = Math.max(1, refereesPerMatch);
-    const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)].slice(-max);
+    const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)];
     await updateMatch(matchId, { referee: next.join(", ") || null } as any);
 
     if (fromMatchId && fromMatchId !== matchId) {
@@ -1084,6 +1121,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       }
     }
   };
+
 
 
 
@@ -2640,7 +2678,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!editMatchId) return;
     const parsed = editMatchDuration.trim() === "" ? null : parseInt(editMatchDuration, 10);
     const dur = parsed != null && !isNaN(parsed) && parsed > 0 ? parsed : null;
-    await updateMatch(editMatchId, { referee: editMatchReferee || null, duration_minutes: dur } as any);
+    const refs = editMatchRefs.map(r => r.trim()).filter(Boolean);
+    await updateMatch(editMatchId, { referee: refs.length ? refs.join(", ") : null, duration_minutes: dur } as any);
+
     setEditMatchId(null);
     toast({ title: "Wedstrijd bijgewerkt" });
   };
@@ -3118,7 +3158,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 )}
                                               </div>
                                               <button
-                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); setEditMatchReferee(m.referee || ""); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
+                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
                                                 className="text-muted-foreground hover:text-foreground print:hidden"
                                               >
                                                 <Pencil className="h-2.5 w-2.5" />
@@ -3147,9 +3187,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefInsert(prev => prev?.matchId === m.id ? null : prev); }}
                                                 onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
                                               >
-                                                {refNames(m.referee).map((name, refIdx, arr) => (
+                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === refIdx && (
+                                                    {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
                                                       <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
                                                     )}
                                                     <span
@@ -3162,7 +3202,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       title={`Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
                                                         refDragName === name
-                                                          ? "border-primary bg-primary/20 text-primary opacity-60 scale-95"
+                                                          ? "border-primary bg-primary/20 text-primary ring-1 ring-primary shadow-sm"
                                                           : "border-border bg-muted text-muted-foreground"
                                                       }`}
                                                     >
@@ -3171,10 +3211,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                     </span>
                                                   </span>
                                                 ))}
-                                                {refInsert?.matchId === m.id && refInsert.index >= refNames(m.referee).length && (
+                                                {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
                                                   <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
                                                 )}
                                               </div>
+
                                             )}
 
 
@@ -3301,7 +3342,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
             {/* ===== RIGHT SIDEBAR ===== */}
             {!plannerCollapsed && (
-            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden">
+            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden self-start sticky top-0 max-h-screen overflow-y-auto overscroll-contain">
               {/* Tab icons */}
               <div className="flex border-b border-border">
                 <button
@@ -3570,7 +3611,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </SelectTrigger>
                       <SelectContent>
                         {["Eén", "Twee", "Drie", "Vier", "Vijf"].map((label, i) => (
-                          <SelectItem key={i + 1} value={String(i + 1)}>{label} scheidsrechter{i > 0 ? "s" : ""} per wedstrijd</SelectItem>
+                          <SelectItem key={i + 1} value={String(i + 1)}>{label} scheidsrechter{i > 0 ? "s" : ""} bij automatisch indelen</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -3832,19 +3873,39 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   {getMatchLabel(m.home_team_id, m.home_slot_label)} vs {getMatchLabel(m.away_team_id, m.away_slot_label)}
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-sm">Scheidsrechter</Label>
-                  <Select value={editMatchReferee || "__none__"} onValueChange={(v) => setEditMatchReferee(v === "__none__" ? "" : v)}>
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Kies scheidsrechter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— Geen —</SelectItem>
-                      {referees.map(r => (
-                        <SelectItem key={r} value={r}>{r}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-sm">Scheidsrechters</Label>
+                  {editMatchRefs.map((val, i) => (
+                    <div key={i} className="flex items-center gap-1">
+                      <span className="w-4 text-xs font-bold text-primary">{i + 1}</span>
+                      <Select
+                        value={val || "__none__"}
+                        onValueChange={(v) => setEditMatchRefs(prev => prev.map((p, idx) => idx === i ? (v === "__none__" ? "" : v) : p))}
+                      >
+                        <SelectTrigger className="h-9 flex-1">
+                          <SelectValue placeholder="Kies scheidsrechter" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__none__">— Geen —</SelectItem>
+                          {referees.map(r => (
+                            <SelectItem key={r} value={r}>{r}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {editMatchRefs.length > 1 && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setEditMatchRefs(prev => prev.filter((_, idx) => idx !== i))}>
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  {editMatchRefs.length < MAX_REFEREES && (
+                    <Button variant="outline" size="sm" className="gap-1 text-xs h-8" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
+                      <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
+                    </Button>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">De volgorde bepaalt de rol (1, 2, …). Maximaal {MAX_REFEREES}.</p>
                 </div>
+
                 <div className="space-y-1">
                   <Label className="text-sm">Aangepaste wedstrijdduur (min)</Label>
                   <Input
