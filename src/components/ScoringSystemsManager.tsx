@@ -643,44 +643,40 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
           const showAdv = showAdvancedId === sys.id;
           return (
             <div key={sys.id} className="rounded-lg border border-border bg-secondary/30 overflow-hidden">
-              <div className="flex items-center gap-2 px-3 py-2.5">
+              <div
+                className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                onClick={() => {
+                  const newId = isOpen ? null : sys.id;
+                  setExpandedId(newId);
+                  if (newId && hasAdvancedSettings(sys)) {
+                    setShowAdvancedId(newId);
+                  } else if (!newId && showAdvancedId === sys.id) {
+                    setShowAdvancedId(null);
+                  }
+                }}
+              >
+                <span className="text-muted-foreground">
+                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </span>
+                <span className="text-sm font-semibold text-foreground flex-1">{sys.name}</span>
                 <button
                   type="button"
-                  onClick={() => {
-                    const newId = isOpen ? null : sys.id;
-                    setExpandedId(newId);
-                    if (newId && hasAdvancedSettings(sys)) {
-                      setShowAdvancedId(newId);
-                    } else if (!newId && showAdvancedId === sys.id) {
-                      setShowAdvancedId(null);
-                    }
-                  }}
+                  onClick={(e) => { e.stopPropagation(); setEditName(sys.name); setEditingNameId(sys.id); }}
                   className="text-muted-foreground hover:text-foreground"
+                  aria-label="Naam bewerken"
                 >
-                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  <Pencil className="h-3.5 w-3.5" />
                 </button>
-                <>
-                  <span className="text-sm font-semibold text-foreground flex-1">{sys.name}</span>
+                {sysIdx > 0 && (
                   <button
                     type="button"
-                    onClick={() => { setEditName(sys.name); setEditingNameId(sys.id); }}
-                    className="text-muted-foreground hover:text-foreground"
-                    aria-label="Naam bewerken"
+                    onClick={(e) => { e.stopPropagation(); openDelete(sys.id); }}
+                    className="text-muted-foreground hover:text-destructive"
+                    aria-label="Verwijderen"
                   >
-                    <Pencil className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
-                  {sysIdx > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => openDelete(sys.id)}
-                      className="text-muted-foreground hover:text-destructive"
-                      aria-label="Verwijderen"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </>
-
+                )}
               </div>
 
               {isOpen && (
