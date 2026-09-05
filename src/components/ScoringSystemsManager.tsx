@@ -418,7 +418,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const saveTiebreakers = async () => {
     if (!tiebreakerEditId) return;
     const id = tiebreakerEditId;
-    const updates = { tiebreaker_rules: tiebreakerDraft, h2h_sub_rules: h2hSubDraft };
+    const fairplayEnabled = !!tournament?.enable_fairplay;
+    const updates = {
+      tiebreaker_rules: tiebreakerDraft.filter((r) => r !== "fairplay" || fairplayEnabled),
+      h2h_sub_rules: h2hSubDraft,
+    };
     const count = await checkPlayedMatches();
     if (count > 0) {
       setConfirmAction({
