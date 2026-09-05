@@ -66,7 +66,7 @@ const LocationSelector = ({
       >
         {locations.map((l) => (
           <option key={l.id} value={l.name}>
-            {l.name}
+            {truncateName(l.name)}
           </option>
         ))}
       </select>
