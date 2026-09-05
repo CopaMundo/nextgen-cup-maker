@@ -3610,8 +3610,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {["Eén", "Twee", "Drie", "Vier", "Vijf"].map((label, i) => (
-                          <SelectItem key={i + 1} value={String(i + 1)}>{label} scheidsrechter{i > 0 ? "s" : ""} bij automatisch indelen</SelectItem>
+                        {[
+                          { value: 1, label: "één scheidsrechter per wedstrijd" },
+                          { value: 2, label: "twee scheidsrechters per wedstrijd" },
+                          { value: 3, label: "drie scheidsrechters per wedstrijd" },
+                          { value: 4, label: "vier scheidsrechters per wedstrijd" },
+                          { value: 5, label: "vijf scheidsrechters per wedstrijd" },
+                        ].map((item) => (
+                          <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
