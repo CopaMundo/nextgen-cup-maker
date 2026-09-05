@@ -692,10 +692,21 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   }, [matches]);
 
   // === CLEAR SCHEDULE (alles of enkel de gekozen dag) ===
+  const getLocationFieldNames = (loc: string | null) => {
+    if (!loc || loc === "__unassigned") return new Set(fields.map(f => f.name));
+    return new Set(fields.filter(f => {
+      if (f.location) return f.location === loc;
+      return locations[0]?.name === loc;
+    }).map(f => f.name));
+  };
+
   const clearAllSchedule = async (scope: "all" | "day" = "all") => {
     const isDay = scope === "day";
+    const locFieldNames = getLocationFieldNames(selectedLocation);
     const scheduled = matches.filter(m =>
-      (m.match_date || m.match_time || m.field) && (!isDay || m.match_date === plannerDate)
+      (m.match_date || m.match_time || m.field) &&
+      (!isDay || m.match_date === plannerDate) &&
+      (!selectedLocation || !m.field || locFieldNames.has(m.field))
     );
     if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden om te wissen" }); return; }
     const ids = new Set(scheduled.map(m => m.id));
@@ -704,7 +715,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
     setMatches(prev => prev.map(m => ids.has(m.id) ? { ...m, match_date: null, match_time: null, field: null, referee: null } : m));
     if (!isDay) {
-      setPlannerBreaks([]);
+      setPlannerBreaks(prev => prev.filter(b => !b.fieldNames.some(fn => locFieldNames.has(fn))));
       setSchedFormats([]); setSchedGroups([]); setSchedRounds([]); setSchedFields([]);
     }
     toast({ title: `${scheduled.length} wedstrijden gewist uit planning` });
