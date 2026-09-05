@@ -3670,7 +3670,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => void clearRefereesFromDay()}
+                              onClick={() => setShowClearRefereesConfirm(true)}
                               className="w-full gap-1 text-xs text-destructive hover:text-destructive"
                             >
                               <RotateCcw className="h-3 w-3" /> Alle scheidsrechters uit schema
