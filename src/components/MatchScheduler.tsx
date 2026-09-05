@@ -3142,27 +3142,41 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             )}
                                             {refNames(m.referee).length > 0 && (
                                               <div
-                                                className="mt-0.5 flex flex-wrap gap-1"
-                                                onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); } }}
+                                                className={`mt-0.5 flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                                onDragOver={(e) => handleRefereeBadgeDragOver(e, m.id)}
+                                                onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefInsert(prev => prev?.matchId === m.id ? null : prev); }}
                                                 onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
                                               >
                                                 {refNames(m.referee).map((name, refIdx, arr) => (
-                                                  <span
-                                                    key={name}
-                                                    draggable
-                                                    data-ref-badge="true"
-                                                    onDragStart={(e) => startRefereeDrag(e, name, m.id)}
-                                                    onPointerDown={(e) => e.stopPropagation()}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    title={`Rol ${refIdx + 1}`}
-                                                    className="inline-flex items-center gap-0.5 rounded border border-border bg-muted px-1 py-0.5 text-[8px] font-semibold text-muted-foreground cursor-grab active:cursor-grabbing print:text-[9px]"
-                                                  >
-                                                    {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
-                                                    <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                  <span key={name} className="contents">
+                                                    {refInsert?.matchId === m.id && refInsert.index === refIdx && (
+                                                      <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
+                                                    )}
+                                                    <span
+                                                      draggable
+                                                      data-ref-badge="true"
+                                                      onDragStart={(e) => startRefereeDrag(e, name, m.id)}
+                                                      onDragEnd={endRefereeDrag}
+                                                      onPointerDown={(e) => e.stopPropagation()}
+                                                      onClick={(e) => e.stopPropagation()}
+                                                      title={`Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
+                                                      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
+                                                        refDragName === name
+                                                          ? "border-primary bg-primary/20 text-primary opacity-60 scale-95"
+                                                          : "border-border bg-muted text-muted-foreground"
+                                                      }`}
+                                                    >
+                                                      {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
+                                                      <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                    </span>
                                                   </span>
                                                 ))}
+                                                {refInsert?.matchId === m.id && refInsert.index >= refNames(m.referee).length && (
+                                                  <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
+                                                )}
                                               </div>
                                             )}
+
 
 
                                           </div>
