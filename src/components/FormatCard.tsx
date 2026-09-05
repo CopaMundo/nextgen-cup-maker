@@ -318,6 +318,7 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
     <>
       <div className="rounded-lg border border-border bg-card/50 overflow-hidden">
         <div className="flex items-center justify-between w-full p-3 hover:bg-foreground/[0.02] transition-colors">
+          {dragHandle}
            <div
             onClick={() => setExpanded(!expanded)}
             className="flex min-w-0 flex-1 items-center gap-2 text-left cursor-pointer"
