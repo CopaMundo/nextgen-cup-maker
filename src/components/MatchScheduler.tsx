@@ -1049,30 +1049,28 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
   };
 
-  /** Bepaal de insertiepositie binnen een wedstrijd op basis van de dichtstbijzijnde badge. */
-  const getRefereeInsertIndex = (container: HTMLElement, x: number, y: number, currentLength: number) => {
-    const children = Array.from(container.children).filter(
-      (el): el is HTMLElement => el instanceof HTMLElement && el.dataset.refBadge === "true"
-    );
-    if (children.length === 0) return 0;
+  /** Bepaal de insertiepositie binnen een wedstrijd op basis van de dichtstbijzijnde badge (client-coördinaten). */
+  const getRefereeInsertIndex = (container: HTMLElement, clientX: number, clientY: number, _currentLength?: number) => {
+    const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'));
+    if (badges.length === 0) return 0;
     let nearestIdx = 0;
     let nearestDist = Infinity;
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      const cx = child.offsetLeft + child.offsetWidth / 2;
-      const cy = child.offsetTop + child.offsetHeight / 2;
-      const dx = x - cx;
-      const dy = y - cy;
+    for (let i = 0; i < badges.length; i++) {
+      const r = badges[i].getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = clientX - cx;
+      const dy = clientY - cy;
       const dist = dx * dx + dy * dy;
       if (dist < nearestDist) {
         nearestDist = dist;
         nearestIdx = i;
       }
     }
-    const nearest = children[nearestIdx];
-    const cx = nearest.offsetLeft + nearest.offsetWidth / 2;
-    return x < cx ? nearestIdx : nearestIdx + 1;
+    const r = badges[nearestIdx].getBoundingClientRect();
+    return clientX < r.left + r.width / 2 ? nearestIdx : nearestIdx + 1;
   };
+
 
   /** Toon de invoegplek en laat de andere scheidsrechters live opschuiven. */
   const handleRefereeBadgeDragOver = (e: React.DragEvent, matchId: string) => {
@@ -1081,8 +1079,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
     const container = e.currentTarget as HTMLElement;
-    const rect = container.getBoundingClientRect();
-    const raw = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    const raw = getRefereeInsertIndex(container, e.clientX, e.clientY);
     const target = matches.find(m => m.id === matchId);
     const names = refNames(target?.referee);
     let index = raw;
@@ -1116,10 +1113,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!target) return;
     const current = refNames(target.referee);
     const container = e.currentTarget as HTMLElement;
-    const rect = container.getBoundingClientRect();
     const insertIndex = refInsert?.matchId === matchId
       ? refInsert.index
-      : getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, current.length);
+      : getRefereeInsertIndex(container, e.clientX, e.clientY);
 
     if (fromMatchId === matchId) {
       const withoutName = current.filter(n => n !== name);
