@@ -913,6 +913,45 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     setMatches(m => m.map(x => x.id === id ? { ...x, ...updates } : x));
   };
 
+  // === SCHEIDSRECHTER SLEPEN ===
+  const REF_DRAG_TYPE = "application/x-referee";
+  const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
+
+  const startRefereeDrag = (e: React.DragEvent, name: string, fromMatchId?: string) => {
+    e.dataTransfer.setData(REF_DRAG_TYPE, JSON.stringify({ name, fromMatchId: fromMatchId || null }));
+    e.dataTransfer.setData("text/plain", name);
+    e.dataTransfer.effectAllowed = "move";
+    e.stopPropagation();
+  };
+
+  const isRefereeDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes(REF_DRAG_TYPE);
+
+  const dropRefereeOnMatch = async (e: React.DragEvent, matchId: string) => {
+    if (!isRefereeDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    let payload: { name: string; fromMatchId: string | null };
+    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
+    const { name, fromMatchId } = payload;
+    if (!name || fromMatchId === matchId) return;
+
+    const target = matches.find(m => m.id === matchId);
+    if (!target) return;
+    const current = refNames(target.referee);
+    if (!current.includes(name)) {
+      const next = [...current, name].slice(-Math.max(1, refereesPerMatch));
+      await updateMatch(matchId, { referee: next.join(", ") || null } as any);
+    }
+    if (fromMatchId) {
+      const source = matches.find(m => m.id === fromMatchId);
+      if (source) {
+        const rest = refNames(source.referee).filter(n => n !== name);
+        await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
+      }
+    }
+  };
+
+
   const unscheduleMatch = async (id: string) => {
     await updateMatch(id, { match_date: null, match_time: null, field: null });
   };
