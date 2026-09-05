@@ -284,7 +284,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return !!sys?.no_draws;
   };
 
-  const resolveMatchNeedsDecider = (match: Match): boolean => {
+  const resolveMatchNeedsDecider = (match: Match, baseList?: Match[]): boolean => {
+    const matches = baseList ?? matchesState;
     if (!matchAllowsDecider(match)) return false;
 
     // Wedstrijden over meerdere ontmoetingen (Heen/Terug): geen beslissende score
