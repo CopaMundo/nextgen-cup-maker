@@ -289,7 +289,7 @@ const TournamentDetail = () => {
 
   return (
     <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
-      <Navbar />
+      <Navbar tournamentName={tournament?.name} />
       <ThemeSwitcher />
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
