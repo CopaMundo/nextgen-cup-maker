@@ -408,7 +408,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
     const sameAsPointsDefault =
       current.length === defaultPoints.length && current.every((v, i) => v === defaultPoints[i]);
     const initial = isSets && sameAsPointsDefault ? defaultSets : current;
-    setTiebreakerDraft([...initial]);
+    const fairplayEnabled = !!tournament?.enable_fairplay;
+    setTiebreakerDraft([...initial].filter((r) => r !== "fairplay" || fairplayEnabled));
     setH2hSubDraft([...(sys.h2h_sub_rules || ["points", "goal_difference", "goals_scored", "wins"])]);
     setH2hSubOpen(false);
     setTiebreakerEditId(sys.id);
@@ -417,7 +418,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const saveTiebreakers = async () => {
     if (!tiebreakerEditId) return;
     const id = tiebreakerEditId;
-    const updates = { tiebreaker_rules: tiebreakerDraft, h2h_sub_rules: h2hSubDraft };
+    const fairplayEnabled = !!tournament?.enable_fairplay;
+    const updates = {
+      tiebreaker_rules: tiebreakerDraft.filter((r) => r !== "fairplay" || fairplayEnabled),
+      h2h_sub_rules: h2hSubDraft,
+    };
     const count = await checkPlayedMatches();
     if (count > 0) {
       setConfirmAction({
@@ -707,12 +712,14 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         </p>
                         <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
                           <ol className="text-sm text-foreground space-y-1">
-                            {sys.tiebreaker_rules.map((rule, idx) => (
-                              <li key={`${sys.id}-${rule}`} className="flex gap-2">
-                                <span className="text-muted-foreground font-medium">{idx + 1}.</span>
-                                <span>{getTbLabel(rule)}</span>
-                              </li>
-                            ))}
+                            {sys.tiebreaker_rules
+                              .filter((rule) => rule !== "fairplay" || tournament?.enable_fairplay)
+                              .map((rule, idx) => (
+                                <li key={`${sys.id}-${rule}`} className="flex gap-2">
+                                  <span className="text-muted-foreground font-medium">{idx + 1}.</span>
+                                  <span>{getTbLabel(rule)}</span>
+                                </li>
+                              ))}
                           </ol>
                         </div>
                         <Button
