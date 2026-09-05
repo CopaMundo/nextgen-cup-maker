@@ -1026,14 +1026,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const target = matches.find(m => m.id === matchId);
     if (!target) return;
     const current = refNames(target.referee);
-    if (!current.includes(name)) {
-      if (current.length >= MAX_REFEREES) {
-        toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
-        return;
-      }
+    if (current.includes(name)) {
+      toast({ title: `${name} staat al bij deze wedstrijd`, variant: "destructive" });
+      return;
+    }
+    if (current.length >= MAX_REFEREES) {
+      toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
+      return;
+    }
+    {
       const next = [...current, name];
       await updateMatch(matchId, { referee: next.join(", ") || null } as any);
     }
+
 
     if (fromMatchId) {
       const source = matches.find(m => m.id === fromMatchId);
@@ -1124,7 +1129,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       return;
     }
 
-    if (!current.includes(name) && current.length >= MAX_REFEREES) {
+    if (current.includes(name)) {
+      toast({ title: `${name} staat al bij deze wedstrijd`, variant: "destructive" });
+      return;
+    }
+    if (current.length >= MAX_REFEREES) {
       toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
       return;
     }
@@ -2699,6 +2708,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const parsed = editMatchDuration.trim() === "" ? null : parseInt(editMatchDuration, 10);
     const dur = parsed != null && !isNaN(parsed) && parsed > 0 ? parsed : null;
     const refs = editMatchRefs.map(r => r.trim()).filter(Boolean);
+    const dupe = refs.find((r, i) => refs.indexOf(r) !== i);
+    if (dupe) {
+      toast({ title: `${dupe} staat op meerdere rollen`, description: "Een scheidsrechter kan maar één rol per wedstrijd hebben.", variant: "destructive" });
+      return;
+    }
     await updateMatch(editMatchId, { referee: refs.length ? refs.join(", ") : null, duration_minutes: dur } as any);
 
     setEditMatchId(null);
@@ -3936,11 +3950,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     </div>
                   ))}
                   {editMatchRefs.length < MAX_REFEREES && (
-                    <Button variant="outline" size="sm" className="gap-1 text-xs h-8" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
-                      <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
-                    </Button>
+                    <div className="pl-5 pt-1">
+                      <Button variant="outline" size="sm" className="gap-1 text-xs h-8 w-full justify-center" onClick={() => setEditMatchRefs(prev => [...prev, ""])}>
+                        <Plus className="h-3 w-3" /> Scheidsrechter toevoegen
+                      </Button>
+                    </div>
                   )}
-                  <p className="text-[11px] text-muted-foreground">De volgorde bepaalt de rol (1, 2, …). Maximaal {MAX_REFEREES}.</p>
                 </div>
 
                 <div className="space-y-1">
