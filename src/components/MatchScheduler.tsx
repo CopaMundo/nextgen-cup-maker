@@ -2861,7 +2861,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       {/* Planner only — no tabs */}
-      <div>
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
 
         {/* ===== PLANNER VIEW ===== */}
         <div className="print-planner-area flex-1 min-h-0 flex flex-col overflow-hidden">
