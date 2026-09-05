@@ -3185,9 +3185,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefInsert(prev => prev?.matchId === m.id ? null : prev); }}
                                                 onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
                                               >
-                                                {refNames(m.referee).map((name, refIdx, arr) => (
+                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === refIdx && (
+                                                    {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
                                                       <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
                                                     )}
                                                     <span
@@ -3200,7 +3200,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       title={`Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
                                                         refDragName === name
-                                                          ? "border-primary bg-primary/20 text-primary opacity-60 scale-95"
+                                                          ? "border-primary bg-primary/20 text-primary ring-1 ring-primary shadow-sm"
                                                           : "border-border bg-muted text-muted-foreground"
                                                       }`}
                                                     >
@@ -3209,10 +3209,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                     </span>
                                                   </span>
                                                 ))}
-                                                {refInsert?.matchId === m.id && refInsert.index >= refNames(m.referee).length && (
+                                                {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
                                                   <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
                                                 )}
                                               </div>
+
                                             )}
 
 
