@@ -2868,7 +2868,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className="py-2 print:hidden border-b border-border mb-0">
+            <div className="py-2 print:hidden border-b border-border mb-0 shrink-0">
               <DateStripNav
                 dates={tournamentDates}
                 activeDate={plannerDate}
