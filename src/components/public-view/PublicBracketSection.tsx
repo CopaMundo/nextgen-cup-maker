@@ -747,11 +747,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               )}
             </div>
             <div className="text-right flex-shrink-0 ml-auto">
-              {timeInHeader && (
-                <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                  {activeLegMatch?.match_name?.endsWith("(Terug)") ? "Terug" : "Heen"} {displayTimeStr}
-                </div>
-              )}
               {displayField && (
                 <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
                   <MapPin className="h-2 w-2" /> {displayField}
