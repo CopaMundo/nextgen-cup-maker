@@ -334,12 +334,12 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
             </button>
           </div>
           <div className="ml-3 flex shrink-0 items-center gap-1.5">
-            {canMoveUp && (
+            {!dragHandle && canMoveUp && (
               <button type="button" onClick={onMoveUp} className="text-muted-foreground hover:text-foreground" title="Naar boven">
                 <ArrowUp className="h-3.5 w-3.5" />
               </button>
             )}
-            {canMoveDown && (
+            {!dragHandle && canMoveDown && (
               <button type="button" onClick={onMoveDown} className="text-muted-foreground hover:text-foreground" title="Naar beneden">
                 <ArrowDown className="h-3.5 w-3.5" />
               </button>
