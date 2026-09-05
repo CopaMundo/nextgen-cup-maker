@@ -59,36 +59,27 @@ const SortableRow = ({
   dragLabel,
   onRename,
   onDelete,
-}: { id: string; label: string; dragLabel: string; onRename: () => void; onDelete: () => void }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  return (
-    <div
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(
-        "flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-3 py-2",
-        isDragging && "opacity-70 shadow-lg z-10 relative",
-      )}
-    >
-      <div className="flex items-center gap-1.5 min-w-0">
-        <button
-          type="button"
-          {...attributes}
-          {...listeners}
-          aria-label={dragLabel}
-          className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none"
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
-        <span className="text-foreground font-medium truncate">{label}</span>
-      </div>
-      <div className="flex items-center gap-1 shrink-0">
-        <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
-        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
-      </div>
-    </div>
-  );
-};
+}: { id: string; label: string; dragLabel: string; onRename: () => void; onDelete: () => void }) => (
+  <SortableRowShell
+    id={id}
+    dragLabel={dragLabel}
+    className="flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-3 py-2"
+  >
+    {(handle) => (
+      <>
+        <div className="flex items-center gap-1.5 min-w-0">
+          {handle}
+          <span className="text-foreground font-medium truncate">{label}</span>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+        </div>
+      </>
+    )}
+  </SortableRowShell>
+);
+
 
 
 const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate: (t: any) => void }) => {
