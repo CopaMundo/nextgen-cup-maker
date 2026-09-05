@@ -282,7 +282,7 @@ const TournamentDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
       <Navbar />
       <ThemeSwitcher />
       <div className="flex flex-1 overflow-hidden min-h-0">
