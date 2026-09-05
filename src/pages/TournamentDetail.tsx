@@ -224,34 +224,40 @@ const TournamentDetail = () => {
             )}
           </>
         );
-      case "schedule":
-        return (
+      case "schedule": {
+        const compactSelect = "h-7 w-44 rounded-md px-2 text-xs";
+        const scheduleSelectors = (
           <>
-            <div className="flex flex-wrap items-center gap-4 mb-4">
-              <CategorySelector
-                tournamentId={id!}
-                isMultiCategory={tournament.is_multi_category}
-                selectedCategoryId={selectedCategoryId}
-                onSelect={setSelectedCategoryId}
-              />
-              <LocationSelector
-                tournamentId={id!}
-                selectedLocation={selectedLocation}
-                onSelect={setSelectedLocation}
-              />
-            </div>
-            {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <MatchScheduler
-                tournamentId={id!}
-                tournament={tournament}
-                categoryId={effectiveCategoryId}
-                selectedLocation={selectedLocation}
-                onLocationChange={setSelectedLocation}
-                onManageReferees={goToRefereesTab}
-              />
-            )}
+            <CategorySelector
+              tournamentId={id!}
+              isMultiCategory={tournament.is_multi_category}
+              selectedCategoryId={selectedCategoryId}
+              onSelect={setSelectedCategoryId}
+              selectClassName={compactSelect}
+            />
+            <LocationSelector
+              tournamentId={id!}
+              selectedLocation={selectedLocation}
+              onSelect={setSelectedLocation}
+              selectClassName={compactSelect}
+            />
           </>
         );
+        const showScheduler = !tournament.is_multi_category || !!effectiveCategoryId;
+        return showScheduler ? (
+          <MatchScheduler
+            tournamentId={id!}
+            tournament={tournament}
+            categoryId={effectiveCategoryId}
+            selectedLocation={selectedLocation}
+            onLocationChange={setSelectedLocation}
+            onManageReferees={goToRefereesTab}
+            toolbarLeft={scheduleSelectors}
+          />
+        ) : (
+          <div className="flex flex-wrap items-center gap-3 mb-4">{scheduleSelectors}</div>
+        );
+      }
       case "results":
         return (
           <>

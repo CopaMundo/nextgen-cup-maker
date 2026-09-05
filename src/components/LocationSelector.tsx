@@ -13,11 +13,13 @@ const LocationSelector = ({
   selectedLocation,
   onSelect,
   className,
+  selectClassName,
 }: {
   tournamentId: string;
   selectedLocation: string | null;
   onSelect: (name: string | null) => void;
   className?: string;
+  selectClassName?: string;
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
 
@@ -55,7 +57,7 @@ const LocationSelector = ({
       <select
         value={selectedLocation || ""}
         onChange={(e) => onSelect(e.target.value || null)}
-        className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
+        className={cn("h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium", selectClassName)}
       >
         {locations.map((l) => (
           <option key={l.id} value={l.name}>

@@ -339,7 +339,7 @@ const DateStripNav = ({
   );
 };
 
-const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void }) => {
+const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
 
@@ -507,6 +507,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [activeDragPayload, setActiveDragPayload] = useState<PlannerDragPayload | null>(null);
   const pointerPositionRef = useRef({ x: 0, y: 0 });
   const unscheduledZoneRef = useRef<HTMLDivElement | null>(null);
+  const plannerSidebarRef = useRef<HTMLDivElement | null>(null);
 
   const { toast } = useToast();
   const hasAnyStats = tournament?.enable_goalscorers || tournament?.enable_assists || tournament?.enable_yellow_cards || tournament?.enable_red_cards;
@@ -1978,12 +1979,32 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       if (now - lastPreviewUpdate.current < 16) return;
       lastPreviewUpdate.current = now;
 
+      // Rechterplanner heeft voorrang: overal in dat paneel loslaten = ontplannen.
+      // (Veldkolommen kunnen horizontaal onder de planner doorlopen, dus eerst checken.)
+      const sidebarEl = plannerSidebarRef.current;
+      if (sidebarEl) {
+        const sr = sidebarEl.getBoundingClientRect();
+        if (e.clientX >= sr.left && e.clientX <= sr.right && e.clientY >= sr.top && e.clientY <= sr.bottom) {
+          setDragOverField("__unscheduled__");
+          setDragOverIndex(getUnscheduledMatches().length);
+          setPreviewField(null);
+          setPreviewIndex(null);
+          return;
+        }
+      }
+
+      // Enkel het zichtbare deel van de veldkolommen telt (niet wat horizontaal weggescrold is)
+      const scrollRect = plannerScrollRef.current?.getBoundingClientRect();
+      const insideVisibleFields = !scrollRect || (e.clientX >= scrollRect.left && e.clientX <= scrollRect.right);
+
       let foundField: string | null = null;
-      for (const [fieldName, el] of fieldColumnRefs.current.entries()) {
-        const rect = el.getBoundingClientRect();
-        if (e.clientX >= rect.left - 10 && e.clientX <= rect.right + 10) {
-          foundField = fieldName;
-          break;
+      if (insideVisibleFields) {
+        for (const [fieldName, el] of fieldColumnRefs.current.entries()) {
+          const rect = el.getBoundingClientRect();
+          if (e.clientX >= rect.left - 10 && e.clientX <= rect.right + 10) {
+            foundField = fieldName;
+            break;
+          }
         }
       }
 
@@ -3011,6 +3032,35 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <div className="flex gap-0 mt-2 items-start">
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative">
+              {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
+                <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="outline" size="sm" onClick={() => {
+                    setDraftMatchDuration(globalMatchDuration);
+                    setDraftBreakDuration(globalBreakDuration);
+                    setDraftPerFormat(perFormatDurationEnabled);
+                    setDraftPhaseConfigs(phases.reduce((acc, p) => {
+                      const cfg = (p.match_config as any) || {};
+                      acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
+                      return acc;
+                    }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
+                    setShowDurationDialog(true);
+                  }} className="gap-1 text-xs h-7">
+                    <Settings className="h-3 w-3" /> Wedstrijdduur
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPlannerCollapsed((v) => !v)}
+                    className="h-7 w-7 p-0"
+                    title={plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
+                    aria-label={plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
+                  >
+                    {plannerCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
+                  </Button>
+                </div>
+              </div>
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
@@ -3051,32 +3101,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                 return (
                   <div>
-                    {/* Action bar — Wedstrijdduur + planner collapse */}
-                    <div className="sticky top-0 z-10 flex items-center justify-end gap-1 mb-1 bg-background/95 backdrop-blur-sm py-1 print:hidden">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setDraftMatchDuration(globalMatchDuration);
-                        setDraftBreakDuration(globalBreakDuration);
-                        setDraftPerFormat(perFormatDurationEnabled);
-                        setDraftPhaseConfigs(phases.reduce((acc, p) => {
-                          const cfg = (p.match_config as any) || {};
-                          acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
-                          return acc;
-                        }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
-                        setShowDurationDialog(true);
-                      }} className="gap-1 text-xs h-7">
-                        <Settings className="h-3 w-3" /> Wedstrijdduur
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPlannerCollapsed((v) => !v)}
-                        className="gap-1 text-xs h-7"
-                        title={plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
-                      >
-                        {plannerCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
-                        {plannerCollapsed ? "Planner tonen" : "Planner inklappen"}
-                      </Button>
-                    </div>
+
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-0 min-w-0">
@@ -3427,6 +3452,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {/* ===== RIGHT SIDEBAR ===== */}
             {!plannerCollapsed && (
             <div
+              ref={plannerSidebarRef}
               className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 self-start h-[calc(100vh-6rem)] overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
               onDragOver={(e) => {
                 if (!hasPlannerDragData(e)) return;
