@@ -1088,8 +1088,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       if (current > endOfDay) break;
       result.push({ time: minutesToTime(current), minuteStart: current });
       current += globalMatchDuration + globalBreakDuration;
-      const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-      if (breakHere) current += breakHere.duration;
+      const breaksHere = fieldBreaks.filter(b => b.afterSlotIndex === i);
+      for (const bh of breaksHere) current += bh.duration;
     }
     return result;
   };
