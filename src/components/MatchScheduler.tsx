@@ -2960,7 +2960,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   : "border-border bg-card hover:border-primary/50 hover:shadow-md"
                                           }`}
                                         >
-                                          <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation">
+                                          <div
+                                            onClick={() => handleMobileTapMatch(m.id)}
+                                            className="touch-manipulation"
+                                            onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; } }}
+                                            onDrop={(e) => dropRefereeOnMatch(e, m.id)}
+                                          >
+
                                             {/* Time row */}
                                             <div className="flex items-center justify-between mb-1">
                                               <div className="flex items-center gap-1">
