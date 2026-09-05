@@ -3579,41 +3579,67 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       <Settings className="h-3 w-3" /> Scheidsrechters beheren
                     </Button>
 
-                    {/* Lijst van scheidsrechters (sleepbaar naar een wedstrijd) */}
-                    {referees.length === 0 ? (
-                      <div className="text-center py-6">
-                        <WhistleIcon className="h-10 w-10 mx-auto text-muted-foreground/30 mb-2" />
-                        <p className="text-xs text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {refereeConfigs.map((rc, i) => {
-                          const r = rc.name;
-                          const count = matches.filter(m => refNames(m.referee).includes(r)).length;
-                          return (
-                            <span
-                              key={i}
-                              draggable
-                              onDragStart={(e) => startRefereeDrag(e, r)}
-                              title="Sleep naar een wedstrijd"
-                              className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground cursor-grab active:cursor-grabbing hover:border-primary/60"
-                            >
-                              <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
-                              {r}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
+                    {/* Lijst van scheidsrechters (sleepbaar naar een wedstrijd, sleep terug om te verwijderen) */}
+                    <div
+                      onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setRefListDropActive(true); } }}
+                      onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefListDropActive(false); }}
+                      onDrop={dropRefereeOnList}
+                      className={`rounded-lg border-2 border-dashed p-2 transition-colors ${refListDropActive ? "border-primary bg-primary/10" : "border-transparent"}`}
+                    >
+                      {referees.length === 0 ? (
+                        <div className="text-center py-6">
+                          <WhistleIcon className="h-10 w-10 mx-auto text-muted-foreground/30 mb-2" />
+                          <p className="text-xs text-muted-foreground">Nog geen scheidsrechters. Voeg je eerste scheidsrechter toe.</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {refereeConfigs.map((rc, i) => {
+                            const r = rc.name;
+                            const count = matches.filter(m => refNames(m.referee).includes(r)).length;
+                            return (
+                              <span
+                                key={i}
+                                draggable
+                                onDragStart={(e) => startRefereeDrag(e, r)}
+                                onDragEnd={endRefereeDrag}
+                                title="Sleep naar een wedstrijd"
+                                className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground cursor-grab active:cursor-grabbing hover:border-primary/60"
+                              >
+                                <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
+                                {r}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {refDragName && (
+                        <p className="mt-2 text-[10px] text-center text-muted-foreground">Laat hier los om {refDragName} uit de wedstrijd te halen</p>
+                      )}
+                    </div>
 
 
                     {/* Scheidsrechters toewijzen */}
                     <div className="pt-2 border-t border-border space-y-2">
                       <h4 className="text-xs font-semibold text-foreground">Scheidsrechters toewijzen</h4>
-                      <Button variant="outline" size="sm" onClick={autoAssignReferees} className="w-full gap-1 text-xs">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const locFieldNames = getLocationFieldNames(selectedLocation);
+                          const alreadyAssigned = matches.filter(m =>
+                            m.match_date === plannerDate && m.match_time && m.field &&
+                            (!selectedLocation || locFieldNames.has(m.field)) &&
+                            refNames(m.referee).length > 0
+                          ).length;
+                          if (alreadyAssigned > 0) setConfirmAssignOpen(true);
+                          else void autoAssignReferees(true);
+                        }}
+                        className="w-full gap-1 text-xs"
+                      >
                         <UserCheck className="h-3 w-3" /> Indelen op {plannerDate ? formatIsoDateForLocale(plannerDate) : "schema"}
                       </Button>
                     </div>
+
                   </div>
                 )}
 
