@@ -294,10 +294,10 @@ const TournamentDetail = () => {
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
-          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-4 gap-1 print:hidden min-h-0 overflow-y-auto">
+          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-2 gap-0.5 print:hidden min-h-0 overflow-hidden">
             {tournament.logo_url && (
-              <div className="mb-3 pb-3 border-b border-border">
-                <img src={tournament.logo_url} alt="" className="h-10 w-10 rounded-lg object-contain" />
+              <div className="mb-2 pb-2 border-b border-border shrink-0">
+                <img src={tournament.logo_url} alt="" className="h-8 w-8 rounded-lg object-contain" />
               </div>
             )}
             {sidebarItems.map(item => (
@@ -306,14 +306,14 @@ const TournamentDetail = () => {
                   <button
                     onClick={() => setActiveTab(item.id)}
                     className={cn(
-                      "w-16 py-2 rounded-lg flex flex-col items-center gap-1 transition-all duration-150",
+                      "w-16 flex-1 min-h-0 max-h-[56px] py-1 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all duration-150 overflow-hidden",
                       activeTab === item.id
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     )}
                   >
                     <item.icon className="h-5 w-5" />
-                    <span className="text-[10px] font-medium leading-tight">{item.label}</span>
+                    <span className="text-[10px] font-medium leading-tight truncate w-full text-center">{item.label}</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="text-xs">
