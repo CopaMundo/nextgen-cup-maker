@@ -23,6 +23,11 @@ const LocationSelector = ({
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
 
+  const truncateName = (name: string) => {
+    if (name.length > 20) return name.slice(0, 17) + "...";
+    return name;
+  };
+
   useEffect(() => {
     supabase
       .from("tournament_locations")
