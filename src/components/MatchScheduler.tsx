@@ -2678,7 +2678,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!editMatchId) return;
     const parsed = editMatchDuration.trim() === "" ? null : parseInt(editMatchDuration, 10);
     const dur = parsed != null && !isNaN(parsed) && parsed > 0 ? parsed : null;
-    await updateMatch(editMatchId, { referee: editMatchReferee || null, duration_minutes: dur } as any);
+    const refs = editMatchRefs.map(r => r.trim()).filter(Boolean);
+    await updateMatch(editMatchId, { referee: refs.length ? refs.join(", ") : null, duration_minutes: dur } as any);
+
     setEditMatchId(null);
     toast({ title: "Wedstrijd bijgewerkt" });
   };
