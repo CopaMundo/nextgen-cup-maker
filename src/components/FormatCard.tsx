@@ -44,12 +44,13 @@ interface FormatCardProps {
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   initialExpanded?: boolean;
+  dragHandle?: ReactNode;
 }
 
 interface AffectedGroup { id: string; name: string; current: string | null; }
 interface AffectedMatch { id: string; label: string; current: string | null; }
 
-const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, categoryId, refreshKey, onSlotChange, onMoveUp, onMoveDown, canMoveUp, canMoveDown, initialExpanded }: FormatCardProps) => {
+const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, categoryId, refreshKey, onSlotChange, onMoveUp, onMoveDown, canMoveUp, canMoveDown, initialExpanded, dragHandle }: FormatCardProps) => {
   const [expanded, setExpanded] = useState(initialExpanded ?? false);
   const [uploading, setUploading] = useState(false);
   const [confirmMode, setConfirmMode] = useState<"auto" | "empty" | null>(null);
