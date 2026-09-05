@@ -916,11 +916,27 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // === SCHEIDSRECHTER SLEPEN ===
   const REF_DRAG_TYPE = "application/x-referee";
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
+  const [refDropMatchId, setRefDropMatchId] = useState<string | null>(null);
+
+  /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
+  const setRefereeDragImage = (e: React.DragEvent, name: string) => {
+    if (typeof document === "undefined") return;
+    const ghost = document.createElement("div");
+    ghost.textContent = name;
+    ghost.style.cssText =
+      "position:fixed;top:-1000px;left:-1000px;padding:4px 10px;border-radius:9999px;" +
+      "background:hsl(var(--card));color:hsl(var(--foreground));border:2px solid hsl(var(--primary));" +
+      "font-size:12px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.25);white-space:nowrap;";
+    document.body.appendChild(ghost);
+    try { e.dataTransfer.setDragImage(ghost, 12, 12); } catch { /* noop */ }
+    window.setTimeout(() => ghost.remove(), 0);
+  };
 
   const startRefereeDrag = (e: React.DragEvent, name: string, fromMatchId?: string) => {
     e.dataTransfer.setData(REF_DRAG_TYPE, JSON.stringify({ name, fromMatchId: fromMatchId || null }));
     e.dataTransfer.setData("text/plain", name);
     e.dataTransfer.effectAllowed = "move";
+    setRefereeDragImage(e, name);
     e.stopPropagation();
   };
 
@@ -930,6 +946,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!isRefereeDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
+    setRefDropMatchId(null);
     let payload: { name: string; fromMatchId: string | null };
     try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
     const { name, fromMatchId } = payload;
@@ -950,6 +967,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       }
     }
   };
+
+  /** Volgorde bepaalt de rol (1 = eerste scheidsrechter). */
+  const moveRefereeInMatch = async (matchId: string, index: number, dir: -1 | 1) => {
+    const match = matches.find(m => m.id === matchId);
+    if (!match) return;
+    const names = refNames(match.referee);
+    const target = index + dir;
+    if (target < 0 || target >= names.length) return;
+    [names[index], names[target]] = [names[target], names[index]];
+    await updateMatch(matchId, { referee: names.join(", ") } as any);
+  };
+
 
 
   const unscheduleMatch = async (id: string) => {
