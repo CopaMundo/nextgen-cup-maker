@@ -3437,7 +3437,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           ? (allSelected ? "Alle poules/brackets" : `${selectedCount} geselecteerd`)
                           : "Selecteer poules/brackets";
                         return (
-                          <div className="space-y-1 relative">
+                          <div className="space-y-1 relative" ref={dropdownBracketsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer poules/brackets</Label>}
                             <button
                               onClick={() => openDropdown("brackets")}
@@ -3491,7 +3491,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           ? (allSelected ? "Alle rondes" : `${selectedCount} geselecteerd`)
                           : "Selecteer rondes";
                         return (
-                          <div className="space-y-1 relative">
+                          <div className="space-y-1 relative" ref={dropdownRoundsRef}>
                             {hasSelection && !noBracketsSelected && <Label className="text-[10px] text-muted-foreground">Selecteer rondes</Label>}
                             <button
                               onClick={() => openDropdown("rounds")}
@@ -3561,7 +3561,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             ? (allSelected ? "Alle velden" : `${selectedCount} geselecteerd`)
                             : "Selecteer velden";
                         return (
-                          <div className="space-y-1 relative">
+                          <div className="space-y-1 relative" ref={dropdownFieldsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer velden</Label>}
                             <button
                               onClick={() => hasFields && openDropdown("fields")}
