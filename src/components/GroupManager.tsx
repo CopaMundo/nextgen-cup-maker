@@ -940,6 +940,7 @@ const GroupManager = ({
               </button>
             )}
           </div>
+          </DndContext>
         </>
       )}
 
