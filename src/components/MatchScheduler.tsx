@@ -2859,7 +2859,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const availableRounds = getAvailableRounds();
 
   return (
-    <div className="space-y-4">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Planner only — no tabs */}
       <div>
 
