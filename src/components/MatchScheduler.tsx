@@ -405,11 +405,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [filterRound, setFilterRound] = useState<string>("all");
 
   // UI toggles
-  const [showRefAdd, setShowRefAdd] = useState(false);
-  const [newRef, setNewRef] = useState("");
   const addFieldDialogRef = useDialogFocus(showAddFieldDialog);
   const editFieldDialogRef = useDialogFocus(editFieldIdx !== null);
-  const addRefDialogRef = useDialogFocus(showRefAdd);
   const editRefDialogRef = useDialogFocus(editRefIdx !== null);
 
   // Planner state
