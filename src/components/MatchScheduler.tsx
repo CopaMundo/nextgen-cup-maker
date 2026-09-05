@@ -451,21 +451,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // Close dropdowns on click outside the specific open dropdown wrapper
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const openRefs = [
-        dropdownOpenBrackets && dropdownBracketsRef.current,
-        dropdownOpenRounds && dropdownRoundsRef.current,
-        dropdownOpenFields && dropdownFieldsRef.current,
-      ].filter(Boolean) as HTMLDivElement[];
-      if (openRefs.length > 0 && !openRefs.some((ref) => ref.contains(target))) {
-        setDropdownOpenBrackets(false);
-        setDropdownOpenRounds(false);
-        setDropdownOpenFields(false);
-      }
+      const target = e.target as HTMLElement | null;
+      const anyOpen = dropdownOpenBrackets || dropdownOpenRounds || dropdownOpenFields;
+      if (!anyOpen) return;
+      // Only clicks on the trigger button or inside the open panel count as "inside"
+      if (target && target.closest('[data-dd-inside="true"]')) return;
+      setDropdownOpenBrackets(false);
+      setDropdownOpenRounds(false);
+      setDropdownOpenFields(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handler, true);
+    return () => document.removeEventListener("mousedown", handler, true);
   }, [dropdownOpenBrackets, dropdownOpenRounds, dropdownOpenFields]);
+
 
   const openDropdown = (which: "brackets" | "rounds" | "fields") => {
     setDropdownOpenBrackets(which === "brackets" ? v => !v : false);
@@ -3488,7 +3486,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <div className="space-y-1 relative" ref={dropdownBracketsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer poules/brackets</Label>}
                             <button
-                              onClick={() => openDropdown("brackets")}
+                              onClick={() => openDropdown("brackets")} data-dd-inside="true"
                               className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors"
                             >
                               <span className="flex items-center gap-1 truncate">
@@ -3504,7 +3502,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && (
-                              <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                                 {options.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground">Alles is ingepland</div>
                                 ) : (
@@ -3542,7 +3540,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <div className="space-y-1 relative" ref={dropdownRoundsRef}>
                             {hasSelection && !noBracketsSelected && <Label className="text-[10px] text-muted-foreground">Selecteer rondes</Label>}
                             <button
-                              onClick={() => openDropdown("rounds")}
+                              onClick={() => openDropdown("rounds")} data-dd-inside="true"
                               className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors"
                             >
                               <span className="flex items-center gap-1 truncate">
@@ -3558,7 +3556,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && (
-                              <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                                 {unscheduledMatches.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground">Alles is ingepland</div>
                                 ) : noBracketsSelected ? (
@@ -3612,7 +3610,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           <div className="space-y-1 relative" ref={dropdownFieldsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer velden</Label>}
                             <button
-                              onClick={() => hasFields && openDropdown("fields")}
+                              onClick={() => hasFields && openDropdown("fields")} data-dd-inside="true"
                               disabled={!hasFields}
                               className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -3629,7 +3627,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && hasFields && (
-                              <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                              <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                                 <label className="flex items-center gap-2 px-3 py-2 text-xs cursor-pointer hover:bg-secondary/50 border-b border-border font-semibold">
                                   <Checkbox checked={allSelected} onCheckedChange={() => setSchedFields(allSelected ? [] : plannerFields.map(f => f.name))} className="h-3.5 w-3.5" />
                                   Alle velden
