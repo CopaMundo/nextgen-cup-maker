@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
