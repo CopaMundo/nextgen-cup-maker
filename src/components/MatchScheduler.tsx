@@ -3792,6 +3792,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     data-planner-drop-zone="true"
                     onDragOver={(e) => {
                       if (!hasPlannerDragData(e)) return;
+                      const inner = (e.target as HTMLElement).closest('[data-planner-drop-zone="true"]');
+                      if (inner && inner !== e.currentTarget) return;
                       e.preventDefault();
                       setDragOverField("__unscheduled__");
                       setDragOverIndex(getUnscheduledMatches().length);
