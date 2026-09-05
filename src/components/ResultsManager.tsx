@@ -356,7 +356,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     } as any).eq("id", match.id);
     if (error) {
       toast({ title: "Fout", description: error.message, variant: "destructive" });
-      return;
+      return base;
     }
 
     let updatedMatches = base.map(x => x.id === match.id ? {
@@ -375,7 +375,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         : match.match_name;
       updatedMatches = await clearDownstreamTeams(baseForClear, updatedMatches, match.phase_id);
       setMatches(updatedMatches);
-      return;
+      return updatedMatches;
     }
 
     if (finalIsPlayed && match.match_name) {
@@ -441,6 +441,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       }
     }
     setMatches(updatedMatches);
+    return updatedMatches;
   };
 
   const updatePhaseCompletionState = async (phaseFormats: Phase[], completed: boolean) => {
@@ -2484,10 +2485,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               });
               setMatches(nextList);
 
+              let listAfter = nextList;
               if (updatedHeen) {
-                await saveScore(updatedHeen, nextList);
+                listAfter = (await saveScore(updatedHeen, listAfter)) ?? listAfter;
               }
-              await saveScore(updatedMatch, nextList);
+              await saveScore(updatedMatch, listAfter);
             }}
           />
         );
