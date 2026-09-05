@@ -942,6 +942,60 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     setMatches(m => m.map(x => x.id === id ? { ...x, ...updates } : x));
   };
 
+  // === HEEN/TERUG SYNCHRONISATIE OP BASIS VAN SCHEMA ===
+  // Bij home & away is de eerst geplande wedstrijd altijd de Heen-wedstrijd en
+  // de tweede de Terug-wedstrijd: het schema heeft prioriteit op de volgorde
+  // van aanmaak. Na elke planningswijziging controleren we de paren en
+  // wisselen we de labels (incl. penalty-oriëntatie) indien nodig.
+  const haScheduleKey = (m: Match): string => {
+    const scheduled = !!(m.match_date && m.match_time && m.field);
+    return `${scheduled ? "0" : "1"}|${m.match_date || "9999-12-31"}|${m.match_time || "99:99"}|${m.field || "~~~"}|${String(m.round_number ?? 0).padStart(4, "0")}|${m.id}`;
+  };
+
+  const syncHALegNames = async (list: Match[]) => {
+    const pairs = new Map<string, Match[]>();
+    for (const m of list) {
+      const mm = m.match_name?.match(/^(.+)\s+\((Heen|Terug)\)$/);
+      if (!mm) continue;
+      const key = `${m.phase_id}|${m.group_id ?? ""}|${mm[1]}`;
+      const arr = pairs.get(key) || [];
+      arr.push(m);
+      pairs.set(key, arr);
+    }
+    const next = list.map(m => ({ ...m }));
+    const byId = new Map(next.map(m => [m.id, m]));
+    const swapped: Match[] = [];
+    for (const arr of pairs.values()) {
+      if (arr.length !== 2) continue;
+      const ordered = [...arr].sort((a, b) => haScheduleKey(a).localeCompare(haScheduleKey(b)));
+      const first = ordered[0];
+      if (first.match_name!.endsWith("(Heen)")) continue;
+      const oldHeen = arr.find(m => m.match_name!.endsWith("(Heen)"))!;
+      const oldTerug = arr.find(m => m.match_name!.endsWith("(Terug)"))!;
+      const base = oldHeen.match_name!.replace(/\s+\(Heen\)$/, "");
+      const newHeen = byId.get(oldTerug.id)!;
+      const newTerug = byId.get(oldHeen.id)!;
+      newHeen.match_name = `${base} (Heen)`;
+      newTerug.match_name = `${base} (Terug)`;
+      // Penalties leven op de Heen-wedstrijd in Heen-oriëntatie. De nieuwe
+      // Heen-wedstrijd heeft omgekeerde thuis/uit, dus de waarden wisselen mee.
+      newHeen.home_penalties = oldHeen.away_penalties;
+      newHeen.away_penalties = oldHeen.home_penalties;
+      newTerug.home_penalties = null;
+      newTerug.away_penalties = null;
+      swapped.push(newHeen, newTerug);
+    }
+    if (swapped.length === 0) return;
+    setMatches(next);
+    for (const m of swapped) {
+      await supabase.from("matches").update({
+        match_name: m.match_name,
+        home_penalties: m.home_penalties,
+        away_penalties: m.away_penalties,
+      }).eq("id", m.id);
+    }
+  };
+
   // === SCHEIDSRECHTER SLEPEN ===
   const REF_DRAG_TYPE = "application/x-referee";
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
