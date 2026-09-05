@@ -3426,7 +3426,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
             {/* ===== RIGHT SIDEBAR ===== */}
             {!plannerCollapsed && (
-            <div className="w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col h-full overflow-hidden overscroll-contain">
+            <div
+              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 self-start h-[calc(100vh-6rem)] overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
+              onDragOver={(e) => {
+                if (!hasPlannerDragData(e)) return;
+                e.preventDefault();
+                setDragOverField("__unscheduled__");
+                setDragOverIndex(getUnscheduledMatches().length);
+              }}
+              onDrop={(e) => {
+                if (!hasPlannerDragData(e)) return;
+                void handleDropToUnscheduled(e, getUnscheduledMatches().length);
+              }}
+            >
               {/* Tab icons */}
               <div className="flex border-b border-border">
                 <button
