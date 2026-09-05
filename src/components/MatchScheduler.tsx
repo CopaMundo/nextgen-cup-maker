@@ -339,7 +339,7 @@ const DateStripNav = ({
   );
 };
 
-const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void }) => {
+const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
 
