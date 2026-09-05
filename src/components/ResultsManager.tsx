@@ -285,17 +285,51 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
   const resolveMatchNeedsDecider = (match: Match): boolean => {
+    if (!matchAllowsDecider(match)) return false;
+
+    // Wedstrijden over meerdere ontmoetingen (Heen/Terug): geen beslissende score
+    // per leg — enkel op de Heen-wedstrijd wanneer alle legs gespeeld zijn én de
+    // totaalscore gelijk is.
+    const ha = match.match_name?.match(/^(.+)\s+\((Heen|Terug)\)$/);
+    if (ha) {
+      if (ha[2] !== "Heen") return false; // beslissing leeft op de Heen-wedstrijd
+      const terug = matches.find(m => m.match_name === `${ha[1]} (Terug)` && m.group_id === match.group_id);
+      if (!terug) return false;
+      if (match.home_score === null || match.away_score === null) return false;
+      if (terug.home_score === null || terug.away_score === null) return false;
+      // Aggregaat in Heen-oriëntatie: Terug home/away zijn omgewisseld
+      const aggHome = match.home_score + terug.away_score;
+      const aggAway = match.away_score + terug.home_score;
+      return aggHome === aggAway;
+    }
+
+    // Meerdere ontmoetingen met identieke naam (zonder Heen/Terug-suffix):
+    // enkel de eerste wedstrijd draagt de beslissing, en pas als alles gespeeld
+    // is en het totaal gelijk is.
+    if (match.match_name) {
+      const siblings = matches
+        .filter(m => m.phase_id === match.phase_id && m.match_name === match.match_name)
+        .sort((a, b) => (a.round_number ?? 0) - (b.round_number ?? 0));
+      if (siblings.length > 1) {
+        if (siblings[0].id !== match.id) return false;
+        if (!siblings.every(m => m.home_score !== null && m.away_score !== null)) return false;
+        const aggHome = siblings.reduce((s, m) => s + (m.home_score ?? 0), 0);
+        const aggAway = siblings.reduce((s, m) => s + (m.away_score ?? 0), 0);
+        return aggHome === aggAway;
+      }
+    }
+
     const isTied = match.home_score !== null && match.away_score !== null && match.home_score === match.away_score;
-    if (!isTied) return false;
-    return matchAllowsDecider(match);
+    return isTied;
   };
 
 
   const saveScore = async (match: Match) => {
     const isPlayed = match.home_score !== null && match.away_score !== null;
-    // H&A legs: tied is OK per leg — penalties resolve aggregate ties on the Heen match
+    // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Heen-match
+    // wanneer alle legs gespeeld zijn en het aggregaat gelijk is.
     const isHALeg = !!match.match_name?.match(/\s+\((Heen|Terug)\)$/);
-    const needsPenalties = isHALeg ? false : resolveMatchNeedsDecider(match);
+    const needsPenalties = resolveMatchNeedsDecider(match);
     const hasPenalties = match.home_penalties !== null && match.away_penalties !== null && match.home_penalties !== match.away_penalties;
     const finalIsPlayed = isPlayed && (!needsPenalties || hasPenalties);
 
