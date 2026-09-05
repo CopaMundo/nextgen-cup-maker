@@ -248,6 +248,13 @@ export interface StandingRow {
   gf: number;
   ga: number;
   gd: number;
+  /** Home/away splits (used by home/away sub-criteria) */
+  gfHome: number;
+  gaHome: number;
+  gfAway: number;
+  gaAway: number;
+  wHome: number;
+  wAway: number;
   pts: number;
   bonus: number;
   fairplay: number;
@@ -286,6 +293,30 @@ const resolveGroupTiebreakers = (
   return { rules, h2hSubRules };
 };
 
+/** Split a (sub)criterion into its base rule and optional home/away scope. */
+export const parseTiebreakerRule = (rule: string): { base: string; scope: "total" | "home" | "away" } => {
+  if (rule.endsWith("_home")) return { base: rule.slice(0, -5), scope: "home" };
+  if (rule.endsWith("_away")) return { base: rule.slice(0, -5), scope: "away" };
+  return { base: rule, scope: "total" };
+};
+
+interface H2HStats {
+  pts: number; gd: number; gf: number; w: number;
+  gdHome: number; gdAway: number;
+  gfHome: number; gfAway: number;
+  wHome: number; wAway: number;
+}
+
+/** Value of a head-to-head sub-criterion for one team. */
+const h2hKey = (st: H2HStats, sub: string): number => {
+  const { base, scope } = parseTiebreakerRule(sub);
+  if (base === "points") return st.pts;
+  if (base === "goal_difference") return scope === "home" ? st.gdHome : scope === "away" ? st.gdAway : st.gd;
+  if (base === "goals_scored") return scope === "home" ? st.gfHome : scope === "away" ? st.gfAway : st.gf;
+  if (base === "wins") return scope === "home" ? st.wHome : scope === "away" ? st.wAway : st.w;
+  return 0;
+};
+
 /**
  * Compute head-to-head mini-standings between a subset of tied teams.
  * Returns a Map of teamId → { pts, gd, gf, w } based ONLY on matches between them.
@@ -297,10 +328,14 @@ const computeHeadToHead = (
   phases: StandingPhase[],
   scoringSystems: ScoringSystem[],
   tournament: TournamentDefaults | null | undefined,
-): Map<string, { pts: number; gd: number; gf: number; w: number }> => {
+): Map<string, H2HStats> => {
   const set = new Set(tiedTeamIds);
-  const result = new Map<string, { pts: number; gd: number; gf: number; w: number }>();
-  tiedTeamIds.forEach((id) => result.set(id, { pts: 0, gd: 0, gf: 0, w: 0 }));
+  const result = new Map<string, H2HStats>();
+  const blank = (): H2HStats => ({
+    pts: 0, gd: 0, gf: 0, w: 0,
+    gdHome: 0, gdAway: 0, gfHome: 0, gfAway: 0, wHome: 0, wAway: 0,
+  });
+  tiedTeamIds.forEach((id) => result.set(id, blank()));
 
   matches.forEach((m) => {
     if (!m.is_played) return;
@@ -311,11 +346,11 @@ const computeHeadToHead = (
     const as = m.away_score ?? 0;
     const home = result.get(m.home_team_id)!;
     const away = result.get(m.away_team_id)!;
-    home.gf += hs; home.gd += hs - as;
-    away.gf += as; away.gd += as - hs;
-    if (hs > as) { home.pts += adv.homePoints; away.pts += adv.awayPoints; home.w++; }
-    else if (hs < as) { away.pts += adv.awayPoints; home.pts += adv.homePoints; away.w++; }
-    else { home.pts += adv.homePoints; away.pts += adv.awayPoints; }
+    home.gf += hs; home.gd += hs - as; home.gfHome += hs; home.gdHome += hs - as;
+    away.gf += as; away.gd += as - hs; away.gfAway += as; away.gdAway += as - hs;
+    home.pts += adv.homePoints; away.pts += adv.awayPoints;
+    if (hs > as) { home.w++; home.wHome++; }
+    else if (hs < as) { away.w++; away.wAway++; }
   });
   return result;
 };
@@ -366,11 +401,7 @@ const applyTiebreakers = (
         const ha = h2h.get(a.teamId)!;
         const hb = h2h.get(b.teamId)!;
         for (const sub of h2hSubRules) {
-          let diff = 0;
-          if (sub === "points") diff = hb.pts - ha.pts;
-          else if (sub === "goal_difference") diff = hb.gd - ha.gd;
-          else if (sub === "goals_scored") diff = hb.gf - ha.gf;
-          else if (sub === "wins") diff = hb.w - ha.w;
+          const diff = h2hKey(hb, sub) - h2hKey(ha, sub);
           if (diff !== 0) return diff;
         }
         return 0;
@@ -385,13 +416,7 @@ const applyTiebreakers = (
           j < subset.length &&
           (() => {
             const hb = h2h.get(subset[j].teamId)!;
-            return h2hSubRules.every((sub) => {
-              if (sub === "points") return hb.pts === ha.pts;
-              if (sub === "goal_difference") return hb.gd === ha.gd;
-              if (sub === "goals_scored") return hb.gf === ha.gf;
-              if (sub === "wins") return hb.w === ha.w;
-              return true;
-            });
+            return h2hSubRules.every((sub) => h2hKey(hb, sub) === h2hKey(ha, sub));
           })()
         ) j++;
         next.push(...resolveTied(subset.slice(i, j), ruleIdx + 1));
@@ -406,12 +431,16 @@ const applyTiebreakers = (
     }
 
     // fairplay & least_cards: lower is better
-    const lowerIsBetter = rule === "fairplay" || rule === "least_cards";
+    const { base, scope } = parseTiebreakerRule(rule);
+    const lowerIsBetter = base === "fairplay" || base === "least_cards";
     const getKey = (r: StandingRow): number => {
-      switch (rule) {
-        case "goal_difference": return r.gd;
-        case "goals_scored": return r.gf;
-        case "wins": return r.w;
+      switch (base) {
+        case "goal_difference":
+          return scope === "home" ? r.gfHome - r.gaHome : scope === "away" ? r.gfAway - r.gaAway : r.gd;
+        case "goals_scored":
+          return scope === "home" ? r.gfHome : scope === "away" ? r.gfAway : r.gf;
+        case "wins":
+          return scope === "home" ? r.wHome : scope === "away" ? r.wAway : r.w;
         case "fairplay": return r.fairplay;
         case "least_cards": return 0; // not tracked
         default: return 0;
@@ -461,6 +490,7 @@ export const calculateGroupStandings = (
 
   let rows: StandingRow[] = gts.map((gt) => {
     let w = 0, d = 0, l = 0, gf = 0, ga = 0, pts = 0;
+    let gfHome = 0, gaHome = 0, gfAway = 0, gaAway = 0, wHome = 0, wAway = 0;
     groupMatches.forEach((m) => {
       const isHome = m.home_team_id === gt.team_id;
       const isAway = m.away_team_id === gt.team_id;
@@ -469,8 +499,9 @@ export const calculateGroupStandings = (
       const own = (isHome ? m.home_score : m.away_score) ?? 0;
       const opp = (isHome ? m.away_score : m.home_score) ?? 0;
       gf += own; ga += opp;
+      if (isHome) { gfHome += own; gaHome += opp; } else { gfAway += own; gaAway += opp; }
       const myPts = isHome ? adv.homePoints : adv.awayPoints;
-      if (own > opp) { w++; pts += myPts; }
+      if (own > opp) { w++; if (isHome) wHome++; else wAway++; pts += myPts; }
       else if (own === opp) { d++; pts += myPts; }
       else { l++; pts += myPts; }
     });
@@ -478,6 +509,7 @@ export const calculateGroupStandings = (
       pos: 0,
       teamId: gt.team_id,
       gp: w + d + l, w, d, l, gf, ga, gd: gf - ga,
+      gfHome, gaHome, gfAway, gaAway, wHome, wAway,
       pts: pts + gt.bonus_points,
       bonus: gt.bonus_points,
       fairplay: gt.fairplay_points ?? 0,
