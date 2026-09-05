@@ -1092,9 +1092,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const current = refNames(target.referee);
     const container = e.currentTarget as HTMLElement;
     const rect = container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const insertIndex = getRefereeInsertIndex(container, x, y, current.length);
+    const insertIndex = refInsert?.matchId === matchId
+      ? refInsert.index
+      : getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, current.length);
 
     if (fromMatchId === matchId) {
       const withoutName = current.filter(n => n !== name);
@@ -1104,10 +1104,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       return;
     }
 
+    if (!current.includes(name) && current.length >= MAX_REFEREES) {
+      toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
+      return;
+    }
     const withoutName = current.filter(n => n !== name);
     const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
-    const max = Math.max(1, refereesPerMatch);
-    const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)].slice(-max);
+    const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)];
     await updateMatch(matchId, { referee: next.join(", ") || null } as any);
 
     if (fromMatchId && fromMatchId !== matchId) {
@@ -1118,6 +1121,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       }
     }
   };
+
 
 
 
