@@ -1263,7 +1263,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
   const unscheduleMatch = async (id: string) => {
-    await updateMatch(id, { match_date: null, match_time: null, field: null });
+    await supabase.from("matches").update({ match_date: null, match_time: null, field: null }).eq("id", id);
+    const next = matches.map(x => x.id === id ? { ...x, match_date: null, match_time: null, field: null } : x);
+    setMatches(next);
+    await syncHALegNames(next);
   };
 
   const getMatchLabel = (id: string | null, slotLabel: string | null) => {
@@ -1934,6 +1937,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       await supabase.from("matches").update(updatePayload).eq("id", u.id);
     }
 
+    await syncHALegNames(newMatches);
+
     // No structural conflict warnings needed — matches from the same round can play simultaneously
   };
 
@@ -2009,6 +2014,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     for (const u of dbUpdates) {
       await supabase.from("matches").update({ match_time: u.match_time }).eq("id", u.id);
     }
+
+    await syncHALegNames(newMatches);
 
     setUnscheduledOrder((prev) => {
       const next = prev.filter((id) => id !== matchId);
@@ -2373,6 +2380,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       }
     }
     setMatches(updatedMatches);
+    await syncHALegNames(updatedMatches);
     setSchedFormats([]); setSchedGroups([]); setSchedRounds([]); setSchedFields([]);
     toast({ title: `${updates.length} wedstrijden gepland!` });
   };
@@ -2569,6 +2577,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       }
     }
     setMatches(updatedMatches);
+    await syncHALegNames(updatedMatches);
     toast({ title: `${updates.length} wedstrijden gepland voor volledig toernooi!` });
   };
 
@@ -2925,6 +2934,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       if (u.match_time !== undefined) updatePayload.match_time = u.match_time;
       await supabase.from("matches").update(updatePayload).eq("id", u.id);
     }
+    await syncHALegNames(newMatches);
     toast({ title: "Wedstrijd geplaatst" });
   };
 
