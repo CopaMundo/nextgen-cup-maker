@@ -1007,9 +1007,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (!target) return;
     const current = refNames(target.referee);
     if (!current.includes(name)) {
-      const next = [...current, name].slice(-Math.max(1, refereesPerMatch));
+      if (current.length >= MAX_REFEREES) {
+        toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
+        return;
+      }
+      const next = [...current, name];
       await updateMatch(matchId, { referee: next.join(", ") || null } as any);
     }
+
     if (fromMatchId) {
       const source = matches.find(m => m.id === fromMatchId);
       if (source) {
