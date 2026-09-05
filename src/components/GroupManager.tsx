@@ -37,8 +37,8 @@ interface Phase {
 type MatchType = "single_leg" | "home_away" | "multiple" | "rounds";
 
 const COMPETITION_TYPES: { value: MatchType; label: string; desc: string }[] = [
-  { value: "single_leg", label: "SINGLE LEG", desc: "Elk team speelt één keer tegen elk ander team in de poule" },
-  { value: "home_away", label: "HOME & AWAY", desc: "Elk team speelt twee keer tegen elk ander team in de poule (thuis & uit)" },
+  { value: "single_leg", label: "ENKELE WEDSTRIJD", desc: "Elk team speelt één keer tegen elk ander team in de poule" },
+  { value: "home_away", label: "HEEN EN TERUG", desc: "Elk team speelt twee keer tegen elk ander team in de poule (thuis & uit)" },
   { value: "multiple", label: "MEERDERE ONTMOETINGEN", desc: "Elk team speelt meerdere keren tegen elke tegenstander in de poule" },
   { value: "rounds", label: "SPEELRONDES", desc: "Bepaal zelf het totaal aantal wedstrijden dat elk team moet spelen" },
 ];

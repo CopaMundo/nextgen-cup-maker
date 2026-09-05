@@ -73,7 +73,7 @@ export const resolveScoringSystem = (
  * Options:
  *   - includeLeg: when true, append "(Heen)" / "(Terug)" derived from match_name.
  *   - includeScoring: when true, append "(N sets)" or "(beste van N)".
- *   - haPairLabel: when set (e.g. "Home & Away"), used for the bracket chip
+ *   - haPairLabel: when set (e.g. "Heen en terug"), used for the bracket chip
  *     where one chip represents both legs — overrides the leg suffix.
  */
 export const getMatchFormatSuffix = (

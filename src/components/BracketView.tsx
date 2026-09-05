@@ -2665,7 +2665,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                           scoringSystems as any,
                           phases as any,
                           groups as any,
-                          { haPairLabel: matchIsHA ? "Home & Away" : undefined }
+                          { haPairLabel: matchIsHA ? "Heen en terug" : undefined }
                         );
                         return (
                           <span className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
@@ -3341,8 +3341,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 <Label className="text-sm font-medium">Wedstrijdformat</Label>
                 <div className="space-y-2">
                   {[
-                    { value: "single_leg" as const, label: "SINGLE LEG", desc: "Er wordt één beslissende wedstrijd gespeeld" },
-                    { value: "home_away" as const, label: "HOME & AWAY", desc: "Er worden twee wedstrijden gespeeld: één thuis en één uit" },
+                    { value: "single_leg" as const, label: "ENKELE WEDSTRIJD", desc: "Er wordt één beslissende wedstrijd gespeeld" },
+                    { value: "home_away" as const, label: "HEEN EN TERUG", desc: "Er worden twee wedstrijden gespeeld: één thuis en één uit" },
                   ].map(opt => (
                     <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${matchSettingsMatchType === opt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
                       <input
@@ -3376,8 +3376,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 <Label className="text-sm font-medium">Wedstrijdformat</Label>
                 <div className="space-y-2">
                   {[
-                    { value: "single_leg" as const, label: "SINGLE LEG", desc: "Eén beslissende wedstrijd" },
-                    { value: "home_away" as const, label: "HOME & AWAY", desc: "Heen- en terugwedstrijd" },
+                    { value: "single_leg" as const, label: "ENKELE WEDSTRIJD", desc: "Eén beslissende wedstrijd" },
+                    { value: "home_away" as const, label: "HEEN EN TERUG", desc: "Heen- en terugwedstrijd" },
                   ].map(opt => (
                     <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${matchSettingsMatchType === opt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
                       <input

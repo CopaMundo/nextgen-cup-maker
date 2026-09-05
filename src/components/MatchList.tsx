@@ -215,7 +215,7 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
               <Zap className="h-4 w-4" /> Single
             </Button>
             <Button variant="outline" onClick={() => generateMatches(false)}>
-              <Zap className="h-4 w-4" /> Home & Away
+              <Zap className="h-4 w-4" /> Heen en terug
             </Button>
           </>
         )}

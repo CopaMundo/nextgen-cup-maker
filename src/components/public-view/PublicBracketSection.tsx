@@ -616,7 +616,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       scoringSystems as any,
       (phases ?? []) as any,
       (groups ?? []) as any,
-      { haPairLabel: matchIsHA ? "Home & Away" : undefined }
+      { haPairLabel: matchIsHA ? "Heen en terug" : undefined }
     );
     const displayName = baseDisplayName ? `${baseDisplayName}${displayNameSuffix}` : baseDisplayName;
 
