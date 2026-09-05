@@ -1979,12 +1979,32 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       if (now - lastPreviewUpdate.current < 16) return;
       lastPreviewUpdate.current = now;
 
+      // Rechterplanner heeft voorrang: overal in dat paneel loslaten = ontplannen.
+      // (Veldkolommen kunnen horizontaal onder de planner doorlopen, dus eerst checken.)
+      const sidebarEl = plannerSidebarRef.current;
+      if (sidebarEl) {
+        const sr = sidebarEl.getBoundingClientRect();
+        if (e.clientX >= sr.left && e.clientX <= sr.right && e.clientY >= sr.top && e.clientY <= sr.bottom) {
+          setDragOverField("__unscheduled__");
+          setDragOverIndex(getUnscheduledMatches().length);
+          setPreviewField(null);
+          setPreviewIndex(null);
+          return;
+        }
+      }
+
+      // Enkel het zichtbare deel van de veldkolommen telt (niet wat horizontaal weggescrold is)
+      const scrollRect = plannerScrollRef.current?.getBoundingClientRect();
+      const insideVisibleFields = !scrollRect || (e.clientX >= scrollRect.left && e.clientX <= scrollRect.right);
+
       let foundField: string | null = null;
-      for (const [fieldName, el] of fieldColumnRefs.current.entries()) {
-        const rect = el.getBoundingClientRect();
-        if (e.clientX >= rect.left - 10 && e.clientX <= rect.right + 10) {
-          foundField = fieldName;
-          break;
+      if (insideVisibleFields) {
+        for (const [fieldName, el] of fieldColumnRefs.current.entries()) {
+          const rect = el.getBoundingClientRect();
+          if (e.clientX >= rect.left - 10 && e.clientX <= rect.right + 10) {
+            foundField = fieldName;
+            break;
+          }
         }
       }
 
