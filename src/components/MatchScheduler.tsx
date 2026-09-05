@@ -3648,11 +3648,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </SelectTrigger>
                       <SelectContent>
                         {[
-                          { value: 1, label: "één scheidsrechter per wedstrijd" },
-                          { value: 2, label: "twee scheidsrechters per wedstrijd" },
-                          { value: 3, label: "drie scheidsrechters per wedstrijd" },
-                          { value: 4, label: "vier scheidsrechters per wedstrijd" },
-                          { value: 5, label: "vijf scheidsrechters per wedstrijd" },
+                          { value: 1, label: "Één scheidsrechter per wedstrijd" },
+                          { value: 2, label: "Twee scheidsrechters per wedstrijd" },
+                          { value: 3, label: "Drie scheidsrechters per wedstrijd" },
+                          { value: 4, label: "Vier scheidsrechters per wedstrijd" },
+                          { value: 5, label: "Vijf scheidsrechters per wedstrijd" },
                         ].map((item) => (
                           <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>
                         ))}
