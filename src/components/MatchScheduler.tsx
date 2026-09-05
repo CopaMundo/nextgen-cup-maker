@@ -3786,7 +3786,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                 {/* ===== ONGEPLAND TAB ===== */}
                 {rightSidebarTab === "ongepland" && (
-                  <div className="space-y-3" ref={unscheduledZoneRef}>
+                  <div
+                    className={`space-y-3 flex-1 min-h-0 flex flex-col rounded-lg transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "ring-2 ring-primary/50 bg-primary/5" : ""}`}
+                    ref={unscheduledZoneRef}
+                    data-planner-drop-zone="true"
+                    onDragOver={(e) => {
+                      if (!hasPlannerDragData(e)) return;
+                      e.preventDefault();
+                      setDragOverField("__unscheduled__");
+                      setDragOverIndex(getUnscheduledMatches().length);
+                    }}
+                    onDrop={(e) => void handleDropToUnscheduled(e, getUnscheduledMatches().length)}
+                  >
                     <h3 className="font-display text-sm font-bold text-foreground">Niet gepland ({getUnscheduledMatches().length}/{matches.length})</h3>
 
                     {/* Sidebar filters */}
