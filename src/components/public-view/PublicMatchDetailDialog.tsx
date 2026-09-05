@@ -115,13 +115,14 @@ const PublicMatchDetailDialog = ({
     const base = getBaseMatchName(match.match_name) || match.match_name || "";
     titleSub = `${base}${formatSuffix}`.trim();
   } else {
-    // Group phase
-    titleMain = group?.name || phase?.name || "";
+    // Group phase → format/phase name on top, group name underneath
+    titleMain = phase?.name || group?.name || "";
     const parts: string[] = [];
-    if (match.match_name) parts.push(getBaseMatchName(match.match_name));
+    if (group?.name && group.name !== phase?.name) parts.push(group.name);
     if (formatSuffix) parts.push(formatSuffix.trim());
     titleSub = parts.filter(Boolean).join(" · ");
   }
+
 
   // Resolve teams + names (use slot-aware label resolver so TBD slot labels work too)
   const homeTeam = teams.find((t) => t.id === heenMatch?.home_team_id);
