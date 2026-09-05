@@ -3894,6 +3894,29 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Bevestiging: bestaande scheidsrechtersindeling overschrijven */}
+      <AlertDialog open={confirmAssignOpen} onOpenChange={setConfirmAssignOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bestaande indeling overschrijven?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Er zijn al scheidsrechters toegewezen op {plannerDate ? formatIsoDateForLocale(plannerDate) : "deze dag"}
+              {selectedLocation ? ` (${selectedLocation})` : ""}. Wil je die vervangen door een nieuwe indeling, of enkel de wedstrijden zonder scheidsrechter invullen?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <Button variant="outline" onClick={() => { setConfirmAssignOpen(false); void autoAssignReferees(false); }}>
+              Enkel lege aanvullen
+            </Button>
+            <AlertDialogAction onClick={() => { setConfirmAssignOpen(false); void autoAssignReferees(true); }}>
+              Overschrijven
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {hasAnyStats && (() => {
         const sm = selectedStatsMatchId ? matches.find(m => m.id === selectedStatsMatchId) : null;
         const smPhase = sm ? phases.find(p => p.id === sm.phase_id) : null;
