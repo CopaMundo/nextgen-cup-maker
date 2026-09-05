@@ -1049,7 +1049,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return x < cx ? nearestIdx : nearestIdx + 1;
   };
 
-  /** Toon een duidelijke invoegstreep tussen de scheidsrechters tijdens het slepen. */
+  /** Toon de invoegplek en laat de andere scheidsrechters live opschuiven. */
   const handleRefereeBadgeDragOver = (e: React.DragEvent, matchId: string) => {
     if (!isRefereeDrag(e)) return;
     e.preventDefault();
@@ -1057,10 +1057,23 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     e.dataTransfer.dropEffect = "move";
     const container = e.currentTarget as HTMLElement;
     const rect = container.getBoundingClientRect();
-    const index = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    const raw = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    const target = matches.find(m => m.id === matchId);
+    const names = refNames(target?.referee);
+    let index = raw;
+    // Binnen dezelfde wedstrijd staat het gesleepte vakje al in de weergave: corrigeer de index.
+    if (refDragName && refDragFromMatchId === matchId && names.includes(refDragName)) {
+      const shown = displayRefNames(matchId, target?.referee);
+      const pos = shown.indexOf(refDragName);
+      if (pos >= 0 && raw > pos) index = raw - 1;
+      index = Math.max(0, Math.min(index, names.length - 1));
+    } else {
+      index = Math.max(0, Math.min(index, names.length));
+    }
     setRefDropMatchId(matchId);
     setRefInsert(prev => (prev && prev.matchId === matchId && prev.index === index ? prev : { matchId, index }));
   };
+
 
   /** Sleep een scheidsrechter naar links/rechts in dezelfde wedstrijd om de rolvolgorde te wijzigen,
    *  of vanuit de lijst/een andere wedstrijd om hem toe te voegen op die positie. */
