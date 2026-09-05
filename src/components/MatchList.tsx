@@ -195,14 +195,6 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
   const phaseMatches = matches.filter((m) => m.phase_id === selectedPhase);
   const currentPhase = phases.find(p => p.id === selectedPhase);
 
-  // Group matches by round
-  const rounds = new Map<number, Match[]>();
-  phaseMatches.forEach((m) => {
-    const r = m.round_number || 0;
-    if (!rounds.has(r)) rounds.set(r, []);
-    rounds.get(r)!.push(m);
-  });
-
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>;
 
   return (
@@ -229,20 +221,14 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
         )}
       </div>
 
-      {/* Match cards grouped by round */}
+      {/* Match cards */}
       {phaseMatches.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border py-12 text-center">
           <p className="text-muted-foreground">Nog geen wedstrijden in deze fase</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {Array.from(rounds.entries()).sort((a, b) => a[0] - b[0]).map(([roundNum, roundMatches]) => (
-            <div key={roundNum}>
-              {roundNum > 0 && (
-                <h3 className="font-display text-sm font-bold text-muted-foreground mb-2">Speelronde {roundNum}</h3>
-              )}
-              <div className="space-y-3">
-                {roundMatches.map((match) => (
+        <div className="space-y-3">
+          {phaseMatches.map((match) => (
                   <div key={match.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
                     <div className="grid grid-cols-3 gap-2 items-center">
                       <select
@@ -292,9 +278,6 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
                       </Button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
           ))}
         </div>
       )}

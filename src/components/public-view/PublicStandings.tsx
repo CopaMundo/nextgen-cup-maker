@@ -79,7 +79,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   const [selectedPhaseNum, setSelectedPhaseNum] = useState<number | null>(autoPhaseNum);
   const [selectedFormatId, setSelectedFormatId] = useState<string | null>(initialPhaseId || null);
   const [expandedGroupSchedule, setExpandedGroupSchedule] = useState<string | null>(null);
-  const [selectedRoundFilter, setSelectedRoundFilter] = useState<string>("all");
 
   // Keep selectedPhaseNum in sync when data changes (e.g. phase undo)
   useEffect(() => {
@@ -227,7 +226,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                   const standings = calcStandings(group.id);
                   const colors = getPhaseColors(format.id);
                   const groupMatches = matches.filter((m: any) => m.group_id === group.id);
-                  const roundNumbers = [...new Set(groupMatches.map((m: any) => m.round_number).filter(Boolean))].sort((a, b) => a - b);
                   const isExpanded = expandedGroupSchedule === group.id;
                   const setsMode = isSetsGroup(group.id, groups as any, phases as any, (scoringSystems || []) as any);
                   const setPts = setsMode ? computeSetPointTotals(group.id, matches as any) : null;
@@ -361,19 +359,8 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                           </button>
                           {isExpanded && (
                             <div className="px-3 pb-3 space-y-2">
-                              {roundNumbers.length > 1 && (
-                              <div className="flex gap-1 overflow-x-auto pb-1">
-                                  <button onClick={() => setSelectedRoundFilter("all")}
-                                    className={`${ds(bStyle, "phaseTab")} ${selectedRoundFilter === "all" ? ds(bStyle, "phaseTabActive") : ds(bStyle, "phaseTabInactive")}`}>Alle</button>
-                                  {roundNumbers.map((r: number) => (
-                                    <button key={r} onClick={() => setSelectedRoundFilter(String(r))}
-                                      className={`${ds(bStyle, "phaseTab")} ${selectedRoundFilter === String(r) ? ds(bStyle, "phaseTabActive") : ds(bStyle, "phaseTabInactive")}`}>R{r}</button>
-                                  ))}
-                                </div>
-                              )}
                               <div className="p-2 space-y-2">
                               {groupMatches
-                                  .filter((m: any) => selectedRoundFilter === "all" || String(m.round_number) === selectedRoundFilter)
                                   .map((m: any) => {
                                     const positions = getMatchTeamPositions(m, groupTeams || [], matches, groups, phases, scoringSystems || [], tournament);
                                     return (

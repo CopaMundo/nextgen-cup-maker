@@ -118,7 +118,6 @@ const PublicMatchDetailDialog = ({
     // Group phase
     titleMain = group?.name || phase?.name || "";
     const parts: string[] = [];
-    if (match.round_number) parts.push(`Ronde ${match.round_number}`);
     if (match.match_name) parts.push(getBaseMatchName(match.match_name));
     if (formatSuffix) parts.push(formatSuffix.trim());
     titleSub = parts.filter(Boolean).join(" · ");
