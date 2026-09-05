@@ -983,7 +983,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-semibold text-foreground">Fairplayklassement</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">Alleen zichtbaar in de beheeromgeving, niet op de publieke toernooiwebsite.</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Alleen zichtbaar in de beheeromgeving. Je kunt fairplay ook toevoegen als criterium bij gelijke punten in de puntentelling.</p>
                     </div>
                     <Switch
                       checked={form.enable_fairplay}
