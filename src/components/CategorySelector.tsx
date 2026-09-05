@@ -14,12 +14,14 @@ const CategorySelector = ({
   selectedCategoryId,
   onSelect,
   className,
+  selectClassName,
 }: {
   tournamentId: string;
   isMultiCategory: boolean;
   selectedCategoryId: string | null;
   onSelect: (id: string | null) => void;
   className?: string;
+  selectClassName?: string;
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -60,7 +62,7 @@ const CategorySelector = ({
       <select
         value={selectedCategoryId || ""}
         onChange={(e) => onSelect(e.target.value || null)}
-        className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
+        className={cn("h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium", selectClassName)}
       >
         {categories.map((c) => (
           <option key={c.id} value={c.id}>
