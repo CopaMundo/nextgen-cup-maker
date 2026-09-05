@@ -536,6 +536,93 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
   const removeTb = (idx: number) => setTiebreakerDraft((prev) => prev.filter((_, i) => i !== idx));
   const addTb = (value: string) => setTiebreakerDraft((prev) => [...prev, value]);
   const removeH2h = (idx: number) => setH2hSubDraft((prev) => prev.filter((_, i) => i !== idx));
+
+  /** Subcriteria (totaal / thuis / uit) voor doelsaldo, doelpunten en overwinningen. */
+  const renderScopeEditor = (rule: string, group: "main" | "h2h") => {
+    if (!SCOPED_RULES.includes(rule)) return null;
+    const scopes = group === "main" ? scopeDraft : h2hScopeDraft;
+    const setScopes = group === "main" ? setScopeDraft : setH2hScopeDraft;
+    const list = scopes[rule]?.length ? scopes[rule] : ["total"];
+    const setList = (next: string[]) => setScopes((prev) => ({ ...prev, [rule]: next }));
+    const key = `${group}-${rule}`;
+    const open = openScopes.includes(key);
+    const baseLabel = group === "main" ? getTbLabel(rule, editingIsSets) : getH2hLabel(rule, editingIsSets);
+    const available = SCOPE_OPTIONS.filter((o) => !list.includes(o.value));
+    return (
+      <div className="ml-6 mt-1.5 mb-1">
+        <button
+          type="button"
+          onClick={() => toggleScopeOpen(key)}
+          className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium"
+        >
+          {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          Subcriteria aanpassen
+          <span className="relative group/info">
+            <Info className="h-3 w-3 text-muted-foreground" />
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-60 px-2.5 py-1.5 rounded-md bg-popover border border-border text-xs text-popover-foreground shadow-md opacity-0 group-hover/info:opacity-100 pointer-events-none z-50 transition-opacity">
+              Standaard geldt {baseLabel.toLowerCase()} over alle wedstrijden. Voeg thuis of uit toe om daarna enkel de thuis- of uitwedstrijden te vergelijken.
+            </span>
+          </span>
+        </button>
+        {open && (
+          <>
+            <SortableVerticalList
+              items={list}
+              getId={(sc) => sc}
+              onReorder={(next) => setList(next)}
+              className="space-y-1 mt-1.5"
+            >
+              {list.map((sc, sIdx) => (
+                <SortableRowShell
+                  key={`${key}-${sc}`}
+                  id={sc}
+                  dragLabel="Subcriterium verplaatsen"
+                  className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5"
+                  handleClassName="[&>svg]:h-3 [&>svg]:w-3"
+                >
+                  {(subHandle) => (
+                    <>
+                      {subHandle}
+                      <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
+                      <span className="text-xs text-foreground flex-1">
+                        {baseLabel}{sc === "home" ? " thuis" : sc === "away" ? " uit" : " totaal"}
+                      </span>
+                      {list.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setList(list.filter((_, i) => i !== sIdx))}
+                          className="text-muted-foreground hover:text-destructive"
+                          aria-label="Subcriterium verwijderen"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </SortableRowShell>
+              ))}
+            </SortableVerticalList>
+            {available.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button type="button" className="mt-1.5 flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
+                    <Plus className="h-3 w-3" /> Subcriterium toevoegen
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {available.map((o) => (
+                    <DropdownMenuItem key={o.value} onClick={() => setList([...list, o.value])}>
+                      {baseLabel}{o.value === "home" ? " thuis" : o.value === "away" ? " uit" : " totaal"}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
   const addH2h = (value: string) => setH2hSubDraft((prev) => [...prev, value]);
 
   const saveName = async (id: string) => {
@@ -1111,6 +1198,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           <X className="h-3.5 w-3.5" />
                         </button>
                       </div>
+                      {renderScopeEditor(rule, "main")}
                       {rule === "head_to_head" && (
                         <div className="ml-6 mt-1.5 mb-1">
                           <button
@@ -1140,17 +1228,19 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                     key={`h2h-${sub}`}
                                     id={sub}
                                     dragLabel="Subcriterium verplaatsen"
-                                    className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5"
                                     handleClassName="[&>svg]:h-3 [&>svg]:w-3"
                                   >
                                     {(subHandle) => (
                                       <>
-                                        {subHandle}
-                                        <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
-                                        <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
-                                        <button type="button" onClick={() => removeH2h(sIdx)} className="text-muted-foreground hover:text-destructive" aria-label="Subcriterium verwijderen">
-                                          <X className="h-3 w-3" />
-                                        </button>
+                                        <div className="flex items-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-2.5 py-1.5">
+                                          {subHandle}
+                                          <span className="text-xs text-muted-foreground w-4">{sIdx + 1}.</span>
+                                          <span className="text-xs text-foreground flex-1">{getH2hLabel(sub, editingIsSets)}</span>
+                                          <button type="button" onClick={() => removeH2h(sIdx)} className="text-muted-foreground hover:text-destructive" aria-label="Subcriterium verwijderen">
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </div>
+                                        {renderScopeEditor(sub, "h2h")}
                                       </>
                                     )}
                                   </SortableRowShell>
