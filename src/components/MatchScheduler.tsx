@@ -2730,10 +2730,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     const dur = fieldMatches[i].duration_minutes ?? matchCfg.phaseDuration ?? globalMatchDuration;
                     const brk = matchCfg.phaseBreak ?? globalBreakDuration;
                     currentTime += dur + brk;
-                    const breakHere = fieldBreaks.find(b => b.afterSlotIndex === i);
-                    if (breakHere) {
-                      items.push({ kind: "break", startMin: currentTime, idx: i, brk: breakHere });
-                      currentTime += breakHere.duration;
+                    const breaksHere = fieldBreaks.filter(b => b.afterSlotIndex === i);
+                    for (const bh of breaksHere) {
+                      items.push({ kind: "break", startMin: currentTime, idx: i, brk: bh });
+                      currentTime += bh.duration;
                     }
                   }
                   return { field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime: minutesToTime(currentTime) };
