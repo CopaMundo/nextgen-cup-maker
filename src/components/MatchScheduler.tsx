@@ -3613,19 +3613,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         </DialogContent>
       </Dialog>
 
-      {/* Scheidsrechter toevoegen dialog */}
-      <Dialog open={showRefAdd} onOpenChange={(open) => { if (!open) { setShowRefAdd(false); setNewRef(""); } }}>
-        <DialogContent ref={addRefDialogRef} className="max-w-xs">
-          <DialogHeader>
-            <DialogTitle className="text-sm">Scheidsrechter toevoegen</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam" className="h-9 text-sm" onKeyDown={(e) => e.key === "Enter" && addReferee()} />
-            <Button size="sm" onClick={addReferee} disabled={!newRef.trim()} className="w-full">Toevoegen</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       {/* Scheidsrechter bewerken dialog */}
       <Dialog open={editRefIdx !== null} onOpenChange={(open) => { if (!open) { setEditRefIdx(null); setEditRefName(""); } }}>
         <DialogContent ref={editRefDialogRef} className="max-w-xs">
