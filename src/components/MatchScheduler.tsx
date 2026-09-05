@@ -3611,7 +3611,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </SelectTrigger>
                       <SelectContent>
                         {["Eén", "Twee", "Drie", "Vier", "Vijf"].map((label, i) => (
-                          <SelectItem key={i + 1} value={String(i + 1)}>{label} scheidsrechter{i > 0 ? "s" : ""} per wedstrijd</SelectItem>
+                          <SelectItem key={i + 1} value={String(i + 1)}>{label} scheidsrechter{i > 0 ? "s" : ""} bij automatisch indelen</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
