@@ -927,6 +927,7 @@ const GroupManager = ({
         </div>
       ) : (
         <>
+          <DndContext sensors={slotSensors} collisionDetection={closestCenter} onDragEnd={handleSlotDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {groups.map((g) => renderGroupCard(g))}
             {(phaseType === "group" || phaseType === "round_robin") && (
