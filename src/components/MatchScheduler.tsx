@@ -2890,7 +2890,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
           {/* Locatiekiezer — enkel bij meerdere locaties (fallback wanneer niet via TournamentDetail bestuurd) */}
           {!isLocationControlled && locations.length > 1 && (
-            <div className="flex items-center gap-2 py-2 print:hidden border-b border-border">
+            <div className="flex items-center gap-2 py-2 print:hidden border-b border-border shrink-0">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
               <select
                 value={selectedLocation || ""}
