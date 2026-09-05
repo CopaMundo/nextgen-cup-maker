@@ -944,6 +944,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
   const [refListDropActive, setRefListDropActive] = useState(false);
   const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
+  const [showClearRefereesConfirm, setShowClearRefereesConfirm] = useState(false);
 
   const MAX_REFEREES = 5;
   /** Weergaveorde van de scheidsrechters van een wedstrijd, met live opschuiven tijdens het slepen. */
