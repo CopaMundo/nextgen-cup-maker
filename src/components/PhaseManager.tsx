@@ -1259,25 +1259,32 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         .map((container) => (
           <div key={container.phaseNumber}>
             <div className="space-y-3">
-              {/* Format cards - always visible, individually collapsible */}
-              {container.formats.map((format, formatIdx) => (
-                <FormatCard
-                  key={format.id}
-                  format={format}
-                  tournamentId={tournamentId}
-                  allFormats={allFormats}
-                  onRemove={removeFormat}
-                  onUpdate={updateFormat}
-                  categoryId={categoryId}
-                  refreshKey={slotRefreshKey}
-                  onSlotChange={() => setSlotRefreshKey(k => k + 1)}
-                  canMoveUp={formatIdx > 0}
-                  canMoveDown={formatIdx < container.formats.length - 1}
-                  onMoveUp={() => formatIdx > 0 && swapFormats(format, container.formats[formatIdx - 1])}
-                  onMoveDown={() => formatIdx < container.formats.length - 1 && swapFormats(format, container.formats[formatIdx + 1])}
-                  initialExpanded={format.id === newlyCreatedId}
-                />
-              ))}
+              {/* Format cards - sleepbaar binnen de fase */}
+              <SortableVerticalList
+                items={container.formats}
+                getId={(f) => f.id}
+                onReorder={(next) => reorderFormats(next)}
+                className="space-y-3"
+              >
+                {container.formats.map((format) => (
+                  <SortableRowShell key={format.id} id={format.id} dragLabel="Format verplaatsen">
+                    {(handle) => (
+                      <FormatCard
+                        format={format}
+                        tournamentId={tournamentId}
+                        allFormats={allFormats}
+                        onRemove={removeFormat}
+                        onUpdate={updateFormat}
+                        categoryId={categoryId}
+                        refreshKey={slotRefreshKey}
+                        onSlotChange={() => setSlotRefreshKey(k => k + 1)}
+                        initialExpanded={format.id === newlyCreatedId}
+                        dragHandle={container.formats.length > 1 ? handle : undefined}
+                      />
+                    )}
+                  </SortableRowShell>
+                ))}
+              </SortableVerticalList>
 
               <div className="flex justify-start">
                 <button
