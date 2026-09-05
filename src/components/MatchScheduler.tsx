@@ -2976,11 +2976,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       className={`transition-[max-height,opacity,padding,margin,transform] duration-200 ease-out ${isDragging ? "max-h-0 opacity-0 overflow-hidden" : ""}`}
                                       style={isDragging ? { maxHeight: 0, padding: 0, margin: 0, height: 0 } : undefined}
                                     >
-                                      <div className="px-1.5 py-0.5">
+                                      <div
+                                        className="px-1.5 py-0.5"
+                                        onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setRefDropMatchId(m.id); } }}
+                                        onDragEnter={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); setRefDropMatchId(m.id); } }}
+                                        onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefDropMatchId(prev => prev === m.id ? null : prev); }}
+                                        onDrop={(e) => dropRefereeOnMatch(e, m.id)}
+                                      >
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
                                           className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-2 text-xs transition-all duration-200 ${
-                                            mobileSelectedMatchId === m.id
+                                            refDropMatchId === m.id
+                                              ? "border-primary ring-2 ring-primary/50 bg-primary/10"
+                                              : mobileSelectedMatchId === m.id
                                               ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
                                                 ? "border-primary ring-2 ring-primary/20 bg-primary/5"
@@ -2992,8 +3000,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                           <div
                                             onClick={() => handleMobileTapMatch(m.id)}
                                             className="touch-manipulation"
-                                            onDragOver={(e) => { if (isRefereeDrag(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; } }}
-                                            onDrop={(e) => dropRefereeOnMatch(e, m.id)}
                                           >
 
                                             {/* Time row */}
