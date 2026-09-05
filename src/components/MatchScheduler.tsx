@@ -1028,6 +1028,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return x < cx ? nearestIdx : nearestIdx + 1;
   };
 
+  /** Toon een duidelijke invoegstreep tussen de scheidsrechters tijdens het slepen. */
+  const handleRefereeBadgeDragOver = (e: React.DragEvent, matchId: string) => {
+    if (!isRefereeDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+    const container = e.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    const index = getRefereeInsertIndex(container, e.clientX - rect.left, e.clientY - rect.top, 0);
+    setRefDropMatchId(matchId);
+    setRefInsert(prev => (prev && prev.matchId === matchId && prev.index === index ? prev : { matchId, index }));
+  };
+
   /** Sleep een scheidsrechter naar links/rechts in dezelfde wedstrijd om de rolvolgorde te wijzigen,
    *  of vanuit de lijst/een andere wedstrijd om hem toe te voegen op die positie. */
   const handleRefereeBadgeDrop = async (e: React.DragEvent, matchId: string) => {
