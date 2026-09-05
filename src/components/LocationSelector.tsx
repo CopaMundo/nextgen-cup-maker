@@ -23,6 +23,11 @@ const LocationSelector = ({
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
 
+  const truncateName = (name: string) => {
+    if (name.length > 20) return name.slice(0, 17) + "...";
+    return name;
+  };
+
   useEffect(() => {
     supabase
       .from("tournament_locations")
@@ -61,7 +66,7 @@ const LocationSelector = ({
       >
         {locations.map((l) => (
           <option key={l.id} value={l.name}>
-            {l.name}
+            {truncateName(l.name)}
           </option>
         ))}
       </select>

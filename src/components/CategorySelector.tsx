@@ -25,6 +25,11 @@ const CategorySelector = ({
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
 
+  const truncateName = (name: string) => {
+    if (name.length > 20) return name.slice(0, 17) + "...";
+    return name;
+  };
+
   useEffect(() => {
     if (!isMultiCategory) return;
 
@@ -66,7 +71,7 @@ const CategorySelector = ({
       >
         {categories.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.name}
+            {truncateName(c.name)}
           </option>
         ))}
       </select>
