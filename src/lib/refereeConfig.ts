@@ -283,3 +283,62 @@ export const refereeCanOfficiate = (
 
   return true;
 };
+
+/** Redenen waarom deze scheidsrechter deze wedstrijd (in deze rol) eigenlijk niet mag fluiten. */
+export const refereeViolations = (
+  ref: RefereeConfig,
+  match: MatchLike,
+  role = 1,
+  opts: { assignedCount?: number; teamName?: (id: string) => string } = {}
+): string[] => {
+  const reasons: string[] = [];
+  const teamName = opts.teamName || ((id: string) => id);
+
+  if (ref.roles && ref.roles.length > 0 && !ref.roles.includes(role)) {
+    reasons.push(`Niet toegelaten voor rol ${role} (enkel rol ${[...ref.roles].sort((a, b) => a - b).join(", ")})`);
+  }
+
+  if (ref.maxMatches != null && opts.assignedCount != null && opts.assignedCount > ref.maxMatches) {
+    reasons.push(`Meer dan het maximum van ${ref.maxMatches} wedstrijden`);
+  }
+
+  if (ref.allowedFields && ref.allowedFields.length === 0) {
+    reasons.push("Geen enkel veld toegelaten");
+  } else if (ref.allowedFields && ref.allowedFields.length > 0 && match.field && !ref.allowedFields.includes(match.field)) {
+    reasons.push(`Veld/locatie "${match.field}" is niet toegelaten`);
+  }
+
+  if (ref.excludedTeams.length > 0) {
+    if (match.home_team_id && ref.excludedTeams.includes(match.home_team_id)) {
+      reasons.push(`Mag ${teamName(match.home_team_id)} niet fluiten`);
+    }
+    if (match.away_team_id && ref.excludedTeams.includes(match.away_team_id)) {
+      reasons.push(`Mag ${teamName(match.away_team_id)} niet fluiten`);
+    }
+  }
+
+  if (ref.availability && ref.availability.length > 0) {
+    if (!match.match_date) {
+      reasons.push("Buiten de opgegeven beschikbaarheid");
+    } else {
+      const windows = ref.availability.filter(a => a.date === match.match_date);
+      if (windows.length === 0) {
+        reasons.push("Niet beschikbaar op deze dag");
+      } else {
+        const start = timeToMinutes(match.match_time);
+        if (start != null) {
+          const fits = windows.some(w => {
+            const from = timeToMinutes(w.from) ?? 0;
+            const to = timeToMinutes(w.to) ?? 24 * 60;
+            return start >= from && start <= to;
+          });
+          if (!fits) {
+            reasons.push(`Buiten beschikbaarheid (${windows.map(w => `${w.from}–${w.to}`).join(", ")})`);
+          }
+        }
+      }
+    }
+  }
+
+  return reasons;
+};

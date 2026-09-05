@@ -20,7 +20,7 @@ import { parseIsoDate, formatIsoDate } from "@/lib/dateUtils";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
-import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee } from "@/lib/refereeConfig";
+import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee, refereeViolations } from "@/lib/refereeConfig";
 import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix } from "@/lib/fieldLocations";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -965,6 +965,45 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return [...rest.slice(0, idx), refDragName, ...rest.slice(idx)];
   };
 
+  /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
+  const getRefereeIssue = (match: Match, name: string, roleIdx: number): { level: "error" | "warn"; reasons: string[] } | null => {
+    const cfg = refereeConfigs.find(r => r.name === name);
+    const teamNameOf = (id: string) => teams.find(t => t.id === id)?.name || "dit team";
+    const durOf = (m: Match) => {
+      const mp = phases.find(p => p.id === m.phase_id);
+      const mc = (mp?.match_config as any) || {};
+      return m.duration_minutes ?? mc.phaseDuration ?? globalMatchDuration;
+    };
+
+    // Dubbele boeking: overlappende tijd op dezelfde dag
+    if (match.match_date && match.match_time) {
+      const start = timeToMinutes(match.match_time);
+      const end = start + durOf(match);
+      const overlapping = matches.filter(o =>
+        o.id !== match.id &&
+        o.match_date === match.match_date &&
+        o.match_time &&
+        refNames(o.referee).includes(name) &&
+        timeToMinutes(o.match_time) < end &&
+        timeToMinutes(o.match_time) + durOf(o) > start
+      );
+      if (overlapping.length > 0) {
+        return {
+          level: "error",
+          reasons: [
+            `Dubbel geboekt: fluit tegelijk op ${overlapping
+              .map(o => `${o.match_time?.slice(0, 5)}${o.field ? ` – ${o.field}` : ""}`)
+              .join(", ")}`,
+          ],
+        };
+      }
+    }
+
+    if (!cfg) return null;
+    const assignedCount = matches.filter(m => refNames(m.referee).includes(name)).length;
+    const reasons = refereeViolations(cfg, match, roleIdx + 1, { assignedCount, teamName: teamNameOf });
+    return reasons.length > 0 ? { level: "warn", reasons } : null;
+  };
 
 
   /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
@@ -3225,7 +3264,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setRefInsert(prev => prev?.matchId === m.id ? null : prev); }}
                                                 onDrop={(e) => handleRefereeBadgeDrop(e, m.id)}
                                               >
-                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => (
+                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
+                                                  const issue = getRefereeIssue(m, name, refIdx);
+                                                  return (
                                                   <span key={name} className="contents">
                                                     {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
                                                       <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
@@ -3237,18 +3278,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       onDragEnd={endRefereeDrag}
                                                       onPointerDown={(e) => e.stopPropagation()}
                                                       onClick={(e) => e.stopPropagation()}
-                                                      title={`Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
+                                                      title={issue ? `${issue.reasons.join("\n")}\n\nRol ${refIdx + 1} — sleep om de volgorde te wijzigen` : `Rol ${refIdx + 1} — sleep om de volgorde te wijzigen`}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
                                                         refDragName === name
                                                           ? "border-primary bg-primary/20 text-primary ring-1 ring-primary shadow-sm"
-                                                          : "border-border bg-muted text-muted-foreground"
+                                                          : issue?.level === "error"
+                                                            ? "border-destructive bg-destructive/15 text-destructive"
+                                                            : issue?.level === "warn"
+                                                              ? "border-warning bg-warning/15 text-warning"
+                                                              : "border-border bg-muted text-muted-foreground"
                                                       }`}
                                                     >
-                                                      {arr.length > 1 && <span className="text-primary font-bold">{refIdx + 1}</span>}
+                                                      {arr.length > 1 && <span className={issue ? "font-bold" : "text-primary font-bold"}>{refIdx + 1}</span>}
                                                       <WhistleIcon className="h-2.5 w-2.5" /> {name}
+                                                      {issue && <span aria-hidden>⚠</span>}
                                                     </span>
                                                   </span>
-                                                ))}
+                                                  );
+                                                })}
+
                                                 {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
                                                   <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
                                                 )}
