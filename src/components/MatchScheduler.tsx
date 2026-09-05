@@ -2889,7 +2889,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className="py-2 print:hidden border-b border-border mb-0 shrink-0">
+            <div className="py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm">
               <DateStripNav
                 dates={tournamentDates}
                 activeDate={plannerDate}
@@ -3033,7 +3033,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative">
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
+              <div className="sticky top-[3.25rem] z-20 flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button variant="outline" size="sm" onClick={() => {
@@ -3453,7 +3453,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {!plannerCollapsed && (
             <div
               ref={plannerSidebarRef}
-              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 self-start h-[calc(100vh-6rem)] overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
+              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-[3.25rem] self-start h-[calc(100vh-9rem)] overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
               onDragOver={(e) => {
                 if (!hasPlannerDragData(e)) return;
                 e.preventDefault();
