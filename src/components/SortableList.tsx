@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type React from "react";
 import {
   DndContext,
   closestCenter,
@@ -60,42 +61,65 @@ export function SortableVerticalList<T>({
   );
 }
 
-/** Rij binnen een sleeplijst; geeft de sleepgreep door aan de inhoud. */
+/** Elementen waarop een pointerdown NIET als sleep mag starten. */
+const isInteractive = (target: EventTarget | null) => {
+  const el = target as HTMLElement | null;
+  return !!el?.closest?.("input, textarea, select, button, a, [role='button'], [contenteditable='true'], [data-no-drag]");
+};
+
+/** Rij binnen een sleeplijst; hele rij is sleepbaar, greep blijft beschikbaar. */
 export const SortableRowShell = ({
   id,
   className,
   dragLabel = "Verplaatsen",
   handleClassName,
+  manualRowDrag = false,
   children,
 }: {
   id: string;
   className?: string;
   dragLabel?: string;
   handleClassName?: string;
-  children: (handle: ReactNode) => ReactNode;
+  /** Zet aan wanneer je zelf bepaalt welk deel van de rij sleepbaar is (via rowProps). */
+  manualRowDrag?: boolean;
+  children: (handle: ReactNode, rowProps: Record<string, any>) => ReactNode;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+  const rowProps: Record<string, any> = {
+    ...attributes,
+    ...listeners,
+    onPointerDown: (e: React.PointerEvent) => {
+      if (isInteractive(e.target)) return;
+      (listeners as any)?.onPointerDown?.(e);
+    },
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (isInteractive(e.target)) return;
+      (listeners as any)?.onKeyDown?.(e);
+    },
+    className: "cursor-grab active:cursor-grabbing touch-none",
+  };
+
   const handle = (
-    <button
-      type="button"
-      {...attributes}
-      {...listeners}
-      aria-label={dragLabel}
-      className={cn(
-        "shrink-0 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none",
-        handleClassName,
-      )}
+    <span
+      aria-hidden
+      className={cn("shrink-0 text-muted-foreground cursor-grab active:cursor-grabbing touch-none", handleClassName)}
     >
       <GripVertical className="h-4 w-4" />
-    </button>
+    </span>
   );
+
+  const { className: rowCursor, ...rowHandlers } = rowProps;
+
   return (
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(className, isDragging && "opacity-70 shadow-lg z-10 relative")}
+      aria-label={dragLabel}
+      {...(manualRowDrag ? {} : rowHandlers)}
+      className={cn(className, !manualRowDrag && rowCursor, isDragging && "opacity-70 shadow-lg z-10 relative")}
     >
-      {children(handle)}
+      {children(handle, rowProps)}
     </div>
   );
 };
