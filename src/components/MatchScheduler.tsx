@@ -444,12 +444,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [dropdownOpenBrackets, setDropdownOpenBrackets] = useState(false);
   const [dropdownOpenRounds, setDropdownOpenRounds] = useState(false);
   const [dropdownOpenFields, setDropdownOpenFields] = useState(false);
-  const dropdownContainerRef = useRef<HTMLDivElement>(null);
+  const dropdownBracketsRef = useRef<HTMLDivElement>(null);
+  const dropdownRoundsRef = useRef<HTMLDivElement>(null);
+  const dropdownFieldsRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns on click outside
+  // Close dropdowns on click outside the specific open dropdown wrapper
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownContainerRef.current && !dropdownContainerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const openRefs = [
+        dropdownOpenBrackets && dropdownBracketsRef.current,
+        dropdownOpenRounds && dropdownRoundsRef.current,
+        dropdownOpenFields && dropdownFieldsRef.current,
+      ].filter(Boolean) as HTMLDivElement[];
+      if (openRefs.length > 0 && !openRefs.some((ref) => ref.contains(target))) {
         setDropdownOpenBrackets(false);
         setDropdownOpenRounds(false);
         setDropdownOpenFields(false);
@@ -457,7 +465,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  }, [dropdownOpenBrackets, dropdownOpenRounds, dropdownOpenFields]);
 
   const openDropdown = (which: "brackets" | "rounds" | "fields") => {
     setDropdownOpenBrackets(which === "brackets" ? v => !v : false);
@@ -3406,8 +3414,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                     {/* Scheduling filters — Tournify-style multi-select dropdowns */}
-                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                    <div className="space-y-3 border-t border-border pt-3" ref={dropdownContainerRef}>
+                    <div className="space-y-3 border-t border-border pt-3">
                       {/* Poules/Brackets dropdown */}
                       {(() => {
                         const options = getUnifiedGroupBracketOptions();
@@ -3430,7 +3437,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           ? (allSelected ? "Alle poules/brackets" : `${selectedCount} geselecteerd`)
                           : "Selecteer poules/brackets";
                         return (
-                          <div className="space-y-1 relative">
+                          <div className="space-y-1 relative" ref={dropdownBracketsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer poules/brackets</Label>}
                             <button
                               onClick={() => openDropdown("brackets")}
@@ -3484,7 +3491,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           ? (allSelected ? "Alle rondes" : `${selectedCount} geselecteerd`)
                           : "Selecteer rondes";
                         return (
-                          <div className="space-y-1 relative">
+                          <div className="space-y-1 relative" ref={dropdownRoundsRef}>
                             {hasSelection && !noBracketsSelected && <Label className="text-[10px] text-muted-foreground">Selecteer rondes</Label>}
                             <button
                               onClick={() => openDropdown("rounds")}
@@ -3554,7 +3561,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             ? (allSelected ? "Alle velden" : `${selectedCount} geselecteerd`)
                             : "Selecteer velden";
                         return (
-                          <div className="space-y-1 relative">
+                          <div className="space-y-1 relative" ref={dropdownFieldsRef}>
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer velden</Label>}
                             <button
                               onClick={() => hasFields && openDropdown("fields")}
@@ -3641,11 +3648,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </SelectTrigger>
                       <SelectContent>
                         {[
-                          { value: 1, label: "één scheidsrechter per wedstrijd" },
-                          { value: 2, label: "twee scheidsrechters per wedstrijd" },
-                          { value: 3, label: "drie scheidsrechters per wedstrijd" },
-                          { value: 4, label: "vier scheidsrechters per wedstrijd" },
-                          { value: 5, label: "vijf scheidsrechters per wedstrijd" },
+                          { value: 1, label: "Één scheidsrechter per wedstrijd" },
+                          { value: 2, label: "Twee scheidsrechters per wedstrijd" },
+                          { value: 3, label: "Drie scheidsrechters per wedstrijd" },
+                          { value: 4, label: "Vier scheidsrechters per wedstrijd" },
+                          { value: 5, label: "Vijf scheidsrechters per wedstrijd" },
                         ].map((item) => (
                           <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>
                         ))}
