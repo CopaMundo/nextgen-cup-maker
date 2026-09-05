@@ -691,16 +691,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     });
   }, [matches]);
 
-  // === CLEAR ALL SCHEDULE ===
-  const clearAllSchedule = async () => {
-    const scheduled = matches.filter(m => m.match_date || m.match_time || m.field);
+  // === CLEAR SCHEDULE (alles of enkel de gekozen dag) ===
+  const clearAllSchedule = async (scope: "all" | "day" = "all") => {
+    const isDay = scope === "day";
+    const scheduled = matches.filter(m =>
+      (m.match_date || m.match_time || m.field) && (!isDay || m.match_date === plannerDate)
+    );
     if (scheduled.length === 0) { toast({ title: "Geen geplande wedstrijden om te wissen" }); return; }
+    const ids = new Set(scheduled.map(m => m.id));
     for (const m of scheduled) {
       await supabase.from("matches").update({ match_date: null, match_time: null, field: null, referee: null }).eq("id", m.id);
     }
-    setMatches(prev => prev.map(m => ({ ...m, match_date: null, match_time: null, field: null, referee: null })));
-    setPlannerBreaks([]);
-    setSchedFormats([]); setSchedGroups([]); setSchedRounds([]); setSchedFields([]);
+    setMatches(prev => prev.map(m => ids.has(m.id) ? { ...m, match_date: null, match_time: null, field: null, referee: null } : m));
+    if (!isDay) {
+      setPlannerBreaks([]);
+      setSchedFormats([]); setSchedGroups([]); setSchedRounds([]); setSchedFields([]);
+    }
     toast({ title: `${scheduled.length} wedstrijden gewist uit planning` });
   };
 
