@@ -321,30 +321,32 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
       <div className="rounded-lg border border-border bg-card/50 overflow-hidden">
         <div
           {...(dragRowProps ? (({ className: _c, ...rest }) => rest)(dragRowProps) : {})}
-          className={`flex items-center justify-between w-full p-3 hover:bg-foreground/[0.02] transition-colors ${dragRowProps ? "cursor-grab active:cursor-grabbing touch-none" : ""}`}
+          className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 p-3 transition-colors hover:bg-foreground/[0.02] sm:flex sm:justify-between ${dragRowProps ? "cursor-grab active:cursor-grabbing touch-none" : ""}`}
         >
           {dragHandle}
           <div
             onClick={() => setExpanded(!expanded)}
-            className="flex min-w-0 flex-1 items-center gap-2 text-left cursor-pointer"
+            className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-1 text-left cursor-pointer sm:flex sm:flex-1"
           >
             {format.logo_url ? (
-              <img src={format.logo_url} alt="" className="h-6 w-6 object-contain flex-shrink-0 rounded" />
+              <img src={format.logo_url} alt="" className="row-span-2 h-6 w-6 object-contain flex-shrink-0 rounded sm:row-auto" />
             ) : (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+              <span className="row-span-2 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary sm:row-auto">
                 {formatTypeIcon(format.phase_type, "h-4 w-4")}
               </span>
             )}
 
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1.5 py-0.5 rounded bg-secondary">
+            <span className="w-fit max-w-full truncate rounded bg-secondary px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               {typeLabel}
             </span>
-            <span className="font-display text-sm font-bold text-foreground">{format.name}</span>
-            <button type="button" aria-label={`${format.name} bewerken`} onClick={(e) => { e.stopPropagation(); openEditDialog(); }} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1">
-              <Pencil className="h-4 w-4 sm:h-3 sm:w-3" />
-            </button>
+            <span className="flex min-w-0 items-center gap-1">
+              <span className="min-w-0 truncate font-display text-sm font-bold text-foreground">{format.name}</span>
+              <button type="button" aria-label={`${format.name} bewerken`} onClick={(e) => { e.stopPropagation(); openEditDialog(); }} className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1">
+                <Pencil className="h-4 w-4 sm:h-3 sm:w-3" />
+              </button>
+            </span>
           </div>
-          <div className="ml-3 flex shrink-0 items-center gap-1.5">
+          <div className="flex shrink-0 items-center gap-1 sm:ml-3 sm:gap-1.5">
             {!dragHandle && canMoveUp && (
               <button type="button" onClick={onMoveUp} className="text-muted-foreground hover:text-foreground" title="Naar boven">
                 <ArrowUp className="h-3.5 w-3.5" />
