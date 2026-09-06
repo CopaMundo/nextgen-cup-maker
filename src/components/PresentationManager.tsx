@@ -70,6 +70,8 @@ const PresentationManager = ({
   const [subTab, setSubTab] = useState<SubTab>("website");
   const isMobile = useIsMobile();
   const [mobileOverview, setMobileOverview] = useState(true);
+  const [mobileSlideshowOverview, setMobileSlideshowOverview] = useState(true);
+  const [mobileSlideshowTitle, setMobileSlideshowTitle] = useState("Dialoogvoorstelling");
 
   const viewUrl = `${window.location.origin}/view/${tournament.view_link_token}`;
 
@@ -162,8 +164,8 @@ const PresentationManager = ({
               key={t.id}
               role="button"
               tabIndex={0}
-              onClick={() => { setSubTab(t.id); setMobileOverview(false); }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setSubTab(t.id); setMobileOverview(false); } }}
+              onClick={() => { setSubTab(t.id); setMobileOverview(false); if (t.id === "slideshow") setMobileSlideshowOverview(true); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setSubTab(t.id); setMobileOverview(false); if (t.id === "slideshow") setMobileSlideshowOverview(true); } }}
               className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -178,10 +180,21 @@ const PresentationManager = ({
 
       {isMobile && !mobileOverview && (
         <div className="flex items-center gap-2 mb-4">
-          <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Terug naar presentatie" onClick={() => setMobileOverview(true)}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            aria-label={subTab === "slideshow" && !mobileSlideshowOverview ? "Terug naar voorstellingen" : "Terug naar presentatie"}
+            onClick={() => {
+              if (subTab === "slideshow" && !mobileSlideshowOverview) setMobileSlideshowOverview(true);
+              else setMobileOverview(true);
+            }}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">{activeLabel}</h2>
+          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">
+            {subTab === "slideshow" && !mobileSlideshowOverview ? mobileSlideshowTitle : activeLabel}
+          </h2>
         </div>
       )}
 
@@ -209,7 +222,7 @@ const PresentationManager = ({
         {subTab === "website" && (
           <>
             {/* Website link */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className={cn("rounded-lg border border-border bg-card space-y-4", isMobile ? "p-4" : "p-6")}>
               <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
                 <LinkIcon className="h-5 w-5 text-primary" /> Website-link
               </h2>
@@ -235,14 +248,14 @@ const PresentationManager = ({
                   <div className="rounded-lg border border-border bg-secondary p-3">
                     <p className="text-xs text-muted-foreground break-all font-mono">{viewUrl}</p>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Button variant="outline" size="sm" onClick={copyViewLink}>
+                  <div className={cn("gap-2", isMobile ? "grid grid-cols-1" : "flex flex-wrap")}>
+                    <Button variant="outline" size="sm" className={cn(isMobile && "w-full justify-start")} onClick={copyViewLink}>
                       <Copy className="h-4 w-4" /> Kopieer link
                     </Button>
-                    <Button variant="outline" size="sm" onClick={openViewLink}>
+                    <Button variant="outline" size="sm" className={cn(isMobile && "w-full justify-start")} onClick={openViewLink}>
                       <ExternalLink className="h-4 w-4" /> Openen
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowQR(true)}>
+                    <Button variant="outline" size="sm" className={cn(isMobile && "w-full justify-start")} onClick={() => setShowQR(true)}>
                       <QrCode className="h-4 w-4" /> QR-code
                     </Button>
                   </div>
@@ -251,7 +264,7 @@ const PresentationManager = ({
             </div>
 
             {/* Site visibility */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className={cn("rounded-lg border border-border bg-card space-y-4", isMobile ? "p-4" : "p-6")}>
               <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
                 <Globe className="h-5 w-5 text-primary" /> Zichtbaarheid op de site
               </h2>
@@ -283,6 +296,9 @@ const PresentationManager = ({
               tournamentId={tournament.id}
               tournament={tournament}
               onUpdate={onUpdate}
+              mobileOverview={mobileSlideshowOverview}
+              onMobileOverviewChange={setMobileSlideshowOverview}
+              onMobileTitleChange={setMobileSlideshowTitle}
             />
           </>
         )}
