@@ -6,7 +6,7 @@ interface PollIconProps {
 
 const PollIcon = ({ className }: PollIconProps) => (
   <span
-    className={className}
+    className={["bg-current inline-block", className].filter(Boolean).join(" ")}
     style={{
       display: "inline-block",
       maskImage: `url(${questionAndAnswerAsset.url})`,
