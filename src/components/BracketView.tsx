@@ -2660,13 +2660,14 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       )}
                       {(displayBaseName || match.match_name) && (() => {
                         const baseName = displayBaseName || match.match_name || "";
-                        const suffix = getMatchFormatSuffix(
-                          match as any,
-                          scoringSystems as any,
-                          phases as any,
-                          groups as any,
-                          { haPairLabel: matchIsHA ? "Heen en terug" : undefined }
-                        );
+                        const suffix = matchIsHA
+                          ? ""
+                          : getMatchFormatSuffix(
+                              match as any,
+                              scoringSystems as any,
+                              phases as any,
+                              groups as any
+                            );
                         return (
                           <span className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
                             {baseName}{suffix}
