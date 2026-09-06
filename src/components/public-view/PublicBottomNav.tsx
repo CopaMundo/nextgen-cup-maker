@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Info, Users, Trophy, Calendar, Home } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
@@ -13,9 +14,44 @@ interface Props {
 const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, teams }: Props) => {
   const bStyle = useBroadcastStyle();
   const favTeam = favoriteTeam ? teams?.find((t: any) => t.id === favoriteTeam) : null;
-  // Geen JS-correctie meer: de balk staat altijd gewoon vast (position: fixed).
-  // Elke vorm van meebewegen via transform loopt bij snel scrollen of pinch-zoom
-  // een frame achter en veroorzaakt zichtbaar geschud.
+  const navRef = useRef<HTMLElement>(null);
+
+  // Houd de balk tijdens pinch-zoom standvast: een vaste (position: fixed) balk
+  // schaalt en verschuift mee met de layout-viewport zodra je inzoomt. We lezen
+  // de visualViewport ELKE frame uit via requestAnimationFrame (vóór de paint,
+  // dus geen zichtbare achterloop) en corrigeren de balk rechtstreeks via
+  // inline stijlen — geen React state, geen extra renders.
+  useEffect(() => {
+    const nav = navRef.current;
+    const vv = window.visualViewport;
+    if (!nav || !vv) return;
+
+    let raf = 0;
+    const apply = () => {
+      raf = requestAnimationFrame(apply);
+      const zoomed = vv.scale !== 1;
+      if (!zoomed) {
+        if (nav.style.transform) {
+          nav.style.transform = "";
+          nav.style.width = "";
+          nav.style.left = "";
+          nav.style.bottom = "";
+        }
+        return;
+      }
+      const s = vv.scale;
+      const w = vv.width;
+      // Compenseer de zoom: hou de balk even groot en vast op de
+      // zichtbare viewport, onderaan en horizontaal gecentreerd.
+      nav.style.transform = `translate(${vv.offsetLeft}px, ${vv.offsetTop + vv.height - (nav.offsetHeight * s)}px) scale(${1 / s})`;
+      nav.style.transformOrigin = "bottom left";
+      nav.style.width = `${w * s}px`;
+      nav.style.left = "0";
+      nav.style.bottom = "0";
+    };
+    raf = requestAnimationFrame(apply);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const tabs: { id: string; label: string; icon: any; isCenter?: boolean }[] = [
     { id: "info", label: "Info", icon: Info },
