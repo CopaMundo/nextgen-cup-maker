@@ -564,8 +564,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
         ) : (
           <div className="flex items-center gap-3 mb-2">
-            <Button variant="outline" size="sm" onClick={() => setGeneralSubTab("overview")}>
-              <ArrowLeft className="h-4 w-4 mr-1.5" /> Overzicht
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setGeneralSubTab("overview")} aria-label="Terug naar overzicht">
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <h2 className="font-display text-lg font-bold text-foreground">
               {(() => {
