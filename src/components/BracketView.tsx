@@ -2660,13 +2660,14 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       )}
                       {(displayBaseName || match.match_name) && (() => {
                         const baseName = displayBaseName || match.match_name || "";
-                        const suffix = getMatchFormatSuffix(
-                          match as any,
-                          scoringSystems as any,
-                          phases as any,
-                          groups as any,
-                          { haPairLabel: matchIsHA ? "Heen en terug" : undefined }
-                        );
+                        const suffix = matchIsHA
+                          ? ""
+                          : getMatchFormatSuffix(
+                              match as any,
+                              scoringSystems as any,
+                              phases as any,
+                              groups as any
+                            );
                         return (
                           <span className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
                             {baseName}{suffix}
@@ -2698,6 +2699,11 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   </button>
                 )}
                 <div className="text-right">
+                  {matchIsHA && (
+                    <div className="flex justify-end mb-0.5">
+                      <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5">2 wedstrijden</span>
+                    </div>
+                  )}
                   {fieldStr && (
                     <div className="text-[9px] font-bold text-muted-foreground flex items-center gap-0.5 justify-end">
                       <MapPin className="h-2 w-2" /> {fieldStr}
