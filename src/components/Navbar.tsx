@@ -6,9 +6,10 @@ import CopaMundoMark from "@/components/CopaMundoMark";
 
 interface NavbarProps {
   tournamentName?: string | null;
+  hideTournamentNameOnMobile?: boolean;
 }
 
-const Navbar = ({ tournamentName }: NavbarProps) => {
+const Navbar = ({ tournamentName, hideTournamentNameOnMobile = false }: NavbarProps) => {
   const { user, signOut } = useAuth();
 
   return (
@@ -24,7 +25,7 @@ const Navbar = ({ tournamentName }: NavbarProps) => {
           {tournamentName && (
             <>
               <span className="hidden sm:block text-muted-foreground/60">|</span>
-              <span className="font-display text-base sm:text-lg font-semibold text-foreground truncate">
+              <span className={`font-display text-base sm:text-lg font-semibold text-foreground truncate ${hideTournamentNameOnMobile ? "hidden sm:block" : ""}`}>
                 {tournamentName}
               </span>
             </>
