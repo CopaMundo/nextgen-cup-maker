@@ -5,7 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, MessageCircle, Handshake, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Settings, Tv2, BarChart3, MessageCircle, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
+import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
@@ -60,6 +61,7 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
+  const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
   const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(locationStorageKey(id));
@@ -98,6 +100,7 @@ const TournamentDetail = () => {
   const goToRefereesTab = () => {
     setActiveTab("teams");
     setDeelnemersSubTab("referees");
+    setMobileDeelnemersOverview(false);
   };
 
   // When tournament id changes, hydrate from localStorage
@@ -200,8 +203,41 @@ const TournamentDetail = () => {
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <>
-                <div className="flex justify-center border-b border-border mb-6">
-                  <button
+                {isMobile ? (
+                  mobileDeelnemersOverview ? (
+                    <div className="grid grid-cols-1 gap-2">
+                      {([
+                        { id: "teams" as const, label: tournament.teams_label || "Teams", icon: Users },
+                        { id: "referees" as const, label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
+                      ]).map((card) => {
+                        const Icon = card.icon;
+                        return (
+                          <button
+                            key={card.id}
+                            onClick={() => { setDeelnemersSubTab(card.id); setMobileDeelnemersOverview(false); }}
+                            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                          >
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
+                            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 mb-3">
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileDeelnemersOverview(true)} aria-label="Terug naar overzicht">
+                        <ArrowLeft className="h-4 w-4" />
+                      </Button>
+                      <h2 className="font-display text-lg font-bold text-foreground">
+                        {deelnemersSubTab === "teams" ? (tournament.teams_label || "Teams") : (tournament.referees_label || "Scheidsrechters")}
+                      </h2>
+                    </div>
+                  )
+                ) : (
+                <div className="flex justify-center border-b border-border mb-6">                  <button
                     onClick={() => setDeelnemersSubTab("teams")}
                     className={cn(
                       "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
@@ -224,10 +260,11 @@ const TournamentDetail = () => {
                     {tournament.referees_label || "Scheidsrechters"}
                   </button>
                 </div>
-                {deelnemersSubTab === "teams" && (
+                )}
+                {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} />
                 )}
-                {deelnemersSubTab === "referees" && (
+                {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "referees" && (
                   <RefereeManager tournamentId={id!} categoryId={effectiveCategoryId} />
                 )}
               </>
