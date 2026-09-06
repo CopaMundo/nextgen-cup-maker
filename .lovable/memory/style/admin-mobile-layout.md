@@ -1,8 +1,8 @@
 ---
 name: Admin mobile layout
-description: Tournament admin on mobile is locked to the current compact icon-sidebar layout; never change it
+description: Tournament admin on mobile uses a full-height, collapsible app sidebar with an always-visible compact state
 type: design
 ---
-Op mobiele schermen blijft de toernooibeheeromgeving (admin) zoals nu, bevestigd door de gebruiker op 06/09/2026: een vaste compacte zijbalk met iconen en labels, een compacte bovenbalk, en de instellingen rechts daarvan, passend binnen het scherm. De beheerpagina mag nooit omschakelen naar een mobiele onderbalk, hamburger-menu of een andere mobiele layout.
+Op mobiele schermen gebruikt de toernooibeheeromgeving een app-achtige zijbalk over de volledige beschikbare hoogte. De zijbalk moet inklapbaar zijn, maar in ingeklapte toestand zichtbaar blijven als smalle iconenbalk zodat navigatie en de uitklapknop altijd bereikbaar zijn. De instellingen blijven overzichtelijk rechts van de zijbalk.
 
-**Regel:** Deze mobiele admin-weergave is definitief. Bij toekomstige aanpassingen aan instellingen of beheerpagina's moet deze weergave behouden blijven en altijd in mobiele weergave (393px) gecontroleerd worden.
+**Regel:** Geen mobiele onderbalk of volledig verdwijnend hamburger-menu. Bij toekomstige aanpassingen aan instellingen of beheerpagina's moet de full-height inklapbare zijbalk behouden blijven en altijd in mobiele weergave (393px) gecontroleerd worden.
