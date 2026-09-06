@@ -216,6 +216,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
                         allMatches={matches}
                         favoriteTeam={favoriteTeam}
                         hideRoundNumber
+                        locationFilter={hasMultiLocations ? locationFilter : undefined}
                       />
                     </div>
                   ))}
