@@ -307,21 +307,9 @@ const TournamentDetail = () => {
     }
   };
 
-  // Op smalle (mobiele) schermen: render de volledige desktop-layout op een
-  // vaste breedte en schaal die verkleind naar het scherm, zodat het beheer er
-  // op een telefoon exact hetzelfde uitziet als op desktop.
-  const ADMIN_MIN_WIDTH = 900;
-  const zoom = viewport.width > 0 && viewport.width < ADMIN_MIN_WIDTH ? viewport.width / ADMIN_MIN_WIDTH : 1;
-  const scaledStyle =
-    zoom < 1
-      ? ({ zoom, width: ADMIN_MIN_WIDTH, height: viewport.height / zoom } as React.CSSProperties)
-      : undefined;
-
   return (
-    <div
-      className={cn("bg-background flex flex-col overflow-hidden", zoom === 1 && "h-screen min-h-0")}
-      style={scaledStyle}
-    >
+    <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
+
 
       <Navbar tournamentName={tournament?.name} />
       <ThemeSwitcher />
