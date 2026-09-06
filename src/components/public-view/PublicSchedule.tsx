@@ -188,7 +188,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
             <div key={slot.key}>
               <div className={ds(bStyle, "card")}>
                 {/* Timeslot header */}
-                <div className={ds(bStyle, "timeslotHeader")}>
+                <div className={`${ds(bStyle, "timeslotHeader")} py-0.5 min-h-[22px]`}>
                   {slot.time && (
                     <span className={ds(bStyle, "timeslotBadge") || ds(bStyle, "badge")}>
                       {slot.time.slice(0, 5)}
