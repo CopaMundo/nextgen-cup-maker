@@ -25,7 +25,29 @@ import PollManager from "@/components/PollManager";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+// Op smalle (mobiele) schermen wordt de volledige desktop-layout van het beheer
+// verkleind weergegeven, zodat het er op een telefoon exact hetzelfde uitziet.
+const ADMIN_MIN_WIDTH = 900;
+
+const useAdminDesktopScale = () => {
+  useEffect(() => {
+    const apply = () => {
+      const zoom = window.innerWidth < ADMIN_MIN_WIDTH ? window.innerWidth / ADMIN_MIN_WIDTH : 1;
+      document.documentElement.style.zoom = zoom === 1 ? "" : String(zoom);
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    window.addEventListener("orientationchange", apply);
+    return () => {
+      window.removeEventListener("resize", apply);
+      window.removeEventListener("orientationchange", apply);
+      document.documentElement.style.zoom = "";
+    };
+  }, []);
+};
+
 const useViewportSize = () => {
+
   const [size, setSize] = useState(() => ({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
