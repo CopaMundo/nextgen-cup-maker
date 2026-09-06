@@ -734,24 +734,60 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
-          <div className={`flex w-full flex-1 min-w-0 items-start justify-between leading-none gap-3 ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
-            <div className="min-w-0 flex-1">
-              {phase?.name ? (
-                <div className="flex flex-col gap-y-0.5">
+          <div className={`grid grid-cols-[1fr_auto] items-center gap-x-3 ${tight ? "gap-y-0" : "gap-y-1"} leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
+            {phase?.name ? (
+              displayName && !compactTree ? (
+                <>
                   <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                     {phase.name}
                   </div>
-                  {displayName && !compactTree && (
-                    <div className="flex items-center gap-1.5">
-                      <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
-                      {matchIsHA && (
-                        <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
-                      )}
+                  {displayField ? (
+                    <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <MapPin className="h-2 w-2" /> {displayField}
                     </div>
-                  )}
-                </div>
+                  ) : <div />}
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
+                    {matchIsHA && (
+                      <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
+                    )}
+                  </div>
+                  {displayReferee ? (
+                    <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                    </div>
+                  ) : <div />}
+                </>
               ) : (
-                <div className="flex items-center gap-1.5">
+                <>
+                  <div className={`flex items-center gap-1.5 min-w-0 ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
+                    <span className="truncate">{phase.name}</span>
+                    {matchIsHA && (
+                      <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
+                    )}
+                  </div>
+                  {displayField ? (
+                    <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <MapPin className="h-2 w-2" /> {displayField}
+                    </div>
+                  ) : displayReferee ? (
+                    <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                    </div>
+                  ) : <div />}
+                  {displayField && displayReferee && (
+                    <>
+                      <div />
+                      <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                        <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                      </div>
+                    </>
+                  )}
+                </>
+              )
+            ) : (
+              <>
+                <div className="flex items-center gap-1.5 min-w-0">
                   <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                     {displayName}
                   </div>
@@ -759,20 +795,25 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
                   )}
                 </div>
-              )}
-            </div>
-            <div className="text-right flex-shrink-0 flex flex-col gap-y-0.5">
-              {displayField && (
-                <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                  <MapPin className="h-2 w-2" /> {displayField}
-                </div>
-              )}
-              {displayReferee && (
-                <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                  <WhistleIcon className="h-2 w-2" /> {displayReferee}
-                </div>
-              )}
-            </div>
+                {displayField ? (
+                  <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                    <MapPin className="h-2 w-2" /> {displayField}
+                  </div>
+                ) : displayReferee ? (
+                  <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                    <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                  </div>
+                ) : <div />}
+                {displayField && displayReferee && (
+                  <>
+                    <div />
+                    <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </div>
         <div className="relative leading-none" style={compactTree ? { height: cardH, overflow: "hidden" } : undefined}>
