@@ -749,7 +749,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   <div className="flex items-center gap-1.5 min-w-0">
                     <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
                     {matchIsHA && (
-                      <span className={`font-bold text-muted-foreground/70 bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
+                      <span className={`font-bold text-muted-foreground/70 bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>(2 wedstrijden)</span>
                     )}
                   </div>
                   {displayReferee ? (
@@ -763,7 +763,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   <div className={`flex items-center gap-1.5 min-w-0 ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                     <span className="truncate">{phase.name}</span>
                     {matchIsHA && (
-                      <span className={`${ds(bStyle, "matchContextText")} font-bold bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "!text-[6px]" : "!text-[8px]"}`}>2 wedstrijden</span>
+                      <span className={`${ds(bStyle, "matchContextText")} font-bold bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "!text-[6px]" : "!text-[8px]"}`}>(2 wedstrijden)</span>
                     )}
                   </div>
                   {displayField ? (
@@ -792,7 +792,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     {displayName}
                   </div>
                   {matchIsHA && (
-                    <span className={`${ds(bStyle, "matchContextText")} font-bold bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "!text-[6px]" : "!text-[8px]"}`}>2 wedstrijden</span>
+                    <span className={`${ds(bStyle, "matchContextText")} font-bold bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "!text-[6px]" : "!text-[8px]"}`}>(2 wedstrijden)</span>
                   )}
                 </div>
                 {displayField ? (
