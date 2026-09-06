@@ -426,14 +426,16 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
               <div className="flex shrink-0 items-center gap-1" onClick={e => e.stopPropagation()}>
                 <button
                   onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                   className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                   aria-label={`${team.name} bewerken`}
                   title="Bewerken"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setTeamToDelete(team.id)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                   className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                   aria-label={`${team.name} verwijderen`}
                   title="Verwijderen"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

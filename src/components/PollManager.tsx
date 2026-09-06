@@ -226,7 +226,8 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
               <div className="flex shrink-0 items-center gap-1" onClick={e => e.stopPropagation()}>
                 <button
                   onClick={() => setDeleteId(poll.id)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                   className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                   aria-label="Poll verwijderen"
                   title="Verwijderen"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
