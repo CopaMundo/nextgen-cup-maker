@@ -717,6 +717,15 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       : (!match.is_played && !!displayTimeStr);
     const showOverlayTime = showInlineTime;
 
+    // Bij H&A: als de heenwedstrijd gespeeld is en we tonen de tijd van de
+    // terugwedstrijd, dan tonen we het resultaat van de heenwedstrijd eronder.
+    const heenLegScoreLabel =
+      matchIsHA && pairedMatch && heenMatch?.is_played && activeLegMatch === terugMatch &&
+      heenMatch.home_score != null && heenMatch.away_score != null
+        ? `HEEN ${heenMatch.home_score}-${heenMatch.away_score}`
+        : null;
+
+
     // Every chip is clickable — H&A opens aggregate dialog, others open match detail dialog
     const isHAClick = matchIsHA && !!pairedMatch;
     const isClickable = true;
