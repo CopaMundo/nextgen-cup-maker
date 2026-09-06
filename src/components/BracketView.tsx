@@ -2674,7 +2674,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                               {baseName}{suffix}
                             </span>
                             {matchIsHA && (
-                              <span className="text-[8px] font-bold text-muted-foreground bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0">2 wedstrijden</span>
+                              <span className="text-[8px] font-bold text-muted-foreground bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0">(2 wedstrijden)</span>
                             )}
                           </div>
                         );
