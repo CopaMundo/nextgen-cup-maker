@@ -61,7 +61,7 @@ const PublicMatchCard = ({
   // Format suffix: "(Heen)" / "(Terug)" + "(N sets)" / "(beste van N)"
   const formatSuffix = getMatchFormatSuffix(m, scoringSystems as any, phases as any, groups as any);
   const isHALeg = !!m.match_name && /\s+\((Heen|Terug)\)$/.test(m.match_name);
-  const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "Heen" : "Terug") : null;
+  const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "Heenwedstrijd" : "Terugwedstrijd") : null;
 
   // Build structured context lines
   const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
@@ -93,7 +93,7 @@ const PublicMatchCard = ({
   const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   // Beslissende score hoort nooit bij een Heen-wedstrijd; toon ze daar nooit.
-  const hasPenalties = haLegLabel !== "Heen" && m.home_penalties != null && m.away_penalties != null;
+  const hasPenalties = haLegLabel !== "Heenwedstrijd" && m.home_penalties != null && m.away_penalties != null;
   // Scores worden weergegeven zodra ze zijn ingevuld, ook als een beslissende
   // score nog ontbreekt (wedstrijd nog niet officieel afgerond).
   const showScores = m.is_played || (m.home_score != null && m.away_score != null);
@@ -184,8 +184,8 @@ const PublicMatchCard = ({
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
                       {isHALeg && (
-                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
-                          {haLegLabel}
+                        <span className="text-[9px] text-muted-foreground font-medium truncate">
+                          ({haLegLabel})
                         </span>
                       )}
                     </div>
@@ -203,8 +203,8 @@ const PublicMatchCard = ({
                       )}
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                       {isHALeg && (
-                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
-                          {haLegLabel}
+                        <span className="text-[9px] text-muted-foreground font-medium truncate">
+                          ({haLegLabel})
                         </span>
                       )}
                     </div>
@@ -238,8 +238,8 @@ const PublicMatchCard = ({
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
                       {isHALeg && (
-                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
-                          {haLegLabel}
+                        <span className="text-[9px] text-muted-foreground font-medium truncate">
+                          ({haLegLabel})
                         </span>
                       )}
                     </div>
