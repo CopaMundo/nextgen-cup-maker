@@ -349,6 +349,7 @@ const TournamentDetail = () => {
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
           <nav
+            aria-label="Toernooibeheer"
             className={cn(
               "shrink-0 self-stretch border-r border-border bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width] duration-200",
               isMobile ? (mobileSidebarCollapsed ? "w-16 items-center" : "w-44 items-stretch") : "w-20 items-center"
@@ -378,38 +379,40 @@ const TournamentDetail = () => {
                 )}
               </div>
             )}
-            {sidebarItems.map(item => (
-              <Tooltip key={item.id}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setActiveTab(item.id)}
-                    aria-label={item.label}
-                    aria-current={activeTab === item.id ? "page" : undefined}
-                    className={cn(
-                      "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
-                      isMobile
-                        ? mobileSidebarCollapsed
-                          ? "h-12 w-12 justify-center"
-                          : "mx-2 h-11 w-auto justify-start gap-3 px-3"
-                        : "w-16 flex-1 min-h-0 max-h-[56px] py-1 flex-col justify-center gap-0.5",
-                      activeTab === item.id
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5 shrink-0" />
-                    {(!isMobile || !mobileSidebarCollapsed) && (
-                      <span className={cn("font-medium leading-tight truncate", isMobile ? "text-xs text-left" : "text-[10px] w-full text-center")}>
-                        {item.label}
-                      </span>
-                    )}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="text-xs">
-                  {item.label}
-                </TooltipContent>
-              </Tooltip>
-            ))}
+            <div className={cn("min-h-0 w-full", isMobile ? "flex-1 overflow-y-auto scrollbar-none" : "flex flex-1 flex-col items-center gap-0.5 overflow-hidden")}>
+              {sidebarItems.map(item => (
+                <Tooltip key={item.id}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setActiveTab(item.id)}
+                      aria-label={item.label}
+                      aria-current={activeTab === item.id ? "page" : undefined}
+                      className={cn(
+                        "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
+                        isMobile
+                          ? mobileSidebarCollapsed
+                            ? "mx-auto mb-1 h-12 w-12 justify-center"
+                            : "mx-2 mb-1 h-11 w-[calc(100%-1rem)] justify-start gap-3 px-3"
+                          : "w-16 flex-1 min-h-0 max-h-[56px] py-1 flex-col justify-center gap-0.5",
+                        activeTab === item.id
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {(!isMobile || !mobileSidebarCollapsed) && (
+                        <span className={cn("font-medium leading-tight truncate", isMobile ? "text-xs text-left" : "text-[10px] w-full text-center")}>
+                          {item.label}
+                        </span>
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="text-xs">
+                    {item.label}
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
           </nav>
         </TooltipProvider>
 
