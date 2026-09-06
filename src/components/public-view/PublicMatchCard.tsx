@@ -62,6 +62,7 @@ const PublicMatchCard = ({
   const formatSuffix = getMatchFormatSuffix(m, scoringSystems as any, phases as any, groups as any);
   const isHALeg = !!m.match_name && /\s+\((Heen|Terug)\)$/.test(m.match_name);
   const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "Heen" : "Terug") : null;
+  const haLegDisplayLabel = haLegLabel === "Heen" ? "Heenwedstrijd" : haLegLabel === "Terug" ? "Terugwedstrijd" : null;
 
   // Build structured context lines
   const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
@@ -184,8 +185,8 @@ const PublicMatchCard = ({
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
                       {isHALeg && (
-                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
-                          {haLegLabel}
+                        <span className="text-[8px] font-bold text-muted-foreground bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0">
+                          {haLegDisplayLabel}
                         </span>
                       )}
                     </div>
@@ -203,8 +204,8 @@ const PublicMatchCard = ({
                       )}
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                       {isHALeg && (
-                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
-                          {haLegLabel}
+                        <span className="text-[8px] font-bold text-muted-foreground bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0">
+                          {haLegDisplayLabel}
                         </span>
                       )}
                     </div>
@@ -238,8 +239,8 @@ const PublicMatchCard = ({
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
                       {isHALeg && (
-                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
-                          {haLegLabel}
+                        <span className="text-[8px] font-bold text-muted-foreground bg-muted-foreground/10 rounded px-1 py-0.5 flex-shrink-0">
+                          {haLegDisplayLabel}
                         </span>
                       )}
                     </div>
