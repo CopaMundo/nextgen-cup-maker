@@ -2416,6 +2416,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
         // Voor H&A: needsPenalties altijd true in knockout/single_match (zodra aggregate tied is)
         const phase = phases.find(p => p.id === sem.phase_id);
+        const group = groups.find(g => g.id === sem.group_id);
         const isKnockoutLike = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
         const needsPen = isHALeg && isKnockoutLike ? true : matchAllowsDecider(sem);
 
