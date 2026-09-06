@@ -133,7 +133,7 @@ input[type="number"] {
     --card-foreground: 220 25% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
-    --primary: 220 100% 23%;
+    --primary: 220.17 100% 23.14%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 12% 92%;
     --secondary-foreground: 220 20% 25%;
@@ -147,16 +147,16 @@ input[type="number"] {
     --destructive-foreground: 0 0% 100%;
     --border: 220 15% 85%;
     --input: 220 15% 85%;
-    --ring: 220 100% 23%;
+    --ring: 220.17 100% 23.14%;
     --radius: 0.2rem;
     --sidebar-background: 220 8% 96%;
     --sidebar-foreground: 220 20% 25%;
-    --sidebar-primary: 220 100% 23%;
+    --sidebar-primary: 220.17 100% 23.14%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 12% 92%;
     --sidebar-accent-foreground: 220 20% 25%;
     --sidebar-border: 220 15% 85%;
-    --sidebar-ring: 220 100% 23%;
+    --sidebar-ring: 220.17 100% 23.14%;
     --gradient-hero: linear-gradient(135deg, hsl(220, 15%, 96%) 0%, hsl(143, 10%, 94%) 40%, hsl(52, 15%, 96%) 100%);
     --gradient-brand: linear-gradient(135deg, hsl(220, 100%, 23%), hsl(143, 100%, 31%));
     --shadow-glow: 0 0 30px -5px hsla(220, 100%, 23%, 0.15);
