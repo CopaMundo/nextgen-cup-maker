@@ -1328,7 +1328,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         </div>
       )}
 
-      {containers
+      {!(isMobile && mobilePhaseOverview) && containers
         .filter((c) => c.phaseNumber === activePhaseNumber)
         .map((container) => (
           <div key={container.phaseNumber}>
