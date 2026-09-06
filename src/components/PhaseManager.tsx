@@ -69,6 +69,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
   const [deletePhaseNumber, setDeletePhaseNumber] = useState<number | null>(null);
   const [slotRefreshKey, setSlotRefreshKey] = useState(0);
   const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null);
+  useEffect(() => { if (isMobile && newlyCreatedId) setOpenFormatId(newlyCreatedId); }, [isMobile, newlyCreatedId]);
   const [editPhaseNumber, setEditPhaseNumber] = useState<number | null>(null);
   const [editPhaseLabel, setEditPhaseLabel] = useState("");
   const addFormatDialogRef = useDialogFocus(showAddFormat !== null);
