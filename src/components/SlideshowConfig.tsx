@@ -40,6 +40,8 @@ import {
   Check,
   ImageIcon,
   Upload,
+  ChevronRight,
+  Presentation,
 } from "lucide-react";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
@@ -47,6 +49,8 @@ import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import { detectBracketStructure } from "@/components/public-view/PublicBracketSection";
 import { BROADCAST_STYLES, SELECTABLE_BROADCAST_STYLES, type BroadcastStyle } from "@/lib/broadcastStyles";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import {
   type Slide,
   type SlideBlock,
@@ -64,6 +68,9 @@ interface Props {
   tournamentId: string;
   tournament: any;
   onUpdate: (t: any) => void;
+  mobileOverview?: boolean;
+  onMobileOverviewChange?: (value: boolean) => void;
+  onMobileTitleChange?: (title: string) => void;
 }
 
 const STYLE_KEYS = SELECTABLE_BROADCAST_STYLES;
@@ -73,8 +80,9 @@ const newId = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2));
 
-const SlideshowConfig = ({ tournamentId, tournament, onUpdate }: Props) => {
+const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = false, onMobileOverviewChange, onMobileTitleChange }: Props) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [shows, setShows] = useState<SlideshowRow[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -430,9 +438,79 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate }: Props) => {
     return <p className="text-sm text-muted-foreground">Laden…</p>;
   }
 
+  if (isMobile && mobileOverview) {
+    return (
+      <div className="space-y-3">
+        {shows.map(show => (
+          <div
+            key={show.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setActiveId(show.id);
+              onMobileTitleChange?.(show.name);
+              onMobileOverviewChange?.(false);
+            }}
+            onKeyDown={event => {
+              if (event.key === "Enter" || event.key === " ") {
+                setActiveId(show.id);
+                onMobileTitleChange?.(show.name);
+                onMobileOverviewChange?.(false);
+              }
+            }}
+            className="flex min-h-14 items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <Presentation className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block break-words text-sm font-semibold text-foreground">{show.name}</span>
+              <span className="block text-xs text-muted-foreground">{show.slides.length} {show.slides.length === 1 ? "dia" : "dia's"}</span>
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              aria-label={`${show.name} hernoemen`}
+              onClick={event => { event.stopPropagation(); setRenamingShow(show); }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            {shows.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
+                aria-label={`${show.name} verwijderen`}
+                onClick={event => { event.stopPropagation(); deleteShow(show.id); }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </div>
+        ))}
+        <Button variant="outline" className="w-full justify-start border-dashed" onClick={createShow}>
+          <Plus className="h-4 w-4" /> Voorstelling toevoegen
+        </Button>
+
+        <Dialog open={!!renamingShow} onOpenChange={open => !open && setRenamingShow(null)}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader><DialogTitle>Voorstelling hernoemen</DialogTitle></DialogHeader>
+            {renamingShow && <Input autoFocus value={renamingShow.name} onChange={event => setRenamingShow({ ...renamingShow, name: event.target.value })} />}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRenamingShow(null)}>Annuleren</Button>
+              <Button onClick={async () => { if (renamingShow) { await renameShow(renamingShow.id, renamingShow.name || "Diavoorstelling"); setRenamingShow(null); } }}>Opslaan</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="space-y-2">
+    <div className={cn("max-w-3xl", isMobile ? "space-y-4" : "space-y-6")}>
+      <div className={cn("space-y-2", isMobile && "hidden")}>
         <h2 className="font-display text-lg font-bold text-foreground">Dialoogvoorstelling</h2>
         <p className="text-sm text-muted-foreground">
           Alleen dia's die gemarkeerd zijn als 'actief' worden getoond. Hoeveel informatie er op één
@@ -463,9 +541,9 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate }: Props) => {
       )}
 
       {/* Show selector + style chips */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
-          <DropdownMenu>
+      <div className={cn("flex items-center justify-between gap-4 flex-wrap", isMobile && "rounded-lg border border-border bg-card p-3")}>
+        <div className={cn("flex items-center gap-2 flex-wrap", isMobile && "w-full justify-between")}>
+          {!isMobile && <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
@@ -516,7 +594,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate }: Props) => {
                 <Plus className="h-3.5 w-3.5" /> Nieuwe voorstelling
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>}
 
           {/* Division filter — only when tournament has multiple categories */}
           {categories.length > 1 && activeShow && (
@@ -549,15 +627,16 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate }: Props) => {
             </DropdownMenu>
           )}
 
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="icon"
             onClick={openSlideshow}
             disabled={!activeShow}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 disabled:opacity-40"
+            className="h-9 w-9"
             aria-label="Open diavoorstelling"
           >
             <ExternalLink className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
 
       </div>
@@ -585,13 +664,13 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate }: Props) => {
               onRemoveBlock={blockId => removeBlock(slide.id, blockId)}
             />
           ))}
-          <button
-            type="button"
+          <Button
+            variant="outline"
             onClick={addSlide}
-            className="w-full rounded-lg border border-dashed border-border py-3 text-xs font-bold uppercase tracking-wide text-muted-foreground hover:text-foreground hover:border-foreground/30"
+            className="w-full border-dashed"
           >
-            Dia toevoegen
-          </button>
+            <Plus className="h-4 w-4" /> Dia toevoegen
+          </Button>
         </div>
       )}
 
@@ -693,10 +772,10 @@ const SlideCard = ({
   return (
     <div className="rounded-lg border border-border overflow-hidden">
       {/* Header bar */}
-      <div className="flex items-center justify-between bg-primary text-primary-foreground px-4 py-2.5">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-bold">{slideName}</span>
-          <span className="inline-flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 bg-primary text-primary-foreground px-3 py-2.5 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <span className="min-w-0 break-words text-sm font-bold">{slideName}</span>
+          <span className="inline-flex shrink-0 items-center gap-1 sm:gap-2">
             <span className="inline-flex items-center rounded bg-background/20 px-2 py-0.5 text-sm font-bold text-primary-foreground">
               {slide.durationSec || 15} seconden
             </span>
@@ -711,9 +790,9 @@ const SlideCard = ({
             </button>
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <label className="flex items-center gap-2 text-xs cursor-pointer select-none">
-            <span>Actief:</span>
+            <span className="hidden sm:inline">Actief:</span>
             <span
               className={`relative inline-flex h-4 w-4 items-center justify-center rounded border ${
                 slide.enabled
@@ -762,7 +841,7 @@ const SlideCard = ({
         )}
 
         {/* Block toolbar */}
-        <div className="flex items-center justify-center gap-1 pt-2 border-t border-border">
+        <div className="grid grid-cols-5 items-center justify-items-center gap-1 pt-2 border-t border-border">
           <GroupBracketPicker sources={sources} onAddBlock={onAddBlock} />
           <BlockButton icon={CalendarClockIcon} label="Aankomende wedstrijden" onClick={() => onAddBlock("upcoming_matches")} />
           <BlockButton icon={ScoreboardIcon} label="Laatste resultaten" onClick={() => onAddBlock("recent_results")} />
