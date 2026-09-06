@@ -907,15 +907,15 @@ const GroupManager = ({
         </p>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         {showRandomAssign && (
-          <Button variant="outline" size="sm" onClick={() => {
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
             if (hasAssignedTeams) { setShowRandomConfirm(true); } else { randomAssignTeams(); }
           }}>
             <Shuffle className="h-3 w-3" /> Willekeurige indeling
           </Button>
         )}
-        <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)}>
+        <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setShowClearConfirm(true)}>
           <Trash2 className="h-3 w-3" /> Alles leeg maken
         </Button>
       </div>
