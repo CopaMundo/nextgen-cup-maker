@@ -275,6 +275,7 @@ const PublicMatchCard = ({
                 )
               )}
             </div>
+            </div>
           </div>
         )}
 
