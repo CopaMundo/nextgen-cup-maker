@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil } from "lucide-react";
+import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil, ChevronRight, ArrowLeft, Grid3X3, Trophy, Swords, ListOrdered } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -40,6 +41,8 @@ interface PhaseContainer {
 }
 
 const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
+  const isMobile = useIsMobile();
+  const [openFormatId, setOpenFormatId] = useState<string | null>(null);
   const [allFormats, setAllFormats] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [creatingFormat, setCreatingFormat] = useState(false);
