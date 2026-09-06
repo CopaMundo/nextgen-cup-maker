@@ -70,7 +70,7 @@ const SortableRow = ({
 }: {
   id: string;
   label: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   dragLabel: string;
   onRename: () => void;
   onDelete: () => void;
