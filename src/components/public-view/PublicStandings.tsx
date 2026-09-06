@@ -81,7 +81,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   const [expandedGroupSchedule, setExpandedGroupSchedule] = useState<string | null>(null);
   const phaseTabRefs = useRef<Map<number, HTMLButtonElement | null>>(new Map());
   const phaseContainerRef = useRef<HTMLDivElement | null>(null);
-  const [phaseOverflows, setPhaseOverflows] = useState(false);
 
   // De fase-tabs worden altijd gecentreerd binnen de scrollbare rij.
   // Bij overflow kan de gebruiker zijwaarts swipen; de inhoud blijft vanuit het midden groeien.
