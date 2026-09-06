@@ -185,7 +185,7 @@ const PublicMatchCard = ({
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
                       {isHALeg && (
-                        <span className="text-[9px] text-muted-foreground font-medium truncate">
+                        <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
                           ({haLegLabel})
                         </span>
                       )}
@@ -204,7 +204,7 @@ const PublicMatchCard = ({
                       )}
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                       {isHALeg && (
-                        <span className="text-[9px] text-muted-foreground font-medium truncate">
+                        <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
                           ({haLegLabel})
                         </span>
                       )}
@@ -239,7 +239,7 @@ const PublicMatchCard = ({
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
                       {isHALeg && (
-                        <span className="text-[9px] text-muted-foreground font-medium truncate">
+                        <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
                           ({haLegLabel})
                         </span>
                       )}
