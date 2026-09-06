@@ -1,0 +1,10 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.matches;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.match_stats;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.group_teams;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.groups;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.teams;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.slots;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.tournament_phases;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.standing_colors;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.tournament_polls;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.poll_votes;
