@@ -157,6 +157,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [editCatName, setEditCatName] = useState("");
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [editLocName, setEditLocName] = useState("");
+  const editCategoryDialogRef = useDialogFocus(editingCatId !== null);
+  const editLocationDialogRef = useDialogFocus(editingLocId !== null);
 
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
@@ -986,11 +988,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             dragLabel="Locatie verplaatsen"
                             onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
                             onDelete={() => setDeleteLocId(loc.id)}
-                            editing={editingLocId === loc.id}
-                            editValue={editLocName}
-                            onEditValueChange={setEditLocName}
-                            onEditSave={() => { saveLocationRename(); }}
-                            onEditCancel={() => setEditingLocId(null)}
                           />
                         ))}
                       </div>
@@ -1060,11 +1057,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
-                        editing={editingCatId === cat.id}
-                        editValue={editCatName}
-                        onEditValueChange={setEditCatName}
-                        onEditSave={() => { saveCategoryRename(); }}
-                        onEditCancel={() => setEditingCatId(null)}
                       />
 
                     ))}
@@ -1356,6 +1348,48 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={editingLocId !== null} onOpenChange={(open) => !open && setEditingLocId(null)}>
+        <DialogContent ref={editLocationDialogRef} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Locatie bewerken</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="edit-location-name">Naam</Label>
+            <Input
+              id="edit-location-name"
+              value={editLocName}
+              onChange={(event) => setEditLocName(event.target.value)}
+              onKeyDown={(event) => { if (event.key === "Enter" && editLocName.trim()) void saveLocationRename(); }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingLocId(null)}>Annuleren</Button>
+            <Button onClick={saveLocationRename} disabled={!editLocName.trim()}>Opslaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editingCatId !== null} onOpenChange={(open) => !open && setEditingCatId(null)}>
+        <DialogContent ref={editCategoryDialogRef} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Divisie bewerken</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="edit-category-name">Naam</Label>
+            <Input
+              id="edit-category-name"
+              value={editCatName}
+              onChange={(event) => setEditCatName(event.target.value)}
+              onKeyDown={(event) => { if (event.key === "Enter" && editCatName.trim()) void saveCategoryRename(); }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingCatId(null)}>Annuleren</Button>
+            <Button onClick={saveCategoryRename} disabled={!editCatName.trim()}>Opslaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
       {/* Edit Name Dialog */}
