@@ -1691,27 +1691,25 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return (
       <div key={match.id} className="rounded-md border border-border/60 bg-card hover:border-border transition-colors">
         <div className="px-2 py-1.5 flex items-center gap-2">
-          {/* Phase / group meta — compact left rail */}
+          {/* Format / group / match / field / referee meta — compact left rail */}
           <div className="flex flex-col shrink-0 min-w-0 max-w-[6.5rem] gap-0">
             <div className="flex items-center gap-1 min-w-0">
               {phase?.logo_url && <img src={phase.logo_url} alt="" className="h-2.5 w-2.5 object-contain rounded flex-shrink-0" />}
-              <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground truncate">{headerLabel}</span>
+              <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground truncate" title={headerLabel}>{headerLabel}</span>
             </div>
             {subLabel && (
-              <span className="text-[9px] text-muted-foreground/80 truncate leading-tight">{subLabel}</span>
+              <span className="text-[9px] text-muted-foreground/80 truncate leading-tight" title={subLabel}>{subLabel}</span>
             )}
-            {(match.field || match.referee) && (
-              <div className="flex items-center gap-1.5 mt-0.5">
-                {match.field && (
-                  <span className="text-[9px] text-muted-foreground flex items-center gap-0.5 truncate">
-                    <MapPin className="h-2 w-2 shrink-0" />{formatFieldLabel(match.field)}
-                  </span>
-                )}
-                {match.referee && (
-                  <span className="text-[9px] text-muted-foreground flex items-center gap-0.5 truncate">
-                    <WhistleIcon className="h-2 w-2 shrink-0" />{match.referee}
-                  </span>
-                )}
+            {match.field && (
+              <div className="flex items-center gap-0.5 mt-0.5">
+                <MapPin className="h-2 w-2 shrink-0 text-muted-foreground" />
+                <span className="text-[9px] text-muted-foreground truncate" title={formatFieldLabel(match.field)}>{formatFieldLabel(match.field)}</span>
+              </div>
+            )}
+            {match.referee && (
+              <div className="flex items-center gap-0.5">
+                <WhistleIcon className="h-2 w-2 shrink-0 text-muted-foreground" />
+                <span className="text-[9px] text-muted-foreground truncate" title={match.referee}>{match.referee}</span>
               </div>
             )}
           </div>
@@ -2418,6 +2416,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
         // Voor H&A: needsPenalties altijd true in knockout/single_match (zodra aggregate tied is)
         const phase = phases.find(p => p.id === sem.phase_id);
+        const group = groups.find(g => g.id === sem.group_id);
         const isKnockoutLike = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
         const needsPen = isHALeg && isKnockoutLike ? true : matchAllowsDecider(sem);
 
@@ -2448,6 +2447,13 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             }
             tournament={tournament}
             aggregate={aggregateProp}
+            formatName={phase?.name || null}
+            groupName={group?.name || null}
+            matchName={sem.match_name || null}
+            field={sem.field}
+            referee={sem.referee}
+            matchDate={sem.match_date}
+            matchTime={sem.match_time}
             onSave={async (data) => {
               // Update de huidige leg. Bij H&A horen penalties UITSLUITEND op de
               // Terug-match: de Heen-match wordt dus altijd hard op null gezet
