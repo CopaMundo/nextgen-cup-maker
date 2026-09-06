@@ -271,9 +271,9 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
               className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                {tab.id === "scorers" && <Target className="h-4 w-4" />}
-                {tab.id === "assists" && <Users className="h-4 w-4" />}
-                {tab.id === "fairplay" && <ShieldCheck className="h-4 w-4" />}
+                {tab.id === "scorers" && <MaskIcon src={trophyIconAsset.url} label="Topschutters" />}
+                {tab.id === "assists" && <MaskIcon src={bootsIconAsset.url} label="Assists" />}
+                {tab.id === "fairplay" && <MaskIcon src={yellowCardIconAsset.url} label="Fairplay" />}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm font-semibold">{tab.label}</span>
               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
