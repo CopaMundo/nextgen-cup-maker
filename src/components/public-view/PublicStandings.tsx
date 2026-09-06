@@ -151,6 +151,26 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
     return Object.values(map).sort((a, b) => b.count - a.count);
   };
 
+  const statsEnabled = !!(tournament.enable_goalscorers || tournament.enable_assists || tournament.enable_fairplay);
+  const seenKey = `ttx-stats-hint-${tournament.id}`;
+  const [showStatsHint, setShowStatsHint] = useState(false);
+  const [statsSeen, setStatsSeen] = useState(true);
+
+  useEffect(() => {
+    if (!statsEnabled) return;
+    try {
+      setStatsSeen(localStorage.getItem(seenKey) === "1");
+    } catch {
+      setStatsSeen(true);
+    }
+  }, [statsEnabled, seenKey]);
+
+  const markStatsSeen = () => {
+    setStatsSeen(true);
+    setShowStatsHint(false);
+    try { localStorage.setItem(seenKey, "1"); } catch { /* ignore */ }
+  };
+
   return (
     <div className="px-3 pb-4">
       {/* Sticky header: title, phases, subformats */}
@@ -162,17 +182,54 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
             {subTab === "standings" ? "Standen" : "Statistieken"}
           </h2>
           <div className={ds(bStyle, "sectionLine")} />
-          <button
-            onClick={() => setSubTab(subTab === "standings" ? "stats" : "standings")}
-            className="ttx-stats-toggle shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-            aria-label={subTab === "standings" ? "Statistieken openen" : "Standen openen"}
-            title={subTab === "standings" ? "Statistieken" : "Standen"}
-          >
-            {subTab === "standings"
-              ? <BarChart3 className="h-4 w-4" />
-              : <ListOrdered className="h-4 w-4" />}
-          </button>
+          {statsEnabled && (
+          <div className="relative shrink-0">
+            <button
+              onClick={() => {
+                if (subTab === "standings" && !statsSeen) {
+                  setShowStatsHint((v) => !v);
+                  return;
+                }
+                markStatsSeen();
+                setSubTab(subTab === "standings" ? "stats" : "standings");
+              }}
+              className="ttx-stats-toggle shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              aria-label={subTab === "standings" ? "Statistieken openen" : "Standen openen"}
+              title={subTab === "standings" ? "Statistieken" : "Standen"}
+            >
+              {subTab === "standings"
+                ? <BarChart3 className="h-4 w-4" />
+                : <ListOrdered className="h-4 w-4" />}
+              {!statsSeen && subTab === "standings" && (
+                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+              )}
+            </button>
+
+            {showStatsHint && (
+              <div className="absolute right-0 top-full z-40 mt-2 w-56 rounded-lg border border-border bg-popover p-3 text-left shadow-lg">
+                <p className="text-xs leading-snug text-foreground">
+                  Voor dit toernooi worden spelerstatistieken bijgehouden. Bekijk ze hier.
+                </p>
+                <div className="mt-2 flex justify-end gap-2">
+                  <button
+                    onClick={markStatsSeen}
+                    className="rounded-md px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
+                  >
+                    Sluiten
+                  </button>
+                  <button
+                    onClick={() => { markStatsSeen(); setSubTab("stats"); }}
+                    className="rounded-md bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground"
+                  >
+                    Bekijken
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          )}
         </div>
+
 
         {subTab === "standings" && (
           <div className="space-y-1.5">
