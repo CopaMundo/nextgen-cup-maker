@@ -300,7 +300,14 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     <div className="space-y-4">
       {isMobile ? (
         <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm text-muted-foreground">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
+            {categoryId && (
+              <Button variant="outline" size="sm" className="h-8" onClick={openImport}>
+                <Download className="h-3.5 w-3.5 mr-1" /> Importeren
+              </Button>
+            )}
+          </div>
           <div className="grid grid-cols-1 gap-2">
             {referees.map((r, i) => (
               <div
@@ -339,17 +346,6 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
               </div>
               <span className="font-display text-sm font-semibold text-foreground">Scheidsrechter toevoegen</span>
             </button>
-            {categoryId && (
-              <button
-                onClick={openImport}
-                className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                  <Download className="h-4 w-4" />
-                </div>
-                <span className="font-display text-sm font-semibold text-foreground">Importeren</span>
-              </button>
-            )}
           </div>
         </div>
       ) : (
