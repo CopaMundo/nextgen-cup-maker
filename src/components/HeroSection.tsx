@@ -1,6 +1,6 @@
 import { Plus, Search, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import trophyLogo from "@/assets/copa-mundo-trophy.png";
+import CopaMundoMark from "@/components/CopaMundoMark";
 import stadiumHero from "@/assets/stadium-hero.jpg";
 
 const HeroSection = () => {
@@ -25,7 +25,7 @@ const HeroSection = () => {
           <div className="flex flex-col items-start gap-6">
             {/* Logo + badge */}
             <div className="flex items-center gap-4">
-              <img src={trophyLogo} alt="" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-2xl" />
+              <CopaMundoMark className="h-16 w-16 sm:h-20 sm:w-20 drop-shadow-2xl" />
               <div>
                 <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.3em] text-primary/80">
                   Toernooi Platform
