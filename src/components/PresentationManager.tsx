@@ -22,11 +22,14 @@ import {
   Presentation,
   AlertTriangle,
   HelpCircle,
+  ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type SubTab = "website" | "slideshow" | "visualization";
 
@@ -44,6 +47,8 @@ const PresentationManager = ({
   const [displayStyle, setDisplayStyle] = useState<BroadcastStyle>(normalizeBroadcastStyle(tournament.view_display_style));
   const [formatDisplayMode, setFormatDisplayMode] = useState<"tabs" | "stacked">((tournament.format_display_mode || "tabs") as "tabs" | "stacked");
   const [subTab, setSubTab] = useState<SubTab>("website");
+  const isMobile = useIsMobile();
+  const [mobileOverview, setMobileOverview] = useState(true);
 
   const viewUrl = `${window.location.origin}/view/${tournament.view_link_token}`;
 
