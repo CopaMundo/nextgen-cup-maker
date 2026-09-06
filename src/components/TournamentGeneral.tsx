@@ -130,10 +130,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [editCatName, setEditCatName] = useState("");
-  const editCategoryDialogRef = useDialogFocus(!!editingCatId);
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [editLocName, setEditLocName] = useState("");
-  const editLocationDialogRef = useDialogFocus(!!editingLocId);
 
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
