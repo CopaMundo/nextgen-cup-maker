@@ -577,7 +577,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     // so all cards in one bracket share identical typography.
     const scale = sizeOverride?.scale ?? (compactTree ? compactBracketScale : 1);
     const fsName = Math.round(11 * scale);
-    const fsScore = Math.round(15 * scale);
+    const fsScore = Math.round(18 * scale);
     const logoSize = Math.round(16 * scale);
     const flagW = Math.round(16 * scale);
     const flagH = Math.round(12 * scale);
