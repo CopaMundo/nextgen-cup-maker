@@ -734,7 +734,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Logo</Label>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.logo_url && (
                   <img src={tournament.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain bg-secondary" />
                  )}
@@ -746,7 +746,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
             <div className="space-y-2">
               <Label>Omslagfoto</Label>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.cover_url && (
                   <img src={tournament.cover_url} alt="Cover" className="h-16 w-28 rounded-lg object-cover bg-secondary" />
                 )}
