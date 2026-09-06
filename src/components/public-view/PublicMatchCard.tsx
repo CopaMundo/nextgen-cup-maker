@@ -30,6 +30,8 @@ interface PublicMatchCardProps {
   awayPosition?: number;
   /** When provided, overrides the default match-detail dialog open. */
   onCardClick?: () => void;
+  /** Active location filter in the public schedule. When set, the field label shows only the field name. */
+  locationFilter?: string;
 }
 
 const getTeamName = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.name || "–";
