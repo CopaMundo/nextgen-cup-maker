@@ -100,6 +100,16 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   }, [initialGroupId]);
 
   const activePhaseNum = selectedPhaseNum ?? allPhaseNumbers[0] ?? null;
+
+  // Centreer het actieve fase-tabblad in de scrollbare rij
+  useEffect(() => {
+    if (allPhaseNumbers.length <= 1 || activePhaseNum === null) return;
+    const el = phaseTabRefs.current.get(activePhaseNum);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [activePhaseNum, allPhaseNumbers]);
+
   const phasesInActiveNum = phases.filter((p: any) => p.phase_number === activePhaseNum);
   const showFormatsAsTabs = tournament.format_display_mode !== "stacked";
   
