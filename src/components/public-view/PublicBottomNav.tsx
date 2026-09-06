@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { Info, Users, Trophy, Calendar, Home } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
@@ -14,47 +13,9 @@ interface Props {
 const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, teams }: Props) => {
   const bStyle = useBroadcastStyle();
   const favTeam = favoriteTeam ? teams?.find((t: any) => t.id === favoriteTeam) : null;
-  const navRef = useRef<HTMLElement | null>(null);
-
-  // Houd de balk vast onderaan het zichtbare scherm, ook bij pinch-zoom
-  useEffect(() => {
-    const vv = window.visualViewport;
-    const el = navRef.current;
-    if (!vv || !el) return;
-
-    let raf = 0;
-    const apply = () => {
-      raf = 0;
-      const scale = vv.scale || 1;
-      if (scale === 1) {
-        // Geen pinch-zoom: gewone fixed-positionering volstaat en blijft stabiel bij snel scrollen.
-        el.style.transform = "";
-        el.style.width = "";
-        el.style.right = "";
-        return;
-      }
-      const x = vv.offsetLeft;
-      const y = vv.offsetTop + vv.height - window.innerHeight;
-      el.style.transformOrigin = "left bottom";
-      el.style.transform = `translate(${x}px, ${y}px) scale(${1 / scale})`;
-      el.style.width = `${vv.width * scale}px`;
-      el.style.right = "auto";
-    };
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(apply);
-    };
-
-    apply();
-    vv.addEventListener("resize", schedule);
-    vv.addEventListener("scroll", schedule);
-    window.addEventListener("scroll", schedule, { passive: true });
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      vv.removeEventListener("resize", schedule);
-      vv.removeEventListener("scroll", schedule);
-      window.removeEventListener("scroll", schedule);
-    };
-  }, []);
+  // Geen JS-correctie meer: de balk staat altijd gewoon vast (position: fixed).
+  // Elke vorm van meebewegen via transform loopt bij snel scrollen of pinch-zoom
+  // een frame achter en veroorzaakt zichtbaar geschud.
 
   const tabs: { id: string; label: string; icon: any; isCenter?: boolean }[] = [
     { id: "info", label: "Info", icon: Info },
@@ -65,7 +26,7 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
   ];
 
   return (
-    <nav ref={navRef} className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
+    <nav className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
 
       <div className="relative grid h-16 grid-cols-5 items-end px-2 pt-1 pb-2">
         {tabs.map((tab) => {
