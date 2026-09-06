@@ -186,7 +186,7 @@ const PublicMatchCard = ({
                       )}
                       {isHALeg && (
                         <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
-                          ({haLegLabel})
+                          {haLegLabel}
                         </span>
                       )}
                     </div>
@@ -205,7 +205,7 @@ const PublicMatchCard = ({
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                       {isHALeg && (
                         <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
-                          ({haLegLabel})
+                          {haLegLabel}
                         </span>
                       )}
                     </div>
@@ -240,7 +240,7 @@ const PublicMatchCard = ({
                       )}
                       {isHALeg && (
                         <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
-                          ({haLegLabel})
+                          {haLegLabel}
                         </span>
                       )}
                     </div>
