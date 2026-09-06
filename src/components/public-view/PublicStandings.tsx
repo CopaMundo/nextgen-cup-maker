@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { getPhaseLabel } from "@/lib/phaseLabel";
 import { BarChart3, ChevronDown, ChevronUp, ListOrdered } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
