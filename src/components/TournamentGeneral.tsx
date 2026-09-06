@@ -992,6 +992,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
+                        editing={editingCatId === cat.id}
+                        editValue={editCatName}
+                        onEditValueChange={setEditCatName}
+                        onEditSave={() => { saveCategoryRename(); }}
+                        onEditCancel={() => setEditingCatId(null)}
                       />
 
                     ))}
