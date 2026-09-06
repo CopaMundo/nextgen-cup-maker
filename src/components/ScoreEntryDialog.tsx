@@ -221,12 +221,59 @@ const ScoreEntryDialog = ({
   const actualShowPenalties = tieNeedsDecider && !penaltiesLockedToOtherLeg;
 
 
+  const formatDate = (d: string | null | undefined) => {
+    if (!d) return null;
+    try {
+      const dt = new Date(d);
+      return dt.toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short" });
+    } catch {
+      return d;
+    }
+  };
+  const formatTime = (t: string | null | undefined) => (t ? t.substring(0, 5) : null);
+
+  const infoLabel = groupName || matchName || "";
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleDiscard(); }}>
       <DialogContent className="max-w-md top-4 translate-y-0 sm:top-[50%] sm:translate-y-[-50%] max-h-[calc(100dvh-2rem)] sm:max-h-[90dvh] overflow-y-auto overscroll-contain">
         <DialogHeader>
           <DialogTitle className="text-base">Score invullen</DialogTitle>
         </DialogHeader>
+
+        {/* Match info */}
+        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2 space-y-1">
+          {formatName && (
+            <div className="flex items-center gap-1.5">
+              {formatName && <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground truncate">{formatName}</span>}
+            </div>
+          )}
+          {infoLabel && (
+            <div className="text-xs font-medium text-foreground truncate">{infoLabel}</div>
+          )}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+            {matchDate && (
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" /> {formatDate(matchDate)}
+              </span>
+            )}
+            {matchTime && (
+              <span className="flex items-center gap-1 tabular-nums">
+                <Clock className="h-3 w-3" /> {formatTime(matchTime)}
+              </span>
+            )}
+            {field && (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> {formatFieldLabel(field)}
+              </span>
+            )}
+            {referee && (
+              <span className="flex items-center gap-1">
+                <WhistleIcon className="h-3 w-3" /> {referee}
+              </span>
+            )}
+          </div>
+        </div>
 
         {/* Team headers */}
         <div className="flex items-center justify-between px-2">
