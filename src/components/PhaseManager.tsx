@@ -1221,7 +1221,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                 <button
                   onClick={() => setActivePhaseNumber(c.phaseNumber)}
                   className={
-                    "pl-6 pr-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative flex items-center gap-2 " +
+                    "pl-6 pr-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative flex items-center gap-2 shrink-0 whitespace-nowrap max-sm:pl-3 max-sm:text-xs " +
                     (isActive
                       ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
                       : "text-muted-foreground hover:text-foreground")
@@ -1264,7 +1264,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           })}
           <button
             onClick={addNewPhase}
-            className="px-6 py-3 text-sm font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5"
+            className="px-6 py-3 text-sm font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap max-sm:px-3 max-sm:text-xs"
             title="Fase toevoegen"
           >
             <Plus className="h-4 w-4" /> Fase toevoegen
