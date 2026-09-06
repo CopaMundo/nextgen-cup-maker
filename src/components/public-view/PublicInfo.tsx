@@ -195,11 +195,11 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Locatie-overzicht */}
         <Dialog open={showLocations} onOpenChange={setShowLocations}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
+          <DialogContent className="max-w-sm max-h-[80vh] flex flex-col">
+            <DialogHeader className="shrink-0">
               <DialogTitle className="text-base">Locaties</DialogTitle>
             </DialogHeader>
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-y-auto overscroll-contain flex-1 -mr-2 pr-2">
               {locations.map((l: any) => (
                 <div key={l.id} className={`p-3 ${cardFrame}`}>
                   <div className="flex items-center gap-2">
@@ -208,7 +208,6 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
                   </div>
                 </div>
               ))}
-
             </div>
           </DialogContent>
         </Dialog>
