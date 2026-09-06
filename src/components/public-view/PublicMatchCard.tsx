@@ -61,7 +61,7 @@ const PublicMatchCard = ({
   // Format suffix: "(Heen)" / "(Terug)" + "(N sets)" / "(beste van N)"
   const formatSuffix = getMatchFormatSuffix(m, scoringSystems as any, phases as any, groups as any);
   const isHALeg = !!m.match_name && /\s+\((Heen|Terug)\)$/.test(m.match_name);
-  const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "Heenwedstrijd" : "Terugwedstrijd") : null;
+  const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "HEEN" : "TERUG") : null;
 
   // Build structured context lines
   const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
@@ -93,7 +93,7 @@ const PublicMatchCard = ({
   const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   // Beslissende score hoort nooit bij een Heen-wedstrijd; toon ze daar nooit.
-  const hasPenalties = haLegLabel !== "Heenwedstrijd" && m.home_penalties != null && m.away_penalties != null;
+  const hasPenalties = haLegLabel !== "HEEN" && m.home_penalties != null && m.away_penalties != null;
   // Scores worden weergegeven zodra ze zijn ingevuld, ook als een beslissende
   // score nog ontbreekt (wedstrijd nog niet officieel afgerond).
   const showScores = m.is_played || (m.home_score != null && m.away_score != null);

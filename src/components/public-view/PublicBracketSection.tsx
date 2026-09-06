@@ -612,7 +612,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const group = groups?.find((g: any) => g.id === match.group_id);
     const baseDisplayName = matchIsHA ? getBaseMatchName(match.match_name) : match.match_name;
     const displayNameSuffix = matchIsHA
-      ? ""
+      ? ` (${match.match_name?.endsWith("(Heen)") ? "HEEN" : "TERUG"})`
       : getMatchFormatSuffix(
           match,
           scoringSystems as any,
