@@ -364,6 +364,13 @@ const ScoreEntryDialog = ({
           </div>
         )}
 
+        {tieNeedsDecider && penaltiesLockedToOtherLeg && (
+          <p className="text-[11px] text-center text-muted-foreground font-medium pt-1">
+            Beslissende score wordt ingegeven bij de {aggregate?.pairedLegLabel?.toLowerCase() ?? "terug"}wedstrijd
+          </p>
+        )}
+
+
         {hasStatsEnabled && tournament && match.home_team_id && match.away_team_id && (() => {
           const effHome = scoringType === "sets" && numSets >= 2
             ? computedSetTotals.homeWins
