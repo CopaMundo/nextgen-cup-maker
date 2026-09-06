@@ -672,23 +672,23 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             const penValue = matchIsHA
               ? (haTotal?.hasPenalties ? (side === "home" ? haTotal.homePen : haTotal.awayPen) : null)
               : (match.home_penalties !== null && match.away_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
-            const scoreW = tightSide ? 8 : isCompactPretty ? Math.max(10, (fsScore ?? 11)) : 12;
+            const scoreW = tightSide ? 10 : isCompactPretty ? Math.max(12, (fsScore ?? 13)) : 14;
             const hasPen = penValue !== null && penValue !== undefined;
             // Keep the complete score block near the card edge while reserving
             // enough room for a two-digit shoot-out score such as “(10)”.
-            const penSlot = tightSide ? 12 : 18;
+            const penSlot = tightSide ? 14 : 20;
             return (
               <div className="flex items-center shrink-0">
                 <span
-                  className={`tabular-nums text-right leading-none ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[12px]"}`}
+                  className={`tabular-nums text-right leading-none ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[15px]"}`}
                   style={{
                     minWidth: scoreW,
-                    ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 7, lineHeight: 1 } : {}),
+                    ...(isCompactPretty ? { fontSize: fsScore, lineHeight: 1 } : tightSide ? { fontSize: 9, lineHeight: 1 } : {}),
                   }}
                 >{displayScore ?? "–"}</span>
                 {/* Fixed-width penalty slot: always reserved so the main score never shifts */}
                 <span
-                  className="text-left text-[8px] text-muted-foreground font-medium leading-none whitespace-nowrap tabular-nums ml-0.5 shrink-0"
+                  className="text-left text-[9px] text-muted-foreground font-medium leading-none whitespace-nowrap tabular-nums ml-0.5 shrink-0"
                   style={{ width: penSlot }}
                 >{hasPen ? `(${penValue})` : ""}</span>
               </div>
