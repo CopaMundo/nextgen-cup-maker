@@ -1,10 +1,10 @@
 # Project Memory
 
 ## Core
-- Admin op mobiel: full-height inklapbare zijbalk; ingeklapt blijft een smalle iconenbalk zichtbaar; altijd op 393px controleren.
+- Admin op mobiel: icon-only zijbalk die volledig verdwijnt; dunne contextbalk toont actieve tab en toernooinaam; controleer op 393px.
 
 ## Memories
-- [Admin mobile layout](mem://style/admin-mobile-layout) — Beheer op mobiel gebruikt een full-height inklapbare app-zijbalk met blijvend zichtbare iconenstand
+- [Admin mobile layout](mem://style/admin-mobile-layout) — Beheer op mobiel gebruikt een volledig inklapbare iconenzijbalk met dunne contextbalk
 - [Broadcast SoccerTec Masters](mem://style/broadcast-soccertec-masters) — soccertec stijl: premium monochroom zwart-wit, Barlow Condensed, 2px radius
 - [Broadcast Old Clubhouse](mem://style/broadcast-old-clubhouse) — old_clubhouse stijl: voetbalkantine-uitslagenbord, hout/letterboard/crème, Oswald
 - [Broadcast Sticker Album](mem://style/broadcast-sticker-album) — sticker_album stijl: voetbalstickeralbum, albumpapier + witte stickers, navy/rood, Barlow Condensed

@@ -312,44 +312,46 @@ const TournamentDetail = () => {
     >
 
 
-      <Navbar tournamentName={tournament?.name} />
+      <Navbar tournamentName={tournament?.name} hideTournamentNameOnMobile />
       <ThemeSwitcher />
+      {isMobile && (
+        <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border bg-card px-2 print:hidden">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={toggleMobileSidebar}
+            className="h-7 w-7 shrink-0"
+            aria-label={mobileSidebarCollapsed ? "Navigatie openen" : "Navigatie sluiten"}
+            title={mobileSidebarCollapsed ? "Navigatie openen" : "Navigatie sluiten"}
+          >
+            {mobileSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </Button>
+          <span className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground">
+            {sidebarItems.find((item) => item.id === activeTab)?.label}
+          </span>
+          <span className="max-w-[52%] truncate text-right text-xs text-muted-foreground" title={tournament.name}>
+            {tournament.name}
+          </span>
+        </div>
+      )}
       <div className="relative flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
           <nav
             aria-label="Toernooibeheer"
             className={cn(
-              "shrink-0 self-stretch border-r border-border bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width,box-shadow] duration-200",
+              "shrink-0 self-stretch bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width,border-color] duration-200",
               isMobile
                 ? mobileSidebarCollapsed
-                  ? "relative z-40 w-14 items-center"
-                  : "absolute inset-y-0 left-0 z-40 w-40 items-stretch shadow-xl"
-                : "relative w-20 items-center"
+                  ? "relative w-0 border-r-0"
+                  : "relative w-14 items-center border-r border-border"
+                : "relative w-20 items-center border-r border-border"
             )}
           >
-            {isMobile && (
-              <div className={cn("shrink-0 border-b border-border pb-2", mobileSidebarCollapsed ? "px-2" : "px-3")}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleMobileSidebar}
-                  className={cn("h-9", mobileSidebarCollapsed ? "w-9" : "w-full justify-start px-2")}
-                  aria-label={mobileSidebarCollapsed ? "Navigatie uitklappen" : "Navigatie inklappen"}
-                  title={mobileSidebarCollapsed ? "Navigatie uitklappen" : "Navigatie inklappen"}
-                >
-                  {mobileSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-                  {!mobileSidebarCollapsed && <span className="ml-2 text-xs font-semibold">Inklappen</span>}
-                </Button>
-              </div>
-            )}
-            {tournament.logo_url && (
-              <div className={cn("mb-1 shrink-0 border-b border-border py-2", isMobile && !mobileSidebarCollapsed ? "mx-3 flex items-center gap-2" : "px-2")}>
+            {tournament.logo_url && !isMobile && (
+              <div className="mb-1 shrink-0 border-b border-border px-2 py-2">
                 <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
-                {isMobile && !mobileSidebarCollapsed && (
-                  <span className="truncate text-xs font-semibold text-foreground">{tournament.name}</span>
-                )}
               </div>
             )}
             <div className={cn("min-h-0 w-full", isMobile ? "flex-1 overflow-y-auto scrollbar-none" : "flex flex-1 flex-col items-center gap-0.5 overflow-hidden")}>
@@ -368,9 +370,7 @@ const TournamentDetail = () => {
                       className={cn(
                         "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
                         isMobile
-                          ? mobileSidebarCollapsed
-                            ? "mx-auto mb-1 h-11 w-11 justify-center p-0"
-                            : "mx-2 mb-1 h-10 w-[calc(100%-1rem)] justify-start gap-2 px-2"
+                          ? "mx-auto mb-1 h-11 w-11 justify-center p-0"
                           : "w-16 flex-1 min-h-0 max-h-[56px] py-1 flex-col justify-center gap-0.5",
                         activeTab === item.id
                           ? "bg-primary text-primary-foreground shadow-sm"
@@ -378,8 +378,8 @@ const TournamentDetail = () => {
                       )}
                     >
                       <item.icon className="h-[18px] w-[18px] shrink-0" />
-                      {(!isMobile || !mobileSidebarCollapsed) && (
-                        <span className={cn("font-medium leading-tight truncate", isMobile ? "text-xs text-left" : "text-[10px] w-full text-center")}>
+                      {!isMobile && (
+                        <span className="w-full truncate text-center text-[10px] font-medium leading-tight">
                           {item.label}
                         </span>
                       )}
