@@ -181,7 +181,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : <div />}
                     <div className="flex items-center gap-1.5 min-w-0">
@@ -215,7 +215,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
@@ -250,7 +250,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
@@ -271,7 +271,7 @@ const PublicMatchCard = ({
                     <div />
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
