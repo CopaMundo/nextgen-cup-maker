@@ -1223,7 +1223,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </div>
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
-        <DialogContent ref={addLocationDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
+        <DialogContent ref={addLocationDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Locatie toevoegen</DialogTitle>
           </DialogHeader>
@@ -1245,7 +1245,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddCategory} onOpenChange={setShowAddCategory}>
-        <DialogContent ref={addCategoryDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
+        <DialogContent ref={addCategoryDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Divisie toevoegen</DialogTitle>
           </DialogHeader>
@@ -1267,7 +1267,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddMatchDay} onOpenChange={setShowAddMatchDay}>
-        <DialogContent ref={addMatchDayDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
+        <DialogContent ref={addMatchDayDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Wedstrijddag toevoegen</DialogTitle>
             <DialogDescription>Kies een datum waarop er gespeeld wordt.</DialogDescription>
@@ -1288,7 +1288,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </Dialog>
 
       <Dialog open={showAddPeriod} onOpenChange={setShowAddPeriod}>
-        <DialogContent ref={addPeriodDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
+        <DialogContent ref={addPeriodDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Periode toevoegen</DialogTitle>
             <DialogDescription>Alle dagen binnen deze periode worden toegevoegd als extra wedstrijddagen.</DialogDescription>
@@ -1400,7 +1400,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Match Day Dialog */}
       <Dialog open={editMatchDayIdx !== null} onOpenChange={(open) => !open && setEditMatchDayIdx(null)}>
-        <DialogContent ref={editMatchDayDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
+        <DialogContent ref={editMatchDayDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Wedstrijddag bewerken</DialogTitle>
             <DialogDescription>Pas de datum aan.</DialogDescription>
@@ -1428,7 +1428,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Period Dialog */}
       <Dialog open={editPeriodIdx !== null} onOpenChange={(open) => !open && setEditPeriodIdx(null)}>
-        <DialogContent ref={editPeriodDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
+        <DialogContent ref={editPeriodDialogRef} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Periode bewerken</DialogTitle>
             <DialogDescription>Pas de start- en einddatum aan.</DialogDescription>
