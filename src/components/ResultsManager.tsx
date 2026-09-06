@@ -100,6 +100,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return stored ? parseInt(stored) : null;
   });
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
   const [phaseActionDialog, setPhaseActionDialog] = useState<"format-complete" | "format-undo" | "format-incomplete" | null>(null);
   const [lotsDialogGroupId, setLotsDialogGroupId] = useState<string | null>(null);
