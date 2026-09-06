@@ -23,6 +23,17 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 
+const formatTypeLabel = (t: string) =>
+  t === "group" ? "Groepsfase" : t === "knockout" ? "Knock-outfase" : t === "single_match" ? "Losse wedstrijd" : "Round Robin";
+
+const formatIcon = (t: string) => {
+  const cls = "h-4 w-4";
+  if (t === "group") return <Grid3X3 className={cls} />;
+  if (t === "knockout") return <Trophy className={cls} />;
+  if (t === "single_match") return <Swords className={cls} />;
+  return <ListOrdered className={cls} />;
+};
+
 interface Phase {
   id: string;
   name: string;
@@ -1262,6 +1273,73 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         .filter((c) => c.phaseNumber === activePhaseNumber)
         .map((container) => (
           <div key={container.phaseNumber}>
+            {isMobile ? (
+              openFormat ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Terug naar formats" onClick={() => setOpenFormatId(null)}>
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                    <h2 className="truncate text-base font-semibold">{openFormat.name}</h2>
+                  </div>
+                  <FormatCard
+                    key={openFormat.id}
+                    format={openFormat}
+                    tournamentId={tournamentId}
+                    allFormats={allFormats}
+                    onRemove={(id) => { setOpenFormatId(null); removeFormat(id); }}
+                    onUpdate={updateFormat}
+                    categoryId={categoryId}
+                    refreshKey={slotRefreshKey}
+                    onSlotChange={() => setSlotRefreshKey(k => k + 1)}
+                    initialExpanded
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <SortableVerticalList
+                    items={container.formats}
+                    getId={(f) => f.id}
+                    onReorder={(next) => reorderFormats(next)}
+                    className="grid grid-cols-1 gap-2"
+                  >
+                    {container.formats.map((format) => (
+                      <SortableRowShell key={format.id} id={format.id} manualRowDrag dragLabel="Format verplaatsen">
+                        {(handle, rowProps) => (
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setOpenFormatId(format.id)}
+                            onKeyDown={(e) => { if (e.key === "Enter") setOpenFormatId(format.id); }}
+                            className="flex items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-2 transition-colors hover:border-primary/50 hover:bg-accent/40"
+                          >
+                            <span {...rowProps} data-no-drag={undefined} onClick={(e) => e.stopPropagation()} className="flex h-7 w-7 shrink-0 items-center justify-center text-muted-foreground cursor-grab active:cursor-grabbing touch-none">
+                              {handle}
+                            </span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 text-primary">
+                              {format.logo_url
+                                ? <img src={format.logo_url} alt="" className="h-full w-full object-contain" />
+                                : formatIcon(format.phase_type)}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm font-semibold">{format.name}</span>
+                              <span className="block truncate text-[11px] text-muted-foreground">{formatTypeLabel(format.phase_type)}</span>
+                            </span>
+                            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          </div>
+                        )}
+                      </SortableRowShell>
+                    ))}
+                  </SortableVerticalList>
+                  <button
+                    onClick={() => setShowAddFormat(container.phaseNumber)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-3 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+                  >
+                    <Plus className="h-4 w-4" /> Format toevoegen
+                  </button>
+                </div>
+              )
+            ) : (
             <div className="space-y-3">
               {/* Format cards - always visible, individually collapsible */}
               <SortableVerticalList
@@ -1304,6 +1382,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                 </button>
               </div>
             </div>
+            )}
           </div>
         ))}
 
