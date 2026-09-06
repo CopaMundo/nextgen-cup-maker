@@ -69,7 +69,7 @@ const CategorySelector = ({
       <div className={cn("flex items-center gap-2", className)}>
         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
         <Select value={selectedCategoryId || ""} onValueChange={(v) => onSelect(v || null)}>
-          <SelectTrigger className={cn("h-8 flex-1 min-w-0 text-[11px] font-black uppercase tracking-wider", selectClassName)}>
+          <SelectTrigger className={cn("h-8 w-auto max-w-full gap-1 text-[11px] font-black uppercase tracking-wider", selectClassName)}>
             <SelectValue placeholder="Kies divisie" />
           </SelectTrigger>
           <SelectContent>
