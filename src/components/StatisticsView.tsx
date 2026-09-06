@@ -5,7 +5,29 @@ import { cn } from "@/lib/utils";
 import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight, ShieldCheck, Target, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
+import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
+import yellowCardIconAsset from "@/assets/yellow-card.png.asset.json";
+
+const MaskIcon = ({ src, label }: { src: string; label: string }) => (
+  <span
+    role="img"
+    aria-label={label}
+    className="inline-block h-4 w-4 bg-primary"
+    style={{
+      maskImage: `url(${src})`,
+      maskSize: "contain",
+      maskRepeat: "no-repeat",
+      maskPosition: "center",
+      WebkitMaskImage: `url(${src})`,
+      WebkitMaskSize: "contain",
+      WebkitMaskRepeat: "no-repeat",
+      WebkitMaskPosition: "center",
+    }}
+  />
+);
+
 
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
