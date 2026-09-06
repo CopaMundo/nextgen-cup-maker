@@ -2496,11 +2496,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               const nextList = matches.map(m => {
                 if (m.id === updatedMatch.id) return updatedMatch;
                 if (updatedCarrier && m.id === updatedCarrier.id) return updatedCarrier;
+                if (staleHeen && m.id === staleHeen.id) return staleHeen;
                 return m;
               });
               setMatches(nextList);
 
               let listAfter = nextList;
+              if (staleHeen) {
+                listAfter = (await saveScore(staleHeen, listAfter)) ?? listAfter;
+              }
               if (updatedCarrier) {
                 listAfter = (await saveScore(updatedCarrier, listAfter)) ?? listAfter;
               }
