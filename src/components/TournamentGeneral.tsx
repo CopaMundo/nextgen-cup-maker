@@ -61,7 +61,23 @@ const SortableRow = ({
   dragLabel,
   onRename,
   onDelete,
-}: { id: string; label: string; dragLabel: string; onRename: () => void; onDelete: () => void }) => (
+  editing = false,
+  editValue = "",
+  onEditValueChange,
+  onEditSave,
+  onEditCancel,
+}: {
+  id: string;
+  label: string;
+  dragLabel: string;
+  onRename: () => void;
+  onDelete: () => void;
+  editing?: boolean;
+  editValue?: string;
+  onEditValueChange?: (value: string) => void;
+  onEditSave?: () => void;
+  onEditCancel?: () => void;
+}) => (
   <SortableRowShell
     id={id}
     dragLabel={dragLabel}
@@ -69,18 +85,37 @@ const SortableRow = ({
   >
     {(handle) => (
       <>
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {handle}
-          <span className="text-foreground font-medium truncate">{label}</span>
+          {editing ? (
+            <Input
+              autoFocus
+              value={editValue}
+              onChange={(e) => onEditValueChange?.(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onEditSave?.();
+                if (e.key === "Escape") onEditCancel?.();
+              }}
+              onBlur={() => onEditSave?.()}
+              className="h-8 text-sm"
+            />
+          ) : (
+            <span className="text-foreground font-medium truncate">{label}</span>
+          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+          {editing ? (
+            <button onMouseDown={(e) => e.preventDefault()} onClick={onEditSave} className="text-muted-foreground hover:text-foreground"><Check className="h-4 w-4" /></button>
+          ) : (
+            <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+          )}
           <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
         </div>
       </>
     )}
   </SortableRowShell>
 );
+
 
 
 
