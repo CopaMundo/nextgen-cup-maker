@@ -3139,8 +3139,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         const bothPlayed = heenM.is_played && terugM.is_played;
         const isTied = homeTotal === awayTotal && bothPlayed;
         const hasPenalties = isTied && (heenM.home_penalties != null || heenM.away_penalties != null || terugM.home_penalties != null || terugM.away_penalties != null);
-        const homePen = (terugM.home_penalties ?? heenM.home_penalties ?? 0);
-        const awayPen = (terugM.away_penalties ?? heenM.away_penalties ?? 0);
+        // Penalties live on the Terug match, whose orientation is swapped vs Heen:
+        // terug.home = heen.away. Map them back to the Heen orientation shown here.
+        const homePen = (terugM.away_penalties ?? heenM.home_penalties ?? 0);
+        const awayPen = (terugM.home_penalties ?? heenM.away_penalties ?? 0);
         const homeWon = bothPlayed && (homeTotal > awayTotal || (isTied && homePen > awayPen));
         const awayWon = bothPlayed && (awayTotal > homeTotal || (isTied && awayPen > homePen));
 
