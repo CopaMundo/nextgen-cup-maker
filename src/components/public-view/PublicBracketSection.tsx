@@ -725,6 +725,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         ? `HEEN ${heenMatch.home_score}-${heenMatch.away_score}`
         : null;
 
+    // Bij een nog niet gespeelde terugwedstrijd tonen we geen totaalscore
+    // naast de ploegen; enkel de heenscore-badge onder het tijdsbalkje.
+    const hideScores = matchIsHA && pairedMatch && activeLegMatch === terugMatch && !terugMatch?.is_played;
+
 
     // Every chip is clickable — H&A opens aggregate dialog, others open match detail dialog
     const isHAClick = matchIsHA && !!pairedMatch;
