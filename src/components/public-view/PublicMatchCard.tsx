@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFieldLabel } from "@/lib/fieldLocations";
+import { useFieldLabel, displayFieldName } from "@/lib/fieldLocations";
 import { firstRefereeName } from "@/lib/refereeConfig";
 import { MapPin } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
