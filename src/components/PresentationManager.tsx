@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
 import { useIsMobile } from "@/hooks/use-mobile";
 import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
-import slideshowIconAsset from "@/assets/led-tv.png.asset.json";
+import slideshowIconAsset from "@/assets/television.png.asset.json";
 import stylingIconAsset from "@/assets/paint_1.png.asset.json";
 
 const MaskIcon = ({ src, label, className = "h-4 w-4" }: { src: string; label: string; className?: string }) => (
