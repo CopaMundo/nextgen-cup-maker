@@ -166,13 +166,15 @@ const StandingColorManager = ({
            )}
            <button
              onClick={() => openDialog(zone)}
-             className="text-muted-foreground hover:text-foreground"
+             className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1"
+             aria-label="Kwalificatiezone bewerken"
            >
              <Pencil className="h-3 w-3" />
            </button>
            <button
              onClick={() => setDeleteId(zone.id)}
-             className="text-muted-foreground hover:text-destructive"
+             className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1"
+             aria-label="Kwalificatiezone verwijderen"
            >
              <Trash2 className="h-3 w-3" />
            </button>

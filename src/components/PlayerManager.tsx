@@ -243,7 +243,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
             <div className="text-center">
               <div className="flex items-center justify-center gap-1">
                 <p className="text-sm font-medium text-foreground">{player.first_name} {player.last_name}</p>
-                <button onClick={() => { setEditingId(player.id); setEditForm({ first_name: `${player.first_name} ${player.last_name}`.trim(), last_name: player.last_name, shirt_number: player.shirt_number?.toString() || "", birth_date: player.birth_date || "", position: player.position || "" }); }} className="text-muted-foreground hover:text-foreground">
+                <button aria-label={`${player.first_name} ${player.last_name} bewerken`} onClick={() => { setEditingId(player.id); setEditForm({ first_name: `${player.first_name} ${player.last_name}`.trim(), last_name: player.last_name, shirt_number: player.shirt_number?.toString() || "", birth_date: player.birth_date || "", position: player.position || "" }); }} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1">
                   <Pencil className="h-3 w-3" />
                 </button>
               </div>
@@ -251,7 +251,7 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
                 <p className="text-[10px] text-muted-foreground">{new Date(player.birth_date).toLocaleDateString("nl-BE")}</p>
               )}
             </div>
-            <button onClick={() => setDeletePlayerId(player.id)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-destructive">
+            <button aria-label={`${player.first_name} ${player.last_name} verwijderen`} onClick={() => setDeletePlayerId(player.id)} className="absolute right-1 top-1 inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1">
               <Trash2 className="h-3 w-3" />
             </button>
           </div>

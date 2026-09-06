@@ -738,12 +738,13 @@ const GroupManager = ({
           <h4 className="font-display font-bold text-foreground">{group.name}</h4>
           <button
             onClick={() => openEditDialog(group)}
-            className="text-muted-foreground hover:text-foreground"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1"
+            aria-label={`${group.name} bewerken`}
           >
             <Pencil className="h-3 w-3" />
           </button>
         </div>
-        <button onClick={() => setDeleteGroupId(group.id)} className="text-muted-foreground hover:text-destructive">
+        <button onClick={() => setDeleteGroupId(group.id)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1" aria-label={`${group.name} verwijderen`}>
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       </div>

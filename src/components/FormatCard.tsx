@@ -340,8 +340,8 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
               {typeLabel}
             </span>
             <span className="font-display text-sm font-bold text-foreground">{format.name}</span>
-            <button type="button" onClick={(e) => { e.stopPropagation(); openEditDialog(); }} className="text-muted-foreground hover:text-foreground">
-              <Pencil className="h-3 w-3" />
+            <button type="button" aria-label={`${format.name} bewerken`} onClick={(e) => { e.stopPropagation(); openEditDialog(); }} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1">
+              <Pencil className="h-4 w-4 sm:h-3 sm:w-3" />
             </button>
           </div>
           <div className="ml-3 flex shrink-0 items-center gap-1.5">
@@ -355,10 +355,10 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
                 <ArrowDown className="h-3.5 w-3.5" />
               </button>
             )}
-            <button type="button" onClick={() => setShowDeleteConfirm(true)} className="text-muted-foreground hover:text-destructive">
-              <Trash2 className="h-3.5 w-3.5" />
+            <button type="button" aria-label={`${format.name} verwijderen`} onClick={() => setShowDeleteConfirm(true)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1">
+              <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </button>
-            <button type="button" onClick={() => setExpanded(!expanded)} className="text-muted-foreground hover:text-foreground" title={expanded ? "Inklappen" : "Uitklappen"}>
+            <button type="button" onClick={() => setExpanded(!expanded)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1" title={expanded ? "Inklappen" : "Uitklappen"}>
               {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             </button>
           </div>

@@ -1266,11 +1266,11 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               ? getPhaseLabel(activePhaseNumber, allFormats)
               : (pendingPhaseLabels[activePhaseNumber] || `Fase ${activePhaseNumber}`)}
           </h2>
-          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Naam bewerken" onClick={() => openPhaseEdit(activePhaseNumber)}>
+          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Naam bewerken" onClick={() => openPhaseEdit(activePhaseNumber)}>
             <Pencil className="h-4 w-4" />
           </Button>
           {containers.length > 1 && activePhaseNumber !== 1 && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label="Fase verwijderen" onClick={() => setDeletePhaseNumber(activePhaseNumber)}>
+            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-destructive" aria-label="Fase verwijderen" onClick={() => setDeletePhaseNumber(activePhaseNumber)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           )}

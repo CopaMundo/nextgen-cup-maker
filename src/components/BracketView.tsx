@@ -2689,7 +2689,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 {editable && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); openMatchSettings(match.id); }} 
-                    className="text-muted-foreground hover:text-foreground p-0.5 rounded hover:bg-foreground/5"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-0.5"
+                    aria-label="Wedstrijd bewerken"
                   >
                     <Pencil className="h-3 w-3" />
                   </button>
@@ -2697,7 +2698,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 {editable && isSingleMatch && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); setShowDeleteSingleConfirm(match.id); }} 
-                    className="text-muted-foreground hover:text-destructive p-0.5 rounded hover:bg-destructive/5"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-0.5"
+                    aria-label="Wedstrijd verwijderen"
                   >
                     <Trash2 className="h-3 w-3" />
                   </button>
@@ -2937,7 +2939,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                                       {pRound.name}
                                     </span>
                                     {editable && (
-                                      <button onClick={() => setShowDeletePlacementConfirm(pRound.id)} className="text-muted-foreground hover:text-destructive">
+                                      <button aria-label={`${pRound.name} verwijderen`} onClick={() => setShowDeletePlacementConfirm(pRound.id)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1">
                                         <Trash2 className="h-3 w-3" />
                                       </button>
                                     )}
@@ -3095,7 +3097,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     {editable && <Pencil className="h-3 w-3 text-muted-foreground" />}
                   </h3>
                 {editable && (
-                  <Button variant="ghost" size="sm" onClick={() => setShowDeleteBracketConfirm(p)} className="text-muted-foreground hover:text-destructive h-7 px-2">
+                  <Button variant="ghost" size="icon" onClick={() => setShowDeleteBracketConfirm(p)} className="h-9 w-9 text-muted-foreground hover:text-destructive sm:h-7 sm:w-7">
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 )}
