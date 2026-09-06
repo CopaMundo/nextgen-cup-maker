@@ -3,6 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ChevronRight, ShieldCheck, Target, Users } from "lucide-react";
 
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
@@ -119,6 +122,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
+  const isMobile = useIsMobile();
+  const [mobileOverview, setMobileOverview] = useState(true);
 
   useEffect(() => {
     if (tabs.length > 0 && !tabs.find(t => t.id === activeTab)) {
@@ -249,31 +254,73 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     )
   );
 
+  const activeLabel = tabs.find(t => t.id === activeTab)?.label || "";
+
   return (
     <div className="space-y-6 w-full">
-      <div className="flex justify-center border-b border-border flex-wrap">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-              activeTab === tab.id
-                ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Mobiel: statistieken als tegels */}
+      {isMobile && mobileOverview && (
+        <div className="grid grid-cols-1 gap-2">
+          {tabs.map(tab => (
+            <div
+              key={tab.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => { setActiveTab(tab.id); setMobileOverview(false); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActiveTab(tab.id); setMobileOverview(false); } }}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                {tab.id === "scorers" && <Target className="h-4 w-4" />}
+                {tab.id === "assists" && <Users className="h-4 w-4" />}
+                {tab.id === "fairplay" && <ShieldCheck className="h-4 w-4" />}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{tab.label}</span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </div>
+          ))}
+        </div>
+      )}
 
-      {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
-      {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
-      {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+      {/* Mobiel: kop met terugknop */}
+      {isMobile && !mobileOverview && (
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Terug naar statistieken" onClick={() => setMobileOverview(true)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">{activeLabel}</h2>
+        </div>
+      )}
 
+      {!isMobile && (
+        <div className="flex justify-center border-b border-border flex-wrap">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                activeTab === tab.id
+                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!(isMobile && mobileOverview) && (
+        <div className="max-sm:overflow-x-auto">
+          {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
+          {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
+          {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+        </div>
+      )}
     </div>
   );
+
 };
 
 export default StatisticsView;
