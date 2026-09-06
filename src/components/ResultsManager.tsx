@@ -1690,9 +1690,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
     return (
       <div key={match.id} className="rounded-md border border-border/60 bg-card hover:border-border transition-colors">
-        <div className="px-2 py-1.5 flex items-center gap-2">
+        <div className="px-2 py-1.5 grid grid-cols-[6.5rem_1fr_3.5rem] gap-2 items-center">
           {/* Format / group / match / field / referee meta — compact left rail */}
-          <div className="flex flex-col shrink-0 min-w-0 max-w-[6.5rem] gap-0">
+          <div className="flex flex-col min-w-0 gap-0">
             <div className="flex items-center gap-1 min-w-0">
               {phase?.logo_url && <img src={phase.logo_url} alt="" className="h-2.5 w-2.5 object-contain rounded flex-shrink-0" />}
               <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground truncate" title={headerLabel}>{headerLabel}</span>
@@ -1715,16 +1715,16 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           </div>
 
           {/* Teams + score */}
-          <div className="flex-1 flex flex-col items-center gap-0 min-w-0">
-            <div className="flex items-center justify-center gap-1.5 w-full">
-              <div className="flex items-center gap-1 flex-1 justify-end min-w-0">
-                <span className="font-medium text-foreground text-xs truncate">{homeName}</span>
+          <div className="flex flex-col items-center gap-0 min-w-0">
+            <div className="grid grid-cols-[1fr_5rem_1fr] gap-2 items-center w-full">
+              <div className="flex items-center gap-1 justify-end min-w-0">
+                <span className="font-medium text-foreground text-xs truncate text-right">{homeName}</span>
                 {teamLogo(match.home_team_id) && <img src={teamLogo(match.home_team_id)!} className="h-4 w-4 object-contain flex-shrink-0" />}
               </div>
 
               <button
                 onClick={() => canEditMatch(match) && setScoreEntryMatchId(match.id)}
-                className={`flex items-center gap-0.5 shrink-0 rounded border px-1.5 py-0.5 ${match.is_played ? 'border-primary' : 'border-input'} ${canEditMatch(match) ? "cursor-pointer hover:bg-secondary/50 transition-colors" : "cursor-default"}`}
+                className={`flex items-center justify-center gap-0.5 rounded border px-1.5 py-0.5 ${match.is_played ? 'border-primary' : 'border-input'} ${canEditMatch(match) ? "cursor-pointer hover:bg-secondary/50 transition-colors" : "cursor-default"}`}
               >
                 <span className="h-5 w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
                   {match.home_score ?? "–"}
@@ -1735,7 +1735,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 </span>
               </button>
 
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+              <div className="flex items-center gap-1 min-w-0">
                 {teamLogo(match.away_team_id) && <img src={teamLogo(match.away_team_id)!} className="h-4 w-4 object-contain flex-shrink-0" />}
                 <span className="font-medium text-foreground text-xs truncate">{awayName}</span>
               </div>
@@ -1752,7 +1752,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           </div>
 
           {/* Action icons */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center justify-end gap-1.5 min-w-0">
             {canAssignTeams(match) && (
               <button
                 onClick={() => openAssignDialog(match)}
