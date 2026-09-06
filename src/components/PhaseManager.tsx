@@ -675,6 +675,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     const nextPhaseNumber = maxExisting + 1;
     setDraftPhaseNumbers((prev) => (prev.includes(nextPhaseNumber) ? prev : [...prev, nextPhaseNumber]));
     setActivePhaseNumber(nextPhaseNumber);
+    setMobilePhaseOverview(false);
   };
 
   const clearSlotsReferencingFormats = async (formatIds: string[]) => {
