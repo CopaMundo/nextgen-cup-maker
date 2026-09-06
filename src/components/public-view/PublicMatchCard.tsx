@@ -57,6 +57,7 @@ const PublicMatchCard = ({
 }: PublicMatchCardProps) => {
   const bStyle = useBroadcastStyle();
   const fieldLabel = useFieldLabel();
+  const fieldDisplay = locationFilter ? displayFieldName(m.field) : fieldLabel(m.field);
   const phase = phases.find((p) => p.id === m.phase_id);
   const group = groups.find((g) => g.id === m.group_id);
   const isFav = favoriteTeam && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam);
