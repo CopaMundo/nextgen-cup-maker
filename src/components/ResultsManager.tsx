@@ -2444,13 +2444,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             tournament={tournament}
             aggregate={aggregateProp}
             onSave={async (data) => {
-              // Update de huidige leg (zonder penalties bij H&A — die horen op de Terug-match)
+              // Update de huidige leg. Bij H&A horen penalties UITSLUITEND op de
+              // Terug-match: de Heen-match wordt dus altijd hard op null gezet
+              // (ook als er nog verouderde waarden in de database stonden).
               const updatedMatch: Match = {
                 ...sem,
                 home_score: data.homeScore,
                 away_score: data.awayScore,
-                home_penalties: isHALeg ? sem.home_penalties : data.homePenalties,
-                away_penalties: isHALeg ? sem.away_penalties : data.awayPenalties,
+                home_penalties: isHALeg ? (currentIsHeen ? null : data.homePenalties) : data.homePenalties,
+                away_penalties: isHALeg ? (currentIsHeen ? null : data.awayPenalties) : data.awayPenalties,
                 set_scores: data.setScores,
               };
 
