@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Trash2, BarChart3, X, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import pollingIconAsset from "@/assets/polling.png.asset.json";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -225,8 +226,8 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
             onClick={() => setShowAdd(true)}
             className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Plus className="h-4 w-4" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+              <img src={pollingIconAsset.url} alt="" className="h-5 w-5 object-contain" />
             </div>
             <span className="font-display text-sm font-semibold text-foreground">Poll toevoegen</span>
           </button>
