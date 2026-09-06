@@ -16,7 +16,7 @@ const Navbar = ({ tournamentName }: NavbarProps) => {
       <div className="flex items-center justify-between w-full gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 shrink-0">
-            <img src={trophyLogo} alt="Copa Mundo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
+            <CopaMundoMark className="h-9 w-9 sm:h-10 sm:w-10" />
             <span className="font-display text-lg sm:text-xl font-black tracking-tight text-primary uppercase">
               Copa Mundo
             </span>
