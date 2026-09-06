@@ -2065,6 +2065,11 @@ body[data-broadcast="wc26"] {
   color: hsl(var(--background)) !important;
   opacity: 0.85;
 }
+/* Uitzondering: leg-badge behoudt de accentkleur */
+[data-broadcast="wc26"] .wc26-context .wc26-leg-badge,
+[data-broadcast="wc26"] .wc26-context .wc26-leg-badge * {
+  color: hsl(var(--broadcast-cyan)) !important;
+}
 
 
 /* Bracket connectors: dun en geometrisch */
