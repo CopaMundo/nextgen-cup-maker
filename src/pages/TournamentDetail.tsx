@@ -25,7 +25,32 @@ import PollManager from "@/components/PollManager";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+// Op smalle (mobiele) schermen wordt de volledige desktop-layout van het beheer
+// verkleind weergegeven, zodat het er op een telefoon exact hetzelfde uitziet.
+const ADMIN_MIN_WIDTH = 900;
+
+const useAdminDesktopScale = () => {
+  useEffect(() => {
+    const apply = () => {
+      const zoom = window.innerWidth < ADMIN_MIN_WIDTH ? window.innerWidth / ADMIN_MIN_WIDTH : 1;
+      document.documentElement.style.zoom = zoom === 1 ? "" : String(zoom);
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    window.addEventListener("orientationchange", apply);
+    return () => {
+      window.removeEventListener("resize", apply);
+      window.removeEventListener("orientationchange", apply);
+      document.documentElement.style.zoom = "";
+    };
+  }, []);
+};
+
+
+
+
 const sidebarItems = [
+
   { id: "general", icon: Settings, label: "Algemeen" },
   { id: "teams", icon: ShirtIcon, label: "Deelnemers" },
   { id: "phases", icon: BracketTreeIcon, label: "Format" },
@@ -45,6 +70,8 @@ const locationStorageKey = (tournamentId: string) => `tournament-location:${tour
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  useAdminDesktopScale();
+
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCategoryId, setSelectedCategoryIdState] = useState<string | null>(() => {
@@ -289,6 +316,8 @@ const TournamentDetail = () => {
 
   return (
     <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
+
+
       <Navbar tournamentName={tournament?.name} />
       <ThemeSwitcher />
       <div className="flex flex-1 overflow-hidden min-h-0">
