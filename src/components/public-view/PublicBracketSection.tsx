@@ -749,7 +749,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         style={{ overflow: "hidden", width: tight ? cardW : undefined, height: cardH, boxSizing: "border-box" }}
         onClick={isClickable ? handleClick : undefined}
       >
-        <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
+        <div className={`ttx-match-context flex-shrink-0 ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
           <div className="flex items-center gap-1.5">
           {phase?.logo_url && (
             <img
