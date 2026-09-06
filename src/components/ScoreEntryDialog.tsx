@@ -104,18 +104,21 @@ const ScoreEntryDialog = ({
     setHomeScore(match.home_score !== null ? String(match.home_score) : "");
     setAwayScore(match.away_score !== null ? String(match.away_score) : "");
 
-    // H&A: penalty waarden leven altijd op de Terug-wedstrijd (laatste leg). Voor
-    // de andere leg draaien we ze om zodat ze bij de juiste teamnaam staan.
+    // H&A: de beslissende score hoort UITSLUITEND op de Terug-wedstrijd.
+    // Bij de Heen-wedstrijd tonen we die dus nooit en houden we de velden leeg.
     if (aggregate) {
-      const swap = !aggregate.currentIsCarrier;
-      const h = swap ? aggregate.storedAwayPenalties : aggregate.storedHomePenalties;
-      const a = swap ? aggregate.storedHomePenalties : aggregate.storedAwayPenalties;
-      setHomePen(h !== null ? String(h) : "");
-      setAwayPen(a !== null ? String(a) : "");
+      if (aggregate.currentIsCarrier) {
+        setHomePen(aggregate.storedHomePenalties !== null ? String(aggregate.storedHomePenalties) : "");
+        setAwayPen(aggregate.storedAwayPenalties !== null ? String(aggregate.storedAwayPenalties) : "");
+      } else {
+        setHomePen("");
+        setAwayPen("");
+      }
     } else {
       setHomePen(match.home_penalties !== null ? String(match.home_penalties) : "");
       setAwayPen(match.away_penalties !== null ? String(match.away_penalties) : "");
     }
+
 
     if (scoringType === "sets" && numSets >= 2) {
       const existing = match.set_scores || [];
@@ -190,6 +193,9 @@ const ScoreEntryDialog = ({
     return { totalHome, totalAway, tied: totalHome === totalAway };
   })();
 
+  // Bij H&A mag de beslissende score enkel op de Terug-wedstrijd ingegeven worden.
+  const penaltiesLockedToOtherLeg = !!aggregate && !aggregate.currentIsCarrier;
+
   const showPenalties = aggregate
     ? (needsPenalties && !!aggregateTotals && aggregateTotals.tied)
     : (needsPenalties && parsedHomeScore !== null && parsedAwayScore !== null && parsedHomeScore === parsedAwayScore);
@@ -199,7 +205,9 @@ const ScoreEntryDialog = ({
     return setsMatchCompleted && computedSetTotals.homeWins === computedSetTotals.awayWins;
   })();
 
-  const actualShowPenalties = scoringType === "sets" ? setsShowPenalties : showPenalties;
+  const tieNeedsDecider = scoringType === "sets" ? setsShowPenalties : showPenalties;
+  const actualShowPenalties = tieNeedsDecider && !penaltiesLockedToOtherLeg;
+
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleDiscard(); }}>
@@ -355,6 +363,13 @@ const ScoreEntryDialog = ({
             </div>
           </div>
         )}
+
+        {tieNeedsDecider && penaltiesLockedToOtherLeg && (
+          <p className="text-[11px] text-center text-muted-foreground font-medium pt-1">
+            Beslissende score wordt ingegeven bij de {aggregate?.pairedLegLabel?.toLowerCase() ?? "terug"}wedstrijd
+          </p>
+        )}
+
 
         {hasStatsEnabled && tournament && match.home_team_id && match.away_team_id && (() => {
           const effHome = scoringType === "sets" && numSets >= 2
