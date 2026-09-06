@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,7 @@ interface Attachment {
 const SortableRow = ({
   id,
   label,
+  icon,
   dragLabel,
   onRename,
   onDelete,
@@ -69,6 +70,7 @@ const SortableRow = ({
 }: {
   id: string;
   label: string;
+  icon?: ReactNode;
   dragLabel: string;
   onRename: () => void;
   onDelete: () => void;
@@ -81,12 +83,13 @@ const SortableRow = ({
   <SortableRowShell
     id={id}
     dragLabel={dragLabel}
-    className="flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-3 py-2"
+    className="flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-2.5 py-2"
   >
     {(handle) => (
       <>
-        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           {handle}
+          {icon && <span className="shrink-0 text-muted-foreground">{icon}</span>}
           {editing ? (
             <Input
               autoFocus
@@ -103,13 +106,35 @@ const SortableRow = ({
             <span className="text-foreground font-medium truncate">{label}</span>
           )}
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {editing ? (
-            <button onMouseDown={(e) => e.preventDefault()} onClick={onEditSave} className="text-muted-foreground hover:text-foreground"><Check className="h-4 w-4" /></button>
+            <button
+              type="button"
+              title="Opslaan"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={onEditSave}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+            >
+              <Check className="h-4 w-4" />
+            </button>
           ) : (
-            <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+            <button
+              type="button"
+              title="Bewerken"
+              onClick={onRename}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
           )}
-          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+          <button
+            type="button"
+            title="Verwijderen"
+            onClick={onDelete}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </>
     )}
@@ -850,16 +875,26 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 {(form.match_days as MatchDayEntry[]).map((entry, idx) => {
                   if (typeof entry === "string") {
                     return (
-                      <div key={`day-${idx}`} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-3 py-2">
-                        <div className="flex items-center gap-2">
-                          <CalendarPlus className="h-4 w-4 text-primary" />
-                          <span className="text-foreground font-medium">{formatDate(entry)}</span>
+                      <div key={`day-${idx}`} className="flex items-center justify-between text-sm rounded-lg border border-border bg-secondary px-2.5 py-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          <span className="text-foreground font-medium truncate">{formatDate(entry)}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => { setEditMatchDayIdx(idx); setEditMatchDayValue(entry); }} className="text-muted-foreground hover:text-foreground">
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            title="Bewerken"
+                            onClick={() => { setEditMatchDayIdx(idx); setEditMatchDayValue(entry); }}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                          >
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
-                          <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive">
+                          <button
+                            type="button"
+                            title="Verwijderen"
+                            onClick={() => setDeleteMatchDayIdx(idx)}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                          >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -867,16 +902,26 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                     );
                   }
                   return (
-                    <div key={`period-${idx}`} className="flex items-center justify-between text-sm rounded-lg border border-primary/30 bg-primary/5 px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <CalendarPlus className="h-4 w-4 text-primary" />
-                        <span className="text-foreground font-medium">{formatDate(entry.start)} – {formatDate(entry.end)}</span>
+                    <div key={`period-${idx}`} className="flex items-center justify-between text-sm rounded-lg border border-primary/30 bg-primary/5 px-2.5 py-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <CalendarPlus className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="text-foreground font-medium truncate">{formatDate(entry.start)} – {formatDate(entry.end)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }} className="text-muted-foreground hover:text-foreground">
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          title="Bewerken"
+                          onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                        >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
-                        <button onClick={() => setDeleteMatchDayIdx(idx)} className="text-muted-foreground hover:text-destructive">
+                        <button
+                          type="button"
+                          title="Verwijderen"
+                          onClick={() => setDeleteMatchDayIdx(idx)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -914,6 +959,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             key={loc.id}
                             id={loc.id}
                             label={loc.name}
+                            icon={<MapPin className="h-4 w-4" />}
                             dragLabel="Locatie verplaatsen"
                             onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
                             onDelete={() => setDeleteLocId(loc.id)}
@@ -987,6 +1033,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         key={cat.id}
                         id={cat.id}
                         label={cat.name}
+                        icon={<LayoutGrid className="h-4 w-4" />}
                         dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
