@@ -330,13 +330,18 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
 
-  const saveScore = async (match: Match, baseList?: Match[]) => {
+  const saveScore = async (matchIn: Match, baseList?: Match[]) => {
     const base = baseList ?? matches;
-    const isPlayed = match.home_score !== null && match.away_score !== null;
-    // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Heen-match
+    const isPlayed = matchIn.home_score !== null && matchIn.away_score !== null;
+    // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Terug-match
     // wanneer alle legs gespeeld zijn en het aggregaat gelijk is.
-    const isHALeg = !!match.match_name?.match(/\s+\((Heen|Terug)\)$/);
-    const needsPenalties = resolveMatchNeedsDecider(match, base);
+    const isHALeg = !!matchIn.match_name?.match(/\s+\((Heen|Terug)\)$/);
+    const needsPenalties = resolveMatchNeedsDecider(matchIn, base);
+    // Harde regel: is er geen beslissende score nodig, dan wordt ze ook nooit
+    // bewaard. Zo kunnen er nooit verouderde penalty's blijven hangen.
+    const match: Match = needsPenalties
+      ? matchIn
+      : { ...matchIn, home_penalties: null, away_penalties: null };
     const hasPenalties = match.home_penalties !== null && match.away_penalties !== null && match.home_penalties !== match.away_penalties;
     const finalIsPlayed = isPlayed && (!needsPenalties || hasPenalties);
 
@@ -2444,13 +2449,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             tournament={tournament}
             aggregate={aggregateProp}
             onSave={async (data) => {
-              // Update de huidige leg (zonder penalties bij H&A — die horen op de Terug-match)
+              // Update de huidige leg. Bij H&A horen penalties UITSLUITEND op de
+              // Terug-match: de Heen-match wordt dus altijd hard op null gezet
+              // (ook als er nog verouderde waarden in de database stonden).
               const updatedMatch: Match = {
                 ...sem,
                 home_score: data.homeScore,
                 away_score: data.awayScore,
-                home_penalties: isHALeg ? sem.home_penalties : data.homePenalties,
-                away_penalties: isHALeg ? sem.away_penalties : data.awayPenalties,
+                home_penalties: isHALeg ? (currentIsHeen ? null : data.homePenalties) : data.homePenalties,
+                away_penalties: isHALeg ? (currentIsHeen ? null : data.awayPenalties) : data.awayPenalties,
                 set_scores: data.setScores,
               };
 
@@ -2481,16 +2488,28 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 updatedCarrier = null;
               }
 
+              // Veiligheidsnet: bij het bewerken van de Terug-wedstrijd wissen we
+              // eventuele verouderde penalties die nog op de Heen-wedstrijd staan.
+              let staleHeen: Match | null = null;
+              if (isHALeg && !currentIsHeen && pairedMatch &&
+                (pairedMatch.home_penalties !== null || pairedMatch.away_penalties !== null)) {
+                staleHeen = { ...pairedMatch, home_penalties: null, away_penalties: null };
+              }
+
               // Werk alle betrokken wedstrijden in één keer bij, zodat de
               // winnaarbepaling meteen de nieuwe scores én penalties ziet.
               const nextList = matches.map(m => {
                 if (m.id === updatedMatch.id) return updatedMatch;
                 if (updatedCarrier && m.id === updatedCarrier.id) return updatedCarrier;
+                if (staleHeen && m.id === staleHeen.id) return staleHeen;
                 return m;
               });
               setMatches(nextList);
 
               let listAfter = nextList;
+              if (staleHeen) {
+                listAfter = (await saveScore(staleHeen, listAfter)) ?? listAfter;
+              }
               if (updatedCarrier) {
                 listAfter = (await saveScore(updatedCarrier, listAfter)) ?? listAfter;
               }
