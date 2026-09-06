@@ -829,6 +829,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               </>
             )}
           </div>
+          </div>
         </div>
         <div className="relative leading-none" style={compactTree ? { height: cardH, overflow: "hidden" } : undefined}>
           {renderSide("home")}
