@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Info, Users, Trophy, Calendar, Home } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
@@ -13,6 +14,40 @@ interface Props {
 const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, teams }: Props) => {
   const bStyle = useBroadcastStyle();
   const favTeam = favoriteTeam ? teams?.find((t: any) => t.id === favoriteTeam) : null;
+  const navRef = useRef<HTMLElement | null>(null);
+
+  // Houd de balk vast onderaan het zichtbare scherm, ook bij pinch-zoom
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const el = navRef.current;
+    if (!vv || !el) return;
+
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const scale = vv.scale || 1;
+      const x = vv.offsetLeft;
+      const y = vv.offsetTop + vv.height - window.innerHeight;
+      el.style.transformOrigin = "left bottom";
+      el.style.transform = `translate(${x}px, ${y}px) scale(${1 / scale})`;
+      el.style.width = `${vv.width * scale}px`;
+      el.style.right = "auto";
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+
+    apply();
+    vv.addEventListener("resize", schedule);
+    vv.addEventListener("scroll", schedule);
+    window.addEventListener("scroll", schedule, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      vv.removeEventListener("resize", schedule);
+      vv.removeEventListener("scroll", schedule);
+      window.removeEventListener("scroll", schedule);
+    };
+  }, []);
 
   const tabs: { id: string; label: string; icon: any; isCenter?: boolean }[] = [
     { id: "info", label: "Info", icon: Info },
@@ -23,7 +58,8 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
   ];
 
   return (
-    <nav className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
+    <nav ref={navRef} className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
+
       <div className="relative grid h-16 grid-cols-5 items-end px-2 pt-1 pb-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
