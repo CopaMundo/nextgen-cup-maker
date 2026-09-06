@@ -438,7 +438,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
           <DialogHeader><DialogTitle>Scheidsrechter toevoegen</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <Input value={newRef} onChange={(e) => setNewRef(e.target.value)} placeholder="Naam scheidsrechter" onKeyDown={(e) => e.key === "Enter" && addReferee()} />
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
               <Button onClick={addReferee} className="bg-foreground text-background hover:bg-foreground/90">Toevoegen</Button>
             </div>

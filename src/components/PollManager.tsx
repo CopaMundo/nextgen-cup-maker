@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Trash2, BarChart3, X } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -34,7 +34,6 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
   const [showAdd, setShowAdd] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { toast } = useToast();
-  const addDialogRef = useDialogFocus(showAdd);
 
   useEffect(() => { fetchData(); }, [tournamentId]);
 
@@ -155,11 +154,12 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
         </div>
       </div>
 
-      {/* Add poll modal */}
-      {showAdd && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setShowAdd(false)}>
-          <div ref={addDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h3 className="font-display text-lg font-bold text-foreground">Poll toevoegen</h3>
+      <Dialog open={showAdd} onOpenChange={(o) => { if (!o) setShowAdd(false); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Poll toevoegen</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
             <div className="space-y-1">
               <Label className="text-xs">Vraag</Label>
               <Input value={newQuestion} onChange={(e) => setNewQuestion(e.target.value)} placeholder="Bijv. Wie wint het toernooi?" />
@@ -189,13 +189,13 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
                 </Button>
               )}
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
-              <Button onClick={addPoll} className="bg-foreground text-background hover:bg-foreground/90">Aanmaken</Button>
-            </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
+            <Button onClick={addPoll} className="bg-foreground text-background hover:bg-foreground/90">Aanmaken</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
         <AlertDialogContent>
