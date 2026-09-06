@@ -26,7 +26,7 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
   ];
 
   return (
-    <nav ref={navRef} className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
+    <nav className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
 
       <div className="relative grid h-16 grid-cols-5 items-end px-2 pt-1 pb-2">
         {tabs.map((tab) => {
