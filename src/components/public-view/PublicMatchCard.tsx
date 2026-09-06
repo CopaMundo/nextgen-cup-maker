@@ -165,26 +165,30 @@ const PublicMatchCard = ({
         {(formatName || detailLine || m.field || m.referee) && (
           <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`}>
             <div className="flex items-start justify-between w-full">
-              <div className="flex items-start gap-1.5">
+              <div className="flex items-start gap-1.5 min-w-0 flex-1">
                 {phase?.logo_url && (
                   <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm mt-0.5" />
                 )}
-                <div className="flex flex-col">
+                <div className="flex flex-col min-w-0 flex-1">
                   {formatName && (
                     <span className={ds(bStyle, "matchContextText")}>{formatName}</span>
                   )}
-                  {detailLine && (
-                    <span className="text-[9px] text-muted-foreground font-medium">{detailLine}</span>
+                  {(detailLine || isHALeg) && (
+                    <div className="flex items-center gap-1.5">
+                      {detailLine && (
+                        <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
+                      )}
+                      {isHALeg && (
+                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
+                          {haLegLabel}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
-              {(m.field || m.referee || isHALeg) && (
-                <div className="flex flex-col items-end text-[9px] text-muted-foreground flex-shrink-0">
-                  {isHALeg && (
-                    <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 mb-0.5">
-                      {haLegLabel}
-                    </span>
-                  )}
+              {(m.field || m.referee) && (
+                <div className="flex flex-col items-end text-[9px] text-muted-foreground flex-shrink-0 ml-1">
                   {m.field && (
                     <span className="flex items-center gap-0.5 font-bold">
                       <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
