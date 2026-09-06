@@ -734,7 +734,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
-          <div className={`grid grid-cols-[1fr_auto] items-center gap-x-3 ${tight ? "gap-y-0" : "gap-y-1"} leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
+          <div className={`grid grid-cols-[1fr_auto] items-center gap-x-3 ${tight ? "gap-y-0" : "gap-y-0.5"} leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             {phase?.name ? (
               displayName && !compactTree ? (
                 <>
