@@ -330,9 +330,14 @@ const TournamentDetail = () => {
           <span className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground">
             {sidebarItems.find((item) => item.id === activeTab)?.label}
           </span>
-          <span className="max-w-[52%] truncate text-right text-xs text-muted-foreground" title={tournament.name}>
-            {tournament.name}
-          </span>
+          <div className="flex items-center justify-end gap-1.5 min-w-0 max-w-[55%]">
+            <span className="truncate text-right text-xs font-bold text-foreground" title={tournament.name}>
+              {tournament.name}
+            </span>
+            {tournament.logo_url && (
+              <img src={tournament.logo_url} alt="" className="h-4 w-4 shrink-0 object-contain" />
+            )}
+          </div>
         </div>
       )}
       <div className="relative flex flex-1 overflow-hidden min-h-0">
