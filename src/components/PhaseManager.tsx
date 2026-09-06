@@ -54,6 +54,7 @@ interface PhaseContainer {
 const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
+  const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
   const [allFormats, setAllFormats] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [creatingFormat, setCreatingFormat] = useState(false);
