@@ -5,12 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, MessageCircle, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
+import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import ShirtIcon from "@/components/icons/ShirtIcon";
+import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
@@ -38,7 +39,7 @@ const sidebarItems = [
   { id: "results", icon: ScoreboardIcon, label: "Resultaten" },
   { id: "statistics", icon: BarChart3, label: "Statistieken" },
   { id: "sponsors", icon: Handshake, label: "Sponsors" },
-  { id: "polls", icon: MessageCircle, label: "Polls" },
+  { id: "polls", icon: PollIcon, label: "Polls" },
   { id: "presentation", icon: Tv2, label: "Presentatie" },
 ] as const;
 
