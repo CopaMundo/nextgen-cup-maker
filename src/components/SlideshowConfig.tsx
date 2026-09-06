@@ -470,7 +470,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0"
+              className="h-9 w-9 shrink-0"
               aria-label={`${show.name} hernoemen`}
               onClick={event => { event.stopPropagation(); setRenamingShow(show); }}
             >
@@ -480,7 +480,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
+                className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
                 aria-label={`${show.name} verwijderen`}
                 onClick={event => { event.stopPropagation(); deleteShow(show.id); }}
               >

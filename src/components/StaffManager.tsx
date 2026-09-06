@@ -156,13 +156,13 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
             <div className="text-center">
               <div className="flex items-center justify-center gap-1">
                 <p className="text-sm font-medium text-foreground">{s.name}</p>
-                <button onClick={() => { setEditingId(s.id); setEditForm({ name: s.name, role: s.role }); }} className="text-muted-foreground hover:text-foreground">
+                <button aria-label={`${s.name} bewerken`} onClick={() => { setEditingId(s.id); setEditForm({ name: s.name, role: s.role }); }} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1">
                   <Pencil className="h-3 w-3" />
                 </button>
               </div>
               <p className="text-[10px] text-muted-foreground">{s.role}</p>
             </div>
-            <button onClick={() => setDeleteStaffId(s.id)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-destructive">
+            <button aria-label={`${s.name} verwijderen`} onClick={() => setDeleteStaffId(s.id)} className="absolute right-1 top-1 inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1">
               <Trash2 className="h-3 w-3" />
             </button>
           </div>
