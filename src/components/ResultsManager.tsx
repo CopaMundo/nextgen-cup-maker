@@ -330,13 +330,18 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   };
 
 
-  const saveScore = async (match: Match, baseList?: Match[]) => {
+  const saveScore = async (matchIn: Match, baseList?: Match[]) => {
     const base = baseList ?? matches;
-    const isPlayed = match.home_score !== null && match.away_score !== null;
-    // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Heen-match
+    const isPlayed = matchIn.home_score !== null && matchIn.away_score !== null;
+    // H&A legs: resolveMatchNeedsDecider eist enkel penalties op de Terug-match
     // wanneer alle legs gespeeld zijn en het aggregaat gelijk is.
-    const isHALeg = !!match.match_name?.match(/\s+\((Heen|Terug)\)$/);
-    const needsPenalties = resolveMatchNeedsDecider(match, base);
+    const isHALeg = !!matchIn.match_name?.match(/\s+\((Heen|Terug)\)$/);
+    const needsPenalties = resolveMatchNeedsDecider(matchIn, base);
+    // Harde regel: is er geen beslissende score nodig, dan wordt ze ook nooit
+    // bewaard. Zo kunnen er nooit verouderde penalty's blijven hangen.
+    const match: Match = needsPenalties
+      ? matchIn
+      : { ...matchIn, home_penalties: null, away_penalties: null };
     const hasPenalties = match.home_penalties !== null && match.away_penalties !== null && match.home_penalties !== match.away_penalties;
     const finalIsPlayed = isPlayed && (!needsPenalties || hasPenalties);
 
