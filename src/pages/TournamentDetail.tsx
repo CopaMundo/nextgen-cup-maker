@@ -39,7 +39,7 @@ const sidebarItems = [
   { id: "results", icon: ScoreboardIcon, label: "Resultaten" },
   { id: "statistics", icon: BarChart3, label: "Statistieken" },
   { id: "sponsors", icon: Handshake, label: "Sponsors" },
-  { id: "polls", icon: MessageCircle, label: "Polls" },
+  { id: "polls", icon: PollIcon, label: "Polls" },
   { id: "presentation", icon: Tv2, label: "Presentatie" },
 ] as const;
 
