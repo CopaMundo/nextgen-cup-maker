@@ -37,7 +37,7 @@ interface Category {
   name: string;
 }
 
-const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLabel = "Teams" }: { tournamentId: string; teamCount: number; showCountry: boolean; categoryId?: string | null; teamsLabel?: string }) => {
+const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLabel = "Teams", onDetailOpenChange }: { tournamentId: string; teamCount: number; showCountry: boolean; categoryId?: string | null; teamsLabel?: string; onDetailOpenChange?: (open: boolean) => void }) => {
   const isPlayers = teamsLabel === "Spelers";
   const singularLabel = isPlayers ? "Speler" : "Team";
   const pluralLabel = isPlayers ? "Spelers" : "Teams";
@@ -52,6 +52,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const [newTeam, setNewTeam] = useState({ name: "", country: "" });
   const [editTeam, setEditTeam] = useState({ name: "", country: "" });
   const isMobile = useIsMobile();
+
   const { toast } = useToast();
   const addDialogRef = useDialogFocus(showAdd);
   const editDialogRef = useDialogFocus(!!editingId);
