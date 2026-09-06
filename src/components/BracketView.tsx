@@ -2705,13 +2705,13 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 )}
                 <div className="text-right">
                   {fieldStr && (
-                    <div className="text-[9px] font-bold text-muted-foreground flex items-center gap-0.5 justify-end">
-                      <MapPin className="h-2 w-2" /> {fieldStr}
+                    <div className="text-[9px] font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none">
+                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{fieldStr}</span>
                     </div>
                   )}
                   {match.referee && (
-                    <div className="text-[9px] text-muted-foreground/70 flex items-center gap-0.5 justify-end">
-                      <WhistleIcon className="h-2 w-2" /> {match.referee}
+                    <div className="text-[9px] text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none">
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{match.referee}</span>
                     </div>
                   )}
                 </div>
