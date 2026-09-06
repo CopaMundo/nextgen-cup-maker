@@ -1,4 +1,4 @@
-import vsIconPng from "@/assets/vs.png";
+import singleMatchIconAsset from "@/assets/pvp.png.asset.json";
 import bracketIconPng from "@/assets/tournament.png";
 import listIconPng from "@/assets/list_1.png";
 
