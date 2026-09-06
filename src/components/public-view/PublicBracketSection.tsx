@@ -717,6 +717,15 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       : (!match.is_played && !!displayTimeStr);
     const showOverlayTime = showInlineTime;
 
+    // Bij H&A: als de heenwedstrijd gespeeld is en we tonen de tijd van de
+    // terugwedstrijd, dan tonen we het resultaat van de heenwedstrijd eronder.
+    const heenLegScoreLabel =
+      matchIsHA && pairedMatch && heenMatch?.is_played && activeLegMatch === terugMatch &&
+      heenMatch.home_score != null && heenMatch.away_score != null
+        ? `HEEN ${heenMatch.home_score}-${heenMatch.away_score}`
+        : null;
+
+
     // Every chip is clickable — H&A opens aggregate dialog, others open match detail dialog
     const isHAClick = matchIsHA && !!pairedMatch;
     const isClickable = true;
@@ -814,15 +823,22 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           {renderSide("away")}
           {showOverlayTime && (
             tight ? (
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-end font-bold text-muted-foreground leading-none">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center font-bold text-muted-foreground leading-none gap-0.5">
                 <span className="text-[10px]">{displayTimeStr}</span>
+                {heenLegScoreLabel && (
+                  <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>{heenLegScoreLabel}</span>
+                )}
               </div>
             ) : (
-              <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end leading-none">
+              <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center leading-none gap-0.5">
                 <span className={ds(bStyle, "matchTimeBadge")}>{displayTimeStr}</span>
+                {heenLegScoreLabel && (
+                  <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>{heenLegScoreLabel}</span>
+                )}
               </div>
             )
           )}
+
         </div>
 
       </div>
