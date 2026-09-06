@@ -939,6 +939,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             key={loc.id}
                             id={loc.id}
                             label={loc.name}
+                            icon={<MapPin className="h-4 w-4" />}
                             dragLabel="Locatie verplaatsen"
                             onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
                             onDelete={() => setDeleteLocId(loc.id)}
