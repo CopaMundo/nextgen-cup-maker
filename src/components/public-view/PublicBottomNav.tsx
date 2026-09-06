@@ -40,12 +40,14 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
         return;
       }
       const s = vv.scale;
-      const w = vv.width;
+      const H = window.innerHeight; // hoogte van de layout-viewport (vaste anker)
       // Compenseer de zoom: hou de balk even groot en vast op de
-      // zichtbare viewport, onderaan en horizontaal gecentreerd.
-      nav.style.transform = `translate(${vv.offsetLeft}px, ${vv.offsetTop + vv.height - (nav.offsetHeight * s)}px) scale(${1 / s})`;
+      // zichtbare viewport, onderaan en over de volle zichtbare breedte.
+      const tx = vv.offsetLeft * s;
+      const ty = vv.height - H * s + vv.offsetTop * s;
+      nav.style.transform = `translate(${tx}px, ${ty}px) scale(${1 / s})`;
       nav.style.transformOrigin = "bottom left";
-      nav.style.width = `${w * s}px`;
+      nav.style.width = `${vv.width}px`;
       nav.style.left = "0";
       nav.style.bottom = "0";
     };
