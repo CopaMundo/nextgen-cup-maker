@@ -20,7 +20,7 @@ const IconImage = ({ src, className }: { src: string; className?: string }) => (
 
 export const formatTypeIcon = (phaseType: string, className = "h-4 w-4") => {
   if (phaseType === "knockout") return <IconImage src={bracketIconPng} className={className} />;
-  if (phaseType === "single_match") return <IconImage src={vsIconPng} className={className} />;
+  if (phaseType === "single_match") return <IconImage src={singleMatchIconAsset.url} className={className} />;
   return <IconImage src={listIconPng} className={className} />;
 };
 
