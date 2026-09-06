@@ -32,7 +32,7 @@ import SlideshowConfig from "./SlideshowConfig";
 import { useIsMobile } from "@/hooks/use-mobile";
 import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
 import slideshowIconAsset from "@/assets/television.png.asset.json";
-import stylingIconAsset from "@/assets/paint_1.png.asset.json";
+import stylingIconAsset from "@/assets/paint_2.png.asset.json";
 
 const MaskIcon = ({ src, label, className = "h-4 w-4" }: { src: string; label: string; className?: string }) => (
   <span
@@ -290,13 +290,10 @@ const PresentationManager = ({
         {subTab === "visualization" && (
           <>
             {/* Broadcast style */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
               <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
                 <Eye className="h-5 w-5 text-primary" /> Broadcast stijl
               </h2>
-              <p className="text-sm text-muted-foreground">
-                Kies hoe het toernooi visueel wordt gepresenteerd voor bezoekers. Light/dark wordt door de bezoeker zelf gekozen.
-              </p>
               {(() => {
                 const applyStyle = async (target: BroadcastStyle, name: string) => {
                   setDisplayStyle(target);
@@ -306,27 +303,27 @@ const PresentationManager = ({
                 };
                 const entries = (Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
                   .filter(([key]) => SELECTABLE_BROADCAST_STYLES.includes(key));
-                const renderCard = ([key, info]: [BroadcastStyle, { name: string; description: string; preview: string }]) => {
-                  const isActive = displayStyle === key;
-                  return (
-                    <button key={key} onClick={() => applyStyle(key, info.name)}
-                      className={`rounded-lg border p-3 text-left transition-colors ${
-                        isActive ? "border-primary bg-primary/10" : "border-border hover:border-foreground/30"
-                      }`}>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{info.preview}</span>
-                        <div>
-                          <p className="text-xs font-bold text-foreground">{info.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{info.description}</p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                };
                 return (
                   <div className="space-y-2">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Broadcast styles</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{entries.map(renderCard)}</div>
+                    {entries.map(([key, info]) => {
+                      const isActive = displayStyle === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => applyStyle(key, info.name)}
+                          className={cn(
+                            "w-full flex items-center gap-3 rounded-lg border p-3 text-left transition-colors",
+                            isActive ? "border-primary bg-primary/10" : "border-border hover:border-foreground/30"
+                          )}
+                        >
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
+                            {info.preview}
+                          </span>
+                          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        </button>
+                      );
+                    })}
                   </div>
                 );
               })()}
@@ -334,16 +331,11 @@ const PresentationManager = ({
 
 
             {/* Format display */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-                    <Presentation className="h-5 w-5 text-primary" /> Formatweergave
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Kies hoe meerdere formats binnen dezelfde fase zichtbaar zijn voor bezoekers.
-                  </p>
-                </div>
+                <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                  <Presentation className="h-5 w-5 text-primary" /> Formatweergave
+                </h2>
                 <TooltipProvider delayDuration={150}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -357,26 +349,28 @@ const PresentationManager = ({
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => updateFormatDisplayMode("stacked")}
-                  className={`rounded-lg border p-3 text-left transition-colors ${
+                  className={cn(
+                    "w-full flex flex-col rounded-lg border p-3 text-left transition-colors",
                     formatDisplayMode === "stacked" ? "border-primary bg-primary/10" : "border-border hover:border-foreground/30"
-                  }`}
+                  )}
                 >
-                  <p className="text-xs font-bold text-foreground">Onder elkaar</p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">Alle formats staan direct onder dezelfde fase.</p>
+                  <span className="text-sm font-semibold text-foreground">Onder elkaar</span>
+                  <span className="text-xs text-muted-foreground">Alle formats staan direct onder dezelfde fase.</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => updateFormatDisplayMode("tabs")}
-                  className={`rounded-lg border p-3 text-left transition-colors ${
+                  className={cn(
+                    "w-full flex flex-col rounded-lg border p-3 text-left transition-colors",
                     formatDisplayMode === "tabs" ? "border-primary bg-primary/10" : "border-border hover:border-foreground/30"
-                  }`}
+                  )}
                 >
-                  <p className="text-xs font-bold text-foreground">Tabs</p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">Formats worden als keuzes onder de fase getoond.</p>
+                  <span className="text-sm font-semibold text-foreground">Tabs</span>
+                  <span className="text-xs text-muted-foreground">Formats worden als keuzes onder de fase getoond.</span>
                 </button>
               </div>
             </div>
