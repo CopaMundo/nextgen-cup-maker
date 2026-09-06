@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, BarChart3, X } from "lucide-react";
+import { Plus, Trash2, BarChart3, X, ChevronRight } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -33,6 +34,8 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
   const [newOptions, setNewOptions] = useState(["", ""]);
   const [showAdd, setShowAdd] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [openPollId, setOpenPollId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
   const { toast } = useToast();
 
   useEffect(() => { fetchData(); }, [tournamentId]);
@@ -86,6 +89,152 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
   const getVotesForPoll = (pollId: string) => votes.filter(v => v.poll_id === pollId);
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>;
+
+  const dialogs = (
+    <>
+    <Dialog open={showAdd} onOpenChange={(o) => { if (!o) setShowAdd(false); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Poll toevoegen</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <Label className="text-xs">Vraag</Label>
+            <Input value={newQuestion} onChange={(e) => setNewQuestion(e.target.value)} placeholder="Bijv. Wie wint het toernooi?" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Antwoorden ({newOptions.length}/128)</Label>
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {newOptions.map((opt, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <Input
+                    value={opt}
+                    onChange={(e) => setNewOptions(o => o.map((x, j) => j === i ? e.target.value : x))}
+                    placeholder={`Antwoord ${i + 1}`}
+                    className="h-8 text-sm"
+                  />
+                  {newOptions.length > 2 && (
+                    <button onClick={() => setNewOptions(o => o.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-destructive">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {newOptions.length < 128 && (
+              <Button variant="ghost" size="sm" onClick={() => setNewOptions(o => [...o, ""])} className="text-xs">
+                <Plus className="h-3 w-3" /> Antwoord
+              </Button>
+            )}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
+          <Button onClick={addPoll} className="bg-foreground text-background hover:bg-foreground/90">Aanmaken</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Poll verwijderen?</AlertDialogTitle>
+          <AlertDialogDescription>De poll en alle stemmen worden permanent verwijderd.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuleren</AlertDialogCancel>
+          <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Verwijderen</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
+  );
+
+  if (isMobile) {
+    const openPoll = polls.find(p => p.id === openPollId);
+    if (openPoll) {
+      const pollVotes = getVotesForPoll(openPoll.id);
+      const totalVotes = pollVotes.length;
+      return (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setOpenPollId(null)}>
+              <ChevronRight className="h-4 w-4 rotate-180" />
+            </Button>
+            <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground">{openPoll.question}</span>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">{totalVotes} stem{totalVotes !== 1 ? "men" : ""}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground">{openPoll.active ? "Actief" : "Uit"}</span>
+                <Switch checked={openPoll.active} onCheckedChange={(v) => toggleActive(openPoll.id, v)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              {openPoll.options.map((option, i) => {
+                const optVotes = pollVotes.filter(v => v.option_index === i).length;
+                const pct = totalVotes > 0 ? Math.round((optVotes / totalVotes) * 100) : 0;
+                return (
+                  <div key={i} className="relative overflow-hidden rounded bg-background border border-border">
+                    <div className="absolute inset-0 bg-primary/10 transition-all" style={{ width: `${pct}%` }} />
+                    <div className="relative flex items-center justify-between px-3 py-1.5">
+                      <span className="text-sm text-foreground">{option}</span>
+                      <span className="text-xs font-medium text-muted-foreground">{optVotes} ({pct}%)</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {dialogs}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">{polls.length} {polls.length === 1 ? "poll" : "polls"}</p>
+        <div className="grid grid-cols-1 gap-2">
+          {polls.map(poll => (
+            <div
+              key={poll.id}
+              onClick={() => setOpenPollId(poll.id)}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <BarChart3 className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="block truncate font-display text-sm font-semibold text-foreground">{poll.question}</span>
+                <span className="text-[11px] text-muted-foreground">{getVotesForPoll(poll.id).length} stemmen · {poll.active ? "Actief" : "Uit"}</span>
+              </div>
+              <div className="flex shrink-0 items-center gap-1" onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => setDeleteId(poll.id)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  title="Verwijderen"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <span className="shrink-0 text-muted-foreground"><ChevronRight className="h-4 w-4" /></span>
+            </div>
+          ))}
+          <button
+            onClick={() => setShowAdd(true)}
+            className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <Plus className="h-4 w-4" />
+            </div>
+            <span className="font-display text-sm font-semibold text-foreground">Poll toevoegen</span>
+          </button>
+        </div>
+        {dialogs}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 w-full">
@@ -154,61 +303,7 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
         </div>
       </div>
 
-      <Dialog open={showAdd} onOpenChange={(o) => { if (!o) setShowAdd(false); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Poll toevoegen</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label className="text-xs">Vraag</Label>
-              <Input value={newQuestion} onChange={(e) => setNewQuestion(e.target.value)} placeholder="Bijv. Wie wint het toernooi?" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Antwoorden ({newOptions.length}/128)</Label>
-              <div className="max-h-60 overflow-y-auto space-y-1">
-                {newOptions.map((opt, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <Input
-                      value={opt}
-                      onChange={(e) => setNewOptions(o => o.map((x, j) => j === i ? e.target.value : x))}
-                      placeholder={`Antwoord ${i + 1}`}
-                      className="h-8 text-sm"
-                    />
-                    {newOptions.length > 2 && (
-                      <button onClick={() => setNewOptions(o => o.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-destructive">
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {newOptions.length < 128 && (
-                <Button variant="ghost" size="sm" onClick={() => setNewOptions(o => [...o, ""])} className="text-xs">
-                  <Plus className="h-3 w-3" /> Antwoord
-                </Button>
-              )}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
-            <Button onClick={addPoll} className="bg-foreground text-background hover:bg-foreground/90">Aanmaken</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Poll verwijderen?</AlertDialogTitle>
-            <AlertDialogDescription>De poll en alle stemmen worden permanent verwijderd.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Verwijderen</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {dialogs}
     </div>
   );
 };
