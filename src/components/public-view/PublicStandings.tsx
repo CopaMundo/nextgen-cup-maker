@@ -80,6 +80,19 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   const [selectedFormatId, setSelectedFormatId] = useState<string | null>(initialPhaseId || null);
   const [expandedGroupSchedule, setExpandedGroupSchedule] = useState<string | null>(null);
   const phaseTabRefs = useRef<Map<number, HTMLButtonElement | null>>(new Map());
+  const phaseContainerRef = useRef<HTMLDivElement | null>(null);
+  const [phaseOverflows, setPhaseOverflows] = useState(false);
+
+  // Detecteer of de fase-tabs passen; als ze passen centreren we ze, anders links uitlijnen voor swipe
+  useEffect(() => {
+    const el = phaseContainerRef.current;
+    if (!el) return;
+    const update = () => setPhaseOverflows(el.scrollWidth > el.clientWidth + 1);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [allPhaseNumbers]);
 
   // Auto-scroll naar de groep van het favoriete team
 
