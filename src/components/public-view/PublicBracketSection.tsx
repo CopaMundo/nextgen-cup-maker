@@ -676,7 +676,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             const hasPen = penValue !== null && penValue !== undefined;
             // Keep the complete score block near the card edge while reserving
             // enough room for a two-digit shoot-out score such as “(10)”.
-            const penSlot = tightSide ? 16 : 22;
+            const penSlot = tightSide ? 14 : 20;
             return (
               <div className="flex items-center shrink-0 ml-1.5">
                 <span
