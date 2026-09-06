@@ -3,6 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ChevronRight, ShieldCheck, Target, Users } from "lucide-react";
 
 interface Team { id: string; name: string; logo_url: string | null; }
 interface MatchStat { id: string; match_id: string; stat_type: "goal" | "assist" | "yellow_card" | "red_card" | "straight_red"; player_name: string; team_id: string; }
