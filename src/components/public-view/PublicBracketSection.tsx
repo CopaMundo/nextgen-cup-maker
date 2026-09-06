@@ -746,12 +746,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                       <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
                     </div>
                   ) : <div />}
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
-                    {matchIsHA && (
-                      <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
-                    )}
-                  </div>
+                  <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
                   {displayReferee ? (
                     <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
                       <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
@@ -760,11 +755,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </>
               ) : (
                 <>
-                  <div className={`flex items-center gap-1.5 min-w-0 ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
-                    <span className="truncate">{phase.name}</span>
-                    {matchIsHA && (
-                      <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
-                    )}
+                  <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
+                    {phase.name}
                   </div>
                   {displayField ? (
                     <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
@@ -787,13 +779,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               )
             ) : (
               <>
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
-                    {displayName}
-                  </div>
-                  {matchIsHA && (
-                    <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
-                  )}
+                <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
+                  {displayName}
                 </div>
                 {displayField ? (
                   <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
