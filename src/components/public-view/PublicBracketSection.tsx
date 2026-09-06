@@ -678,7 +678,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             // enough room for a two-digit shoot-out score such as “(10)”.
             const penSlot = tightSide ? 16 : 22;
             return (
-              <div className="flex items-center shrink-0">
+              <div className="flex items-center shrink-0 ml-1.5">
                 <span
                   className={`tabular-nums text-right leading-none ${won ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")} ${isCompactPretty ? "font-semibold" : tightSide ? "" : "text-[18px]"}`}
                   style={{
