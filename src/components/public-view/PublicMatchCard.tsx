@@ -164,17 +164,22 @@ const PublicMatchCard = ({
         {/* Context: format name + detail line */}
         {(formatName || detailLine || m.field || m.referee) && (
           <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`}>
-            <div className="flex items-start justify-between w-full">
-              <div className="flex items-start gap-1.5 min-w-0 flex-1">
-                {phase?.logo_url && (
-                  <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm mt-0.5" />
-                )}
-                <div className="flex flex-col min-w-0 flex-1">
-                  {formatName && (
-                    <span className={ds(bStyle, "matchContextText")}>{formatName}</span>
-                  )}
-                  {(detailLine || isHALeg) && (
-                    <div className="flex items-center gap-1.5">
+            <div className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 leading-none py-0.5 min-h-[22px]">
+              {formatName ? (
+                detailLine || isHALeg ? (
+                  <>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {phase?.logo_url && (
+                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
+                      )}
+                      <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
+                    </div>
+                    {m.field ? (
+                      <div className="font-bold text-muted-foreground flex items-center gap-0.5 justify-end text-[9px]">
+                        <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
+                      </div>
+                    ) : <div />}
+                    <div className="flex items-center gap-1.5 min-w-0">
                       {detailLine && (
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
@@ -184,22 +189,92 @@ const PublicMatchCard = ({
                         </span>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
-              {(m.field || m.referee) && (
-                <div className="flex flex-col items-end text-[9px] text-muted-foreground flex-shrink-0 ml-1">
-                  {m.field && (
-                    <span className="flex items-center gap-0.5 font-bold">
-                      <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
-                    </span>
-                  )}
-                  {m.referee && (
-                    <span className="flex items-center gap-0.5">
-                      <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
-                    </span>
-                  )}
-                </div>
+                    {m.referee ? (
+                      <div className="text-muted-foreground/70 flex items-center gap-0.5 justify-end text-[9px]">
+                        <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
+                      </div>
+                    ) : <div />}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {phase?.logo_url && (
+                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
+                      )}
+                      <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
+                      {isHALeg && (
+                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
+                          {haLegLabel}
+                        </span>
+                      )}
+                    </div>
+                    {m.field ? (
+                      <div className="font-bold text-muted-foreground flex items-center gap-0.5 justify-end text-[9px]">
+                        <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
+                      </div>
+                    ) : m.referee ? (
+                      <div className="text-muted-foreground/70 flex items-center gap-0.5 justify-end text-[9px]">
+                        <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
+                      </div>
+                    ) : <div />}
+                    {m.field && m.referee && (
+                      <>
+                        <div />
+                        <div className="text-muted-foreground/70 flex items-center gap-0.5 justify-end text-[9px]">
+                          <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )
+              ) : (
+                detailLine || isHALeg ? (
+                  <>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {phase?.logo_url && (
+                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
+                      )}
+                      {detailLine && (
+                        <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
+                      )}
+                      {isHALeg && (
+                        <span className="text-[8px] font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0">
+                          {haLegLabel}
+                        </span>
+                      )}
+                    </div>
+                    {m.field ? (
+                      <div className="font-bold text-muted-foreground flex items-center gap-0.5 justify-end text-[9px]">
+                        <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
+                      </div>
+                    ) : m.referee ? (
+                      <div className="text-muted-foreground/70 flex items-center gap-0.5 justify-end text-[9px]">
+                        <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
+                      </div>
+                    ) : <div />}
+                    {m.field && m.referee && (
+                      <>
+                        <div />
+                        <div className="text-muted-foreground/70 flex items-center gap-0.5 justify-end text-[9px]">
+                          <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div />
+                    {m.field ? (
+                      <div className="font-bold text-muted-foreground flex items-center gap-0.5 justify-end text-[9px]">
+                        <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
+                      </div>
+                    ) : m.referee ? (
+                      <div className="text-muted-foreground/70 flex items-center gap-0.5 justify-end text-[9px]">
+                        <WhistleIcon className="h-2.5 w-2.5" /> {m.referee}
+                      </div>
+                    ) : <div />}
+                  </>
+                )
               )}
             </div>
           </div>
