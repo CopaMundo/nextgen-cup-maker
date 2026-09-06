@@ -21,6 +21,7 @@ import CountryFlag from "@/components/CountryFlag";
 import PlayerManager from "./PlayerManager";
 import StaffManager from "./StaffManager";
 import CountrySelect from "./CountrySelect";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Team {
   id: string;
@@ -50,6 +51,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [newTeam, setNewTeam] = useState({ name: "", country: "" });
   const [editTeam, setEditTeam] = useState({ name: "", country: "" });
+  const isMobile = useIsMobile();
   const { toast } = useToast();
   const addDialogRef = useDialogFocus(showAdd);
   const editDialogRef = useDialogFocus(!!editingId);
