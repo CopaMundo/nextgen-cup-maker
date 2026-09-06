@@ -243,6 +243,74 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
     );
   }
 
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
+          {categoryId && importByCategory.length > 0 && (
+            <Button variant="outline" size="sm" className="h-8" onClick={() => setShowImport(true)}>
+              <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-2">
+          {teams.map(team => (
+            <div
+              key={team.id}
+              onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10">
+                {team.logo_url ? (
+                  <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
+                ) : (
+                  <span className="text-sm font-bold text-primary">{team.name.charAt(0)}</span>
+                )}
+              </div>
+              <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground">{team.name}</span>
+              {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 shrink-0 object-contain" />}
+              <div className="flex shrink-0 items-center gap-1" onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  title="Bewerken"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => setTeamToDelete(team.id)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  title="Verwijderen"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              {!isPlayers && (
+                <span className="shrink-0 text-muted-foreground">
+                  <ChevronRight className="h-4 w-4" />
+                </span>
+              )}
+            </div>
+          ))}
+          {teams.length < 128 && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Plus className="h-4 w-4" />
+              </div>
+              <span className="font-display text-sm font-semibold text-foreground">{singularLabel} toevoegen</span>
+            </button>
+          )}
+        </div>
+        {modals}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -293,6 +361,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
           </button>
         )}
       </div>
+
 
       {/* Add team modal */}
       {showAdd && (
