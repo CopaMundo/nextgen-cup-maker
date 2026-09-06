@@ -200,6 +200,54 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     )
   );
 
+  const renderMobilePlayerStandings = (
+    data: { name: string; teamId: string; count: number; rank: number }[],
+    countLabel: string,
+  ) => (
+    data.length === 0 ? (
+      <div className="rounded-lg border border-dashed border-border py-8 text-center">
+        <p className="text-sm text-muted-foreground">Nog geen gegevens beschikbaar.</p>
+      </div>
+    ) : (
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <div className="grid grid-cols-[2rem_minmax(0,1fr)_3.25rem] items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2 text-[10px] font-semibold uppercase text-muted-foreground">
+          <span className="text-center">#</span>
+          <span>Speler</span>
+          <span className="text-center">{countLabel}</span>
+        </div>
+        <div className="divide-y divide-border">
+          {data.slice(0, 50).map((row) => {
+            const logo = teamLogo(row.teamId);
+            return (
+              <div
+                key={`${row.name}-${row.teamId}`}
+                className="grid min-h-[4.25rem] grid-cols-[2rem_minmax(0,1fr)_3.25rem] items-center gap-2 px-3 py-2.5"
+              >
+                <span className="text-center text-sm font-bold tabular-nums text-muted-foreground">{row.rank}</span>
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-semibold leading-snug text-foreground">{row.name}</p>
+                  <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded bg-secondary">
+                      {logo ? (
+                        <img src={logo} className="h-full w-full object-contain" alt="" />
+                      ) : (
+                        <span className="text-[9px] font-bold text-muted-foreground">{teamName(row.teamId).charAt(0)}</span>
+                      )}
+                    </span>
+                    <span className="min-w-0 break-words text-xs leading-snug text-muted-foreground">{teamName(row.teamId)}</span>
+                  </div>
+                </div>
+                <span className="flex h-10 w-10 justify-self-center items-center justify-center rounded-md bg-primary/10 text-lg font-bold tabular-nums text-primary">
+                  {row.count}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )
+  );
+
   const YellowIcon = () => <div className="h-4 w-3 rounded-sm bg-yellow-400 inline-block" />;
   const SecondYellowIcon = () => (
     <span className="inline-flex items-center gap-0.5 align-middle">
@@ -276,6 +324,87 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     )
   );
 
+  const renderMobileFairplayStandings = (data: (TeamFairplayRow & { rank: number })[]) => (
+    data.length === 0 ? (
+      <div className="rounded-lg border border-dashed border-border py-8 text-center">
+        <p className="text-sm text-muted-foreground">Nog geen teams.</p>
+      </div>
+    ) : (
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <div className="grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2 text-[10px] font-semibold uppercase text-muted-foreground">
+          <span className="text-center">#</span>
+          <span>Team</span>
+          <span className="text-center">Punten</span>
+        </div>
+        <div className="divide-y divide-border">
+          {data.map((row) => {
+            const logo = teamLogo(row.teamId);
+            return (
+              <div key={row.teamId} className="px-3 py-2.5">
+                <div className="grid min-h-10 grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-2">
+                  <span className="text-center text-sm font-bold tabular-nums text-muted-foreground">{row.rank}</span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-secondary">
+                      {logo ? (
+                        <img src={logo} className="h-full w-full object-contain" alt="" />
+                      ) : (
+                        <span className="text-xs font-bold text-muted-foreground">{teamName(row.teamId).charAt(0)}</span>
+                      )}
+                    </span>
+                    <span className="min-w-0 break-words text-sm font-semibold leading-snug text-foreground">{teamName(row.teamId)}</span>
+                  </div>
+                  <span className="flex h-10 min-w-10 items-center justify-center justify-self-center rounded-md bg-primary/10 px-1 text-base font-bold tabular-nums text-primary">
+                    {row.total}
+                  </span>
+                </div>
+                <div className={cn(
+                  "mt-2 ml-10 grid divide-x divide-border rounded-md border border-border bg-secondary/20",
+                  fpConfig.clean_match != null ? "grid-cols-5" : "grid-cols-4",
+                )}>
+                  <div className="flex min-w-0 flex-col items-center justify-center gap-1 py-1.5">
+                    <YellowIcon />
+                    <span className="text-xs font-semibold tabular-nums">{row.yellows}</span>
+                  </div>
+                  <div className="flex min-w-0 flex-col items-center justify-center gap-1 py-1.5">
+                    <SecondYellowIcon />
+                    <span className="text-xs font-semibold tabular-nums">{row.secondYellows}</span>
+                  </div>
+                  <div className="flex min-w-0 flex-col items-center justify-center gap-1 py-1.5">
+                    <RedIcon />
+                    <span className="text-xs font-semibold tabular-nums">{row.reds}</span>
+                  </div>
+                  {fpConfig.clean_match != null && (
+                    <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 py-1.5 text-center">
+                      <span className="text-[9px] leading-none text-muted-foreground">Zonder<br />kaart</span>
+                      <span className="text-xs font-semibold tabular-nums">{row.cleanMatches}</span>
+                    </div>
+                  )}
+                  <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 py-1.5 text-center">
+                    <span className="text-[9px] leading-none text-muted-foreground">Straf</span>
+                    <span className={cn("text-xs font-semibold tabular-nums", row.penalty > 0 ? "text-destructive" : "text-muted-foreground")}>
+                      {row.penalty > 0 ? `-${row.penalty}` : 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="space-y-1 border-t border-border bg-secondary/30 px-3 py-2 text-[10px] text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="inline-flex items-center gap-1"><YellowIcon /> -{fpConfig.yellow} pt</span>
+            <span className="inline-flex items-center gap-1"><SecondYellowIcon /> -{fpConfig.second_yellow} pt</span>
+            <span className="inline-flex items-center gap-1"><RedIcon /> -{fpConfig.red} pt</span>
+          </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {fpConfig.clean_match != null && <span>Zonder kaart +{fpConfig.clean_match} pt</span>}
+            <span>Startpunten {fpConfig.start}</span>
+          </div>
+        </div>
+      </div>
+    )
+  );
+
   const activeLabel = tabs.find(t => t.id === activeTab)?.label || "";
 
   return (
@@ -334,10 +463,10 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       )}
 
       {!(isMobile && mobileOverview) && (
-        <div className="max-sm:overflow-x-auto">
-          {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
-          {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
-          {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+        <div className="min-w-0">
+          {activeTab === "scorers" && showGoals && (isMobile ? renderMobilePlayerStandings(goals, "Goals") : renderPlayerTable(goals, "Doelpunten"))}
+          {activeTab === "assists" && showAssists && (isMobile ? renderMobilePlayerStandings(assists, "Assists") : renderPlayerTable(assists, "Assists"))}
+          {activeTab === "fairplay" && showFairplay && (isMobile ? renderMobileFairplayStandings(fairplay) : renderFairplayTable(fairplay))}
         </div>
       )}
     </div>
