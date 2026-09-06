@@ -184,6 +184,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                   return (
                     <button
                       key={pn}
+                      ref={(node) => { phaseTabRefs.current.set(pn, node); }}
                       data-active={isActive}
                       onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
                       className={
