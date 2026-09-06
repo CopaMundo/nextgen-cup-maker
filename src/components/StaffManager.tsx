@@ -106,38 +106,37 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
   return (
     <>
     <div className="space-y-3">
-      {/* Add staff modal */}
-      {showAdd && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => { setShowAdd(false); setPhotoFile(null); }}>
-          <div ref={addDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h3 className="font-display text-lg font-bold text-foreground">Stafflid toevoegen</h3>
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Naam *</Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Functie</Label>
-                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  {STAFF_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Foto</Label>
-                <label className="flex h-10 w-full cursor-pointer items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-                  <Upload className="h-4 w-4 mr-2" />
-                  {photoFile ? photoFile.name : "Bestand kiezen"}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} />
-                </label>
-              </div>
+      <Dialog open={showAdd} onOpenChange={(o) => { if (!o) { setShowAdd(false); setPhotoFile(null); } else setShowAdd(true); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Stafflid toevoegen</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Naam *</Label>
+              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setShowAdd(false); setPhotoFile(null); }}>Annuleren</Button>
-              <Button onClick={addStaff} className="bg-foreground text-background hover:bg-foreground/90">Toevoegen</Button>
+            <div className="space-y-1">
+              <Label className="text-xs">Functie</Label>
+              <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                {STAFF_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Foto</Label>
+              <label className="flex h-10 w-full cursor-pointer items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                <Upload className="h-4 w-4 mr-2" />
+                {photoFile ? photoFile.name : "Bestand kiezen"}
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} />
+              </label>
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowAdd(false); setPhotoFile(null); }}>Annuleren</Button>
+            <Button onClick={addStaff} className="bg-foreground text-background hover:bg-foreground/90">Toevoegen</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
         {staff.map(s => (
