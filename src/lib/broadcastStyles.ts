@@ -297,7 +297,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     backButton: "flex items-center gap-1 font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[0.12em] text-foreground",
     matchContext: "wc26-context bg-foreground px-3 py-1.5 border-b border-foreground",
     matchContextText: "font-['Barlow_Condensed'] text-[11px] font-semibold uppercase tracking-[0.12em] text-background",
-    matchLegBadge: "inline-flex items-center rounded-none bg-primary/10 border border-primary/30 px-1.5 py-0.5 font-['Barlow_Condensed'] text-[7px] font-bold uppercase text-[hsl(var(--broadcast-cyan))]",
+    matchLegBadge: "wc26-leg-badge inline-flex items-center rounded-none bg-primary/10 border border-primary/30 px-1.5 py-0.5 font-['Barlow_Condensed'] text-[7px] font-bold uppercase text-[hsl(var(--broadcast-cyan))]",
     matchTeamRow: "px-3 py-2",
     matchTeamRowWin: "bg-primary/10",
     matchTeamName: "text-[14px] font-semibold truncate",
