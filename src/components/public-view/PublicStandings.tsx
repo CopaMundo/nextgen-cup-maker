@@ -174,7 +174,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                       data-active={isActive}
                       onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
                       className={
-                        "ttx-phase-tab px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
+                        "ttx-phase-tab shrink-0 px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
                         (isActive
                           ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
                           : "text-muted-foreground hover:text-foreground")
