@@ -199,7 +199,10 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [showEsportWarning, setShowEsportWarning] = useState(false);
   const [showSportPicker, setShowSportPicker] = useState(false);
   const [sportSearch, setSportSearch] = useState("");
-  const [generalSubTab, setGeneralSubTab] = useState<"overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling">("overview");
+  const [generalSubTab, setGeneralSubTab] = useState<"overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling">(() => {
+    if (typeof window === "undefined") return "info";
+    return window.matchMedia("(max-width: 639px)").matches ? "overview" : "info";
+  });
   const [pendingParticipantSwitch, setPendingParticipantSwitch] = useState<"Teams" | "Spelers" | null>(null);
 
   const [form, setForm] = useState({
@@ -590,55 +593,80 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   return (
     <>
       <div className="space-y-6 w-full">
-        {generalSubTab === "overview" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {([
-              { id: "info", label: "Toernooi informatie", description: "Naam, beschrijving, sport, logo, omslagfoto en bijlagen", icon: Info },
-              { id: "wedstrijddagen", label: "Wedstrijddagen", description: "Losse dagen of periodes waarop er gespeeld wordt", icon: CalendarDays },
-              { id: "locaties", label: "Locaties", description: "Speelvelden of locaties voor je toernooi", icon: MapPin },
-              { id: "divisies", label: "Divisies", description: "Verdeel je toernooi in leeftijds- of niveaugroepen", icon: LayoutGrid },
-              { id: "puntentelling", label: "Puntensysteem", description: "Punten, sets, spelersstatistieken en fairplay", icon: Trophy },
-            ] as const).map((card) => {
-              const Icon = card.icon;
-              return (
-                <button
-                  key={card.id}
-                  onClick={() => setGeneralSubTab(card.id)}
-                  className="group text-left rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Icon className="h-5 w-5" />
+        {isMobile ? (
+          generalSubTab === "overview" ? (
+            <div className="grid grid-cols-1 gap-4">
+              {([
+                { id: "info", label: "Toernooi informatie", description: "Naam, beschrijving, sport, logo, omslagfoto en bijlagen", icon: Info },
+                { id: "wedstrijddagen", label: "Wedstrijddagen", description: "Losse dagen of periodes waarop er gespeeld wordt", icon: CalendarDays },
+                { id: "locaties", label: "Locaties", description: "Speelvelden of locaties voor je toernooi", icon: MapPin },
+                { id: "divisies", label: "Divisies", description: "Verdeel je toernooi in leeftijds- of niveaugroepen", icon: LayoutGrid },
+                { id: "puntentelling", label: "Puntensysteem", description: "Punten, sets, spelersstatistieken en fairplay", icon: Trophy },
+              ] as const).map((card) => {
+                const Icon = card.icon;
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => setGeneralSubTab(card.id)}
+                    className="group text-left rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="rounded-full border border-border bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+                        Openen
+                      </span>
                     </div>
-                    <span className="rounded-full border border-border bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                      Openen
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <h3 className="font-display text-base font-bold text-foreground">{card.label}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground leading-snug">{card.description}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                    <div className="mt-4">
+                      <h3 className="font-display text-base font-bold text-foreground">{card.label}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground leading-snug">{card.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 mb-2">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setGeneralSubTab("overview")} aria-label="Terug naar overzicht">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <h2 className="font-display text-lg font-bold text-foreground">
+                {(() => {
+                  const titles: Record<Exclude<typeof generalSubTab, "overview">, string> = {
+                    info: "Toernooi informatie",
+                    wedstrijddagen: "Wedstrijddagen",
+                    locaties: "Locaties",
+                    divisies: "Divisies",
+                    puntentelling: "Puntensysteem",
+                  };
+                  return titles[generalSubTab];
+                })()}
+              </h2>
+            </div>
+          )
         ) : (
-          <div className="flex items-center gap-3 mb-2">
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setGeneralSubTab("overview")} aria-label="Terug naar overzicht">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="font-display text-lg font-bold text-foreground">
-              {(() => {
-                const titles: Record<Exclude<typeof generalSubTab, "overview">, string> = {
-                  info: "Toernooi informatie",
-                  wedstrijddagen: "Wedstrijddagen",
-                  locaties: "Locaties",
-                  divisies: "Divisies",
-                  puntentelling: "Puntensysteem",
-                };
-                return titles[generalSubTab];
-              })()}
-            </h2>
+          <div className="flex justify-center border-b border-border flex-wrap">
+            {([
+              { id: "info", label: "Toernooi informatie" },
+              { id: "wedstrijddagen", label: "Wedstrijddagen" },
+              { id: "locaties", label: "Locaties" },
+              { id: "divisies", label: "Divisies" },
+              { id: "puntentelling", label: "Puntensysteem" },
+            ] as const).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setGeneralSubTab(tab.id)}
+                className={cn(
+                  "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                  generalSubTab === tab.id
+                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         )}
 
