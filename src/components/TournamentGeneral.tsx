@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, X, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -61,7 +61,23 @@ const SortableRow = ({
   dragLabel,
   onRename,
   onDelete,
-}: { id: string; label: string; dragLabel: string; onRename: () => void; onDelete: () => void }) => (
+  editing = false,
+  editValue = "",
+  onEditValueChange,
+  onEditSave,
+  onEditCancel,
+}: {
+  id: string;
+  label: string;
+  dragLabel: string;
+  onRename: () => void;
+  onDelete: () => void;
+  editing?: boolean;
+  editValue?: string;
+  onEditValueChange?: (value: string) => void;
+  onEditSave?: () => void;
+  onEditCancel?: () => void;
+}) => (
   <SortableRowShell
     id={id}
     dragLabel={dragLabel}
@@ -69,18 +85,37 @@ const SortableRow = ({
   >
     {(handle) => (
       <>
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {handle}
-          <span className="text-foreground font-medium truncate">{label}</span>
+          {editing ? (
+            <Input
+              autoFocus
+              value={editValue}
+              onChange={(e) => onEditValueChange?.(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onEditSave?.();
+                if (e.key === "Escape") onEditCancel?.();
+              }}
+              onBlur={() => onEditSave?.()}
+              className="h-8 text-sm"
+            />
+          ) : (
+            <span className="text-foreground font-medium truncate">{label}</span>
+          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+          {editing ? (
+            <button onMouseDown={(e) => e.preventDefault()} onClick={onEditSave} className="text-muted-foreground hover:text-foreground"><Check className="h-4 w-4" /></button>
+          ) : (
+            <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+          )}
           <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
         </div>
       </>
     )}
   </SortableRowShell>
 );
+
 
 
 
@@ -95,10 +130,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [editCatName, setEditCatName] = useState("");
-  const editCategoryDialogRef = useDialogFocus(!!editingCatId);
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [editLocName, setEditLocName] = useState("");
-  const editLocationDialogRef = useDialogFocus(!!editingLocId);
 
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
@@ -884,6 +917,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             dragLabel="Locatie verplaatsen"
                             onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
                             onDelete={() => setDeleteLocId(loc.id)}
+                            editing={editingLocId === loc.id}
+                            editValue={editLocName}
+                            onEditValueChange={setEditLocName}
+                            onEditSave={() => { saveLocationRename(); }}
+                            onEditCancel={() => setEditingLocId(null)}
                           />
                         ))}
                       </div>
@@ -952,6 +990,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
+                        editing={editingCatId === cat.id}
+                        editValue={editCatName}
+                        onEditValueChange={setEditCatName}
+                        onEditSave={() => { saveCategoryRename(); }}
+                        onEditCancel={() => setEditingCatId(null)}
                       />
 
                     ))}
@@ -1242,45 +1285,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={!!editingCatId} onOpenChange={(open) => !open && setEditingCatId(null)}>
-        <DialogContent ref={editCategoryDialogRef} className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Divisie bewerken</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label>Naam</Label>
-            <Input
-              value={editCatName}
-              onChange={(e) => setEditCatName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && saveCategoryRename()}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingCatId(null)}>Annuleren</Button>
-            <Button onClick={saveCategoryRename} disabled={!editCatName.trim()}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!editingLocId} onOpenChange={(open) => !open && setEditingLocId(null)}>
-        <DialogContent ref={editLocationDialogRef} className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Locatie bewerken</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label>Naam</Label>
-            <Input
-              value={editLocName}
-              onChange={(e) => setEditLocName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && saveLocationRename()}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingLocId(null)}>Annuleren</Button>
-            <Button onClick={saveLocationRename} disabled={!editLocName.trim()}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Name Dialog */}
       <Dialog open={showEditName} onOpenChange={setShowEditName}>
