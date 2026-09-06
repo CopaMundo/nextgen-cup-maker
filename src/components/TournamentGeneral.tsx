@@ -199,7 +199,10 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [showEsportWarning, setShowEsportWarning] = useState(false);
   const [showSportPicker, setShowSportPicker] = useState(false);
   const [sportSearch, setSportSearch] = useState("");
-  const [generalSubTab, setGeneralSubTab] = useState<"overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling">("overview");
+  const [generalSubTab, setGeneralSubTab] = useState<"overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling">(() => {
+    if (typeof window === "undefined") return "info";
+    return window.matchMedia("(max-width: 639px)").matches ? "overview" : "info";
+  });
   const [pendingParticipantSwitch, setPendingParticipantSwitch] = useState<"Teams" | "Spelers" | null>(null);
 
   const [form, setForm] = useState({
