@@ -193,6 +193,9 @@ const ScoreEntryDialog = ({
     return { totalHome, totalAway, tied: totalHome === totalAway };
   })();
 
+  // Bij H&A mag de beslissende score enkel op de Terug-wedstrijd ingegeven worden.
+  const penaltiesLockedToOtherLeg = !!aggregate && !aggregate.currentIsCarrier;
+
   const showPenalties = aggregate
     ? (needsPenalties && !!aggregateTotals && aggregateTotals.tied)
     : (needsPenalties && parsedHomeScore !== null && parsedAwayScore !== null && parsedHomeScore === parsedAwayScore);
@@ -202,7 +205,9 @@ const ScoreEntryDialog = ({
     return setsMatchCompleted && computedSetTotals.homeWins === computedSetTotals.awayWins;
   })();
 
-  const actualShowPenalties = scoringType === "sets" ? setsShowPenalties : showPenalties;
+  const tieNeedsDecider = scoringType === "sets" ? setsShowPenalties : showPenalties;
+  const actualShowPenalties = tieNeedsDecider && !penaltiesLockedToOtherLeg;
+
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleDiscard(); }}>
