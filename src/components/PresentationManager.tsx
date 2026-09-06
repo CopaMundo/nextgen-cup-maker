@@ -22,11 +22,14 @@ import {
   Presentation,
   AlertTriangle,
   HelpCircle,
+  ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type SubTab = "website" | "slideshow" | "visualization";
 
@@ -44,6 +47,8 @@ const PresentationManager = ({
   const [displayStyle, setDisplayStyle] = useState<BroadcastStyle>(normalizeBroadcastStyle(tournament.view_display_style));
   const [formatDisplayMode, setFormatDisplayMode] = useState<"tabs" | "stacked">((tournament.format_display_mode || "tabs") as "tabs" | "stacked");
   const [subTab, setSubTab] = useState<SubTab>("website");
+  const isMobile = useIsMobile();
+  const [mobileOverview, setMobileOverview] = useState(true);
 
   const viewUrl = `${window.location.origin}/view/${tournament.view_link_token}`;
 
@@ -119,32 +124,67 @@ const PresentationManager = ({
     }
   };
 
-  const tabs: { id: SubTab; label: string }[] = [
-    { id: "website", label: "Website" },
-    { id: "slideshow", label: "Dialoogvoorstelling" },
-    { id: "visualization", label: "Vormgeving" },
+  const tabs: { id: SubTab; label: string; icon: typeof LinkIcon }[] = [
+    { id: "website", label: "Website", icon: Globe },
+    { id: "slideshow", label: "Dialoogvoorstelling", icon: Presentation },
+    { id: "visualization", label: "Vormgeving", icon: Eye },
   ];
+
+  const activeLabel = tabs.find(t => t.id === subTab)?.label ?? "";
 
   return (
     <>
-      <div className="flex justify-center border-b border-border flex-wrap mb-6">
-        {tabs.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setSubTab(t.id)}
-            className={cn(
-              "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-              subTab === t.id
-                ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {isMobile && mobileOverview && (
+        <div className="grid grid-cols-1 gap-2 mb-4">
+          {tabs.map(t => (
+            <div
+              key={t.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => { setSubTab(t.id); setMobileOverview(false); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setSubTab(t.id); setMobileOverview(false); } }}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <t.icon className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{t.label}</span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </div>
+          ))}
+        </div>
+      )}
 
-      <div className="space-y-6 max-w-2xl">
+      {isMobile && !mobileOverview && (
+        <div className="flex items-center gap-2 mb-4">
+          <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Terug naar presentatie" onClick={() => setMobileOverview(true)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">{activeLabel}</h2>
+        </div>
+      )}
+
+      {!isMobile && (
+        <div className="flex justify-center border-b border-border flex-wrap mb-6">
+          {tabs.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setSubTab(t.id)}
+              className={cn(
+                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                subTab === t.id
+                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className={cn("space-y-6 max-w-2xl", isMobile && mobileOverview && "hidden")}>
+
         {subTab === "website" && (
           <>
             {/* Website link */}
