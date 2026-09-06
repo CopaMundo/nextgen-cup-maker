@@ -60,6 +60,8 @@ const PublicMatchCard = ({
   const { systems: scoringSystems } = useScoringSystems(tournament?.id);
   // Format suffix: "(Heen)" / "(Terug)" + "(N sets)" / "(beste van N)"
   const formatSuffix = getMatchFormatSuffix(m, scoringSystems as any, phases as any, groups as any);
+  const isHALeg = !!m.match_name && /\s+\((Heen|Terug)\)$/.test(m.match_name);
+  const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "Heen" : "Terug") : null;
 
   // Build structured context lines
   const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
@@ -68,9 +70,9 @@ const PublicMatchCard = ({
 
   if (isKnockout) {
     formatName = extraContext || phase?.name || "";
-    // Strip leg from match_name; getMatchFormatSuffix re-appends it consistently.
+    // Strip leg from match_name; H&A leg is shown as a small badge instead.
     const baseMatchName = getBaseMatchName(m.match_name) || "";
-    detailLine = `${baseMatchName}${formatSuffix}`.trim();
+    detailLine = isHALeg ? baseMatchName : `${baseMatchName}${formatSuffix}`.trim();
   } else {
     formatName = extraContext || phase?.name || "";
     if (!hideContext) {
@@ -78,7 +80,7 @@ const PublicMatchCard = ({
       if (group?.name && group.name !== phase?.name) parts.push(group.name);
       detailLine = parts.join(" ● ");
     }
-    if (formatSuffix) {
+    if (formatSuffix && !isHALeg) {
       detailLine = `${detailLine}${detailLine ? " " : ""}${formatSuffix.trim()}`;
     }
   }
