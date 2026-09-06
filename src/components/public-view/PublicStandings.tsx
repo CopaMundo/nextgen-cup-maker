@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { getPhaseLabel } from "@/lib/phaseLabel";
 import { BarChart3, ChevronDown, ChevronUp, ListOrdered } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
@@ -79,6 +79,9 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   const [selectedPhaseNum, setSelectedPhaseNum] = useState<number | null>(autoPhaseNum);
   const [selectedFormatId, setSelectedFormatId] = useState<string | null>(initialPhaseId || null);
   const [expandedGroupSchedule, setExpandedGroupSchedule] = useState<string | null>(null);
+  const phaseTabRefs = useRef<Map<number, HTMLButtonElement | null>>(new Map());
+
+  // Auto-scroll naar de groep van het favoriete team
 
   // Keep selectedPhaseNum in sync when data changes (e.g. phase undo)
   useEffect(() => {
@@ -97,6 +100,16 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   }, [initialGroupId]);
 
   const activePhaseNum = selectedPhaseNum ?? allPhaseNumbers[0] ?? null;
+
+  // Centreer het actieve fase-tabblad in de scrollbare rij
+  useEffect(() => {
+    if (allPhaseNumbers.length <= 1 || activePhaseNum === null) return;
+    const el = phaseTabRefs.current.get(activePhaseNum);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [activePhaseNum, allPhaseNumbers]);
+
   const phasesInActiveNum = phases.filter((p: any) => p.phase_number === activePhaseNum);
   const showFormatsAsTabs = tournament.format_display_mode !== "stacked";
   
@@ -171,6 +184,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                   return (
                     <button
                       key={pn}
+                      ref={(node) => { phaseTabRefs.current.set(pn, node); }}
                       data-active={isActive}
                       onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
                       className={
