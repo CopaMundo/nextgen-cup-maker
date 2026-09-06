@@ -2483,6 +2483,14 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 updatedCarrier = null;
               }
 
+              // Veiligheidsnet: bij het bewerken van de Terug-wedstrijd wissen we
+              // eventuele verouderde penalties die nog op de Heen-wedstrijd staan.
+              let staleHeen: Match | null = null;
+              if (isHALeg && !currentIsHeen && pairedMatch &&
+                (pairedMatch.home_penalties !== null || pairedMatch.away_penalties !== null)) {
+                staleHeen = { ...pairedMatch, home_penalties: null, away_penalties: null };
+              }
+
               // Werk alle betrokken wedstrijden in één keer bij, zodat de
               // winnaarbepaling meteen de nieuwe scores én penalties ziet.
               const nextList = matches.map(m => {
