@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -99,6 +100,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return stored ? parseInt(stored) : null;
   });
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
   const [phaseActionDialog, setPhaseActionDialog] = useState<"format-complete" | "format-undo" | "format-incomplete" | null>(null);
   const [lotsDialogGroupId, setLotsDialogGroupId] = useState<string | null>(null);
@@ -1687,6 +1689,42 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const formatSuffix = getMatchFormatSuffix(match, scoringSystems as any, phases as any, groups as any);
     const baseMatchName = (match.match_name || "").replace(/\s+\((Heen|Terug)\)$/, "");
     const subLabel = group ? `${group.name}${formatSuffix}` : `${baseMatchName}${formatSuffix}`.trim();
+
+    // Mobiel: compacte rij (FotMob-stijl) — tik opent de wedstrijd-pop-up
+    if (isMobile) {
+      const homeLogoUrl = teamLogo(match.home_team_id);
+      const awayLogoUrl = teamLogo(match.away_team_id);
+      return (
+        <button
+          key={match.id}
+          type="button"
+          onClick={() => setScoreEntryMatchId(match.id)}
+          className="w-full rounded-md border border-border/60 bg-card px-2 py-2 text-left active:bg-secondary/50 transition-colors"
+        >
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <div className="flex items-start justify-end gap-1.5 min-w-0">
+              <span className="text-[13px] font-medium leading-tight text-right text-foreground break-words">{homeName}</span>
+              {homeLogoUrl && <img src={homeLogoUrl} alt="" className="h-5 w-5 object-contain shrink-0" />}
+            </div>
+            <span className="shrink-0 rounded px-1 text-[15px] font-bold tabular-nums text-foreground">
+              {match.home_score ?? "–"} - {match.away_score ?? "–"}
+            </span>
+            <div className="flex items-start gap-1.5 min-w-0">
+              {awayLogoUrl && <img src={awayLogoUrl} alt="" className="h-5 w-5 object-contain shrink-0" />}
+              <span className="text-[13px] font-medium leading-tight text-foreground break-words">{awayName}</span>
+            </div>
+          </div>
+          {showPenalties && match.home_penalties !== null && match.away_penalties !== null && (
+            <div className="mt-0.5 text-center text-[10px] text-muted-foreground">
+              ({match.home_penalties} - {match.away_penalties} pen.)
+            </div>
+          )}
+          {showPenalties && needsPenaltiesFilled && (
+            <p className="mt-0.5 text-center text-[10px] font-medium text-destructive">Vul de beslissende score in</p>
+          )}
+        </button>
+      );
+    }
 
     return (
       <div key={match.id} className="rounded-md border border-border/60 bg-card hover:border-border transition-colors">

@@ -236,7 +236,7 @@ const ScoreEntryDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleDiscard(); }}>
-      <DialogContent className="max-w-md top-4 translate-y-0 sm:top-[50%] sm:translate-y-[-50%] max-h-[calc(100dvh-2rem)] sm:max-h-[90dvh] overflow-y-auto overscroll-contain">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-base">Score invullen</DialogTitle>
         </DialogHeader>
