@@ -1694,33 +1694,49 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     if (isMobile) {
       const homeLogoUrl = teamLogo(match.home_team_id);
       const awayLogoUrl = teamLogo(match.away_team_id);
+      const scoreBoxBase = "flex items-center justify-center gap-1 rounded-lg border px-2 h-8 min-w-[4.25rem]";
+      const scoreBoxState = match.is_played
+        ? "border-primary/60 bg-primary/10"
+        : "border-input bg-secondary/40";
       return (
         <button
           key={match.id}
           type="button"
           onClick={() => setScoreEntryMatchId(match.id)}
-          className="w-full rounded-md border border-border/60 bg-card px-2 py-2 text-left active:bg-secondary/50 transition-colors"
+          className="w-full rounded-md border border-border/60 bg-card px-3 py-2.5 text-left active:bg-secondary/50 transition-colors"
         >
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-            <div className="flex items-start justify-end gap-1.5 min-w-0">
-              <span className="text-[13px] font-medium leading-tight text-right text-foreground break-words">{homeName}</span>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+            {/* Home team */}
+            <div className="flex items-center justify-end gap-1.5 min-w-0">
+              <span className="text-[13px] font-medium leading-tight text-right text-foreground line-clamp-2">{homeName}</span>
               {homeLogoUrl && <img src={homeLogoUrl} alt="" className="h-5 w-5 object-contain shrink-0" />}
             </div>
-            <span className="shrink-0 rounded px-1 text-[15px] font-bold tabular-nums text-foreground">
-              {match.home_score ?? "–"} - {match.away_score ?? "–"}
-            </span>
-            <div className="flex items-start gap-1.5 min-w-0">
+
+            {/* Score box */}
+            <div className={cn(scoreBoxBase, scoreBoxState)}>
+              <span className="w-5 text-center text-[15px] font-bold tabular-nums text-foreground">
+                {match.home_score ?? "–"}
+              </span>
+              <span className="text-[13px] font-bold text-muted-foreground">:</span>
+              <span className="w-5 text-center text-[15px] font-bold tabular-nums text-foreground">
+                {match.away_score ?? "–"}
+              </span>
+            </div>
+
+            {/* Away team */}
+            <div className="flex items-center gap-1.5 min-w-0">
               {awayLogoUrl && <img src={awayLogoUrl} alt="" className="h-5 w-5 object-contain shrink-0" />}
-              <span className="text-[13px] font-medium leading-tight text-foreground break-words">{awayName}</span>
+              <span className="text-[13px] font-medium leading-tight text-left text-foreground line-clamp-2">{awayName}</span>
             </div>
           </div>
+
           {showPenalties && match.home_penalties !== null && match.away_penalties !== null && (
-            <div className="mt-0.5 text-center text-[10px] text-muted-foreground">
+            <div className="mt-1.5 text-center text-[10px] text-muted-foreground">
               ({match.home_penalties} - {match.away_penalties} pen.)
             </div>
           )}
           {showPenalties && needsPenaltiesFilled && (
-            <p className="mt-0.5 text-center text-[10px] font-medium text-destructive">Vul de beslissende score in</p>
+            <p className="mt-1 text-center text-[10px] font-medium text-destructive">Vul de beslissende score in</p>
           )}
         </button>
       );
