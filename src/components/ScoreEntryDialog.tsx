@@ -82,6 +82,7 @@ interface ScoreEntryDialogProps {
 const ScoreEntryDialog = ({
   open, onClose, match, homeName, awayName, homeLogo, awayLogo,
   scoringType, numSets, needsPenalties, editable, hasStatsEnabled, tournament, onOpenStats, aggregate, onSave,
+  formatName, groupName, matchName, field, referee, matchDate, matchTime,
 }: ScoreEntryDialogProps) => {
   const [homeScore, setHomeScore] = useState<string>("");
   const [awayScore, setAwayScore] = useState<string>("");
