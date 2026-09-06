@@ -320,7 +320,6 @@ const PresentationManager = ({
                             {info.preview}
                           </span>
                           <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
-                          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                         </button>
                       );
                     })}
