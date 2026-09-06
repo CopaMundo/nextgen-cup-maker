@@ -6,6 +6,7 @@ import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
+import { firstRefereeName } from "@/lib/refereeConfig";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { getMatchSideDisplayName } from "@/lib/slotLabels";
 import PublicMatchDetailDialog from "@/components/public-view/PublicMatchDetailDialog";
@@ -708,7 +709,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         : (!heenMatch.is_played ? heenMatch : null))
       : match;
     const displayField = activeLegMatch?.field ?? null;
-    const displayReferee = activeLegMatch?.referee ?? null;
+    const displayReferee = firstRefereeName(activeLegMatch?.referee) || null;
     const displayTimeStr = activeLegMatch?.match_time?.substring(0, 5);
     const showInlineTime = matchIsHA && pairedMatch
       ? (!!activeLegMatch && !activeLegMatch.is_played && !!displayTimeStr)
@@ -743,13 +744,13 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   </div>
                   {displayField ? (
                     <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
+                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={displayField || undefined}>{displayField}</span>
                     </div>
                   ) : <div />}
                   <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
                   {displayReferee ? (
                     <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={activeLegMatch?.referee || undefined}>{displayReferee}</span>
                     </div>
                   ) : <div />}
                 </>
@@ -760,18 +761,18 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   </div>
                   {displayField ? (
                     <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
+                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={displayField || undefined}>{displayField}</span>
                     </div>
                   ) : displayReferee ? (
                     <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={activeLegMatch?.referee || undefined}>{displayReferee}</span>
                     </div>
                   ) : <div />}
                   {displayField && displayReferee && (
                     <>
                       <div />
                       <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                        <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
+                        <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={activeLegMatch?.referee || undefined}>{displayReferee}</span>
                       </div>
                     </>
                   )}
@@ -784,18 +785,18 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 {displayField ? (
                   <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                    <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
+                    <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={displayField || undefined}>{displayField}</span>
                   </div>
                 ) : displayReferee ? (
                   <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                    <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
+                    <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={activeLegMatch?.referee || undefined}>{displayReferee}</span>
                   </div>
                 ) : <div />}
                 {displayField && displayReferee && (
                   <>
                     <div />
                     <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={activeLegMatch?.referee || undefined}>{displayReferee}</span>
                     </div>
                   </>
                 )}

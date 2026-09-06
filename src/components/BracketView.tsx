@@ -19,6 +19,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import CountryFlag from "@/components/CountryFlag";
 import { getSlotReferenceLabel as resolveSlotReferenceLabel } from "@/lib/slotLabels";
+import { firstRefereeName } from "@/lib/refereeConfig";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 
 interface BracketMatch {
@@ -2704,12 +2705,12 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 <div className="text-right">
                   {fieldStr && (
                     <div className="text-[9px] font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none">
-                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{fieldStr}</span>
+                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={fieldStr}>{fieldStr}</span>
                     </div>
                   )}
                   {match.referee && (
                     <div className="text-[9px] text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none">
-                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{match.referee}</span>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={match.referee || undefined}>{firstRefereeName(match.referee)}</span>
                     </div>
                   )}
                 </div>

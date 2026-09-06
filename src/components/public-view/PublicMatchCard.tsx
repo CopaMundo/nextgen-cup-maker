@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useFieldLabel } from "@/lib/fieldLocations";
+import { firstRefereeName } from "@/lib/refereeConfig";
 import { MapPin } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import CountryFlag from "@/components/CountryFlag";
@@ -176,7 +177,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
                       </div>
                     ) : <div />}
                     <div className="flex items-center gap-1.5 min-w-0">
@@ -191,7 +192,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{m.referee}</span>
+                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.referee || undefined}>{firstRefereeName(m.referee)}</span>
                       </div>
                     ) : <div />}
                   </>
@@ -210,18 +211,18 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{m.referee}</span>
+                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.referee || undefined}>{firstRefereeName(m.referee)}</span>
                       </div>
                     ) : <div />}
                     {m.field && m.referee && (
                       <>
                         <div />
                         <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                          <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{m.referee}</span>
+                          <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.referee || undefined}>{firstRefereeName(m.referee)}</span>
                         </div>
                       </>
                     )}
@@ -245,18 +246,18 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{m.referee}</span>
+                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.referee || undefined}>{firstRefereeName(m.referee)}</span>
                       </div>
                     ) : <div />}
                     {m.field && m.referee && (
                       <>
                         <div />
                         <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                          <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{m.referee}</span>
+                          <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.referee || undefined}>{firstRefereeName(m.referee)}</span>
                         </div>
                       </>
                     )}
@@ -266,11 +267,11 @@ const PublicMatchCard = ({
                     <div />
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{m.referee}</span>
+                        <WhistleIcon className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.referee || undefined}>{firstRefereeName(m.referee)}</span>
                       </div>
                     ) : <div />}
                   </>
