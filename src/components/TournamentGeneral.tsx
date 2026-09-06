@@ -1160,6 +1160,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           <div className="space-y-2">
             <Label>Naam</Label>
             <Input
+              className="h-11 text-base sm:h-10 sm:text-sm"
               value={newLocationName}
               onChange={(e) => setNewLocationName(e.target.value)}
               placeholder="Bijv. Sporthal Centrum"
@@ -1167,8 +1168,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddLocation(false)}>Annuleren</Button>
-            <Button onClick={addLocation} disabled={!newLocationName.trim()}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddLocation(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addLocation} disabled={!newLocationName.trim()}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1181,6 +1182,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           <div className="space-y-2">
             <Label>Naam</Label>
             <Input
+              className="h-11 text-base sm:h-10 sm:text-sm"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Bijv. U13, Seniors"
@@ -1188,8 +1190,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddCategory(false)}>Annuleren</Button>
-            <Button onClick={addCategory} disabled={!newCategoryName.trim()}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddCategory(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addCategory} disabled={!newCategoryName.trim()}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1209,8 +1211,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddMatchDay(false)}>Annuleren</Button>
-            <Button onClick={addMatchDay} disabled={!newMatchDay}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddMatchDay(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addMatchDay} disabled={!newMatchDay}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1240,8 +1242,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddPeriod(false)}>Annuleren</Button>
-            <Button onClick={addPeriod} disabled={!periodStart || !periodEnd}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddPeriod(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addPeriod} disabled={!periodStart || !periodEnd}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
