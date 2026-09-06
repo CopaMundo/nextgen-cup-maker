@@ -564,8 +564,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
         ) : (
           <div className="flex items-center gap-3 mb-2">
-            <Button variant="outline" size="sm" onClick={() => setGeneralSubTab("overview")}>
-              <ArrowLeft className="h-4 w-4 mr-1.5" /> Overzicht
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setGeneralSubTab("overview")} aria-label="Terug naar overzicht">
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <h2 className="font-display text-lg font-bold text-foreground">
               {(() => {
@@ -734,7 +734,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Logo</Label>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.logo_url && (
                   <img src={tournament.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain bg-secondary" />
                  )}
@@ -746,7 +746,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
             <div className="space-y-2">
               <Label>Omslagfoto</Label>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.cover_url && (
                   <img src={tournament.cover_url} alt="Cover" className="h-16 w-28 rounded-lg object-cover bg-secondary" />
                 )}
@@ -831,7 +831,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Button variant="outline" size="sm" onClick={() => { setNewMatchDay(""); setShowAddMatchDay(true); }}>
                 <Plus className="h-3.5 w-3.5 mr-1" /> Wedstrijddag toevoegen
               </Button>
