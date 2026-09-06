@@ -325,7 +325,7 @@ const TournamentDetail = () => {
         </TooltipProvider>
 
         {/* Main content */}
-        <div className="flex-1 overflow-auto min-h-0 flex flex-col">
+        <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className="px-3 sm:px-6 py-3 sm:py-4 w-full flex flex-col">
             <div className="flex flex-col">{renderContent()}</div>
           </div>
