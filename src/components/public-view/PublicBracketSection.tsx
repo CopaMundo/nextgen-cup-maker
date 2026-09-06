@@ -404,13 +404,12 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     : bracketRoundCount === 4 ? 1.55
     : 1.85;
   const COMPACT_BASE_W = Math.round(200 * compactBracketScale);
-  const COMPACT_BASE_H = Math.round(56 * compactBracketScale);
-  const COMPACT_BASE_GAP = Math.round(12 * Math.min(compactBracketScale, 1.4));
+  const COMPACT_BASE_H = Math.round(64 * compactBracketScale);
   const CARD_W = isMobile ? Math.min(288, typeof window !== "undefined" ? window.innerWidth - EDGE_PAD - PEEK_W - 8 : 268) : compactTree ? COMPACT_BASE_W : 268;
   const CONNECTOR_W = isMobile ? 0 : compactTree ? Math.round(28 * Math.min(compactBracketScale, 1.4)) : 32;
-  const CARD_H = isMobile ? 104 : compactTree ? COMPACT_BASE_H : 96;
+  const CARD_H = isMobile ? 112 : compactTree ? COMPACT_BASE_H : 108;
 
-  const GAP = isMobile ? 20 : compactTree ? COMPACT_BASE_GAP : 16;
+  const GAP = isMobile ? 12 : CONNECTOR_W;
   const HEADER_H = isMobile ? 28 : compactTree ? Math.round(26 * Math.min(compactBracketScale, 1.3)) : 36;
   // Column = card + some gap, so the next column's cards are visible as peek
   const MOBILE_COL_W = CARD_W + 24;
