@@ -7,6 +7,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { expandMatchDays, type MatchDayEntry } from "@/lib/dateUtils";
 
 interface Props {
   data: PublicTournamentData;
@@ -42,6 +43,21 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
     if (!d) return null;
     return new Date(d).toLocaleDateString("nl-BE", { day: "numeric", month: "long", year: "numeric" });
   };
+
+  // Periode: eerste tot laatste wedstrijddag (dagen + periodes), anders start/eind datum
+  const matchDayDates = (() => {
+    const raw = (tournament as any).match_days;
+    let entries: any[] = [];
+    if (Array.isArray(raw)) entries = raw;
+    else if (typeof raw === "string") {
+      try { const p = JSON.parse(raw); if (Array.isArray(p)) entries = p; } catch { /* ignore */ }
+    }
+    try { return expandMatchDays(entries as MatchDayEntry[]); } catch { return []; }
+  })();
+
+  const periodStart = matchDayDates[0] || tournament.start_date || null;
+  const periodEnd = matchDayDates.length > 0 ? matchDayDates[matchDayDates.length - 1] : (tournament.end_date || null);
+
 
   const renderSponsors = () => {
     if (sponsors.length === 0) return null;
@@ -149,12 +165,12 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Date & Location badges */}
         <div className="flex flex-wrap gap-2 justify-center">
-          {(tournament.start_date || tournament.end_date) && (
+          {(periodStart || periodEnd) && (
             <div className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
               <CalendarDays className="h-4 w-4 text-primary" />
               <span className="text-foreground font-bold text-xs">
-                {formatDate(tournament.start_date)}
-                {tournament.end_date && tournament.end_date !== tournament.start_date && ` – ${formatDate(tournament.end_date)}`}
+                {formatDate(periodStart)}
+                {periodEnd && periodEnd !== periodStart && ` – ${formatDate(periodEnd)}`}
               </span>
             </div>
           )}
@@ -179,11 +195,11 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Locatie-overzicht */}
         <Dialog open={showLocations} onOpenChange={setShowLocations}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
+          <DialogContent className="max-w-sm max-h-[80vh] flex flex-col">
+            <DialogHeader className="shrink-0">
               <DialogTitle className="text-base">Locaties</DialogTitle>
             </DialogHeader>
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-y-auto overscroll-contain flex-1 -mr-2 pr-2">
               {locations.map((l: any) => (
                 <div key={l.id} className={`p-3 ${cardFrame}`}>
                   <div className="flex items-center gap-2">
@@ -192,7 +208,6 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
                   </div>
                 </div>
               ))}
-
             </div>
           </DialogContent>
         </Dialog>
