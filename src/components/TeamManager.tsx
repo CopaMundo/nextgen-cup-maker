@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Upload, Pencil, Check, X, ArrowLeft, Users, Camera, Copy, ChevronRight } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
@@ -17,6 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
 import CountryFlag from "@/components/CountryFlag";
 import PlayerManager from "./PlayerManager";
 import StaffManager from "./StaffManager";
@@ -54,8 +56,6 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const isMobile = useIsMobile();
 
   const { toast } = useToast();
-  const addDialogRef = useDialogFocus(showAdd);
-  const editDialogRef = useDialogFocus(!!editingId);
 
   useEffect(() => { fetchTeams(); }, [tournamentId, categoryId]);
   useEffect(() => { onDetailOpenChange?.(!!selectedTeamId); }, [selectedTeamId, onDetailOpenChange]);
@@ -261,117 +261,119 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
 
   const modals = (
     <>
-      {/* Add team modal */}
-      {showAdd && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setShowAdd(false)}>
-          <div ref={addDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h3 className="font-display text-lg font-bold text-foreground">{singularLabel} toevoegen</h3>
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <Label className="text-xs">{isPlayers ? "Naam" : "Teamnaam"} *</Label>
-                <Input value={newTeam.name} onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })} placeholder={isPlayers ? "Bijv. Lionel Messi" : "Bijv. RSC Anderlecht"} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Land (optioneel)</Label>
-                <CountrySelect value={newTeam.country} onChange={(v) => setNewTeam({ ...newTeam, country: v })} />
-              </div>
+      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{singularLabel} toevoegen</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-xs">{isPlayers ? "Naam" : "Teamnaam"} *</Label>
+              <Input value={newTeam.name} onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })} placeholder={isPlayers ? "Bijv. Lionel Messi" : "Bijv. RSC Anderlecht"} />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
-              <Button onClick={addTeam} className="bg-foreground text-background hover:bg-foreground/90">Toevoegen</Button>
+            <div className="space-y-1">
+              <Label className="text-xs">Land (optioneel)</Label>
+              <CountrySelect value={newTeam.country} onChange={(v) => setNewTeam({ ...newTeam, country: v })} />
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Annuleren</Button>
+            <Button onClick={addTeam} className="bg-foreground text-background hover:bg-foreground/90">Toevoegen</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Edit team dialog */}
-      {editingId && (() => {
-        const team = teams.find(t => t.id === editingId);
-        if (!team) return null;
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setEditingId(null)}>
-            <div ref={editDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4" onClick={e => e.stopPropagation()}>
-              <h3 className="font-display text-lg font-bold text-foreground">{singularLabel} bewerken</h3>
-              <div className="flex justify-center">
-                <label className="cursor-pointer relative group">
-                  <div className="h-24 w-24 overflow-hidden flex-shrink-0">
-                    {team.logo_url ? (
-                      <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-3xl font-bold text-muted-foreground">{editTeam.name.charAt(0) || team.name.charAt(0)}</div>
-                    )}
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Upload className="h-6 w-6 text-foreground" />
-                  </div>
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) uploadLogo(team.id, e.target.files[0]); }} />
-                </label>
-              </div>
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">{isPlayers ? "Naam" : "Teamnaam"} *</Label>
-                  <Input value={editTeam.name} onChange={(e) => setEditTeam({ ...editTeam, name: e.target.value })} placeholder={isPlayers ? "Naam" : "Teamnaam"} />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Land (optioneel)</Label>
-                  <CountrySelect value={editTeam.country} onChange={(v) => setEditTeam({ ...editTeam, country: v })} />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
-                <Button onClick={() => saveEdit(editingId)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Import team modal */}
-      {showImport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setShowImport(false)}>
-          <div className="relative w-full max-w-lg max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h3 className="font-display text-lg font-bold text-foreground">Team importeren uit andere divisie</h3>
-            <p className="text-xs text-muted-foreground">Alleen teamnaam, logo en land worden gekopieerd. Spelers, staff en ploegfoto worden niet overgenomen.</p>
-            {importByCategory.map(cat => (
-              <div key={cat.id} className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{cat.name}</h4>
-                <div className="grid gap-2">
-                  {cat.teams.map(t => {
-                    const alreadyImported = teams.some(existing => existing.name === t.name);
-                    return (
-                      <button
-                        key={t.id}
-                        disabled={alreadyImported}
-                        onClick={() => { importTeam(t); }}
-                        className={`flex items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors ${
-                          alreadyImported ? "opacity-50 cursor-not-allowed" : "hover:bg-foreground/5"
-                        }`}
-                      >
-                        {t.logo_url ? (
-                          <img src={t.logo_url} className="h-8 w-8 rounded-lg object-contain" />
+      <Dialog open={!!editingId} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
+        <DialogContent className="max-w-md">
+          {(() => {
+            const team = teams.find(t => t.id === editingId);
+            if (!team) return null;
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{singularLabel} bewerken</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="flex justify-center">
+                    <label className="cursor-pointer relative group">
+                      <div className="h-24 w-24 overflow-hidden flex-shrink-0">
+                        {team.logo_url ? (
+                          <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
                         ) : (
-                          <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center text-sm font-bold text-muted-foreground">{t.name.charAt(0)}</div>
+                          <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-3xl font-bold text-muted-foreground">{editTeam.name.charAt(0) || team.name.charAt(0)}</div>
                         )}
-                        <div>
-                          <span className="text-sm font-medium text-foreground">{t.name}</span>
-                          {t.country && <CountryFlag country={t.country} className="ml-2 h-3.5 w-5 object-contain inline-block align-text-bottom" />}
-                        </div>
-                        {alreadyImported && <span className="ml-auto text-xs text-muted-foreground">Al toegevoegd</span>}
-                        {!alreadyImported && <Copy className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}
-                      </button>
-                    );
-                  })}
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Upload className="h-6 w-6 text-foreground" />
+                      </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) uploadLogo(team.id, e.target.files[0]); }} />
+                    </label>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">{isPlayers ? "Naam" : "Teamnaam"} *</Label>
+                      <Input value={editTeam.name} onChange={(e) => setEditTeam({ ...editTeam, name: e.target.value })} placeholder={isPlayers ? "Naam" : "Teamnaam"} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Land (optioneel)</Label>
+                      <CountrySelect value={editTeam.country} onChange={(v) => setEditTeam({ ...editTeam, country: v })} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div className="flex justify-end">
-              <Button variant="outline" onClick={() => setShowImport(false)}>Sluiten</Button>
-            </div>
-          </div>
-        </div>
-      )}
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
+                  <Button onClick={() => editingId && saveEdit(editingId)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
-      {/* Delete team confirmation */}
+      <Dialog open={showImport} onOpenChange={setShowImport}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Team importeren uit andere divisie</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground">Alleen teamnaam, logo en land worden gekopieerd. Spelers, staff en ploegfoto worden niet overgenomen.</p>
+          {importByCategory.map(cat => (
+            <div key={cat.id} className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{cat.name}</h4>
+              <div className="grid gap-2">
+                {cat.teams.map(t => {
+                  const alreadyImported = teams.some(existing => existing.name === t.name);
+                  return (
+                    <button
+                      key={t.id}
+                      disabled={alreadyImported}
+                      onClick={() => { importTeam(t); }}
+                      className={`flex items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors ${
+                        alreadyImported ? "opacity-50 cursor-not-allowed" : "hover:bg-foreground/5"
+                      }`}
+                    >
+                      {t.logo_url ? (
+                        <img src={t.logo_url} className="h-8 w-8 rounded-lg object-contain" />
+                      ) : (
+                        <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center text-sm font-bold text-muted-foreground">{t.name.charAt(0)}</div>
+                      )}
+                      <div>
+                        <span className="text-sm font-medium text-foreground">{t.name}</span>
+                        {t.country && <CountryFlag country={t.country} className="ml-2 h-3.5 w-5 object-contain inline-block align-text-bottom" />}
+                      </div>
+                      {alreadyImported && <span className="ml-auto text-xs text-muted-foreground">Al toegevoegd</span>}
+                      {!alreadyImported && <Copy className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowImport(false)}>Sluiten</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={!!teamToDelete} onOpenChange={(open) => { if (!open) setTeamToDelete(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
