@@ -1,31 +1,24 @@
-import markUrl from "@/assets/copa-mundo-mark.png";
+import blueLogo from "@/assets/copa-mundo-blue.png.asset.json";
+import yellowLogo from "@/assets/copa-mundo-yellow.png.asset.json";
 
 interface Props {
   className?: string;
   title?: string;
 }
 
-/**
- * Copa Mundo beeldmerk. Wordt als masker getekend zodat het logo
- * automatisch de themakleur (primary) aanneemt:
- * geel in donkere modus, blauw in lichte modus.
- */
 const CopaMundoMark = ({ className = "h-10 w-10", title = "Copa Mundo" }: Props) => (
-  <span
-    role="img"
-    aria-label={title}
-    className={`inline-block bg-primary ${className}`}
-    style={{
-      WebkitMaskImage: `url(${markUrl})`,
-      maskImage: `url(${markUrl})`,
-      WebkitMaskRepeat: "no-repeat",
-      maskRepeat: "no-repeat",
-      WebkitMaskPosition: "center",
-      maskPosition: "center",
-      WebkitMaskSize: "contain",
-      maskSize: "contain",
-    }}
-  />
+  <span className={`inline-block ${className}`}>
+    <img
+      src={yellowLogo.url}
+      alt={title}
+      className="hidden h-full w-full object-contain [[data-mode=dark]_&]:block"
+    />
+    <img
+      src={blueLogo.url}
+      alt={title}
+      className="h-full w-full object-contain [[data-mode=dark]_&]:hidden"
+    />
+  </span>
 );
 
 export default CopaMundoMark;
