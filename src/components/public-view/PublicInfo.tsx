@@ -165,12 +165,12 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
 
         {/* Date & Location badges */}
         <div className="flex flex-wrap gap-2 justify-center">
-          {(tournament.start_date || tournament.end_date) && (
+          {(periodStart || periodEnd) && (
             <div className={`ttx-info-badge flex items-center gap-1.5 bg-secondary/60 border border-foreground/10 px-3 py-2 text-sm ${controlFrameShape}`}>
               <CalendarDays className="h-4 w-4 text-primary" />
               <span className="text-foreground font-bold text-xs">
-                {formatDate(tournament.start_date)}
-                {tournament.end_date && tournament.end_date !== tournament.start_date && ` – ${formatDate(tournament.end_date)}`}
+                {formatDate(periodStart)}
+                {periodEnd && periodEnd !== periodStart && ` – ${formatDate(periodEnd)}`}
               </span>
             </div>
           )}
