@@ -122,6 +122,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
+  const isMobile = useIsMobile();
+  const [mobileOverview, setMobileOverview] = useState(true);
 
   useEffect(() => {
     if (tabs.length > 0 && !tabs.find(t => t.id === activeTab)) {
