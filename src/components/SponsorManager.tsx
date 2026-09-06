@@ -169,14 +169,16 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
               <div className="flex shrink-0 items-center gap-1">
                 <button
                   onClick={() => { setEditingId(sponsor.id); setEditName(sponsor.name); }}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                   className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                   aria-label="Sponsor bewerken"
                   title="Bewerken"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setDeleteId(sponsor.id)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                   className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                   aria-label="Sponsor verwijderen"
                   title="Verwijderen"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

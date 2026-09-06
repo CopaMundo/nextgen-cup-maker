@@ -322,14 +322,16 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                 <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => openEdit(i)}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                     className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                     aria-label={`${r.name} bewerken`}
                     title="Bewerken"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => setDeleteIdx(i)}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                     className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                     aria-label={`${r.name} verwijderen`}
                     title="Verwijderen"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

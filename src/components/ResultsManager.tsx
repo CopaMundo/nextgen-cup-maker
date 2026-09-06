@@ -1880,7 +1880,21 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         {/* Format chips – left sidebar (sticky on desktop) */}
         {phaseNumbers.length > 0 && (
           <aside className="lg:w-56 lg:shrink-0 lg:h-full lg:overflow-y-auto lg:border-r lg:border-border lg:pr-2">
-            {phaseNumbers.length > 1 && (
+            {phaseNumbers.length > 1 && isMobile && (
+              <Select value={String(selectedPhaseNumber ?? phaseNumbers[0])} onValueChange={value => setSelectedPhaseNumber(Number(value))}>
+                <SelectTrigger className="mb-2 h-9 w-full bg-card text-xs font-semibold uppercase">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {phaseNumbers.map(phaseNumber => (
+                    <SelectItem key={phaseNumber} value={String(phaseNumber)}>
+                      {getPhaseLabel(phaseNumber, phases)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {phaseNumbers.length > 1 && !isMobile && (
               <div className="mb-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
                 {phaseNumbers.map(phaseNumber => {
                   const isSelected = phaseNumber === selectedPhaseNumber;
@@ -1911,7 +1925,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 const phaseLabel = getPhaseLabel(format.phase_number, phases);
 
                 return (
-                  <div key={format.id} className="min-w-[9rem] lg:min-w-0 lg:w-full max-w-[12rem] lg:max-w-none rounded-md border border-border bg-card px-2 py-1.5 text-left">
+                    <div key={format.id} className="min-w-[12rem] lg:min-w-0 lg:w-full max-w-[15rem] lg:max-w-none rounded-md border border-border bg-card px-2 py-1.5 text-left">
                     <button
                       type="button"
                       onClick={() => setExpandedFormats(new Set([format.id]))}
@@ -1919,7 +1933,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                     >
                       <div className="flex min-w-0 items-center gap-1.5">
                         {format.logo_url && <img src={format.logo_url} alt="" className="h-3 w-3 object-contain flex-shrink-0" />}
-                        <span className="min-w-0 flex-1 truncate text-[10px] font-semibold text-foreground">{phaseLabel} · {format.name}</span>
+                        <span className="min-w-0 flex-1 break-words text-[10px] font-semibold text-foreground">{phaseLabel} · {format.name}</span>
                       </div>
                       <div className="mt-1 h-0.5 bg-secondary rounded-full overflow-hidden">
                         <div
