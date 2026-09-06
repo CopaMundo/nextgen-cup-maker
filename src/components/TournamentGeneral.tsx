@@ -595,33 +595,28 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       <div className="space-y-6 w-full">
         {isMobile ? (
           generalSubTab === "overview" ? (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-2">
               {([
-                { id: "info", label: "Toernooi informatie", description: "Naam, beschrijving, sport, logo, omslagfoto en bijlagen", icon: Info },
-                { id: "wedstrijddagen", label: "Wedstrijddagen", description: "Losse dagen of periodes waarop er gespeeld wordt", icon: CalendarDays },
-                { id: "locaties", label: "Locaties", description: "Speelvelden of locaties voor je toernooi", icon: MapPin },
-                { id: "divisies", label: "Divisies", description: "Verdeel je toernooi in leeftijds- of niveaugroepen", icon: LayoutGrid },
-                { id: "puntentelling", label: "Puntensysteem", description: "Punten, sets, spelersstatistieken en fairplay", icon: Trophy },
+                { id: "info", label: "Toernooi informatie", icon: Info },
+                { id: "wedstrijddagen", label: "Wedstrijddagen", icon: CalendarDays },
+                { id: "locaties", label: "Locaties", icon: MapPin },
+                { id: "divisies", label: "Divisies", icon: LayoutGrid },
+                { id: "puntentelling", label: "Puntensysteem", icon: Trophy },
               ] as const).map((card) => {
                 const Icon = card.icon;
                 return (
                   <button
                     key={card.id}
                     onClick={() => setGeneralSubTab(card.id)}
-                    className="group text-left rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                    className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="rounded-full border border-border bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                        Openen
-                      </span>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                      <Icon className="h-4 w-4" />
                     </div>
-                    <div className="mt-4">
-                      <h3 className="font-display text-base font-bold text-foreground">{card.label}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground leading-snug">{card.description}</p>
-                    </div>
+                    <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
+                    <span className="shrink-0 text-muted-foreground">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 18 6-6-6-6"/></svg>
+                    </span>
                   </button>
                 );
               })}
