@@ -19,6 +19,7 @@ import TiebreakerManager from "./TiebreakerManager";
 import ScoringSystemsManager from "./ScoringSystemsManager";
 import { DatePicker } from "@/components/ui/datepicker";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { getFairplayConfig, FAIRPLAY_DEFAULTS } from "@/lib/fairplay";
 
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
@@ -89,6 +90,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
+  const isMobile = useIsMobile();
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
@@ -586,23 +588,43 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         <div className="rounded-xl border border-border bg-card p-6 space-y-4">
           <div className="space-y-2">
             <Label>Toernooinaam</Label>
-            <div
-              onClick={() => { setEditName(form.name); setShowEditName(true); }}
-              className="cursor-pointer rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors"
-            >
-              {form.name || <span className="text-muted-foreground">Klik om naam in te vullen</span>}
-            </div>
+            {isMobile ? (
+              <Input
+                value={form.name}
+                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== tournament.name) saveToDb({ name: v }); }}
+                placeholder="Naam van het toernooi"
+              />
+            ) : (
+              <div
+                onClick={() => { setEditName(form.name); setShowEditName(true); }}
+                className="cursor-pointer rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors"
+              >
+                {form.name || <span className="text-muted-foreground">Klik om naam in te vullen</span>}
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Beschrijving</Label>
-            <p className="text-xs text-muted-foreground">Deze beschrijving is het eerste wat bezoekers zien op de toernooipagina. Klik om volledige tekst te bekijken of te bewerken.</p>
-            <div
-              onClick={() => { setEditDesc(form.description); setShowEditDesc(true); }}
-              className="cursor-pointer rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors h-[60px] overflow-hidden line-clamp-2 whitespace-pre-wrap"
-            >
-              {form.description || <span className="text-muted-foreground">Klik om beschrijving toe te voegen</span>}
-            </div>
+            <p className="text-xs text-muted-foreground">Deze beschrijving is het eerste wat bezoekers zien op de toernooipagina.</p>
+            {isMobile ? (
+              <Textarea
+                value={form.description}
+                onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                onBlur={(e) => { if (e.target.value !== (tournament as any).description) saveToDb({ description: e.target.value }); }}
+                rows={4}
+                placeholder="Beschrijving van het toernooi"
+              />
+            ) : (
+              <div
+                onClick={() => { setEditDesc(form.description); setShowEditDesc(true); }}
+                className="cursor-pointer rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors h-[60px] overflow-hidden line-clamp-2 whitespace-pre-wrap"
+              >
+                {form.description || <span className="text-muted-foreground">Klik om beschrijving toe te voegen</span>}
+              </div>
+            )}
           </div>
+
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
