@@ -2446,6 +2446,13 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             }
             tournament={tournament}
             aggregate={aggregateProp}
+            formatName={phase?.name || null}
+            groupName={group?.name || null}
+            matchName={sem.match_name || null}
+            field={sem.field}
+            referee={sem.referee}
+            matchDate={sem.match_date}
+            matchTime={sem.match_time}
             onSave={async (data) => {
               // Update de huidige leg. Bij H&A horen penalties UITSLUITEND op de
               // Terug-match: de Heen-match wordt dus altijd hard op null gezet
