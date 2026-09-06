@@ -165,7 +165,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
           <div className="space-y-1.5">
             {/* Phase tabs — admin Format-stijl (Deelnemers-stijl) */}
             {allPhaseNumbers.length > 1 && (
-              <div className="ttx-phase-tab-container flex justify-center border-b border-border flex-wrap overflow-x-auto">
+              <div className="ttx-phase-tab-container flex flex-nowrap justify-start sm:justify-center border-b border-border overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch]">
                 {allPhaseNumbers.map(pn => {
                   const isActive = activePhaseNum === pn;
                   return (
@@ -174,7 +174,7 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
                       data-active={isActive}
                       onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
                       className={
-                        "ttx-phase-tab px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
+                        "ttx-phase-tab shrink-0 px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
                         (isActive
                           ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
                           : "text-muted-foreground hover:text-foreground")
