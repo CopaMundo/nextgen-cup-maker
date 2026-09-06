@@ -58,6 +58,8 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const editDialogRef = useDialogFocus(!!editingId);
 
   useEffect(() => { fetchTeams(); }, [tournamentId, categoryId]);
+  useEffect(() => { onDetailOpenChange?.(!!selectedTeamId); }, [selectedTeamId, onDetailOpenChange]);
+  useEffect(() => () => { onDetailOpenChange?.(false); }, [onDetailOpenChange]);
 
   const fetchTeams = async () => {
     const [teamsRes, allTeamsRes, catRes] = await Promise.all([

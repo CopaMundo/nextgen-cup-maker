@@ -62,6 +62,7 @@ const TournamentDetail = () => {
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
+  const [teamDetailOpen, setTeamDetailOpen] = useState(false);
   const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(locationStorageKey(id));
@@ -226,7 +227,7 @@ const TournamentDetail = () => {
                         );
                       })}
                     </div>
-                  ) : (
+                  ) : teamDetailOpen ? null : (
                     <div className="flex items-center gap-3 mb-3">
                       <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileDeelnemersOverview(true)} aria-label="Terug naar overzicht">
                         <ArrowLeft className="h-4 w-4" />
@@ -262,7 +263,7 @@ const TournamentDetail = () => {
                 </div>
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
-                  <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} />
+                  <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "referees" && (
                   <RefereeManager tournamentId={id!} categoryId={effectiveCategoryId} />
