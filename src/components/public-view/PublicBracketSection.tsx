@@ -668,7 +668,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               </span>
             )}
           </div>
-          {isPlayedish && (() => {
+          {isPlayedish && !hideScores && (() => {
             const penValue = matchIsHA
               ? (haTotal?.hasPenalties ? (side === "home" ? haTotal.homePen : haTotal.awayPen) : null)
               : (match.home_penalties !== null && match.away_penalties !== null ? (side === "home" ? match.home_penalties : match.away_penalties) : null);
