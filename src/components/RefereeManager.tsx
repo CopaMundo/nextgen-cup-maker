@@ -6,7 +6,7 @@ import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Pencil, Trash2, Download } from "lucide-react";
+import { Plus, Pencil, Trash2, Copy } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -304,7 +304,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
             <p className="text-sm text-muted-foreground">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
             {categoryId && (
               <Button variant="outline" size="sm" className="h-8" onClick={openImport}>
-                <Download className="h-3.5 w-3.5 mr-1" /> Importeren
+                <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
               </Button>
             )}
           </div>
@@ -361,7 +361,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
         </Button>
         {categoryId && (
           <Button variant="outline" size="sm" onClick={openImport} className="gap-1">
-            <Download className="h-3.5 w-3.5" /> Importeer uit divisies
+            <Copy className="h-3.5 w-3.5" /> Importeer uit divisies
           </Button>
         )}
         <p className="text-sm text-muted-foreground ml-auto">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
