@@ -541,8 +541,8 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
       )}
 
       {/* Show selector + style chips */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className={cn("flex items-center justify-between gap-4 flex-wrap", isMobile && "rounded-lg border border-border bg-card p-3")}>
+        <div className={cn("flex items-center gap-2 flex-wrap", isMobile && "w-full justify-between")}>
           {!isMobile && <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -772,10 +772,10 @@ const SlideCard = ({
   return (
     <div className="rounded-lg border border-border overflow-hidden">
       {/* Header bar */}
-      <div className="flex items-center justify-between bg-primary text-primary-foreground px-4 py-2.5">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-bold">{slideName}</span>
-          <span className="inline-flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 bg-primary text-primary-foreground px-3 py-2.5 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <span className="min-w-0 break-words text-sm font-bold">{slideName}</span>
+          <span className="inline-flex shrink-0 items-center gap-1 sm:gap-2">
             <span className="inline-flex items-center rounded bg-background/20 px-2 py-0.5 text-sm font-bold text-primary-foreground">
               {slide.durationSec || 15} seconden
             </span>
@@ -790,9 +790,9 @@ const SlideCard = ({
             </button>
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <label className="flex items-center gap-2 text-xs cursor-pointer select-none">
-            <span>Actief:</span>
+            <span className="hidden sm:inline">Actief:</span>
             <span
               className={`relative inline-flex h-4 w-4 items-center justify-center rounded border ${
                 slide.enabled
@@ -841,7 +841,7 @@ const SlideCard = ({
         )}
 
         {/* Block toolbar */}
-        <div className="flex items-center justify-center gap-1 pt-2 border-t border-border">
+        <div className="grid grid-cols-5 items-center justify-items-center gap-1 pt-2 border-t border-border">
           <GroupBracketPicker sources={sources} onAddBlock={onAddBlock} />
           <BlockButton icon={CalendarClockIcon} label="Aankomende wedstrijden" onClick={() => onAddBlock("upcoming_matches")} />
           <BlockButton icon={ScoreboardIcon} label="Laatste resultaten" onClick={() => onAddBlock("recent_results")} />
