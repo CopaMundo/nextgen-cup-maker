@@ -269,33 +269,33 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
       </div>
     </div>
 
-      {editingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setEditingId(null)}>
-          <div ref={editDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h3 className="font-display text-lg font-bold text-foreground">Speler bewerken</h3>
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Naam *</Label>
-                <Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Rugnummer</Label>
-                  <Input type="number" value={editForm.shirt_number} onChange={(e) => setEditForm({ ...editForm, shirt_number: e.target.value })} />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Geboortedatum</Label>
-                  <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" />
-                </div>
-              </div>
+      <Dialog open={!!editingId} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Speler bewerken</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Naam *</Label>
+              <Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
-              <Button onClick={() => saveEdit(editingId)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Rugnummer</Label>
+                <Input type="number" value={editForm.shirt_number} onChange={(e) => setEditForm({ ...editForm, shirt_number: e.target.value })} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Geboortedatum</Label>
+                <DatePicker value={editForm.birth_date} onChange={(v) => setEditForm({ ...editForm, birth_date: v })} placeholder="Kies datum" />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
+            <Button onClick={() => editingId && saveEdit(editingId)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deletePlayerId} onOpenChange={(o) => !o && setDeletePlayerId(null)}>
         <AlertDialogContent>

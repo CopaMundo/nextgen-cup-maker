@@ -180,30 +180,29 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
       </div>
     </div>
 
-      {/* Edit staff dialog */}
-      {editingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setEditingId(null)}>
-          <div ref={editDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h3 className="font-display text-lg font-bold text-foreground">Stafflid bewerken</h3>
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Naam *</Label>
-                <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Functie</Label>
-                <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  {STAFF_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
+      <Dialog open={!!editingId} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Stafflid bewerken</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Naam *</Label>
+              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
-              <Button onClick={() => saveEditStaff(editingId)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+            <div className="space-y-1">
+              <Label className="text-xs">Functie</Label>
+              <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                {STAFF_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
+            <Button onClick={() => editingId && saveEditStaff(editingId)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deleteStaffId} onOpenChange={(o) => !o && setDeleteStaffId(null)}>
         <AlertDialogContent>
