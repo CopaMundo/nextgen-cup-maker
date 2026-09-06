@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil, ChevronRight, ArrowLeft, Grid3X3, ListOrdered } from "lucide-react";
+import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil, ChevronRight, ArrowLeft, Grid3X3 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
 import {
