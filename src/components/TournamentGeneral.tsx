@@ -1013,6 +1013,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                         key={cat.id}
                         id={cat.id}
                         label={cat.name}
+                        icon={<LayoutGrid className="h-4 w-4" />}
                         dragLabel="Divisie verplaatsen"
                         onRename={() => { setEditingCatId(cat.id); setEditCatName(cat.name); }}
                         onDelete={() => setDeleteCatId(cat.id)}
