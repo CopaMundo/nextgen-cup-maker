@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFieldLabel } from "@/lib/fieldLocations";
+import { useFieldLabel, displayFieldName } from "@/lib/fieldLocations";
 import { firstRefereeName } from "@/lib/refereeConfig";
 import { MapPin } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
@@ -30,6 +30,8 @@ interface PublicMatchCardProps {
   awayPosition?: number;
   /** When provided, overrides the default match-detail dialog open. */
   onCardClick?: () => void;
+  /** Active location filter in the public schedule. When set, the field label shows only the field name. */
+  locationFilter?: string;
 }
 
 const getTeamName = (teams: any[], id: string | null) => teams.find((t) => t.id === id)?.name || "–";
@@ -51,9 +53,11 @@ const PublicMatchCard = ({
   homePosition,
   awayPosition,
   onCardClick,
+  locationFilter,
 }: PublicMatchCardProps) => {
   const bStyle = useBroadcastStyle();
   const fieldLabel = useFieldLabel();
+  const fieldDisplay = locationFilter ? displayFieldName(m.field) : fieldLabel(m.field);
   const phase = phases.find((p) => p.id === m.phase_id);
   const group = groups.find((g) => g.id === m.group_id);
   const isFav = favoriteTeam && (m.home_team_id === favoriteTeam || m.away_team_id === favoriteTeam);
@@ -177,7 +181,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : <div />}
                     <div className="flex items-center gap-1.5 min-w-0">
@@ -211,7 +215,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
@@ -246,7 +250,7 @@ const PublicMatchCard = ({
                     </div>
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
@@ -267,7 +271,7 @@ const PublicMatchCard = ({
                     <div />
                     {m.field ? (
                       <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldLabel(m.field)}</span>
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={m.field || undefined}>{fieldDisplay}</span>
                       </div>
                     ) : m.referee ? (
                       <div className="text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
