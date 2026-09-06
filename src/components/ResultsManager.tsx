@@ -1690,6 +1690,42 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const baseMatchName = (match.match_name || "").replace(/\s+\((Heen|Terug)\)$/, "");
     const subLabel = group ? `${group.name}${formatSuffix}` : `${baseMatchName}${formatSuffix}`.trim();
 
+    // Mobiel: compacte rij (FotMob-stijl) — tik opent de wedstrijd-pop-up
+    if (isMobile) {
+      const homeLogoUrl = teamLogo(match.home_team_id);
+      const awayLogoUrl = teamLogo(match.away_team_id);
+      return (
+        <button
+          key={match.id}
+          type="button"
+          onClick={() => setScoreEntryMatchId(match.id)}
+          className="w-full rounded-md border border-border/60 bg-card px-2 py-2 text-left active:bg-secondary/50 transition-colors"
+        >
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <div className="flex items-start justify-end gap-1.5 min-w-0">
+              <span className="text-[13px] font-medium leading-tight text-right text-foreground break-words">{homeName}</span>
+              {homeLogoUrl && <img src={homeLogoUrl} alt="" className="h-5 w-5 object-contain shrink-0" />}
+            </div>
+            <span className="shrink-0 rounded px-1 text-[15px] font-bold tabular-nums text-foreground">
+              {match.home_score ?? "–"} - {match.away_score ?? "–"}
+            </span>
+            <div className="flex items-start gap-1.5 min-w-0">
+              {awayLogoUrl && <img src={awayLogoUrl} alt="" className="h-5 w-5 object-contain shrink-0" />}
+              <span className="text-[13px] font-medium leading-tight text-foreground break-words">{awayName}</span>
+            </div>
+          </div>
+          {showPenalties && match.home_penalties !== null && match.away_penalties !== null && (
+            <div className="mt-0.5 text-center text-[10px] text-muted-foreground">
+              ({match.home_penalties} - {match.away_penalties} pen.)
+            </div>
+          )}
+          {showPenalties && needsPenaltiesFilled && (
+            <p className="mt-0.5 text-center text-[10px] font-medium text-destructive">Vul de beslissende score in</p>
+          )}
+        </button>
+      );
+    }
+
     return (
       <div key={match.id} className="rounded-md border border-border/60 bg-card hover:border-border transition-colors">
         <div className="px-2 py-1.5 grid grid-cols-[6.5rem_1fr_3.5rem] gap-2 items-center">
