@@ -611,13 +611,14 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const phase = phases?.find((p: any) => p.id === match.phase_id);
     const group = groups?.find((g: any) => g.id === match.group_id);
     const baseDisplayName = matchIsHA ? getBaseMatchName(match.match_name) : match.match_name;
-    const displayNameSuffix = getMatchFormatSuffix(
-      match,
-      scoringSystems as any,
-      (phases ?? []) as any,
-      (groups ?? []) as any,
-      { haPairLabel: matchIsHA ? "Heen en terug" : undefined }
-    );
+    const displayNameSuffix = matchIsHA
+      ? ""
+      : getMatchFormatSuffix(
+          match,
+          scoringSystems as any,
+          (phases ?? []) as any,
+          (groups ?? []) as any
+        );
     const displayName = baseDisplayName ? `${baseDisplayName}${displayNameSuffix}` : baseDisplayName;
 
     const renderSide = (side: "home" | "away") => {
