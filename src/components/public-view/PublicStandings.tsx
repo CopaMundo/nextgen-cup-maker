@@ -81,18 +81,9 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   const [expandedGroupSchedule, setExpandedGroupSchedule] = useState<string | null>(null);
   const phaseTabRefs = useRef<Map<number, HTMLButtonElement | null>>(new Map());
   const phaseContainerRef = useRef<HTMLDivElement | null>(null);
-  const [phaseOverflows, setPhaseOverflows] = useState(false);
 
-  // Detecteer of de fase-tabs passen; als ze passen centreren we ze, anders links uitlijnen voor swipe
-  useEffect(() => {
-    const el = phaseContainerRef.current;
-    if (!el) return;
-    const update = () => setPhaseOverflows(el.scrollWidth > el.clientWidth + 1);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [allPhaseNumbers]);
+  // De fase-tabs worden altijd gecentreerd binnen de scrollbare rij.
+  // Bij overflow kan de gebruiker zijwaarts swipen; de inhoud blijft vanuit het midden groeien.
 
   // Auto-scroll naar de groep van het favoriete team
 
@@ -250,27 +241,29 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
             {allPhaseNumbers.length > 1 && (
               <div
                 ref={phaseContainerRef}
-                className={`ttx-phase-tab-container flex flex-nowrap ${phaseOverflows ? 'justify-start' : 'justify-center'} border-b border-border overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch]`}
+                className="ttx-phase-tab-container flex justify-center overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch] border-b border-border"
               >
-                {allPhaseNumbers.map(pn => {
-                  const isActive = activePhaseNum === pn;
-                  return (
-                    <button
-                      key={pn}
-                      ref={(node) => { phaseTabRefs.current.set(pn, node); }}
-                      data-active={isActive}
-                      onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
-                      className={
-                        "ttx-phase-tab shrink-0 px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
-                        (isActive
-                          ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                          : "text-muted-foreground hover:text-foreground")
-                      }
-                    >
-                      {getPhaseLabel(pn, phases)}
-                    </button>
-                  );
-                })}
+                <div className="inline-flex flex-nowrap">
+                  {allPhaseNumbers.map(pn => {
+                    const isActive = activePhaseNum === pn;
+                    return (
+                      <button
+                        key={pn}
+                        ref={(node) => { phaseTabRefs.current.set(pn, node); }}
+                        data-active={isActive}
+                        onClick={() => { setSelectedPhaseNum(pn); setSelectedFormatId(null); }}
+                        className={
+                          "ttx-phase-tab shrink-0 px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative whitespace-nowrap " +
+                          (isActive
+                            ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                            : "text-muted-foreground hover:text-foreground")
+                        }
+                      >
+                        {getPhaseLabel(pn, phases)}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
