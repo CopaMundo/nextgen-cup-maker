@@ -321,7 +321,10 @@ const TournamentDetail = () => {
   };
 
   return (
-    <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
+    <div
+      className="min-h-0 bg-background flex flex-col overflow-hidden"
+      style={{ height: "var(--admin-vh, 100vh)" }}
+    >
 
 
       <Navbar tournamentName={tournament?.name} />
