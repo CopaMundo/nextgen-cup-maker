@@ -742,8 +742,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     {phase.name}
                   </div>
                   {displayField ? (
-                    <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <MapPin className="h-2 w-2" /> {displayField}
+                    <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
                     </div>
                   ) : <div />}
                   <div className="flex items-center gap-1.5 min-w-0">
@@ -753,8 +753,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     )}
                   </div>
                   {displayReferee ? (
-                    <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                    <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
                     </div>
                   ) : <div />}
                 </>
@@ -767,19 +767,19 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     )}
                   </div>
                   {displayField ? (
-                    <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <MapPin className="h-2 w-2" /> {displayField}
+                    <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
                     </div>
                   ) : displayReferee ? (
-                    <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                    <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
                     </div>
                   ) : <div />}
                   {displayField && displayReferee && (
                     <>
                       <div />
-                      <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                        <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                      <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                        <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
                       </div>
                     </>
                   )}
@@ -796,19 +796,19 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   )}
                 </div>
                 {displayField ? (
-                  <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                    <MapPin className="h-2 w-2" /> {displayField}
+                  <div className={`font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                    <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayField}</span>
                   </div>
                 ) : displayReferee ? (
-                  <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                    <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                  <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                    <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
                   </div>
                 ) : <div />}
                 {displayField && displayReferee && (
                   <>
                     <div />
-                    <div className={`text-muted-foreground/70 flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
-                      <WhistleIcon className="h-2 w-2" /> {displayReferee}
+                    <div className={`text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none ${tight ? "text-[7px]" : "text-[9px]"}`}>
+                      <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none">{displayReferee}</span>
                     </div>
                   </>
                 )}
