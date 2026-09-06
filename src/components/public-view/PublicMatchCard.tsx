@@ -175,8 +175,8 @@ const PublicMatchCard = ({
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                     </div>
                     {m.field ? (
-                      <div className="font-bold text-muted-foreground flex items-center gap-0.5 justify-end text-[9px]">
-                        <MapPin className="h-2.5 w-2.5" /> {fieldLabel(m.field)}
+                      <div className="font-bold text-muted-foreground inline-flex items-center gap-0.5 justify-end text-[9px] leading-none">
+                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" /> <span className="leading-none">{fieldLabel(m.field)}</span>
                       </div>
                     ) : <div />}
                     <div className="flex items-center gap-1.5 min-w-0">
