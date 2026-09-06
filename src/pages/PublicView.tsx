@@ -104,17 +104,54 @@ const PublicView = () => {
     localStorage.setItem(`dark-${token}`, String(value));
   }, [token]);
 
-  // Realtime
+  // Realtime: de publieke site past meteen mee zodra er iets wijzigt,
+  // zonder dat de bezoeker moet vernieuwen.
   useEffect(() => {
     if (!data?.tournament) return;
-    const channel = supabase
-      .channel("public-view")
-      .on("postgres_changes", { event: "*", schema: "public", table: "matches", filter: `tournament_id=eq.${data.tournament.id}` }, () => fetchData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "group_teams", filter: `tournament_id=eq.${data.tournament.id}` }, () => fetchData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "match_stats", filter: `tournament_id=eq.${data.tournament.id}` }, () => fetchData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "tournament_phases", filter: `tournament_id=eq.${data.tournament.id}` }, () => fetchData())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const tournamentId = data.tournament.id;
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    let refreshing = false;
+    let pending = false;
+    const scheduleRefresh = () => {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(async () => {
+        if (refreshing) { pending = true; return; }
+        refreshing = true;
+        try { await fetchData(); } finally {
+          refreshing = false;
+          if (pending) { pending = false; scheduleRefresh(); }
+        }
+      }, 400);
+    };
+    const tables = [
+      "matches",
+      "match_stats",
+      "group_teams",
+      "groups",
+      "teams",
+      "slots",
+      "tournament_phases",
+      "standing_colors",
+    ];
+    let channel = supabase.channel(`public-view-${tournamentId}`);
+    for (const table of tables) {
+      channel = channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table, filter: `tournament_id=eq.${tournamentId}` },
+        scheduleRefresh
+      );
+    }
+    // poll_votes heeft geen tournament_id-kolom: zonder filter meeluisteren.
+    channel = channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "poll_votes" },
+      scheduleRefresh
+    );
+    channel.subscribe();
+    return () => {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      supabase.removeChannel(channel);
+    };
   }, [data?.tournament?.id]);
 
   const fetchData = async () => {
