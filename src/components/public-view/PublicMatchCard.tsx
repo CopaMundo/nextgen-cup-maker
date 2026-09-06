@@ -234,9 +234,6 @@ const PublicMatchCard = ({
                 detailLine || isHALeg ? (
                   <>
                     <div className="flex items-center gap-1.5 min-w-0">
-                      {phase?.logo_url && (
-                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
-                      )}
                       {detailLine && (
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
