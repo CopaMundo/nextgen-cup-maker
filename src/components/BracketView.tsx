@@ -2772,11 +2772,11 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
-    const CARD_W = 240;
+    const CARD_W = 272;
     const CONNECTOR_W = 32;
     // Card height is measured from the real DOM (headers, dates, score inputs all change it),
     // so spacing stays correct whether cards are empty, filled with teams or with scores.
-    const CARD_H = Math.max(measuredCardH, effectiveScoreEditable ? 104 : 90);
+    const CARD_H = Math.max(measuredCardH, effectiveScoreEditable ? 92 : 78);
     const GAP = CONNECTOR_W;
     const HEADER_H = 36; // Header height (mb-3 + text)
 
@@ -3047,10 +3047,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           )}
           <div className="flex flex-col pb-72" style={{ gap: 16, overflow: "visible" }}>
             {rounds.flatMap(r => r.matches).map(match => (
-              <div key={match.id} className="relative" style={{ width: 240, overflow: "visible" }}>{renderMatchCard(match)}</div>
+              <div key={match.id} className="relative" style={{ width: 272, overflow: "visible" }}>{renderMatchCard(match)}</div>
             ))}
             {editable && (
-              <Button variant="outline" size="sm" className="w-[240px]" onClick={addSingleMatch}>
+              <Button variant="outline" size="sm" className="w-[272px]" onClick={addSingleMatch}>
                 <Plus className="h-3.5 w-3.5" /> Losse wedstrijd
               </Button>
             )}
