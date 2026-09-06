@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, MessageCircle, Handshake } from "lucide-react";
+import { Settings, Tv2, BarChart3, MessageCircle, Handshake, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
@@ -24,6 +24,8 @@ import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Op smalle (mobiele) schermen wordt de volledige desktop-layout van het beheer
 // verkleind weergegeven, zodat het er op een telefoon exact hetzelfde uitziet.
@@ -72,10 +74,12 @@ type TabId = typeof sidebarItems[number]["id"];
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
 const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
+const mobileSidebarStorageKey = "admin-mobile-sidebar-collapsed";
 
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   useAdminDesktopScale();
 
   const [tournament, setTournament] = useState<any>(null);
@@ -90,6 +94,18 @@ const TournamentDetail = () => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(locationStorageKey(id));
   });
+  const [mobileSidebarCollapsed, setMobileSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem(mobileSidebarStorageKey) === "true";
+  });
+
+  const toggleMobileSidebar = () => {
+    setMobileSidebarCollapsed((collapsed) => {
+      const next = !collapsed;
+      sessionStorage.setItem(mobileSidebarStorageKey, String(next));
+      return next;
+    });
+  };
 
   // Persist location selection per tournament
   const setSelectedLocation = (location: string | null) => {
@@ -332,10 +348,34 @@ const TournamentDetail = () => {
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
-          <nav className="w-20 shrink-0 border-r border-border bg-card flex flex-col items-center py-2 gap-0.5 print:hidden min-h-0 overflow-hidden">
+          <nav
+            className={cn(
+              "shrink-0 self-stretch border-r border-border bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width] duration-200",
+              isMobile ? (mobileSidebarCollapsed ? "w-16 items-center" : "w-44 items-stretch") : "w-20 items-center"
+            )}
+          >
+            {isMobile && (
+              <div className={cn("shrink-0 border-b border-border pb-2", mobileSidebarCollapsed ? "px-2" : "px-3")}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMobileSidebar}
+                  className={cn("h-10", mobileSidebarCollapsed ? "w-10" : "w-full justify-start px-2")}
+                  aria-label={mobileSidebarCollapsed ? "Navigatie uitklappen" : "Navigatie inklappen"}
+                  title={mobileSidebarCollapsed ? "Navigatie uitklappen" : "Navigatie inklappen"}
+                >
+                  {mobileSidebarCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+                  {!mobileSidebarCollapsed && <span className="ml-2 text-xs font-semibold">Inklappen</span>}
+                </Button>
+              </div>
+            )}
             {tournament.logo_url && (
-              <div className="mb-2 pb-2 border-b border-border shrink-0">
-                <img src={tournament.logo_url} alt="" className="h-8 w-8 rounded-lg object-contain" />
+              <div className={cn("mb-1 shrink-0 border-b border-border py-2", isMobile && !mobileSidebarCollapsed ? "mx-3 flex items-center gap-2" : "px-2")}>
+                <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+                {isMobile && !mobileSidebarCollapsed && (
+                  <span className="truncate text-xs font-semibold text-foreground">{tournament.name}</span>
+                )}
               </div>
             )}
             {sidebarItems.map(item => (
@@ -343,15 +383,26 @@ const TournamentDetail = () => {
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setActiveTab(item.id)}
+                    aria-label={item.label}
+                    aria-current={activeTab === item.id ? "page" : undefined}
                     className={cn(
-                      "w-16 flex-1 min-h-0 max-h-[56px] py-1 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all duration-150 overflow-hidden",
+                      "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
+                      isMobile
+                        ? mobileSidebarCollapsed
+                          ? "h-12 w-12 justify-center"
+                          : "mx-2 h-11 w-auto justify-start gap-3 px-3"
+                        : "w-16 flex-1 min-h-0 max-h-[56px] py-1 flex-col justify-center gap-0.5",
                       activeTab === item.id
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     )}
                   >
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-[10px] font-medium leading-tight truncate w-full text-center">{item.label}</span>
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {(!isMobile || !mobileSidebarCollapsed) && (
+                      <span className={cn("font-medium leading-tight truncate", isMobile ? "text-xs text-left" : "text-[10px] w-full text-center")}>
+                        {item.label}
+                      </span>
+                    )}
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="text-xs">
