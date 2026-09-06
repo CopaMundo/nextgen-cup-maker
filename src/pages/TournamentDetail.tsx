@@ -359,7 +359,7 @@ const TournamentDetail = () => {
                 <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
               </div>
             )}
-            <div className={cn("min-h-0 w-full", isMobile ? "flex-1 overflow-y-auto scrollbar-none" : "flex flex-1 flex-col items-center gap-0.5 overflow-y-auto scrollbar-none")}>
+            <div className={cn("min-h-0 w-full", isMobile ? "flex-1 overflow-y-auto scrollbar-none" : "flex flex-1 flex-col items-center gap-0.5 overflow-hidden")}>
               {sidebarItems.map(item => (
                 <Tooltip key={item.id}>
                   <TooltipTrigger asChild>
@@ -376,7 +376,7 @@ const TournamentDetail = () => {
                         "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
                         isMobile
                           ? "mx-auto mb-1 h-11 w-11 justify-center p-0"
-                          : "w-20 h-[72px] shrink-0 px-1 py-1 flex-col justify-center gap-0.5",
+                          : "w-20 flex-1 min-h-0 max-h-[56px] px-1 py-1 flex-col justify-center gap-0.5",
                         activeTab === item.id
                           ? "bg-primary text-primary-foreground shadow-sm"
                           : "text-muted-foreground hover:bg-secondary hover:text-foreground"
