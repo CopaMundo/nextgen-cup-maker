@@ -167,14 +167,15 @@ const PublicMatchCard = ({
         {/* Context: format name + detail line */}
         {(formatName || detailLine || m.field || m.referee) && (
           <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`}>
-            <div className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 leading-none py-0.5 min-h-[22px]">
+            <div className="flex items-center gap-1.5">
+            {phase?.logo_url && (
+              <img src={phase.logo_url} alt="" className="h-4 w-4 object-contain flex-shrink-0" />
+            )}
+            <div className="min-w-0 flex-1 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 leading-none py-0.5 min-h-[22px]">
               {formatName ? (
                 detailLine || isHALeg ? (
                   <>
                     <div className="flex items-center gap-1.5 min-w-0">
-                      {phase?.logo_url && (
-                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
-                      )}
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                     </div>
                     {m.field ? (
@@ -201,9 +202,6 @@ const PublicMatchCard = ({
                 ) : (
                   <>
                     <div className="flex items-center gap-1.5 min-w-0">
-                      {phase?.logo_url && (
-                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
-                      )}
                       <span className={`truncate ${ds(bStyle, "matchContextText")}`}>{formatName}</span>
                       {isHALeg && (
                         <span className={`shrink-0 ${ds(bStyle, "matchLegBadge")}`}>
@@ -234,9 +232,6 @@ const PublicMatchCard = ({
                 detailLine || isHALeg ? (
                   <>
                     <div className="flex items-center gap-1.5 min-w-0">
-                      {phase?.logo_url && (
-                        <img src={phase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm" />
-                      )}
                       {detailLine && (
                         <span className="text-[9px] text-muted-foreground font-medium truncate">{detailLine}</span>
                       )}
@@ -279,6 +274,7 @@ const PublicMatchCard = ({
                   </>
                 )
               )}
+            </div>
             </div>
           </div>
         )}

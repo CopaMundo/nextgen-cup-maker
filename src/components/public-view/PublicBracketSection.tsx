@@ -749,7 +749,15 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
-          <div className={`grid grid-cols-[1fr_auto] items-center gap-x-3 ${tight ? "gap-y-0" : "gap-y-0.5"} leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
+          <div className="flex items-center gap-1.5">
+          {phase?.logo_url && (
+            <img
+              src={phase.logo_url}
+              alt=""
+              className={`${tight ? "h-3 w-3" : "h-4 w-4"} object-contain flex-shrink-0`}
+            />
+          )}
+          <div className={`min-w-0 flex-1 grid grid-cols-[1fr_auto] items-center gap-x-3 ${tight ? "gap-y-0" : "gap-y-0.5"} leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             {phase?.name ? (
               displayName && !compactTree ? (
                 <>
@@ -820,6 +828,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 )}
               </>
             )}
+          </div>
           </div>
         </div>
         <div className="relative leading-none" style={compactTree ? { height: cardH, overflow: "hidden" } : undefined}>
