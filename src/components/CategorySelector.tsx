@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Category {
   id: string;
@@ -24,6 +26,7 @@ const CategorySelector = ({
   selectClassName?: string;
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const isMobile = useIsMobile();
 
   const truncateName = (name: string) => {
     if (name.length > 20) return name.slice(0, 17) + "...";
@@ -60,6 +63,24 @@ const CategorySelector = ({
   }, [tournamentId, isMultiCategory, selectedCategoryId, onSelect]);
 
   if (!isMultiCategory || categories.length === 0) return null;
+
+  if (isMobile) {
+    return (
+      <div className={cn("flex items-center gap-2", className)}>
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
+        <Select value={selectedCategoryId || ""} onValueChange={(v) => onSelect(v || null)}>
+          <SelectTrigger className={cn("h-8 flex-1 min-w-0 text-[11px] font-black uppercase tracking-wider", selectClassName)}>
+            <SelectValue placeholder="Kies divisie" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
