@@ -63,6 +63,8 @@ const locationStorageKey = (tournamentId: string) => `tournament-location:${tour
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const viewport = useViewportSize();
+
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCategoryId, setSelectedCategoryIdState] = useState<string | null>(() => {
