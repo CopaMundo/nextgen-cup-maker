@@ -409,7 +409,7 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
     backButton: "flex items-center gap-1 font-['VT323'] text-[18px] uppercase tracking-[0.08em] text-[hsl(var(--broadcast-cyan))]",
     matchContext: "flex items-center gap-2 px-3 py-1 bg-[hsl(var(--broadcast-surface-secondary))]",
     matchContextText: "font-['VT323'] text-[12px] uppercase tracking-[0.1em] text-[hsl(var(--broadcast-bright))]",
-    matchLegBadge: "inline-flex items-center bg-[hsl(var(--broadcast-score))] px-1.5 py-0 font-['VT323'] text-[12px] uppercase text-black",
+    matchLegBadge: "inline-flex items-center bg-[hsl(var(--broadcast-score))] px-1.5 py-0 font-['VT323'] text-[12px] uppercase text-[hsl(var(--broadcast-surface))]",
     matchTeamRow: "px-3 py-2",
     matchTeamRowWin: "bg-[hsl(var(--broadcast-success)/0.10)]",
     bracketQualBar: "bg-[hsl(var(--broadcast-success))]",
