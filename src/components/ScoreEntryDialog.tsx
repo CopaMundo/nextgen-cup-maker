@@ -236,7 +236,7 @@ const ScoreEntryDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleDiscard(); }}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="text-base">Score invullen</DialogTitle>
         </DialogHeader>
@@ -276,14 +276,14 @@ const ScoreEntryDialog = ({
         </div>
 
         {/* Team headers */}
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-2">
+          <div className="flex items-center gap-2 min-w-0">
             {homeLogo && <img src={homeLogo} className="h-6 w-6 object-contain flex-shrink-0" alt="" />}
-            <span className="text-sm font-bold text-foreground truncate">{homeName}</span>
+            <span className="text-sm font-bold text-foreground break-words leading-tight">{homeName}</span>
           </div>
           <div className="w-8" />
-          <div className="flex items-center gap-2 flex-1 justify-end min-w-0">
-            <span className="text-sm font-bold text-foreground truncate text-right">{awayName}</span>
+          <div className="flex items-center gap-2 justify-end min-w-0">
+            <span className="text-sm font-bold text-foreground break-words leading-tight text-right">{awayName}</span>
             {awayLogo && <img src={awayLogo} className="h-6 w-6 object-contain flex-shrink-0" alt="" />}
           </div>
         </div>
