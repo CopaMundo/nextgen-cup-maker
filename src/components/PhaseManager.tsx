@@ -1206,11 +1206,13 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     </div>
   );
 
+  const openFormat = openFormatId ? allFormats.find((f) => f.id === openFormatId) ?? null : null;
+
   return (
     <div className="space-y-6">
       {/* Phase tab-bar (Deelnemers-stijl) */}
-      {containers.length > 0 && (
-        <div className="flex justify-center border-b border-border flex-wrap">
+      {containers.length > 0 && !(isMobile && openFormat) && (
+        <div className="flex border-b border-border max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:justify-start sm:justify-center sm:flex-wrap">
           {containers.map((c) => {
             const isActive = activePhaseNumber === c.phaseNumber;
             return (
