@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Trash2, Upload, Pencil, Check, X, ArrowLeft, Users, Camera, Copy } from "lucide-react";
+import { Plus, Trash2, Upload, Pencil, Check, X, ArrowLeft, Users, Camera, Copy, ChevronRight } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
   AlertDialog,
@@ -243,126 +243,8 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
     );
   }
 
-  if (isMobile) {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
-          {categoryId && importByCategory.length > 0 && (
-            <Button variant="outline" size="sm" className="h-8" onClick={() => setShowImport(true)}>
-              <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
-            </Button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 gap-2">
-          {teams.map(team => (
-            <div
-              key={team.id}
-              onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10">
-                {team.logo_url ? (
-                  <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
-                ) : (
-                  <span className="text-sm font-bold text-primary">{team.name.charAt(0)}</span>
-                )}
-              </div>
-              <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground">{team.name}</span>
-              {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 shrink-0 object-contain" />}
-              <div className="flex shrink-0 items-center gap-1" onClick={e => e.stopPropagation()}>
-                <button
-                  onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                  title="Bewerken"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={() => setTeamToDelete(team.id)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                  title="Verwijderen"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-              {!isPlayers && (
-                <span className="shrink-0 text-muted-foreground">
-                  <ChevronRight className="h-4 w-4" />
-                </span>
-              )}
-            </div>
-          ))}
-          {teams.length < 128 && (
-            <button
-              onClick={() => setShowAdd(true)}
-              className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <Plus className="h-4 w-4" />
-              </div>
-              <span className="font-display text-sm font-semibold text-foreground">{singularLabel} toevoegen</span>
-            </button>
-          )}
-        </div>
-        {modals}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
-        {categoryId && importByCategory.length > 0 && (
-          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
-            <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
-          </Button>
-        )}
-      </div>
-
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {teams.map(team => (
-          <div key={team.id} className={`rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-3 group relative ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
-            <div className="h-20 w-20 overflow-hidden flex-shrink-0">
-              {team.logo_url ? (
-                <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
-              )}
-            </div>
-            <div className="text-center">
-              <span className="text-sm font-medium text-foreground block">{team.name}</span>
-              {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 object-contain" />}
-            </div>
-            <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-              <button onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title={`${singularLabel} bewerken`}>
-                <Pencil className="h-4 w-4" />
-              </button>
-              {!isPlayers && (
-                <button onClick={() => setSelectedTeamId(team.id)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title="Teammanagement">
-                  <Users className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-            <button onClick={(e) => { e.stopPropagation(); setTeamToDelete(team.id); }} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        ))}
-        {teams.length < 128 && (
-          <button
-            onClick={() => setShowAdd(true)}
-            className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px]"
-          >
-            <Plus className="h-6 w-6 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{singularLabel} toevoegen</span>
-          </button>
-        )}
-      </div>
-
-
+  const modals = (
+    <>
       {/* Add team modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowAdd(false)}>
@@ -492,6 +374,130 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
+          {categoryId && importByCategory.length > 0 && (
+            <Button variant="outline" size="sm" className="h-8" onClick={() => setShowImport(true)}>
+              <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-2">
+          {teams.map(team => (
+            <div
+              key={team.id}
+              onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10">
+                {team.logo_url ? (
+                  <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
+                ) : (
+                  <span className="text-sm font-bold text-primary">{team.name.charAt(0)}</span>
+                )}
+              </div>
+              <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground">{team.name}</span>
+              {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 shrink-0 object-contain" />}
+              <div className="flex shrink-0 items-center gap-1" onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  title="Bewerken"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => setTeamToDelete(team.id)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  title="Verwijderen"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              {!isPlayers && (
+                <span className="shrink-0 text-muted-foreground">
+                  <ChevronRight className="h-4 w-4" />
+                </span>
+              )}
+            </div>
+          ))}
+          {teams.length < 128 && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Plus className="h-4 w-4" />
+              </div>
+              <span className="font-display text-sm font-semibold text-foreground">{singularLabel} toevoegen</span>
+            </button>
+          )}
+        </div>
+        {modals}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
+        {categoryId && importByCategory.length > 0 && (
+          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
+            <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
+          </Button>
+        )}
+      </div>
+
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {teams.map(team => (
+          <div key={team.id} className={`rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-3 group relative ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
+            <div className="h-20 w-20 overflow-hidden flex-shrink-0">
+              {team.logo_url ? (
+                <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
+              )}
+            </div>
+            <div className="text-center">
+              <span className="text-sm font-medium text-foreground block">{team.name}</span>
+              {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 object-contain" />}
+            </div>
+            <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+              <button onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title={`${singularLabel} bewerken`}>
+                <Pencil className="h-4 w-4" />
+              </button>
+              {!isPlayers && (
+                <button onClick={() => setSelectedTeamId(team.id)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title="Teammanagement">
+                  <Users className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <button onClick={(e) => { e.stopPropagation(); setTeamToDelete(team.id); }} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+        {teams.length < 128 && (
+          <button
+            onClick={() => setShowAdd(true)}
+            className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px]"
+          >
+            <Plus className="h-6 w-6 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">{singularLabel} toevoegen</span>
+          </button>
+        )}
+      </div>
+
+
+      {modals}
     </div>
   );
 };
