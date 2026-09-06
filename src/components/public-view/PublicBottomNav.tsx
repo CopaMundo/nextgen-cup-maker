@@ -26,6 +26,13 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
     const apply = () => {
       raf = 0;
       const scale = vv.scale || 1;
+      if (scale === 1) {
+        // Geen pinch-zoom: gewone fixed-positionering volstaat en blijft stabiel bij snel scrollen.
+        el.style.transform = "";
+        el.style.width = "";
+        el.style.right = "";
+        return;
+      }
       const x = vv.offsetLeft;
       const y = vv.offsetTop + vv.height - window.innerHeight;
       el.style.transformOrigin = "left bottom";
