@@ -646,7 +646,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 
       return (
         <div
-          className={`relative flex items-center ${isCompactPretty ? "gap-1.5 pl-2 pr-1 py-0" : tightSide ? "gap-0.5 pl-1 pr-0.5 py-0" : "gap-2 pl-2.5 pr-1 h-[34px]"} ${winRowClass}`}
+          className={`relative flex items-center ${isCompactPretty ? "gap-1.5 pl-2 pr-0 py-0" : tightSide ? "gap-0.5 pl-1 pr-0 py-0" : "gap-2 pl-2.5 pr-0 h-[34px]"} ${winRowClass}`}
           style={tightSide ? { height: cardH / 2 } : undefined}
         >
           {won && !winRowHasEdgeMarker && (
@@ -676,7 +676,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             const hasPen = penValue !== null && penValue !== undefined;
             // Keep the complete score block near the card edge while reserving
             // enough room for a two-digit shoot-out score such as “(10)”.
-            const penSlot = tightSide ? 16 : 22;
+            const penSlot = tightSide ? 14 : 20;
             return (
               <div className="flex items-center shrink-0 ml-1.5">
                 <span
