@@ -2660,6 +2660,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       )}
                       {(displayBaseName || match.match_name) && (() => {
                         const baseName = displayBaseName || match.match_name || "";
+                        const haSuffix = matchIsHA
+                          ? ` (${match.match_name?.endsWith("(Heen)") ? "HEEN" : "TERUG"})`
+                          : "";
                         const suffix = matchIsHA
                           ? ""
                           : getMatchFormatSuffix(
@@ -2670,7 +2673,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                             );
                         return (
                           <span className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
-                            {baseName}{suffix}
+                            {baseName}{suffix}{haSuffix}
                           </span>
                         );
                       })()}
