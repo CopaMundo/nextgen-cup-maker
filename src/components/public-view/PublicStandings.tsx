@@ -81,15 +81,6 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
   const [expandedGroupSchedule, setExpandedGroupSchedule] = useState<string | null>(null);
   const phaseTabRefs = useRef<Map<number, HTMLButtonElement | null>>(new Map());
 
-  // Centreer het actieve fase-tabblad in de scrollbare rij
-  useEffect(() => {
-    if (allPhaseNumbers.length <= 1 || activePhaseNum === null) return;
-    const el = phaseTabRefs.current.get(activePhaseNum);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    }
-  }, [activePhaseNum, allPhaseNumbers]);
-
   // Auto-scroll naar de groep van het favoriete team
 
   // Keep selectedPhaseNum in sync when data changes (e.g. phase undo)
