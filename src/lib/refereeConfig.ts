@@ -101,6 +101,10 @@ export const serializeReferees = (refs: RefereeConfig[]) =>
 
 export const refereeNames = (refs: RefereeConfig[]) => refs.map(r => r.name);
 
+/** Eerste naam uit een kommagescheiden referee-string = rol 1 (hoofdscheidsrechter). */
+export const firstRefereeName = (referee: string | null | undefined): string =>
+  (referee || "").split(",")[0]?.trim() || "";
+
 const timeToMinutes = (t: string | null | undefined) => {
   if (!t) return null;
   const [h, m] = t.split(":");
