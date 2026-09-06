@@ -53,6 +53,7 @@ const PublicMatchCard = ({
   homePosition,
   awayPosition,
   onCardClick,
+  locationFilter,
 }: PublicMatchCardProps) => {
   const bStyle = useBroadcastStyle();
   const fieldLabel = useFieldLabel();
