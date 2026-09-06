@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import MatchStatsEditor from "./MatchStatsEditor";
+import { formatFieldLabel } from "@/lib/fieldLocations";
+import { MapPin, Calendar, Clock } from "lucide-react";
+import WhistleIcon from "@/components/icons/WhistleIcon";
 
 interface SetScore {
   home: number | null;
