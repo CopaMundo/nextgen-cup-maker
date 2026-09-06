@@ -27,7 +27,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 // Op smalle (mobiele) schermen wordt de volledige desktop-layout van het beheer
 // verkleind weergegeven, zodat het er op een telefoon exact hetzelfde uitziet.
-const ADMIN_MIN_WIDTH = 900;
+const ADMIN_MIN_WIDTH = 625;
 
 const useAdminDesktopScale = () => {
   useEffect(() => {
