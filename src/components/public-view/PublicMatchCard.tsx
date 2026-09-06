@@ -107,15 +107,15 @@ const PublicMatchCard = ({
 
 
   const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean, position?: number) => (
-    <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} pl-2 pr-2 transition-colors`}>
-      <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
+    <div className={`grid h-10 items-center grid-cols-[1.75rem_1fr_3.5rem] gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} py-0 px-3 transition-colors`}>
+      <div className="h-7 w-7 overflow-hidden justify-self-start">
         {logo ? (
           <img src={logo} className="h-full w-full object-contain" alt="" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-secondary text-[10px] font-black text-muted-foreground">{name.charAt(0)}</div>
         )}
       </div>
-      <div className="flex min-w-0 flex-1 items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-1.5">
         <span className={`ttx-team-name truncate ${ds(bStyle, "matchTeamName")} ${teamId === favoriteTeam ? `ttx-fav-team ${ds(bStyle, "matchTeamNameFav")}` : (ds(bStyle, "matchTeamName").includes("text-") ? "" : "text-foreground")}`}>
           {name}
         </span>
@@ -125,17 +125,15 @@ const PublicMatchCard = ({
             </span>
           )}
       </div>
-      <div className="flex flex-shrink-0 items-center gap-1.5 ml-2 mr-0.5">
-        <div className="relative flex items-center">
-          {showScores ? (
-            <>
-              <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
-              {hasPenalties && (
-                <span className="absolute left-full ml-0.5 text-left text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
-              )}
-            </>
-          ) : null}
-        </div>
+      <div className="flex items-center justify-end">
+        {showScores ? (
+          <div className="flex items-center justify-end gap-0.5">
+            <span className={`min-w-[1.1rem] text-right leading-none tabular-nums ${ds(bStyle, "matchScore")} ${isWin ? "font-bold " + ds(bStyle, "matchScoreWin") : ds(bStyle, "matchScoreLose")}`}>{score}</span>
+            {hasPenalties && (
+              <span className="text-[8px] font-medium leading-none whitespace-nowrap tabular-nums text-muted-foreground">({penalties})</span>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );
