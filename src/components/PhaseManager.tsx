@@ -54,6 +54,7 @@ interface PhaseContainer {
 const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
+  const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
   const [allFormats, setAllFormats] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [creatingFormat, setCreatingFormat] = useState(false);
@@ -674,6 +675,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     const nextPhaseNumber = maxExisting + 1;
     setDraftPhaseNumbers((prev) => (prev.includes(nextPhaseNumber) ? prev : [...prev, nextPhaseNumber]));
     setActivePhaseNumber(nextPhaseNumber);
+    setMobilePhaseOverview(false);
   };
 
   const clearSlotsReferencingFormats = async (formatIds: string[]) => {
@@ -1211,8 +1213,62 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
 
   return (
     <div className="space-y-6">
+      {/* Mobiel: fases als tegels */}
+      {isMobile && mobilePhaseOverview && (
+        <div className="grid grid-cols-1 gap-2">
+          {containers.map((c) => (
+            <div
+              key={c.phaseNumber}
+              role="button"
+              tabIndex={0}
+              onClick={() => { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); } }}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <ListOrdered className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+                {allFormats.some((f) => f.phase_number === c.phaseNumber)
+                  ? getPhaseLabel(c.phaseNumber, allFormats)
+                  : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`)}
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </div>
+          ))}
+          <button
+            onClick={addNewPhase}
+            className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-accent/40"
+          >
+            <Plus className="h-4 w-4" /> Fase toevoegen
+          </button>
+        </div>
+      )}
+
+      {/* Mobiel: kop met terugknop binnen een fase */}
+      {isMobile && !mobilePhaseOverview && !openFormat && activePhaseNumber !== null && (
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Terug naar fases" onClick={() => setMobilePhaseOverview(true)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">
+            {allFormats.some((f) => f.phase_number === activePhaseNumber)
+              ? getPhaseLabel(activePhaseNumber, allFormats)
+              : (pendingPhaseLabels[activePhaseNumber] || `Fase ${activePhaseNumber}`)}
+          </h2>
+          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Naam bewerken" onClick={() => openPhaseEdit(activePhaseNumber)}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          {containers.length > 1 && activePhaseNumber !== 1 && (
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label="Fase verwijderen" onClick={() => setDeletePhaseNumber(activePhaseNumber)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Phase tab-bar (Deelnemers-stijl) */}
-      {containers.length > 0 && !(isMobile && openFormat) && (
+      {containers.length > 0 && !isMobile && (
         <div className="flex border-b border-border max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:justify-start sm:justify-center sm:flex-wrap">
           {containers.map((c) => {
             const isActive = activePhaseNumber === c.phaseNumber;
@@ -1272,7 +1328,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         </div>
       )}
 
-      {containers
+      {!(isMobile && mobilePhaseOverview) && containers
         .filter((c) => c.phaseNumber === activePhaseNumber)
         .map((container) => (
           <div key={container.phaseNumber}>
