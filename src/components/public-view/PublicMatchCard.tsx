@@ -93,7 +93,7 @@ const PublicMatchCard = ({
   const awayCountry = getTeamCountry(teams, m.away_team_id);
 
   // Beslissende score hoort nooit bij een Heen-wedstrijd; toon ze daar nooit.
-  const hasPenalties = haLegLabel !== "Heen" && m.home_penalties != null && m.away_penalties != null;
+  const hasPenalties = haLegLabel !== "Heenwedstrijd" && m.home_penalties != null && m.away_penalties != null;
   // Scores worden weergegeven zodra ze zijn ingevuld, ook als een beslissende
   // score nog ontbreekt (wedstrijd nog niet officieel afgerond).
   const showScores = m.is_played || (m.home_score != null && m.away_score != null);
