@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil, ChevronRight, ArrowLeft, Grid3X3, Trophy, Swords, ListOrdered } from "lucide-react";
+import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil, ChevronRight, ArrowLeft, Grid3X3, ListOrdered } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -22,17 +22,27 @@ import { SortableVerticalList, SortableRowShell } from "@/components/SortableLis
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import { formatTypeIcon } from "./FormatTypeIcon";
+import listIconPng from "@/assets/list_1.png";
 
 const formatTypeLabel = (t: string) =>
   t === "group" ? "Groepsfase" : t === "knockout" ? "Knock-outfase" : t === "single_match" ? "Losse wedstrijd" : "Round Robin";
 
-const formatIcon = (t: string) => {
-  const cls = "h-4 w-4";
-  if (t === "group") return <Grid3X3 className={cls} />;
-  if (t === "knockout") return <Trophy className={cls} />;
-  if (t === "single_match") return <Swords className={cls} />;
-  return <ListOrdered className={cls} />;
-};
+const phaseListIcon = (className = "h-4 w-4") => (
+  <span
+    className={`inline-block bg-current text-primary ${className}`}
+    style={{
+      WebkitMaskImage: `url(${listIconPng})`,
+      maskImage: `url(${listIconPng})`,
+      WebkitMaskSize: "contain",
+      maskSize: "contain",
+      WebkitMaskRepeat: "no-repeat",
+      maskRepeat: "no-repeat",
+      WebkitMaskPosition: "center",
+      maskPosition: "center",
+    }}
+  />
+);
 
 interface Phase {
   id: string;
@@ -1226,7 +1236,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <ListOrdered className="h-4 w-4" />
+                {phaseListIcon("h-4 w-4")}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm font-semibold">
                 {allFormats.some((f) => f.phase_number === c.phaseNumber)
@@ -1378,7 +1388,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                             <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 text-primary">
                               {format.logo_url
                                 ? <img src={format.logo_url} alt="" className="h-full w-full object-contain" />
-                                : formatIcon(format.phase_type)}
+                                : formatTypeIcon(format.phase_type)}
                             </span>
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm font-semibold">{format.name}</span>
