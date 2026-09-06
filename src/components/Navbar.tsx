@@ -2,7 +2,7 @@ import { LogIn, User, LogOut, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ChampionsTrophyIcon from "@/components/icons/ChampionsTrophyIcon";
-import trophyLogo from "@/assets/copa-mundo-trophy.png";
+import CopaMundoMark from "@/components/CopaMundoMark";
 
 interface NavbarProps {
   tournamentName?: string | null;
