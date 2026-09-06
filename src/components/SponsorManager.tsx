@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Upload, Pencil } from "lucide-react";
+import { Plus, Trash2, Upload, Pencil, ChevronRight } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -26,6 +27,7 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const isMobile = useIsMobile();
   const { toast } = useToast();
 
   useEffect(() => { fetchSponsors(); }, [tournamentId]);
@@ -97,6 +99,110 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>;
 
 
+  const dialogs = (
+    <>
+    <Dialog open={!!editingSponsor} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Sponsor bewerken</DialogTitle>
+        </DialogHeader>
+        {editingSponsor && (
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <label className="cursor-pointer relative group">
+                <div className="h-24 w-24 overflow-hidden rounded-xl bg-secondary flex-shrink-0 flex items-center justify-center">
+                  {editingSponsor.logo_url ? (
+                    <img src={editingSponsor.logo_url} alt={editingSponsor.name} className="h-full w-full object-contain" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-muted-foreground">{editName.charAt(0) || "?"}</div>
+                  )}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Upload className="h-6 w-6 text-foreground" />
+                </div>
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) replaceLogo(editingSponsor.id, e.target.files[0]); }} />
+              </label>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Sponsornaam</Label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Naam sponsor" />
+            </div>
+          </div>
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
+          <Button onClick={() => editingSponsor && saveEdit(editingSponsor.id)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Sponsor verwijderen?</AlertDialogTitle>
+          <AlertDialogDescription>Deze sponsor wordt permanent verwijderd.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuleren</AlertDialogCancel>
+          <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Verwijderen</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">{sponsors.length} {sponsors.length === 1 ? "sponsor" : "sponsors"}</p>
+        <div className="grid grid-cols-1 gap-2">
+          {sponsors.map(sponsor => (
+            <div key={sponsor.id} className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10">
+                {sponsor.logo_url ? (
+                  <img src={sponsor.logo_url} alt={sponsor.name} className="h-full w-full object-contain" />
+                ) : (
+                  <span className="text-sm font-bold text-primary">{(sponsor.name || "?").charAt(0)}</span>
+                )}
+              </div>
+              <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground">{sponsor.name || "Naamloos"}</span>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  onClick={() => { setEditingId(sponsor.id); setEditName(sponsor.name); }}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  title="Bewerken"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => setDeleteId(sponsor.id)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  title="Verwijderen"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+          <label className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left cursor-pointer active:bg-accent/40">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <Plus className="h-4 w-4" />
+            </div>
+            <span className="font-display text-sm font-semibold text-foreground">{uploading ? "Uploaden..." : "Sponsor toevoegen"}</span>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => { if (e.target.files?.[0]) { addSponsor(e.target.files[0]); e.target.value = ""; } }}
+            />
+          </label>
+        </div>
+        {dialogs}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 w-full">
       {/* Section header tab bar (matches Statistics/Deelnemers pattern) */}
@@ -154,53 +260,7 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
         </div>
       </div>
 
-      <Dialog open={!!editingSponsor} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Sponsor bewerken</DialogTitle>
-          </DialogHeader>
-          {editingSponsor && (
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <label className="cursor-pointer relative group">
-                  <div className="h-24 w-24 overflow-hidden rounded-xl bg-secondary flex-shrink-0 flex items-center justify-center">
-                    {editingSponsor.logo_url ? (
-                      <img src={editingSponsor.logo_url} alt={editingSponsor.name} className="h-full w-full object-contain" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-muted-foreground">{editName.charAt(0) || "?"}</div>
-                    )}
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Upload className="h-6 w-6 text-foreground" />
-                  </div>
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) replaceLogo(editingSponsor.id, e.target.files[0]); }} />
-                </label>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Sponsornaam</Label>
-                <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Naam sponsor" />
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingId(null)}>Annuleren</Button>
-            <Button onClick={() => editingSponsor && saveEdit(editingSponsor.id)} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Sponsor verwijderen?</AlertDialogTitle>
-            <AlertDialogDescription>Deze sponsor wordt permanent verwijderd.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Verwijderen</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {dialogs}
     </div>
   );
 };
