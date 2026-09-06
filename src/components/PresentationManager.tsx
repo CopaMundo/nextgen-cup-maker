@@ -33,6 +33,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
 import slideshowIconAsset from "@/assets/led-tv.png.asset.json";
 import stylingIconAsset from "@/assets/paint_1.png.asset.json";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import themesIconAsset from "@/assets/themes_1.png.asset.json";
 
 const MaskIcon = ({ src, label, className = "h-4 w-4" }: { src: string; label: string; className?: string }) => (
   <span
