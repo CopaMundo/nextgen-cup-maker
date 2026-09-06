@@ -736,21 +736,28 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
           <div className={`flex w-full flex-1 min-w-0 items-start justify-between leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             <div className="min-w-0 flex-1">
-                <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
-                {phase?.name || displayName}
-              </div>
-              {displayName && phase?.name && !compactTree && (
+              {phase?.name ? (
+                <>
+                  <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
+                    {phase.name}
+                  </div>
+                  {displayName && !compactTree && (
+                    <div className="flex items-center gap-1.5">
+                      <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
+                      {matchIsHA && (
+                        <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
                 <div className="flex items-center gap-1.5">
-                  <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
+                  <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
+                    {displayName}
+                  </div>
                   {matchIsHA && (
                     <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
                   )}
-                </div>
-              )}
-              {displayName && !phase?.name && matchIsHA && (
-                <div className="flex items-center gap-1.5">
-                  <div className={`text-muted-foreground/70 truncate ${tight ? "text-[7px]" : "text-[9px]"}`}>{displayName}</div>
-                  <span className={`font-bold text-primary/80 bg-primary/10 rounded px-1 py-0.5 flex-shrink-0 ${tight ? "text-[6px]" : "text-[8px]"}`}>2 wedstrijden</span>
                 </div>
               )}
             </div>
