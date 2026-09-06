@@ -58,6 +58,7 @@ interface Attachment {
 const SortableRow = ({
   id,
   label,
+  icon,
   dragLabel,
   onRename,
   onDelete,
@@ -69,6 +70,7 @@ const SortableRow = ({
 }: {
   id: string;
   label: string;
+  icon?: React.ReactNode;
   dragLabel: string;
   onRename: () => void;
   onDelete: () => void;
@@ -81,12 +83,13 @@ const SortableRow = ({
   <SortableRowShell
     id={id}
     dragLabel={dragLabel}
-    className="flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-3 py-2"
+    className="flex items-center justify-between gap-2 text-sm rounded-lg border border-border bg-secondary px-2.5 py-2"
   >
     {(handle) => (
       <>
-        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           {handle}
+          {icon && <span className="shrink-0 text-muted-foreground">{icon}</span>}
           {editing ? (
             <Input
               autoFocus
@@ -103,13 +106,35 @@ const SortableRow = ({
             <span className="text-foreground font-medium truncate">{label}</span>
           )}
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {editing ? (
-            <button onMouseDown={(e) => e.preventDefault()} onClick={onEditSave} className="text-muted-foreground hover:text-foreground"><Check className="h-4 w-4" /></button>
+            <button
+              type="button"
+              title="Opslaan"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={onEditSave}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+            >
+              <Check className="h-4 w-4" />
+            </button>
           ) : (
-            <button onClick={onRename} className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+            <button
+              type="button"
+              title="Bewerken"
+              onClick={onRename}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
           )}
-          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+          <button
+            type="button"
+            title="Verwijderen"
+            onClick={onDelete}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </>
     )}
