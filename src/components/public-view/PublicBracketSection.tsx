@@ -404,7 +404,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     : bracketRoundCount === 4 ? 1.55
     : 1.85;
   const COMPACT_BASE_W = Math.round(200 * compactBracketScale);
-  const COMPACT_BASE_H = Math.round(64 * compactBracketScale);
+  const COMPACT_BASE_H = Math.round(76 * compactBracketScale);
   const CARD_W = isMobile ? Math.min(288, typeof window !== "undefined" ? window.innerWidth - EDGE_PAD - PEEK_W - 8 : 268) : compactTree ? COMPACT_BASE_W : 268;
   const CONNECTOR_W = isMobile ? 0 : compactTree ? Math.round(28 * Math.min(compactBracketScale, 1.4)) : 32;
   const CARD_H = isMobile ? 120 : compactTree ? COMPACT_BASE_H : 120;
