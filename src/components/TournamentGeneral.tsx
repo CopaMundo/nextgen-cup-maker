@@ -831,7 +831,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Button variant="outline" size="sm" onClick={() => { setNewMatchDay(""); setShowAddMatchDay(true); }}>
                 <Plus className="h-3.5 w-3.5 mr-1" /> Wedstrijddag toevoegen
               </Button>
