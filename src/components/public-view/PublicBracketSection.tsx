@@ -405,10 +405,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     : 1.85;
   const COMPACT_BASE_W = Math.round(200 * compactBracketScale);
   const COMPACT_BASE_H = Math.round(76 * compactBracketScale);
-  const CARD_W = isMobile ? Math.min(288, typeof window !== "undefined" ? window.innerWidth - EDGE_PAD - PEEK_W - 8 : 268) : compactTree ? COMPACT_BASE_W : 268;
+  const DESKTOP_CARD_W = 300;
+  const CARD_W = isMobile ? Math.min(320, typeof window !== "undefined" ? window.innerWidth - EDGE_PAD - PEEK_W - 8 : DESKTOP_CARD_W) : compactTree ? COMPACT_BASE_W : DESKTOP_CARD_W;
   const CONNECTOR_W = isMobile ? 0 : compactTree ? Math.round(28 * Math.min(compactBracketScale, 1.4)) : 32;
-  // Non-compact cards get a fixed height (team rows stretch to fill), so the tree is truly taller.
-  const CARD_H = isMobile ? 132 : compactTree ? COMPACT_BASE_H : 132;
+  const CARD_H = isMobile ? 112 : compactTree ? COMPACT_BASE_H : 110;
 
   // Vertical gap = horizontal gap to the next round (mobile peek gap = MOBILE_COL_W - CARD_W).
   const GAP = isMobile ? 24 : CONNECTOR_W;
@@ -647,7 +647,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 
       return (
         <div
-          className={`relative flex items-center ${isCompactPretty ? "gap-1.5 pl-2 pr-0 py-0" : tightSide ? "gap-0.5 pl-1 pr-0 py-0" : "gap-2 pl-2.5 pr-0 flex-1 min-h-[34px]"} ${winRowClass}`}
+          className={`relative flex items-center ${isCompactPretty ? "gap-1.5 pl-2 pr-0 py-0" : tightSide ? "gap-0.5 pl-1 pr-0 py-0" : "gap-2 pl-2.5 pr-0 h-[34px]"} ${winRowClass}`}
           style={tightSide ? { height: cardH / 2 } : undefined}
         >
           {won && !winRowHasEdgeMarker && (
@@ -745,11 +745,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     const tight = (compact && !isMobile) || compactTree;
     const card = (
       <div
-        className={`${ds(bStyle, "card")} ${tight ? "" : "w-[268px] flex flex-col"} ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-primary/30 transition-shadow" : ""}`}
-        style={{ overflow: "hidden", width: tight ? cardW : undefined, height: cardH, boxSizing: "border-box" }}
+        className={`${ds(bStyle, "card")} ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-primary/30 transition-shadow" : ""}`}
+        style={{ overflow: "hidden", width: cardW, height: tight ? cardH : undefined, boxSizing: "border-box" }}
         onClick={isClickable ? handleClick : undefined}
       >
-        <div className={`ttx-match-context flex-shrink-0 ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
+        <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
           <div className="flex items-center gap-1.5">
           {phase?.logo_url && (
             <img
@@ -832,7 +832,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           </div>
           </div>
         </div>
-        <div className={`relative leading-none ${tight ? "" : "flex-1 flex flex-col min-h-0"}`} style={compactTree ? { height: cardH, overflow: "hidden" } : undefined}>
+        <div className="relative leading-none" style={compactTree ? { height: cardH, overflow: "hidden" } : undefined}>
           {renderSide("home")}
           {renderSide("away")}
           {showOverlayTime && (
