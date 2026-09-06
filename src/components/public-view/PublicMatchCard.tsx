@@ -125,7 +125,7 @@ const PublicMatchCard = ({
             </span>
           )}
       </div>
-      <div className="flex flex-shrink-0 items-center gap-1.5">
+      <div className="flex flex-shrink-0 items-center gap-1.5 ml-2">
         <div className="relative flex items-center">
           {showScores ? (
             <>
