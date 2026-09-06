@@ -812,7 +812,7 @@ const SlideCard = ({
           <button
             type="button"
             onClick={() => setConfirmDeleteSlide(true)}
-            className="text-primary-foreground/80 hover:text-primary-foreground"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground sm:h-auto sm:w-auto sm:p-1"
             aria-label="Verwijder dia"
           >
             <Trash2 className="h-4 w-4" />
@@ -1197,7 +1197,7 @@ const BlockRow = ({
         <button
           type="button"
           onClick={onRemove}
-          className="text-muted-foreground hover:text-destructive"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1"
           aria-label="Verwijder blok"
         >
           <Trash2 className="h-4 w-4" />
@@ -1312,7 +1312,7 @@ const BlockRow = ({
       <button
         type="button"
         onClick={onRemove}
-        className="text-muted-foreground hover:text-destructive"
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1"
         aria-label="Verwijder blok"
       >
         <Trash2 className="h-4 w-4" />

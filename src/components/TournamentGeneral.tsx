@@ -113,7 +113,7 @@ const SortableRow = ({
               title="Opslaan"
               onMouseDown={(e) => e.preventDefault()}
               onClick={onEditSave}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors sm:h-7 sm:w-7"
             >
               <Check className="h-4 w-4" />
             </button>
@@ -122,7 +122,7 @@ const SortableRow = ({
               type="button"
               title="Bewerken"
               onClick={onRename}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors sm:h-7 sm:w-7"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -131,7 +131,7 @@ const SortableRow = ({
             type="button"
             title="Verwijderen"
             onClick={onDelete}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors sm:h-7 sm:w-7"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -908,7 +908,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             type="button"
                             title="Bewerken"
                             onClick={() => { setEditMatchDayIdx(idx); setEditMatchDayValue(entry); }}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors sm:h-7 sm:w-7"
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
@@ -916,7 +916,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             type="button"
                             title="Verwijderen"
                             onClick={() => setDeleteMatchDayIdx(idx)}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors sm:h-7 sm:w-7"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -935,7 +935,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                           type="button"
                           title="Bewerken"
                           onClick={() => { setEditPeriodIdx(idx); setEditPeriodStart(entry.start); setEditPeriodEnd(entry.end); }}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors sm:h-7 sm:w-7"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
@@ -943,7 +943,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                           type="button"
                           title="Verwijderen"
                           onClick={() => setDeleteMatchDayIdx(idx)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors sm:h-7 sm:w-7"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>

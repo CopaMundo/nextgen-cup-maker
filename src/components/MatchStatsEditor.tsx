@@ -304,7 +304,7 @@ const MatchStatsEditor = ({
             </SelectContent>
           </Select>
           {goal && (
-            <button onClick={() => setDeleteStatId(goal.id)} className="text-muted-foreground hover:text-destructive">
+            <button aria-label="Doelpunt verwijderen" onClick={() => setDeleteStatId(goal.id)} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1">
               <Trash2 className="h-3 w-3" />
             </button>
           )}
@@ -475,7 +475,7 @@ const MatchStatsEditor = ({
                       <span className="flex-1 text-xs text-foreground truncate">
                         {stat.player_name && stat.player_name !== PLACEHOLDER_NAME ? stat.player_name : <span className="text-muted-foreground italic">onbekend</span>}
                       </span>
-                      <button onClick={() => setDeleteStatId(stat.id)} className="text-muted-foreground hover:text-destructive">
+                      <button aria-label="Kaart verwijderen" onClick={() => setDeleteStatId(stat.id)} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1">
                         <Trash2 className="h-3 w-3" />
                       </button>
                     </div>
