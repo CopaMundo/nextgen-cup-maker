@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Info, Users, Trophy, Calendar, Home } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
@@ -10,9 +11,66 @@ interface Props {
   teams?: any[];
 }
 
+/**
+ * Keeps the bar pinned to the bottom of the *visible* screen while the user
+ * pinch-zooms. The bar is untouched (no transform at all) as long as the page
+ * is not zoomed, so normal scrolling stays perfectly stable.
+ */
+const usePinToVisualViewport = (ref: React.RefObject<HTMLElement>) => {
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const el = ref.current;
+    if (!vv || !el) return;
+
+    let raf = 0;
+    let pinned = false;
+
+    const apply = () => {
+      raf = 0;
+      const scale = vv.scale;
+      if (scale <= 1.01) {
+        if (pinned) {
+          el.style.transform = "";
+          el.style.transformOrigin = "";
+          pinned = false;
+        }
+        return;
+      }
+      // Layout position of the bar: bottom edge at window.innerHeight.
+      // Visible bottom edge in layout px: vv.offsetTop + vv.height.
+      const dy = vv.offsetTop + vv.height - window.innerHeight;
+      const dx = vv.offsetLeft;
+      el.style.transformOrigin = "0 100%";
+      el.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${1 / scale})`;
+      pinned = true;
+    };
+
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(apply);
+    };
+
+    vv.addEventListener("resize", schedule);
+    vv.addEventListener("scroll", schedule);
+    window.addEventListener("scroll", schedule, { passive: true });
+    apply();
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      vv.removeEventListener("resize", schedule);
+      vv.removeEventListener("scroll", schedule);
+      window.removeEventListener("scroll", schedule);
+      el.style.transform = "";
+      el.style.transformOrigin = "";
+    };
+  }, [ref]);
+};
+
 const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, teams }: Props) => {
   const bStyle = useBroadcastStyle();
   const favTeam = favoriteTeam ? teams?.find((t: any) => t.id === favoriteTeam) : null;
+  const navRef = useRef<HTMLElement>(null);
+  usePinToVisualViewport(navRef);
 
   const tabs: { id: string; label: string; icon: any; isCenter?: boolean }[] = [
     { id: "info", label: "Info", icon: Info },
@@ -23,7 +81,10 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
   ];
 
   return (
-    <nav className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom ${ds(bStyle, "navBar")}`}>
+    <nav
+      ref={navRef}
+      className={`fixed inset-x-0 bottom-0 z-50 safe-area-bottom will-change-transform ${ds(bStyle, "navBar")}`}
+    >
 
 
       <div className="relative grid h-16 grid-cols-5 items-end px-2 pt-1 pb-2">
