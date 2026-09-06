@@ -919,6 +919,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                             dragLabel="Locatie verplaatsen"
                             onRename={() => { setEditingLocId(loc.id); setEditLocName(loc.name); }}
                             onDelete={() => setDeleteLocId(loc.id)}
+                            editing={editingLocId === loc.id}
+                            editValue={editLocName}
+                            onEditValueChange={setEditLocName}
+                            onEditSave={() => { saveLocationRename(); }}
+                            onEditCancel={() => setEditingLocId(null)}
                           />
                         ))}
                       </div>
