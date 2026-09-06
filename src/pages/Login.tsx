@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Eye, EyeOff } from "lucide-react";
-import copaLogo from "@/assets/copa-mundo-full-logo.png";
+import CopaMundoMark from "@/components/CopaMundoMark";
 import SEOHead from "@/components/SEOHead";
 
 const Login = () => {
@@ -35,7 +35,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-3 mb-6">
-            <img src={copaLogo} alt="Copa Mundo" className="h-12 w-auto object-contain" />
+            <CopaMundoMark className="h-12 w-12" />
             <span className="font-display text-xl font-bold text-foreground">COPA MUNDO</span>
           </Link>
           <h1 className="font-display text-3xl font-bold text-foreground">Welkom terug</h1>
