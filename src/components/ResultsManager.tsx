@@ -2457,9 +2457,12 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               // H&A: penalties horen op de Terug-match (in Terug-oriëntatie)
               let updatedCarrier: Match | null = null;
               if (isHALeg && terugMatch) {
-                const swap = currentIsHeen;
-                const carrierHomePen = swap ? data.awayPenalties : data.homePenalties;
-                const carrierAwayPen = swap ? data.homePenalties : data.awayPenalties;
+                // De beslissende score kan enkel bij de Terug-wedstrijd ingegeven
+                // worden. Wordt de Heen-wedstrijd bewerkt, dan wist dat de
+                // bestaande beslissende score: die moet opnieuw bij de Terug.
+                const carrierHomePen = currentIsHeen ? null : data.homePenalties;
+                const carrierAwayPen = currentIsHeen ? null : data.awayPenalties;
+
                 const carrierBase = terugMatch.id === sem.id ? updatedMatch : terugMatch;
                 if (
                   carrierHomePen !== carrierBase.home_penalties ||
