@@ -157,8 +157,8 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
 
       {/* Edit sponsor dialog */}
       {editingSponsor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setEditingId(null)}>
-          <div ref={editDialogRef} className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-3 sm:p-4" onClick={() => setEditingId(null)}>
+          <div ref={editDialogRef} className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-display text-lg font-bold text-foreground">Sponsor bewerken</h3>
             <div className="flex justify-center">
               <label className="cursor-pointer relative group">
