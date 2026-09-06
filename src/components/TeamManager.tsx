@@ -187,13 +187,22 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
     const team = teams.find(t => t.id === selectedTeamId);
     if (!team) return null;
     return (
-      <div className="space-y-6">
-        <button onClick={() => setSelectedTeamId(null)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Terug naar {pluralLabel.toLowerCase()}
-        </button>
-        <div className="flex items-center gap-6">
+      <div className={isMobile ? "space-y-4" : "space-y-6"}>
+        {isMobile ? (
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="icon" className="h-8 w-8 shrink-0" onClick={() => setSelectedTeamId(null)} aria-label={`Terug naar ${pluralLabel.toLowerCase()}`}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="min-w-0 flex-1 truncate font-display text-lg font-bold text-foreground">{team.name}</h2>
+          </div>
+        ) : (
+          <button onClick={() => setSelectedTeamId(null)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Terug naar {pluralLabel.toLowerCase()}
+          </button>
+        )}
+        <div className={isMobile ? "flex items-center gap-4" : "flex items-center gap-6"}>
           <label className="cursor-pointer relative group">
-            <div className="h-24 w-24 overflow-hidden flex-shrink-0">
+            <div className={`${isMobile ? "h-16 w-16" : "h-24 w-24"} overflow-hidden flex-shrink-0`}>
               {team.logo_url ? (
                 <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
               ) : (
@@ -205,11 +214,13 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
             </div>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadLogo(team.id, e.target.files[0])} />
           </label>
-          <div>
-            <h2 className="font-display text-2xl font-bold text-foreground">{team.name}</h2>
+          <div className="min-w-0">
+            {!isMobile && <h2 className="font-display text-2xl font-bold text-foreground">{team.name}</h2>}
+            {isMobile && <p className="text-xs text-muted-foreground">Tik op het logo om te wijzigen</p>}
             {showCountry && team.country && <p className="text-sm text-muted-foreground flex items-center gap-1"><CountryFlag country={team.country} className="h-4 w-5 object-contain" /> {team.country}</p>}
           </div>
         </div>
+
         {!isPlayers && (
           <>
             <div className="rounded-xl border border-border bg-card p-6">
