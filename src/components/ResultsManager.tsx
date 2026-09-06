@@ -1714,11 +1714,12 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             )}
           </div>
 
-          {/* Teams + score */}
+          {/* Teams + score — grid keeps score blocks aligned regardless of team name length */}
           <div className="flex-1 flex flex-col items-center gap-0 min-w-0">
-            <div className="flex items-center justify-center gap-1.5 w-full">
-              <div className="flex items-center gap-1 flex-1 justify-end min-w-0">
-                <span className="font-medium text-foreground text-xs truncate">{homeName}</span>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 w-full">
+              {/* Home team — right aligned so long names push inward, not the score block */}
+              <div className="flex items-center gap-1 justify-end min-w-0">
+                <span className="font-medium text-foreground text-xs truncate text-right">{homeName}</span>
                 {teamLogo(match.home_team_id) && <img src={teamLogo(match.home_team_id)!} className="h-4 w-4 object-contain flex-shrink-0" />}
               </div>
 
@@ -1735,7 +1736,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 </span>
               </button>
 
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+              {/* Away team — left aligned */}
+              <div className="flex items-center gap-1 min-w-0">
                 {teamLogo(match.away_team_id) && <img src={teamLogo(match.away_team_id)!} className="h-4 w-4 object-contain flex-shrink-0" />}
                 <span className="font-medium text-foreground text-xs truncate">{awayName}</span>
               </div>
