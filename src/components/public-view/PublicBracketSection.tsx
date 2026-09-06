@@ -734,10 +734,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         onClick={isClickable ? handleClick : undefined}
       >
         <div className={`ttx-match-context ${ds(bStyle, "matchContext")}`} style={compactTree ? { display: "none" } : undefined}>
-          <div className={`flex w-full flex-1 min-w-0 items-start justify-between leading-none ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
+          <div className={`flex w-full flex-1 min-w-0 items-start justify-between leading-none gap-3 ${tight ? "" : "py-0.5 min-h-[22px]"}`}>
             <div className="min-w-0 flex-1">
               {phase?.name ? (
-                <>
+                <div className="flex flex-col gap-y-0.5">
                   <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
                     {phase.name}
                   </div>
@@ -749,7 +749,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                       )}
                     </div>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="flex items-center gap-1.5">
                   <div className={`truncate ${ds(bStyle, "matchContextText")} ${tight ? "!text-[6px] !leading-none" : ""}`}>
@@ -761,7 +761,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
               )}
             </div>
-            <div className="text-right flex-shrink-0 ml-auto">
+            <div className="text-right flex-shrink-0 flex flex-col gap-y-0.5">
               {displayField && (
                 <div className={`font-bold text-muted-foreground flex items-center gap-0.5 justify-end ${tight ? "text-[7px]" : "text-[9px]"}`}>
                   <MapPin className="h-2 w-2" /> {displayField}
