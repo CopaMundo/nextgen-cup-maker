@@ -104,18 +104,21 @@ const ScoreEntryDialog = ({
     setHomeScore(match.home_score !== null ? String(match.home_score) : "");
     setAwayScore(match.away_score !== null ? String(match.away_score) : "");
 
-    // H&A: penalty waarden leven altijd op de Terug-wedstrijd (laatste leg). Voor
-    // de andere leg draaien we ze om zodat ze bij de juiste teamnaam staan.
+    // H&A: de beslissende score hoort UITSLUITEND op de Terug-wedstrijd.
+    // Bij de Heen-wedstrijd tonen we die dus nooit en houden we de velden leeg.
     if (aggregate) {
-      const swap = !aggregate.currentIsCarrier;
-      const h = swap ? aggregate.storedAwayPenalties : aggregate.storedHomePenalties;
-      const a = swap ? aggregate.storedHomePenalties : aggregate.storedAwayPenalties;
-      setHomePen(h !== null ? String(h) : "");
-      setAwayPen(a !== null ? String(a) : "");
+      if (aggregate.currentIsCarrier) {
+        setHomePen(aggregate.storedHomePenalties !== null ? String(aggregate.storedHomePenalties) : "");
+        setAwayPen(aggregate.storedAwayPenalties !== null ? String(aggregate.storedAwayPenalties) : "");
+      } else {
+        setHomePen("");
+        setAwayPen("");
+      }
     } else {
       setHomePen(match.home_penalties !== null ? String(match.home_penalties) : "");
       setAwayPen(match.away_penalties !== null ? String(match.away_penalties) : "");
     }
+
 
     if (scoringType === "sets" && numSets >= 2) {
       const existing = match.set_scores || [];
