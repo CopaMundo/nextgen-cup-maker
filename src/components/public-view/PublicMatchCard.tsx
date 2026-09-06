@@ -107,7 +107,7 @@ const PublicMatchCard = ({
 
 
   const renderTeamRow = (name: string, logo: string | undefined, country: string | undefined, teamId: string | null, penalties: number | null, score: number | null, isWin: boolean, position?: number) => (
-    <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} px-2 transition-colors`}>
+    <div className={`flex h-10 items-center gap-2 ${ds(bStyle, "matchTeamRow") || "rounded-md"} pl-2 pr-0.5 transition-colors`}>
       <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
         {logo ? (
           <img src={logo} className="h-full w-full object-contain" alt="" />
@@ -125,7 +125,7 @@ const PublicMatchCard = ({
             </span>
           )}
       </div>
-      <div className="flex flex-shrink-0 items-center gap-1.5 ml-2">
+      <div className="flex flex-shrink-0 items-center gap-1.5 ml-2 mr-0.5">
         <div className="relative flex items-center">
           {showScores ? (
             <>
