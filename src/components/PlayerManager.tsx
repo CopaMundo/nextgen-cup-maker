@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Pencil, Upload, User } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
@@ -45,8 +44,6 @@ const PlayerManager = ({ tournamentId, teamId }: { tournamentId: string; teamId:
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const { toast } = useToast();
   const [deletePlayerId, setDeletePlayerId] = useState<string | null>(null);
-  const addDialogRef = useDialogFocus(showAdd);
-  const editDialogRef = useDialogFocus(!!editingId);
 
   useEffect(() => { fetchPlayers(); }, [teamId]);
 

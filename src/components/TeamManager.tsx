@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Upload, Pencil, Check, X, ArrowLeft, Users, Camera, Copy, ChevronRight } from "lucide-react";
 import { compressImage, getFileExtension } from "@/lib/compressImage";
 import {
@@ -57,8 +56,6 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const isMobile = useIsMobile();
 
   const { toast } = useToast();
-  const addDialogRef = useDialogFocus(showAdd);
-  const editDialogRef = useDialogFocus(!!editingId);
 
   useEffect(() => { fetchTeams(); }, [tournamentId, categoryId]);
   useEffect(() => { onDetailOpenChange?.(!!selectedTeamId); }, [selectedTeamId, onDetailOpenChange]);
