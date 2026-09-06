@@ -43,6 +43,21 @@ const PublicInfo = ({ data, selectedCategory, onCategoryChange, darkMode, onTogg
     return new Date(d).toLocaleDateString("nl-BE", { day: "numeric", month: "long", year: "numeric" });
   };
 
+  // Periode: eerste tot laatste wedstrijddag (dagen + periodes), anders start/eind datum
+  const matchDayDates = (() => {
+    const raw = (tournament as any).match_days;
+    let entries: any[] = [];
+    if (Array.isArray(raw)) entries = raw;
+    else if (typeof raw === "string") {
+      try { const p = JSON.parse(raw); if (Array.isArray(p)) entries = p; } catch { /* ignore */ }
+    }
+    try { return expandMatchDays(entries as MatchDayEntry[]); } catch { return []; }
+  })();
+
+  const periodStart = matchDayDates[0] || tournament.start_date || null;
+  const periodEnd = matchDayDates.length > 0 ? matchDayDates[matchDayDates.length - 1] : (tournament.end_date || null);
+
+
   const renderSponsors = () => {
     if (sponsors.length === 0) return null;
     const rows: any[][] = [];
