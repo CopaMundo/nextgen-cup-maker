@@ -351,7 +351,7 @@ const TournamentDetail = () => {
                 ? mobileSidebarCollapsed
                   ? "relative w-0 border-r-0"
                   : "relative w-14 items-center border-r border-border"
-                : "relative w-20 items-center border-r border-border"
+                : "relative w-24 items-center border-r border-border"
             )}
           >
             {tournament.logo_url && !isMobile && (
@@ -376,7 +376,7 @@ const TournamentDetail = () => {
                         "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
                         isMobile
                           ? "mx-auto mb-1 h-11 w-11 justify-center p-0"
-                          : "w-16 h-[72px] shrink-0 py-1 flex-col justify-center gap-0.5",
+                          : "w-20 h-[72px] shrink-0 px-1 py-1 flex-col justify-center gap-0.5",
                         activeTab === item.id
                           ? "bg-primary text-primary-foreground shadow-sm"
                           : "text-muted-foreground hover:bg-secondary hover:text-foreground"
