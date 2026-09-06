@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Trash2, BarChart3, X, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import pollingIconAsset from "@/assets/polling.png.asset.json";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
