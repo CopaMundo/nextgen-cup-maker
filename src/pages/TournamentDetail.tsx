@@ -31,9 +31,13 @@ const ADMIN_MIN_WIDTH = 900;
 
 const useAdminDesktopScale = () => {
   useEffect(() => {
+    const root = document.documentElement;
     const apply = () => {
       const zoom = window.innerWidth < ADMIN_MIN_WIDTH ? window.innerWidth / ADMIN_MIN_WIDTH : 1;
-      document.documentElement.style.zoom = zoom === 1 ? "" : String(zoom);
+      root.style.zoom = zoom === 1 ? "" : String(zoom);
+      // 100vh houdt geen rekening met zoom: hoogte expliciet omrekenen,
+      // anders wordt de onderkant van de pagina afgesneden.
+      root.style.setProperty("--admin-vh", zoom === 1 ? "100vh" : `${window.innerHeight / zoom}px`);
     };
     apply();
     window.addEventListener("resize", apply);
@@ -41,9 +45,11 @@ const useAdminDesktopScale = () => {
     return () => {
       window.removeEventListener("resize", apply);
       window.removeEventListener("orientationchange", apply);
-      document.documentElement.style.zoom = "";
+      root.style.zoom = "";
+      root.style.removeProperty("--admin-vh");
     };
   }, []);
+
 };
 
 
@@ -315,7 +321,10 @@ const TournamentDetail = () => {
   };
 
   return (
-    <div className="h-screen min-h-0 bg-background flex flex-col overflow-hidden">
+    <div
+      className="min-h-0 bg-background flex flex-col overflow-hidden"
+      style={{ height: "var(--admin-vh, 100vh)" }}
+    >
 
 
       <Navbar tournamentName={tournament?.name} />
