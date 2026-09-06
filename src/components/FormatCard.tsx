@@ -17,6 +17,7 @@ import BracketView from "./BracketView";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import ScoringSystemSelector, { MIXED_VALUE } from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
+import { formatTypeIcon } from "./FormatTypeIcon";
 
 interface Phase {
   id: string;
@@ -323,14 +324,18 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
           className={`flex items-center justify-between w-full p-3 hover:bg-foreground/[0.02] transition-colors ${dragRowProps ? "cursor-grab active:cursor-grabbing touch-none" : ""}`}
         >
           {dragHandle}
-           <div
+          <div
             onClick={() => setExpanded(!expanded)}
             className="flex min-w-0 flex-1 items-center gap-2 text-left cursor-pointer"
           >
-            {format.logo_url && (
+            {format.logo_url ? (
               <img src={format.logo_url} alt="" className="h-6 w-6 object-contain flex-shrink-0 rounded" />
+            ) : (
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+                {formatTypeIcon(format.phase_type, "h-4 w-4")}
+              </span>
             )}
-            
+
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1.5 py-0.5 rounded bg-secondary">
               {typeLabel}
             </span>
