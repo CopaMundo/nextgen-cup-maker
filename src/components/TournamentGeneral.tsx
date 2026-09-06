@@ -1287,45 +1287,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={!!editingCatId} onOpenChange={(open) => !open && setEditingCatId(null)}>
-        <DialogContent ref={editCategoryDialogRef} className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Divisie bewerken</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label>Naam</Label>
-            <Input
-              value={editCatName}
-              onChange={(e) => setEditCatName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && saveCategoryRename()}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingCatId(null)}>Annuleren</Button>
-            <Button onClick={saveCategoryRename} disabled={!editCatName.trim()}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!editingLocId} onOpenChange={(open) => !open && setEditingLocId(null)}>
-        <DialogContent ref={editLocationDialogRef} className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Locatie bewerken</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label>Naam</Label>
-            <Input
-              value={editLocName}
-              onChange={(e) => setEditLocName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && saveLocationRename()}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingLocId(null)}>Annuleren</Button>
-            <Button onClick={saveLocationRename} disabled={!editLocName.trim()}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Name Dialog */}
       <Dialog open={showEditName} onOpenChange={setShowEditName}>
