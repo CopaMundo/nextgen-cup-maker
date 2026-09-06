@@ -62,6 +62,14 @@ interface ScoreEntryDialogProps {
   tournament?: TournamentStatsConfig;
   onOpenStats?: () => void;
   aggregate?: AggregateInfo | null;
+  /** Wedstrijdgegevens om in de pop-up te tonen. */
+  formatName?: string | null;
+  groupName?: string | null;
+  matchName?: string | null;
+  field?: string | null;
+  referee?: string | null;
+  matchDate?: string | null;
+  matchTime?: string | null;
   onSave: (data: {
     homeScore: number | null;
     awayScore: number | null;
