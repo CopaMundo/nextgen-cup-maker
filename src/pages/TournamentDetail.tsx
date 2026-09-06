@@ -27,35 +27,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-// Op smalle (mobiele) schermen wordt de volledige desktop-layout van het beheer
-// verkleind weergegeven, zodat het er op een telefoon exact hetzelfde uitziet.
-const ADMIN_MIN_WIDTH = 625;
-
-const useAdminDesktopScale = () => {
-  useEffect(() => {
-    const root = document.documentElement;
-    const apply = () => {
-      const zoom = window.innerWidth < ADMIN_MIN_WIDTH ? window.innerWidth / ADMIN_MIN_WIDTH : 1;
-      root.style.zoom = zoom === 1 ? "" : String(zoom);
-      // 100vh houdt geen rekening met zoom: hoogte expliciet omrekenen,
-      // anders wordt de onderkant van de pagina afgesneden.
-      root.style.setProperty("--admin-vh", zoom === 1 ? "100vh" : `${window.innerHeight / zoom}px`);
-    };
-    apply();
-    window.addEventListener("resize", apply);
-    window.addEventListener("orientationchange", apply);
-    return () => {
-      window.removeEventListener("resize", apply);
-      window.removeEventListener("orientationchange", apply);
-      root.style.zoom = "";
-      root.style.removeProperty("--admin-vh");
-    };
-  }, []);
-
-};
-
-
-
 
 const sidebarItems = [
 
@@ -80,7 +51,6 @@ const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  useAdminDesktopScale();
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -338,21 +308,24 @@ const TournamentDetail = () => {
 
   return (
     <div
-      className="min-h-0 bg-background flex flex-col overflow-hidden"
-      style={{ height: "var(--admin-vh, 100vh)" }}
+      className="h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
     >
 
 
       <Navbar tournamentName={tournament?.name} />
       <ThemeSwitcher />
-      <div className="flex flex-1 overflow-hidden min-h-0">
+      <div className="relative flex flex-1 overflow-hidden min-h-0">
         {/* Left icon sidebar */}
         <TooltipProvider delayDuration={200}>
           <nav
             aria-label="Toernooibeheer"
             className={cn(
-              "shrink-0 self-stretch border-r border-border bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width] duration-200",
-              isMobile ? (mobileSidebarCollapsed ? "w-16 items-center" : "w-44 items-stretch") : "w-20 items-center"
+              "shrink-0 self-stretch border-r border-border bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width,box-shadow] duration-200",
+              isMobile
+                ? mobileSidebarCollapsed
+                  ? "relative z-40 w-14 items-center"
+                  : "absolute inset-y-0 left-0 z-40 w-40 items-stretch shadow-xl"
+                : "relative w-20 items-center"
             )}
           >
             {isMobile && (
@@ -362,11 +335,11 @@ const TournamentDetail = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleMobileSidebar}
-                  className={cn("h-10", mobileSidebarCollapsed ? "w-10" : "w-full justify-start px-2")}
+                  className={cn("h-9", mobileSidebarCollapsed ? "w-9" : "w-full justify-start px-2")}
                   aria-label={mobileSidebarCollapsed ? "Navigatie uitklappen" : "Navigatie inklappen"}
                   title={mobileSidebarCollapsed ? "Navigatie uitklappen" : "Navigatie inklappen"}
                 >
-                  {mobileSidebarCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+                  {mobileSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
                   {!mobileSidebarCollapsed && <span className="ml-2 text-xs font-semibold">Inklappen</span>}
                 </Button>
               </div>
@@ -383,29 +356,34 @@ const TournamentDetail = () => {
               {sidebarItems.map(item => (
                 <Tooltip key={item.id}>
                   <TooltipTrigger asChild>
-                    <button
-                      onClick={() => setActiveTab(item.id)}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        if (isMobile && !mobileSidebarCollapsed) toggleMobileSidebar();
+                      }}
                       aria-label={item.label}
                       aria-current={activeTab === item.id ? "page" : undefined}
                       className={cn(
                         "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
                         isMobile
                           ? mobileSidebarCollapsed
-                            ? "mx-auto mb-1 h-12 w-12 justify-center"
-                            : "mx-2 mb-1 h-11 w-[calc(100%-1rem)] justify-start gap-3 px-3"
+                            ? "mx-auto mb-1 h-11 w-11 justify-center p-0"
+                            : "mx-2 mb-1 h-10 w-[calc(100%-1rem)] justify-start gap-2 px-2"
                           : "w-16 flex-1 min-h-0 max-h-[56px] py-1 flex-col justify-center gap-0.5",
                         activeTab === item.id
                           ? "bg-primary text-primary-foreground shadow-sm"
                           : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                       )}
                     >
-                      <item.icon className="h-5 w-5 shrink-0" />
+                      <item.icon className="h-[18px] w-[18px] shrink-0" />
                       {(!isMobile || !mobileSidebarCollapsed) && (
                         <span className={cn("font-medium leading-tight truncate", isMobile ? "text-xs text-left" : "text-[10px] w-full text-center")}>
                           {item.label}
                         </span>
                       )}
-                    </button>
+                    </Button>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="text-xs">
                     {item.label}
