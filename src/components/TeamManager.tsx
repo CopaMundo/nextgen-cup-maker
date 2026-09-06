@@ -223,7 +223,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
 
         {!isPlayers && (
           <>
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className={`rounded-xl border border-border bg-card ${isMobile ? "p-4" : "p-6"}`}>
               <h3 className="font-display text-lg font-bold text-foreground mb-4">Ploegfoto</h3>
               <label className="cursor-pointer relative group block">
                 {team.team_photo_url ? (
@@ -242,11 +242,11 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadTeamPhoto(team.id, e.target.files[0])} />
               </label>
             </div>
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className={`rounded-xl border border-border bg-card ${isMobile ? "p-4" : "p-6"}`}>
               <h3 className="font-display text-lg font-bold text-foreground mb-4">Spelers</h3>
               <PlayerManager tournamentId={tournamentId} teamId={selectedTeamId} />
             </div>
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className={`rounded-xl border border-border bg-card ${isMobile ? "p-4" : "p-6"}`}>
               <h3 className="font-display text-lg font-bold text-foreground mb-4">Staff</h3>
               <StaffManager tournamentId={tournamentId} teamId={selectedTeamId} />
             </div>
