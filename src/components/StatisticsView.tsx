@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
 import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
-import yellowCardIconAsset from "@/assets/yellow-card.png.asset.json";
+import yellowCardIconAsset from "@/assets/yellow-card_1.png.asset.json";
 
 const MaskIcon = ({ src, label }: { src: string; label: string }) => (
   <span
