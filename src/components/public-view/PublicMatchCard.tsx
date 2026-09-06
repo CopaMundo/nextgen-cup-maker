@@ -62,6 +62,7 @@ const PublicMatchCard = ({
   const formatSuffix = getMatchFormatSuffix(m, scoringSystems as any, phases as any, groups as any);
   const isHALeg = !!m.match_name && /\s+\((Heen|Terug)\)$/.test(m.match_name);
   const haLegLabel = isHALeg ? (m.match_name?.endsWith("(Heen)") ? "Heen" : "Terug") : null;
+  const haLegDisplayLabel = haLegLabel === "Heen" ? "Heenwedstrijd" : haLegLabel === "Terug" ? "Terugwedstrijd" : null;
 
   // Build structured context lines
   const isKnockout = phase?.phase_type === "knockout" || phase?.phase_type === "single_match";
