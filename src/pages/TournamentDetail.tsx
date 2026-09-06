@@ -407,7 +407,6 @@ const TournamentDetail = () => {
                       variant="ghost"
                       onClick={() => {
                         setActiveTab(item.id);
-                        if (isMobile && !mobileSidebarCollapsed) toggleMobileSidebar();
                       }}
                       aria-label={item.label}
                       aria-current={activeTab === item.id ? "page" : undefined}
