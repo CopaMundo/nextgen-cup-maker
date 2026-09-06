@@ -1153,13 +1153,14 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
       </div>
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
-        <DialogContent ref={addLocationDialogRef} className="sm:max-w-sm">
+        <DialogContent ref={addLocationDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Locatie toevoegen</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             <Label>Naam</Label>
             <Input
+              className="h-11 text-base sm:h-10 sm:text-sm"
               value={newLocationName}
               onChange={(e) => setNewLocationName(e.target.value)}
               placeholder="Bijv. Sporthal Centrum"
@@ -1167,20 +1168,21 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddLocation(false)}>Annuleren</Button>
-            <Button onClick={addLocation} disabled={!newLocationName.trim()}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddLocation(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addLocation} disabled={!newLocationName.trim()}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showAddCategory} onOpenChange={setShowAddCategory}>
-        <DialogContent ref={addCategoryDialogRef} className="sm:max-w-sm">
+        <DialogContent ref={addCategoryDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Divisie toevoegen</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             <Label>Naam</Label>
             <Input
+              className="h-11 text-base sm:h-10 sm:text-sm"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Bijv. U13, Seniors"
@@ -1188,14 +1190,14 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddCategory(false)}>Annuleren</Button>
-            <Button onClick={addCategory} disabled={!newCategoryName.trim()}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddCategory(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addCategory} disabled={!newCategoryName.trim()}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showAddMatchDay} onOpenChange={setShowAddMatchDay}>
-        <DialogContent ref={addMatchDayDialogRef} className="sm:max-w-sm">
+        <DialogContent ref={addMatchDayDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Wedstrijddag toevoegen</DialogTitle>
             <DialogDescription>Kies een datum waarop er gespeeld wordt.</DialogDescription>
@@ -1209,14 +1211,14 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddMatchDay(false)}>Annuleren</Button>
-            <Button onClick={addMatchDay} disabled={!newMatchDay}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddMatchDay(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addMatchDay} disabled={!newMatchDay}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showAddPeriod} onOpenChange={setShowAddPeriod}>
-        <DialogContent ref={addPeriodDialogRef} className="sm:max-w-sm">
+        <DialogContent ref={addPeriodDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Periode toevoegen</DialogTitle>
             <DialogDescription>Alle dagen binnen deze periode worden toegevoegd als extra wedstrijddagen.</DialogDescription>
@@ -1240,8 +1242,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddPeriod(false)}>Annuleren</Button>
-            <Button onClick={addPeriod} disabled={!periodStart || !periodEnd}>Toevoegen</Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAddPeriod(false)}>Annuleren</Button>
+            <Button className="w-full sm:w-auto" onClick={addPeriod} disabled={!periodStart || !periodEnd}>Toevoegen</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1328,7 +1330,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Match Day Dialog */}
       <Dialog open={editMatchDayIdx !== null} onOpenChange={(open) => !open && setEditMatchDayIdx(null)}>
-        <DialogContent ref={editMatchDayDialogRef} className="sm:max-w-sm">
+        <DialogContent ref={editMatchDayDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Wedstrijddag bewerken</DialogTitle>
             <DialogDescription>Pas de datum aan.</DialogDescription>
@@ -1356,7 +1358,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
       {/* Edit Period Dialog */}
       <Dialog open={editPeriodIdx !== null} onOpenChange={(open) => !open && setEditPeriodIdx(null)}>
-        <DialogContent ref={editPeriodDialogRef} className="sm:max-w-sm">
+        <DialogContent ref={editPeriodDialogRef} className="top-[8%] max-w-sm translate-y-0 sm:top-[50%] sm:max-w-sm sm:translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Periode bewerken</DialogTitle>
             <DialogDescription>Pas de start- en einddatum aan.</DialogDescription>
