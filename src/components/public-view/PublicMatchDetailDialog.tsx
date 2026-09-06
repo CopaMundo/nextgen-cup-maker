@@ -101,7 +101,7 @@ const PublicMatchDetailDialog = ({
     scoringSystems as any,
     phases as any,
     groups as any,
-    isHA ? { haPairLabel: "Heen en terug", includeLeg: false } : undefined
+    isHA ? { includeLeg: false } : undefined
   );
 
   let titleMain = "";
