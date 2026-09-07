@@ -611,24 +611,21 @@ const TournamentDetail = () => {
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
-              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center justify-start gap-6">
-                {activeTab === "schedule" ? (
-                  <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
-                    {categorySelector}
+              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center gap-6">
+                <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
+                  {categorySelector}
+                  {activeTab === "schedule" && (
                     <LocationSelector
                       tournamentId={id!}
                       selectedLocation={selectedLocation}
                       onSelect={setSelectedLocation}
                       selectClassName="h-6 rounded-md px-1.5 text-[11px] font-medium leading-none"
                     />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
-                    {categorySelector}
-                  </div>
-                )}
-                {activeTab === "schedule" && tournamentDates.length > 0 && (
-                  <div className="flex min-w-0 flex-1 justify-center">
+                  )}
+                </div>
+
+                <div className="flex min-w-0 flex-1 justify-center">
+                  {activeTab === "schedule" && tournamentDates.length > 0 ? (
                     <DateStripNav
                       dates={tournamentDates}
                       activeDate={plannerDate}
@@ -643,32 +640,34 @@ const TournamentDetail = () => {
                         });
                       }}
                     />
-                  </div>
-                )}
-                {activeTab !== "schedule" && <div className="flex-1" />}
-                {desktopSegments && (
-                  <div className="ml-auto flex shrink-0 items-center gap-1 border-b border-border">
-                    {desktopSegments.items.map((seg) => {
-                      const active = desktopSegments.active === seg.id;
-                      return (
-                        <button
-                          key={seg.id}
-                          type="button"
-                          onClick={() => desktopSegments.onSelect(seg.id)}
-                          className={cn(
-                            "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
-                            active
-                              ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
-                              : ""
-                          )}
-                        >
-                          {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
-                          <span className="truncate">{seg.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                  ) : (
+                    desktopSegments && (
+                      <div className="flex shrink-0 items-center gap-1">
+                        {desktopSegments.items.map((seg) => {
+                          const active = desktopSegments.active === seg.id;
+                          return (
+                            <button
+                              key={seg.id}
+                              type="button"
+                              onClick={() => desktopSegments.onSelect(seg.id)}
+                              className={cn(
+                                "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
+                                active
+                                  ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
+                                  : ""
+                              )}
+                            >
+                              {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
+                              <span className="truncate">{seg.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )
+                  )}
+                </div>
+
+                <div className="hidden shrink-0 lg:block lg:flex-1" />
               </div>
             </header>
           )}

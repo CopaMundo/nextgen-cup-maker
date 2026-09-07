@@ -58,7 +58,7 @@ const LocationSelector = ({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="w-12 text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
+      <span className="w-12 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
       <select
         value={selectedLocation || ""}
         onChange={(e) => onSelect(e.target.value || null)}
