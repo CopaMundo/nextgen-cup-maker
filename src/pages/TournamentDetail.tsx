@@ -244,6 +244,11 @@ const TournamentDetail = () => {
 
   useEffect(() => { if (id) fetchTournament(); }, [id]);
 
+  const tournamentDates = useMemo(() => {
+    if (!tournament) return [];
+    return getTournamentPlannerDates(tournament);
+  }, [tournament]);
+
   const fetchTournament = async () => {
     const { data } = await supabase.from("tournaments").select("*").eq("id", id!).single();
     setTournament(data);
@@ -283,11 +288,6 @@ const TournamentDetail = () => {
   );
 
   const effectiveCategoryId = selectedCategoryId;
-
-  const tournamentDates = useMemo(() => {
-    if (!tournament) return [];
-    return getTournamentPlannerDates(tournament);
-  }, [tournament]);
 
   const renderContent = () => {
     switch (activeTab) {
