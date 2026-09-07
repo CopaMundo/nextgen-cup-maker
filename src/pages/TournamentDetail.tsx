@@ -472,8 +472,29 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
+            {!isMobile && (
+              <header className="mb-5 flex items-end justify-between gap-4 border-b border-border/60 pb-4">
+                <div className="min-w-0">
+                  <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
+                    {sidebarItems.find((i) => i.id === activeTab)?.title}
+                  </h1>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {sidebarItems.find((i) => i.id === activeTab)?.desc}
+                  </p>
+                </div>
+                <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                  {tournament.logo_url && (
+                    <img src={tournament.logo_url} alt="" className="h-8 w-8 object-contain" />
+                  )}
+                  <span className="max-w-[280px] truncate text-sm font-bold text-foreground" title={tournament.name}>
+                    {tournament.name}
+                  </span>
+                </div>
+              </header>
+            )}
             <div className="flex flex-col">{renderContent()}</div>
           </div>
+
 
         </div>
 
