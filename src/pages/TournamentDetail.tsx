@@ -428,7 +428,7 @@ const TournamentDetail = () => {
             aria-label="Toernooibeheer"
             className="shrink-0 border-b border-border bg-card/80 backdrop-blur-sm print:hidden"
           >
-            <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-1 px-3 xl:px-6">
+            <div className="mx-auto flex w-auto max-w-[1600px] items-stretch justify-center gap-1 px-6 xl:px-10">
               {tournament.logo_url && (
                 <div className="flex shrink-0 items-center pr-4">
                   <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
