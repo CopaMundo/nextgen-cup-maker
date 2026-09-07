@@ -32,16 +32,17 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const sidebarItems = [
 
-  { id: "general", icon: Settings, label: "Algemeen" },
-  { id: "teams", icon: ShirtIcon, label: "Deelnemers" },
-  { id: "phases", icon: BracketTreeIcon, label: "Format" },
-  { id: "schedule", icon: CalendarClockIcon, label: "Schema" },
-  { id: "results", icon: ScoreboardIcon, label: "Resultaten" },
-  { id: "statistics", icon: BarChart3, label: "Statistieken" },
-  { id: "sponsors", icon: Handshake, label: "Sponsors" },
-  { id: "polls", icon: PollIcon, label: "Polls" },
-  { id: "presentation", icon: Tv2, label: "Presentatie" },
+  { id: "general", icon: Settings, label: "Algemeen", title: "Toernooi-instellingen", desc: "Naam, logo, speeldagen, locaties en puntentelling" },
+  { id: "teams", icon: ShirtIcon, label: "Deelnemers", title: "Deelnemerslijst", desc: "Teams, spelers en scheidsrechters beheren" },
+  { id: "phases", icon: BracketTreeIcon, label: "Format", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
+  { id: "schedule", icon: CalendarClockIcon, label: "Schema", title: "Speelschema", desc: "Wedstrijden verdelen over velden en tijdsloten" },
+  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen", desc: "Scores invullen en standen bijwerken" },
+  { id: "statistics", icon: BarChart3, label: "Statistieken", title: "Cijfers & records", desc: "Topschutters, assists en fairplay" },
+  { id: "sponsors", icon: Handshake, label: "Sponsors", title: "Partners", desc: "Logo's van sponsors en partners" },
+  { id: "polls", icon: PollIcon, label: "Polls", title: "Publieksvragen", desc: "Stemmingen voor het publiek" },
+  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
 ] as const;
+
 
 type TabId = typeof sidebarItems[number]["id"];
 
