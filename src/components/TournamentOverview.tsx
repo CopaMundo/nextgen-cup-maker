@@ -314,7 +314,7 @@ const TournamentOverview = ({ tournamentId, tournament, onNavigate }: Tournament
           <CardHead icon={<BracketTreeIcon className="h-4 w-4" />} label="Format" action />
           <p className="font-display text-4xl font-bold text-foreground">{counts.phases}</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {counts.phases === 1 ? "fase" : "fases"} · {counts.formats} {counts.formats === 1 ? "onderdeel" : "onderdelen"}
+            {counts.phases === 1 ? "fase" : "fases"} · {counts.formats} {counts.formats === 1 ? "groep" : "groepen"}
           </p>
         </Card>
 
