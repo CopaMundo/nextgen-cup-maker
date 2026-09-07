@@ -163,12 +163,14 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     setShowImport(true);
   };
 
-  const importFromCategory = async (catRefs: RefereeConfig[]) => {
-    const existing = new Set(referees.map(r => r.name));
-    const toAdd = catRefs.filter(r => !existing.has(r.name));
-    if (toAdd.length > 0) await saveReferees([...referees, ...toAdd]);
-    setShowImport(false);
+  const importReferee = async (ref: RefereeConfig) => {
+    if (referees.some(r => r.name === ref.name)) return;
+    await saveReferees([
+      ...referees,
+      { name: ref.name, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null },
+    ]);
   };
+
 
   // ==== draft helpers ====
   /** Bouw allowedFields op basis van de gekozen modus per locatie. */
