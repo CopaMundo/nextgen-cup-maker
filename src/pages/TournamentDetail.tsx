@@ -74,6 +74,7 @@ const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
