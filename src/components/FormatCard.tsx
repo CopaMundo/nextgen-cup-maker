@@ -17,7 +17,7 @@ import BracketView from "./BracketView";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import ScoringSystemSelector, { MIXED_VALUE } from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
-import { formatTypeIcon } from "./FormatTypeIcon";
+
 
 interface Phase {
   id: string;
@@ -330,11 +330,7 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
           >
             {format.logo_url ? (
               <img src={format.logo_url} alt="" className="row-span-2 h-6 w-6 object-contain flex-shrink-0 rounded sm:row-auto" />
-            ) : (
-              <span className="row-span-2 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary sm:row-auto">
-                {formatTypeIcon(format.phase_type, "h-4 w-4")}
-              </span>
-            )}
+            ) : null}
 
             <span className="w-fit max-w-full truncate rounded bg-secondary px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               {typeLabel}
