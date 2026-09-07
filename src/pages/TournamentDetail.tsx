@@ -211,7 +211,16 @@ const TournamentDetail = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "overview":
+        return (
+          <TournamentOverview
+            tournamentId={id!}
+            tournament={tournament}
+            onNavigate={(tab) => setActiveTab(tab as TabId)}
+          />
+        );
       case "general":
+
         return <TournamentGeneral tournament={tournament} onUpdate={t => setTournament(t)} />;
       case "teams":
         return (
