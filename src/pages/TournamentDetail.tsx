@@ -274,7 +274,7 @@ const TournamentDetail = () => {
       case "teams":
         return (
           <>
-            {categorySelector}
+            {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <>
                 {isMobile ? (
