@@ -143,6 +143,12 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     ...(showFairplayRanking ? [{ id: "fairplay" as StatTab, label: "Fairplayklassement" }] : []),
   ];
 
+  const statSections = [
+    ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters", icon: <MaskIcon src={trophyIconAsset.url} label="Topschutters" /> }] : []),
+    ...(showAssists ? [{ id: "assists" as StatTab, label: "Assists", icon: <MaskIcon src={bootsIconAsset.url} label="Assists" /> }] : []),
+    ...(showFairplayRanking ? [{ id: "fairplay" as StatTab, label: "Fairplayklassement", icon: <MaskIcon src={yellowCardIconAsset.url} label="Fairplay" /> }] : []),
+  ];
+
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
   const isMobile = useIsMobile();
