@@ -478,7 +478,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
 
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {teams.map(team => (
-          <div key={team.id} className={`rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-3 group relative ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
+          <div key={team.id} className={`group relative flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-md ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
             <div className="h-20 w-20 overflow-hidden flex-shrink-0">
               {team.logo_url ? (
                 <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
@@ -486,9 +486,9 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
                 <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
               )}
             </div>
-            <div className="text-center">
-              <span className="text-sm font-medium text-foreground block">{team.name}</span>
-              {showCountry && team.country && <CountryFlag country={team.country} className="h-3.5 w-5 object-contain" />}
+            <div className="w-full min-w-0 text-center">
+              <span className="block truncate text-sm font-medium text-foreground" title={team.name}>{team.name}</span>
+              {showCountry && team.country && <CountryFlag country={team.country} className="mx-auto mt-1 h-3.5 w-5 object-contain" />}
             </div>
             <div className="flex gap-2" onClick={e => e.stopPropagation()}>
               <button onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title={`${singularLabel} bewerken`}>
@@ -500,10 +500,11 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
                 </button>
               )}
             </div>
-            <button onClick={(e) => { e.stopPropagation(); setTeamToDelete(team.id); }} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
+            <button onClick={(e) => { e.stopPropagation(); setTeamToDelete(team.id); }} className="absolute top-2 right-2 rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100" title="Verwijderen">
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
+
         ))}
         {teams.length < 128 && (
           <button

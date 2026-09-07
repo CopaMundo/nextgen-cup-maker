@@ -439,9 +439,10 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          <div className="px-3 sm:px-6 py-3 sm:py-4 w-full flex flex-col">
+          <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
             <div className="flex flex-col">{renderContent()}</div>
           </div>
+
         </div>
       </div>
     </div>

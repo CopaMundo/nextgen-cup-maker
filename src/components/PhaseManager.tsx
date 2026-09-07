@@ -1287,10 +1287,11 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                 <button
                   onClick={() => setActivePhaseNumber(c.phaseNumber)}
                   className={
-                    "pl-6 pr-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative flex items-center gap-2 shrink-0 whitespace-nowrap max-sm:pl-3 max-sm:text-xs " +
+                    "pl-6 pr-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative flex items-center gap-2 shrink-0 whitespace-nowrap rounded-t-md max-sm:pl-3 max-sm:text-xs " +
                     (isActive
                       ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                      : "text-muted-foreground hover:text-foreground")
+                      : "text-muted-foreground hover:bg-accent/40 hover:text-foreground")
+
                   }
                 >
                   <span>
