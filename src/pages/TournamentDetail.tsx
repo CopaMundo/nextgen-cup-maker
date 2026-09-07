@@ -278,30 +278,7 @@ const TournamentDetail = () => {
                     </div>
                   )
                 ) : (
-                <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2 mb-6">
-                  <button
-                    onClick={() => setDeelnemersSubTab("teams")}
-                    className={cn(
-                      "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "teams"
-                        ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                    )}
-                  >
-                    {tournament.teams_label || "Teams"}
-                  </button>
-                  <button
-                    onClick={() => setDeelnemersSubTab("referees")}
-                    className={cn(
-                      "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "referees"
-                        ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                    )}
-                  >
-                    {tournament.referees_label || "Scheidsrechters"}
-                  </button>
-                </div>
+                null
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
