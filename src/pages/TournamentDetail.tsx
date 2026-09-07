@@ -611,9 +611,9 @@ const TournamentDetail = () => {
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
-              <div className="relative mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center gap-4">
+              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center justify-start gap-6">
                 {activeTab === "schedule" ? (
-                  <div className="absolute left-16 xl:left-28 top-1/2 -translate-y-1/2 flex flex-col items-start gap-1 [&>*]:mb-0">
+                  <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
                     {categorySelector}
                     <LocationSelector
                       tournamentId={id!}
@@ -622,29 +622,32 @@ const TournamentDetail = () => {
                       selectClassName="h-6 rounded-md px-1.5 text-[11px] font-medium leading-none"
                     />
                   </div>
-                ) : categorySelector ? (
-                  <div className="absolute left-16 xl:left-28 top-1/2 -translate-y-1/2 [&>*]:mb-0">
+                ) : (
+                  <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
                     {categorySelector}
                   </div>
-                ) : null}
-                {activeTab === "schedule" && tournamentDates.length > 0 && (
-                  <DateStripNav
-                    dates={tournamentDates}
-                    activeDate={plannerDate}
-                    onSelect={handlePlannerDateChange}
-                    maxVisible={3}
-                    centerActive
-                    onInvalidPick={(iso) => {
-                      toast({
-                        title: "Datum buiten toernooiperiode",
-                        description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
-                        variant: "destructive",
-                      });
-                    }}
-                  />
                 )}
+                {activeTab === "schedule" && tournamentDates.length > 0 && (
+                  <div className="flex min-w-0 flex-1 justify-center">
+                    <DateStripNav
+                      dates={tournamentDates}
+                      activeDate={plannerDate}
+                      onSelect={handlePlannerDateChange}
+                      maxVisible={3}
+                      centerActive
+                      onInvalidPick={(iso) => {
+                        toast({
+                          title: "Datum buiten toernooiperiode",
+                          description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
+                          variant: "destructive",
+                        });
+                      }}
+                    />
+                  </div>
+                )}
+                {activeTab !== "schedule" && <div className="flex-1" />}
                 {desktopSegments && (
-                  <div className="flex shrink-0 items-center gap-1 border-b border-border">
+                  <div className="ml-auto flex shrink-0 items-center gap-1 border-b border-border">
                     {desktopSegments.items.map((seg) => {
                       const active = desktopSegments.active === seg.id;
                       return (
