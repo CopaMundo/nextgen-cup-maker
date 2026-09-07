@@ -425,6 +425,7 @@ const PresentationManager = ({
           </DialogContent>
         </Dialog>
       </div>
+      </div>
     </>
   );
 };
