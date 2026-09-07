@@ -658,30 +658,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </h2>
             </div>
           )
-        ) : (
-          <div className="flex justify-center border-b border-border flex-wrap gap-1">
-            {([
-              { id: "info", label: "Toernooi informatie" },
-              { id: "wedstrijddagen", label: "Wedstrijddagen" },
-              { id: "locaties", label: "Locaties" },
-              { id: "divisies", label: "Divisies" },
-              { id: "puntentelling", label: "Puntensysteem" },
-            ] as const).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setGeneralSubTab(tab.id)}
-                className={cn(
-                  "rounded-t-md px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                  generalSubTab === tab.id
-                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
         )}
 
         {generalSubTab === "info" && (
