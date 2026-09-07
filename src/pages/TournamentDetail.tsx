@@ -376,47 +376,83 @@ const TournamentDetail = () => {
           </div>
         </div>
       )}
-      {/* Desktop: top tab bar */}
+      {/* Desktop: grouped workspace bar */}
       {!isMobile && (
         <TooltipProvider delayDuration={300}>
           <nav
             aria-label="Toernooibeheer"
             className="shrink-0 border-b border-border bg-card print:hidden"
           >
-            <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-0.5 px-3 xl:px-6">
-              {tournament.logo_url && (
-                <div className="flex shrink-0 items-center pr-3">
-                  <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
-                </div>
-              )}
-              {sidebarItems.map((item) => {
-                const active = activeTab === item.id;
-                return (
-                  <Tooltip key={item.id}>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab(item.id)}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "relative flex min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 px-1.5 py-3 text-[13px] font-semibold transition-colors",
-                          active
-                            ? "text-primary after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-[3px] after:rounded-full after:bg-primary"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        <item.icon className="h-[18px] w-[18px] shrink-0" />
-                        <span className="truncate">{item.label}</span>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
-                  </Tooltip>
-                );
-              })}
+            <div className="mx-auto flex w-full max-w-[1600px] items-center gap-3 px-3 py-2 xl:px-6">
+              <button
+                type="button"
+                onClick={() => setActiveTab("overview")}
+                aria-current={activeTab === "overview" ? "page" : undefined}
+                className={cn(
+                  "flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold transition-colors",
+                  activeTab === "overview"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                )}
+              >
+                <LayoutGrid className="h-4 w-4 shrink-0" />
+                <span>Overzicht</span>
+              </button>
+
+              <div className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden">
+                {desktopNavGroups.map((group, gi) => (
+                  <div key={group.label} className="flex min-w-0 items-center gap-3">
+                    {gi > 0 && <span className="h-8 w-px shrink-0 bg-border" />}
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70">
+                        {group.label}
+                      </span>
+                      <div className="flex min-w-0 items-center gap-0.5">
+                        {group.items.map((itemId) => {
+                          const item = sidebarItems.find((i) => i.id === itemId)!;
+                          const active = activeTab === item.id;
+                          return (
+                            <Tooltip key={item.id}>
+                              <TooltipTrigger asChild>
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveTab(item.id)}
+                                  aria-current={active ? "page" : undefined}
+                                  className={cn(
+                                    "flex min-w-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold transition-colors",
+                                    active
+                                      ? "bg-primary/10 text-primary"
+                                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                                  )}
+                                >
+                                  <item.icon className="h-4 w-4 shrink-0" />
+                                  <span className="truncate">{item.label}</span>
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
+                            </Tooltip>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex min-w-0 shrink-0 items-center gap-2 pl-2">
+                <span className="max-w-[220px] truncate text-sm font-bold text-foreground" title={tournament.name}>
+                  {tournament.name}
+                </span>
+                {tournament.logo_url && (
+                  <img src={tournament.logo_url} alt="" className="h-7 w-7 shrink-0 object-contain" />
+                )}
+              </div>
             </div>
           </nav>
         </TooltipProvider>
       )}
+
+
 
 
       <div className="relative flex flex-1 overflow-hidden min-h-0">
