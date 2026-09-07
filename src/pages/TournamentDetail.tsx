@@ -111,6 +111,19 @@ const TournamentDetail = () => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem(mobileSidebarStorageKey) === "true";
   });
+  const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("admin-desktop-nav-collapsed") === "true";
+  });
+
+  const toggleDesktopNav = () => {
+    setDesktopNavCollapsed((collapsed) => {
+      const next = !collapsed;
+      sessionStorage.setItem("admin-desktop-nav-collapsed", String(next));
+      return next;
+    });
+  };
+
 
   const toggleMobileSidebar = () => {
     setMobileSidebarCollapsed((collapsed) => {
@@ -278,30 +291,7 @@ const TournamentDetail = () => {
                     </div>
                   )
                 ) : (
-                <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2 mb-6">
-                  <button
-                    onClick={() => setDeelnemersSubTab("teams")}
-                    className={cn(
-                      "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "teams"
-                        ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                    )}
-                  >
-                    {tournament.teams_label || "Teams"}
-                  </button>
-                  <button
-                    onClick={() => setDeelnemersSubTab("referees")}
-                    className={cn(
-                      "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "referees"
-                        ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                    )}
-                  >
-                    {tournament.referees_label || "Scheidsrechters"}
-                  </button>
-                </div>
+                null
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -359,7 +349,7 @@ const TournamentDetail = () => {
       case "results":
         return (
           <>
-            {subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
+            {isMobile && subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
@@ -373,7 +363,7 @@ const TournamentDetail = () => {
       case "presentation":
         return (
           <>
-            {subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
+            {isMobile && subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
             {presentationSubTab === "presentation" && (
               <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />
             )}
@@ -386,6 +376,24 @@ const TournamentDetail = () => {
         return null;
     }
   };
+
+  const activeItem = sidebarItems.find((item) => item.id === activeTab);
+
+  const desktopSegments: { items: readonly { id: string; label: string; icon: any }[]; active: string; onSelect: (id: any) => void } | null =
+    activeTab === "teams"
+      ? {
+          items: [
+            { id: "teams", label: tournament.teams_label || "Teams", icon: Users },
+            { id: "referees", label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
+          ],
+          active: deelnemersSubTab,
+          onSelect: setDeelnemersSubTab,
+        }
+      : activeTab === "results"
+      ? { items: resultsSubTabs, active: resultsSubTab, onSelect: setResultsSubTab }
+      : activeTab === "presentation"
+      ? { items: presentationSubTabs, active: presentationSubTab, onSelect: setPresentationSubTab }
+      : null;
 
   return (
     <div
@@ -421,53 +429,84 @@ const TournamentDetail = () => {
           </div>
         </div>
       )}
-      {/* Desktop: top tab bar */}
-      {!isMobile && (
-        <TooltipProvider delayDuration={300}>
-          <nav
-            aria-label="Toernooibeheer"
-            className="shrink-0 py-2 print:hidden"
-          >
-            <div className="mx-auto flex w-fit max-w-[1600px] items-stretch justify-center gap-1 rounded-xl border border-border bg-card/80 px-4 py-1 shadow-sm backdrop-blur-sm">
-              {tournament.logo_url && (
-                <div className="flex shrink-0 items-center pr-4">
-                  <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
-                </div>
-              )}
-              {sidebarItems.map((item) => {
-                const active = activeTab === item.id;
-                return (
-                  <Tooltip key={item.id}>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab(item.id)}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "group relative flex shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-colors",
-                          active
-                            ? "text-primary"
-                            : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                        )}
-                      >
-                        <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
-                        <span className="truncate">{item.label}</span>
-                        {active && (
-                          <span className="absolute bottom-1 left-3 right-3 h-[3px] rounded-full bg-primary" />
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
-                  </Tooltip>
-                );
-              })}
-            </div>
-          </nav>
-        </TooltipProvider>
-      )}
-
-
       <div className="relative flex flex-1 overflow-hidden min-h-0">
+        {/* Desktop: left navigation column */}
+        {!isMobile && (
+          <TooltipProvider delayDuration={300}>
+            <nav
+              aria-label="Toernooibeheer"
+              className={cn(
+                "shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
+                desktopNavCollapsed ? "w-[68px]" : "w-60"
+              )}
+            >
+              <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-3">
+                {tournament.logo_url ? (
+                  <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+                ) : (
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-sm font-bold text-primary">
+                    {tournament.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
+                {!desktopNavCollapsed && (
+                  <span className="min-w-0 flex-1 truncate font-display text-sm font-bold uppercase tracking-wide text-foreground" title={tournament.name}>
+                    {tournament.name}
+                  </span>
+                )}
+              </div>
+
+              <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
+                {sidebarItems.map((item) => {
+                  const active = activeTab === item.id;
+                  return (
+                    <Tooltip key={item.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab(item.id)}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "group relative flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-semibold transition-colors",
+                            desktopNavCollapsed && "justify-center px-0",
+                            active
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                          )}
+                        >
+                          {active && !desktopNavCollapsed && (
+                            <span className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-primary" />
+                          )}
+                          <item.icon className="h-[18px] w-[18px] shrink-0" />
+                          {!desktopNavCollapsed && <span className="truncate">{item.label}</span>}
+                        </button>
+                      </TooltipTrigger>
+                      {desktopNavCollapsed && (
+                        <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
+                      )}
+                    </Tooltip>
+                  );
+                })}
+              </div>
+
+              <div className="shrink-0 border-t border-border p-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={toggleDesktopNav}
+                  className={cn(
+                    "w-full justify-start gap-3 px-2.5 text-xs font-semibold text-muted-foreground",
+                    desktopNavCollapsed && "justify-center px-0"
+                  )}
+                  aria-label={desktopNavCollapsed ? "Menu openen" : "Menu inklappen"}
+                >
+                  {desktopNavCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+                  {!desktopNavCollapsed && <span>Inklappen</span>}
+                </Button>
+              </div>
+            </nav>
+          </TooltipProvider>
+        )}
+
         {/* Mobile: left icon sidebar */}
         {isMobile && (
           <TooltipProvider delayDuration={200}>
@@ -515,11 +554,44 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          <div className="px-3 sm:px-8 lg:px-10 py-4 sm:py-6 lg:py-8 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
+          {!isMobile && (
+            <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
+              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center gap-4">
+                <div className="min-w-0">
+                  <h1 className="truncate font-display text-base font-bold uppercase tracking-wide text-foreground">
+                    {activeItem?.title}
+                  </h1>
+                  <p className="truncate text-xs text-muted-foreground">{activeItem?.desc}</p>
+                </div>
+                {desktopSegments && (
+                  <div className="ml-auto flex shrink-0 items-center gap-1 rounded-lg border border-border bg-card p-1">
+                    {desktopSegments.items.map((seg) => {
+                      const active = desktopSegments.active === seg.id;
+                      return (
+                        <button
+                          key={seg.id}
+                          type="button"
+                          onClick={() => desktopSegments.onSelect(seg.id)}
+                          className={cn(
+                            "flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors",
+                            active
+                              ? "bg-primary text-primary-foreground shadow-sm"
+                              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                          )}
+                        >
+                          <seg.icon className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{seg.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </header>
+          )}
+          <div className="px-3 sm:px-6 lg:px-8 py-4 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
             <div className="flex flex-col gap-4">{renderContent()}</div>
           </div>
-
-
         </div>
 
       </div>
