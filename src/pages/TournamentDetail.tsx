@@ -370,7 +370,7 @@ const TournamentDetail = () => {
         return (
           <>
             {isMobile && subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
-            {categorySelector}
+            {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
                 <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
