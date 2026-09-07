@@ -163,20 +163,17 @@ const TournamentOverview = ({ tournamentId, tournament, onNavigate }: Tournament
 
       setCounts({
         teams: teamsRes.data?.length ?? 0,
-        referees: refsRes.data?.length ?? 0,
+        referees: refereeList.length,
         phases: phasesRes.data?.length ?? 0,
-        formats: formatsRes.data?.length ?? 0,
+        formats: groupsRes.data?.length ?? 0,
         matches: matches.length,
         played: matches.filter((m) => m.is_played).length,
         sponsors: sponsorsRes.data?.length ?? 0,
         polls: pollsRes.data?.length ?? 0,
       });
       setUpcoming(next);
-      setLocations(
-        Array.from(
-          new Set(((fieldsRes.data ?? []) as any[]).map((f) => f.location).filter(Boolean))
-        ) as string[]
-      );
+      setLocations(((locRes.data ?? []) as any[]).map((l) => l.name).filter(Boolean) as string[]);
+
       setLoading(false);
     };
 
