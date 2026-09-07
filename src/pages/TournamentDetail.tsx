@@ -610,7 +610,7 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
-            <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
+            <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 pl-3 pr-6 backdrop-blur lg:pl-4 lg:pr-8 print:hidden">
               <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center gap-6">
                 <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
                   {categorySelector}
