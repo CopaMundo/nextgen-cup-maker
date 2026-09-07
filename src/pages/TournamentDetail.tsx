@@ -331,27 +331,29 @@ const TournamentDetail = () => {
       case "results":
         return (
           <>
+            {subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              resultsSubTab === "results" ? (
+                <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              ) : (
+                <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              )
             )}
           </>
         );
-      case "statistics":
+      case "presentation":
         return (
           <>
-            {categorySelector}
-            {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+            {subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
+            {presentationSubTab === "presentation" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />
             )}
+            {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id!} />}
+            {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
           </>
         );
-      case "sponsors":
-        return <SponsorManager tournamentId={id!} />;
-      case "polls":
-        return <PollManager tournamentId={id!} tournament={tournament} />;
-      case "presentation":
-        return <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />;
+
       default:
         return null;
     }
