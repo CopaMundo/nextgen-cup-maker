@@ -32,16 +32,17 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const sidebarItems = [
 
-  { id: "general", icon: Settings, label: "Algemeen" },
-  { id: "teams", icon: ShirtIcon, label: "Deelnemers" },
-  { id: "phases", icon: BracketTreeIcon, label: "Format" },
-  { id: "schedule", icon: CalendarClockIcon, label: "Schema" },
-  { id: "results", icon: ScoreboardIcon, label: "Resultaten" },
-  { id: "statistics", icon: BarChart3, label: "Statistieken" },
-  { id: "sponsors", icon: Handshake, label: "Sponsors" },
-  { id: "polls", icon: PollIcon, label: "Polls" },
-  { id: "presentation", icon: Tv2, label: "Presentatie" },
+  { id: "general", icon: Settings, label: "Algemeen", title: "Toernooi-instellingen", desc: "Naam, logo, speeldagen, locaties en puntentelling" },
+  { id: "teams", icon: ShirtIcon, label: "Deelnemers", title: "Deelnemerslijst", desc: "Teams, spelers en scheidsrechters beheren" },
+  { id: "phases", icon: BracketTreeIcon, label: "Format", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
+  { id: "schedule", icon: CalendarClockIcon, label: "Schema", title: "Speelschema", desc: "Wedstrijden verdelen over velden en tijdsloten" },
+  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen", desc: "Scores invullen en standen bijwerken" },
+  { id: "statistics", icon: BarChart3, label: "Statistieken", title: "Cijfers & records", desc: "Topschutters, assists en fairplay" },
+  { id: "sponsors", icon: Handshake, label: "Sponsors", title: "Partners", desc: "Logo's van sponsors en partners" },
+  { id: "polls", icon: PollIcon, label: "Polls", title: "Publieksvragen", desc: "Stemmingen voor het publiek" },
+  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
 ] as const;
+
 
 type TabId = typeof sidebarItems[number]["id"];
 
@@ -381,39 +382,46 @@ const TournamentDetail = () => {
       )}
       {/* Desktop: top tab bar */}
       {!isMobile && (
-        <nav
-          aria-label="Toernooibeheer"
-          className="shrink-0 border-b border-border bg-card print:hidden"
-        >
-          <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-1 overflow-x-auto px-8 scrollbar-none">
-            {tournament.logo_url && (
-              <div className="flex shrink-0 items-center pr-4">
-                <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
-              </div>
-            )}
-            {sidebarItems.map((item) => {
-              const active = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActiveTab(item.id)}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "relative flex shrink-0 items-center gap-2 px-4 py-3 text-sm font-semibold transition-colors",
-                    active
-                      ? "text-primary after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[3px] after:rounded-full after:bg-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <item.icon className="h-[18px] w-[18px] shrink-0" />
-                  <span className="whitespace-nowrap">{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </nav>
+        <TooltipProvider delayDuration={300}>
+          <nav
+            aria-label="Toernooibeheer"
+            className="shrink-0 border-b border-border bg-card print:hidden"
+          >
+            <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-0.5 px-3 xl:px-6">
+              {tournament.logo_url && (
+                <div className="flex shrink-0 items-center pr-3">
+                  <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
+                </div>
+              )}
+              {sidebarItems.map((item) => {
+                const active = activeTab === item.id;
+                return (
+                  <Tooltip key={item.id}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab(item.id)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "relative flex min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 px-1.5 py-3 text-[13px] font-semibold transition-colors",
+                          active
+                            ? "text-primary after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-[3px] after:rounded-full after:bg-primary"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <item.icon className="h-[18px] w-[18px] shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </nav>
+        </TooltipProvider>
       )}
+
 
       <div className="relative flex flex-1 overflow-hidden min-h-0">
         {/* Mobile: left icon sidebar */}
@@ -464,8 +472,29 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
+            {!isMobile && (
+              <header className="mb-5 flex items-end justify-between gap-4 border-b border-border/60 pb-4">
+                <div className="min-w-0">
+                  <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
+                    {sidebarItems.find((i) => i.id === activeTab)?.title}
+                  </h1>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {sidebarItems.find((i) => i.id === activeTab)?.desc}
+                  </p>
+                </div>
+                <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                  {tournament.logo_url && (
+                    <img src={tournament.logo_url} alt="" className="h-8 w-8 object-contain" />
+                  )}
+                  <span className="max-w-[280px] truncate text-sm font-bold text-foreground" title={tournament.name}>
+                    {tournament.name}
+                  </span>
+                </div>
+              </header>
+            )}
             <div className="flex flex-col">{renderContent()}</div>
           </div>
+
 
         </div>
 
