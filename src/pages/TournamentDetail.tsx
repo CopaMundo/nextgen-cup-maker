@@ -24,6 +24,7 @@ import LocationSelector from "@/components/LocationSelector";
 import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -202,11 +203,20 @@ const TournamentDetail = () => {
         return <TournamentGeneral tournament={tournament} onUpdate={t => setTournament(t)} />;
       case "teams":
         return (
-          <>
+          <TabSectionLayout
+            title="Deelnemers"
+            icon={<Users className="h-5 w-5" />}
+            sections={[
+              { id: "teams", label: tournament.teams_label || "Teams", icon: <ShirtIcon className="h-4 w-4" /> },
+              { id: "referees", label: tournament.referees_label || "Scheidsrechters", icon: <GiWhistle className="h-4 w-4" /> },
+            ]}
+            activeSection={deelnemersSubTab}
+            onSectionChange={(id) => setDeelnemersSubTab(id as typeof deelnemersSubTab)}
+          >
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <>
-                {isMobile ? (
+                {isMobile && (
                   mobileDeelnemersOverview ? (
                     <div className="grid grid-cols-1 gap-2">
                       {([
@@ -239,30 +249,6 @@ const TournamentDetail = () => {
                       </h2>
                     </div>
                   )
-                ) : (
-                <div className="flex justify-center border-b border-border mb-6">                  <button
-                    onClick={() => setDeelnemersSubTab("teams")}
-                    className={cn(
-                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "teams"
-                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {tournament.teams_label || "Teams"}
-                  </button>
-                  <button
-                    onClick={() => setDeelnemersSubTab("referees")}
-                    className={cn(
-                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "referees"
-                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {tournament.referees_label || "Scheidsrechters"}
-                  </button>
-                </div>
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -272,7 +258,7 @@ const TournamentDetail = () => {
                 )}
               </>
             )}
-          </>
+          </TabSectionLayout>
         );
       case "phases":
         return (
@@ -473,23 +459,10 @@ const TournamentDetail = () => {
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
             {!isMobile && (
-              <header className="mb-5 flex items-end justify-between gap-4 border-b border-border/60 pb-4">
-                <div className="min-w-0">
-                  <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
-                    {sidebarItems.find((i) => i.id === activeTab)?.title}
-                  </h1>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {sidebarItems.find((i) => i.id === activeTab)?.desc}
-                  </p>
-                </div>
-                <div className="hidden shrink-0 items-center gap-2 lg:flex">
-                  {tournament.logo_url && (
-                    <img src={tournament.logo_url} alt="" className="h-8 w-8 object-contain" />
-                  )}
-                  <span className="max-w-[280px] truncate text-sm font-bold text-foreground" title={tournament.name}>
-                    {tournament.name}
-                  </span>
-                </div>
+              <header className="mb-6 flex items-center justify-between gap-4 border-b border-border/60 pb-4">
+                <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
+                  {sidebarItems.find((i) => i.id === activeTab)?.title}
+                </h1>
               </header>
             )}
             <div className="flex flex-col">{renderContent()}</div>

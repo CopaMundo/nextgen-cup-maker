@@ -24,12 +24,14 @@ import {
   HelpCircle,
   ChevronRight,
   ArrowLeft,
+  Tv2,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
 import slideshowIconAsset from "@/assets/television.png.asset.json";
 import stylingIconAsset from "@/assets/paint_2.png.asset.json";
@@ -153,10 +155,22 @@ const PresentationManager = ({
     { id: "visualization", label: "Vormgeving", icon: <MaskIcon src={stylingIconAsset.url} label="Vormgeving" className="h-5 w-5" /> },
   ];
 
+  const presentationSections = [
+    { id: "website" as const, label: "Website", icon: <MaskIcon src={websiteIconAsset.url} label="Website" className="h-4 w-4" /> },
+    { id: "slideshow" as const, label: "Dialoogvoorstelling", icon: <MaskIcon src={slideshowIconAsset.url} label="Dialoogvoorstelling" className="h-4 w-4" /> },
+    { id: "visualization" as const, label: "Vormgeving", icon: <MaskIcon src={stylingIconAsset.url} label="Vormgeving" className="h-4 w-4" /> },
+  ];
+
   const activeLabel = tabs.find(t => t.id === subTab)?.label ?? "";
 
   return (
-    <>
+    <TabSectionLayout
+      title="Presentatie"
+      icon={<Tv2 className="h-5 w-5" />}
+      sections={presentationSections}
+      activeSection={subTab}
+      onSectionChange={(id) => setSubTab(id as SubTab)}
+    >
       {isMobile && mobileOverview && (
         <div className="grid grid-cols-1 gap-2 mb-4">
           {tabs.map(t => (
@@ -195,25 +209,6 @@ const PresentationManager = ({
           <h2 className="min-w-0 flex-1 truncate text-base font-semibold">
             {subTab === "slideshow" && !mobileSlideshowOverview ? mobileSlideshowTitle : activeLabel}
           </h2>
-        </div>
-      )}
-
-      {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap mb-6">
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setSubTab(t.id)}
-              className={cn(
-                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                subTab === t.id
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
         </div>
       )}
 
@@ -432,7 +427,7 @@ const PresentationManager = ({
           </DialogContent>
         </Dialog>
       </div>
-    </>
+    </TabSectionLayout>
   );
 };
 

@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, BarChart3 } from "lucide-react";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
 import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
 import yellowCardIconAsset from "@/assets/yellow-card_1.png.asset.json";
@@ -140,6 +141,12 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
     ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
     ...(showAssists ? [{ id: "assists" as StatTab, label: "Assists" }] : []),
     ...(showFairplayRanking ? [{ id: "fairplay" as StatTab, label: "Fairplayklassement" }] : []),
+  ];
+
+  const statSections = [
+    ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters", icon: <MaskIcon src={trophyIconAsset.url} label="Topschutters" /> }] : []),
+    ...(showAssists ? [{ id: "assists" as StatTab, label: "Assists", icon: <MaskIcon src={bootsIconAsset.url} label="Assists" /> }] : []),
+    ...(showFairplayRanking ? [{ id: "fairplay" as StatTab, label: "Fairplayklassement", icon: <MaskIcon src={yellowCardIconAsset.url} label="Fairplay" /> }] : []),
   ];
 
 
@@ -408,6 +415,13 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   const activeLabel = tabs.find(t => t.id === activeTab)?.label || "";
 
   return (
+    <TabSectionLayout
+      title="Statistieken"
+      icon={<BarChart3 className="h-5 w-5" />}
+      sections={statSections}
+      activeSection={activeTab}
+      onSectionChange={(id) => setActiveTab(id as StatTab)}
+    >
     <div className="space-y-6 w-full">
       {/* Mobiel: statistieken als tegels */}
       {isMobile && mobileOverview && (
@@ -443,25 +457,6 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
         </div>
       )}
 
-      {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                activeTab === tab.id
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {!(isMobile && mobileOverview) && (
         <div className="min-w-0">
           {activeTab === "scorers" && showGoals && (isMobile ? renderMobilePlayerStandings(goals, "Goals") : renderPlayerTable(goals, "Doelpunten"))}
@@ -470,6 +465,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
         </div>
       )}
     </div>
+    </TabSectionLayout>
   );
 
 };

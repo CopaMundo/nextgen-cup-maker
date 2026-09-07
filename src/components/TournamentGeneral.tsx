@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy, Settings } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -21,6 +21,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getFairplayConfig, FAIRPLAY_DEFAULTS } from "@/lib/fairplay";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
@@ -592,10 +593,25 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     return formatIsoDateForLocale(date, "nl-BE", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   };
 
+  const generalSections = [
+    { id: "info", label: "Toernooi informatie", icon: <Info className="h-4 w-4" /> },
+    { id: "wedstrijddagen", label: "Wedstrijddagen", icon: <CalendarDays className="h-4 w-4" /> },
+    { id: "locaties", label: "Locaties", icon: <MapPin className="h-4 w-4" /> },
+    { id: "divisies", label: "Divisies", icon: <LayoutGrid className="h-4 w-4" /> },
+    { id: "puntentelling", label: "Puntensysteem", icon: <Trophy className="h-4 w-4" /> },
+  ];
+
   return (
     <>
+      <TabSectionLayout
+        title="Algemeen"
+        icon={<Settings className="h-5 w-5" />}
+        sections={generalSections}
+        activeSection={generalSubTab}
+        onSectionChange={(id) => setGeneralSubTab(id as typeof generalSubTab)}
+      >
       <div className="space-y-6 w-full">
-        {isMobile ? (
+        {isMobile && (
           generalSubTab === "overview" ? (
             <div className="grid grid-cols-1 gap-2">
               {([
@@ -642,30 +658,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </h2>
             </div>
           )
-        ) : (
-          <div className="flex justify-center border-b border-border flex-wrap gap-1">
-            {([
-              { id: "info", label: "Toernooi informatie" },
-              { id: "wedstrijddagen", label: "Wedstrijddagen" },
-              { id: "locaties", label: "Locaties" },
-              { id: "divisies", label: "Divisies" },
-              { id: "puntentelling", label: "Puntensysteem" },
-            ] as const).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setGeneralSubTab(tab.id)}
-                className={cn(
-                  "rounded-t-md px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                  generalSubTab === tab.id
-                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
         )}
 
         {generalSubTab === "info" && (
@@ -1214,6 +1206,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
         )}
       </div>
+      </TabSectionLayout>
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
         <DialogContent ref={addLocationDialogRef} className="max-w-sm">
