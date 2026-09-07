@@ -234,13 +234,18 @@ export const DateStripNav = ({
   activeDate,
   onSelect,
   onInvalidPick,
+  maxVisible,
+  centerActive = false,
 }: {
   dates: string[];
   activeDate: string;
   onSelect: (iso: string) => void;
   onInvalidPick: (iso: string) => void;
+  maxVisible?: number;
+  centerActive?: boolean;
 }) => {
-  const windowSize = useResponsiveWindowSize();
+  const responsiveSize = useResponsiveWindowSize();
+  const windowSize = maxVisible ? Math.min(maxVisible, responsiveSize) : responsiveSize;
   const [windowStart, setWindowStart] = useState(0);
 
   // Keep the active date visible — only when the active date itself changes,
@@ -249,12 +254,17 @@ export const DateStripNav = ({
     const idx = dates.indexOf(activeDate);
     if (idx === -1) return;
     setWindowStart((current) => {
+      if (centerActive) {
+        const maxStart = Math.max(0, dates.length - windowSize);
+        const centered = idx - Math.floor((windowSize - 1) / 2);
+        return Math.min(maxStart, Math.max(0, centered));
+      }
       if (idx < current) return idx;
       if (idx >= current + windowSize) return Math.max(0, idx - windowSize + 1);
       return current;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDate, windowSize]);
+  }, [activeDate, windowSize, centerActive]);
 
   const maxStart = Math.max(0, dates.length - windowSize);
   const safeStart = Math.min(windowStart, maxStart);
