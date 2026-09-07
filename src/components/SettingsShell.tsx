@@ -4,7 +4,9 @@ import { cn } from "@/lib/utils";
 export interface SettingsShellItem {
   id: string;
   label: string;
-  icon: ComponentType<{ className?: string }>;
+  icon?: ComponentType<{ className?: string }>;
+  /** Alternative to `icon` when the icon is already an element. */
+  iconNode?: ReactNode;
 }
 
 interface SettingsNavProps {
@@ -52,7 +54,7 @@ export const SettingsNav = ({
                 : "border-transparent text-muted-foreground hover:bg-accent/40 hover:text-foreground"
             )}
           >
-            <ItemIcon className="h-[18px] w-[18px] shrink-0" />
+            {ItemIcon ? <ItemIcon className="h-[18px] w-[18px] shrink-0" /> : item.iconNode}
             <span className="min-w-0 flex-1 truncate">{item.label}</span>
           </button>
         );

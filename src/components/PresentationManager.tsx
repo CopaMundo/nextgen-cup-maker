@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Tv2, MonitorPlay, Palette } from "lucide-react";
+import SettingsNav from "@/components/SettingsShell";
 import { supabase } from "@/integrations/supabase/client";
 import { BROADCAST_STYLES, SELECTABLE_BROADCAST_STYLES, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import { Button } from "@/components/ui/button";
@@ -198,26 +200,23 @@ const PresentationManager = ({
         </div>
       )}
 
+      <div className={cn(isMobile ? "" : "flex w-full items-start gap-6")}>
       {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2 mb-6">
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setSubTab(t.id)}
-              className={cn(
-                "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                subTab === t.id
-                  ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                  : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <SettingsNav
+          title="Presentatie"
+          description="Publieke weergave van je toernooi."
+          icon={Tv2}
+          items={tabs.map(t => ({
+            id: t.id,
+            label: t.label,
+            icon: t.id === "website" ? Globe : t.id === "slideshow" ? MonitorPlay : Palette,
+          }))}
+          activeId={subTab}
+          onSelect={(id) => setSubTab(id as SubTab)}
+        />
       )}
 
-      <div className={cn("space-y-6 max-w-4xl", isMobile && mobileOverview && "hidden")}>
+      <div className={cn("space-y-6", isMobile ? "" : "min-w-0 flex-1", isMobile && mobileOverview && "hidden")}>
 
         {subTab === "website" && (
           <>
@@ -431,6 +430,7 @@ const PresentationManager = ({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      </div>
       </div>
     </>
   );

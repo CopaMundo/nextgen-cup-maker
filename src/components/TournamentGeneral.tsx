@@ -666,7 +666,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         {generalSubTab === "info" && (
 
         <div className="section-card space-y-6">
-          <h2 className="section-title">Toernooi informatie</h2>
+          <SectionHeader icon={Info} title="Toernooi informatie" description="Naam, sport, logo en omslagfoto van je toernooi." />
 
           <div className="space-y-2">
             <Label className="form-label">Toernooinaam</Label>
@@ -892,8 +892,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
         {generalSubTab === "wedstrijddagen" && (
           <div className="section-card space-y-5">
-            <h2 className="section-title">Wedstrijddagen</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde.</p>
+            <SectionHeader
+              icon={CalendarDays}
+              title="Wedstrijddagen"
+              description="Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde."
+            />
 
             {(form.match_days || []).length > 0 && (
               <div className="space-y-1">
@@ -969,7 +972,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
         {generalSubTab === "locaties" && (
           <div className="section-card space-y-5">
-            <h2 className="section-title">Locaties</h2>
+            <SectionHeader
+              icon={MapPin}
+              title="Locaties"
+              description="Bepaal waar er gespeeld wordt. De volgorde bepaal je door te slepen."
+            />
             {!form.is_esport && (
               <>
                 {locations.length > 0 && (
@@ -1003,6 +1010,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             )}
 
             <TooltipProvider>
+              <div className="border-t border-border pt-4" />
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm font-medium text-foreground">Dit is een online (eSport) toernooi</p>
                 <Switch
@@ -1037,10 +1045,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
         {generalSubTab === "divisies" && (
           <div className="section-card space-y-5">
-            <h2 className="section-title">Divisies</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Verdeel je toernooi in divisies op basis van leeftijd of niveau. Elke divisie krijgt een eigen deelnemerslijst, indeling en schema.
-            </p>
+            <SectionHeader
+              icon={LayoutGrid}
+              title="Divisies"
+              description="Verdeel je toernooi in divisies op basis van leeftijd of niveau. Elke divisie krijgt een eigen deelnemerslijst, indeling en schema."
+            />
 
             {categories.length > 0 && (
               <DndContext
@@ -1076,20 +1085,20 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         {generalSubTab === "puntentelling" && (
           <div className="space-y-6">
             <div className="section-card space-y-5">
-              <div className="space-y-2">
-                <h2 className="section-title">Puntentelling</h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.</p>
-              </div>
+              <SectionHeader
+                icon={Trophy}
+                title="Puntentelling"
+                description="Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen."
+              />
               <ScoringSystemsManager tournamentId={tournament.id} tournament={tournament} onUpdate={onUpdate} />
             </div>
 
             <div className="section-card space-y-5">
-              <div className="space-y-2">
-                <h3 className="section-title">Spelersstatistieken</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl">
-                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
-                </p>
-              </div>
+              <SectionHeader
+                icon={Info}
+                title="Spelersstatistieken"
+                description="Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt."
+              />
               <div className="grid gap-3 lg:grid-cols-2">
                 {[
                   { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers" },
