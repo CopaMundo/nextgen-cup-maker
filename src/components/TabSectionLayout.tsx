@@ -1,16 +1,15 @@
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import type { LucideIcon } from "lucide-react";
 
 interface Section {
   id: string;
   label: string;
-  icon?: LucideIcon;
+  icon?: React.ReactNode;
 }
 
 interface TabSectionLayoutProps {
   title: string;
-  icon?: LucideIcon;
+  icon?: React.ReactNode;
   sections: Section[];
   activeSection: string;
   onSectionChange: (id: string) => void;
@@ -20,7 +19,7 @@ interface TabSectionLayoutProps {
 
 export function TabSectionLayout({
   title,
-  icon: Icon,
+  icon,
   sections,
   activeSection,
   onSectionChange,
@@ -38,12 +37,11 @@ export function TabSectionLayout({
       {/* Sub-navigation sidebar */}
       <aside className="sticky top-0 hidden h-fit w-56 shrink-0 flex-col gap-1 lg:flex">
         <div className="mb-3 flex items-center gap-2 border-b border-border pb-3">
-          {Icon && <Icon className="h-5 w-5 text-primary" />}
+          {icon && <span className="text-primary">{icon}</span>}
           <h2 className="font-display text-lg font-bold text-foreground">{title}</h2>
         </div>
         <nav aria-label={title} className="flex flex-col gap-1">
           {sections.map((section) => {
-            const SectionIcon = section.icon;
             const active = activeSection === section.id;
             return (
               <button
@@ -57,7 +55,7 @@ export function TabSectionLayout({
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >
-                {SectionIcon && <SectionIcon className="h-4 w-4 shrink-0" />}
+                {section.icon && <span className="shrink-0">{section.icon}</span>}
                 <span className="truncate">{section.label}</span>
               </button>
             );
