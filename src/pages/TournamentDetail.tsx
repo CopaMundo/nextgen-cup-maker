@@ -201,74 +201,76 @@ const TournamentDetail = () => {
       case "general":
         return <TournamentGeneral tournament={tournament} onUpdate={t => setTournament(t)} />;
       case "teams":
+        if (!isMobile) {
+          const teamsLabel = tournament.teams_label || "Teams";
+          const refsLabel = tournament.referees_label || "Scheidsrechters";
+          return (
+            <div className="flex w-full items-start gap-6">
+              <SettingsNav
+                title="Deelnemers"
+                description="Beheer wie er meedoet aan je toernooi."
+                icon={ShirtIcon}
+                items={[
+                  { id: "teams", label: teamsLabel, icon: Users },
+                  { id: "referees", label: refsLabel, icon: GiWhistle },
+                ]}
+                activeId={deelnemersSubTab}
+                onSelect={(id) => setDeelnemersSubTab(id as "teams" | "referees")}
+              />
+              <div className="min-w-0 flex-1 space-y-4">
+                {categorySelector}
+                {(!tournament.is_multi_category || effectiveCategoryId) && (
+                  deelnemersSubTab === "teams" ? (
+                    <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={teamsLabel} onDetailOpenChange={setTeamDetailOpen} />
+                  ) : (
+                    <RefereeManager tournamentId={id!} categoryId={effectiveCategoryId} />
+                  )
+                )}
+              </div>
+            </div>
+          );
+        }
         return (
           <>
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <>
-                {isMobile ? (
-                  mobileDeelnemersOverview ? (
-                    <div className="grid grid-cols-1 gap-2">
-                      {([
-                        { id: "teams" as const, label: tournament.teams_label || "Teams", icon: Users },
-                        { id: "referees" as const, label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
-                      ]).map((card) => {
-                        const Icon = card.icon;
-                        return (
-                          <button
-                            key={card.id}
-                            onClick={() => { setDeelnemersSubTab(card.id); setMobileDeelnemersOverview(false); }}
-                            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-                          >
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
-                            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : teamDetailOpen ? null : (
-                    <div className="flex items-center gap-3 mb-3">
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileDeelnemersOverview(true)} aria-label="Terug naar overzicht">
-                        <ArrowLeft className="h-4 w-4" />
-                      </Button>
-                      <h2 className="font-display text-lg font-bold text-foreground">
-                        {deelnemersSubTab === "teams" ? (tournament.teams_label || "Teams") : (tournament.referees_label || "Scheidsrechters")}
-                      </h2>
-                    </div>
-                  )
-                ) : (
-                <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2 mb-6">
-                  <button
-                    onClick={() => setDeelnemersSubTab("teams")}
-                    className={cn(
-                      "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "teams"
-                        ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                    )}
-                  >
-                    {tournament.teams_label || "Teams"}
-                  </button>
-                  <button
-                    onClick={() => setDeelnemersSubTab("referees")}
-                    className={cn(
-                      "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "referees"
-                        ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                    )}
-                  >
-                    {tournament.referees_label || "Scheidsrechters"}
-                  </button>
-                </div>
+                {mobileDeelnemersOverview ? (
+                  <div className="grid grid-cols-1 gap-2">
+                    {([
+                      { id: "teams" as const, label: tournament.teams_label || "Teams", icon: Users },
+                      { id: "referees" as const, label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
+                    ]).map((card) => {
+                      const Icon = card.icon;
+                      return (
+                        <button
+                          key={card.id}
+                          onClick={() => { setDeelnemersSubTab(card.id); setMobileDeelnemersOverview(false); }}
+                          className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                        >
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : teamDetailOpen ? null : (
+                  <div className="flex items-center gap-3 mb-3">
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileDeelnemersOverview(true)} aria-label="Terug naar overzicht">
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                    <h2 className="font-display text-lg font-bold text-foreground">
+                      {deelnemersSubTab === "teams" ? (tournament.teams_label || "Teams") : (tournament.referees_label || "Scheidsrechters")}
+                    </h2>
+                  </div>
                 )}
-                {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
+                {!mobileDeelnemersOverview && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 )}
-                {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "referees" && (
+                {!mobileDeelnemersOverview && deelnemersSubTab === "referees" && (
                   <RefereeManager tournamentId={id!} categoryId={effectiveCategoryId} />
                 )}
               </>
