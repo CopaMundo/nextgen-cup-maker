@@ -22,7 +22,7 @@ import { SortableVerticalList, SortableRowShell } from "@/components/SortableLis
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
-import { formatTypeIcon } from "./FormatTypeIcon";
+
 import listIconPng from "@/assets/list_1.png";
 
 const formatTypeLabel = (t: string) =>
@@ -1385,11 +1385,11 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                             <span {...rowProps} data-no-drag={undefined} onClick={(e) => e.stopPropagation()} className="flex h-7 w-7 shrink-0 items-center justify-center text-muted-foreground cursor-grab active:cursor-grabbing touch-none">
                               {handle}
                             </span>
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 text-primary">
-                              {format.logo_url
-                                ? <img src={format.logo_url} alt="" className="h-full w-full object-contain" />
-                                : formatTypeIcon(format.phase_type)}
-                            </span>
+                            {format.logo_url ? (
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 text-primary">
+                                <img src={format.logo_url} alt="" className="h-full w-full object-contain" />
+                              </span>
+                            ) : null}
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm font-semibold">{format.name}</span>
                               <span className="block truncate text-[11px] text-muted-foreground">{formatTypeLabel(format.phase_type)}</span>
