@@ -89,6 +89,11 @@ const TournamentDetail = () => {
   const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
   const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
 
+  const [plannerDate, setPlannerDate] = useState<string>(() => {
+    if (typeof window === "undefined" || !id) return "";
+    return localStorage.getItem(plannerDateStorageKey(id, selectedCategoryId)) || "";
+  });
+
   const subTabBar = (
     items: readonly { id: string; label: string; icon: any }[],
     active: string,
