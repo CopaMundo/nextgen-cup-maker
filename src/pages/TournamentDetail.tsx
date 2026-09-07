@@ -515,13 +515,27 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
-            {!isMobile && (
+            {!isMobile && activeTab !== "overview" && (
               <header className="mb-6 flex items-center justify-between gap-4 border-b border-border/60 pb-4">
-                <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
-                  {sidebarItems.find((i) => i.id === activeTab)?.title}
-                </h1>
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => setActiveTab("overview")}
+                    aria-label="Terug naar overzicht"
+                    title="Terug naar overzicht"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
+                    {sidebarItems.find((i) => i.id === activeTab)?.title}
+                  </h1>
+                </div>
               </header>
             )}
+
             <div className="flex flex-col">{renderContent()}</div>
           </div>
 
