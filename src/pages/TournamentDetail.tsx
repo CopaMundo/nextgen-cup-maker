@@ -364,6 +364,24 @@ const TournamentDetail = () => {
     }
   };
 
+  const activeItem = sidebarItems.find((item) => item.id === activeTab);
+
+  const desktopSegments: { items: readonly { id: string; label: string; icon: any }[]; active: string; onSelect: (id: any) => void } | null =
+    activeTab === "teams"
+      ? {
+          items: [
+            { id: "teams", label: tournament.teams_label || "Teams", icon: Users },
+            { id: "referees", label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
+          ],
+          active: deelnemersSubTab,
+          onSelect: setDeelnemersSubTab,
+        }
+      : activeTab === "results"
+      ? { items: resultsSubTabs, active: resultsSubTab, onSelect: setResultsSubTab }
+      : activeTab === "presentation"
+      ? { items: presentationSubTabs, active: presentationSubTab, onSelect: setPresentationSubTab }
+      : null;
+
   return (
     <div
       className="h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
