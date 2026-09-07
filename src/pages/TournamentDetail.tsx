@@ -345,12 +345,14 @@ const TournamentDetail = () => {
                 selectClassName={compactSelect}
               />
             )}
-            <LocationSelector
-              tournamentId={id!}
-              selectedLocation={selectedLocation}
-              onSelect={setSelectedLocation}
-              selectClassName={compactSelect}
-            />
+            {isMobile && (
+              <LocationSelector
+                tournamentId={id!}
+                selectedLocation={selectedLocation}
+                onSelect={setSelectedLocation}
+                selectClassName={compactSelect}
+              />
+            )}
           </>
         );
         const showScheduler = !tournament.is_multi_category || !!effectiveCategoryId;
