@@ -175,6 +175,13 @@ const TournamentDetail = () => {
     setMobileDeelnemersOverview(false);
   };
 
+  const handlePlannerDateChange = (date: string) => {
+    setPlannerDate(date);
+    if (typeof window !== "undefined" && id) {
+      localStorage.setItem(plannerDateStorageKey(id, selectedCategoryId), date);
+    }
+  };
+
   // When tournament id changes, hydrate from localStorage
   useEffect(() => {
     if (!id) return;
