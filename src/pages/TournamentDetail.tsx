@@ -111,6 +111,19 @@ const TournamentDetail = () => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem(mobileSidebarStorageKey) === "true";
   });
+  const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("admin-desktop-nav-collapsed") === "true";
+  });
+
+  const toggleDesktopNav = () => {
+    setDesktopNavCollapsed((collapsed) => {
+      const next = !collapsed;
+      sessionStorage.setItem("admin-desktop-nav-collapsed", String(next));
+      return next;
+    });
+  };
+
 
   const toggleMobileSidebar = () => {
     setMobileSidebarCollapsed((collapsed) => {
