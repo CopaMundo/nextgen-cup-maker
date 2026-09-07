@@ -611,7 +611,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         onSectionChange={(id) => setGeneralSubTab(id as typeof generalSubTab)}
       >
       <div className="space-y-6 w-full">
-        {isMobile ? (
+        {isMobile && (
           generalSubTab === "overview" ? (
             <div className="grid grid-cols-1 gap-2">
               {([
