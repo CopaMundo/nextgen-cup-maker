@@ -212,25 +212,6 @@ const PresentationManager = ({
         </div>
       )}
 
-      {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap mb-6">
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setSubTab(t.id)}
-              className={cn(
-                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                subTab === t.id
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       <div className={cn("space-y-6 max-w-2xl", isMobile && mobileOverview && "hidden")}>
 
         {subTab === "website" && (
