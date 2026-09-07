@@ -450,28 +450,26 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       )}
 
       {!isMobile && (
-        <div className="section-card space-y-5">
-          <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                  activeTab === tab.id
-                    ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="min-w-0">
-            {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
-            {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
-            {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+        <div className="flex w-full items-start gap-6">
+          <SettingsNav
+            title="Statistieken"
+            description="Klassementen van je toernooi."
+            icon={BarChart3}
+            items={tabs.map(t => ({
+              id: t.id,
+              label: t.label,
+              icon: t.id === "scorers" ? Goal : t.id === "assists" ? Handshake : ShieldAlert,
+            }))}
+            activeId={activeTab}
+            onSelect={(id) => setActiveTab(id as StatTab)}
+          />
+          <div className="section-card min-w-0 flex-1 space-y-5">
+            <SectionHeader title={tabs.find(t => t.id === activeTab)?.label ?? "Statistieken"} />
+            <div className="min-w-0">
+              {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
+              {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
+              {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+            </div>
           </div>
         </div>
       )}
