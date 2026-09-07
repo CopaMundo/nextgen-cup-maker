@@ -88,7 +88,7 @@ const CategorySelector = ({
       <select
         value={selectedCategoryId || ""}
         onChange={(e) => onSelect(e.target.value || null)}
-        className={cn("h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium", selectClassName)}
+        className={cn("h-7 rounded-md border border-input bg-background px-2 text-xs font-medium", selectClassName)}
       >
         {categories.map((c) => (
           <option key={c.id} value={c.id}>
