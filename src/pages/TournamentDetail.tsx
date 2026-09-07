@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, LayoutGrid } from "lucide-react";
+import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
@@ -13,8 +13,6 @@ import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import ShirtIcon from "@/components/icons/ShirtIcon";
 import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
-import TournamentOverview from "@/components/TournamentOverview";
-
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
 import MatchScheduler from "@/components/MatchScheduler";
@@ -26,7 +24,6 @@ import LocationSelector from "@/components/LocationSelector";
 import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
-import { TabSectionLayout } from "@/components/TabSectionLayout";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -46,19 +43,12 @@ const sidebarItems = [
   { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
 ] as const;
 
-const desktopNavGroups: { label: string; items: TabId[] }[] = [
-  { label: "Opzet", items: ["general", "teams", "phases"] },
-  { label: "Wedstrijden", items: ["schedule", "results", "statistics"] },
-  { label: "Publiek", items: ["sponsors", "polls", "presentation"] },
-];
-
 
 type TabId = typeof sidebarItems[number]["id"];
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
 const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
 const mobileSidebarStorageKey = "admin-mobile-sidebar-collapsed";
-
 
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,10 +61,7 @@ const TournamentDetail = () => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(categoryStorageKey(id));
   });
-  const [activeTab, setActiveTab] = useState<TabId | "overview">(() =>
-    typeof window !== "undefined" && window.innerWidth >= 768 ? "overview" : "general"
-  );
-
+  const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
   const [teamDetailOpen, setTeamDetailOpen] = useState(false);
@@ -211,33 +198,15 @@ const TournamentDetail = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "overview":
-        return (
-          <TournamentOverview
-            tournamentId={id!}
-            tournament={tournament}
-            onNavigate={(tab) => setActiveTab(tab as TabId)}
-          />
-        );
       case "general":
-
         return <TournamentGeneral tournament={tournament} onUpdate={t => setTournament(t)} />;
       case "teams":
         return (
-          <TabSectionLayout
-            title="Deelnemers"
-            icon={<Users className="h-5 w-5" />}
-            sections={[
-              { id: "teams", label: tournament.teams_label || "Teams", icon: <ShirtIcon className="h-4 w-4" /> },
-              { id: "referees", label: tournament.referees_label || "Scheidsrechters", icon: <GiWhistle className="h-4 w-4" /> },
-            ]}
-            activeSection={deelnemersSubTab}
-            onSectionChange={(id) => setDeelnemersSubTab(id as typeof deelnemersSubTab)}
-          >
+          <>
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <>
-                {isMobile && (
+                {isMobile ? (
                   mobileDeelnemersOverview ? (
                     <div className="grid grid-cols-1 gap-2">
                       {([
@@ -270,6 +239,30 @@ const TournamentDetail = () => {
                       </h2>
                     </div>
                   )
+                ) : (
+                <div className="flex justify-center border-b border-border mb-6">                  <button
+                    onClick={() => setDeelnemersSubTab("teams")}
+                    className={cn(
+                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                      deelnemersSubTab === "teams"
+                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {tournament.teams_label || "Teams"}
+                  </button>
+                  <button
+                    onClick={() => setDeelnemersSubTab("referees")}
+                    className={cn(
+                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                      deelnemersSubTab === "referees"
+                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {tournament.referees_label || "Scheidsrechters"}
+                  </button>
+                </div>
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -279,7 +272,7 @@ const TournamentDetail = () => {
                 )}
               </>
             )}
-          </TabSectionLayout>
+          </>
         );
       case "phases":
         return (
@@ -387,75 +380,47 @@ const TournamentDetail = () => {
           </div>
         </div>
       )}
-      {/* Desktop: grouped workspace bar */}
+      {/* Desktop: top tab bar */}
       {!isMobile && (
         <TooltipProvider delayDuration={300}>
           <nav
             aria-label="Toernooibeheer"
             className="shrink-0 border-b border-border bg-card print:hidden"
           >
-            <div className="mx-auto flex w-full max-w-[1600px] items-center gap-3 px-3 py-2 xl:px-6">
-              <button
-                type="button"
-                onClick={() => setActiveTab("overview")}
-                aria-current={activeTab === "overview" ? "page" : undefined}
-                className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold transition-colors",
-                  activeTab === "overview"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                )}
-              >
-                <LayoutGrid className="h-4 w-4 shrink-0" />
-                <span>Overzicht</span>
-              </button>
-
-              <div className="flex flex-1 flex-wrap items-center gap-x-3 gap-y-1">
-                {desktopNavGroups.map((group, gi) => (
-                  <div key={group.label} className="flex items-center gap-3">
-                    {gi > 0 && <span className="h-8 w-px shrink-0 bg-border" />}
-                    <div className="flex flex-col gap-0.5">
-                      <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70">
-                        {group.label}
-                      </span>
-                      <div className="flex items-center gap-0.5">
-                        {group.items.map((itemId) => {
-                          const item = sidebarItems.find((i) => i.id === itemId)!;
-                          const active = activeTab === item.id;
-                          return (
-                            <Tooltip key={item.id}>
-                              <TooltipTrigger asChild>
-                                <button
-                                  type="button"
-                                  onClick={() => setActiveTab(item.id)}
-                                  aria-current={active ? "page" : undefined}
-                                  className={cn(
-                                    "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[13px] font-semibold transition-colors",
-                                    active
-                                      ? "bg-primary/10 text-primary"
-                                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                                  )}
-                                >
-                                  <item.icon className="h-4 w-4 shrink-0" />
-                                  <span>{item.label}</span>
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
-                            </Tooltip>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+            <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-0.5 px-3 xl:px-6">
+              {tournament.logo_url && (
+                <div className="flex shrink-0 items-center pr-3">
+                  <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
+                </div>
+              )}
+              {sidebarItems.map((item) => {
+                const active = activeTab === item.id;
+                return (
+                  <Tooltip key={item.id}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab(item.id)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "relative flex min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 px-1.5 py-3 text-[13px] font-semibold transition-colors",
+                          active
+                            ? "text-primary after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-[3px] after:rounded-full after:bg-primary"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <item.icon className="h-[18px] w-[18px] shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
+                  </Tooltip>
+                );
+              })}
             </div>
           </nav>
         </TooltipProvider>
       )}
-
-
 
 
       <div className="relative flex flex-1 overflow-hidden min-h-0">
@@ -507,27 +472,26 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
-            {!isMobile && activeTab !== "overview" && (
-              <header className="mb-6 flex items-center justify-between gap-4 border-b border-border/60 pb-4">
-                <div className="flex items-center gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="h-9 w-9"
-                    onClick={() => setActiveTab("overview")}
-                    aria-label="Terug naar overzicht"
-                    title="Terug naar overzicht"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
+            {!isMobile && (
+              <header className="mb-5 flex items-end justify-between gap-4 border-b border-border/60 pb-4">
+                <div className="min-w-0">
                   <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
                     {sidebarItems.find((i) => i.id === activeTab)?.title}
                   </h1>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {sidebarItems.find((i) => i.id === activeTab)?.desc}
+                  </p>
+                </div>
+                <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                  {tournament.logo_url && (
+                    <img src={tournament.logo_url} alt="" className="h-8 w-8 object-contain" />
+                  )}
+                  <span className="max-w-[280px] truncate text-sm font-bold text-foreground" title={tournament.name}>
+                    {tournament.name}
+                  </span>
                 </div>
               </header>
             )}
-
             <div className="flex flex-col">{renderContent()}</div>
           </div>
 
