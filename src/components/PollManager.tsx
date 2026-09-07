@@ -253,20 +253,15 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
   }
 
   return (
-    <div className="space-y-6 w-full">
-      {/* Section header tab bar (matches Statistics/Sponsors pattern) */}
-      <div className="flex justify-center border-b border-border flex-wrap">
-        <div className="px-6 py-3 text-sm font-semibold uppercase tracking-wide text-primary relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary">
-          Polls
-        </div>
-      </div>
-
-      <div className="space-y-4">
+    <div className="space-y-4 w-full">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
           {polls.length} {polls.length === 1 ? "poll" : "polls"}
           {!tournament.view_link_active && " · Activeer eerst de view-link bij Presentatie zodat bezoekers kunnen stemmen."}
         </p>
+      </div>
 
+      <div className="space-y-4">
         <div className="space-y-3">
           {polls.map(poll => {
             const pollVotes = getVotesForPoll(poll.id);
