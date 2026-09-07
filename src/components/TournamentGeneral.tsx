@@ -642,9 +642,33 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </h2>
             </div>
           )
-        ) : null}
+        ) : (
+          <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2">
+            {([
+              { id: "info", label: "Toernooi informatie" },
+              { id: "wedstrijddagen", label: "Wedstrijddagen" },
+              { id: "locaties", label: "Locaties" },
+              { id: "divisies", label: "Divisies" },
+              { id: "puntentelling", label: "Puntensysteem" },
+            ] as const).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setGeneralSubTab(tab.id)}
+                className={cn(
+                  "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                  generalSubTab === tab.id
+                    ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
+                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        {(!isMobile || generalSubTab === "info") && (
+        )}
+
+        {generalSubTab === "info" && (
         <div className="section-card space-y-6">
           <h2 className="section-title">Toernooi informatie</h2>
 
@@ -870,7 +894,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         )}
 
 
-        {(!isMobile || generalSubTab === "wedstrijddagen") && (
+        {generalSubTab === "wedstrijddagen" && (
           <div className="section-card space-y-5">
             <h2 className="section-title">Wedstrijddagen</h2>
             <p className="text-xs sm:text-sm text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde.</p>
@@ -947,7 +971,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
         )}
 
-        {(!isMobile || generalSubTab === "locaties") && (
+        {generalSubTab === "locaties" && (
           <div className="section-card space-y-5">
             <h2 className="section-title">Locaties</h2>
             {!form.is_esport && (
@@ -1015,7 +1039,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
         )}
 
-        {(!isMobile || generalSubTab === "divisies") && (
+        {generalSubTab === "divisies" && (
           <div className="section-card space-y-5">
             <h2 className="section-title">Divisies</h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
@@ -1053,7 +1077,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
         )}
 
-        {(!isMobile || generalSubTab === "puntentelling") && (
+        {generalSubTab === "puntentelling" && (
           <div className="space-y-6">
             <div className="section-card space-y-5">
               <div className="space-y-2">

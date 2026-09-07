@@ -5,12 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
+import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import ShirtIcon from "@/components/icons/ShirtIcon";
+import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
@@ -21,6 +22,8 @@ import RefereeManager from "@/components/RefereeManager";
 import CategorySelector from "@/components/CategorySelector";
 import LocationSelector from "@/components/LocationSelector";
 import StatisticsView from "@/components/StatisticsView";
+import SponsorManager from "@/components/SponsorManager";
+import PollManager from "@/components/PollManager";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -33,8 +36,11 @@ const sidebarItems = [
   { id: "teams", icon: ShirtIcon, label: "Deelnemers", title: "Deelnemerslijst", desc: "Teams, spelers en scheidsrechters beheren" },
   { id: "phases", icon: BracketTreeIcon, label: "Format", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
   { id: "schedule", icon: CalendarClockIcon, label: "Schema", title: "Speelschema", desc: "Wedstrijden verdelen over velden en tijdsloten" },
-  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen & standen", desc: "Scores invullen, standen en statistieken" },
-  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, voorstelling, vormgeving, sponsors en polls" },
+  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen", desc: "Scores invullen en standen bijwerken" },
+  { id: "statistics", icon: BarChart3, label: "Statistieken", title: "Cijfers & records", desc: "Topschutters, assists en fairplay" },
+  { id: "sponsors", icon: Handshake, label: "Sponsors", title: "Partners", desc: "Logo's van sponsors en partners" },
+  { id: "polls", icon: PollIcon, label: "Polls", title: "Publieksvragen", desc: "Stemmingen voor het publiek" },
+  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
 ] as const;
 
 
@@ -57,7 +63,6 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
-  const [resultsSubTab, setResultsSubTab] = useState<"results" | "statistics">("results");
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
   const [teamDetailOpen, setTeamDetailOpen] = useState(false);
   const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
@@ -318,35 +323,23 @@ const TournamentDetail = () => {
           <>
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <>
-                <div className="flex flex-wrap justify-center gap-1 border-b border-border px-2 mb-4 sm:mb-6">
-                  {([
-                    { id: "results" as const, label: "Uitslagen" },
-                    { id: "statistics" as const, label: "Statistieken" },
-                  ]).map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setResultsSubTab(t.id)}
-                      className={cn(
-                        "relative rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors",
-                        resultsSubTab === t.id
-                          ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                          : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                      )}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-                {resultsSubTab === "results" ? (
-                  <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
-                ) : (
-                  <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
-                )}
-              </>
+              <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
             )}
           </>
         );
+      case "statistics":
+        return (
+          <>
+            {categorySelector}
+            {(!tournament.is_multi_category || effectiveCategoryId) && (
+              <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+            )}
+          </>
+        );
+      case "sponsors":
+        return <SponsorManager tournamentId={id!} />;
+      case "polls":
+        return <PollManager tournamentId={id!} tournament={tournament} />;
       case "presentation":
         return <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />;
       default:
