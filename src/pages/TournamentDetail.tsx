@@ -627,6 +627,20 @@ const TournamentDetail = () => {
                     {categorySelector}
                   </div>
                 ) : null}
+                {activeTab === "schedule" && tournamentDates.length > 0 && (
+                  <DateStripNav
+                    dates={tournamentDates}
+                    activeDate={plannerDate}
+                    onSelect={handlePlannerDateChange}
+                    onInvalidPick={(iso) => {
+                      toast({
+                        title: "Datum buiten toernooiperiode",
+                        description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
+                        variant: "destructive",
+                      });
+                    }}
+                  />
+                )}
                 {desktopSegments && (
                   <div className="flex shrink-0 items-center gap-1 border-b border-border">
                     {desktopSegments.items.map((seg) => {
