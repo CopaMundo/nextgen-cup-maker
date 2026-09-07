@@ -206,7 +206,11 @@ const PresentationManager = ({
           title="Presentatie"
           description="Publieke weergave van je toernooi."
           icon={Tv2}
-          items={tabs.map(t => ({ id: t.id, label: t.label, iconNode: t.icon }))}
+          items={tabs.map(t => ({
+            id: t.id,
+            label: t.label,
+            icon: t.id === "website" ? Globe : t.id === "slideshow" ? MonitorPlay : Palette,
+          }))}
           activeId={subTab}
           onSelect={(id) => setSubTab(id as SubTab)}
         />
