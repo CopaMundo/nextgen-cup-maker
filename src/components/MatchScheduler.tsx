@@ -179,7 +179,7 @@ const formatDateDMY = (d: string | null) => {
   return d;
 };
 
-const getTournamentPlannerDates = (tournament: any) => {
+export const getTournamentPlannerDates = (tournament: any) => {
   const extraDays = expandMatchDays((tournament.match_days as MatchDayEntry[]) || []);
   // When explicit match days are configured, those are the only valid dates.
   if (extraDays.length > 0) return extraDays;
