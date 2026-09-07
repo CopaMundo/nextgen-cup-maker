@@ -188,6 +188,16 @@ const TournamentDetail = () => {
     setSelectedLocationState(stored);
   }, [id]);
 
+  // Keep plannerDate storage key in sync with selected category and default to first tournament day
+  useEffect(() => {
+    if (!id || !tournament) return;
+    const allDays = getTournamentPlannerDates(tournament);
+    const key = plannerDateStorageKey(id, selectedCategoryId);
+    const stored = localStorage.getItem(key);
+    const valid = stored && allDays.includes(stored) ? stored : allDays[0] || "";
+    setPlannerDate((current) => (current !== valid ? valid : current));
+  }, [id, tournament, selectedCategoryId]);
+
   // For single-category tournaments, auto-select the lone category
   // For multi-category tournaments, validate / pick the first
   useEffect(() => {
