@@ -667,7 +667,7 @@ const TournamentDetail = () => {
                   )}
                 </div>
 
-                <div className="hidden shrink-0 lg:block lg:flex-1" />
+                <div aria-hidden="true" />
               </div>
             </header>
           )}
