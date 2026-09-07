@@ -69,7 +69,10 @@ const TournamentDetail = () => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(categoryStorageKey(id));
   });
-  const [activeTab, setActiveTab] = useState<TabId>("general");
+  const [activeTab, setActiveTab] = useState<TabId | "overview">(() =>
+    typeof window !== "undefined" && window.innerWidth >= 768 ? "overview" : "general"
+  );
+
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
   const [teamDetailOpen, setTeamDetailOpen] = useState(false);
