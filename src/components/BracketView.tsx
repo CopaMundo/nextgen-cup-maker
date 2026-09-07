@@ -2901,16 +2901,13 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       const nextIdx = Math.floor(matchIdx / 2);
                       const yTarget = getNextCenterY(nextIdx);
                       const midX = CONNECTOR_W / 2;
+                      const r = Math.min(8, CONNECTOR_W / 2, Math.abs(y2 - y1) / 2);
                       return (
-                        <g key={matchIdx}>
-                          {/* From top match center-right to midpoint */}
-                          <line x1={0} y1={y1} x2={midX} y2={y1} className="stroke-border" strokeWidth={1.5} />
-                          {/* From bottom match center-right to midpoint */}
-                          <line x1={0} y1={y2} x2={midX} y2={y2} className="stroke-border" strokeWidth={1.5} />
-                          {/* Vertical line connecting the two */}
-                          <line x1={midX} y1={y1} x2={midX} y2={y2} className="stroke-border" strokeWidth={1.5} />
-                          {/* From midpoint to next match center-left */}
-                          <line x1={midX} y1={yTarget} x2={CONNECTOR_W} y2={yTarget} className="stroke-border" strokeWidth={1.5} />
+                        <g key={matchIdx} className="stroke-border" strokeWidth={1.5} fill="none" strokeLinecap="round">
+                          {/* Top card -> rounded elbow down */}
+                          <path d={`M0 ${y1} H${midX - r} Q${midX} ${y1} ${midX} ${y1 + r} V${y2 - r} Q${midX} ${y2} ${midX - r} ${y2} H0`} />
+                          {/* Elbow -> next round card */}
+                          <path d={`M${midX} ${yTarget} H${CONNECTOR_W}`} />
                         </g>
                       );
                     })}
