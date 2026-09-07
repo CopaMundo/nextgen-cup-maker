@@ -9,7 +9,7 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Pencil, Trash2, Copy } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -163,12 +163,14 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     setShowImport(true);
   };
 
-  const importFromCategory = async (catRefs: RefereeConfig[]) => {
-    const existing = new Set(referees.map(r => r.name));
-    const toAdd = catRefs.filter(r => !existing.has(r.name));
-    if (toAdd.length > 0) await saveReferees([...referees, ...toAdd]);
-    setShowImport(false);
+  const importReferee = async (ref: RefereeConfig) => {
+    if (referees.some(r => r.name === ref.name)) return;
+    await saveReferees([
+      ...referees,
+      { name: ref.name, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null },
+    ]);
   };
+
 
   // ==== draft helpers ====
   /** Bouw allowedFields op basis van de gekozen modus per locatie. */
@@ -644,26 +646,49 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
       {/* Import from divisions dialog */}
       <Dialog open={showImport} onOpenChange={setShowImport}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Importeer scheidsrechters</DialogTitle></DialogHeader>
-          <div className="space-y-2">
+        <DialogContent ref={importDialogRef} className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Scheidsrechter importeren uit andere divisie</DialogTitle></DialogHeader>
+          <p className="text-xs text-muted-foreground">Kies per scheidsrechter. Alleen de naam wordt gekopieerd, instellingen niet.</p>
+          <div className="space-y-4">
             {otherCategories.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">Geen andere divisies met scheidsrechters gevonden.</p>
             ) : (
               otherCategories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => importFromCategory(cat.referees)}
-                  className="w-full flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 hover:bg-secondary transition-colors"
-                >
-                  <span className="text-sm font-medium">{cat.name}</span>
-                  <span className="text-xs text-muted-foreground">{cat.referees.length} scheidsrechter{cat.referees.length !== 1 ? "s" : ""}</span>
-                </button>
+                <div key={cat.id} className="space-y-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{cat.name}</h4>
+                  <div className="grid gap-2">
+                    {cat.referees.map((r, i) => {
+                      const already = referees.some(existing => existing.name === r.name);
+                      return (
+                        <button
+                          key={`${cat.id}-${r.name}-${i}`}
+                          disabled={already}
+                          onClick={() => importReferee(r)}
+                          className={`flex items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors ${
+                            already ? "opacity-50 cursor-not-allowed" : "hover:bg-foreground/5"
+                          }`}
+                        >
+                          <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground">
+                            <WhistleIcon className="h-4 w-4" />
+                          </div>
+                          <span className="text-sm font-medium text-foreground">{r.name}</span>
+                          {already
+                            ? <span className="ml-auto text-xs text-muted-foreground">Al toegevoegd</span>
+                            : <Copy className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               ))
             )}
           </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowImport(false)}>Sluiten</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 };
