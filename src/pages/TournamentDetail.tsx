@@ -444,7 +444,7 @@ const TournamentDetail = () => {
                         onClick={() => setActiveTab(item.id)}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "group relative flex min-w-0 flex-1 basis-0 items-center justify-center gap-2 rounded-t-lg px-2 py-3.5 text-sm font-semibold transition-colors",
+                          "group relative flex shrink-0 items-center justify-center gap-2 rounded-t-lg px-4 py-3.5 text-sm font-semibold transition-colors",
                           active
                             ? "text-primary"
                             : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
@@ -453,7 +453,7 @@ const TournamentDetail = () => {
                         <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
                         <span className="truncate">{item.label}</span>
                         {active && (
-                          <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-primary" />
+                          <span className="absolute bottom-0 left-3 right-3 h-[3px] rounded-full bg-primary" />
                         )}
                       </button>
                     </TooltipTrigger>
