@@ -22,6 +22,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee, refereeViolations } from "@/lib/refereeConfig";
 import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix, getFieldLocation } from "@/lib/fieldLocations";
+import { cn } from "@/lib/utils";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
