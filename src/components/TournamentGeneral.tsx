@@ -643,7 +643,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           )
         ) : (
-          <div className="flex justify-center border-b border-border flex-wrap gap-1">
+          <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2">
             {([
               { id: "info", label: "Toernooi informatie" },
               { id: "wedstrijddagen", label: "Wedstrijddagen" },
@@ -655,9 +655,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 key={tab.id}
                 onClick={() => setGeneralSubTab(tab.id)}
                 className={cn(
-                  "rounded-t-md px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                  "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
                   generalSubTab === tab.id
-                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
+                    ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
                     : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
                 )}
               >
@@ -669,9 +669,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         )}
 
         {generalSubTab === "info" && (
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+        <div className="section-card space-y-6">
+          <h2 className="section-title">Toernooi informatie</h2>
+
           <div className="space-y-2">
-            <Label>Toernooinaam</Label>
+            <Label className="form-label">Toernooinaam</Label>
             {isMobile ? (
               <Input
                 value={form.name}
@@ -682,15 +684,15 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             ) : (
               <div
                 onClick={() => { setEditName(form.name); setShowEditName(true); }}
-                className="cursor-pointer rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors"
+                className="cursor-pointer rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors"
               >
                 {form.name || <span className="text-muted-foreground">Klik om naam in te vullen</span>}
               </div>
             )}
           </div>
           <div className="space-y-2">
-            <Label>Beschrijving</Label>
-            <p className="text-xs text-muted-foreground">Deze beschrijving is het eerste wat bezoekers zien op de toernooipagina.</p>
+            <Label className="form-label">Beschrijving</Label>
+            <p className="text-xs sm:text-sm text-muted-foreground">Deze beschrijving is het eerste wat bezoekers zien op de toernooipagina.</p>
             {isMobile ? (
               <Textarea
                 value={form.description}
@@ -702,7 +704,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             ) : (
               <div
                 onClick={() => { setEditDesc(form.description); setShowEditDesc(true); }}
-                className="cursor-pointer rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors h-[60px] overflow-hidden line-clamp-2 whitespace-pre-wrap"
+                className="cursor-pointer rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors min-h-[72px] overflow-hidden line-clamp-2 whitespace-pre-wrap"
               >
                 {form.description || <span className="text-muted-foreground">Klik om beschrijving toe te voegen</span>}
               </div>
@@ -710,14 +712,14 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
           </div>
 
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-2">
-              <div className="flex items-center gap-1.5 h-5"><Label>Sport</Label></div>
+              <div className="flex items-center gap-1.5 h-5"><Label className="form-label">Sport</Label></div>
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowSportPicker(!showSportPicker)}
-                  className="flex items-center gap-2 w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground hover:border-primary/50 transition-colors text-left h-10"
+                  className="flex items-center gap-2 w-full rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors text-left h-11"
                 >
                   {(() => {
                     const found = findSport(form.sport);
@@ -780,8 +782,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
             {/* Type deelnemers: Teams / Spelers */}
             <div className="space-y-2">
-              <div className="flex items-center gap-1.5 h-5"><Label>Type deelnemers</Label></div>
-              <div className="grid grid-cols-2 rounded-md border border-border bg-secondary p-1 h-10">
+              <div className="flex items-center gap-1.5 h-5"><Label className="form-label">Type deelnemers</Label></div>
+              <div className="grid grid-cols-2 rounded-md border border-border bg-secondary p-1 h-11">
                 {(["Teams", "Spelers"] as const).map((opt) => (
                   <button
                     key={opt}
@@ -795,7 +797,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                       }
                     }}
                     className={cn(
-                      "rounded-sm text-xs font-semibold uppercase tracking-wide transition-colors",
+                      "rounded-sm text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors",
                       form.teams_label === opt
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
@@ -807,11 +809,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </div>
             </div>
 
-
-
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 h-5">
-                <Label>Landvlag bij deelnemers</Label>
+                <Label className="form-label">Landvlag bij deelnemers</Label>
                 <TooltipProvider delayDuration={150}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -825,7 +825,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-secondary px-3 h-10">
+              <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-secondary px-4 h-11">
                 <span className="text-sm text-muted-foreground">
                   {form.show_country ? "Tonen" : "Verbergen"}
                 </span>
@@ -837,12 +837,12 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
-              <Label>Logo</Label>
-              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
+              <Label className="form-label">Logo</Label>
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.logo_url && (
-                  <img src={tournament.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain bg-secondary" />
+                  <img src={tournament.logo_url} alt="Logo" className="h-20 w-20 rounded-lg object-contain bg-secondary border border-border" />
                  )}
                 <input id="logo-upload" type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} />
                 <Button variant="outline" size="sm" onClick={() => document.getElementById('logo-upload')?.click()}>
@@ -851,10 +851,10 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Omslagfoto</Label>
-              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
+              <Label className="form-label">Omslagfoto</Label>
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.cover_url && (
-                  <img src={tournament.cover_url} alt="Cover" className="h-16 w-28 rounded-lg object-cover bg-secondary" />
+                  <img src={tournament.cover_url} alt="Cover" className="h-20 w-36 rounded-lg object-cover bg-secondary border border-border" />
                 )}
                 <input id="cover-upload" type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadCover(e.target.files[0])} />
                 <Button variant="outline" size="sm" onClick={() => document.getElementById('cover-upload')?.click()}>
@@ -864,14 +864,16 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
 
-          <div className="space-y-2 pt-2 border-t border-border">
-            <Label>Bijlagen</Label>
-            <p className="text-xs text-muted-foreground">Upload hier documenten die bezoekers kunnen downloaden op je toernooipagina.</p>
+          <div className="space-y-3 pt-4 border-t border-border">
+            <div className="space-y-1">
+              <Label className="form-label">Bijlagen</Label>
+              <p className="text-xs sm:text-sm text-muted-foreground">Upload hier documenten die bezoekers kunnen downloaden op je toernooipagina.</p>
+            </div>
             {attachments.length > 0 && (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {attachments.map((attachment) => (
-                  <div key={attachment.id} className="flex items-center justify-between rounded-lg border border-border bg-secondary p-2.5">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div key={attachment.id} className="flex items-center justify-between rounded-lg border border-border bg-secondary p-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                       <a href={attachment.file_url} target="_blank" rel="noopener" className="text-sm font-medium text-foreground hover:text-primary truncate">{attachment.file_name}</a>
                       <span className="text-xs text-muted-foreground flex-shrink-0">{formatSize(attachment.file_size)}</span>
@@ -893,8 +895,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
 
         {generalSubTab === "wedstrijddagen" && (
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <p className="text-xs text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde.</p>
+          <div className="section-card space-y-5">
+            <h2 className="section-title">Wedstrijddagen</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde.</p>
 
             {(form.match_days || []).length > 0 && (
               <div className="space-y-1">
@@ -969,7 +972,8 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         )}
 
         {generalSubTab === "locaties" && (
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <div className="section-card space-y-5">
+            <h2 className="section-title">Locaties</h2>
             {!form.is_esport && (
               <>
                 {locations.length > 0 && (
@@ -1036,8 +1040,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         )}
 
         {generalSubTab === "divisies" && (
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <p className="text-xs text-muted-foreground">
+          <div className="section-card space-y-5">
+            <h2 className="section-title">Divisies</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Verdeel je toernooi in divisies op basis van leeftijd of niveau. Elke divisie krijgt een eigen deelnemerslijst, indeling en schema.
             </p>
 
@@ -1074,18 +1079,18 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
         {generalSubTab === "puntentelling" && (
           <div className="space-y-6">
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className="section-card space-y-5">
               <div className="space-y-2">
-                <div className="flex items-center gap-1.5 h-5"><Label>Puntentelling</Label></div>
-                <p className="text-xs text-muted-foreground">Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.</p>
+                <h2 className="section-title">Puntentelling</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground">Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.</p>
               </div>
               <ScoringSystemsManager tournamentId={tournament.id} tournament={tournament} onUpdate={onUpdate} />
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className="section-card space-y-5">
               <div className="space-y-2">
-                <h3 className="font-display text-base font-bold text-foreground">Spelersstatistieken</h3>
-                <p className="text-xs text-muted-foreground max-w-3xl">
+                <h3 className="section-title">Spelersstatistieken</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl">
                   Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
                 </p>
               </div>

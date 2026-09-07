@@ -157,8 +157,12 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   if (tabs.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border py-12 text-center">
-        <p className="text-muted-foreground">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
+      <div className="section-card space-y-5">
+        <h2 className="section-title">Statistieken</h2>
+        <div className="rounded-xl border border-dashed border-border bg-secondary/20 py-12 text-center">
+          <p className="text-muted-foreground">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Schakel statistieken in bij Algemeen &gt; Puntensysteem &gt; Spelersstatistieken.</p>
+        </div>
       </div>
     );
   }
@@ -409,6 +413,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   return (
     <div className="space-y-6 w-full">
+      {!isMobile && <h2 className="section-title">Statistieken</h2>}
+
       {/* Mobiel: statistieken als tegels */}
       {isMobile && mobileOverview && (
         <div className="grid grid-cols-1 gap-2">
@@ -444,29 +450,37 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       )}
 
       {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                activeTab === tab.id
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="section-card space-y-5">
+          <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                  activeTab === tab.id
+                    ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
+                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="min-w-0">
+            {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
+            {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
+            {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
+          </div>
         </div>
       )}
 
-      {!(isMobile && mobileOverview) && (
+      {isMobile && !mobileOverview && (
         <div className="min-w-0">
-          {activeTab === "scorers" && showGoals && (isMobile ? renderMobilePlayerStandings(goals, "Goals") : renderPlayerTable(goals, "Doelpunten"))}
-          {activeTab === "assists" && showAssists && (isMobile ? renderMobilePlayerStandings(assists, "Assists") : renderPlayerTable(assists, "Assists"))}
-          {activeTab === "fairplay" && showFairplay && (isMobile ? renderMobileFairplayStandings(fairplay) : renderFairplayTable(fairplay))}
+          {activeTab === "scorers" && showGoals && renderMobilePlayerStandings(goals, "Goals")}
+          {activeTab === "assists" && showAssists && renderMobilePlayerStandings(assists, "Assists")}
+          {activeTab === "fairplay" && showFairplay && renderMobileFairplayStandings(fairplay)}
         </div>
       )}
     </div>

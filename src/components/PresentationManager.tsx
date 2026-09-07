@@ -199,16 +199,16 @@ const PresentationManager = ({
       )}
 
       {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap mb-6">
+        <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2 mb-6">
           {tabs.map(t => (
             <button
               key={t.id}
               onClick={() => setSubTab(t.id)}
               className={cn(
-                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
                 subTab === t.id
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
+                  : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
               )}
             >
               {t.label}
@@ -217,13 +217,13 @@ const PresentationManager = ({
         </div>
       )}
 
-      <div className={cn("space-y-6 max-w-2xl", isMobile && mobileOverview && "hidden")}>
+      <div className={cn("space-y-6 max-w-4xl", isMobile && mobileOverview && "hidden")}>
 
         {subTab === "website" && (
           <>
             {/* Website link */}
-            <div className={cn("rounded-lg border border-border bg-card space-y-4", isMobile ? "p-4" : "p-6")}>
-              <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+            <div className={cn("section-card space-y-5", isMobile && "p-4")}>
+              <h2 className="section-title">
                 <LinkIcon className="h-5 w-5 text-primary" /> Website-link
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -264,8 +264,8 @@ const PresentationManager = ({
             </div>
 
             {/* Site visibility */}
-            <div className={cn("rounded-lg border border-border bg-card space-y-4", isMobile ? "p-4" : "p-6")}>
-              <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+            <div className={cn("section-card space-y-5", isMobile && "p-4")}>
+              <h2 className="section-title">
                 <Globe className="h-5 w-5 text-primary" /> Zichtbaarheid op de site
               </h2>
               <div className="flex items-center justify-between">
@@ -306,8 +306,8 @@ const PresentationManager = ({
         {subTab === "visualization" && (
           <>
             {/* Broadcast style */}
-            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-              <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+            <div className="section-card space-y-5">
+              <h2 className="section-title">
                 <Eye className="h-5 w-5 text-primary" /> Broadcast stijl
               </h2>
               {(() => {
@@ -346,9 +346,9 @@ const PresentationManager = ({
 
 
             {/* Format display */}
-            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <div className="section-card space-y-5">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                <h2 className="section-title">
                   <Presentation className="h-5 w-5 text-primary" /> Formatweergave
                 </h2>
                 <TooltipProvider delayDuration={150}>
