@@ -262,11 +262,6 @@ const PollManager = ({ tournamentId, tournament }: { tournamentId: string; tourn
       </div>
 
       <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          {polls.length} {polls.length === 1 ? "poll" : "polls"}
-          {!tournament.view_link_active && " · Activeer eerst de view-link bij Presentatie zodat bezoekers kunnen stemmen."}
-        </p>
-
         <div className="space-y-3">
           {polls.map(poll => {
             const pollVotes = getVotesForPoll(poll.id);
