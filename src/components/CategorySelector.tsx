@@ -84,7 +84,7 @@ const CategorySelector = ({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
+      <span className="w-12 text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
       <select
         value={selectedCategoryId || ""}
         onChange={(e) => onSelect(e.target.value || null)}
