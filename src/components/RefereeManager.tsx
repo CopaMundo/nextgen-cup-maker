@@ -375,20 +375,21 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[860px] text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/40">
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Scheidsrechter</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Locaties en velden</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Beschikbaarheid (Dagen en tijden)</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Max. aantal wedstrijden</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Uitgesloten teams/spelers</th>
-                <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Rol (1-5)</th>
-                <th className="px-3 py-2" />
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-border bg-secondary/60 backdrop-blur">
+                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Scheidsrechter</th>
+                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Locaties en velden</th>
+                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Beschikbaarheid (Dagen en tijden)</th>
+                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Max. aantal wedstrijden</th>
+                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Uitgesloten teams/spelers</th>
+                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Rol (1-5)</th>
+                <th className="px-3 py-2.5" />
               </tr>
             </thead>
             <tbody>
               {referees.map((r, i) => (
-                <tr key={i} className="border-b border-border/60 last:border-b-0 align-top">
+                <tr key={i} className="border-b border-border/60 last:border-b-0 align-top transition-colors hover:bg-accent/30">
+
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
