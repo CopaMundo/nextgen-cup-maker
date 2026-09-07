@@ -144,7 +144,19 @@ const SortableRow = ({
 
 
 
-const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate: (t: any) => void }) => {
+type GeneralSubTab = "overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling";
+
+const TournamentGeneral = ({
+  tournament,
+  onUpdate,
+  generalSubTab,
+  onGeneralSubTabChange,
+}: {
+  tournament: any;
+  onUpdate: (t: any) => void;
+  generalSubTab: GeneralSubTab;
+  onGeneralSubTabChange: (tab: GeneralSubTab) => void;
+}) => {
   const { toast } = useToast();
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -201,10 +213,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   const [showEsportWarning, setShowEsportWarning] = useState(false);
   const [showSportPicker, setShowSportPicker] = useState(false);
   const [sportSearch, setSportSearch] = useState("");
-  const [generalSubTab, setGeneralSubTab] = useState<"overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling">(() => {
-    if (typeof window === "undefined") return "info";
-    return window.matchMedia("(max-width: 639px)").matches ? "overview" : "info";
-  });
   const [pendingParticipantSwitch, setPendingParticipantSwitch] = useState<"Teams" | "Spelers" | null>(null);
 
   const [form, setForm] = useState({
@@ -609,7 +617,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
                 return (
                   <button
                     key={card.id}
-                    onClick={() => setGeneralSubTab(card.id)}
+                    onClick={() => onGeneralSubTabChange(card.id)}
                     className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                   >
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -625,7 +633,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           ) : (
             <div className="flex items-center gap-3 mb-2">
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setGeneralSubTab("overview")} aria-label="Terug naar overzicht">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onGeneralSubTabChange("overview")} aria-label="Terug naar overzicht">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <h2 className="font-display text-lg font-bold text-foreground">
@@ -642,31 +650,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
               </h2>
             </div>
           )
-        ) : (
-          <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 pb-0">
-            {([
-              { id: "info", label: "Toernooi informatie" },
-              { id: "wedstrijddagen", label: "Wedstrijddagen" },
-              { id: "locaties", label: "Locaties" },
-              { id: "divisies", label: "Divisies" },
-              { id: "puntentelling", label: "Puntensysteem" },
-            ] as const).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setGeneralSubTab(tab.id)}
-                className={cn(
-                  "relative rounded-t-lg px-3 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
-                  generalSubTab === tab.id
-                    ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
-                    : ""
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-        )}
+        ) : null}
 
         {generalSubTab === "info" && (
         <div className="section-card space-y-6">
@@ -897,7 +881,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         {generalSubTab === "wedstrijddagen" && (
           <div className="section-card space-y-5">
             <h2 className="section-title">Wedstrijddagen</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">Voeg hier losse wedstrijddagen of meteen een volledige periode toe. De dagen staan automatisch op chronologische volgorde.</p>
 
             {(form.match_days || []).length > 0 && (
               <div className="space-y-1">
@@ -1042,9 +1025,6 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
         {generalSubTab === "divisies" && (
           <div className="section-card space-y-5">
             <h2 className="section-title">Divisies</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Verdeel je toernooi in divisies op basis van leeftijd of niveau. Elke divisie krijgt een eigen deelnemerslijst, indeling en schema.
-            </p>
 
             {categories.length > 0 && (
               <DndContext

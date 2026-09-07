@@ -54,6 +54,15 @@ const presentationSubTabs = [
 type TabId = typeof sidebarItems[number]["id"];
 type ResultsSubTab = typeof resultsSubTabs[number]["id"];
 type PresentationSubTab = typeof presentationSubTabs[number]["id"];
+type GeneralSubTab = "overview" | "info" | "wedstrijddagen" | "locaties" | "divisies" | "puntentelling";
+
+const generalSubTabs = [
+  { id: "info", label: "Toernooi informatie" },
+  { id: "wedstrijddagen", label: "Wedstrijddagen" },
+  { id: "locaties", label: "Locaties" },
+  { id: "divisies", label: "Divisies" },
+  { id: "puntentelling", label: "Puntensysteem" },
+] as const;
 
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
@@ -72,6 +81,10 @@ const TournamentDetail = () => {
     return localStorage.getItem(categoryStorageKey(id));
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
+  const [generalSubTab, setGeneralSubTab] = useState<GeneralSubTab>(() => {
+    if (typeof window === "undefined") return "info";
+    return window.matchMedia("(max-width: 639px)").matches ? "overview" : "info";
+  });
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
   const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
@@ -250,7 +263,14 @@ const TournamentDetail = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "general":
-        return <TournamentGeneral tournament={tournament} onUpdate={t => setTournament(t)} />;
+        return (
+          <TournamentGeneral
+            tournament={tournament}
+            onUpdate={t => setTournament(t)}
+            generalSubTab={generalSubTab}
+            onGeneralSubTabChange={setGeneralSubTab}
+          />
+        );
       case "teams":
         return (
           <>
@@ -379,8 +399,10 @@ const TournamentDetail = () => {
 
   const activeItem = sidebarItems.find((item) => item.id === activeTab);
 
-  const desktopSegments: { items: readonly { id: string; label: string; icon: any }[]; active: string; onSelect: (id: any) => void } | null =
-    activeTab === "teams"
+  const desktopSegments: { items: readonly { id: string; label: string; icon?: any }[]; active: string; onSelect: (id: any) => void } | null =
+    activeTab === "general"
+      ? { items: generalSubTabs, active: generalSubTab, onSelect: setGeneralSubTab }
+      : activeTab === "teams"
       ? {
           items: [
             { id: "teams", label: tournament.teams_label || "Teams", icon: Users },
@@ -579,7 +601,7 @@ const TournamentDetail = () => {
                               : ""
                           )}
                         >
-                          <seg.icon className="h-4 w-4 shrink-0" />
+                           {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
                           <span className="truncate">{seg.label}</span>
                         </button>
                       );
