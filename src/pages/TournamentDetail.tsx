@@ -76,10 +76,10 @@ const TournamentDetail = () => {
   const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
   const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
 
-  const subTabBar = <T extends string>(
-    items: readonly { id: T; label: string; icon: any }[],
-    active: T,
-    onSelect: (id: T) => void,
+  const subTabBar = (
+    items: readonly { id: string; label: string; icon: any }[],
+    active: string,
+    onSelect: (id: any) => void,
   ) => (
     <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 mb-4">
       {items.map((item) => (
