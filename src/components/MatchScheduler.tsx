@@ -228,7 +228,7 @@ const useResponsiveWindowSize = () => {
   return size;
 };
 
-const DateStripNav = ({
+export const DateStripNav = ({
   dates,
   activeDate,
   onSelect,
