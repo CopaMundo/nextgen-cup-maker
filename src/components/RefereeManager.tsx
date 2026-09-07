@@ -9,7 +9,7 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Pencil, Trash2, Copy } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
