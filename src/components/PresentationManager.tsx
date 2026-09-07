@@ -155,9 +155,22 @@ const PresentationManager = ({
     { id: "visualization", label: "Vormgeving", icon: <MaskIcon src={stylingIconAsset.url} label="Vormgeving" className="h-5 w-5" /> },
   ];
 
+  const presentationSections = [
+    { id: "website" as const, label: "Website", icon: <MaskIcon src={websiteIconAsset.url} label="Website" className="h-4 w-4" /> },
+    { id: "slideshow" as const, label: "Dialoogvoorstelling", icon: <MaskIcon src={slideshowIconAsset.url} label="Dialoogvoorstelling" className="h-4 w-4" /> },
+    { id: "visualization" as const, label: "Vormgeving", icon: <MaskIcon src={stylingIconAsset.url} label="Vormgeving" className="h-4 w-4" /> },
+  ];
+
   const activeLabel = tabs.find(t => t.id === subTab)?.label ?? "";
 
   return (
+    <TabSectionLayout
+      title="Presentatie"
+      icon={<Tv2 className="h-5 w-5" />}
+      sections={presentationSections}
+      activeSection={subTab}
+      onSectionChange={(id) => setSubTab(id as SubTab)}
+    >
     <>
       {isMobile && mobileOverview && (
         <div className="grid grid-cols-1 gap-2 mb-4">
