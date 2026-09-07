@@ -346,9 +346,9 @@ const PresentationManager = ({
 
 
             {/* Format display */}
-            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <div className="section-card space-y-5">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                <h2 className="section-title">
                   <Presentation className="h-5 w-5 text-primary" /> Formatweergave
                 </h2>
                 <TooltipProvider delayDuration={150}>
