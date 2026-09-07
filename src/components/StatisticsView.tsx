@@ -457,25 +457,6 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
         </div>
       )}
 
-      {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                activeTab === tab.id
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {!(isMobile && mobileOverview) && (
         <div className="min-w-0">
           {activeTab === "scorers" && showGoals && (isMobile ? renderMobilePlayerStandings(goals, "Goals") : renderPlayerTable(goals, "Doelpunten"))}
