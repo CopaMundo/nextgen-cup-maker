@@ -574,30 +574,33 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          {!isMobile && desktopSegments && (
+          {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
-              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center">
-                <div className="flex shrink-0 items-center gap-1 border-b border-border">
-                  {desktopSegments.items.map((seg) => {
-                    const active = desktopSegments.active === seg.id;
-                    return (
-                      <button
-                        key={seg.id}
-                        type="button"
-                        onClick={() => desktopSegments.onSelect(seg.id)}
-                        className={cn(
-                          "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
-                          active
-                            ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
-                            : ""
-                        )}
-                      >
-                         {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
-                        <span className="truncate">{seg.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center gap-4">
+                {categorySelector}
+                {desktopSegments && (
+                  <div className="flex shrink-0 items-center gap-1 border-b border-border">
+                    {desktopSegments.items.map((seg) => {
+                      const active = desktopSegments.active === seg.id;
+                      return (
+                        <button
+                          key={seg.id}
+                          type="button"
+                          onClick={() => desktopSegments.onSelect(seg.id)}
+                          className={cn(
+                            "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
+                            active
+                              ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
+                              : ""
+                          )}
+                        >
+                          {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
+                          <span className="truncate">{seg.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </header>
           )}
