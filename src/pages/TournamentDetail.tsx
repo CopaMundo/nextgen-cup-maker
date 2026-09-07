@@ -453,7 +453,7 @@ const TournamentDetail = () => {
                         <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
                         <span className="truncate">{item.label}</span>
                         {active && (
-                          <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-primary" />
+                          <span className="absolute bottom-0 left-1/2 h-[3px] w-10 -translate-x-1/2 rounded-full bg-primary" />
                         )}
                       </button>
                     </TooltipTrigger>
