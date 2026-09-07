@@ -326,7 +326,7 @@ const TournamentDetail = () => {
       case "phases":
         return (
           <>
-            {categorySelector}
+            {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <PhaseManager key={`phases-${id}-${effectiveCategoryId ?? "all"}`} tournamentId={id!} tournamentType={tournament.tournament_type} categoryId={effectiveCategoryId} />
             )}
