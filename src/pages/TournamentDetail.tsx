@@ -44,12 +44,19 @@ const sidebarItems = [
   { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
 ] as const;
 
+const desktopNavGroups: { label: string; items: TabId[] }[] = [
+  { label: "Opzet", items: ["general", "teams", "phases"] },
+  { label: "Wedstrijden", items: ["schedule", "results", "statistics"] },
+  { label: "Publiek", items: ["sponsors", "polls", "presentation"] },
+];
+
 
 type TabId = typeof sidebarItems[number]["id"];
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
 const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
 const mobileSidebarStorageKey = "admin-mobile-sidebar-collapsed";
+
 
 const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
