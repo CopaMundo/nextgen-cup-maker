@@ -7,7 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy, Settings } from "lucide-react";
+import SettingsNav, { SectionHeader } from "@/components/SettingsShell";
+
+const GENERAL_NAV_ITEMS = [
+  { id: "info", label: "Toernooiinformatie", icon: Info },
+  { id: "wedstrijddagen", label: "Wedstrijddagen", icon: CalendarDays },
+  { id: "locaties", label: "Locaties", icon: MapPin },
+  { id: "divisies", label: "Divisies", icon: LayoutGrid },
+  { id: "puntentelling", label: "Puntensysteem", icon: Trophy },
+] as const;
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -594,7 +603,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
 
   return (
     <>
-      <div className="space-y-6 w-full">
+      <div className={cn("w-full", isMobile ? "space-y-6" : "flex items-start gap-6")}>
         {isMobile ? (
           generalSubTab === "overview" ? (
             <div className="grid grid-cols-1 gap-2">
@@ -643,32 +652,19 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           )
         ) : (
-          <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2">
-            {([
-              { id: "info", label: "Toernooi informatie" },
-              { id: "wedstrijddagen", label: "Wedstrijddagen" },
-              { id: "locaties", label: "Locaties" },
-              { id: "divisies", label: "Divisies" },
-              { id: "puntentelling", label: "Puntensysteem" },
-            ] as const).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setGeneralSubTab(tab.id)}
-                className={cn(
-                  "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                  generalSubTab === tab.id
-                    ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
+          <SettingsNav
+            title="Algemeen"
+            description="Beheer de basisgegevens van je toernooi."
+            icon={Settings}
+            items={GENERAL_NAV_ITEMS}
+            activeId={generalSubTab}
+            onSelect={(id) => setGeneralSubTab(id as typeof generalSubTab)}
+          />
         )}
 
+        <div className="min-w-0 flex-1 space-y-6">
         {generalSubTab === "info" && (
+
         <div className="section-card space-y-6">
           <h2 className="section-title">Toernooi informatie</h2>
 
@@ -1218,7 +1214,9 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
         )}
+        </div>
       </div>
+
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
         <DialogContent ref={addLocationDialogRef} className="max-w-sm">
