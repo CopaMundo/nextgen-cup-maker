@@ -73,6 +73,34 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
+  const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
+  const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
+
+  const subTabBar = <T extends string>(
+    items: readonly { id: T; label: string; icon: any }[],
+    active: T,
+    onSelect: (id: T) => void,
+  ) => (
+    <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 mb-4">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          onClick={() => onSelect(item.id)}
+          className={cn(
+            "relative flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors",
+            active === item.id
+              ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
+              : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+          )}
+        >
+          <item.icon className="h-4 w-4 shrink-0" />
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
   const [teamDetailOpen, setTeamDetailOpen] = useState(false);
   const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
