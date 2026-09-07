@@ -579,11 +579,21 @@ const TournamentDetail = () => {
           {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
               <div className="relative mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center gap-4">
-                {categorySelector && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                {activeTab === "schedule" ? (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-start gap-1 [&>*]:mb-0">
+                    {categorySelector}
+                    <LocationSelector
+                      tournamentId={id!}
+                      selectedLocation={selectedLocation}
+                      onSelect={setSelectedLocation}
+                      selectClassName="h-6 rounded-md px-1.5 text-[11px] font-medium leading-none"
+                    />
+                  </div>
+                ) : categorySelector ? (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 [&>*]:mb-0">
                     {categorySelector}
                   </div>
-                )}
+                ) : null}
                 {desktopSegments && (
                   <div className="flex shrink-0 items-center gap-1 border-b border-border">
                     {desktopSegments.items.map((seg) => {
