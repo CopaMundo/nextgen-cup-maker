@@ -36,15 +36,25 @@ const sidebarItems = [
   { id: "teams", icon: ShirtIcon, label: "Deelnemers", title: "Deelnemerslijst", desc: "Teams, spelers en scheidsrechters beheren" },
   { id: "phases", icon: BracketTreeIcon, label: "Format", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
   { id: "schedule", icon: CalendarClockIcon, label: "Schema", title: "Speelschema", desc: "Wedstrijden verdelen over velden en tijdsloten" },
-  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen", desc: "Scores invullen en standen bijwerken" },
-  { id: "statistics", icon: BarChart3, label: "Statistieken", title: "Cijfers & records", desc: "Topschutters, assists en fairplay" },
-  { id: "sponsors", icon: Handshake, label: "Sponsors", title: "Partners", desc: "Logo's van sponsors en partners" },
-  { id: "polls", icon: PollIcon, label: "Polls", title: "Publieksvragen", desc: "Stemmingen voor het publiek" },
-  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
+  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen & statistieken", desc: "Scores invullen, standen en cijfers" },
+  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, sponsors, polls en vormgeving" },
 ] as const;
 
+const resultsSubTabs = [
+  { id: "results", label: "Uitslagen", icon: ScoreboardIcon },
+  { id: "statistics", label: "Statistieken", icon: BarChart3 },
+] as const;
+
+const presentationSubTabs = [
+  { id: "presentation", label: "Weergave", icon: Tv2 },
+  { id: "sponsors", label: "Sponsors", icon: Handshake },
+  { id: "polls", label: "Polls", icon: PollIcon },
+] as const;
 
 type TabId = typeof sidebarItems[number]["id"];
+type ResultsSubTab = typeof resultsSubTabs[number]["id"];
+type PresentationSubTab = typeof presentationSubTabs[number]["id"];
+
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
 const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
