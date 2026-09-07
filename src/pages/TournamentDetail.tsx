@@ -583,7 +583,6 @@ const TournamentDetail = () => {
                   <h1 className="truncate font-display text-base font-bold uppercase tracking-wide text-foreground">
                     {activeItem?.title}
                   </h1>
-                  <p className="truncate text-xs text-muted-foreground">{activeItem?.desc}</p>
                 </div>
                 {desktopSegments && (
                   <div className="ml-auto flex shrink-0 items-center gap-1 border-b border-border">
