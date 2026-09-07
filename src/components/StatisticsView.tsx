@@ -484,6 +484,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
         </div>
       )}
     </div>
+    </TabSectionLayout>
   );
 
 };
