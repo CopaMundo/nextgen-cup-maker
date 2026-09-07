@@ -413,6 +413,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   return (
     <div className="space-y-6 w-full">
+      {!isMobile && <h2 className="section-title">Statistieken</h2>}
+
       {/* Mobiel: statistieken als tegels */}
       {isMobile && mobileOverview && (
         <div className="grid grid-cols-1 gap-2">
