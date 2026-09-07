@@ -2803,80 +2803,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
     const placementTitle = "Finale";
 
-    // === MOBILE COMPACT MODE ===
-    if (isMobile) {
-      return (
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-3">
-            {displayRounds.map((round, roundIdx) => {
-              const matchCount = round.matches.length;
-              const roundHeight = matchCount * CARD_H + (matchCount - 1) * GAP;
+    // === BRACKET TREE (fixed round columns + elbow connectors, mobile & desktop) ===
 
-              return (
-                <div key={round.id} className="flex-shrink-0" style={{ width: CARD_W }}>
-                  {/* Header */}
-                  <div className="text-center mb-3 h-6 flex items-center justify-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
-                        {getRoundDisplayName(round, bracketPrefix)}
-                      </span>
-                  </div>
-                  {/* Match cards — compact, no absolute positioning */}
-                  <div className="flex flex-col" style={{ gap: GAP }}>
-                    {round.matches.map((match) => (
-                      <div key={match.id}>{renderMatchCard(match)}</div>
-                    ))}
-                  </div>
-
-                  {/* Placement match below finale */}
-                  {roundIdx === displayRounds.length - 1 && displayRounds.length >= 2 && (() => {
-                    const currentPlacementRounds = getPlacementRoundsForBracket(displayRounds);
-                    const placementMatchIds = new Set(currentPlacementRounds.flatMap((r) => r.matches.map((m) => m.id)));
-                    const showInlinePlacement = inlinePlacementMatch && !placementMatchIds.has(inlinePlacementMatch.id);
-
-                    return (
-                      <div className="mt-6">
-                        {showInlinePlacement && (
-                          <div className="mb-2">
-                            <div className="text-center mb-1.5">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded inline-flex items-center gap-1">
-                                {placementTitle}
-                              </span>
-                            </div>
-                            {renderMatchCard(inlinePlacementMatch)}
-                          </div>
-                        )}
-                        {currentPlacementRounds.filter((r) => r.matches.length > 0).map((pRound) => (
-                          <div key={pRound.id}>
-                            <div className="text-center mb-1.5">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded inline-flex items-center gap-1">
-                                {pRound.name}
-                              </span>
-                            </div>
-                            {pRound.matches.map((m) => renderMatchCard(m))}
-                          </div>
-                        ))}
-                        {editable && !currentPlacementRounds.some((r) => r.matches.length > 0) && !showInlinePlacement && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            onClick={() => addPlacementMatch(displayRounds, bracketPrefix || undefined)}
-                          >
-                            <Plus className="h-3 w-3" /> Wedstrijd
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // === DESKTOP MODE (existing absolute positioning + SVG connectors) ===
     return (
       <div className="overflow-x-auto pb-4">
         <div className="flex" style={{ minHeight: totalHeight + 200 }}>
