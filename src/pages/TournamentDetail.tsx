@@ -81,17 +81,17 @@ const TournamentDetail = () => {
     active: string,
     onSelect: (id: any) => void,
   ) => (
-    <div className="flex flex-wrap items-center gap-2 px-1 py-1 mb-4">
+    <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 pb-0">
       {items.map((item) => (
         <button
           key={item.id}
           type="button"
           onClick={() => onSelect(item.id)}
           className={cn(
-            "flex items-center gap-2 rounded-full border px-4 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors",
+            "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
             active === item.id
-              ? "border-primary bg-primary text-primary-foreground shadow-sm"
-              : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground"
+              ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
+              : ""
           )}
         >
           <item.icon className="h-4 w-4 shrink-0" />
