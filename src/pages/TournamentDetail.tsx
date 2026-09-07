@@ -426,9 +426,9 @@ const TournamentDetail = () => {
         <TooltipProvider delayDuration={300}>
           <nav
             aria-label="Toernooibeheer"
-            className="shrink-0 border-b border-border bg-card/80 backdrop-blur-sm print:hidden"
+            className="shrink-0 py-2 print:hidden"
           >
-            <div className="mx-auto flex w-auto max-w-[1600px] items-stretch justify-center gap-1 px-6 xl:px-10">
+            <div className="mx-auto flex w-fit max-w-[1600px] items-stretch justify-center gap-1 rounded-xl border border-border bg-card/80 px-4 py-1 shadow-sm backdrop-blur-sm">
               {tournament.logo_url && (
                 <div className="flex shrink-0 items-center pr-4">
                   <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
@@ -444,7 +444,7 @@ const TournamentDetail = () => {
                         onClick={() => setActiveTab(item.id)}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "group relative flex shrink-0 items-center justify-center gap-2 rounded-t-lg px-4 py-3.5 text-sm font-semibold transition-colors",
+                          "group relative flex shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-colors",
                           active
                             ? "text-primary"
                             : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
@@ -453,7 +453,7 @@ const TournamentDetail = () => {
                         <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
                         <span className="truncate">{item.label}</span>
                         {active && (
-                          <span className="absolute bottom-0 left-3 right-3 h-[3px] rounded-full bg-primary" />
+                          <span className="absolute bottom-1 left-3 right-3 h-[3px] rounded-full bg-primary" />
                         )}
                       </button>
                     </TooltipTrigger>
