@@ -593,8 +593,23 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     return formatIsoDateForLocale(date, "nl-BE", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   };
 
+  const generalSections = [
+    { id: "info", label: "Toernooi informatie", icon: Info },
+    { id: "wedstrijddagen", label: "Wedstrijddagen", icon: CalendarDays },
+    { id: "locaties", label: "Locaties", icon: MapPin },
+    { id: "divisies", label: "Divisies", icon: LayoutGrid },
+    { id: "puntentelling", label: "Puntensysteem", icon: Trophy },
+  ];
+
   return (
     <>
+      <TabSectionLayout
+        title="Algemeen"
+        icon={Settings}
+        sections={generalSections}
+        activeSection={generalSubTab}
+        onSectionChange={(id) => setGeneralSubTab(id as typeof generalSubTab)}
+      >
       <div className="space-y-6 w-full">
         {isMobile ? (
           generalSubTab === "overview" ? (
