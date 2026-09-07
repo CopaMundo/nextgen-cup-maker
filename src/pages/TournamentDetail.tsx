@@ -284,11 +284,6 @@ const TournamentDetail = () => {
 
   const effectiveCategoryId = selectedCategoryId;
 
-  const tournamentDates = useMemo(() => {
-    if (!tournament) return [];
-    return getTournamentPlannerDates(tournament);
-  }, [tournament]);
-
   const renderContent = () => {
     switch (activeTab) {
       case "general":
