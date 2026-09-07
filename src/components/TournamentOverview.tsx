@@ -116,15 +116,16 @@ const TournamentOverview = ({ tournamentId, tournament, onNavigate }: Tournament
 
     const load = async () => {
       setLoading(true);
-      const [teamsRes, refsRes, phasesRes, formatsRes, sponsorsRes, pollsRes, fieldsRes] = await Promise.all([
+      const [teamsRes, phasesRes, groupsRes, sponsorsRes, pollsRes, locRes] = await Promise.all([
         supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
-        supabase.from("referees").select("id").eq("tournament_id", tournamentId),
         supabase.from("tournament_phases").select("id").eq("tournament_id", tournamentId),
-        supabase.from("phase_formats").select("id").eq("tournament_id", tournamentId),
-        supabase.from("sponsors").select("id").eq("tournament_id", tournamentId),
-        supabase.from("polls").select("id").eq("tournament_id", tournamentId),
-        supabase.from("fields").select("location").eq("tournament_id", tournamentId),
+        supabase.from("groups").select("id").eq("tournament_id", tournamentId),
+        supabase.from("tournament_sponsors").select("id").eq("tournament_id", tournamentId),
+        supabase.from("tournament_polls").select("id").eq("tournament_id", tournamentId),
+        supabase.from("tournament_locations").select("name").eq("tournament_id", tournamentId).order("sort_order"),
       ]);
+      const refereeList = Array.isArray((tournament as any)?.referees) ? (tournament as any).referees : [];
+
 
       let matches: any[] = [];
       try {
