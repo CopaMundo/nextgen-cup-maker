@@ -594,11 +594,11 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
   };
 
   const generalSections = [
-    { id: "info", label: "Toernooi informatie", icon: Info },
-    { id: "wedstrijddagen", label: "Wedstrijddagen", icon: CalendarDays },
-    { id: "locaties", label: "Locaties", icon: MapPin },
-    { id: "divisies", label: "Divisies", icon: LayoutGrid },
-    { id: "puntentelling", label: "Puntensysteem", icon: Trophy },
+    { id: "info", label: "Toernooi informatie", icon: <Info className="h-4 w-4" /> },
+    { id: "wedstrijddagen", label: "Wedstrijddagen", icon: <CalendarDays className="h-4 w-4" /> },
+    { id: "locaties", label: "Locaties", icon: <MapPin className="h-4 w-4" /> },
+    { id: "divisies", label: "Divisies", icon: <LayoutGrid className="h-4 w-4" /> },
+    { id: "puntentelling", label: "Puntensysteem", icon: <Trophy className="h-4 w-4" /> },
   ];
 
   return (
