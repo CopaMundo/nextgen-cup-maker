@@ -212,8 +212,6 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
       </div>
 
       <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">{sponsors.length} {sponsors.length === 1 ? "sponsor" : "sponsors"}</p>
-
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {sponsors.map(sponsor => (
             <div key={sponsor.id} className="rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-3 group relative">
