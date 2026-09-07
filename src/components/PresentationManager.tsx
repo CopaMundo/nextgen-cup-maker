@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Tv2, Globe, MonitorPlay, Palette } from "lucide-react";
+import { Tv2, MonitorPlay, Palette } from "lucide-react";
 import SettingsNav from "@/components/SettingsShell";
 import { supabase } from "@/integrations/supabase/client";
 import { BROADCAST_STYLES, SELECTABLE_BROADCAST_STYLES, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
