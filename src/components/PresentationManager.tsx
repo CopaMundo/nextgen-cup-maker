@@ -171,7 +171,6 @@ const PresentationManager = ({
       activeSection={subTab}
       onSectionChange={(id) => setSubTab(id as SubTab)}
     >
-    <>
       {isMobile && mobileOverview && (
         <div className="grid grid-cols-1 gap-2 mb-4">
           {tabs.map(t => (
