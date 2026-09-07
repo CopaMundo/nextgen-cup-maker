@@ -13,6 +13,8 @@ import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import ShirtIcon from "@/components/icons/ShirtIcon";
 import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
+import TournamentOverview from "@/components/TournamentOverview";
+
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
 import MatchScheduler from "@/components/MatchScheduler";
