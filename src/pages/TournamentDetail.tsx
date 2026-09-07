@@ -336,7 +336,7 @@ const TournamentDetail = () => {
       case "results":
         return (
           <>
-            {subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
+            {isMobile && subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
