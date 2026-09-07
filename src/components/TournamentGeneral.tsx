@@ -1205,6 +1205,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
             </div>
           </div>
         )}
+      </div>
       </TabSectionLayout>
 
       <Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
