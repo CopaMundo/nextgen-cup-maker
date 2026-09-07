@@ -24,6 +24,7 @@ import LocationSelector from "@/components/LocationSelector";
 import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
