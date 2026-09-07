@@ -157,8 +157,12 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   if (tabs.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border py-12 text-center">
-        <p className="text-muted-foreground">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
+      <div className="section-card space-y-5">
+        <h2 className="section-title">Statistieken</h2>
+        <div className="rounded-xl border border-dashed border-border bg-secondary/20 py-12 text-center">
+          <p className="text-muted-foreground">Voor dit toernooi worden geen spelerstatistieken bijgehouden.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Schakel statistieken in bij Algemeen &gt; Puntensysteem &gt; Spelersstatistieken.</p>
+        </div>
       </div>
     );
   }
