@@ -410,15 +410,15 @@ const TournamentDetail = () => {
                 <span>Overzicht</span>
               </button>
 
-              <div className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden">
+              <div className="flex flex-1 flex-wrap items-center gap-x-3 gap-y-1">
                 {desktopNavGroups.map((group, gi) => (
-                  <div key={group.label} className="flex min-w-0 items-center gap-3">
+                  <div key={group.label} className="flex items-center gap-3">
                     {gi > 0 && <span className="h-8 w-px shrink-0 bg-border" />}
-                    <div className="flex min-w-0 flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5">
                       <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70">
                         {group.label}
                       </span>
-                      <div className="flex min-w-0 items-center gap-0.5">
+                      <div className="flex items-center gap-0.5">
                         {group.items.map((itemId) => {
                           const item = sidebarItems.find((i) => i.id === itemId)!;
                           const active = activeTab === item.id;
@@ -430,14 +430,14 @@ const TournamentDetail = () => {
                                   onClick={() => setActiveTab(item.id)}
                                   aria-current={active ? "page" : undefined}
                                   className={cn(
-                                    "flex min-w-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold transition-colors",
+                                    "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[13px] font-semibold transition-colors",
                                     active
                                       ? "bg-primary/10 text-primary"
                                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                                   )}
                                 >
                                   <item.icon className="h-4 w-4 shrink-0" />
-                                  <span className="truncate">{item.label}</span>
+                                  <span>{item.label}</span>
                                 </button>
                               </TooltipTrigger>
                               <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
@@ -450,14 +450,6 @@ const TournamentDetail = () => {
                 ))}
               </div>
 
-              <div className="flex min-w-0 shrink-0 items-center gap-2 pl-2">
-                <span className="max-w-[220px] truncate text-sm font-bold text-foreground" title={tournament.name}>
-                  {tournament.name}
-                </span>
-                {tournament.logo_url && (
-                  <img src={tournament.logo_url} alt="" className="h-7 w-7 shrink-0 object-contain" />
-                )}
-              </div>
             </div>
           </nav>
         </TooltipProvider>
