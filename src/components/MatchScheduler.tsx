@@ -22,6 +22,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee, refereeViolations } from "@/lib/refereeConfig";
 import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix, getFieldLocation } from "@/lib/fieldLocations";
+import { cn } from "@/lib/utils";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -179,7 +180,7 @@ const formatDateDMY = (d: string | null) => {
   return d;
 };
 
-const getTournamentPlannerDates = (tournament: any) => {
+export const getTournamentPlannerDates = (tournament: any) => {
   const extraDays = expandMatchDays((tournament.match_days as MatchDayEntry[]) || []);
   // When explicit match days are configured, those are the only valid dates.
   if (extraDays.length > 0) return extraDays;
@@ -228,7 +229,7 @@ const useResponsiveWindowSize = () => {
   return size;
 };
 
-const DateStripNav = ({
+export const DateStripNav = ({
   dates,
   activeDate,
   onSelect,
@@ -339,7 +340,7 @@ const DateStripNav = ({
   );
 };
 
-const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode }) => {
+const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft, plannerDate: plannerDateProp, onPlannerDateChange }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode; plannerDate?: string; onPlannerDateChange?: (date: string) => void }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
 
@@ -410,10 +411,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const editRefDialogRef = useDialogFocus(editRefIdx !== null);
 
   // Planner state
-  const [plannerDate, setPlannerDateRaw] = useState<string>(() => {
+  const isPlannerDateControlled = plannerDateProp !== undefined;
+  const [internalPlannerDate, setInternalPlannerDate] = useState<string>(() => {
     const allDays = getTournamentPlannerDates(tournament);
     return allDays[0] || "";
   });
+  const plannerDate = isPlannerDateControlled ? plannerDateProp! : internalPlannerDate;
   const [plannerBreaks, setPlannerBreaksRaw] = useState<PlannerBreak[]>([]);
   const [showBreakAdd, setShowBreakAdd] = useState(false);
   const [newBreakDuration, setNewBreakDuration] = useState(20);
@@ -493,10 +496,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const pauzeDialogRef = useDialogFocus(!!showPauzeModal);
 
   const setPlannerDate = (date: string) => {
-    setPlannerDateRaw(date);
+    if (!isPlannerDateControlled) {
+      setInternalPlannerDate(date);
+    }
     if (typeof window !== "undefined") {
       window.localStorage.setItem(plannerDateStorageKey(tournamentId, categoryId ?? null), date);
     }
+    onPlannerDateChange?.(date);
   };
 
   // dnd-kit
@@ -654,7 +660,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const allDays = getTournamentPlannerDates(tournament);
     const firstScheduledDate = getFirstScheduledMatchDate(fetchedMatches);
-    const initialPlannerDate = firstScheduledDate || (allDays.includes(plannerDate) ? plannerDate : allDays[0] || "");
+    const currentValid = allDays.includes(plannerDate) ? plannerDate : allDays[0] || "";
+    const initialPlannerDate = firstScheduledDate || currentValid;
     if (initialPlannerDate && initialPlannerDate !== plannerDate) {
       setPlannerDate(initialPlannerDate);
     }
@@ -2928,7 +2935,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className="py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm">
+            <div className={cn("py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", isPlannerDateControlled && !isMobile ? "hidden" : "")}>
               <DateStripNav
                 dates={tournamentDates}
                 activeDate={plannerDate}

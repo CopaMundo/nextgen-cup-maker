@@ -15,7 +15,7 @@ import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
-import MatchScheduler from "@/components/MatchScheduler";
+import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey, DateStripNav } from "@/components/MatchScheduler";
 import ResultsManager from "@/components/ResultsManager";
 import PresentationManager from "@/components/PresentationManager";
 import RefereeManager from "@/components/RefereeManager";
@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 
 const sidebarItems = [
@@ -73,6 +74,7 @@ const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -88,6 +90,11 @@ const TournamentDetail = () => {
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
   const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
+
+  const [plannerDate, setPlannerDate] = useState<string>(() => {
+    if (typeof window === "undefined" || !id) return "";
+    return localStorage.getItem(plannerDateStorageKey(id, selectedCategoryId)) || "";
+  });
 
   const subTabBar = (
     items: readonly { id: string; label: string; icon: any }[],
@@ -170,6 +177,13 @@ const TournamentDetail = () => {
     setMobileDeelnemersOverview(false);
   };
 
+  const handlePlannerDateChange = (date: string) => {
+    setPlannerDate(date);
+    if (typeof window !== "undefined" && id) {
+      localStorage.setItem(plannerDateStorageKey(id, selectedCategoryId), date);
+    }
+  };
+
   // When tournament id changes, hydrate from localStorage
   useEffect(() => {
     if (!id) return;
@@ -182,6 +196,16 @@ const TournamentDetail = () => {
     const stored = localStorage.getItem(locationStorageKey(id));
     setSelectedLocationState(stored);
   }, [id]);
+
+  // Keep plannerDate storage key in sync with selected category and default to first tournament day
+  useEffect(() => {
+    if (!id || !tournament) return;
+    const allDays = getTournamentPlannerDates(tournament);
+    const key = plannerDateStorageKey(id, selectedCategoryId);
+    const stored = localStorage.getItem(key);
+    const valid = stored && allDays.includes(stored) ? stored : allDays[0] || "";
+    setPlannerDate((current) => (current !== valid ? valid : current));
+  }, [id, tournament, selectedCategoryId]);
 
   // For single-category tournaments, auto-select the lone category
   // For multi-category tournaments, validate / pick the first
@@ -259,6 +283,11 @@ const TournamentDetail = () => {
   );
 
   const effectiveCategoryId = selectedCategoryId;
+
+  const tournamentDates = useMemo(() => {
+    if (!tournament) return [];
+    return getTournamentPlannerDates(tournament);
+  }, [tournament]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -365,6 +394,8 @@ const TournamentDetail = () => {
             onLocationChange={setSelectedLocation}
             onManageReferees={goToRefereesTab}
             toolbarLeft={scheduleSelectors}
+            plannerDate={plannerDate}
+            onPlannerDateChange={handlePlannerDateChange}
           />
         ) : (
           <div className="flex flex-wrap items-center gap-3 mb-4">{scheduleSelectors}</div>
@@ -596,6 +627,20 @@ const TournamentDetail = () => {
                     {categorySelector}
                   </div>
                 ) : null}
+                {activeTab === "schedule" && tournamentDates.length > 0 && (
+                  <DateStripNav
+                    dates={tournamentDates}
+                    activeDate={plannerDate}
+                    onSelect={handlePlannerDateChange}
+                    onInvalidPick={(iso) => {
+                      toast({
+                        title: "Datum buiten toernooiperiode",
+                        description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
+                        variant: "destructive",
+                      });
+                    }}
+                  />
+                )}
                 {desktopSegments && (
                   <div className="flex shrink-0 items-center gap-1 border-b border-border">
                     {desktopSegments.items.map((seg) => {
