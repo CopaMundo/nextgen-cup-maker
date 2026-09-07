@@ -613,7 +613,7 @@ const TournamentDetail = () => {
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
               <div className="relative mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center gap-4">
                 {activeTab === "schedule" ? (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-start gap-1 [&>*]:mb-0">
+                  <div className="absolute left-16 xl:left-28 top-1/2 -translate-y-1/2 flex flex-col items-start gap-1 [&>*]:mb-0">
                     {categorySelector}
                     <LocationSelector
                       tournamentId={id!}
@@ -623,7 +623,7 @@ const TournamentDetail = () => {
                     />
                   </div>
                 ) : categorySelector ? (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 [&>*]:mb-0">
+                  <div className="absolute left-16 xl:left-28 top-1/2 -translate-y-1/2 [&>*]:mb-0">
                     {categorySelector}
                   </div>
                 ) : null}
@@ -632,6 +632,8 @@ const TournamentDetail = () => {
                     dates={tournamentDates}
                     activeDate={plannerDate}
                     onSelect={handlePlannerDateChange}
+                    maxVisible={3}
+                    centerActive
                     onInvalidPick={(iso) => {
                       toast({
                         title: "Datum buiten toernooiperiode",
