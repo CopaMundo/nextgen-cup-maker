@@ -415,6 +415,13 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   const activeLabel = tabs.find(t => t.id === activeTab)?.label || "";
 
   return (
+    <TabSectionLayout
+      title="Statistieken"
+      icon={<BarChart3 className="h-5 w-5" />}
+      sections={statSections}
+      activeSection={activeTab}
+      onSectionChange={(id) => setActiveTab(id as StatTab)}
+    >
     <div className="space-y-6 w-full">
       {/* Mobiel: statistieken als tegels */}
       {isMobile && mobileOverview && (
