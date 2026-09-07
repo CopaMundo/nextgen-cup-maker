@@ -659,7 +659,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const allDays = getTournamentPlannerDates(tournament);
     const firstScheduledDate = getFirstScheduledMatchDate(fetchedMatches);
-    const initialPlannerDate = firstScheduledDate || (allDays.includes(plannerDate) ? plannerDate : allDays[0] || "");
+    const currentValid = allDays.includes(plannerDate) ? plannerDate : allDays[0] || "";
+    const initialPlannerDate = firstScheduledDate || currentValid;
     if (initialPlannerDate && initialPlannerDate !== plannerDate) {
       setPlannerDate(initialPlannerDate);
     }
