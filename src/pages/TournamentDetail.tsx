@@ -403,8 +403,8 @@ const TournamentDetail = () => {
       : activeTab === "teams"
       ? {
           items: [
-            { id: "teams", label: tournament.teams_label || "Teams", icon: Users },
-            { id: "referees", label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
+            { id: "teams", label: tournament.teams_label || "Teams" },
+            { id: "referees", label: tournament.referees_label || "Scheidsrechters" },
           ],
           active: deelnemersSubTab,
           onSelect: setDeelnemersSubTab,
