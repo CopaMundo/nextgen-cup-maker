@@ -379,63 +379,87 @@ const TournamentDetail = () => {
           </div>
         </div>
       )}
-      <div className="relative flex flex-1 overflow-hidden min-h-0">
-        {/* Left icon sidebar */}
-        <TooltipProvider delayDuration={200}>
-          <nav
-            aria-label="Toernooibeheer"
-            className={cn(
-              "shrink-0 self-stretch bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width,border-color] duration-200",
-              isMobile
-                ? mobileSidebarCollapsed
-                  ? "relative w-0 border-r-0"
-                  : "relative w-14 items-center border-r border-border"
-                : "relative w-24 items-center border-r border-border"
-            )}
-          >
-            {tournament.logo_url && !isMobile && (
-              <div className="mb-1 shrink-0 border-b border-border px-2 py-2">
-                <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+      {/* Desktop: top tab bar */}
+      {!isMobile && (
+        <nav
+          aria-label="Toernooibeheer"
+          className="shrink-0 border-b border-border bg-card print:hidden"
+        >
+          <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-1 overflow-x-auto px-8 scrollbar-none">
+            {tournament.logo_url && (
+              <div className="flex shrink-0 items-center pr-4">
+                <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
               </div>
             )}
-            <div className={cn("min-h-0 w-full", isMobile ? "flex-1 overflow-y-auto scrollbar-none" : "flex flex-1 flex-col items-center gap-0.5 overflow-hidden")}>
-              {sidebarItems.map(item => (
-                <Tooltip key={item.id}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => {
-                        setActiveTab(item.id);
-                      }}
-                      aria-label={item.label}
-                      aria-current={activeTab === item.id ? "page" : undefined}
-                      className={cn(
-                        "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
-                        isMobile
-                          ? "mx-auto mb-1 h-11 w-11 justify-center p-0"
-                          : "w-20 flex-1 min-h-0 max-h-[56px] px-1 py-1 flex-col justify-center gap-0.5",
-                        activeTab === item.id
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                      )}
-                    >
-                      <item.icon className="h-[18px] w-[18px] shrink-0" />
-                      {!isMobile && (
-                        <span className="w-full truncate text-center text-[10px] font-medium leading-tight">
-                          {item.label}
-                        </span>
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="text-xs">
-                    {item.label}
-                  </TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-          </nav>
-        </TooltipProvider>
+            {sidebarItems.map((item) => {
+              const active = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveTab(item.id)}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex shrink-0 items-center gap-2 px-4 py-3 text-sm font-semibold transition-colors",
+                    active
+                      ? "text-primary after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[3px] after:rounded-full after:bg-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="h-[18px] w-[18px] shrink-0" />
+                  <span className="whitespace-nowrap">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      )}
+
+      <div className="relative flex flex-1 overflow-hidden min-h-0">
+        {/* Mobile: left icon sidebar */}
+        {isMobile && (
+          <TooltipProvider delayDuration={200}>
+            <nav
+              aria-label="Toernooibeheer"
+              className={cn(
+                "shrink-0 self-stretch bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width,border-color] duration-200",
+                mobileSidebarCollapsed
+                  ? "relative w-0 border-r-0"
+                  : "relative w-14 items-center border-r border-border"
+              )}
+            >
+              <div className="min-h-0 w-full flex-1 overflow-y-auto scrollbar-none">
+                {sidebarItems.map(item => (
+                  <Tooltip key={item.id}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setActiveTab(item.id);
+                        }}
+                        aria-label={item.label}
+                        aria-current={activeTab === item.id ? "page" : undefined}
+                        className={cn(
+                          "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
+                          "mx-auto mb-1 h-11 w-11 justify-center p-0",
+                          activeTab === item.id
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        )}
+                      >
+                        <item.icon className="h-[18px] w-[18px] shrink-0" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="text-xs">
+                      {item.label}
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </nav>
+          </TooltipProvider>
+        )}
 
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
@@ -446,6 +470,7 @@ const TournamentDetail = () => {
         </div>
 
       </div>
+
     </div>
   );
 };
