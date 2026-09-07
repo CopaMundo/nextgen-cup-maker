@@ -4,7 +4,9 @@ import { cn } from "@/lib/utils";
 export interface SettingsShellItem {
   id: string;
   label: string;
-  icon: ComponentType<{ className?: string }>;
+  icon?: ComponentType<{ className?: string }>;
+  /** Alternative to `icon` when the icon is already an element. */
+  iconNode?: ReactNode;
 }
 
 interface SettingsNavProps {
