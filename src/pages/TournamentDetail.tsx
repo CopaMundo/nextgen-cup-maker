@@ -336,13 +336,15 @@ const TournamentDetail = () => {
         const compactSelect = "h-7 w-auto min-w-fit rounded-md px-2 text-xs";
         const scheduleSelectors = (
           <>
-            <CategorySelector
-              tournamentId={id!}
-              isMultiCategory={tournament.is_multi_category}
-              selectedCategoryId={selectedCategoryId}
-              onSelect={setSelectedCategoryId}
-              selectClassName={compactSelect}
-            />
+            {isMobile && (
+              <CategorySelector
+                tournamentId={id!}
+                isMultiCategory={tournament.is_multi_category}
+                selectedCategoryId={selectedCategoryId}
+                onSelect={setSelectedCategoryId}
+                selectClassName={compactSelect}
+              />
+            )}
             <LocationSelector
               tournamentId={id!}
               selectedLocation={selectedLocation}
