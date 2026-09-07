@@ -36,15 +36,25 @@ const sidebarItems = [
   { id: "teams", icon: ShirtIcon, label: "Deelnemers", title: "Deelnemerslijst", desc: "Teams, spelers en scheidsrechters beheren" },
   { id: "phases", icon: BracketTreeIcon, label: "Format", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
   { id: "schedule", icon: CalendarClockIcon, label: "Schema", title: "Speelschema", desc: "Wedstrijden verdelen over velden en tijdsloten" },
-  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen", desc: "Scores invullen en standen bijwerken" },
-  { id: "statistics", icon: BarChart3, label: "Statistieken", title: "Cijfers & records", desc: "Topschutters, assists en fairplay" },
-  { id: "sponsors", icon: Handshake, label: "Sponsors", title: "Partners", desc: "Logo's van sponsors en partners" },
-  { id: "polls", icon: PollIcon, label: "Polls", title: "Publieksvragen", desc: "Stemmingen voor het publiek" },
-  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, schermvoorstelling en vormgeving" },
+  { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen & statistieken", desc: "Scores invullen, standen en cijfers" },
+  { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, sponsors, polls en vormgeving" },
 ] as const;
 
+const resultsSubTabs = [
+  { id: "results", label: "Uitslagen", icon: ScoreboardIcon },
+  { id: "statistics", label: "Statistieken", icon: BarChart3 },
+] as const;
+
+const presentationSubTabs = [
+  { id: "presentation", label: "Weergave", icon: Tv2 },
+  { id: "sponsors", label: "Sponsors", icon: Handshake },
+  { id: "polls", label: "Polls", icon: PollIcon },
+] as const;
 
 type TabId = typeof sidebarItems[number]["id"];
+type ResultsSubTab = typeof resultsSubTabs[number]["id"];
+type PresentationSubTab = typeof presentationSubTabs[number]["id"];
+
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
 const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
@@ -63,6 +73,34 @@ const TournamentDetail = () => {
   });
   const [activeTab, setActiveTab] = useState<TabId>("general");
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
+  const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
+  const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
+
+  const subTabBar = (
+    items: readonly { id: string; label: string; icon: any }[],
+    active: string,
+    onSelect: (id: any) => void,
+  ) => (
+    <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 mb-4">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          onClick={() => onSelect(item.id)}
+          className={cn(
+            "relative flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors",
+            active === item.id
+              ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
+              : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+          )}
+        >
+          <item.icon className="h-4 w-4 shrink-0" />
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
   const [teamDetailOpen, setTeamDetailOpen] = useState(false);
   const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
@@ -321,27 +359,29 @@ const TournamentDetail = () => {
       case "results":
         return (
           <>
+            {subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              resultsSubTab === "results" ? (
+                <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              ) : (
+                <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+              )
             )}
           </>
         );
-      case "statistics":
+      case "presentation":
         return (
           <>
-            {categorySelector}
-            {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+            {subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
+            {presentationSubTab === "presentation" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />
             )}
+            {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id!} />}
+            {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
           </>
         );
-      case "sponsors":
-        return <SponsorManager tournamentId={id!} />;
-      case "polls":
-        return <PollManager tournamentId={id!} tournament={tournament} />;
-      case "presentation":
-        return <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />;
+
       default:
         return null;
     }
