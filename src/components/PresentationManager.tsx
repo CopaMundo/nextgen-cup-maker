@@ -264,8 +264,8 @@ const PresentationManager = ({
             </div>
 
             {/* Site visibility */}
-            <div className={cn("rounded-lg border border-border bg-card space-y-4", isMobile ? "p-4" : "p-6")}>
-              <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+            <div className={cn("section-card space-y-5", isMobile && "p-4")}>
+              <h2 className="section-title">
                 <Globe className="h-5 w-5 text-primary" /> Zichtbaarheid op de site
               </h2>
               <div className="flex items-center justify-between">
