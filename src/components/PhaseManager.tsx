@@ -1277,22 +1277,21 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         </div>
       )}
 
-      {/* Phase tab-bar (Deelnemers-stijl) */}
+      {/* Phase tab-bar */}
       {containers.length > 0 && !isMobile && (
-        <div className="flex border-b border-border max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:justify-start sm:justify-center sm:flex-wrap">
+        <div className="flex border-b border-border flex-wrap gap-1 px-2 sm:justify-center">
           {containers.map((c) => {
             const isActive = activePhaseNumber === c.phaseNumber;
             return (
               <div key={c.phaseNumber} className="relative flex items-center">
                 <button
                   onClick={() => setActivePhaseNumber(c.phaseNumber)}
-                  className={
-                    "pl-6 pr-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative flex items-center gap-2 shrink-0 whitespace-nowrap rounded-t-md max-sm:pl-3 max-sm:text-xs " +
-                    (isActive
-                      ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                      : "text-muted-foreground hover:bg-accent/40 hover:text-foreground")
-
-                  }
+                  className={cn(
+                    "rounded-t-lg px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative flex items-center gap-2 shrink-0 whitespace-nowrap",
+                    isActive
+                      ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
+                      : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                  )}
                 >
                   <span>
                     {allFormats.some(f => f.phase_number === c.phaseNumber)
@@ -1331,7 +1330,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           })}
           <button
             onClick={addNewPhase}
-            className="px-6 py-3 text-sm font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap max-sm:px-3 max-sm:text-xs"
+            className="rounded-t-lg px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide text-primary hover:bg-primary/[0.06] transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             title="Fase toevoegen"
           >
             <Plus className="h-4 w-4" /> Fase toevoegen
