@@ -2774,8 +2774,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
-    const CARD_W = 272;
-    const CONNECTOR_W = 32;
+    const CARD_W = isMobile ? 236 : 272;
+    const CONNECTOR_W = isMobile ? 24 : 32;
     // Card height is measured from the real DOM (headers, dates, score inputs all change it),
     // so spacing stays correct whether cards are empty, filled with teams or with scores.
     const CARD_H = Math.max(measuredCardH, effectiveScoreEditable ? 92 : 78);
