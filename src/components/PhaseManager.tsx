@@ -1306,7 +1306,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                         tabIndex={0}
                         onClick={(e) => { e.stopPropagation(); openPhaseEdit(c.phaseNumber); }}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); openPhaseEdit(c.phaseNumber); } }}
-                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                        className="p-1 rounded text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 cursor-pointer"
                         title="Naam bewerken"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -1317,7 +1317,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
                           tabIndex={0}
                           onClick={(e) => { e.stopPropagation(); setDeletePhaseNumber(c.phaseNumber); }}
                           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); setDeletePhaseNumber(c.phaseNumber); } }}
-                          className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted cursor-pointer"
+                          className="p-1 rounded text-primary-foreground/70 hover:text-destructive hover:bg-white/10 cursor-pointer"
                           title="Fase verwijderen"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -1331,7 +1331,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           })}
           <button
             onClick={addNewPhase}
-            className="rounded-t-lg px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide text-primary hover:bg-primary/[0.06] transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="rounded-full border border-dashed border-primary/50 px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide text-primary hover:bg-primary/10 transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             title="Fase toevoegen"
           >
             <Plus className="h-4 w-4" /> Fase toevoegen
