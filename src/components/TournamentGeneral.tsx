@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, X, Check, CalendarPlus, FileText, Info, ArrowLeft, CalendarDays, MapPin, LayoutGrid, Trophy, Settings } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -21,6 +21,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getFairplayConfig, FAIRPLAY_DEFAULTS } from "@/lib/fairplay";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
