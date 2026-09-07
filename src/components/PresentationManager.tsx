@@ -306,8 +306,8 @@ const PresentationManager = ({
         {subTab === "visualization" && (
           <>
             {/* Broadcast style */}
-            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-              <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+            <div className="section-card space-y-5">
+              <h2 className="section-title">
                 <Eye className="h-5 w-5 text-primary" /> Broadcast stijl
               </h2>
               {(() => {
