@@ -350,7 +350,7 @@ const TournamentDetail = () => {
       case "presentation":
         return (
           <>
-            {subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
+            {isMobile && subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
             {presentationSubTab === "presentation" && (
               <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />
             )}
