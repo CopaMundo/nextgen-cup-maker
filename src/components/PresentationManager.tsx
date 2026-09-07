@@ -24,11 +24,15 @@ import {
   HelpCircle,
   ChevronRight,
   ArrowLeft,
+  Handshake,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
+import SponsorManager from "./SponsorManager";
+import PollManager from "./PollManager";
+import PollIcon from "@/components/icons/PollIcon";
 import { useIsMobile } from "@/hooks/use-mobile";
 import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
 import slideshowIconAsset from "@/assets/television.png.asset.json";
@@ -52,7 +56,7 @@ const MaskIcon = ({ src, label, className = "h-4 w-4" }: { src: string; label: s
   />
 );
 
-type SubTab = "website" | "slideshow" | "visualization";
+type SubTab = "website" | "slideshow" | "visualization" | "sponsors" | "polls";
 
 const PresentationManager = ({
   tournament,
@@ -151,6 +155,8 @@ const PresentationManager = ({
     { id: "website", label: "Website", icon: <MaskIcon src={websiteIconAsset.url} label="Website" className="h-5 w-5" /> },
     { id: "slideshow", label: "Dialoogvoorstelling", icon: <MaskIcon src={slideshowIconAsset.url} label="Dialoogvoorstelling" className="h-5 w-5" /> },
     { id: "visualization", label: "Vormgeving", icon: <MaskIcon src={stylingIconAsset.url} label="Vormgeving" className="h-5 w-5" /> },
+    { id: "sponsors", label: "Sponsors", icon: <Handshake className="h-5 w-5 text-primary" /> },
+    { id: "polls", label: "Polls", icon: <PollIcon className="h-5 w-5 text-primary" /> },
   ];
 
   const activeLabel = tabs.find(t => t.id === subTab)?.label ?? "";
@@ -284,6 +290,10 @@ const PresentationManager = ({
 
           </>
         )}
+
+        {subTab === "sponsors" && <SponsorManager tournamentId={tournament.id} />}
+
+        {subTab === "polls" && <PollManager tournamentId={tournament.id} tournament={tournament} />}
 
         {subTab === "slideshow" && (
           <>
