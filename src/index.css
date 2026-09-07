@@ -203,6 +203,32 @@ input[type="number"] {
 }
 
 /* ======================================================================
+   DESKTOP REFINEMENT — spacing, typography and section hierarchy
+   ====================================================================== */
+@layer utilities {
+  .section-card {
+    @apply rounded-xl border border-border bg-card p-5 sm:p-7 lg:p-8 shadow-sm;
+  }
+
+  .section-title {
+    @apply flex items-center gap-3 font-display text-lg font-bold text-foreground sm:text-xl;
+  }
+
+  .section-title::before {
+    content: "";
+    @apply h-6 w-1 rounded-full bg-primary;
+  }
+
+  .form-label {
+    @apply text-xs font-bold uppercase tracking-wider text-muted-foreground;
+  }
+
+  .desktop-readable {
+    @apply text-sm sm:text-[15px] leading-relaxed;
+  }
+}
+
+/* ======================================================================
    PRINT STYLES — Planner
    ====================================================================== */
 @media print {

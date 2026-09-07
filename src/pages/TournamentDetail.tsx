@@ -385,11 +385,11 @@ const TournamentDetail = () => {
         <TooltipProvider delayDuration={300}>
           <nav
             aria-label="Toernooibeheer"
-            className="shrink-0 border-b border-border bg-card print:hidden"
+            className="shrink-0 border-b border-border bg-card/80 backdrop-blur-sm print:hidden"
           >
-            <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-0.5 px-3 xl:px-6">
+            <div className="mx-auto flex w-full max-w-[1600px] items-stretch gap-1 px-3 xl:px-6">
               {tournament.logo_url && (
-                <div className="flex shrink-0 items-center pr-3">
+                <div className="flex shrink-0 items-center pr-4">
                   <img src={tournament.logo_url} alt="" className="h-7 w-7 object-contain" />
                 </div>
               )}
@@ -403,14 +403,17 @@ const TournamentDetail = () => {
                         onClick={() => setActiveTab(item.id)}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "relative flex min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 px-1.5 py-3 text-[13px] font-semibold transition-colors",
+                          "group relative flex min-w-0 flex-1 basis-0 items-center justify-center gap-2 rounded-t-lg px-2 py-3.5 text-sm font-semibold transition-colors",
                           active
-                            ? "text-primary after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-[3px] after:rounded-full after:bg-primary"
-                            : "text-muted-foreground hover:text-foreground"
+                            ? "text-primary"
+                            : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
                         )}
                       >
-                        <item.icon className="h-[18px] w-[18px] shrink-0" />
+                        <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
                         <span className="truncate">{item.label}</span>
+                        {active && (
+                          <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-primary" />
+                        )}
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="text-xs">{item.title}</TooltipContent>
@@ -471,8 +474,8 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          <div className="px-3 sm:px-8 py-3 sm:py-6 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
-            <div className="flex flex-col">{renderContent()}</div>
+          <div className="px-3 sm:px-8 lg:px-10 py-4 sm:py-6 lg:py-8 w-full flex flex-col sm:mx-auto sm:max-w-[1600px]">
+            <div className="flex flex-col gap-4">{renderContent()}</div>
           </div>
 
 
