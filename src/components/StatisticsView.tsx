@@ -451,16 +451,16 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       {!isMobile && (
         <div className="section-card space-y-5">
-          <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2">
+          <div className="flex justify-center flex-wrap gap-2 px-2 py-1">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
+                  "rounded-full border px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors",
                   activeTab === tab.id
-                    ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                    : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground"
                 )}
               >
                 {tab.label}
