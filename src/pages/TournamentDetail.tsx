@@ -611,8 +611,8 @@ const TournamentDetail = () => {
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 pl-3 pr-6 backdrop-blur lg:pl-4 lg:pr-8 print:hidden">
-              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center gap-6">
-                <div className="flex flex-col items-start gap-1 shrink-0 [&>*]:mb-0">
+              <div className="mx-auto grid h-14 w-full max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-6">
+                <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
                   {categorySelector}
                   {activeTab === "schedule" && (
                     <LocationSelector
@@ -624,7 +624,7 @@ const TournamentDetail = () => {
                   )}
                 </div>
 
-                <div className="flex min-w-0 flex-1 justify-center">
+                <div className="flex min-w-0 justify-center justify-self-center">
                   {activeTab === "schedule" && tournamentDates.length > 0 ? (
                     <DateStripNav
                       dates={tournamentDates}
@@ -667,7 +667,7 @@ const TournamentDetail = () => {
                   )}
                 </div>
 
-                <div className="hidden shrink-0 lg:block lg:flex-1" />
+                <div aria-hidden="true" />
               </div>
             </header>
           )}
