@@ -578,8 +578,12 @@ const TournamentDetail = () => {
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 px-6 backdrop-blur lg:px-8 print:hidden">
-              <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center gap-4">
-                {categorySelector}
+              <div className="relative mx-auto flex h-14 w-full max-w-[1600px] items-center justify-center gap-4">
+                {categorySelector && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                    {categorySelector}
+                  </div>
+                )}
                 {desktopSegments && (
                   <div className="flex shrink-0 items-center gap-1 border-b border-border">
                     {desktopSegments.items.map((seg) => {
