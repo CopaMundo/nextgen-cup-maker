@@ -447,7 +447,7 @@ const PresentationManager = ({
           </DialogContent>
         </Dialog>
       </div>
-    </>
+    </TabSectionLayout>
   );
 };
 
