@@ -605,7 +605,7 @@ const TournamentGeneral = ({ tournament, onUpdate }: { tournament: any; onUpdate
     <>
       <TabSectionLayout
         title="Algemeen"
-        icon={Settings}
+        icon={<Settings className="h-5 w-5" />}
         sections={generalSections}
         activeSection={generalSubTab}
         onSectionChange={(id) => setGeneralSubTab(id as typeof generalSubTab)}
