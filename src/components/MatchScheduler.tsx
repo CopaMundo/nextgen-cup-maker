@@ -495,10 +495,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const pauzeDialogRef = useDialogFocus(!!showPauzeModal);
 
   const setPlannerDate = (date: string) => {
-    setPlannerDateRaw(date);
+    if (!isPlannerDateControlled) {
+      setInternalPlannerDate(date);
+    }
     if (typeof window !== "undefined") {
       window.localStorage.setItem(plannerDateStorageKey(tournamentId, categoryId ?? null), date);
     }
+    onPlannerDateChange?.(date);
   };
 
   // dnd-kit
