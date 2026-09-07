@@ -9,6 +9,7 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, ArrowUp, ArrowDown, Trash2, Info, Pencil, ChevronRight, ArrowLeft, Grid3X3 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
