@@ -397,8 +397,6 @@ const TournamentDetail = () => {
     }
   };
 
-  const activeItem = sidebarItems.find((item) => item.id === activeTab);
-
   const desktopSegments: { items: readonly { id: string; label: string; icon?: any }[]; active: string; onSelect: (id: any) => void } | null =
     activeTab === "general"
       ? { items: generalSubTabs, active: generalSubTab, onSelect: setGeneralSubTab }
