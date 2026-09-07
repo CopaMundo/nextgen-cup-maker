@@ -24,12 +24,14 @@ import {
   HelpCircle,
   ChevronRight,
   ArrowLeft,
+  Tv2,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TabSectionLayout } from "@/components/TabSectionLayout";
 import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
 import slideshowIconAsset from "@/assets/television.png.asset.json";
 import stylingIconAsset from "@/assets/paint_2.png.asset.json";
