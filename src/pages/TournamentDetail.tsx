@@ -203,11 +203,20 @@ const TournamentDetail = () => {
         return <TournamentGeneral tournament={tournament} onUpdate={t => setTournament(t)} />;
       case "teams":
         return (
-          <>
+          <TabSectionLayout
+            title="Deelnemers"
+            icon={<Users className="h-5 w-5" />}
+            sections={[
+              { id: "teams", label: tournament.teams_label || "Teams", icon: <ShirtIcon className="h-4 w-4" /> },
+              { id: "referees", label: tournament.referees_label || "Scheidsrechters", icon: <GiWhistle className="h-4 w-4" /> },
+            ]}
+            activeSection={deelnemersSubTab}
+            onSectionChange={(id) => setDeelnemersSubTab(id as typeof deelnemersSubTab)}
+          >
             {categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <>
-                {isMobile ? (
+                {isMobile && (
                   mobileDeelnemersOverview ? (
                     <div className="grid grid-cols-1 gap-2">
                       {([
@@ -240,30 +249,6 @@ const TournamentDetail = () => {
                       </h2>
                     </div>
                   )
-                ) : (
-                <div className="flex justify-center border-b border-border mb-6">                  <button
-                    onClick={() => setDeelnemersSubTab("teams")}
-                    className={cn(
-                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "teams"
-                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {tournament.teams_label || "Teams"}
-                  </button>
-                  <button
-                    onClick={() => setDeelnemersSubTab("referees")}
-                    className={cn(
-                      "px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                      deelnemersSubTab === "referees"
-                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {tournament.referees_label || "Scheidsrechters"}
-                  </button>
-                </div>
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -273,7 +258,7 @@ const TournamentDetail = () => {
                 )}
               </>
             )}
-          </>
+          </TabSectionLayout>
         );
       case "phases":
         return (
