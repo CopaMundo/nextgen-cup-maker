@@ -410,10 +410,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const editRefDialogRef = useDialogFocus(editRefIdx !== null);
 
   // Planner state
-  const [plannerDate, setPlannerDateRaw] = useState<string>(() => {
+  const isPlannerDateControlled = plannerDateProp !== undefined;
+  const [internalPlannerDate, setInternalPlannerDate] = useState<string>(() => {
     const allDays = getTournamentPlannerDates(tournament);
     return allDays[0] || "";
   });
+  const plannerDate = isPlannerDateControlled ? plannerDateProp! : internalPlannerDate;
   const [plannerBreaks, setPlannerBreaksRaw] = useState<PlannerBreak[]>([]);
   const [showBreakAdd, setShowBreakAdd] = useState(false);
   const [newBreakDuration, setNewBreakDuration] = useState(20);
