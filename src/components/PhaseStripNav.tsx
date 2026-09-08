@@ -9,6 +9,7 @@ export interface PhaseHeaderState {
   onEdit: (n: number) => void;
   onDelete: (n: number) => void;
   onAdd: () => void;
+  onAddFormat: () => void;
 }
 
 const PHASE_WINDOW = 3;
