@@ -1299,8 +1299,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               key={c.phaseNumber}
               role="button"
               tabIndex={0}
-              onClick={() => { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); } }}
+              onClick={() => { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(c.formats.length === 1 ? c.formats[0].id : null); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(c.formats.length === 1 ? c.formats[0].id : null); } }}
               className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -1460,7 +1460,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   canMoveDown={formatIdx < container.formats.length - 1}
                   onMoveUp={() => formatIdx > 0 && swapFormats(format, container.formats[formatIdx - 1])}
                   onMoveDown={() => formatIdx < container.formats.length - 1 && swapFormats(format, container.formats[formatIdx + 1])}
-                  initialExpanded={format.id === newlyCreatedId}
+                  initialExpanded={container.formats.length === 1 || format.id === newlyCreatedId}
                 />
                   )}
                 </SortableRowShell>
