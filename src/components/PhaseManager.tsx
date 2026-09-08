@@ -1290,6 +1290,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
 
   return (
     <div className="space-y-6">
+      {phaseHeaderReporter}
       {/* Mobiel: fases als tegels */}
       {isMobile && mobilePhaseOverview && (
         <div className="grid grid-cols-1 gap-2">
