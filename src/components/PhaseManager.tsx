@@ -1281,21 +1281,15 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
       )}
 
       {/* Phase strip nav (max 3 zichtbaar, pijltjes, middelste actief) */}
-      {containers.length > 0 && !isMobile && (
+      {containers.length > 0 && !isMobile && !onHeaderStateChange && (
         <div className="sticky top-0 z-20 -mt-2 border-b border-border bg-background/95 py-2 backdrop-blur">
           <div className="flex items-center justify-center gap-4">
             <PhaseStripNav
-              containers={containers}
+              phases={phaseHeaderList}
               activePhaseNumber={activePhaseNumber}
               onSelect={setActivePhaseNumber}
-              labelFor={(n) =>
-                allFormats.some((f) => f.phase_number === n)
-                  ? getPhaseLabel(n, allFormats)
-                  : (pendingPhaseLabels[n] || `Fase ${n}`)
-              }
               onEdit={openPhaseEdit}
               onDelete={(n) => setDeletePhaseNumber(n)}
-              canDelete={(n) => containers.length > 1 && n !== 1}
             />
             <Button size="sm" onClick={addNewPhase} title="Fase toevoegen" className="shrink-0 gap-1.5">
               <Plus className="h-4 w-4" /> Fase toevoegen
