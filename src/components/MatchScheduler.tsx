@@ -453,8 +453,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const isPlannerDateControlled = plannerDateProp !== undefined;
   const [internalPlannerDate, setInternalPlannerDate] = useState<string>(() => {
     const allDays = getTournamentPlannerDates(tournament);
-    return allDays[0] || "";
+    return getMiddleDate(allDays);
   });
+
   const plannerDate = isPlannerDateControlled ? plannerDateProp! : internalPlannerDate;
   const [plannerBreaks, setPlannerBreaksRaw] = useState<PlannerBreak[]>([]);
   const [showBreakAdd, setShowBreakAdd] = useState(false);
