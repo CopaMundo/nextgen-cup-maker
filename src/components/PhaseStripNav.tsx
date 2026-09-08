@@ -9,6 +9,7 @@ export interface PhaseHeaderState {
   onEdit: (n: number) => void;
   onDelete: (n: number) => void;
   onAdd: () => void;
+  onAddFormat: () => void;
 }
 
 const PHASE_WINDOW = 3;
@@ -19,7 +20,7 @@ export const PhaseStripNav = ({
   onSelect,
   onEdit,
   onDelete,
-}: Omit<PhaseHeaderState, "onAdd">) => {
+}: Omit<PhaseHeaderState, "onAdd" | "onAddFormat">) => {
   const numbers = phases.map((p) => p.phaseNumber);
   const labelFor = (n: number) => phases.find((p) => p.phaseNumber === n)?.label ?? `Fase ${n}`;
   const canDelete = (n: number) => phases.find((p) => p.phaseNumber === n)?.canDelete ?? false;
