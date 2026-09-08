@@ -20,7 +20,7 @@ export const PhaseStripNav = ({
   onSelect,
   onEdit,
   onDelete,
-}: Omit<PhaseHeaderState, "onAdd">) => {
+}: Omit<PhaseHeaderState, "onAdd" | "onAddFormat">) => {
   const numbers = phases.map((p) => p.phaseNumber);
   const labelFor = (n: number) => phases.find((p) => p.phaseNumber === n)?.label ?? `Fase ${n}`;
   const canDelete = (n: number) => phases.find((p) => p.phaseNumber === n)?.canDelete ?? false;
