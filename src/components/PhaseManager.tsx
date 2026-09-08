@@ -1224,6 +1224,36 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
 
   const openFormat = openFormatId ? allFormats.find((f) => f.id === openFormatId) ?? null : null;
 
+  const phaseHeaderList = containers.map((c) => ({
+    phaseNumber: c.phaseNumber,
+    label: allFormats.some((f) => f.phase_number === c.phaseNumber)
+      ? getPhaseLabel(c.phaseNumber, allFormats)
+      : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`),
+    canDelete: containers.length > 1 && c.phaseNumber !== 1,
+  }));
+
+  const phaseHeaderKey = `${phaseHeaderList.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
+  const phaseHeaderRef = useRef({ list: phaseHeaderList, active: activePhaseNumber });
+  phaseHeaderRef.current = { list: phaseHeaderList, active: activePhaseNumber };
+
+  useEffect(() => {
+    if (!onHeaderStateChange || isMobile) return;
+    onHeaderStateChange({
+      phases: phaseHeaderRef.current.list,
+      activePhaseNumber: phaseHeaderRef.current.active,
+      onSelect: (n) => setActivePhaseNumber(n),
+      onEdit: (n) => openPhaseEdit(n),
+      onDelete: (n) => setDeletePhaseNumber(n),
+      onAdd: () => addNewPhase(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phaseHeaderKey, isMobile, !!onHeaderStateChange]);
+
+  useEffect(() => {
+    return () => onHeaderStateChange?.(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Mobiel: fases als tegels */}
