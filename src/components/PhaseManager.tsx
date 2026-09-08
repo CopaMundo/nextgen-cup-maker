@@ -23,129 +23,13 @@ import { SortableVerticalList, SortableRowShell } from "@/components/SortableLis
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
 
 import listIconPng from "@/assets/list_1.png";
 
 const formatTypeLabel = (t: string) =>
   t === "group" ? "Groepsfase" : t === "knockout" ? "Knock-outfase" : t === "single_match" ? "Losse wedstrijd" : "Round Robin";
 
-const PHASE_WINDOW = 3;
-
-const PhaseStripNav = ({
-  containers,
-  activePhaseNumber,
-  onSelect,
-  labelFor,
-  onEdit,
-  onDelete,
-  canDelete,
-}: {
-  containers: { phaseNumber: number }[];
-  activePhaseNumber: number | null;
-  onSelect: (n: number) => void;
-  labelFor: (n: number) => string;
-  onEdit: (n: number) => void;
-  onDelete: (n: number) => void;
-  canDelete: (n: number) => boolean;
-}) => {
-  const numbers = containers.map((c) => c.phaseNumber);
-  const windowSize = Math.min(PHASE_WINDOW, numbers.length);
-  const maxStart = Math.max(0, numbers.length - windowSize);
-  const [windowStart, setWindowStart] = useState(0);
-
-  useEffect(() => {
-    if (activePhaseNumber === null) return;
-    const idx = numbers.indexOf(activePhaseNumber);
-    if (idx === -1) return;
-    const centered = idx - Math.floor((windowSize - 1) / 2);
-    setWindowStart(Math.min(maxStart, Math.max(0, centered)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePhaseNumber, windowSize, maxStart]);
-
-  const safeStart = Math.min(windowStart, maxStart);
-  const visible = numbers.slice(safeStart, safeStart + windowSize);
-  const showNav = numbers.length > windowSize;
-  const middleIndex = Math.floor(visible.length / 2);
-
-  const shift = (dir: -1 | 1) => {
-    const next = Math.min(maxStart, Math.max(0, safeStart + dir));
-    setWindowStart(next);
-    const mid = numbers[next + middleIndex];
-    if (mid !== undefined && mid !== activePhaseNumber) onSelect(mid);
-  };
-
-  return (
-    <div className="flex min-w-0 items-center gap-2">
-      {showNav && (
-        <button
-          type="button"
-          onClick={() => shift(-1)}
-          disabled={safeStart === 0}
-          className="shrink-0 p-1 text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
-          aria-label="Vorige fases"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-      )}
-
-      <div className="flex items-center gap-4 overflow-hidden whitespace-nowrap">
-        {visible.map((n) => {
-          const isActive = activePhaseNumber === n;
-          return (
-            <div key={n} className="flex shrink-0 items-center gap-1">
-              <button
-                type="button"
-                onClick={() => onSelect(n)}
-                className={cn(
-                  "py-1 text-sm font-semibold uppercase tracking-wide transition-colors",
-                  isActive
-                    ? "border-b-2 border-primary text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {labelFor(n)}
-              </button>
-              {isActive && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => onEdit(n)}
-                    className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                    title="Naam bewerken"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  {canDelete(n) && (
-                    <button
-                      type="button"
-                      onClick={() => onDelete(n)}
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-destructive"
-                      title="Fase verwijderen"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {showNav && (
-        <button
-          type="button"
-          onClick={() => shift(1)}
-          disabled={safeStart >= maxStart}
-          className="shrink-0 p-1 text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
-          aria-label="Volgende fases"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      )}
-    </div>
-  );
-};
 
 const phaseListIcon = (className = "h-4 w-4") => (
   <span
@@ -180,7 +64,7 @@ interface PhaseContainer {
   formats: Phase[];
 }
 
-const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
+const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateChange }: { tournamentId: string; tournamentType: string; categoryId?: string | null; onHeaderStateChange?: (state: PhaseHeaderState | null) => void }) => {
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
   const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
@@ -1340,6 +1224,36 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
 
   const openFormat = openFormatId ? allFormats.find((f) => f.id === openFormatId) ?? null : null;
 
+  const phaseHeaderList = containers.map((c) => ({
+    phaseNumber: c.phaseNumber,
+    label: allFormats.some((f) => f.phase_number === c.phaseNumber)
+      ? getPhaseLabel(c.phaseNumber, allFormats)
+      : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`),
+    canDelete: containers.length > 1 && c.phaseNumber !== 1,
+  }));
+
+  const phaseHeaderKey = `${phaseHeaderList.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
+  const phaseHeaderRef = useRef({ list: phaseHeaderList, active: activePhaseNumber });
+  phaseHeaderRef.current = { list: phaseHeaderList, active: activePhaseNumber };
+
+  useEffect(() => {
+    if (!onHeaderStateChange || isMobile) return;
+    onHeaderStateChange({
+      phases: phaseHeaderRef.current.list,
+      activePhaseNumber: phaseHeaderRef.current.active,
+      onSelect: (n) => setActivePhaseNumber(n),
+      onEdit: (n) => openPhaseEdit(n),
+      onDelete: (n) => setDeletePhaseNumber(n),
+      onAdd: () => addNewPhase(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phaseHeaderKey, isMobile, !!onHeaderStateChange]);
+
+  useEffect(() => {
+    return () => onHeaderStateChange?.(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Mobiel: fases als tegels */}
@@ -1397,21 +1311,15 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       )}
 
       {/* Phase strip nav (max 3 zichtbaar, pijltjes, middelste actief) */}
-      {containers.length > 0 && !isMobile && (
+      {containers.length > 0 && !isMobile && !onHeaderStateChange && (
         <div className="sticky top-0 z-20 -mt-2 border-b border-border bg-background/95 py-2 backdrop-blur">
           <div className="flex items-center justify-center gap-4">
             <PhaseStripNav
-              containers={containers}
+              phases={phaseHeaderList}
               activePhaseNumber={activePhaseNumber}
               onSelect={setActivePhaseNumber}
-              labelFor={(n) =>
-                allFormats.some((f) => f.phase_number === n)
-                  ? getPhaseLabel(n, allFormats)
-                  : (pendingPhaseLabels[n] || `Fase ${n}`)
-              }
               onEdit={openPhaseEdit}
               onDelete={(n) => setDeletePhaseNumber(n)}
-              canDelete={(n) => containers.length > 1 && n !== 1}
             />
             <Button size="sm" onClick={addNewPhase} title="Fase toevoegen" className="shrink-0 gap-1.5">
               <Plus className="h-4 w-4" /> Fase toevoegen
