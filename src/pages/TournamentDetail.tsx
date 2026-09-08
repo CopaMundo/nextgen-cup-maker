@@ -646,9 +646,6 @@ const TournamentDetail = () => {
                         onDelete={phaseHeader.onDelete}
                       />
                       <div className="flex shrink-0 items-center gap-2">
-                        <Button size="sm" variant="outline" onClick={phaseHeader.onAddFormat} title="Format toevoegen" className="gap-1.5">
-                          <Plus className="h-4 w-4" /> Format
-                        </Button>
                         <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
                           <Plus className="h-4 w-4" /> Fase
                         </Button>
