@@ -1278,64 +1278,27 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         </div>
       )}
 
-      {/* Phase tab-bar */}
+      {/* Phase strip nav (max 3 zichtbaar, pijltjes, middelste actief) */}
       {containers.length > 0 && !isMobile && (
-        <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 pb-0 sm:justify-center">
-          {containers.map((c) => {
-            const isActive = activePhaseNumber === c.phaseNumber;
-            return (
-              <div key={c.phaseNumber} className="relative flex items-center">
-                <button
-                  onClick={() => setActivePhaseNumber(c.phaseNumber)}
-                  className={cn(
-                    "relative rounded-t-lg px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors flex items-center gap-2 shrink-0 whitespace-nowrap text-muted-foreground hover:text-foreground",
-                    isActive
-                      ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
-                      : ""
-                  )}
-                >
-                  <span>
-                    {allFormats.some(f => f.phase_number === c.phaseNumber)
-                      ? getPhaseLabel(c.phaseNumber, allFormats)
-                      : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`)}
-                  </span>
-                  {isActive && (
-                    <span className="flex items-center gap-0.5 ml-1">
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => { e.stopPropagation(); openPhaseEdit(c.phaseNumber); }}
-                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); openPhaseEdit(c.phaseNumber); } }}
-                        className="p-1 rounded text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 cursor-pointer"
-                        title="Naam bewerken"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </span>
-                      {containers.length > 1 && c.phaseNumber !== 1 && (
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => { e.stopPropagation(); setDeletePhaseNumber(c.phaseNumber); }}
-                          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); setDeletePhaseNumber(c.phaseNumber); } }}
-                          className="p-1 rounded text-primary-foreground/70 hover:text-destructive hover:bg-white/10 cursor-pointer"
-                          title="Fase verwijderen"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </span>
-                      )}
-                    </span>
-                  )}
-                </button>
-              </div>
-            );
-          })}
-          <button
-            onClick={addNewPhase}
-            className="rounded-full border border-dashed border-primary/50 px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide text-primary hover:bg-primary/10 transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-            title="Fase toevoegen"
-          >
-            <Plus className="h-4 w-4" /> Fase toevoegen
-          </button>
+        <div className="sticky top-0 z-20 -mt-2 border-b border-border bg-background/95 py-2 backdrop-blur">
+          <div className="flex items-center justify-center gap-4">
+            <PhaseStripNav
+              containers={containers}
+              activePhaseNumber={activePhaseNumber}
+              onSelect={setActivePhaseNumber}
+              labelFor={(n) =>
+                allFormats.some((f) => f.phase_number === n)
+                  ? getPhaseLabel(n, allFormats)
+                  : (pendingPhaseLabels[n] || `Fase ${n}`)
+              }
+              onEdit={openPhaseEdit}
+              onDelete={(n) => setDeletePhaseNumber(n)}
+              canDelete={(n) => containers.length > 1 && n !== 1}
+            />
+            <Button size="sm" onClick={addNewPhase} title="Fase toevoegen" className="shrink-0 gap-1.5">
+              <Plus className="h-4 w-4" /> Fase toevoegen
+            </Button>
+          </div>
         </div>
       )}
 
