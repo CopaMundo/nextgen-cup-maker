@@ -85,7 +85,7 @@ const PhaseHeaderReporter = ({
 }) => {
   const key = `${phases.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
   const latest = useRef({ phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd, onAddFormat });
-  latest.current = { phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd };
+  latest.current = { phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd, onAddFormat };
 
   useEffect(() => {
     const c = latest.current;
