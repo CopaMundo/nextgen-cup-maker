@@ -700,11 +700,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const allDays = getTournamentPlannerDates(tournament);
     const firstScheduledDate = getFirstScheduledMatchDate(fetchedMatches);
-    const currentValid = allDays.includes(plannerDate) ? plannerDate : allDays[0] || "";
+    const currentValid = allDays.includes(plannerDate) ? plannerDate : getMiddleDate(allDays);
     const initialPlannerDate = firstScheduledDate || currentValid;
     if (initialPlannerDate && initialPlannerDate !== plannerDate) {
       setPlannerDate(initialPlannerDate);
     }
+
 
     if (tRes.data) setTeams(tRes.data as any);
     setPhases(fetchedPhases);
