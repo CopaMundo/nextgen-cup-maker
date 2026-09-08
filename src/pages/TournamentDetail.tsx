@@ -360,7 +360,13 @@ const TournamentDetail = () => {
           <>
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
-              <PhaseManager key={`phases-${id}-${effectiveCategoryId ?? "all"}`} tournamentId={id!} tournamentType={tournament.tournament_type} categoryId={effectiveCategoryId} />
+              <PhaseManager
+                key={`phases-${id}-${effectiveCategoryId ?? "all"}`}
+                tournamentId={id!}
+                tournamentType={tournament.tournament_type}
+                categoryId={effectiveCategoryId}
+                onHeaderStateChange={isMobile ? undefined : setPhaseHeader}
+              />
             )}
           </>
         );
@@ -628,7 +634,20 @@ const TournamentDetail = () => {
                 </div>
 
                 <div className="flex min-w-0 justify-center justify-self-center">
-                  {activeTab === "schedule" && tournamentDates.length > 0 ? (
+                  {activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
+                    <div className="flex items-center gap-4">
+                      <PhaseStripNav
+                        phases={phaseHeader.phases}
+                        activePhaseNumber={phaseHeader.activePhaseNumber}
+                        onSelect={phaseHeader.onSelect}
+                        onEdit={phaseHeader.onEdit}
+                        onDelete={phaseHeader.onDelete}
+                      />
+                      <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="shrink-0 gap-1.5">
+                        <Plus className="h-4 w-4" /> Fase toevoegen
+                      </Button>
+                    </div>
+                  ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
                     <DateStripNav
                       dates={tournamentDates}
                       activeDate={plannerDate}
