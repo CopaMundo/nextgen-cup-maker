@@ -637,20 +637,13 @@ const TournamentDetail = () => {
 
                 <div className="flex min-w-0 justify-center justify-self-center">
                   {activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
-                    <div className="flex items-center gap-4">
-                      <PhaseStripNav
-                        phases={phaseHeader.phases}
-                        activePhaseNumber={phaseHeader.activePhaseNumber}
-                        onSelect={phaseHeader.onSelect}
-                        onEdit={phaseHeader.onEdit}
-                        onDelete={phaseHeader.onDelete}
-                      />
-                      <div className="flex shrink-0 items-center gap-2">
-                        <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
-                          <Plus className="h-4 w-4" /> Fase
-                        </Button>
-                      </div>
-                    </div>
+                    <PhaseStripNav
+                      phases={phaseHeader.phases}
+                      activePhaseNumber={phaseHeader.activePhaseNumber}
+                      onSelect={phaseHeader.onSelect}
+                      onEdit={phaseHeader.onEdit}
+                      onDelete={phaseHeader.onDelete}
+                    />
                   ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
                     <DateStripNav
                       dates={tournamentDates}
@@ -693,7 +686,26 @@ const TournamentDetail = () => {
                   )}
                 </div>
 
-                <div aria-hidden="true" />
+                <div className="flex items-center justify-end gap-3">
+                  {activeTab === "phases" && phaseHeader && (
+                    <>
+                      {phaseHeader.activePhaseNumber !== null && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={phaseHeader.onAddFormat}
+                          title="Format toevoegen"
+                          className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+                        >
+                          <Plus className="h-4 w-4" /> Format toevoegen
+                        </Button>
+                      )}
+                      <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
+                        <Plus className="h-4 w-4" /> Fase
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </header>
           )}
