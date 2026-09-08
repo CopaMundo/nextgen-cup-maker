@@ -613,8 +613,8 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
-            <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 pl-3 pr-6 backdrop-blur lg:pl-4 lg:pr-8 print:hidden">
-              <div className="mx-auto grid h-14 w-full max-w-[1920px] grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] items-center gap-6">
+            <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 backdrop-blur print:hidden">
+              <div className="mx-auto grid h-14 w-full max-w-[1920px] grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] items-center gap-6 px-3 sm:px-6 lg:px-8">
                 <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
                   {categorySelector}
                   {activeTab === "schedule" && (
