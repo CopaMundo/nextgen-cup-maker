@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users } from "lucide-react";
+import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
@@ -15,6 +15,7 @@ import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
+import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
 import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey, DateStripNav } from "@/components/MatchScheduler";
 import { getMiddleDate } from "@/lib/dateUtils";
 import ResultsManager from "@/components/ResultsManager";
@@ -77,6 +78,7 @@ const TournamentDetail = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const [phaseHeader, setPhaseHeader] = useState<PhaseHeaderState | null>(null);
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
