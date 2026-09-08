@@ -71,6 +71,7 @@ const PhaseHeaderReporter = ({
   onEdit,
   onDelete,
   onAdd,
+  onAddFormat,
   onHeaderStateChange,
 }: {
   phases: PhaseHeaderState["phases"];
@@ -79,10 +80,11 @@ const PhaseHeaderReporter = ({
   onEdit: (n: number) => void;
   onDelete: (n: number) => void;
   onAdd: () => void;
+  onAddFormat: () => void;
   onHeaderStateChange: (state: PhaseHeaderState | null) => void;
 }) => {
   const key = `${phases.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
-  const latest = useRef({ phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd });
+  const latest = useRef({ phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd, onAddFormat });
   latest.current = { phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd };
 
   useEffect(() => {
@@ -94,6 +96,7 @@ const PhaseHeaderReporter = ({
       onEdit: (n) => latest.current.onEdit(n),
       onDelete: (n) => latest.current.onDelete(n),
       onAdd: () => latest.current.onAdd(),
+      onAddFormat: () => latest.current.onAddFormat(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
@@ -1283,6 +1286,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
       onEdit={(n) => openPhaseEdit(n)}
       onDelete={(n) => setDeletePhaseNumber(n)}
       onAdd={() => addNewPhase()}
+      onAddFormat={() => setShowAddFormat(activePhaseNumber)}
       onHeaderStateChange={onHeaderStateChange}
     />
   ) : null;
