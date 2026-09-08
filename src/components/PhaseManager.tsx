@@ -1460,7 +1460,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   canMoveDown={formatIdx < container.formats.length - 1}
                   onMoveUp={() => formatIdx > 0 && swapFormats(format, container.formats[formatIdx - 1])}
                   onMoveDown={() => formatIdx < container.formats.length - 1 && swapFormats(format, container.formats[formatIdx + 1])}
-                  initialExpanded={format.id === newlyCreatedId}
+                  initialExpanded={container.formats.length === 1 || format.id === newlyCreatedId}
                 />
                   )}
                 </SortableRowShell>

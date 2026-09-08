@@ -54,6 +54,7 @@ interface AffectedMatch { id: string; label: string; current: string | null; }
 
 const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, categoryId, refreshKey, onSlotChange, onMoveUp, onMoveDown, canMoveUp, canMoveDown, dragHandle, dragRowProps, initialExpanded }: FormatCardProps) => {
   const [expanded, setExpanded] = useState(initialExpanded ?? false);
+  useEffect(() => { if (initialExpanded) setExpanded(true); }, [initialExpanded]);
   const [uploading, setUploading] = useState(false);
   const [confirmMode, setConfirmMode] = useState<"auto" | "empty" | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
