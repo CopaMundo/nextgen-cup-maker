@@ -83,3 +83,9 @@ export const expandMatchDays = (entries: MatchDayEntry[]): string[] => {
   }
   return normalizeIsoDates(allDates);
 };
+
+export const getMiddleDate = (dates: string[]): string => {
+  if (!dates.length) return "";
+  return dates[Math.floor(dates.length / 2)];
+};
+

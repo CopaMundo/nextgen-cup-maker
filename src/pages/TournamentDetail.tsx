@@ -16,7 +16,9 @@ import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
 import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey, DateStripNav } from "@/components/MatchScheduler";
+import { getMiddleDate } from "@/lib/dateUtils";
 import ResultsManager from "@/components/ResultsManager";
+
 import PresentationManager from "@/components/PresentationManager";
 import RefereeManager from "@/components/RefereeManager";
 import CategorySelector from "@/components/CategorySelector";
@@ -197,15 +199,16 @@ const TournamentDetail = () => {
     setSelectedLocationState(stored);
   }, [id]);
 
-  // Keep plannerDate storage key in sync with selected category and default to first tournament day
+  // Keep plannerDate storage key in sync with selected category and default to the middle tournament day
   useEffect(() => {
     if (!id || !tournament) return;
     const allDays = getTournamentPlannerDates(tournament);
     const key = plannerDateStorageKey(id, selectedCategoryId);
     const stored = localStorage.getItem(key);
-    const valid = stored && allDays.includes(stored) ? stored : allDays[0] || "";
+    const valid = stored && allDays.includes(stored) ? stored : getMiddleDate(allDays);
     setPlannerDate((current) => (current !== valid ? valid : current));
   }, [id, tournament, selectedCategoryId]);
+
 
   // For single-category tournaments, auto-select the lone category
   // For multi-category tournaments, validate / pick the first

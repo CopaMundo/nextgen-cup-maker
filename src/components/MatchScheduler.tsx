@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry } from "@/lib/dateUtils";
+import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry, getMiddleDate } from "@/lib/dateUtils";
+
 import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import CalendarXIcon from "@/components/icons/CalendarXIcon";
@@ -270,6 +271,13 @@ export const DateStripNav = ({
   const safeStart = Math.min(windowStart, maxStart);
   const visible = dates.slice(safeStart, safeStart + windowSize);
   const showNav = dates.length > windowSize;
+  const middleIndex = Math.floor(visible.length / 2);
+
+  const selectMiddleOfWindow = (start: number) => {
+    const safe = Math.min(start, maxStart);
+    const mid = dates[safe + middleIndex];
+    if (mid && mid !== activeDate) onSelect(mid);
+  };
 
   const dateSet = new Set(dates);
 
@@ -279,7 +287,13 @@ export const DateStripNav = ({
         {showNav && (
           <button
             type="button"
-            onClick={() => setWindowStart((s) => Math.max(0, s - 1))}
+            onClick={() => {
+              setWindowStart((s) => {
+                const next = Math.max(0, s - 1);
+                selectMiddleOfWindow(next);
+                return next;
+              });
+            }}
             disabled={safeStart === 0}
             className="shrink-0 p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Vorige dagen"
@@ -295,9 +309,17 @@ export const DateStripNav = ({
             // Vertical wheel → horizontal date navigation
             const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
             if (delta > 0) {
-              setWindowStart((s) => Math.min(maxStart, s + 1));
+              setWindowStart((s) => {
+                const next = Math.min(maxStart, s + 1);
+                selectMiddleOfWindow(next);
+                return next;
+              });
             } else if (delta < 0) {
-              setWindowStart((s) => Math.max(0, s - 1));
+              setWindowStart((s) => {
+                const next = Math.max(0, s - 1);
+                selectMiddleOfWindow(next);
+                return next;
+              });
             }
           }}
         >
@@ -323,7 +345,13 @@ export const DateStripNav = ({
         {showNav && (
           <button
             type="button"
-            onClick={() => setWindowStart((s) => Math.min(maxStart, s + 1))}
+            onClick={() => {
+              setWindowStart((s) => {
+                const next = Math.min(maxStart, s + 1);
+                selectMiddleOfWindow(next);
+                return next;
+              });
+            }}
             disabled={safeStart >= maxStart}
             className="shrink-0 p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Volgende dagen"
@@ -332,6 +360,7 @@ export const DateStripNav = ({
           </button>
         )}
       </div>
+
 
       <DatePicker
         value={activeDate}
@@ -424,8 +453,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const isPlannerDateControlled = plannerDateProp !== undefined;
   const [internalPlannerDate, setInternalPlannerDate] = useState<string>(() => {
     const allDays = getTournamentPlannerDates(tournament);
-    return allDays[0] || "";
+    return getMiddleDate(allDays);
   });
+
   const plannerDate = isPlannerDateControlled ? plannerDateProp! : internalPlannerDate;
   const [plannerBreaks, setPlannerBreaksRaw] = useState<PlannerBreak[]>([]);
   const [showBreakAdd, setShowBreakAdd] = useState(false);
@@ -670,11 +700,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const allDays = getTournamentPlannerDates(tournament);
     const firstScheduledDate = getFirstScheduledMatchDate(fetchedMatches);
-    const currentValid = allDays.includes(plannerDate) ? plannerDate : allDays[0] || "";
+    const currentValid = allDays.includes(plannerDate) ? plannerDate : getMiddleDate(allDays);
     const initialPlannerDate = firstScheduledDate || currentValid;
     if (initialPlannerDate && initialPlannerDate !== plannerDate) {
       setPlannerDate(initialPlannerDate);
     }
+
 
     if (tRes.data) setTeams(tRes.data as any);
     setPhases(fetchedPhases);
