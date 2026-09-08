@@ -476,7 +476,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
         )}
       </div>
 
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 min-[1900px]:grid-cols-7">
         {teams.map(team => (
           <div key={team.id} className={`group relative flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-md ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
             <div className="h-20 w-20 overflow-hidden flex-shrink-0">
