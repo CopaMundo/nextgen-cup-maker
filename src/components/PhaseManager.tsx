@@ -64,6 +64,49 @@ interface PhaseContainer {
   formats: Phase[];
 }
 
+const PhaseHeaderReporter = ({
+  phases,
+  activePhaseNumber,
+  onSelect,
+  onEdit,
+  onDelete,
+  onAdd,
+  onHeaderStateChange,
+}: {
+  phases: PhaseHeaderState["phases"];
+  activePhaseNumber: number | null;
+  onSelect: (n: number) => void;
+  onEdit: (n: number) => void;
+  onDelete: (n: number) => void;
+  onAdd: () => void;
+  onHeaderStateChange: (state: PhaseHeaderState | null) => void;
+}) => {
+  const key = `${phases.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
+  const latest = useRef({ phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd });
+  latest.current = { phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd };
+
+  useEffect(() => {
+    const c = latest.current;
+    onHeaderStateChange({
+      phases: c.phases,
+      activePhaseNumber: c.activePhaseNumber,
+      onSelect: (n) => latest.current.onSelect(n),
+      onEdit: (n) => latest.current.onEdit(n),
+      onDelete: (n) => latest.current.onDelete(n),
+      onAdd: () => latest.current.onAdd(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  useEffect(() => {
+    return () => onHeaderStateChange(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
+};
+
+
 const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateChange }: { tournamentId: string; tournamentType: string; categoryId?: string | null; onHeaderStateChange?: (state: PhaseHeaderState | null) => void }) => {
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
@@ -1232,30 +1275,22 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
     canDelete: containers.length > 1 && c.phaseNumber !== 1,
   }));
 
-  const phaseHeaderKey = `${phaseHeaderList.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
-  const phaseHeaderRef = useRef({ list: phaseHeaderList, active: activePhaseNumber });
-  phaseHeaderRef.current = { list: phaseHeaderList, active: activePhaseNumber };
+  const phaseHeaderReporter = onHeaderStateChange && !isMobile ? (
+    <PhaseHeaderReporter
+      phases={phaseHeaderList}
+      activePhaseNumber={activePhaseNumber}
+      onSelect={setActivePhaseNumber}
+      onEdit={(n) => openPhaseEdit(n)}
+      onDelete={(n) => setDeletePhaseNumber(n)}
+      onAdd={() => addNewPhase()}
+      onHeaderStateChange={onHeaderStateChange}
+    />
+  ) : null;
 
-  useEffect(() => {
-    if (!onHeaderStateChange || isMobile) return;
-    onHeaderStateChange({
-      phases: phaseHeaderRef.current.list,
-      activePhaseNumber: phaseHeaderRef.current.active,
-      onSelect: (n) => setActivePhaseNumber(n),
-      onEdit: (n) => openPhaseEdit(n),
-      onDelete: (n) => setDeletePhaseNumber(n),
-      onAdd: () => addNewPhase(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phaseHeaderKey, isMobile, !!onHeaderStateChange]);
-
-  useEffect(() => {
-    return () => onHeaderStateChange?.(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="space-y-6">
+      {phaseHeaderReporter}
       {/* Mobiel: fases als tegels */}
       {isMobile && mobilePhaseOverview && (
         <div className="grid grid-cols-1 gap-2">
