@@ -1094,7 +1094,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // === SCHEIDSRECHTER SLEPEN ===
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
   const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
-  const [refListDropActive, setRefListDropActive] = useState(false);
   const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
   const [showClearRefereesConfirm, setShowClearRefereesConfirm] = useState(false);
 
@@ -1167,96 +1166,29 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   const endRefereeDrag = () => {
     setRefInsert(null);
-    setRefListDropActive(false);
     setRefGhostPos(null);
   };
-  const moveRefereeToList = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload) => {
-    if (!name || !fromMatchId) return;
-    const source = matches.find(m => m.id === fromMatchId);
-    if (!source) return;
-    const rest = refNames(source.referee).filter(n => n !== name);
-    await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
-    toast({ title: `${name} verwijderd uit de wedstrijd` });
-  };
-
-
-
-  /**
-   * Bepaalt in leesrichting (regel per regel) waar de aanwijzer tussen de badges staat.
-   * Het lege vak dat al in de rij staat, wordt weggerekend zodat de posities niet meeschuiven
-   * terwijl je sleept (anders klopt slepen naar rechts niet).
-   */
-  const getRefereeInsertIndex = (container: HTMLElement, clientX: number, clientY: number) => {
-    const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
-      .filter(badge => badge.getBoundingClientRect().width > 1);
-    if (badges.length === 0) return 0;
-
-    const placeholder = container.querySelector<HTMLElement>('[data-ref-placeholder="true"]');
-    const phRect = placeholder?.getBoundingClientRect();
-    const gap = 4;
-    const shift = phRect ? phRect.width + gap : 0;
-    // Aantal badges dat vóór het lege vak staat in de DOM-volgorde.
-    const badgesBeforePlaceholder = placeholder
-      ? badges.filter(b => b.compareDocumentPosition(placeholder) & Node.DOCUMENT_POSITION_FOLLOWING).length
-      : badges.length;
-
-    for (let i = 0; i < badges.length; i++) {
-      const r = badges[i].getBoundingClientRect();
-      const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
-      if (clientY < r.top) return i;
-      // Positie zoals ze zou zijn zonder het lege vak in de rij.
-      const staticLeft = i >= badgesBeforePlaceholder ? r.left - shift : r.left;
-      if (sameRow && clientX < staticLeft + r.width / 2) return i;
-    }
-    return badges.length;
-  };
-
   const getRefereeDropTarget = (clientX: number, clientY: number) => {
     const elements = document.elementsFromPoint(clientX, clientY) as HTMLElement[];
-    const list = elements.map(element => element.closest<HTMLElement>('[data-referee-list-zone="true"]')).find(Boolean);
-    if (list) return { type: "list" as const };
-
     const matchContainer = elements
       .map(element => element.closest<HTMLElement>("[data-referee-match-id]"))
       .find((element): element is HTMLElement => Boolean(element?.dataset.refereeMatchId));
     const matchId = matchContainer?.dataset.refereeMatchId;
     if (!matchContainer || !matchId) return null;
-    const dragged = activeDragPayload?.type === "referee" ? activeDragPayload : null;
-    // Vanuit de planningslijst sluit de scheidsrechter altijd achteraan aan.
-    const appendOnly = !dragged?.from_match_id;
-    const badgeCount = Array.from(matchContainer.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
-      .filter(badge => badge.getBoundingClientRect().width > 1).length;
-    // Zolang de aanwijzer boven het lege invoegvak staat, blijft die plek stabiel.
-    // Zonder deze verankering verschuift het vak de badges onder de aanwijzer en
-    // kan rol 1 onmiddellijk als rol 3 worden geïnterpreteerd.
-    const pointsAtPlaceholder = elements.some(element =>
-      element.matches?.('[data-ref-placeholder="true"]') || Boolean(element.closest?.('[data-ref-placeholder="true"]'))
-    );
-    const anchoredIndex = pointsAtPlaceholder && refInsert?.matchId === matchId
-      ? refInsert.index
-      : null;
     return {
       type: "match" as const,
       matchId,
-      index: appendOnly ? badgeCount : (anchoredIndex ?? getRefereeInsertIndex(matchContainer, clientX, clientY)),
+      index: refNames(matches.find(match => match.id === matchId)?.referee).length,
     };
   };
 
 
   const moveRefereeToMatch = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload, matchId: string, insertIndex: number) => {
-    if (!name) return;
+    if (!name || fromMatchId) return;
 
     const target = matches.find(m => m.id === matchId);
     if (!target) return;
     const current = refNames(target.referee);
-    if (fromMatchId === matchId) {
-      const withoutName = current.filter(n => n !== name);
-      const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
-      const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)];
-      await updateMatch(matchId, { referee: next.join(", ") } as any);
-      return;
-    }
-
     if (current.includes(name)) {
       toast({ title: `${name} staat al bij deze wedstrijd`, variant: "destructive" });
       return;
@@ -1265,18 +1197,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
       return;
     }
-    const withoutName = current.filter(n => n !== name);
-    const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
-    const next = [...withoutName.slice(0, idx), name, ...withoutName.slice(idx)];
+    const next = [...current, name];
     await updateMatch(matchId, { referee: next.join(", ") || null } as any);
-
-    if (fromMatchId && fromMatchId !== matchId) {
-      const source = matches.find(m => m.id === fromMatchId);
-      if (source) {
-        const rest = refNames(source.referee).filter(n => n !== name);
-        await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
-      }
-    }
   };
 
 
@@ -2044,21 +1966,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const compute = (x: number, y: number) => {
       if (activeDragPayload.type === "referee") {
         const target = getRefereeDropTarget(x, y);
-        if (target?.type === "list") {
-          setRefListDropActive(true);
-          setRefInsert(null);
-          return;
-        }
-
         if (target?.type === "match") {
-          setRefListDropActive(false);
           setRefInsert(previous => previous?.matchId === target.matchId && previous.index === target.index
             ? previous
             : { matchId: target.matchId, index: target.index });
           return;
         }
 
-        setRefListDropActive(false);
         setRefInsert(null);
         return;
       }
@@ -2147,13 +2061,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         : pointerPositionRef.current;
       pointerPositionRef.current = start;
       setRefGhostPos(start);
-      if (payload.from_match_id) {
-        const source = matches.find(match => match.id === payload.from_match_id);
-        const sourceIndex = source ? refNames(source.referee).indexOf(payload.name) : -1;
-        setRefInsert(sourceIndex >= 0 ? { matchId: payload.from_match_id, index: sourceIndex } : null);
-      } else {
-        setRefInsert(null);
-      }
+      setRefInsert(null);
     }
     if (payload.type !== "referee") {
       setDragItemId(payload.id);
@@ -2178,8 +2086,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     if (payload?.type === "referee") {
       if (finalRefereeTarget?.type === "match") {
         void moveRefereeToMatch(payload, finalRefereeTarget.matchId, finalRefereeTarget.index);
-      } else if (finalRefereeTarget?.type === "list") {
-        void moveRefereeToList(payload);
       }
     } else if (payload && targetField && targetIndex !== null) {
       void performDrop(payload, targetField, targetIndex);
@@ -3404,18 +3310,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               >
                                                 {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                   const issue = getRefereeIssue(m, name, refIdx);
-                                                  const visualIndex = arr.slice(0, refIdx).filter(candidate => !(
-                                                    activeReferee?.from_match_id === m.id && candidate === activeReferee.name
-                                                  )).length;
-                                                  const draggedHere = activeReferee?.from_match_id === m.id ? activeReferee.name : null;
-                                                  const isFirstAtIndex = refIdx === 0 || arr[refIdx - 1] !== draggedHere;
                                                   return (
-                                                  <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && isFirstAtIndex && <RefereePlaceholder />}
-                                                    <DraggableReferee
-                                                      id={`referee-${m.id}-${name}`}
-                                                      data={{ id: `referee-${m.id}-${name}`, type: "referee", name, from_match_id: m.id }}
-                                                      badge
+                                                    <span
+                                                      key={`${name}-${refIdx}`}
                                                       title={issue?.level === "error" ? issue.reasons.join("\n") : undefined}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
                                                         issue?.level === "error"
@@ -3428,14 +3325,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       {arr.length > 1 && <span className={issue ? "font-bold" : "text-primary font-bold"}>{refIdx + 1}</span>}
                                                       <WhistleIcon className="h-2.5 w-2.5" /> {name}
                                                       {issue && <span aria-hidden>⚠</span>}
-                                                    </DraggableReferee>
-                                                  </span>
+                                                    </span>
                                                   );
                                                 })}
 
-                                                {refInsert?.matchId === m.id && refInsert.index >= displayRefNames(m.id, m.referee).filter(name => !(
-                                                  activeReferee?.from_match_id === m.id && name === activeReferee.name
-                                                )).length && <RefereePlaceholder />}
+                                                {refInsert?.matchId === m.id && <RefereePlaceholder />}
                                               </div>
 
                                             )}
@@ -3894,10 +3788,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       );
                     })()}
 
-                    {/* Lijst van scheidsrechters (sleepbaar naar een wedstrijd, sleep terug om te verwijderen) */}
+                    {/* Lijst van scheidsrechters: uitsluitend van hier naar een wedstrijd slepen. */}
                     <div
                       data-referee-list-zone="true"
-                      className={`rounded-lg border-2 border-dashed p-2 transition-colors ${refListDropActive ? "border-primary bg-primary/10" : "border-transparent"}`}
+                      className="rounded-lg border-2 border-dashed border-transparent p-2"
                     >
                       {referees.length === 0 ? (
                         <div className="text-center py-6">
@@ -3923,9 +3817,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             );
                           })}
                         </div>
-                      )}
-                      {activeReferee?.from_match_id && (
-                        <p className="mt-2 text-[10px] text-center text-muted-foreground">Laat hier los om {activeReferee.name} uit de wedstrijd te halen</p>
                       )}
                     </div>
 
