@@ -1027,7 +1027,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     setMatches(m => m.map(x => x.id === id ? { ...x, ...updates } : x));
     const { error } = await supabase.from("matches").update(updates).eq("id", id);
     if (error) {
-      const refreshed = await fetchTournamentMatches(tournamentId);
+      const refreshed = await fetchTournamentMatches({
+        tournamentId,
+        orders: [{ column: "match_date" }, { column: "match_time" }],
+        maxRows: 5000,
+      });
       setMatches(refreshed as Match[]);
       toast({ title: "Wijziging kon niet worden opgeslagen", variant: "destructive" });
     }
