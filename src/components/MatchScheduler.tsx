@@ -3589,10 +3589,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             </div>
 
             {/* ===== RIGHT SIDEBAR ===== */}
-            {!plannerCollapsed && (
+            {(isMobile ? mobileSection === "planning" : !plannerCollapsed) && (
             <div
               ref={plannerSidebarRef}
-              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 h-[calc(100dvh-8rem)] md:h-full overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
+              className={cn(
+                "ml-0 print:hidden flex flex-col sticky top-0 overflow-hidden overscroll-contain transition-colors",
+                isMobile ? "w-full min-w-0 h-[calc(100dvh-11rem)]" : "w-72 shrink-0 border-l border-border h-[calc(100dvh-8rem)] md:h-full",
+                dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""
+              )}
               onDragOver={(e) => {
                 if (!hasPlannerDragData(e)) return;
                 e.preventDefault();
