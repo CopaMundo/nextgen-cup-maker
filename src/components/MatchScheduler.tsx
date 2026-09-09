@@ -3854,10 +3854,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 id={`referee-list-${i}-${r}`}
                                 data={{ id: `referee-list-${i}-${r}`, type: "referee", name: r, from_match_id: null }}
                                 title="Sleep naar een wedstrijd"
-                                className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-1 text-[10px] bg-background hover:bg-secondary/50"
+                                className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-1 text-[11px] bg-background hover:bg-secondary/50"
                               >
                                 <span className="font-medium text-foreground truncate max-w-[90px]">{r}</span>
-                                <span className={`text-[9px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
+                                <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
                               </DraggableReferee>
                             );
                           })}
