@@ -3360,27 +3360,24 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                                             </div>
                                             {/* Referees */}
-                                            {(refNames(m.referee).length > 0 || activeReferee) && (
-                                              <div
-                                                data-referee-match-id={m.id}
-                                                className={`flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
-                                              >
-                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
-                                                  const issue = getRefereeIssue(m, name, refIdx);
-                                                  return (
-                                                    <RefereeBadge
-                                                      key={`${name}-${refIdx}`}
-                                                      name={name}
-                                                      roleNumber={arr.length > 1 ? refIdx + 1 : null}
-                                                      issue={issue}
-                                                    />
-                                                  );
-                                                })}
+                                            <div
+                                              data-referee-match-id={m.id}
+                                              className={`flex flex-wrap items-center gap-1 rounded transition-colors min-h-[14px] ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                            >
+                                              {refNames(m.referee).length > 0 && displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
+                                                const issue = getRefereeIssue(m, name, refIdx);
+                                                return (
+                                                  <RefereeBadge
+                                                    key={`${name}-${refIdx}`}
+                                                    name={name}
+                                                    roleNumber={arr.length > 1 ? refIdx + 1 : null}
+                                                    issue={issue}
+                                                  />
+                                                );
+                                              })}
 
-                                                {refInsert?.matchId === m.id && <RefereePlaceholder />}
-                                              </div>
-
-                                            )}
+                                              {refInsert?.matchId === m.id && <RefereePlaceholder />}
+                                            </div>
 
 
 
