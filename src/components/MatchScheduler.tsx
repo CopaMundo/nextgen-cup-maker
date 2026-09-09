@@ -3966,7 +3966,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           />
                           <PlannerItem
                             payload={{ id: m.id, type: "match", field_id: null, slot_index: null, container: "unscheduled" }}
-                            className={`rounded-lg border bg-card p-2 text-xs hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
+                            className={`rounded-lg border bg-card p-1.5 text-[10px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
                               mobileSelectedMatchId === m.id
                                 ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                 : dragItemId === m.id ? "opacity-30 scale-95 border-primary ring-2 ring-primary/20" : "border-border"
