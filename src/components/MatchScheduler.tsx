@@ -3332,9 +3332,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                           >
 
                                             {/* Time row */}
-                                            <div className="flex items-center justify-between mb-1">
+                                            <div className="flex items-center justify-between mb-0.5">
                                               <div className="flex items-center gap-1">
-                                                <span className="text-[11px] font-mono font-bold text-foreground">{time}</span>
+                                                <span className="text-[10px] font-mono font-bold text-foreground">{time}</span>
                                                 {getMatchClashes(m).length > 0 && (
                                                   <span className="text-destructive cursor-help" title={getMatchClashes(m).join("\n")}>⚠</span>
                                                 )}
@@ -3343,7 +3343,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
                                                 className="text-muted-foreground hover:text-foreground print:hidden"
                                               >
-                                                <Pencil className="h-2.5 w-2.5" />
+                                                <Pencil className="h-2 w-2" />
                                               </button>
                                             </div>
                                             {/* Teams */}
