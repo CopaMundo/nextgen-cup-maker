@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { formatFieldLabel } from "@/lib/fieldLocations";
 import { getPhaseLabel } from "@/lib/phaseLabel";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,6 +114,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0);
   const [collapsedTimeSlots, setCollapsedTimeSlots] = useState<Set<string>>(new Set());
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
+  const matchesScrollRef = useRef<HTMLDivElement | null>(null);
+  const slotRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const autoFocusDoneRef = useRef(false);
   // Teams wijzigen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
   const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
   const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
@@ -1443,6 +1446,40 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
   }, [timeSlotGroups, manuallyOpenedTimeSlots]);
 
+  // Auto-focus: laatste volledig ingegeven tijdsbalk bovenaan (ingeklapt),
+  // de eerstvolgende in te geven tijdsbalk staat daar open onder.
+  useEffect(() => {
+    if (autoFocusDoneRef.current) return;
+    const slots = timeSlotGroups.filter(g => g.key !== "__unplanned__");
+    if (slots.length === 0) return;
+
+    const nextIdx = slots.findIndex(g => g.matches.some(m => !m.is_played));
+    if (nextIdx === -1) return;
+    const nextKey = slots[nextIdx].key;
+    const anchorKey = nextIdx > 0 ? slots[nextIdx - 1].key : nextKey;
+
+    autoFocusDoneRef.current = true;
+
+    setCollapsedTimeSlots(prev => {
+      if (!prev.has(nextKey)) return prev;
+      const next = new Set(prev);
+      next.delete(nextKey);
+      return next;
+    });
+
+    requestAnimationFrame(() => {
+      const container = matchesScrollRef.current;
+      const el = slotRefs.current.get(anchorKey);
+      if (!container || !el) return;
+      const delta = el.getBoundingClientRect().top - container.getBoundingClientRect().top;
+      container.scrollTop += delta;
+    });
+  }, [timeSlotGroups]);
+
+  useEffect(() => {
+    autoFocusDoneRef.current = false;
+  }, [categoryId, selectedPhaseNumber]);
+
   // Render standings table with +/- controls
   const renderStandingsTable = (groupId: string, formatId: string, compact?: boolean) => {
     const standings = calcStandings(groupId);
@@ -1967,7 +2004,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           </aside>
         )}
 
-        <div className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
+        <div ref={matchesScrollRef} className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
 
       {/* Format detail dialog */}
       {(() => {
@@ -2046,7 +2083,14 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                         const allPlayed = slotTotal > 0 && slotPlayed === slotTotal;
                         
                         return (
-                          <div key={slot.key} className="rounded-lg border border-border bg-card/40 overflow-hidden">
+                          <div
+                            key={slot.key}
+                            ref={el => {
+                              if (el) slotRefs.current.set(slot.key, el);
+                              else slotRefs.current.delete(slot.key);
+                            }}
+                            className="rounded-lg border border-border bg-card/40 overflow-hidden"
+                          >
                             <button
                               type="button"
                               onClick={() => toggleTimeSlot(slot.key)}
