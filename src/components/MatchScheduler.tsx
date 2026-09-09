@@ -2967,7 +2967,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const availableRounds = getAvailableRounds();
 
   return (
-    <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
+    <div className="flex flex-col md:flex-1 md:min-h-0">
       {/* Planner only — no tabs */}
       <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
 
