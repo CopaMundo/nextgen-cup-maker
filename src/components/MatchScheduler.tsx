@@ -268,7 +268,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[92px]";
+const PLANNER_ROW_H = "h-[76px]";
 
 
 const formatDateDMY = (d: string | null) => {
