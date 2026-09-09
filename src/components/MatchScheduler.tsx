@@ -176,8 +176,8 @@ const DraggableReferee = ({ id, data, className, children, title, badge }: {
       onClick={(event) => event.stopPropagation()}
       className={cn(
         className,
-        "cursor-grab active:cursor-grabbing select-none touch-none transition-[opacity,width,transform] duration-150",
-        isDragging && "w-0 min-w-0 overflow-hidden opacity-0 pointer-events-none",
+        "cursor-grab active:cursor-grabbing select-none touch-none transition-opacity duration-150",
+        isDragging && "absolute h-0 w-0 overflow-hidden opacity-0 pointer-events-none",
       )}
     >
       {children}
@@ -1024,8 +1024,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   // === MATCH UPDATE ===
   const updateMatch = async (id: string, updates: Partial<Match>) => {
-    await supabase.from("matches").update(updates).eq("id", id);
     setMatches(m => m.map(x => x.id === id ? { ...x, ...updates } : x));
+    const { error } = await supabase.from("matches").update(updates).eq("id", id);
+    if (error) {
+      const refreshed = await fetchTournamentMatches({
+        tournamentId,
+        orders: [{ column: "match_date" }, { column: "match_time" }],
+        maxRows: 5000,
+      });
+      setMatches(refreshed as Match[]);
+      toast({ title: "Wijziging kon niet worden opgeslagen", variant: "destructive" });
+    }
   };
 
   // === HEEN/TERUG SYNCHRONISATIE OP BASIS VAN SCHEMA ===
@@ -1187,6 +1196,23 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
     const r = badges[nearestIdx].getBoundingClientRect();
     return clientX < r.left + r.width / 2 ? nearestIdx : nearestIdx + 1;
+  };
+
+  const getRefereeDropTarget = (clientX: number, clientY: number) => {
+    const elements = document.elementsFromPoint(clientX, clientY) as HTMLElement[];
+    const list = elements.map(element => element.closest<HTMLElement>('[data-referee-list-zone="true"]')).find(Boolean);
+    if (list) return { type: "list" as const };
+
+    const matchContainer = elements
+      .map(element => element.closest<HTMLElement>("[data-referee-match-id]"))
+      .find((element): element is HTMLElement => Boolean(element?.dataset.refereeMatchId));
+    const matchId = matchContainer?.dataset.refereeMatchId;
+    if (!matchContainer || !matchId) return null;
+    return {
+      type: "match" as const,
+      matchId,
+      index: getRefereeInsertIndex(matchContainer, clientX),
+    };
   };
 
 
@@ -1990,22 +2016,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const compute = (x: number, y: number) => {
       if (activeDragPayload.type === "referee") {
-        const hit = document.elementFromPoint(x, y) as HTMLElement | null;
-        const refereeList = hit?.closest<HTMLElement>('[data-referee-list-zone="true"]');
-        if (refereeList) {
+        const target = getRefereeDropTarget(x, y);
+        if (target?.type === "list") {
           setRefListDropActive(true);
           setRefInsert(null);
           return;
         }
 
-        const refereeContainer = hit?.closest<HTMLElement>("[data-referee-match-id]");
-        const matchId = refereeContainer?.dataset.refereeMatchId;
-        if (refereeContainer && matchId) {
-          const index = getRefereeInsertIndex(refereeContainer, x);
+        if (target?.type === "match") {
           setRefListDropActive(false);
-          setRefInsert(previous => previous?.matchId === matchId && previous.index === index
+          setRefInsert(previous => previous?.matchId === target.matchId && previous.index === target.index
             ? previous
-            : { matchId, index });
+            : { matchId: target.matchId, index: target.index });
           return;
         }
 
@@ -2094,21 +2116,26 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
   };
 
-  const handleDndDragEnd = (_event: DragEndEvent) => {
-    const payload = activeDragPayload;
+  const handleDndDragEnd = (event: DragEndEvent) => {
+    const eventPayload = event.active.data.current as SchedulerDragPayload | undefined;
+    const payload = eventPayload || activeDragPayload;
     const targetField = previewField;
     const targetIndex = previewIndex;
     const isUnscheduled = dragOverField === "__unscheduled__";
-    const refereeTarget = refInsert;
-    const removeReferee = refListDropActive;
+    const finalRefereeTarget = payload?.type === "referee"
+      ? getRefereeDropTarget(pointerPositionRef.current.x, pointerPositionRef.current.y)
+      : null;
 
     setActiveDragPayload(null);
     handleDragEnd();
     endRefereeDrag();
 
     if (payload?.type === "referee") {
-      if (refereeTarget) void moveRefereeToMatch(payload, refereeTarget.matchId, refereeTarget.index);
-      else if (removeReferee) void moveRefereeToList(payload);
+      if (finalRefereeTarget?.type === "match") {
+        void moveRefereeToMatch(payload, finalRefereeTarget.matchId, finalRefereeTarget.index);
+      } else if (finalRefereeTarget?.type === "list") {
+        void moveRefereeToList(payload);
+      }
     } else if (payload && targetField && targetIndex !== null) {
       void performDrop(payload, targetField, targetIndex);
     } else if (payload && isUnscheduled) {
@@ -3270,6 +3297,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                                     <div
                                       data-planner-match-card={m.id}
+                                      data-referee-match-id={m.id}
                                       className={`transition-[max-height,opacity,padding,margin,transform] duration-200 ease-out ${isDragging ? "max-h-0 opacity-0 overflow-hidden" : ""}`}
                                       style={isDragging ? { maxHeight: 0, padding: 0, margin: 0, height: 0 } : undefined}
                                     >
@@ -4014,7 +4042,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
                     <div className="text-[10px] text-muted-foreground mb-0.5">{getMatchInfoLabel(m)}</div>
                     <div className="flex items-center gap-1">
                       {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
@@ -4028,14 +4056,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               }
               if (activeDragPayload.type === "break") {
                 return (
-                  <div className="rounded-lg bg-primary/20 border-2 border-primary/40 px-3 py-1.5 text-xs shadow-2xl w-[200px] rotate-1 font-medium text-primary">
+                  <div className="pointer-events-none rounded-lg bg-primary/20 border-2 border-primary/40 px-3 py-1.5 text-xs shadow-2xl w-[200px] rotate-1 font-medium text-primary">
                     Pauze
                   </div>
                 );
               }
               if (activeDragPayload.type === "referee") {
                 return (
-                  <div className="inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl">
+                  <div className="pointer-events-none inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl">
                     <WhistleIcon className="h-3 w-3" /> {activeDragPayload.name}
                   </div>
                 );
