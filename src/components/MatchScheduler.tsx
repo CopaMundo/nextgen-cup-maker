@@ -2113,6 +2113,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const payload = event.active.data.current as SchedulerDragPayload;
     if (!payload) return;
     setActiveDragPayload(payload);
+    if (payload.type === "referee") {
+      const activator = event.activatorEvent as PointerEvent | undefined;
+      const start = activator && typeof activator.clientX === "number"
+        ? { x: activator.clientX, y: activator.clientY }
+        : pointerPositionRef.current;
+      pointerPositionRef.current = start;
+      setRefGhostPos(start);
+    }
     if (payload.type !== "referee") {
       setDragItemId(payload.id);
       setDragItemType(payload.type);
