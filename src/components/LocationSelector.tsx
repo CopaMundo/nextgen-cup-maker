@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 interface Location {
   id: string;
@@ -23,6 +25,7 @@ const LocationSelector = ({
   selectClassName?: string;
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     supabase
