@@ -1967,7 +1967,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           </aside>
         )}
 
-        <div className="min-h-0 min-w-0 space-y-4 lg:flex-1 lg:overflow-y-auto lg:pr-2">
+        <div className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
 
       {/* Format detail dialog */}
       {(() => {
