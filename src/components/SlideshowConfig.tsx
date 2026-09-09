@@ -40,6 +40,7 @@ import {
   ImageIcon,
   Upload,
   ChevronRight,
+  Presentation,
 } from "lucide-react";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
