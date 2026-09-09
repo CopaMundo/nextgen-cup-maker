@@ -1053,14 +1053,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [showClearRefereesConfirm, setShowClearRefereesConfirm] = useState(false);
 
   const MAX_REFEREES = 5;
-  /** Weergaveorde van de scheidsrechters van een wedstrijd, met live opschuiven tijdens het slepen. */
+  /** Leeg badgevak dat de exacte plek aangeeft waar de gesleepte scheidsrechter terechtkomt. */
+  const RefereePlaceholder = () => (
+    <span
+      aria-hidden="true"
+      className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in"
+    />
+  );
+
+  /** Weergaveorde van de scheidsrechters van een wedstrijd. Tijdens het slepen binnen dezelfde wedstrijd
+   *  verdwijnt het gesleepte vakje uit de lijst; een leeg placeholder-vakje toont de nieuwe plek. */
   const displayRefNames = (matchId: string, value?: string | null) => {
     const names = refNames(value);
-    if (!refDragName || refInsert?.matchId !== matchId) return names;
-    if (refDragFromMatchId !== matchId || !names.includes(refDragName)) return names;
-    const rest = names.filter(n => n !== refDragName);
-    const idx = Math.max(0, Math.min(refInsert.index, rest.length));
-    return [...rest.slice(0, idx), refDragName, ...rest.slice(idx)];
+    if (!refDragName || refDragFromMatchId !== matchId) return names;
+    return names.filter(n => n !== refDragName);
   };
 
   /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
