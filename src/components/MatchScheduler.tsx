@@ -2969,10 +2969,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   return (
     <div className="flex flex-col md:flex-1 md:min-h-0">
       {/* Planner only — no tabs */}
-      <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
+      <div className="flex flex-col md:flex-1 md:min-h-0">
 
         {/* ===== PLANNER VIEW ===== */}
-        <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
+        <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0">
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
@@ -3116,9 +3116,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0 md:overflow-hidden">
+          <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0">
             {/* Field columns */}
-            <div className="flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto">
+            <div className="flex-1 min-w-0 relative md:min-h-0">
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
               <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
