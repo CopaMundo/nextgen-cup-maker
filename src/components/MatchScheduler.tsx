@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry, getMiddleDate } from "@/lib/dateUtils";
 
-import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, ArrowLeft, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import CalendarXIcon from "@/components/icons/CalendarXIcon";
 import { DatePicker } from "@/components/ui/datepicker";
@@ -627,6 +627,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [rightSidebarTab, setRightSidebarTab] = useState<"plannen" | "scheidsrechters" | "ongepland">("plannen");
   const [plannerCollapsed, setPlannerCollapsed] = useState(false);
+  // Mobiel: tegeloverzicht (Velden / Planning) en gekozen veld
+  const [mobileSection, setMobileSection] = useState<"velden" | "planning" | null>(null);
+  const [mobileFieldName, setMobileFieldName] = useState<string | null>(null);
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
   const [pauzeModalDuration, setPauzeModalDuration] = useState(20);
@@ -2984,10 +2987,49 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const filteredMatches = getFilteredMatches();
   const availableRounds = getAvailableRounds();
 
+  // ===== MOBIEL: tegeloverzicht =====
+  if (isMobile && mobileSection === null) {
+    const unplannedCount = matches.filter(m => !m.match_date || !m.match_time || !m.field).length;
+    const tiles: { id: "velden" | "planning"; label: string; hint: string }[] = [
+      { id: "velden", label: "Velden", hint: plannerFields.length === 1 ? "1 veld" : `${plannerFields.length} velden` },
+      { id: "planning", label: "Planning", hint: unplannedCount === 1 ? "1 wedstrijd" : `${unplannedCount} wedstrijden` },
+    ];
+    return (
+      <div className="grid grid-cols-1 gap-2">
+        {tiles.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => {
+              setMobileSection(t.id);
+              if (t.id === "velden" && !mobileFieldName) setMobileFieldName(plannerFields[0]?.name ?? null);
+            }}
+            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+          >
+            <span className="h-6 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{t.label}</span>
+            <span className="text-[11px] text-muted-foreground shrink-0">{t.hint}</span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
       {/* Planner only — no tabs */}
       <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
+
+        {isMobile && (
+          <div className="flex items-center gap-3 mb-3">
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileSection(null)} aria-label="Terug naar overzicht">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="font-display text-lg font-bold text-foreground">
+              {mobileSection === "planning" ? "Planning" : "Velden"}
+            </h2>
+          </div>
+        )}
 
         {/* ===== PLANNER VIEW ===== */}
         <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
@@ -3136,7 +3178,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           {/* Main layout: field columns + right sidebar */}
           <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0 md:overflow-hidden">
             {/* Field columns */}
-            <div className="flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto">
+            <div className={cn("flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
               <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
@@ -3154,6 +3196,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   }} className="gap-1 text-xs h-7">
                     <Settings className="h-3 w-3" /> Wedstrijdduur
                   </Button>
+                  {!isMobile && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -3164,6 +3207,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   >
                     {plannerCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
                   </Button>
+                  )}
                 </div>
               </div>
               {plannerFields.length === 0 ? (
@@ -3203,15 +3247,40 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   new Set(fieldData.flatMap(f => f.items.map(i => i.startMin)))
                 ).sort((a, b) => a - b);
 
+                const activeMobileField = mobileFieldName && fieldData.some(f => f.field.name === mobileFieldName)
+                  ? mobileFieldName
+                  : fieldData[0]?.field.name ?? null;
+                const visibleFieldData = isMobile
+                  ? fieldData.filter(f => f.field.name === activeMobileField)
+                  : fieldData;
 
                 return (
                   <div>
 
+                    {/* Mobiel: veldkiezer */}
+                    {isMobile && fieldData.length > 1 && (
+                      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1">
+                        {fieldData.map(({ field }) => (
+                          <button
+                            key={field.name}
+                            onClick={() => setMobileFieldName(field.name)}
+                            className={cn(
+                              "shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
+                              field.name === activeMobileField
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border bg-card text-muted-foreground"
+                            )}
+                          >
+                            {displayFieldName(field.name)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-0 min-w-0">
-                        {fieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className="min-w-[330px] w-[330px] flex-shrink-0 print:min-w-0 print:w-auto print:flex-1">
+                        {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
+                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
@@ -3520,10 +3589,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             </div>
 
             {/* ===== RIGHT SIDEBAR ===== */}
-            {!plannerCollapsed && (
+            {(isMobile ? mobileSection === "planning" : !plannerCollapsed) && (
             <div
               ref={plannerSidebarRef}
-              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 h-[calc(100dvh-8rem)] md:h-full overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
+              className={cn(
+                "ml-0 print:hidden flex flex-col sticky top-0 overflow-hidden overscroll-contain transition-colors",
+                isMobile ? "w-full min-w-0 h-[calc(100dvh-11rem)]" : "w-72 shrink-0 border-l border-border h-[calc(100dvh-8rem)] md:h-full",
+                dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""
+              )}
               onDragOver={(e) => {
                 if (!hasPlannerDragData(e)) return;
                 e.preventDefault();
