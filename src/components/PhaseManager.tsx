@@ -1050,7 +1050,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     teamsPerGroup: Math.min(groupConfig.teamsPerGroup, Math.max(2, maxTeams)),
                   });
                 }}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 32 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -1062,7 +1062,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               <select
                 value={groupConfig.teamsPerGroup}
                 onChange={(e) => setGroupConfig({ ...groupConfig, teamsPerGroup: parseInt(e.target.value) })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: Math.max(1, Math.min(128, Math.floor(128 / groupConfig.groupCount)) - 1) }, (_, i) => i + 2).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -1170,7 +1170,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
             <select
               value={bracketConfig.teamCount}
               onChange={(e) => setBracketConfig({ ...bracketConfig, teamCount: parseInt(e.target.value) })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
             >
               {[2, 4, 8, 16, 32, 64, 128].map((n) => (
                 <option key={n} value={n}>{n}</option>

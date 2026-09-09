@@ -28,7 +28,7 @@ const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: strin
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
     >
       <option value="">Selecteer land</option>
       {COUNTRIES.map((c) => (
