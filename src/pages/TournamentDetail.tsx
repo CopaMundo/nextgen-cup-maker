@@ -431,8 +431,14 @@ const TournamentDetail = () => {
         return (
           <>
             {isMobile && subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
-            {presentationSubTab === "presentation" && (
-              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />
+            {presentationSubTab === "website" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="website" />
+            )}
+            {presentationSubTab === "slideshow" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="slideshow" />
+            )}
+            {presentationSubTab === "visualization" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="visualization" />
             )}
             {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id!} />}
             {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
