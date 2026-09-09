@@ -628,7 +628,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [rightSidebarTab, setRightSidebarTab] = useState<"plannen" | "scheidsrechters" | "ongepland">("plannen");
   const [plannerCollapsed, setPlannerCollapsed] = useState(false);
   // Mobiel: tegeloverzicht (Velden / Planning) en gekozen veld
-  const [mobileSection, setMobileSection] = useState<"velden" | "planning" | null>(null);
+  const [mobileSection, setMobileSection] = useState<"velden" | "planning">("velden");
   const [mobileFieldName, setMobileFieldName] = useState<string | null>(null);
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
@@ -2987,49 +2987,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const filteredMatches = getFilteredMatches();
   const availableRounds = getAvailableRounds();
 
-  // ===== MOBIEL: tegeloverzicht =====
-  if (isMobile && mobileSection === null) {
-    const unplannedCount = matches.filter(m => !m.match_date || !m.match_time || !m.field).length;
-    const tiles: { id: "velden" | "planning"; label: string; hint: string }[] = [
-      { id: "velden", label: "Velden", hint: plannerFields.length === 1 ? "1 veld" : `${plannerFields.length} velden` },
-      { id: "planning", label: "Planning", hint: unplannedCount === 1 ? "1 wedstrijd" : `${unplannedCount} wedstrijden` },
-    ];
-    return (
-      <div className="grid grid-cols-1 gap-2">
-        {tiles.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => {
-              setMobileSection(t.id);
-              if (t.id === "velden" && !mobileFieldName) setMobileFieldName(plannerFields[0]?.name ?? null);
-            }}
-            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-          >
-            <span className="h-6 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{t.label}</span>
-            <span className="text-[11px] text-muted-foreground shrink-0">{t.hint}</span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </button>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
       {/* Planner only — no tabs */}
       <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
-
-        {isMobile && (
-          <div className="flex items-center gap-3 mb-3">
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileSection(null)} aria-label="Terug naar overzicht">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="font-display text-lg font-bold text-foreground">
-              {mobileSection === "planning" ? "Planning" : "Velden"}
-            </h2>
-          </div>
-        )}
 
         {/* ===== PLANNER VIEW ===== */}
         <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
@@ -3593,8 +3554,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             <div
               ref={plannerSidebarRef}
               className={cn(
-                "ml-0 print:hidden flex flex-col sticky top-0 overflow-hidden overscroll-contain transition-colors",
-                isMobile ? "w-full min-w-0 h-[calc(100dvh-11rem)]" : "w-72 shrink-0 border-l border-border h-[calc(100dvh-8rem)] md:h-full",
+                "ml-0 print:hidden flex flex-col overflow-hidden overscroll-contain transition-colors",
+                isMobile ? "fixed inset-0 z-50 bg-background" : "w-72 shrink-0 border-l border-border sticky top-0 h-[calc(100dvh-8rem)] md:h-full",
                 dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""
               )}
               onDragOver={(e) => {
@@ -3608,6 +3569,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 void handleDropToUnscheduled(e, getUnscheduledMatches().length);
               }}
             >
+              {/* Mobiel: sluitbalk */}
+              {isMobile && (
+                <div className="flex items-center gap-3 px-3 py-2 border-b border-border shrink-0">
+                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileSection("velden")} aria-label="Terug naar velden">
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <h2 className="font-display text-base font-bold text-foreground">Planning</h2>
+                </div>
+              )}
+
               {/* Tab icons */}
               <div className="flex border-b border-border">
                 <button
@@ -4166,6 +4137,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             </div>
           )}
           </DndContext>
+
+          {/* Mobiel: zwevende Planning-knop */}
+          {isMobile && mobileSection === "velden" && (
+            <button
+              onClick={() => setMobileSection("planning")}
+              className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg transition-transform active:scale-95 print:hidden"
+              aria-label="Planning openen"
+            >
+              Planning
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-foreground/20 px-1.5 text-[11px] font-bold">
+                {matches.filter(m => !m.match_date || !m.match_time || !m.field).length}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
