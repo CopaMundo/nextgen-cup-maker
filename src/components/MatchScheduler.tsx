@@ -3003,7 +3003,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <select
                 value={selectedLocation || ""}
                 onChange={(e) => updateSelectedLocation(e.target.value || null)}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {locations.map(l => (
                   <option key={l.id} value={l.name}>{l.name}</option>

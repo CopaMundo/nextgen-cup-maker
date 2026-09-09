@@ -62,7 +62,7 @@ const LocationSelector = ({
       <select
         value={selectedLocation || ""}
         onChange={(e) => onSelect(e.target.value || null)}
-        className={cn("h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium", selectClassName)}
+        className={cn("h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]", selectClassName)}
       >
         {locations.map((l) => (
           <option key={l.id} value={l.name}>

@@ -830,7 +830,7 @@ const GroupManager = ({
             <select
               value={dialogEncounters}
               onChange={(e) => setDialogEncounters(parseInt(e.target.value))}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
             >
               {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
                 <option key={n} value={n}>{n}</option>
@@ -845,7 +845,7 @@ const GroupManager = ({
               <select
                 value={dialogRounds}
                 onChange={(e) => setDialogRounds(parseInt(e.target.value))}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -963,7 +963,7 @@ const GroupManager = ({
               <select
                 value={dialogSlots}
                 onChange={(e) => setDialogSlots(parseInt(e.target.value))}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
                   <option key={n} value={n}>{n} teams</option>
@@ -1006,7 +1006,7 @@ const GroupManager = ({
               <select
                 value={editSlotCount}
                 onChange={(e) => setEditSlotCount(parseInt(e.target.value))}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
                   <option key={n} value={n}>{n} teams</option>
