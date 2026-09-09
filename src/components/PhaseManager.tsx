@@ -826,45 +826,75 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
       return;
     }
 
-    // If this is an empty draft phase, just drop it locally
     const isDraft = draftPhaseNumbers.includes(phaseNumber) && !allFormats.some(f => f.phase_number === phaseNumber);
-    if (isDraft) {
-      setDraftPhaseNumbers((prev) => prev.filter((n) => n !== phaseNumber));
-      setDeletePhaseNumber(null);
-      toast({ title: "Fase verwijderd" });
-      return;
-    }
 
-    const formatsToDelete = allFormats.filter(f => f.phase_number === phaseNumber);
-    await clearSlotsReferencingFormats(formatsToDelete.map((fmt) => fmt.id));
-    for (const fmt of formatsToDelete) {
-      await supabase.from("tournament_phases").delete().eq("id", fmt.id);
-    }
+    // Alle fasenummers (echte + concept) die na verwijdering overblijven, oplopend
+    const allPhaseNumbers = [...new Set([
+      ...allFormats.map(f => f.phase_number),
+      ...draftPhaseNumbers,
+    ])].filter(n => n !== phaseNumber).sort((a, b) => a - b);
 
-    // Renumber remaining phases
-    const remaining = allFormats.filter(f => f.phase_number !== phaseNumber);
-    const uniquePhaseNumbers = [...new Set(remaining.map(f => f.phase_number))].sort((a, b) => a - b);
-
+    // Oud nummer -> nieuw nummer (1..N zonder gaten)
     const renumberMap = new Map<number, number>();
-    uniquePhaseNumbers.forEach((oldNumber, i) => renumberMap.set(oldNumber, i + 1));
+    allPhaseNumbers.forEach((oldNumber, i) => renumberMap.set(oldNumber, i + 1));
 
-    for (const fmt of remaining) {
-      const newNumber = renumberMap.get(fmt.phase_number)!;
-      if (newNumber !== fmt.phase_number) {
-        await supabase.from("tournament_phases").update({ phase_number: newNumber } as any).eq("id", fmt.id);
+    if (!isDraft) {
+      const formatsToDelete = allFormats.filter(f => f.phase_number === phaseNumber);
+      await clearSlotsReferencingFormats(formatsToDelete.map((fmt) => fmt.id));
+      for (const fmt of formatsToDelete) {
+        await supabase.from("tournament_phases").delete().eq("id", fmt.id);
       }
+
+      // Hernummer overgebleven formats; fases met een standaardnaam ("Fase X") krijgen het nieuwe nummer in hun naam
+      const remaining = allFormats.filter(f => f.phase_number !== phaseNumber);
+      for (const fmt of remaining) {
+        const newNumber = renumberMap.get(fmt.phase_number)!;
+        const label = fmt.match_config?.phaseLabel;
+        const labelIsDefault = typeof label === "string" && /^Fase\s+\d+$/i.test(label.trim());
+        const nextMatchConfig = { ...(fmt.match_config ?? {}) } as Record<string, any>;
+        if (labelIsDefault) nextMatchConfig.phaseLabel = `Fase ${newNumber}`;
+
+        const updates: Record<string, any> = {};
+        if (newNumber !== fmt.phase_number) updates.phase_number = newNumber;
+        if (labelIsDefault && label.trim() !== `Fase ${newNumber}`) updates.match_config = nextMatchConfig;
+        if (Object.keys(updates).length > 0) {
+          await supabase.from("tournament_phases").update(updates as any).eq("id", fmt.id);
+        }
+      }
+
+      const renumbered = remaining
+        .map((fmt) => {
+          const newNumber = renumberMap.get(fmt.phase_number)!;
+          const label = fmt.match_config?.phaseLabel;
+          const nextMatchConfig = { ...(fmt.match_config ?? {}) } as Record<string, any>;
+          if (typeof label === "string" && /^Fase\s+\d+$/i.test(label.trim())) {
+            nextMatchConfig.phaseLabel = `Fase ${newNumber}`;
+          }
+          return { ...fmt, phase_number: newNumber, match_config: nextMatchConfig };
+        })
+        .sort((a, b) => a.phase_number - b.phase_number || a.sort_order - b.sort_order);
+
+      setAllFormats(renumbered);
     }
 
-    const renumbered = remaining
-      .map((fmt) => ({ ...fmt, phase_number: renumberMap.get(fmt.phase_number)! }))
-      .sort((a, b) => a.phase_number - b.phase_number || a.sort_order - b.sort_order);
+    // Conceptfases en lokale labels mee hernummeren
+    setDraftPhaseNumbers((prev) =>
+      prev.filter((n) => n !== phaseNumber).map((n) => renumberMap.get(n) ?? n)
+    );
+    setPendingPhaseLabels((prev) => {
+      const next: Record<number, string> = {};
+      for (const [key, value] of Object.entries(prev)) {
+        const oldNumber = Number(key);
+        if (oldNumber === phaseNumber) continue;
+        const newNumber = renumberMap.get(oldNumber) ?? oldNumber;
+        next[newNumber] = /^Fase\s+\d+$/i.test(value.trim()) ? `Fase ${newNumber}` : value;
+      }
+      return next;
+    });
 
-    setAllFormats(renumbered);
-    setDraftPhaseNumbers((prev) => prev.filter((n) => n !== phaseNumber && n <= renumbered.length));
     setSlotRefreshKey(k => k + 1);
     setDeletePhaseNumber(null);
     toast({ title: "Fase verwijderd en hernummerd" });
-
   };
 
   // Swap format sort_order within a phase
