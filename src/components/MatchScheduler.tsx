@@ -3191,7 +3191,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
-                      <div className="flex gap-2 min-w-0">
+                      <div className="flex gap-0 min-w-0">
                         {fieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
                           <div key={field.name} className="min-w-[330px] w-[330px] flex-shrink-0 print:min-w-0 print:w-auto print:flex-1">
                             {/* Field header */}
@@ -3200,7 +3200,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => handleDrop(e, field.name, 0)}
                               onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}
-                              className={`rounded-t-lg bg-muted/60 border-b border-border/50 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
+                              className={`rounded-t-lg bg-secondary border border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
                             >
                               <div className="flex items-center justify-between">
                                 <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
@@ -3230,7 +3230,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {/* Field column body */}
                             <div
                               ref={(el) => { if (el) fieldColumnRefs.current.set(field.name, el); }}
-                              className={`min-h-[200px] bg-muted/20 transition-[background-color] duration-200 ${dragItemId ? "bg-primary/[0.02]" : ""}`}
+                              className={`border border-t-0 min-h-[200px] transition-[background-color,border-color] duration-200 ${dragItemId ? "border-primary/30 bg-primary/[0.02]" : "border-border"}`}
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => {
                                 const idx = previewField === field.name && previewIndex !== null ? previewIndex : fieldMatches.length;
@@ -3261,9 +3261,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 // Empty timeline block (field starts later / other field has a pause)
                                 if (!item) {
                                   return (
-                                  <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
-                                      <div className={`${PLANNER_ROW_H} rounded-lg bg-muted/10 flex items-center justify-center`}>
-                                         <span className="text-[10px] font-mono text-muted-foreground/40">{minutesToTime(rowTime)}</span>
+                                    <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
+                                      <div className={`${PLANNER_ROW_H} rounded-lg border border-dashed border-border/60 bg-muted/20 flex items-center justify-center`}>
+                                        <span className="text-[10px] font-mono text-muted-foreground/50">{minutesToTime(rowTime)}</span>
                                       </div>
                                     </div>
                                   );
@@ -3274,10 +3274,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                   const brk = item.brk;
                                   return (
                                     <div key={`break-${brk.id}`} className="px-1.5 py-0.5">
-                                        <PlannerItem
-                                          payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
-                                          className={`${PLANNER_ROW_H} rounded-lg bg-primary/[0.06] px-3 flex flex-col items-start justify-center gap-1 shadow-sm`}
-                                        >
+                                      <PlannerItem
+                                        payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
+                                        className={`${PLANNER_ROW_H} rounded-lg bg-primary/10 border border-primary/30 px-3 flex flex-col items-start justify-center gap-1`}
+                                      >
                                         <div className="flex items-center justify-between w-full">
                                           <span className="text-[11px] font-mono font-bold text-primary">{minutesToTime(item.startMin)}</span>
                                           <button onClick={(e) => { e.stopPropagation(); void removeBreak(brk.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
@@ -3314,16 +3314,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg p-1 text-[11px] transition-all duration-200 shadow-sm ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[11px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
-                                              ? "ring-2 ring-primary/40 bg-primary/[0.08]"
+                                              ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
-                                              ? "ring-2 ring-primary/30 bg-primary/[0.08]"
+                                              ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
-                                                ? "ring-2 ring-primary/20 bg-primary/[0.04]"
+                                                ? "border-primary ring-2 ring-primary/20 bg-primary/5"
                                                 : getMatchClashes(m).length > 0
-                                                  ? "bg-destructive/[0.04] hover:bg-destructive/[0.08] hover:shadow-md ring-1 ring-destructive/20"
-                                                  : "bg-card/60 hover:bg-card hover:shadow-md"
+                                                  ? "border-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-destructive hover:shadow-md"
+                                                  : "border-border bg-card hover:border-primary/50 hover:shadow-md"
                                           }`}
                                         >
                                           <div
@@ -3976,10 +3976,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           />
                           <PlannerItem
                             payload={{ id: m.id, type: "match", field_id: null, slot_index: null, container: "unscheduled" }}
-                            className={`rounded-lg bg-card/60 p-1 text-[11px] hover:bg-card hover:shadow-sm transition-all duration-150 shadow-sm ${
+                            className={`rounded-lg border bg-card p-1 text-[11px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
                               mobileSelectedMatchId === m.id
-                                ? "ring-2 ring-primary/30 bg-primary/[0.08]"
-                                : dragItemId === m.id ? "opacity-30 scale-95 ring-2 ring-primary/20" : ""
+                                ? "border-primary ring-2 ring-primary/30 bg-primary/10"
+                                : dragItemId === m.id ? "opacity-30 scale-95 border-primary ring-2 ring-primary/20" : "border-border"
                             }`}
                           >
                             <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation flex flex-col justify-between gap-0.5">
@@ -4040,7 +4040,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="pointer-events-none rounded-lg bg-card p-1 text-[11px] shadow-xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5 ring-1 ring-primary/30">
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1 text-[11px] shadow-2xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5">
                     <div className="flex items-start gap-1.5 leading-none">
                       <span className="text-[11px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
                       <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
@@ -4057,7 +4057,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               }
               if (activeDragPayload.type === "break") {
                 return (
-                  <div className="pointer-events-none rounded-lg bg-primary/10 px-3 py-1.5 text-xs shadow-xl w-[200px] rotate-1 font-medium text-primary ring-1 ring-primary/30">
+                  <div className="pointer-events-none rounded-lg bg-primary/20 border-2 border-primary/40 px-3 py-1.5 text-xs shadow-2xl w-[200px] rotate-1 font-medium text-primary">
                     Pauze
                   </div>
                 );
@@ -4067,8 +4067,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </DragOverlay>
           {/* Scheidsrechter-ghost volgt exact de muisaanwijzer */}
           {activeReferee && refGhostPos && (
-              <div
-              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded bg-card px-2 py-1 text-[11px] font-semibold text-foreground shadow-xl will-change-transform ring-1 ring-primary/30"
+            <div
+              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[11px] font-semibold text-foreground shadow-2xl will-change-transform"
               style={{ transform: `translate3d(${refGhostPos.x}px, ${refGhostPos.y}px, 0) translate(-50%, -140%)` }}
             >
               <WhistleIcon className="h-3 w-3" /> {activeReferee.name}
