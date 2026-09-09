@@ -3369,7 +3369,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   )).length;
                                                   return (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && name !== activeReferee?.name && <RefereePlaceholder />}
+                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && <RefereePlaceholder />}
                                                     <DraggableReferee
                                                       id={`referee-${m.id}-${name}`}
                                                       data={{ id: `referee-${m.id}-${name}`, type: "referee", name, from_match_id: m.id }}
