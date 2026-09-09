@@ -297,15 +297,17 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
   };
 
   // ── Slide actions ────────────────────────────────────────────
+  const createDefaultSlide = (index: number): Slide => ({
+    id: newId(),
+    name: `Dia ${index}`,
+    durationSec: DEFAULT_OPTIONS.defaultDurationSec,
+    enabled: true,
+    blocks: [],
+  });
+
   const addSlide = () => {
     if (!activeShow) return;
-    const slide: Slide = {
-      id: newId(),
-      name: `Dia ${activeShow.slides.length + 1}`,
-      durationSec: activeShow.options.defaultDurationSec || 15,
-      enabled: true,
-      blocks: [],
-    };
+    const slide = createDefaultSlide(activeShow.slides.length + 1);
     updateActiveShow({ slides: [...activeShow.slides, slide] });
   };
 
