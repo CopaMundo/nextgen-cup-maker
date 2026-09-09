@@ -3332,8 +3332,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                           >
 
                                             {/* Time + format row */}
-                                            <div className="flex items-center justify-between leading-none">
-                                              <div className="flex items-center gap-1.5 min-w-0">
+                                            <div className="flex items-start justify-between leading-none">
+                                              <div className="flex items-start gap-1.5 min-w-0">
                                                 <span className="text-[10px] font-mono font-bold text-foreground shrink-0">{time}</span>
                                                 {(phase || group) && (
                                                   <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
