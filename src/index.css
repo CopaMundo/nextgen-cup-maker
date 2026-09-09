@@ -163,6 +163,13 @@ input[type="number"] {
   }
 }
 
+@layer components {
+  /* Eén keuzestijl voor native selectors binnen het toernooibeheer. */
+  .tournament-admin select {
+    @apply rounded-md border border-input bg-background text-foreground transition-colors hover:bg-secondary/50 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

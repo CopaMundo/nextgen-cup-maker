@@ -3577,7 +3577,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer poules/brackets</Label>}
                             <button
                               onClick={() => openDropdown("brackets")} data-dd-inside="true"
-                              className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors"
+                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none ${open ? "border-y-2 border-y-primary bg-primary/[0.06]" : ""}`}
                             >
                               <span className="flex items-center gap-1 truncate">
                                 {hasSelection ? (
@@ -3592,7 +3592,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && (
-                                <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div data-dd-inside="true" className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg">
                                 {options.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground">Alles is ingepland</div>
                                 ) : (
@@ -3631,7 +3631,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {hasSelection && !noBracketsSelected && <Label className="text-[10px] text-muted-foreground">Selecteer rondes</Label>}
                             <button
                               onClick={() => openDropdown("rounds")} data-dd-inside="true"
-                              className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors"
+                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none ${open ? "border-y-2 border-y-primary bg-primary/[0.06]" : ""}`}
                             >
                               <span className="flex items-center gap-1 truncate">
                                 {hasSelection && !noBracketsSelected ? (
@@ -3646,7 +3646,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && (
-                                <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div data-dd-inside="true" className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg">
                                 {unscheduledMatches.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground">Alles is ingepland</div>
                                 ) : noBracketsSelected ? (
@@ -3702,7 +3702,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <button
                               onClick={() => hasFields && openDropdown("fields")} data-dd-inside="true"
                               disabled={!hasFields}
-                              className="w-full flex items-center justify-between border border-border rounded-md px-2 py-1.5 text-xs bg-background hover:bg-secondary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${open ? "border-y-2 border-y-primary bg-primary/[0.06]" : ""}`}
                             >
                               <span className="flex items-center gap-1 truncate">
                                 {hasSelection ? (
@@ -3717,7 +3717,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                             </button>
                             {open && hasFields && (
-                              <div data-dd-inside="true" className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                              <div data-dd-inside="true" className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg">
                                 <label className="flex items-center gap-2 px-3 py-2 text-xs cursor-pointer hover:bg-secondary/50 border-b border-border font-semibold">
                                   <Checkbox checked={allSelected} onCheckedChange={() => setSchedFields(allSelected ? [] : plannerFields.map(f => f.name))} className="h-3.5 w-3.5" />
                                   Alle velden

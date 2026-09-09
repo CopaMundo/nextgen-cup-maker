@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Location {
   id: string;
@@ -22,11 +23,6 @@ const LocationSelector = ({
   selectClassName?: string;
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
-
-  const truncateName = (name: string) => {
-    if (name.length > 20) return name.slice(0, 17) + "...";
-    return name;
-  };
 
   useEffect(() => {
     supabase
@@ -59,17 +55,16 @@ const LocationSelector = ({
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <span className="w-12 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
-      <select
-        value={selectedLocation || ""}
-        onChange={(e) => onSelect(e.target.value || null)}
-        className={cn("h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]", selectClassName)}
-      >
+      <Select value={selectedLocation || ""} onValueChange={(value) => onSelect(value || null)}>
+        <SelectTrigger className={cn("h-8 w-auto min-w-[9rem] max-w-full gap-2 px-2 text-xs font-medium", selectClassName)}>
+          <SelectValue placeholder="Kies locatie" />
+        </SelectTrigger>
+        <SelectContent>
         {locations.map((l) => (
-          <option key={l.id} value={l.name}>
-            {truncateName(l.name)}
-          </option>
+          <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>
         ))}
-      </select>
+        </SelectContent>
+      </Select>
     </div>
   );
 };
