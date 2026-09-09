@@ -1226,10 +1226,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const appendOnly = !dragged?.from_match_id;
     const badgeCount = Array.from(matchContainer.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
       .filter(badge => badge.getBoundingClientRect().width > 1).length;
+    // Zolang de aanwijzer boven het lege invoegvak staat, blijft die plek stabiel.
+    // Zonder deze verankering verschuift het vak de badges onder de aanwijzer en
+    // kan rol 1 onmiddellijk als rol 3 worden geïnterpreteerd.
+    const pointsAtPlaceholder = elements.some(element =>
+      element.matches?.('[data-ref-placeholder="true"]') || Boolean(element.closest?.('[data-ref-placeholder="true"]'))
+    );
+    const anchoredIndex = pointsAtPlaceholder && refInsert?.matchId === matchId
+      ? refInsert.index
+      : null;
     return {
       type: "match" as const,
       matchId,
-      index: appendOnly ? badgeCount : getRefereeInsertIndex(matchContainer, clientX, clientY),
+      index: appendOnly ? badgeCount : (anchoredIndex ?? getRefereeInsertIndex(matchContainer, clientX, clientY)),
     };
   };
 
@@ -2124,7 +2133,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       window.removeEventListener("pointermove", handler);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [activeDragPayload, matches]);
+  }, [activeDragPayload, matches, refInsert]);
 
   // === dnd-kit event handlers ===
   const handleDndDragStart = (event: DragStartEvent) => {
@@ -2138,6 +2147,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         : pointerPositionRef.current;
       pointerPositionRef.current = start;
       setRefGhostPos(start);
+      if (payload.from_match_id) {
+        const source = matches.find(match => match.id === payload.from_match_id);
+        const sourceIndex = source ? refNames(source.referee).indexOf(payload.name) : -1;
+        setRefInsert(sourceIndex >= 0 ? { matchId: payload.from_match_id, index: sourceIndex } : null);
+      } else {
+        setRefInsert(null);
+      }
     }
     if (payload.type !== "referee") {
       setDragItemId(payload.id);
