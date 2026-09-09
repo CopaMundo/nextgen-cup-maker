@@ -1189,8 +1189,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const r = badges[i].getBoundingClientRect();
       const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
       if (clientY < r.top) return i;
-      // Zodra de aanwijzer een badge raakt, geeft de indicator meteen die plek aan.
-      if (sameRow && clientX < r.right - r.width * 0.15) return i;
+      // Midden van de badge: links ervan komt de gesleepte ervoor, rechts erna.
+      if (sameRow && clientX < r.left + r.width / 2) return i;
     }
     return badges.length;
   };
@@ -1205,10 +1205,15 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       .find((element): element is HTMLElement => Boolean(element?.dataset.refereeMatchId));
     const matchId = matchContainer?.dataset.refereeMatchId;
     if (!matchContainer || !matchId) return null;
+    const dragged = activeDragPayload?.type === "referee" ? activeDragPayload : null;
+    // Vanuit de planningslijst sluit de scheidsrechter altijd achteraan aan.
+    const appendOnly = !dragged?.from_match_id;
+    const badgeCount = Array.from(matchContainer.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
+      .filter(badge => badge.getBoundingClientRect().width > 1).length;
     return {
       type: "match" as const,
       matchId,
-      index: getRefereeInsertIndex(matchContainer, clientX, clientY),
+      index: appendOnly ? badgeCount : getRefereeInsertIndex(matchContainer, clientX, clientY),
     };
   };
 
