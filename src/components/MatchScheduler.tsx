@@ -3230,7 +3230,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {/* Field column body */}
                             <div
                               ref={(el) => { if (el) fieldColumnRefs.current.set(field.name, el); }}
-                              className={`border border-t-0 min-h-[200px] transition-[background-color,border-color] duration-200 ${dragItemId ? "border-primary/30 bg-primary/[0.02]" : "border-border"}`}
+                              className={`min-h-[200px] bg-muted/20 transition-[background-color] duration-200 ${dragItemId ? "bg-primary/[0.02]" : ""}`}
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => {
                                 const idx = previewField === field.name && previewIndex !== null ? previewIndex : fieldMatches.length;
