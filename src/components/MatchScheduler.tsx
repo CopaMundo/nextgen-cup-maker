@@ -215,7 +215,7 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
   const [open, setOpen] = useState(false);
   const badge = (
     <span
-      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
+      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[9px] font-semibold print:text-[10px] ${
         issue ? "cursor-pointer" : ""
       } ${
         issue?.level === "error"
@@ -226,7 +226,7 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
       }`}
     >
       {roleNumber !== null && <span className={issue ? "font-bold" : "text-primary font-bold"}>{roleNumber}</span>}
-      <WhistleIcon className="h-2.5 w-2.5" /> {name}
+      <WhistleIcon className="h-3 w-3" /> {name}
       {issue && <span aria-hidden>⚠</span>}
     </span>
   );
@@ -268,7 +268,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[56px]";
+const PLANNER_ROW_H = "h-[60px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -3314,7 +3314,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[10px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[11px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
                                               ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
@@ -3334,9 +3334,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             {/* Time + format row */}
                                             <div className="flex items-start justify-between leading-none">
                                               <div className="flex items-start gap-1.5 min-w-0">
-                                                <span className="text-[10px] font-mono font-bold text-foreground shrink-0">{time}</span>
+                                                <span className="text-[11px] font-mono font-bold text-foreground shrink-0">{time}</span>
                                                 {(phase || group) && (
-                                                  <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                                                  <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                                                 )}
                                               </div>
                                               <div className="flex items-center gap-1 shrink-0">
@@ -3353,11 +3353,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             </div>
                                             {/* Teams */}
                                             <div className="flex items-center gap-1">
-                                              {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
-                                              <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                                              {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
+                                              <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
                                               <span className="text-muted-foreground font-bold mx-0.5">-</span>
-                                              {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
-                                              <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
+                                              {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
+                                              <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                                             </div>
                                             {/* Referees */}
                                             <div
@@ -3854,10 +3854,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 id={`referee-list-${i}-${r}`}
                                 data={{ id: `referee-list-${i}-${r}`, type: "referee", name: r, from_match_id: null }}
                                 title="Sleep naar een wedstrijd"
-                                className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-1 text-[10px] bg-background hover:bg-secondary/50"
+                                className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-1 text-[11px] bg-background hover:bg-secondary/50"
                               >
                                 <span className="font-medium text-foreground truncate max-w-[90px]">{r}</span>
-                                <span className={`text-[9px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
+                                <span className={`text-[10px] font-bold ${count > 0 ? "text-primary" : "text-muted-foreground"}`}>{count}</span>
                               </DraggableReferee>
                             );
                           })}
@@ -3961,7 +3961,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           />
                           <PlannerItem
                             payload={{ id: m.id, type: "match", field_id: null, slot_index: null, container: "unscheduled" }}
-                            className={`rounded-lg border bg-card p-1 text-[10px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
+                            className={`rounded-lg border bg-card p-1 text-[11px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
                               mobileSelectedMatchId === m.id
                                 ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                 : dragItemId === m.id ? "opacity-30 scale-95 border-primary ring-2 ring-primary/20" : "border-border"
@@ -3969,15 +3969,15 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           >
                             <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation flex flex-col justify-between gap-0.5">
                               <div className="flex items-center gap-1 leading-none">
-                                <GripVertical className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
-                                <span className="text-[9px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                                <GripVertical className="h-3 w-3 text-muted-foreground shrink-0" />
+                                <span className="text-[10px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                               </div>
                               <div className="flex items-center gap-1">
-                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain" draggable={false} />}
-                                <span className="font-medium text-[10px] truncate">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" draggable={false} />}
+                                <span className="font-medium text-[11px] truncate">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
                                 <span className="text-muted-foreground mx-0.5">–</span>
-                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain" draggable={false} />}
-                                <span className="font-medium text-[10px] truncate">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
+                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain" draggable={false} />}
+                                <span className="font-medium text-[11px] truncate">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                               </div>
                             </div>
                           </PlannerItem>
@@ -4025,17 +4025,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1 text-[10px] shadow-2xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5">
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1 text-[11px] shadow-2xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5">
                     <div className="flex items-start gap-1.5 leading-none">
-                      <span className="text-[10px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
-                      <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                      <span className="text-[11px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
+                      <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain" />}
-                      <span className="font-medium text-[10px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
+                      <span className="font-medium text-[11px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
                       <span className="text-muted-foreground mx-0.5">-</span>
-                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain" />}
-                      <span className="font-medium text-[10px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
+                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain" />}
+                      <span className="font-medium text-[11px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                     </div>
                   </div>
                 );
@@ -4053,7 +4053,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           {/* Scheidsrechter-ghost volgt exact de muisaanwijzer */}
           {activeReferee && refGhostPos && (
             <div
-              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl will-change-transform"
+              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[11px] font-semibold text-foreground shadow-2xl will-change-transform"
               style={{ transform: `translate3d(${refGhostPos.x}px, ${refGhostPos.y}px, 0) translate(-50%, -140%)` }}
             >
               <WhistleIcon className="h-3 w-3" /> {activeReferee.name}
