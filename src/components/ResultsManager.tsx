@@ -2004,7 +2004,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           </aside>
         )}
 
-        <div className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
+        <div ref={matchesScrollRef} className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
 
       {/* Format detail dialog */}
       {(() => {
@@ -2083,7 +2083,14 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                         const allPlayed = slotTotal > 0 && slotPlayed === slotTotal;
                         
                         return (
-                          <div key={slot.key} className="rounded-lg border border-border bg-card/40 overflow-hidden">
+                          <div
+                            key={slot.key}
+                            ref={el => {
+                              if (el) slotRefs.current.set(slot.key, el);
+                              else slotRefs.current.delete(slot.key);
+                            }}
+                            className="rounded-lg border border-border bg-card/40 overflow-hidden"
+                          >
                             <button
                               type="button"
                               onClick={() => toggleTimeSlot(slot.key)}
