@@ -1207,7 +1207,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return {
       type: "match" as const,
       matchId,
-      index: getRefereeInsertIndex(matchContainer, clientX),
+      index: getRefereeInsertIndex(matchContainer, clientX, clientY),
     };
   };
 
