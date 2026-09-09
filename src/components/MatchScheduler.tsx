@@ -3391,11 +3391,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   const issue = getRefereeIssue(m, name, refIdx);
                                                   return (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
-                                                      <span className="inline-flex items-center gap-0.5 rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 text-[8px] font-semibold text-transparent animate-fade-in">
-                                                        <WhistleIcon className="h-2.5 w-2.5 text-primary/70" /> {refDragName || "Scheidsrechter"}
-                                                      </span>
-                                                    )}
+                                                    {refInsert?.matchId === m.id && refInsert.index === refIdx && <RefereePlaceholder />}
                                                     <span
                                                       draggable
                                                       data-ref-badge="true"
@@ -3422,11 +3418,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   );
                                                 })}
 
-                                                {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
-                                                  <span className="inline-flex items-center gap-0.5 rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 text-[8px] font-semibold text-transparent animate-fade-in">
-                                                        <WhistleIcon className="h-2.5 w-2.5 text-primary/70" /> {refDragName || "Scheidsrechter"}
-                                                      </span>
-                                                )}
+                                                {refInsert?.matchId === m.id && refInsert.index >= displayRefNames(m.id, m.referee).length && <RefereePlaceholder />}
                                               </div>
 
                                             )}
