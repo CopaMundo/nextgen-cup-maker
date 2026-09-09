@@ -2069,7 +2069,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const handler = (e: PointerEvent) => {
       pointerPositionRef.current = { x: e.clientX, y: e.clientY };
-      autoScrollPlanner(e.clientX, e.clientY);
+      if (activeDragPayload.type !== "referee") autoScrollPlanner(e.clientX, e.clientY);
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
@@ -2938,7 +2938,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
         {/* ===== PLANNER VIEW ===== */}
         <div className="print-planner-area flex flex-col">
-          <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); }}>
+          <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
             <div className={cn("py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", isPlannerDateControlled && !isMobile ? "hidden" : "")}>
@@ -3333,9 +3333,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               >
                                                 {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                   const issue = getRefereeIssue(m, name, refIdx);
+                                                  const visualIndex = arr.slice(0, refIdx).filter(candidate => !(
+                                                    activeReferee?.from_match_id === m.id && candidate === activeReferee.name
+                                                  )).length;
                                                   return (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === refIdx && <RefereePlaceholder />}
+                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && name !== activeReferee?.name && <RefereePlaceholder />}
                                                     <DraggableReferee
                                                       id={`referee-${m.id}-${name}`}
                                                       data={{ id: `referee-${m.id}-${name}`, type: "referee", name, from_match_id: m.id }}
