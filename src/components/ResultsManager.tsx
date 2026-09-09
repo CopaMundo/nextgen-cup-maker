@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { formatFieldLabel } from "@/lib/fieldLocations";
 import { getPhaseLabel } from "@/lib/phaseLabel";
 import { supabase } from "@/integrations/supabase/client";
