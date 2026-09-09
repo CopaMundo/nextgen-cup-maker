@@ -814,7 +814,7 @@ const GroupManager = ({
                 onClick={() => setDialogMatchType(opt.value)}
                 className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
                   dialogMatchType === opt.value
-                    ? "border-primary bg-primary/5"
+                    ? "border-y-2 border-y-primary bg-primary/[0.06]"
                     : "border-border hover:border-primary/20"
                 }`}
               >
@@ -880,7 +880,7 @@ const GroupManager = ({
                     onClick={() => setDialogMatchGenMode(opt.value)}
                     className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
                       dialogMatchGenMode === opt.value
-                        ? "border-primary bg-primary/5"
+                        ? "border-y-2 border-y-primary bg-primary/[0.06]"
                         : "border-border hover:border-primary/20"
                     }`}
                   >
