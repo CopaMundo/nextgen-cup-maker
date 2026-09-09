@@ -2001,9 +2001,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         const refereeContainer = hit?.closest<HTMLElement>("[data-referee-match-id]");
         const matchId = refereeContainer?.dataset.refereeMatchId;
         if (refereeContainer && matchId) {
-          const target = matches.find(match => match.id === matchId);
-          const visibleCount = displayRefNames(matchId, target?.referee).length;
-          const index = Math.max(0, Math.min(getRefereeInsertIndex(refereeContainer, x), visibleCount));
+          const index = getRefereeInsertIndex(refereeContainer, x);
           setRefListDropActive(false);
           setRefInsert(previous => previous?.matchId === matchId && previous.index === index
             ? previous
@@ -3360,7 +3358,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   );
                                                 })}
 
-                                                {refInsert?.matchId === m.id && refInsert.index >= displayRefNames(m.id, m.referee).length && <RefereePlaceholder />}
+                                                {refInsert?.matchId === m.id && refInsert.index >= displayRefNames(m.id, m.referee).filter(name => !(
+                                                  activeReferee?.from_match_id === m.id && name === activeReferee.name
+                                                )).length && <RefereePlaceholder />}
                                               </div>
 
                                             )}
