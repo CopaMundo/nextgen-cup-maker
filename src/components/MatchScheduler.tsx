@@ -3178,7 +3178,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           {/* Main layout: field columns + right sidebar */}
           <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0 md:overflow-hidden">
             {/* Field columns */}
-            <div className="flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto">
+            <div className={cn("flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
               <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
