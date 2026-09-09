@@ -3116,7 +3116,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex gap-0 mt-0 items-start md:flex-1 md:min-h-0 md:overflow-hidden">
+          <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0 md:overflow-hidden">
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto">
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
