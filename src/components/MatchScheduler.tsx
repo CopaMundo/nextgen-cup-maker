@@ -1189,7 +1189,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const r = badges[i].getBoundingClientRect();
       const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
       if (clientY < r.top) return i;
-      if (sameRow && clientX < r.left + r.width / 2) return i;
+      // Zodra de aanwijzer een badge raakt, geeft de indicator meteen die plek aan.
+      if (sameRow && clientX < r.right - r.width * 0.15) return i;
     }
     return badges.length;
   };
