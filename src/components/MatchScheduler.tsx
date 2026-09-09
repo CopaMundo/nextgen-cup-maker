@@ -1061,13 +1061,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     />
   );
 
-  /** Weergaveorde van de scheidsrechters van een wedstrijd. Tijdens het slepen binnen dezelfde wedstrijd
-   *  verdwijnt het gesleepte vakje uit de lijst; een leeg placeholder-vakje toont de nieuwe plek. */
-  const displayRefNames = (matchId: string, value?: string | null) => {
-    const names = refNames(value);
-    if (!refDragName || refDragFromMatchId !== matchId) return names;
-    return names.filter(n => n !== refDragName);
-  };
+  /** Weergaveorde van de scheidsrechters van een wedstrijd (ongewijzigd tijdens het slepen:
+   *  het gesleepte element uit de DOM halen breekt de HTML5-drag). */
+  const displayRefNames = (_matchId: string, value?: string | null) => refNames(value);
+
 
   /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
   const getRefereeIssue = (match: Match, name: string, roleIdx: number): { level: "error" | "warn"; reasons: string[] } | null => {
