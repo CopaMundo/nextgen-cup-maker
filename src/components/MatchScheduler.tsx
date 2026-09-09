@@ -3196,6 +3196,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   }} className="gap-1 text-xs h-7">
                     <Settings className="h-3 w-3" /> Wedstrijdduur
                   </Button>
+                  {!isMobile && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -3206,6 +3207,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   >
                     {plannerCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
                   </Button>
+                  )}
                 </div>
               </div>
               {plannerFields.length === 0 ? (
