@@ -27,6 +27,10 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [addName, setAddName] = useState("");
+  const [addFile, setAddFile] = useState<File | null>(null);
+  const [addPreview, setAddPreview] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -42,26 +46,54 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
     setLoading(false);
   };
 
-  const addSponsor = async (rawFile: File) => {
-    setUploading(true);
-    const file = await compressImage(rawFile);
-    const ext = getFileExtension(file);
-    const path = `${tournamentId}/sponsors/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("team-logos").upload(path, file, { upsert: true });
-    if (error) {
-      toast({ title: "Upload mislukt", description: error.message, variant: "destructive" });
-      setUploading(false);
+  const openAddDialog = () => {
+    setAddName("");
+    setAddFile(null);
+    setAddPreview(null);
+    setAddOpen(true);
+  };
+
+  const closeAddDialog = () => {
+    setAddOpen(false);
+    setAddName("");
+    setAddFile(null);
+    setAddPreview(null);
+  };
+
+  const pickAddFile = (rawFile: File) => {
+    setAddFile(rawFile);
+    setAddPreview(URL.createObjectURL(rawFile));
+  };
+
+  const addSponsor = async () => {
+    const name = addName.trim();
+    if (!name) {
+      toast({ title: "Geef een naam in", variant: "destructive" });
       return;
     }
-    const { data: { publicUrl } } = supabase.storage.from("team-logos").getPublicUrl(path);
+    setUploading(true);
+    let publicUrl = "";
+    if (addFile) {
+      const file = await compressImage(addFile);
+      const ext = getFileExtension(file);
+      const path = `${tournamentId}/sponsors/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("team-logos").upload(path, file, { upsert: true });
+      if (error) {
+        toast({ title: "Upload mislukt", description: error.message, variant: "destructive" });
+        setUploading(false);
+        return;
+      }
+      publicUrl = supabase.storage.from("team-logos").getPublicUrl(path).data.publicUrl;
+    }
     const { data } = await supabase
       .from("tournament_sponsors")
-      .insert({ tournament_id: tournamentId, logo_url: publicUrl, name: file.name.split(".")[0], sort_order: sponsors.length })
+      .insert({ tournament_id: tournamentId, logo_url: publicUrl, name, sort_order: sponsors.length })
       .select("id, name, logo_url, sort_order")
       .single();
     if (data) {
       setSponsors(s => [...s, data]);
       toast({ title: "Sponsor toegevoegd" });
+      closeAddDialog();
     }
     setUploading(false);
   };
