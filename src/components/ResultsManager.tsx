@@ -1875,11 +1875,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const selectedFormatAction = selectedFormatActionId ? phases.find(p => p.id === selectedFormatActionId) : null;
 
   return (
-    <div className="space-y-3 lg:h-[calc(100vh-8rem)] lg:overflow-hidden">
+    <div className="space-y-3 lg:h-full lg:min-h-0 lg:space-y-0 lg:overflow-hidden">
       <div className="flex h-full min-h-0 gap-3 lg:flex-row flex-col">
-        {/* Format chips – left sidebar (sticky on desktop) */}
+        {/* Format chips – left sidebar (own scroll on desktop) */}
         {phaseNumbers.length > 0 && (
-          <aside className="lg:w-56 lg:shrink-0 lg:h-full lg:overflow-y-auto lg:border-r lg:border-border lg:pr-2">
+          <aside className="lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
             {phaseNumbers.length > 1 && isMobile && (
               <Select value={String(selectedPhaseNumber ?? phaseNumbers[0])} onValueChange={value => setSelectedPhaseNumber(Number(value))}>
                 <SelectTrigger className="mb-2 h-9 w-full bg-card text-xs font-semibold uppercase">
