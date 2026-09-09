@@ -3119,8 +3119,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <div className="flex gap-0 mt-0 items-start">
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative">
-              {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="sticky top-[3.25rem] z-20 flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm pt-2 pb-1 pr-2 print:hidden">
+              {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts.
+                  Desktop: vast (niet sticky) — alleen het veldgebied eronder scrollt. */}
+              <div className="flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm pt-2 pb-1 pr-2 print:hidden shrink-0">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button variant="outline" size="sm" onClick={() => {
