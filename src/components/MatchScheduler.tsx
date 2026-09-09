@@ -3116,11 +3116,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex gap-0 mt-0 items-start">
+          <div className="flex gap-0 mt-0 items-start md:flex-1 md:min-h-0 md:overflow-hidden">
             {/* Field columns */}
-            <div className="flex-1 min-w-0 relative">
+            <div className="flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto">
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="sticky top-0 md:top-14 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
+              <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button variant="outline" size="sm" onClick={() => {
