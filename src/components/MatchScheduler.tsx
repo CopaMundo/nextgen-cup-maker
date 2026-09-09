@@ -2987,49 +2987,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const filteredMatches = getFilteredMatches();
   const availableRounds = getAvailableRounds();
 
-  // ===== MOBIEL: tegeloverzicht =====
-  if (isMobile && mobileSection === null) {
-    const unplannedCount = matches.filter(m => !m.match_date || !m.match_time || !m.field).length;
-    const tiles: { id: "velden" | "planning"; label: string; hint: string }[] = [
-      { id: "velden", label: "Velden", hint: plannerFields.length === 1 ? "1 veld" : `${plannerFields.length} velden` },
-      { id: "planning", label: "Planning", hint: unplannedCount === 1 ? "1 wedstrijd" : `${unplannedCount} wedstrijden` },
-    ];
-    return (
-      <div className="grid grid-cols-1 gap-2">
-        {tiles.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => {
-              setMobileSection(t.id);
-              if (t.id === "velden" && !mobileFieldName) setMobileFieldName(plannerFields[0]?.name ?? null);
-            }}
-            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-          >
-            <span className="h-6 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{t.label}</span>
-            <span className="text-[11px] text-muted-foreground shrink-0">{t.hint}</span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </button>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
       {/* Planner only — no tabs */}
       <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
-
-        {isMobile && (
-          <div className="flex items-center gap-3 mb-3">
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileSection(null)} aria-label="Terug naar overzicht">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="font-display text-lg font-bold text-foreground">
-              {mobileSection === "planning" ? "Planning" : "Velden"}
-            </h2>
-          </div>
-        )}
 
         {/* ===== PLANNER VIEW ===== */}
         <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
