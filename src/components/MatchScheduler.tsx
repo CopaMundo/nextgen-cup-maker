@@ -3507,6 +3507,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </div>
                 );
               })()}
+              </div>
             </div>
 
             {/* ===== RIGHT SIDEBAR ===== */}
