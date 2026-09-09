@@ -368,7 +368,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
         tournament_id: tournamentId,
         name: `Diavoorstelling ${nextOrder + 1}`,
         sort_order: nextOrder,
-        slides: [],
+        slides: [createDefaultSlide(1)],
         sponsor_bar: DEFAULT_SPONSOR_BAR,
         options: DEFAULT_OPTIONS,
       } as any)
