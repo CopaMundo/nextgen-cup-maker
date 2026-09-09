@@ -27,6 +27,10 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [addName, setAddName] = useState("");
+  const [addFile, setAddFile] = useState<File | null>(null);
+  const [addPreview, setAddPreview] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -42,26 +46,54 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
     setLoading(false);
   };
 
-  const addSponsor = async (rawFile: File) => {
-    setUploading(true);
-    const file = await compressImage(rawFile);
-    const ext = getFileExtension(file);
-    const path = `${tournamentId}/sponsors/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("team-logos").upload(path, file, { upsert: true });
-    if (error) {
-      toast({ title: "Upload mislukt", description: error.message, variant: "destructive" });
-      setUploading(false);
+  const openAddDialog = () => {
+    setAddName("");
+    setAddFile(null);
+    setAddPreview(null);
+    setAddOpen(true);
+  };
+
+  const closeAddDialog = () => {
+    setAddOpen(false);
+    setAddName("");
+    setAddFile(null);
+    setAddPreview(null);
+  };
+
+  const pickAddFile = (rawFile: File) => {
+    setAddFile(rawFile);
+    setAddPreview(URL.createObjectURL(rawFile));
+  };
+
+  const addSponsor = async () => {
+    const name = addName.trim();
+    if (!name) {
+      toast({ title: "Geef een naam in", variant: "destructive" });
       return;
     }
-    const { data: { publicUrl } } = supabase.storage.from("team-logos").getPublicUrl(path);
+    setUploading(true);
+    let publicUrl = "";
+    if (addFile) {
+      const file = await compressImage(addFile);
+      const ext = getFileExtension(file);
+      const path = `${tournamentId}/sponsors/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("team-logos").upload(path, file, { upsert: true });
+      if (error) {
+        toast({ title: "Upload mislukt", description: error.message, variant: "destructive" });
+        setUploading(false);
+        return;
+      }
+      publicUrl = supabase.storage.from("team-logos").getPublicUrl(path).data.publicUrl;
+    }
     const { data } = await supabase
       .from("tournament_sponsors")
-      .insert({ tournament_id: tournamentId, logo_url: publicUrl, name: file.name.split(".")[0], sort_order: sponsors.length })
+      .insert({ tournament_id: tournamentId, logo_url: publicUrl, name, sort_order: sponsors.length })
       .select("id, name, logo_url, sort_order")
       .single();
     if (data) {
       setSponsors(s => [...s, data]);
       toast({ title: "Sponsor toegevoegd" });
+      closeAddDialog();
     }
     setUploading(false);
   };
@@ -101,6 +133,55 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
 
   const dialogs = (
     <>
+    <Dialog open={addOpen} onOpenChange={(o) => { if (!o) closeAddDialog(); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Sponsor toevoegen</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <Label className="text-xs">Sponsornaam</Label>
+            <Input
+              value={addName}
+              onChange={(e) => setAddName(e.target.value)}
+              placeholder="Naam sponsor"
+              autoFocus
+              onKeyDown={(e) => { if (e.key === "Enter") addSponsor(); }}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Logo (optioneel)</Label>
+            <div className="flex justify-center">
+              <label className="cursor-pointer relative group">
+                <div className="h-24 w-24 overflow-hidden rounded-xl bg-secondary flex items-center justify-center">
+                  {addPreview ? (
+                    <img src={addPreview} alt="Logo voorbeeld" className="h-full w-full object-contain" />
+                  ) : (
+                    <Upload className="h-6 w-6 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Upload className="h-6 w-6 text-white" />
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => { if (e.target.files?.[0]) pickAddFile(e.target.files[0]); e.target.value = ""; }}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={closeAddDialog}>Annuleren</Button>
+          <Button onClick={addSponsor} disabled={uploading || !addName.trim()} className="bg-foreground text-background hover:bg-foreground/90">
+            {uploading ? "Bezig..." : "Toevoegen"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     <Dialog open={!!editingSponsor} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
@@ -186,19 +267,16 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
               </div>
             </div>
           ))}
-          <label className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left cursor-pointer active:bg-accent/40">
+          <button
+            type="button"
+            onClick={openAddDialog}
+            className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left active:bg-accent/40"
+          >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
               <Plus className="h-4 w-4" />
             </div>
-            <span className="font-display text-sm font-semibold text-foreground">{uploading ? "Uploaden..." : "Sponsor toevoegen"}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploading}
-              onChange={(e) => { if (e.target.files?.[0]) { addSponsor(e.target.files[0]); e.target.value = ""; } }}
-            />
-          </label>
+            <span className="font-display text-sm font-semibold text-foreground">Sponsor toevoegen</span>
+          </button>
         </div>
         {dialogs}
       </div>
@@ -245,17 +323,14 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
             </div>
           ))}
 
-          <label className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px] cursor-pointer">
+          <button
+            type="button"
+            onClick={openAddDialog}
+            className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px]"
+          >
             <Plus className="h-6 w-6 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{uploading ? "Uploaden..." : "Sponsor toevoegen"}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploading}
-              onChange={(e) => { if (e.target.files?.[0]) { addSponsor(e.target.files[0]); e.target.value = ""; } }}
-            />
-          </label>
+            <span className="text-xs text-muted-foreground">Sponsor toevoegen</span>
+          </button>
         </div>
       </div>
 
