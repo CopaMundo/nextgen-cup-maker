@@ -3314,7 +3314,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[10px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[11px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
                                               ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
