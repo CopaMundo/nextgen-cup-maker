@@ -1,3 +1,5 @@
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 const COUNTRIES = [
   "Afghanistan","Albanië","Algerije","Andorra","Angola","Argentinië","Armenië","Australië","Azerbeidzjan",
   "Bahama's","Bahrein","Bangladesh","Barbados","België","Belize","Benin","Bhutan","Bolivia","Bosnië en Herzegovina",
@@ -25,16 +27,18 @@ const COUNTRIES = [
 
 const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-    >
-      <option value="">Selecteer land</option>
-      {COUNTRIES.map((c) => (
-        <option key={c} value={c}>{c}</option>
-      ))}
-    </select>
+    <Select value={value || undefined} onValueChange={onChange}>
+      <SelectTrigger className="h-10 w-full text-sm">
+        <SelectValue placeholder="Selecteer land" />
+      </SelectTrigger>
+      <SelectContent>
+        {COUNTRIES.map((country) => (
+          <SelectItem key={country} value={country} className="pl-2 [&>span:first-child]:hidden">
+            {country}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
 

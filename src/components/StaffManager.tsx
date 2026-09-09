@@ -13,6 +13,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const STAFF_ROLES = ["Trainer", "Assistent trainer", "Teammanager", "Verzorger", "Keeperstrainer", "Analist"];
 
@@ -115,9 +116,14 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Functie</Label>
-              <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]">
-                {STAFF_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-              </select>
+              <Select value={form.role} onValueChange={(role) => setForm({ ...form, role })}>
+                <SelectTrigger className="h-10 w-full text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {STAFF_ROLES.map((role) => (
+                    <SelectItem key={role} value={role} className="pl-2 [&>span:first-child]:hidden">{role}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Foto</Label>
@@ -189,9 +195,14 @@ const StaffManager = ({ tournamentId, teamId }: { tournamentId: string; teamId: 
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Functie</Label>
-              <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]">
-                {STAFF_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-              </select>
+              <Select value={editForm.role} onValueChange={(role) => setEditForm({ ...editForm, role })}>
+                <SelectTrigger className="h-10 w-full text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {STAFF_ROLES.map((role) => (
+                    <SelectItem key={role} value={role} className="pl-2 [&>span:first-child]:hidden">{role}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
