@@ -3347,13 +3347,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               </button>
                                             </div>
                                             {/* Teams */}
-                                            <div className="space-y-0.5">
+                                            <div className="space-y-0">
                                               <div className="flex items-center gap-1">
-                                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
-                                                <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
+                                                <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
                                                 <span className="text-muted-foreground font-bold mx-0.5">-</span>
-                                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
-                                                <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
+                                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
+                                                <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                                               </div>
                                             </div>
                                             {/* Phase/group badge */}
