@@ -37,7 +37,7 @@ const sidebarItems = [
 
   { id: "general", icon: Settings, label: "Algemeen", title: "Toernooi-instellingen", desc: "Naam, logo, speeldagen, locaties en puntentelling" },
   { id: "teams", icon: ShirtIcon, label: "Deelnemers", title: "Deelnemerslijst", desc: "Teams, spelers en scheidsrechters beheren" },
-  { id: "phases", icon: BracketTreeIcon, label: "Format", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
+  { id: "phases", icon: BracketTreeIcon, label: "Indeling", title: "Toernooiopbouw", desc: "Fases, groepen en knock-outschema's" },
   { id: "schedule", icon: CalendarClockIcon, label: "Schema", title: "Speelschema", desc: "Wedstrijden verdelen over velden en tijdsloten" },
   { id: "results", icon: ScoreboardIcon, label: "Resultaten", title: "Uitslagen & statistieken", desc: "Scores invullen, standen en cijfers" },
   { id: "presentation", icon: Tv2, label: "Presentatie", title: "Publieke weergave", desc: "Website, sponsors, polls en vormgeving" },
