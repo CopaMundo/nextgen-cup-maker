@@ -703,7 +703,7 @@ const TournamentDetail = () => {
               </div>
             </header>
           )}
-          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0" : "py-4 sm:py-6")}>
+          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
             <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>
           </div>
         </div>
