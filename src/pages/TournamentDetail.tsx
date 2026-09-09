@@ -637,7 +637,6 @@ const TournamentDetail = () => {
                       tournamentId={id!}
                       selectedLocation={selectedLocation}
                       onSelect={setSelectedLocation}
-                      selectClassName="h-6 rounded-md px-1.5 text-[11px] font-medium leading-none"
                     />
                   )}
                 </div>

@@ -59,11 +59,16 @@ const CategorySelector = ({
 
   if (!isMultiCategory || categories.length === 0) return null;
 
+  const selectedName = categories.find((c) => c.id === selectedCategoryId)?.name || "";
+
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <span className={cn("text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground", !isMobile && "w-12")}>Divisie</span>
       <Select value={selectedCategoryId || ""} onValueChange={(value) => onSelect(value || null)}>
-        <SelectTrigger className={cn("h-8 w-auto min-w-[9rem] max-w-full gap-2 px-2 text-xs font-medium", !isMobile && "h-7", selectClassName)}>
+        <SelectTrigger
+          title={selectedName}
+          className={cn("h-8 w-auto min-w-fit max-w-[20ch] gap-2 px-2 text-xs font-medium", !isMobile && "h-7", selectClassName)}
+        >
           <SelectValue placeholder="Kies divisie" />
         </SelectTrigger>
         <SelectContent>

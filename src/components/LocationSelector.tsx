@@ -56,7 +56,10 @@ const LocationSelector = ({
     <div className={cn("flex items-center gap-2", className)}>
       <span className="w-12 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
       <Select value={selectedLocation || ""} onValueChange={(value) => onSelect(value || null)}>
-        <SelectTrigger className={cn("h-8 w-auto min-w-[9rem] max-w-full gap-2 px-2 text-xs font-medium", selectClassName)}>
+        <SelectTrigger
+          title={selectedLocation || ""}
+          className={cn("h-8 w-auto min-w-fit max-w-[20ch] gap-2 px-2 text-xs font-medium", selectClassName)}
+        >
           <SelectValue placeholder="Kies locatie" />
         </SelectTrigger>
         <SelectContent>
