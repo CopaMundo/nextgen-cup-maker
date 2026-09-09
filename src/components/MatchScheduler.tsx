@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry, getMiddleDate } from "@/lib/dateUtils";
@@ -204,6 +205,64 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
     </div>
   );
 };
+
+/** Scheidsrechterbadge in een wedstrijdkaart; bij een probleem toont tikken/hoveren de melding. */
+const RefereeBadge = ({ name, roleNumber, issue }: {
+  name: string;
+  roleNumber: number | null;
+  issue: { level: "error" | "warn"; reasons: string[] } | null;
+}) => {
+  const [open, setOpen] = useState(false);
+  const badge = (
+    <span
+      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
+        issue ? "cursor-pointer" : ""
+      } ${
+        issue?.level === "error"
+          ? "border-destructive bg-destructive/15 text-destructive"
+          : issue?.level === "warn"
+            ? "border-warning bg-warning/15 text-warning"
+            : "border-border bg-muted text-muted-foreground"
+      }`}
+    >
+      {roleNumber !== null && <span className={issue ? "font-bold" : "text-primary font-bold"}>{roleNumber}</span>}
+      <WhistleIcon className="h-2.5 w-2.5" /> {name}
+      {issue && <span aria-hidden>⚠</span>}
+    </span>
+  );
+
+  if (!issue) return badge;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          className="print:hidden"
+        >
+          {badge}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        side="top"
+        className="w-64 p-3"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <p className={`text-xs font-bold mb-1 ${issue.level === "error" ? "text-destructive" : "text-warning"}`}>
+          {issue.level === "error" ? "Conflict" : "Let op"}
+        </p>
+        <ul className="space-y-1 text-[11px] leading-snug text-foreground">
+          {issue.reasons.map((r, i) => <li key={i}>{r}</li>)}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 
 const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
@@ -3311,21 +3370,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                   const issue = getRefereeIssue(m, name, refIdx);
                                                   return (
-                                                    <span
+                                                    <RefereeBadge
                                                       key={`${name}-${refIdx}`}
-                                                      title={issue?.level === "error" ? issue.reasons.join("\n") : undefined}
-                                                      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
-                                                        issue?.level === "error"
-                                                            ? "border-destructive bg-destructive/15 text-destructive"
-                                                            : issue?.level === "warn"
-                                                              ? "border-warning bg-warning/15 text-warning"
-                                                              : "border-border bg-muted text-muted-foreground"
-                                                      }`}
-                                                    >
-                                                      {arr.length > 1 && <span className={issue ? "font-bold" : "text-primary font-bold"}>{refIdx + 1}</span>}
-                                                      <WhistleIcon className="h-2.5 w-2.5" /> {name}
-                                                      {issue && <span aria-hidden>⚠</span>}
-                                                    </span>
+                                                      name={name}
+                                                      roleNumber={arr.length > 1 ? refIdx + 1 : null}
+                                                      issue={issue}
+                                                    />
                                                   );
                                                 })}
 
