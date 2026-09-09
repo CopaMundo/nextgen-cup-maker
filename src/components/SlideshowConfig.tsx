@@ -128,7 +128,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
             tournament_id: tournamentId,
             name: "Diavoorstelling 1",
             sort_order: 0,
-            slides: [],
+            slides: [createDefaultSlide(1)],
             sponsor_bar: DEFAULT_SPONSOR_BAR,
             options: DEFAULT_OPTIONS,
           } as any)
@@ -297,15 +297,17 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
   };
 
   // ── Slide actions ────────────────────────────────────────────
+  const createDefaultSlide = (index: number): Slide => ({
+    id: newId(),
+    name: `Dia ${index}`,
+    durationSec: DEFAULT_OPTIONS.defaultDurationSec,
+    enabled: true,
+    blocks: [],
+  });
+
   const addSlide = () => {
     if (!activeShow) return;
-    const slide: Slide = {
-      id: newId(),
-      name: `Dia ${activeShow.slides.length + 1}`,
-      durationSec: activeShow.options.defaultDurationSec || 15,
-      enabled: true,
-      blocks: [],
-    };
+    const slide = createDefaultSlide(activeShow.slides.length + 1);
     updateActiveShow({ slides: [...activeShow.slides, slide] });
   };
 
@@ -366,7 +368,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
         tournament_id: tournamentId,
         name: `Diavoorstelling ${nextOrder + 1}`,
         sort_order: nextOrder,
-        slides: [],
+        slides: [createDefaultSlide(1)],
         sponsor_bar: DEFAULT_SPONSOR_BAR,
         options: DEFAULT_OPTIONS,
       } as any)
