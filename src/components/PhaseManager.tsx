@@ -138,7 +138,14 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
   const [pendingPhaseLabels, setPendingPhaseLabels] = useState<Record<number, string>>({});
   const [savingPhaseEdit, setSavingPhaseEdit] = useState(false);
   const [activePhaseNumber, setActivePhaseNumber] = useState<number | null>(null);
-  const [draftPhaseNumbers, setDraftPhaseNumbers] = useState<number[]>([]);
+  const draftStorageKey = `phase-drafts-${tournamentId}-${categoryId ?? "all"}`;
+  const [draftPhaseNumbers, setDraftPhaseNumbers] = useState<number[]>(() => {
+    try {
+      const raw = localStorage.getItem(`phase-drafts-${tournamentId}-${categoryId ?? "all"}`);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((n: unknown) => typeof n === "number") : [];
+    } catch { return []; }
+  });
   const [newFormatScoringSystemId, setNewFormatScoringSystemId] = useState<string | null>(null);
   const { toast } = useToast();
   const { systems: scoringSystems, refetch: refetchScoringSystems } = useScoringSystems(tournamentId);
@@ -1303,8 +1310,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               key={c.phaseNumber}
               role="button"
               tabIndex={0}
-              onClick={() => { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(c.formats.length === 1 ? c.formats[0].id : null); }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(c.formats.length === 1 ? c.formats[0].id : null); } }}
+              onClick={() => { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); } }}
               className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -1390,7 +1397,6 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     categoryId={categoryId}
                     refreshKey={slotRefreshKey}
                     onSlotChange={() => setSlotRefreshKey(k => k + 1)}
-                    initialExpanded
                   />
                 </div>
               ) : (
@@ -1464,7 +1470,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   canMoveDown={formatIdx < container.formats.length - 1}
                   onMoveUp={() => formatIdx > 0 && swapFormats(format, container.formats[formatIdx - 1])}
                   onMoveDown={() => formatIdx < container.formats.length - 1 && swapFormats(format, container.formats[formatIdx + 1])}
-                  initialExpanded={container.formats.length === 1 || format.id === newlyCreatedId}
+                  initialExpanded={format.id === newlyCreatedId}
                 />
                   )}
                 </SortableRowShell>
