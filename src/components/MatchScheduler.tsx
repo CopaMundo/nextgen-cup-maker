@@ -2967,12 +2967,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const availableRounds = getAvailableRounds();
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
       {/* Planner only — no tabs */}
-      <div className="flex flex-col">
+      <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
 
         {/* ===== PLANNER VIEW ===== */}
-        <div className="print-planner-area flex flex-col">
+        <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
