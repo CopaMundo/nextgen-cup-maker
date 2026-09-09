@@ -60,7 +60,7 @@ const LocationSelector = ({
       <Select value={selectedLocation || ""} onValueChange={(value) => onSelect(value || null)}>
         <SelectTrigger
           title={selectedLocation || ""}
-          className={cn("h-8 w-auto min-w-fit max-w-[18ch] gap-1 px-1.5 text-xs font-medium", selectClassName)}
+          className={cn("h-7 w-auto min-w-fit max-w-[18ch] gap-1 px-1.5 text-[11px] font-medium leading-none", !isMobile && "h-6", selectClassName)}
         >
           <SelectValue>{displayName || "Kies locatie"}</SelectValue>
         </SelectTrigger>
