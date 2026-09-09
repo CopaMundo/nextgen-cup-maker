@@ -121,7 +121,7 @@ const PresentationManager = ({
 
   return (
     <>
-      <div className="space-y-6 w-full max-w-4xl mx-auto">
+      <div className="w-full space-y-6">
 
         {subTab === "website" && (
           <>
