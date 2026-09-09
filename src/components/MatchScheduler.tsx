@@ -3332,18 +3332,21 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                           >
 
                                             {/* Time row */}
-                                            <div className="flex items-center justify-between mb-0.5">
-                                              <div className="flex items-center gap-1">
-                                                <span className="text-[10px] font-mono font-bold text-foreground">{time}</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                              <div className="flex items-center gap-1 min-w-0">
+                                                <span className="text-[11px] font-mono font-bold text-foreground shrink-0">{time}</span>
+                                                {(phase || group) && (
+                                                  <span className="text-[10px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                                                )}
                                                 {getMatchClashes(m).length > 0 && (
-                                                  <span className="text-destructive cursor-help" title={getMatchClashes(m).join("\n")}>⚠</span>
+                                                  <span className="text-destructive cursor-help shrink-0" title={getMatchClashes(m).join("\n")}>⚠</span>
                                                 )}
                                               </div>
                                               <button
                                                 onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
-                                                className="text-muted-foreground hover:text-foreground print:hidden"
+                                                className="text-muted-foreground hover:text-foreground print:hidden shrink-0"
                                               >
-                                                <Pencil className="h-2 w-2" />
+                                                <Pencil className="h-2.5 w-2.5" />
                                               </button>
                                             </div>
                                             {/* Teams */}
