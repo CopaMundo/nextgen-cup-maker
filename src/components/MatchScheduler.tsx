@@ -3149,6 +3149,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </Button>
                 </div>
               </div>
+              {/* Desktop: eigen scrollgebied onder de vaste actiebalk; mobiel scrollt de pagina */}
+              <div className="lg:h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain min-h-0">
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
