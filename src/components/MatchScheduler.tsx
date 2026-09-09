@@ -3314,7 +3314,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1.5 text-[10px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[10px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
                                               ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
@@ -3328,12 +3328,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                         >
                                           <div
                                             onClick={() => handleMobileTapMatch(m.id)}
-                                            className="touch-manipulation"
+                                            className="touch-manipulation h-full flex flex-col justify-between gap-0.5"
                                           >
 
                                             {/* Time + format row */}
-                                            <div className="flex items-start justify-between mb-0.5 leading-none">
-                                              <div className="flex items-baseline gap-1.5 min-w-0">
+                                            <div className="flex items-center justify-between leading-none">
+                                              <div className="flex items-center gap-1.5 min-w-0">
                                                 <span className="text-[10px] font-mono font-bold text-foreground shrink-0">{time}</span>
                                                 {(phase || group) && (
                                                   <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
@@ -3352,20 +3352,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               </div>
                                             </div>
                                             {/* Teams */}
-                                            <div className="space-y-0">
-                                              <div className="flex items-center gap-1">
-                                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
-                                                <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
-                                                <span className="text-muted-foreground font-bold mx-0.5">-</span>
-                                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
-                                                <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
-                                              </div>
+                                            <div className="flex items-center gap-1">
+                                              {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
+                                              <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                                              <span className="text-muted-foreground font-bold mx-0.5">-</span>
+                                              {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
+                                              <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                                             </div>
                                             {/* Referees */}
                                             {(refNames(m.referee).length > 0 || activeReferee) && (
                                               <div
                                                 data-referee-match-id={m.id}
-                                                className={`mt-0.5 flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                                className={`flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
                                               >
                                                 {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                   const issue = getRefereeIssue(m, name, refIdx);
