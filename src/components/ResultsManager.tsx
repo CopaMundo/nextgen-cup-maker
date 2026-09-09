@@ -1905,7 +1905,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       onClick={() => setSelectedPhaseNumber(phaseNumber)}
                       className={`shrink-0 lg:w-full rounded-md border px-2 py-1 text-[10px] font-semibold uppercase transition-colors text-left ${
                         isSelected
-                          ? "border-primary bg-primary/10 text-primary"
+                          ? "border-y-2 border-y-primary bg-primary/[0.06] text-primary"
                           : "border-border bg-card text-muted-foreground hover:text-foreground"
                       }`}
                     >

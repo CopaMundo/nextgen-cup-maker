@@ -318,7 +318,7 @@ const ScoreEntryDialog = ({
                 value={homeScore}
                 onChange={(e) => handleScoreInput(e.target.value, setHomeScore)}
                 disabled={!editable}
-                className="h-12 w-16 text-center text-xl font-bold border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-12 w-16 text-center text-xl font-bold border border-input rounded-lg bg-background focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="–"
               />
               <span className="text-xl font-bold text-muted-foreground">:</span>
@@ -329,7 +329,7 @@ const ScoreEntryDialog = ({
                 value={awayScore}
                 onChange={(e) => handleScoreInput(e.target.value, setAwayScore)}
                 disabled={!editable}
-                className="h-12 w-16 text-center text-xl font-bold border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-12 w-16 text-center text-xl font-bold border border-input rounded-lg bg-background focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="–"
               />
             </div>
@@ -358,7 +358,7 @@ const ScoreEntryDialog = ({
                     value={s.home}
                     onChange={(e) => handleSetChange(idx, "home", e.target.value)}
                     disabled={!editable}
-                    className="h-9 w-14 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-9 w-14 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="–"
                   />
                   <span className="text-sm font-bold text-muted-foreground">:</span>
@@ -369,7 +369,7 @@ const ScoreEntryDialog = ({
                     value={s.away}
                     onChange={(e) => handleSetChange(idx, "away", e.target.value)}
                     disabled={!editable}
-                    className="h-9 w-14 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-9 w-14 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="–"
                   />
                 </div>
@@ -405,7 +405,7 @@ const ScoreEntryDialog = ({
                 value={homePen}
                 onChange={(e) => handleScoreInput(e.target.value, setHomePen)}
                 disabled={!editable}
-                className="h-8 w-12 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-8 w-12 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="–"
               />
               <span className="text-sm text-muted-foreground">–</span>
@@ -416,7 +416,7 @@ const ScoreEntryDialog = ({
                 value={awayPen}
                 onChange={(e) => handleScoreInput(e.target.value, setAwayPen)}
                 disabled={!editable}
-                className="h-8 w-12 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-8 w-12 text-center text-sm font-bold border border-input rounded-md bg-background focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="–"
               />
             </div>

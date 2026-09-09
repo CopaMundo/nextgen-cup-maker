@@ -204,7 +204,7 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
         <select
           value={selectedPhase}
           onChange={(e) => setSelectedPhase(e.target.value)}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm flex-1 min-w-[200px]"
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm flex-1 min-w-[200px] focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
         >
           {phases.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
@@ -234,7 +234,7 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
                       <select
                         value={match.home_team_id || ""}
                         onChange={(e) => updateMatch(match.id, { home_team_id: e.target.value || null })}
-                        className="h-9 rounded border border-input bg-background px-2 text-sm"
+                        className="h-9 rounded border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
                       >
                         <option value="">Thuisteam</option>
                         {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -257,7 +257,7 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
                       <select
                         value={match.away_team_id || ""}
                         onChange={(e) => updateMatch(match.id, { away_team_id: e.target.value || null })}
-                        className="h-9 rounded border border-input bg-background px-2 text-sm"
+                        className="h-9 rounded border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
                       >
                         <option value="">Uitteam</option>
                         {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}

@@ -45,7 +45,7 @@ const Login = () => {
         <form onSubmit={handleLogin} className="space-y-5 rounded-xl border border-border bg-card p-8">
           <div className="space-y-2">
             <Label htmlFor="email">E-mailadres</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jouw@email.com" required className="border-border focus:border-primary focus:ring-primary" />
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jouw@email.com" required className="border-border" />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -53,7 +53,7 @@ const Login = () => {
               <Link to="/forgot-password" className="text-xs text-primary hover:text-primary/80 transition-colors">Wachtwoord vergeten?</Link>
             </div>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="border-border focus:border-primary focus:ring-primary" />
+              <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="border-border" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>

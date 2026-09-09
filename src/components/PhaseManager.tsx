@@ -1024,7 +1024,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               onClick={() => setNewFormatType(opt.value)}
               className={`rounded-lg border-2 p-3 text-center transition-all ${
                 newFormatType === opt.value
-                  ? "border-primary bg-primary/5"
+                  ? "border-y-2 border-y-primary bg-primary/[0.06]"
                   : "border-border hover:border-primary/20"
               }`}
             >
@@ -1050,7 +1050,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     teamsPerGroup: Math.min(groupConfig.teamsPerGroup, Math.max(2, maxTeams)),
                   });
                 }}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 32 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -1062,7 +1062,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               <select
                 value={groupConfig.teamsPerGroup}
                 onChange={(e) => setGroupConfig({ ...groupConfig, teamsPerGroup: parseInt(e.target.value) })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: Math.max(1, Math.min(128, Math.floor(128 / groupConfig.groupCount)) - 1) }, (_, i) => i + 2).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -1084,7 +1084,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   onClick={() => setGroupConfig({ ...groupConfig, matchType: opt.value as any })}
                   className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
                     groupConfig.matchType === opt.value
-                      ? "border-primary bg-primary/5"
+                      ? "border-y-2 border-y-primary bg-primary/[0.06]"
                       : "border-border hover:border-primary/20"
                   }`}
                 >
@@ -1100,7 +1100,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               <select
                 value={groupConfig.encounters}
                 onChange={(e) => setGroupConfig({ ...groupConfig, encounters: parseInt(e.target.value) })}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -1114,7 +1114,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               <select
                 value={groupConfig.rounds}
                 onChange={(e) => setGroupConfig({ ...groupConfig, rounds: parseInt(e.target.value) })}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -1150,7 +1150,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     onClick={() => setMatchGenMode(opt.value)}
                     className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
                       matchGenMode === opt.value
-                        ? "border-primary bg-primary/5"
+                        ? "border-y-2 border-y-primary bg-primary/[0.06]"
                         : "border-border hover:border-primary/20"
                     }`}
                   >
@@ -1170,7 +1170,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
             <select
               value={bracketConfig.teamCount}
               onChange={(e) => setBracketConfig({ ...bracketConfig, teamCount: parseInt(e.target.value) })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
             >
               {[2, 4, 8, 16, 32, 64, 128].map((n) => (
                 <option key={n} value={n}>{n}</option>
@@ -1189,7 +1189,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   onClick={() => setBracketConfig({ ...bracketConfig, matchType: opt.value })}
                   className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
                     bracketConfig.matchType === opt.value
-                      ? "border-primary bg-primary/5"
+                      ? "border-y-2 border-y-primary bg-primary/[0.06]"
                       : "border-border hover:border-primary/20"
                   }`}
                 >
@@ -1280,7 +1280,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
             <select
               value={singleMatchConfig.matchCount}
               onChange={(e) => setSingleMatchConfig({ ...singleMatchConfig, matchCount: parseInt(e.target.value) })}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
             >
               {Array.from({ length: 32 }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>{n}</option>
@@ -1298,7 +1298,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   key={opt.value}
                   type="button"
                   onClick={() => setSingleMatchConfig({ ...singleMatchConfig, matchType: opt.value as any })}
-                  className={`flex-1 text-left border rounded-lg px-3 py-2 text-xs transition-all ${singleMatchConfig.matchType === opt.value ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"}`}
+                  className={`flex-1 text-left border rounded-lg px-3 py-2 text-xs transition-all ${singleMatchConfig.matchType === opt.value ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-primary/50"}`}
                 >
                   <span className="font-bold block">{opt.label}</span>
                   <p className="text-muted-foreground mt-0.5">{opt.desc}</p>

@@ -3003,7 +3003,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <select
                 value={selectedLocation || ""}
                 onChange={(e) => updateSelectedLocation(e.target.value || null)}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium"
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
               >
                 {locations.map(l => (
                   <option key={l.id} value={l.name}>{l.name}</option>
@@ -3930,19 +3930,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     {/* Sidebar filters */}
                     <div className="flex gap-1 flex-wrap mb-1">
                       {phases.length > 1 && (
-                        <select value={sidebarFormat} onChange={(e) => { setSidebarFormat(e.target.value); setSidebarGroup("all"); setSidebarRound("all"); }} className="h-6 rounded border border-input bg-background px-1 text-[10px]">
+                        <select value={sidebarFormat} onChange={(e) => { setSidebarFormat(e.target.value); setSidebarGroup("all"); setSidebarRound("all"); }} className="h-6 rounded border border-input bg-background px-1 text-[10px] focus:outline-none focus:border-y-2 focus:border-y-primary">
                           <option value="all">Alle formats</option>
                           {phases.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                         </select>
                       )}
                       {getSidebarGroups().length > 0 && (
-                        <select value={sidebarGroup} onChange={(e) => { setSidebarGroup(e.target.value); setSidebarRound("all"); }} className="h-6 rounded border border-input bg-background px-1 text-[10px]">
+                        <select value={sidebarGroup} onChange={(e) => { setSidebarGroup(e.target.value); setSidebarRound("all"); }} className="h-6 rounded border border-input bg-background px-1 text-[10px] focus:outline-none focus:border-y-2 focus:border-y-primary">
                           <option value="all">Alle groepen</option>
                           {getSidebarGroups().map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                         </select>
                       )}
                       {getSidebarRounds().length > 0 && (
-                        <select value={sidebarRound} onChange={(e) => setSidebarRound(e.target.value)} className="h-6 rounded border border-input bg-background px-1 text-[10px]">
+                        <select value={sidebarRound} onChange={(e) => setSidebarRound(e.target.value)} className="h-6 rounded border border-input bg-background px-1 text-[10px] focus:outline-none focus:border-y-2 focus:border-y-primary">
                           <option value="all">Alle rondes</option>
                           {getSidebarRounds().map(r => {
                             const phase = phases.find(p => p.id === r.phaseId);
