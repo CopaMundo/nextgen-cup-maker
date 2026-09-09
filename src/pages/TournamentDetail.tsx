@@ -49,9 +49,11 @@ const resultsSubTabs = [
 ] as const;
 
 const presentationSubTabs = [
-  { id: "presentation", label: "Weergave", icon: Tv2 },
-  { id: "sponsors", label: "Sponsors", icon: Handshake },
-  { id: "polls", label: "Polls", icon: PollIcon },
+  { id: "website", label: "Website" },
+  { id: "slideshow", label: "Dialoogvoorstelling" },
+  { id: "visualization", label: "Vormgeving" },
+  { id: "sponsors", label: "Sponsors" },
+  { id: "polls", label: "Polls" },
 ] as const;
 
 type TabId = typeof sidebarItems[number]["id"];
