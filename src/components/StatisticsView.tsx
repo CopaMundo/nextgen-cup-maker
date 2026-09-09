@@ -412,8 +412,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   const activeLabel = tabs.find(t => t.id === activeTab)?.label || "";
 
   return (
-    <div className="space-y-6 w-full">
-      {!isMobile && <h2 className="section-title">Statistieken</h2>}
+    <div className={cn("w-full", isMobile ? "space-y-6" : "flex h-full min-h-0 flex-col")}>
+
 
       {/* Mobiel: statistieken als tegels */}
       {isMobile && mobileOverview && (
@@ -450,31 +450,42 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
       )}
 
       {!isMobile && (
-        <div className="section-card space-y-5">
-          <div className="flex flex-wrap items-center gap-1 border-b border-border px-1 pb-0">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "relative rounded-t-lg px-3 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
-                  activeTab === tab.id
-                    ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
-                    : ""
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex h-full min-h-0 gap-3">
+          {/* Linkerkolom: klassementen (zelfde stijl als fasenamen bij Resultaten) */}
+          <aside className="w-56 shrink-0 h-full min-h-0 overflow-y-auto overscroll-contain border-r border-border pr-2 pt-2">
+            <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Klassementen</p>
+            <div className="flex flex-col gap-1">
+              {tabs.map(tab => {
+                const isSelected = tab.id === activeTab;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "w-full rounded-md border px-2 py-1.5 text-left text-[11px] font-semibold uppercase transition-colors",
+                      isSelected
+                        ? "border-y-2 border-y-primary bg-primary/[0.06] text-primary"
+                        : "border-border bg-card text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
 
-          <div className="min-w-0">
+          {/* Rechterkolom: statistieken (eigen scroll) */}
+          <div className="min-h-0 min-w-0 h-full flex-1 overflow-y-auto overscroll-contain pr-2 pt-2">
+            <h2 className="section-title mb-4">{activeLabel}</h2>
             {activeTab === "scorers" && showGoals && renderPlayerTable(goals, "Doelpunten")}
             {activeTab === "assists" && showAssists && renderPlayerTable(assists, "Assists")}
             {activeTab === "fairplay" && showFairplay && renderFairplayTable(fairplay)}
           </div>
         </div>
       )}
+
 
       {isMobile && !mobileOverview && (
         <div className="min-w-0">
