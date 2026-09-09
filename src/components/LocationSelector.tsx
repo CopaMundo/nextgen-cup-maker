@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 interface Location {
   id: string;
@@ -23,6 +25,7 @@ const LocationSelector = ({
   selectClassName?: string;
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     supabase
@@ -60,7 +63,7 @@ const LocationSelector = ({
       <Select value={selectedLocation || ""} onValueChange={(value) => onSelect(value || null)}>
         <SelectTrigger
           title={selectedLocation || ""}
-          className={cn("h-8 w-auto min-w-fit max-w-[18ch] gap-1 px-1.5 text-xs font-medium", selectClassName)}
+          className={cn("h-7 w-auto min-w-fit max-w-[18ch] gap-1 px-1.5 text-[11px] font-medium leading-none", !isMobile && "h-6", selectClassName)}
         >
           <SelectValue>{displayName || "Kies locatie"}</SelectValue>
         </SelectTrigger>
