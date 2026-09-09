@@ -55,7 +55,7 @@ const LocationSelector = ({
 
   if (locations.length <= 1) return null;
 
-  const displayName = (selectedLocation || "").length > 16 ? `${selectedLocation!.slice(0, 16).trimEnd()}...` : selectedLocation;
+  const displayName = (selectedLocation || "").length > 18 ? `${selectedLocation!.slice(0, 18).trimEnd()}...` : selectedLocation;
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
