@@ -3386,7 +3386,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   return (
                                                   <span key={name} className="contents">
                                                     {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
-                                                      <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
+                                                      <span className="inline-flex items-center gap-0.5 rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 text-[8px] font-semibold text-transparent animate-fade-in">
+                                                        <WhistleIcon className="h-2.5 w-2.5 text-primary/70" /> {refDragName || "Scheidsrechter"}
+                                                      </span>
                                                     )}
                                                     <span
                                                       draggable
@@ -3415,7 +3417,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 })}
 
                                                 {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
-                                                  <span className="inline-block h-4 w-[3px] rounded-full bg-primary" />
+                                                  <span className="inline-flex items-center gap-0.5 rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 text-[8px] font-semibold text-transparent animate-fade-in">
+                                                        <WhistleIcon className="h-2.5 w-2.5 text-primary/70" /> {refDragName || "Scheidsrechter"}
+                                                      </span>
                                                 )}
                                               </div>
 
