@@ -688,22 +688,9 @@ const TournamentDetail = () => {
 
                 <div className="flex items-center justify-end gap-3">
                   {activeTab === "phases" && phaseHeader && (
-                    <>
-                      {phaseHeader.activePhaseNumber !== null && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={phaseHeader.onAddFormat}
-                          title="Format toevoegen"
-                          className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
-                        >
-                          <Plus className="h-4 w-4" /> Format toevoegen
-                        </Button>
-                      )}
-                      <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
-                        <Plus className="h-4 w-4" /> Fase
-                      </Button>
-                    </>
+                    <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
+                      <Plus className="h-4 w-4" /> Fase
+                    </Button>
                   )}
                 </div>
               </div>
