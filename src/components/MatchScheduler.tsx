@@ -268,7 +268,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[92px]";
+const PLANNER_ROW_H = "h-[64px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -3314,7 +3314,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1.5 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-2 text-xs transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1.5 text-xs transition-all duration-200 ${
                                             refInsert?.matchId === m.id
                                               ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
@@ -3332,11 +3332,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                           >
 
                                             {/* Time row */}
-                                            <div className="flex items-center justify-between mb-1">
+                                            <div className="flex items-center justify-between mb-0.5">
                                               <div className="flex items-center gap-1 min-w-0">
                                                 <span className="text-[11px] font-mono font-bold text-foreground shrink-0">{time}</span>
                                                 {(phase || group) && (
-                                                  <span className="text-[10px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                                                  <span className="text-[10px] text-primary truncate">{getMatchInfoLabel(m)}</span>
                                                 )}
                                                 {getMatchClashes(m).length > 0 && (
                                                   <span className="text-destructive cursor-help shrink-0" title={getMatchClashes(m).join("\n")}>⚠</span>
@@ -3350,7 +3350,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               </button>
                                             </div>
                                             {/* Teams */}
-                                            <div className="space-y-0.5">
+                                            <div className="space-y-0">
                                               <div className="flex items-center gap-1">
                                                 {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
                                                 <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
@@ -3362,7 +3362,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             {(refNames(m.referee).length > 0 || activeReferee) && (
                                               <div
                                                 data-referee-match-id={m.id}
-                                                className={`mt-0.5 flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                                className={`mt-0 flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
                                               >
                                                 {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                   const issue = getRefereeIssue(m, name, refIdx);
@@ -4027,14 +4027,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
-                    <div className="text-[10px] text-muted-foreground mb-1">{getMatchInfoLabel(m)}</div>
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1.5 text-[10px] shadow-2xl w-[180px] rotate-1">
+                    <div className="text-[9px] text-primary mb-0.5">{getMatchInfoLabel(m)}</div>
                     <div className="flex items-center gap-1">
-                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
-                      <span className="font-medium text-[11px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain" />}
+                      <span className="font-medium text-[10px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
                       <span className="text-muted-foreground mx-0.5">-</span>
-                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain" />}
-                      <span className="font-medium text-[11px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
+                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain" />}
+                      <span className="font-medium text-[10px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                     </div>
                   </div>
                 );
