@@ -135,8 +135,8 @@ const DraggablePlannerItem = ({ id, data, className, children }: {
         if (isInteractivePlannerTarget(e.target, e.currentTarget)) return;
         (listeners as any)?.onKeyDown?.(e);
       }}
-      className={`${className} cursor-grab active:cursor-grabbing select-none touch-manipulation transition-all duration-200 ease-out ${
-        isDragging ? 'opacity-20 scale-[0.97]' : 'hover:-translate-y-0.5'
+      className={`${className} cursor-grab active:cursor-grabbing select-none touch-manipulation will-change-transform transition-[transform,opacity] duration-150 ease-out ${
+        isDragging ? 'opacity-40' : 'hover:-translate-y-0.5'
       }`}
     >
       {children}
@@ -547,8 +547,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   // dnd-kit
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
   );
   const [activeDragPayload, setActiveDragPayload] = useState<PlannerDragPayload | null>(null);
   const pointerPositionRef = useRef({ x: 0, y: 0 });
@@ -4070,7 +4070,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </div>
 
           {/* dnd-kit DragOverlay */}
-          <DragOverlay dropAnimation={{ duration: 200, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
+          <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.2, 0, 0, 1)' }}>
             {activeDragPayload && (() => {
               if (activeDragPayload.type === "match") {
                 const m = matches.find(x => x.id === activeDragPayload.id);
