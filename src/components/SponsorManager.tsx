@@ -218,19 +218,16 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
               </div>
             </div>
           ))}
-          <label className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left cursor-pointer active:bg-accent/40">
+          <button
+            type="button"
+            onClick={openAddDialog}
+            className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left active:bg-accent/40"
+          >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
               <Plus className="h-4 w-4" />
             </div>
-            <span className="font-display text-sm font-semibold text-foreground">{uploading ? "Uploaden..." : "Sponsor toevoegen"}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploading}
-              onChange={(e) => { if (e.target.files?.[0]) { addSponsor(e.target.files[0]); e.target.value = ""; } }}
-            />
-          </label>
+            <span className="font-display text-sm font-semibold text-foreground">Sponsor toevoegen</span>
+          </button>
         </div>
         {dialogs}
       </div>
@@ -277,17 +274,14 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
             </div>
           ))}
 
-          <label className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px] cursor-pointer">
+          <button
+            type="button"
+            onClick={openAddDialog}
+            className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px]"
+          >
             <Plus className="h-6 w-6 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{uploading ? "Uploaden..." : "Sponsor toevoegen"}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploading}
-              onChange={(e) => { if (e.target.files?.[0]) { addSponsor(e.target.files[0]); e.target.value = ""; } }}
-            />
-          </label>
+            <span className="text-xs text-muted-foreground">Sponsor toevoegen</span>
+          </button>
         </div>
       </div>
 
