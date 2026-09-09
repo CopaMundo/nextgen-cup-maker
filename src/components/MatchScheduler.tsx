@@ -153,7 +153,7 @@ const DraggablePlannerItem = ({ id, data, className, children }: {
   );
 };
 
-const DraggableReferee = ({ id, data, className, children }: {
+const DraggableReferee = ({ id, data, className, children, title, badge }: {
   id: string;
   data: RefereeDragPayload;
   className: string;
@@ -1099,11 +1099,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   );
 
   const activeReferee = activeDragPayload?.type === "referee" ? activeDragPayload : null;
-  const displayRefNames = (matchId: string, value?: string | null) => {
-    const names = refNames(value);
-    if (activeReferee?.from_match_id !== matchId) return names;
-    return names.filter(name => name !== activeReferee.name);
-  };
+  const displayRefNames = (_matchId: string, value?: string | null) => refNames(value);
 
 
   /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
@@ -1174,7 +1170,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
   const getRefereeInsertIndex = (container: HTMLElement, clientX: number) => {
-    const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'));
+    const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
+      .filter(badge => badge.getBoundingClientRect().width > 1);
     if (badges.length === 0) return 0;
     let nearestIdx = 0;
     let nearestDist = Infinity;
