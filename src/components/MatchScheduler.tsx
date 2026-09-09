@@ -628,7 +628,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [rightSidebarTab, setRightSidebarTab] = useState<"plannen" | "scheidsrechters" | "ongepland">("plannen");
   const [plannerCollapsed, setPlannerCollapsed] = useState(false);
   // Mobiel: tegeloverzicht (Velden / Planning) en gekozen veld
-  const [mobileSection, setMobileSection] = useState<"velden" | "planning" | null>(null);
+  const [mobileSection, setMobileSection] = useState<"velden" | "planning">("velden");
   const [mobileFieldName, setMobileFieldName] = useState<string | null>(null);
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
@@ -3554,8 +3554,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             <div
               ref={plannerSidebarRef}
               className={cn(
-                "ml-0 print:hidden flex flex-col sticky top-0 overflow-hidden overscroll-contain transition-colors",
-                isMobile ? "w-full min-w-0 h-[calc(100dvh-11rem)]" : "w-72 shrink-0 border-l border-border h-[calc(100dvh-8rem)] md:h-full",
+                "ml-0 print:hidden flex flex-col overflow-hidden overscroll-contain transition-colors",
+                isMobile ? "fixed inset-0 z-50 bg-background" : "w-72 shrink-0 border-l border-border sticky top-0 h-[calc(100dvh-8rem)] md:h-full",
                 dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""
               )}
               onDragOver={(e) => {
