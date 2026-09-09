@@ -1103,7 +1103,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const RefereePlaceholder = () => (
     <span
       aria-hidden="true"
-      className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in"
+      className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in transition-all duration-150 ease-out"
     />
   );
 
