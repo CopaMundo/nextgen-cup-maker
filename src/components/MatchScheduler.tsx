@@ -4040,7 +4040,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1 text-[11px] shadow-2xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5">
+                  <div className="pointer-events-none rounded-lg bg-card p-1 text-[11px] shadow-xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5 ring-1 ring-primary/30">
                     <div className="flex items-start gap-1.5 leading-none">
                       <span className="text-[11px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
                       <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
