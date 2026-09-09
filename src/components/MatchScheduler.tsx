@@ -3398,8 +3398,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                       onClick={(e) => e.stopPropagation()}
                                                       title={issue?.level === "error" ? issue.reasons.join("\n") : undefined}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold cursor-grab active:cursor-grabbing print:text-[9px] transition-all ${
-                                                        refDragName === name
-                                                          ? "border-primary bg-primary/20 text-primary ring-1 ring-primary shadow-sm"
+                                                        refDragName === name && refDragFromMatchId === m.id
+                                                          ? "w-0 h-0 min-w-0 p-0 border-0 opacity-0 overflow-hidden pointer-events-none"
                                                           : issue?.level === "error"
                                                             ? "border-destructive bg-destructive/15 text-destructive"
                                                             : issue?.level === "warn"
