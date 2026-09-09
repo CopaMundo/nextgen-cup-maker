@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry, getMiddleDate } from "@/lib/dateUtils";
