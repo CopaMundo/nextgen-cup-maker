@@ -3311,21 +3311,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                   const issue = getRefereeIssue(m, name, refIdx);
                                                   return (
-                                                    <span
+                                                    <RefereeBadge
                                                       key={`${name}-${refIdx}`}
-                                                      title={issue?.level === "error" ? issue.reasons.join("\n") : undefined}
-                                                      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
-                                                        issue?.level === "error"
-                                                            ? "border-destructive bg-destructive/15 text-destructive"
-                                                            : issue?.level === "warn"
-                                                              ? "border-warning bg-warning/15 text-warning"
-                                                              : "border-border bg-muted text-muted-foreground"
-                                                      }`}
-                                                    >
-                                                      {arr.length > 1 && <span className={issue ? "font-bold" : "text-primary font-bold"}>{refIdx + 1}</span>}
-                                                      <WhistleIcon className="h-2.5 w-2.5" /> {name}
-                                                      {issue && <span aria-hidden>⚠</span>}
-                                                    </span>
+                                                      name={name}
+                                                      roleNumber={arr.length > 1 ? refIdx + 1 : null}
+                                                      issue={issue}
+                                                    />
                                                   );
                                                 })}
 
