@@ -4030,14 +4030,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
-                    <div className="text-[10px] text-muted-foreground mb-0.5">{getMatchInfoLabel(m)}</div>
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1.5 text-[10px] shadow-2xl w-[180px] rotate-1">
+                    <div className="text-[9px] text-muted-foreground mb-0.5">{getMatchInfoLabel(m)}</div>
                     <div className="flex items-center gap-1">
-                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
-                      <span className="font-medium text-[11px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain" />}
+                      <span className="font-medium text-[10px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
                       <span className="text-muted-foreground mx-0.5">-</span>
-                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain" />}
-                      <span className="font-medium text-[11px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
+                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain" />}
+                      <span className="font-medium text-[10px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                     </div>
                   </div>
                 );
