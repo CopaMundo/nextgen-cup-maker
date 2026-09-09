@@ -177,7 +177,7 @@ const DraggableReferee = ({ id, data, className, children, title, badge }: {
       className={cn(
         className,
         "cursor-grab active:cursor-grabbing select-none touch-none transition-opacity duration-150",
-        isDragging && "invisible pointer-events-none",
+        isDragging && "absolute h-0 w-0 overflow-hidden opacity-0 pointer-events-none",
       )}
     >
       {children}
