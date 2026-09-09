@@ -4137,6 +4137,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             </div>
           )}
           </DndContext>
+
+          {/* Mobiel: zwevende Planning-knop */}
+          {isMobile && mobileSection === "velden" && (
+            <button
+              onClick={() => setMobileSection("planning")}
+              className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg transition-transform active:scale-95 print:hidden"
+              aria-label="Planning openen"
+            >
+              Planning
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-foreground/20 px-1.5 text-[11px] font-bold">
+                {matches.filter(m => !m.match_date || !m.match_time || !m.field).length}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
