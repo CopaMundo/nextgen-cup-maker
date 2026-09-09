@@ -3274,10 +3274,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                   const brk = item.brk;
                                   return (
                                     <div key={`break-${brk.id}`} className="px-1.5 py-0.5">
-                                      <PlannerItem
-                                        payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
-                                        className={`${PLANNER_ROW_H} rounded-lg bg-primary/10 border border-primary/30 px-3 flex flex-col items-start justify-center gap-1`}
-                                      >
+                                        <PlannerItem
+                                          payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
+                                          className={`${PLANNER_ROW_H} rounded-lg bg-primary/[0.06] px-3 flex flex-col items-start justify-center gap-1 shadow-sm`}
+                                        >
                                         <div className="flex items-center justify-between w-full">
                                           <span className="text-[11px] font-mono font-bold text-primary">{minutesToTime(item.startMin)}</span>
                                           <button onClick={(e) => { e.stopPropagation(); void removeBreak(brk.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
