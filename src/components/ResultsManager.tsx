@@ -116,7 +116,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
   const matchesScrollRef = useRef<HTMLDivElement | null>(null);
   const slotRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const autoFocusDoneRef = useRef(false);
+  const autoFocusDoneRef = useRef<string | null>(null);
   // Teams wijzigen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
   const [assigningMatchId, setAssigningMatchId] = useState<string | null>(null);
   const [assignDraft, setAssignDraft] = useState<{ homeTeamId: string; awayTeamId: string }>({ homeTeamId: "", awayTeamId: "" });
