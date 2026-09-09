@@ -14,13 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import {
   Copy,
-  LinkIcon,
   ExternalLink,
-  Eye,
-  Globe,
   QrCode,
-  Presentation,
-  AlertTriangle,
   HelpCircle,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -127,9 +122,7 @@ const PresentationManager = ({
           <>
             {/* Website link */}
             <div className="section-card space-y-5">
-              <h2 className="section-title">
-                <LinkIcon className="h-5 w-5 text-primary" /> Website-link
-              </h2>
+              <h2 className="section-title">Website-link</h2>
               <p className="text-sm text-muted-foreground">
                 Deel deze link zodat anderen het toernooi kunnen volgen met realtime updates.
               </p>
@@ -169,9 +162,7 @@ const PresentationManager = ({
 
             {/* Site visibility */}
             <div className="section-card space-y-5">
-              <h2 className="section-title">
-                <Globe className="h-5 w-5 text-primary" /> Zichtbaarheid op de site
-              </h2>
+              <h2 className="section-title">Zichtbaarheid op de site</h2>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-foreground">Vindbaar op de website</p>
@@ -208,9 +199,7 @@ const PresentationManager = ({
           <>
             {/* Broadcast style */}
             <div className="section-card space-y-5">
-              <h2 className="section-title">
-                <Eye className="h-5 w-5 text-primary" /> Broadcast stijl
-              </h2>
+              <h2 className="section-title">Broadcast stijl</h2>
               {(() => {
                 const applyStyle = async (target: BroadcastStyle, name: string) => {
                   setDisplayStyle(target);
@@ -249,9 +238,7 @@ const PresentationManager = ({
             {/* Format display */}
             <div className="section-card space-y-5">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="section-title">
-                  <Presentation className="h-5 w-5 text-primary" /> Formatweergave
-                </h2>
+                <h2 className="section-title">Formatweergave</h2>
                 <TooltipProvider delayDuration={150}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -315,9 +302,7 @@ const PresentationManager = ({
         <Dialog open={confirmRegenerate} onOpenChange={setConfirmRegenerate}>
           <DialogContent className="sm:max-w-sm">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" /> Nieuwe link genereren?
-              </DialogTitle>
+              <DialogTitle>Nieuwe link genereren?</DialogTitle>
               <DialogDescription>
                 De huidige link zal niet meer werken. Iedereen die de oude link heeft zal een nieuwe link nodig hebben.
               </DialogDescription>
