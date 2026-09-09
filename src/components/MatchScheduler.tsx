@@ -3247,15 +3247,40 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   new Set(fieldData.flatMap(f => f.items.map(i => i.startMin)))
                 ).sort((a, b) => a - b);
 
+                const activeMobileField = mobileFieldName && fieldData.some(f => f.field.name === mobileFieldName)
+                  ? mobileFieldName
+                  : fieldData[0]?.field.name ?? null;
+                const visibleFieldData = isMobile
+                  ? fieldData.filter(f => f.field.name === activeMobileField)
+                  : fieldData;
 
                 return (
                   <div>
 
+                    {/* Mobiel: veldkiezer */}
+                    {isMobile && fieldData.length > 1 && (
+                      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1">
+                        {fieldData.map(({ field }) => (
+                          <button
+                            key={field.name}
+                            onClick={() => setMobileFieldName(field.name)}
+                            className={cn(
+                              "shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
+                              field.name === activeMobileField
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border bg-card text-muted-foreground"
+                            )}
+                          >
+                            {displayFieldName(field.name)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-0 min-w-0">
-                        {fieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className="min-w-[330px] w-[330px] flex-shrink-0 print:min-w-0 print:w-auto print:flex-1">
+                        {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
+                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
