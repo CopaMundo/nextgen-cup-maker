@@ -3976,10 +3976,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           />
                           <PlannerItem
                             payload={{ id: m.id, type: "match", field_id: null, slot_index: null, container: "unscheduled" }}
-                            className={`rounded-lg border bg-card p-1 text-[11px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
+                            className={`rounded-lg bg-card/60 p-1 text-[11px] hover:bg-card hover:shadow-sm transition-all duration-150 shadow-sm ${
                               mobileSelectedMatchId === m.id
-                                ? "border-primary ring-2 ring-primary/30 bg-primary/10"
-                                : dragItemId === m.id ? "opacity-30 scale-95 border-primary ring-2 ring-primary/20" : "border-border"
+                                ? "ring-2 ring-primary/30 bg-primary/[0.08]"
+                                : dragItemId === m.id ? "opacity-30 scale-95 ring-2 ring-primary/20" : ""
                             }`}
                           >
                             <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation flex flex-col justify-between gap-0.5">
