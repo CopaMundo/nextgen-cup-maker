@@ -607,29 +607,24 @@ const TournamentGeneral = ({
           generalSubTab === "overview" ? (
             <div className="grid grid-cols-1 gap-2">
               {([
-                { id: "info", label: "Toernooi informatie", icon: Info },
-                { id: "wedstrijddagen", label: "Wedstrijddagen", icon: CalendarDays },
-                { id: "locaties", label: "Locaties", icon: MapPin },
-                { id: "divisies", label: "Divisies", icon: LayoutGrid },
-                { id: "puntentelling", label: "Puntensysteem", icon: Trophy },
-              ] as const).map((card) => {
-                const Icon = card.icon;
-                return (
-                  <button
-                    key={card.id}
-                    onClick={() => onGeneralSubTabChange(card.id)}
-                    className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-                  >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
-                    <span className="shrink-0 text-muted-foreground">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 18 6-6-6-6"/></svg>
-                    </span>
-                  </button>
-                );
-              })}
+                { id: "info", label: "Toernooi informatie" },
+                { id: "wedstrijddagen", label: "Wedstrijddagen" },
+                { id: "locaties", label: "Locaties" },
+                { id: "divisies", label: "Divisies" },
+                { id: "puntentelling", label: "Puntensysteem" },
+              ] as const).map((card) => (
+                <button
+                  key={card.id}
+                  onClick={() => onGeneralSubTabChange(card.id)}
+                  className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                >
+                  <span className="h-6 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
+                  <span className="shrink-0 text-muted-foreground">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 18 6-6-6-6"/></svg>
+                  </span>
+                </button>
+              ))}
             </div>
           ) : (
             <div className="flex items-center gap-3 mb-2">

@@ -350,27 +350,13 @@ const TournamentDetail = () => {
               <>
                 {isMobile ? (
                   mobileDeelnemersOverview ? (
-                    <div className="grid grid-cols-1 gap-2">
-                      {([
-                        { id: "teams" as const, label: tournament.teams_label || "Teams", icon: Users },
-                        { id: "referees" as const, label: tournament.referees_label || "Scheidsrechters", icon: GiWhistle },
-                      ]).map((card) => {
-                        const Icon = card.icon;
-                        return (
-                          <button
-                            key={card.id}
-                            onClick={() => { setDeelnemersSubTab(card.id); setMobileDeelnemersOverview(false); }}
-                            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-                          >
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
-                            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                          </button>
-                        );
-                      })}
-                    </div>
+                    renderMobileOverview(
+                      [
+                        { id: "teams" as const, label: tournament.teams_label || "Teams" },
+                        { id: "referees" as const, label: tournament.referees_label || "Scheidsrechters" },
+                      ],
+                      (id) => { setDeelnemersSubTab(id); setMobileDeelnemersOverview(false); }
+                    )
                   ) : teamDetailOpen ? null : (
                     <div className="flex items-center gap-3 mb-3">
                       <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileDeelnemersOverview(true)} aria-label="Terug naar overzicht">
