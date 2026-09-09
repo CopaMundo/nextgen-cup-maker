@@ -94,7 +94,7 @@ const TournamentDetail = () => {
   });
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
-  const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
+  const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("website");
 
   const [plannerDate, setPlannerDate] = useState<string>(() => {
     if (typeof window === "undefined" || !id) return "";
