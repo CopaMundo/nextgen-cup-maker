@@ -3116,7 +3116,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex gap-0 mt-0 items-start md:flex-1 md:min-h-0 md:overflow-hidden">
+          <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0 md:overflow-hidden">
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto">
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
@@ -3510,7 +3510,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {!plannerCollapsed && (
             <div
               ref={plannerSidebarRef}
-              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 self-start h-[calc(100dvh-8rem)] md:h-full overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
+              className={`w-72 shrink-0 border-l border-border ml-0 print:hidden flex flex-col sticky top-0 h-[calc(100dvh-8rem)] md:h-full overflow-hidden overscroll-contain transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""}`}
               onDragOver={(e) => {
                 if (!hasPlannerDragData(e)) return;
                 e.preventDefault();
