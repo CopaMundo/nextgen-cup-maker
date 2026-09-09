@@ -25,27 +25,8 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
 
-import listIconPng from "@/assets/list_1.png";
-
 const formatTypeLabel = (t: string) =>
   t === "group" ? "Groepsfase" : t === "knockout" ? "Knock-outfase" : t === "single_match" ? "Losse wedstrijd" : "Round Robin";
-
-
-const phaseListIcon = (className = "h-4 w-4") => (
-  <span
-    className={`inline-block bg-current text-primary ${className}`}
-    style={{
-      WebkitMaskImage: `url(${listIconPng})`,
-      maskImage: `url(${listIconPng})`,
-      WebkitMaskSize: "contain",
-      maskSize: "contain",
-      WebkitMaskRepeat: "no-repeat",
-      maskRepeat: "no-repeat",
-      WebkitMaskPosition: "center",
-      maskPosition: "center",
-    }}
-  />
-);
 
 interface Phase {
   id: string;
