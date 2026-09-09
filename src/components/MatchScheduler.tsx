@@ -268,7 +268,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[68px]";
+const PLANNER_ROW_H = "h-[56px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -3314,7 +3314,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1.5 text-[10px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[10px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
                                               ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
@@ -3328,12 +3328,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                         >
                                           <div
                                             onClick={() => handleMobileTapMatch(m.id)}
-                                            className="touch-manipulation"
+                                            className="touch-manipulation h-full flex flex-col justify-between gap-0.5"
                                           >
 
                                             {/* Time + format row */}
-                                            <div className="flex items-start justify-between mb-0.5 leading-none">
-                                              <div className="flex items-baseline gap-1.5 min-w-0">
+                                            <div className="flex items-start justify-between leading-none">
+                                              <div className="flex items-start gap-1.5 min-w-0">
                                                 <span className="text-[10px] font-mono font-bold text-foreground shrink-0">{time}</span>
                                                 {(phase || group) && (
                                                   <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
@@ -3352,37 +3352,32 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               </div>
                                             </div>
                                             {/* Teams */}
-                                            <div className="space-y-0">
-                                              <div className="flex items-center gap-1">
-                                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
-                                                <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
-                                                <span className="text-muted-foreground font-bold mx-0.5">-</span>
-                                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
-                                                <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
-                                              </div>
+                                            <div className="flex items-center gap-1">
+                                              {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
+                                              <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
+                                              <span className="text-muted-foreground font-bold mx-0.5">-</span>
+                                              {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3 w-3 object-contain rounded-sm" draggable={false} />}
+                                              <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                                             </div>
                                             {/* Referees */}
-                                            {(refNames(m.referee).length > 0 || activeReferee) && (
-                                              <div
-                                                data-referee-match-id={m.id}
-                                                className={`mt-0.5 flex flex-wrap items-center gap-1 rounded transition-colors ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
-                                              >
-                                                {displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
-                                                  const issue = getRefereeIssue(m, name, refIdx);
-                                                  return (
-                                                    <RefereeBadge
-                                                      key={`${name}-${refIdx}`}
-                                                      name={name}
-                                                      roleNumber={arr.length > 1 ? refIdx + 1 : null}
-                                                      issue={issue}
-                                                    />
-                                                  );
-                                                })}
+                                            <div
+                                              data-referee-match-id={m.id}
+                                              className={`flex flex-wrap items-center gap-1 rounded transition-colors min-h-[14px] ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                            >
+                                              {refNames(m.referee).length > 0 && displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
+                                                const issue = getRefereeIssue(m, name, refIdx);
+                                                return (
+                                                  <RefereeBadge
+                                                    key={`${name}-${refIdx}`}
+                                                    name={name}
+                                                    roleNumber={arr.length > 1 ? refIdx + 1 : null}
+                                                    issue={issue}
+                                                  />
+                                                );
+                                              })}
 
-                                                {refInsert?.matchId === m.id && <RefereePlaceholder />}
-                                              </div>
-
-                                            )}
+                                              {refInsert?.matchId === m.id && <RefereePlaceholder />}
+                                            </div>
 
 
 
@@ -3966,14 +3961,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           />
                           <PlannerItem
                             payload={{ id: m.id, type: "match", field_id: null, slot_index: null, container: "unscheduled" }}
-                            className={`rounded-lg border bg-card p-1.5 text-[10px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
+                            className={`rounded-lg border bg-card p-1 text-[10px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
                               mobileSelectedMatchId === m.id
                                 ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                 : dragItemId === m.id ? "opacity-30 scale-95 border-primary ring-2 ring-primary/20" : "border-border"
                             }`}
                           >
-                            <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation">
-                              <div className="flex items-center gap-1 mb-0.5">
+                            <div onClick={() => handleMobileTapMatch(m.id)} className="touch-manipulation flex flex-col justify-between gap-0.5">
+                              <div className="flex items-center gap-1 leading-none">
                                 <GripVertical className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
                                 <span className="text-[9px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                               </div>
@@ -4030,8 +4025,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1.5 text-[10px] shadow-2xl w-[180px] rotate-1">
-                    <div className="flex items-baseline gap-1.5 mb-0.5 leading-none">
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1 text-[10px] shadow-2xl w-[180px] rotate-1 flex flex-col justify-between gap-0.5">
+                    <div className="flex items-start gap-1.5 leading-none">
                       <span className="text-[10px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
                       <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                     </div>
