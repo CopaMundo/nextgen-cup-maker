@@ -2133,7 +2133,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       window.removeEventListener("pointermove", handler);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [activeDragPayload, matches]);
+  }, [activeDragPayload, matches, refInsert]);
 
   // === dnd-kit event handlers ===
   const handleDndDragStart = (event: DragStartEvent) => {
