@@ -163,6 +163,25 @@ input[type="number"] {
   }
 }
 
+@layer components {
+  /* Eén keuzestijl voor native selectors binnen het toernooibeheer. */
+  .tournament-admin select {
+    @apply rounded-md border border-input bg-background text-foreground transition-colors hover:bg-secondary/50 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .tournament-admin [role="combobox"] {
+    @apply transition-colors hover:bg-secondary/50 data-[state=open]:border-y-2 data-[state=open]:border-y-primary data-[state=open]:bg-primary/[0.06];
+  }
+
+  .tournament-admin [role="combobox"] svg:last-child {
+    @apply text-muted-foreground transition-transform duration-200;
+  }
+
+  .tournament-admin [role="combobox"][data-state="open"] svg:last-child {
+    @apply rotate-180;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -28,11 +28,6 @@ const CategorySelector = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const isMobile = useIsMobile();
 
-  const truncateName = (name: string) => {
-    if (name.length > 20) return name.slice(0, 17) + "...";
-    return name;
-  };
-
   useEffect(() => {
     if (!isMultiCategory) return;
 
@@ -64,38 +59,19 @@ const CategorySelector = ({
 
   if (!isMultiCategory || categories.length === 0) return null;
 
-  if (isMobile) {
-    return (
-      <div className={cn("flex items-center gap-2", className)}>
-        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
-        <Select value={selectedCategoryId || ""} onValueChange={(v) => onSelect(v || null)}>
-          <SelectTrigger className={cn("h-8 w-auto max-w-full gap-1 text-[11px] font-black uppercase tracking-wider", selectClassName)}>
-            <SelectValue placeholder="Kies divisie" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((c) => (
-              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    );
-  }
-
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="w-12 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Divisie</span>
-      <select
-        value={selectedCategoryId || ""}
-        onChange={(e) => onSelect(e.target.value || null)}
-        className={cn("h-6 rounded-md border border-input bg-background px-1.5 text-[11px] font-medium leading-none focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]", selectClassName)}
-      >
+      <span className={cn("text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground", !isMobile && "w-12")}>Divisie</span>
+      <Select value={selectedCategoryId || ""} onValueChange={(value) => onSelect(value || null)}>
+        <SelectTrigger className={cn("h-8 w-auto min-w-[9rem] max-w-full gap-2 px-2 text-xs font-medium", !isMobile && "h-7", selectClassName)}>
+          <SelectValue placeholder="Kies divisie" />
+        </SelectTrigger>
+        <SelectContent>
         {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {truncateName(c.name)}
-          </option>
+          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
         ))}
-      </select>
+        </SelectContent>
+      </Select>
     </div>
   );
 };
