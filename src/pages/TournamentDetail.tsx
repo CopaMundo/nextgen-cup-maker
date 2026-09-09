@@ -5,13 +5,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, Handshake, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus } from "lucide-react";
+import { Settings, Tv2, BarChart3, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import ShirtIcon from "@/components/icons/ShirtIcon";
-import PollIcon from "@/components/icons/PollIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
@@ -50,9 +49,11 @@ const resultsSubTabs = [
 ] as const;
 
 const presentationSubTabs = [
-  { id: "presentation", label: "Weergave", icon: Tv2 },
-  { id: "sponsors", label: "Sponsors", icon: Handshake },
-  { id: "polls", label: "Polls", icon: PollIcon },
+  { id: "website", label: "Website" },
+  { id: "slideshow", label: "Dialoogvoorstelling" },
+  { id: "visualization", label: "Vormgeving" },
+  { id: "sponsors", label: "Sponsors" },
+  { id: "polls", label: "Polls" },
 ] as const;
 
 type TabId = typeof sidebarItems[number]["id"];
@@ -93,7 +94,7 @@ const TournamentDetail = () => {
   });
   const [deelnemersSubTab, setDeelnemersSubTab] = useState<"teams" | "referees">("teams");
   const [resultsSubTab, setResultsSubTab] = useState<ResultsSubTab>("results");
-  const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("presentation");
+  const [presentationSubTab, setPresentationSubTab] = useState<PresentationSubTab>("website");
 
   const [plannerDate, setPlannerDate] = useState<string>(() => {
     if (typeof window === "undefined" || !id) return "";
@@ -101,7 +102,7 @@ const TournamentDetail = () => {
   });
 
   const subTabBar = (
-    items: readonly { id: string; label: string; icon: any }[],
+    items: readonly { id: string; label: string; icon?: any }[],
     active: string,
     onSelect: (id: any) => void,
   ) => (
@@ -118,7 +119,7 @@ const TournamentDetail = () => {
               : ""
           )}
         >
-          <item.icon className="h-4 w-4 shrink-0" />
+          {item.icon && <item.icon className="h-4 w-4 shrink-0" />}
           {item.label}
         </button>
       ))}
@@ -430,8 +431,14 @@ const TournamentDetail = () => {
         return (
           <>
             {isMobile && subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
-            {presentationSubTab === "presentation" && (
-              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} />
+            {presentationSubTab === "website" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="website" />
+            )}
+            {presentationSubTab === "slideshow" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="slideshow" />
+            )}
+            {presentationSubTab === "visualization" && (
+              <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="visualization" />
             )}
             {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id!} />}
             {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}

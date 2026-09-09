@@ -22,56 +22,28 @@ import {
   Presentation,
   AlertTriangle,
   HelpCircle,
-  ChevronRight,
-  ArrowLeft,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import SlideshowConfig from "./SlideshowConfig";
-import { useIsMobile } from "@/hooks/use-mobile";
-import websiteIconAsset from "@/assets/world-wide-web.png.asset.json";
-import slideshowIconAsset from "@/assets/television.png.asset.json";
-import stylingIconAsset from "@/assets/paint_2.png.asset.json";
-
-const MaskIcon = ({ src, label, className = "h-4 w-4" }: { src: string; label: string; className?: string }) => (
-  <span
-    role="img"
-    aria-label={label}
-    className={`inline-block bg-primary ${className}`}
-    style={{
-      maskImage: `url(${src})`,
-      maskSize: "contain",
-      maskRepeat: "no-repeat",
-      maskPosition: "center",
-      WebkitMaskImage: `url(${src})`,
-      WebkitMaskSize: "contain",
-      WebkitMaskRepeat: "no-repeat",
-      WebkitMaskPosition: "center",
-    }}
-  />
-);
 
 type SubTab = "website" | "slideshow" | "visualization";
 
 const PresentationManager = ({
   tournament,
   onUpdate,
+  subTab = "website",
 }: {
   tournament: any;
   onUpdate: (t: any) => void;
+  subTab?: SubTab;
 }) => {
   const { toast } = useToast();
   const [showQR, setShowQR] = useState(false);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
-  const [viewTheme, setViewTheme] = useState(tournament.view_theme || "tropical");
   const [displayStyle, setDisplayStyle] = useState<BroadcastStyle>(normalizeBroadcastStyle(tournament.view_display_style));
   const [formatDisplayMode, setFormatDisplayMode] = useState<"tabs" | "stacked">((tournament.format_display_mode || "tabs") as "tabs" | "stacked");
-  const [subTab, setSubTab] = useState<SubTab>("website");
-  const isMobile = useIsMobile();
-  const [mobileOverview, setMobileOverview] = useState(true);
-  const [mobileSlideshowOverview, setMobileSlideshowOverview] = useState(true);
-  const [mobileSlideshowTitle, setMobileSlideshowTitle] = useState("Dialoogvoorstelling");
 
   const viewUrl = `${window.location.origin}/view/${tournament.view_link_token}`;
 
@@ -147,82 +119,14 @@ const PresentationManager = ({
     }
   };
 
-  const tabs: { id: SubTab; label: string; icon: React.ReactNode }[] = [
-    { id: "website", label: "Website", icon: <MaskIcon src={websiteIconAsset.url} label="Website" className="h-5 w-5" /> },
-    { id: "slideshow", label: "Dialoogvoorstelling", icon: <MaskIcon src={slideshowIconAsset.url} label="Dialoogvoorstelling" className="h-5 w-5" /> },
-    { id: "visualization", label: "Vormgeving", icon: <MaskIcon src={stylingIconAsset.url} label="Vormgeving" className="h-5 w-5" /> },
-  ];
-
-  const activeLabel = tabs.find(t => t.id === subTab)?.label ?? "";
-
   return (
     <>
-      {isMobile && mobileOverview && (
-        <div className="grid grid-cols-1 gap-2 mb-4">
-          {tabs.map(t => (
-            <div
-              key={t.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => { setSubTab(t.id); setMobileOverview(false); if (t.id === "slideshow") setMobileSlideshowOverview(true); }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setSubTab(t.id); setMobileOverview(false); if (t.id === "slideshow") setMobileSlideshowOverview(true); } }}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                {t.icon}
-              </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{t.label}</span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {isMobile && !mobileOverview && (
-        <div className="flex items-center gap-2 mb-4">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8"
-            aria-label={subTab === "slideshow" && !mobileSlideshowOverview ? "Terug naar voorstellingen" : "Terug naar presentatie"}
-            onClick={() => {
-              if (subTab === "slideshow" && !mobileSlideshowOverview) setMobileSlideshowOverview(true);
-              else setMobileOverview(true);
-            }}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">
-            {subTab === "slideshow" && !mobileSlideshowOverview ? mobileSlideshowTitle : activeLabel}
-          </h2>
-        </div>
-      )}
-
-      {!isMobile && (
-        <div className="flex justify-center border-b border-border flex-wrap gap-1 px-2 mb-6">
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setSubTab(t.id)}
-              className={cn(
-                "rounded-t-lg px-5 sm:px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-colors relative",
-                subTab === t.id
-                  ? "text-primary bg-primary/[0.06] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-primary"
-                  : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className={cn("space-y-6 max-w-4xl", isMobile && mobileOverview && "hidden")}>
+      <div className="space-y-6 max-w-4xl">
 
         {subTab === "website" && (
           <>
             {/* Website link */}
-            <div className={cn("section-card space-y-5", isMobile && "p-4")}>
+            <div className="section-card space-y-5">
               <h2 className="section-title">
                 <LinkIcon className="h-5 w-5 text-primary" /> Website-link
               </h2>
@@ -248,14 +152,14 @@ const PresentationManager = ({
                   <div className="rounded-lg border border-border bg-secondary p-3">
                     <p className="text-xs text-muted-foreground break-all font-mono">{viewUrl}</p>
                   </div>
-                  <div className={cn("gap-2", isMobile ? "grid grid-cols-1" : "flex flex-wrap")}>
-                    <Button variant="outline" size="sm" className={cn(isMobile && "w-full justify-start")} onClick={copyViewLink}>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" onClick={copyViewLink}>
                       <Copy className="h-4 w-4" /> Kopieer link
                     </Button>
-                    <Button variant="outline" size="sm" className={cn(isMobile && "w-full justify-start")} onClick={openViewLink}>
+                    <Button variant="outline" size="sm" onClick={openViewLink}>
                       <ExternalLink className="h-4 w-4" /> Openen
                     </Button>
-                    <Button variant="outline" size="sm" className={cn(isMobile && "w-full justify-start")} onClick={() => setShowQR(true)}>
+                    <Button variant="outline" size="sm" onClick={() => setShowQR(true)}>
                       <QrCode className="h-4 w-4" /> QR-code
                     </Button>
                   </div>
@@ -264,7 +168,7 @@ const PresentationManager = ({
             </div>
 
             {/* Site visibility */}
-            <div className={cn("section-card space-y-5", isMobile && "p-4")}>
+            <div className="section-card space-y-5">
               <h2 className="section-title">
                 <Globe className="h-5 w-5 text-primary" /> Zichtbaarheid op de site
               </h2>
@@ -296,9 +200,6 @@ const PresentationManager = ({
               tournamentId={tournament.id}
               tournament={tournament}
               onUpdate={onUpdate}
-              mobileOverview={mobileSlideshowOverview}
-              onMobileOverviewChange={setMobileSlideshowOverview}
-              onMobileTitleChange={setMobileSlideshowTitle}
             />
           </>
         )}
