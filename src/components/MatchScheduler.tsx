@@ -1024,8 +1024,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   // === MATCH UPDATE ===
   const updateMatch = async (id: string, updates: Partial<Match>) => {
-    await supabase.from("matches").update(updates).eq("id", id);
     setMatches(m => m.map(x => x.id === id ? { ...x, ...updates } : x));
+    const { error } = await supabase.from("matches").update(updates).eq("id", id);
+    if (error) {
+      const refreshed = await fetchTournamentMatches(tournamentId);
+      setMatches(refreshed as Match[]);
+      toast({ title: "Wijziging kon niet worden opgeslagen", variant: "destructive" });
+    }
   };
 
   // === HEEN/TERUG SYNCHRONISATIE OP BASIS VAN SCHEMA ===
@@ -4033,7 +4038,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 const m = matches.find(x => x.id === activeDragPayload.id);
                 if (!m) return null;
                 return (
-                  <div className="rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
+                  <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
                     <div className="text-[10px] text-muted-foreground mb-0.5">{getMatchInfoLabel(m)}</div>
                     <div className="flex items-center gap-1">
                       {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
@@ -4047,14 +4052,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               }
               if (activeDragPayload.type === "break") {
                 return (
-                  <div className="rounded-lg bg-primary/20 border-2 border-primary/40 px-3 py-1.5 text-xs shadow-2xl w-[200px] rotate-1 font-medium text-primary">
+                  <div className="pointer-events-none rounded-lg bg-primary/20 border-2 border-primary/40 px-3 py-1.5 text-xs shadow-2xl w-[200px] rotate-1 font-medium text-primary">
                     Pauze
                   </div>
                 );
               }
               if (activeDragPayload.type === "referee") {
                 return (
-                  <div className="inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl">
+                  <div className="pointer-events-none inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl">
                     <WhistleIcon className="h-3 w-3" /> {activeDragPayload.name}
                   </div>
                 );
