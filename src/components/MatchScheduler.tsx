@@ -3331,20 +3331,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             className="touch-manipulation"
                                           >
 
-                                            {/* Time row */}
-                                            <div className="flex items-center justify-between mb-0.5">
-                                              <div className="flex items-center gap-1">
-                                                <span className="text-[10px] font-mono font-bold text-foreground">{time}</span>
+                                            {/* Time + format row */}
+                                            <div className="flex items-start justify-between mb-0.5 leading-none">
+                                              <div className="flex items-baseline gap-1.5 min-w-0">
+                                                <span className="text-[10px] font-mono font-bold text-foreground shrink-0">{time}</span>
+                                                {(phase || group) && (
+                                                  <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                                                )}
+                                              </div>
+                                              <div className="flex items-center gap-1 shrink-0">
                                                 {getMatchClashes(m).length > 0 && (
                                                   <span className="text-destructive cursor-help" title={getMatchClashes(m).join("\n")}>⚠</span>
                                                 )}
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
+                                                  className="text-muted-foreground hover:text-foreground print:hidden"
+                                                >
+                                                  <Pencil className="h-2 w-2" />
+                                                </button>
                                               </div>
-                                              <button
-                                                onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
-                                                className="text-muted-foreground hover:text-foreground print:hidden"
-                                              >
-                                                <Pencil className="h-2 w-2" />
-                                              </button>
                                             </div>
                                             {/* Teams */}
                                             <div className="space-y-0">
@@ -3356,12 +3361,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 <span className="font-medium text-[10px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
                                               </div>
                                             </div>
-                                            {/* Phase/group badge */}
-                                            {(phase || group) && (
-                                              <div className="mt-0.5">
-                                                <span className="text-[8px] font-semibold px-1 py-0 rounded bg-accent/20 text-accent-foreground">{getMatchInfoLabel(m)}</span>
-                                              </div>
-                                            )}
+                                            {/* Referees */}
                                             {(refNames(m.referee).length > 0 || activeReferee) && (
                                               <div
                                                 data-referee-match-id={m.id}
