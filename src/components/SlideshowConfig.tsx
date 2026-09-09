@@ -509,7 +509,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
   }
 
   return (
-    <div className={cn("w-full max-w-3xl mx-auto", isMobile ? "space-y-4" : "space-y-6")}>
+    <div className={cn("w-full max-w-4xl mx-auto", isMobile ? "space-y-4" : "space-y-6")}>
       <div className={cn("space-y-2", isMobile && "hidden")}>
         <h2 className="font-display text-lg font-bold text-foreground">Dialoogvoorstelling</h2>
         <p className="text-sm text-muted-foreground">
@@ -521,22 +521,27 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
 
       {/* Global toggles */}
       {activeShow && (
-        <div className="space-y-3">
-          <ToggleRow
-            label="Toon toernooinaam op diavoorstelling"
-            checked={activeShow.options.showTournamentName}
-            onChange={v => updateOptions({ showTournamentName: v })}
-          />
-          <ToggleRow
-            label="Toon huidige tijd op diavoorstelling"
-            checked={activeShow.options.showCurrentTime}
-            onChange={v => updateOptions({ showCurrentTime: v })}
-          />
-          <ToggleRow
-            label="Sponsorbalk weergeven"
-            checked={activeShow.sponsor_bar.enabled}
-            onChange={v => updateSponsorBar({ enabled: v })}
-          />
+        <div className="section-card space-y-4">
+          <h3 className="section-title text-base">
+            <Presentation className="h-5 w-5 text-primary" /> Algemene instellingen
+          </h3>
+          <div className="space-y-3">
+            <ToggleRow
+              label="Toon toernooinaam op diavoorstelling"
+              checked={activeShow.options.showTournamentName}
+              onChange={v => updateOptions({ showTournamentName: v })}
+            />
+            <ToggleRow
+              label="Toon huidige tijd op diavoorstelling"
+              checked={activeShow.options.showCurrentTime}
+              onChange={v => updateOptions({ showCurrentTime: v })}
+            />
+            <ToggleRow
+              label="Sponsorbalk weergeven"
+              checked={activeShow.sponsor_bar.enabled}
+              onChange={v => updateSponsorBar({ enabled: v })}
+            />
+          </div>
         </div>
       )}
 
