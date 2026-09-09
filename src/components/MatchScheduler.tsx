@@ -3569,6 +3569,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 void handleDropToUnscheduled(e, getUnscheduledMatches().length);
               }}
             >
+              {/* Mobiel: sluitbalk */}
+              {isMobile && (
+                <div className="flex items-center gap-3 px-3 py-2 border-b border-border shrink-0">
+                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setMobileSection("velden")} aria-label="Terug naar velden">
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <h2 className="font-display text-base font-bold text-foreground">Planning</h2>
+                </div>
+              )}
+
               {/* Tab icons */}
               <div className="flex border-b border-border">
                 <button
