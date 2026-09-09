@@ -221,7 +221,7 @@ const PresentationManager = ({
                 const entries = (Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
                   .filter(([key]) => SELECTABLE_BROADCAST_STYLES.includes(key));
                 return (
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {entries.map(([key, info]) => {
                       const isActive = displayStyle === key;
                       return (
@@ -229,7 +229,7 @@ const PresentationManager = ({
                           key={key}
                           onClick={() => applyStyle(key, info.name)}
                           className={cn(
-                            "w-full flex items-center gap-3 rounded-lg border p-3 text-left transition-colors",
+                            "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors",
                             isActive ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
                           )}
                         >
@@ -265,12 +265,12 @@ const PresentationManager = ({
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => updateFormatDisplayMode("stacked")}
                   className={cn(
-                    "w-full flex flex-col rounded-lg border p-3 text-left transition-colors",
+                    "flex flex-col rounded-lg border p-3 text-left transition-colors",
                     formatDisplayMode === "stacked" ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
                   )}
                 >
@@ -281,7 +281,7 @@ const PresentationManager = ({
                   type="button"
                   onClick={() => updateFormatDisplayMode("tabs")}
                   className={cn(
-                    "w-full flex flex-col rounded-lg border p-3 text-left transition-colors",
+                    "flex flex-col rounded-lg border p-3 text-left transition-colors",
                     formatDisplayMode === "tabs" ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
                   )}
                 >
