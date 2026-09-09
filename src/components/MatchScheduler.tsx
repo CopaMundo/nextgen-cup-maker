@@ -3367,9 +3367,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   const visualIndex = arr.slice(0, refIdx).filter(candidate => !(
                                                     activeReferee?.from_match_id === m.id && candidate === activeReferee.name
                                                   )).length;
+                                                  const draggedHere = activeReferee?.from_match_id === m.id ? activeReferee.name : null;
+                                                  const isFirstAtIndex = refIdx === 0 || arr[refIdx - 1] !== draggedHere;
                                                   return (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && <RefereePlaceholder />}
+                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && isFirstAtIndex && <RefereePlaceholder />}
                                                     <DraggableReferee
                                                       id={`referee-${m.id}-${name}`}
                                                       data={{ id: `referee-${m.id}-${name}`, type: "referee", name, from_match_id: m.id }}
