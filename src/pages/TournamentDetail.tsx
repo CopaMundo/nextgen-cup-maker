@@ -87,7 +87,13 @@ const TournamentDetail = () => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(categoryStorageKey(id));
   });
-  const [activeTab, setActiveTab] = useState<TabId>("general");
+  const [activeTab, setActiveTabState] = useState<TabId>("general");
+  const setActiveTab = (tab: TabId) => {
+    setActiveTabState(tab);
+    setMobileResultsOverview(true);
+    setMobilePresentationOverview(true);
+    setMobileDeelnemersOverview(true);
+  };
   const [generalSubTab, setGeneralSubTab] = useState<GeneralSubTab>(() => {
     if (typeof window === "undefined") return "info";
     return window.matchMedia("(max-width: 639px)").matches ? "overview" : "info";
