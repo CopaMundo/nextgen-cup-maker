@@ -126,7 +126,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
           .from("tournament_slideshows" as any)
           .insert({
             tournament_id: tournamentId,
-            name: "Dia 1",
+            name: "Diavoorstelling 1",
             sort_order: 0,
             slides: [],
             sponsor_bar: DEFAULT_SPONSOR_BAR,
@@ -364,7 +364,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
       .from("tournament_slideshows" as any)
       .insert({
         tournament_id: tournamentId,
-        name: "Dia 1",
+        name: `Diavoorstelling ${nextOrder + 1}`,
         sort_order: nextOrder,
         slides: [],
         sponsor_bar: DEFAULT_SPONSOR_BAR,
@@ -500,7 +500,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
             {renamingShow && <Input autoFocus value={renamingShow.name} onChange={event => setRenamingShow({ ...renamingShow, name: event.target.value })} />}
             <DialogFooter>
               <Button variant="outline" onClick={() => setRenamingShow(null)}>Annuleren</Button>
-              <Button onClick={async () => { if (renamingShow) { await renameShow(renamingShow.id, renamingShow.name || "Dia 1"); setRenamingShow(null); } }}>Opslaan</Button>
+              <Button onClick={async () => { if (renamingShow) { await renameShow(renamingShow.id, renamingShow.name || "Diavoorstelling"); setRenamingShow(null); } }}>Opslaan</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -706,7 +706,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
             <Button
               onClick={async () => {
                 if (renamingShow) {
-                  await renameShow(renamingShow.id, renamingShow.name || "Dia 1");
+                  await renameShow(renamingShow.id, renamingShow.name || "Diavoorstelling");
                   setRenamingShow(null);
                 }
               }}

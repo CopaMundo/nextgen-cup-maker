@@ -182,7 +182,7 @@ const TournamentSlideshow = () => {
     const fallbackShow: SlideshowRow = {
       id: "local-fallback",
       tournament_id: id,
-      name: "Dia 1",
+      name: "Diavoorstelling 1",
       sort_order: 0,
       slides: [],
       sponsor_bar: DEFAULT_SPONSOR_BAR,
