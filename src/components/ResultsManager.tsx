@@ -1443,6 +1443,40 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
   }, [timeSlotGroups, manuallyOpenedTimeSlots]);
 
+  // Auto-focus: laatste volledig ingegeven tijdsbalk bovenaan (ingeklapt),
+  // de eerstvolgende in te geven tijdsbalk staat daar open onder.
+  useEffect(() => {
+    if (autoFocusDoneRef.current) return;
+    const slots = timeSlotGroups.filter(g => g.key !== "__unplanned__");
+    if (slots.length === 0) return;
+
+    const nextIdx = slots.findIndex(g => g.matches.some(m => !m.is_played));
+    if (nextIdx === -1) return;
+    const nextKey = slots[nextIdx].key;
+    const anchorKey = nextIdx > 0 ? slots[nextIdx - 1].key : nextKey;
+
+    autoFocusDoneRef.current = true;
+
+    setCollapsedTimeSlots(prev => {
+      if (!prev.has(nextKey)) return prev;
+      const next = new Set(prev);
+      next.delete(nextKey);
+      return next;
+    });
+
+    requestAnimationFrame(() => {
+      const container = matchesScrollRef.current;
+      const el = slotRefs.current.get(anchorKey);
+      if (!container || !el) return;
+      const delta = el.getBoundingClientRect().top - container.getBoundingClientRect().top;
+      container.scrollTop += delta;
+    });
+  }, [timeSlotGroups]);
+
+  useEffect(() => {
+    autoFocusDoneRef.current = false;
+  }, [categoryId, selectedPhaseNumber]);
+
   // Render standings table with +/- controls
   const renderStandingsTable = (groupId: string, formatId: string, compact?: boolean) => {
     const standings = calcStandings(groupId);
