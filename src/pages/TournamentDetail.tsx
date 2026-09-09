@@ -44,8 +44,8 @@ const sidebarItems = [
 ] as const;
 
 const resultsSubTabs = [
-  { id: "results", label: "Uitslagen", icon: ScoreboardIcon },
-  { id: "statistics", label: "Statistieken", icon: BarChart3 },
+  { id: "results", label: "Uitslagen" },
+  { id: "statistics", label: "Statistieken" },
 ] as const;
 
 const presentationSubTabs = [
