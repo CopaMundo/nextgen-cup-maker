@@ -42,7 +42,6 @@ const PresentationManager = ({
   const { toast } = useToast();
   const [showQR, setShowQR] = useState(false);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
-  const [viewTheme, setViewTheme] = useState(tournament.view_theme || "tropical");
   const [displayStyle, setDisplayStyle] = useState<BroadcastStyle>(normalizeBroadcastStyle(tournament.view_display_style));
   const [formatDisplayMode, setFormatDisplayMode] = useState<"tabs" | "stacked">((tournament.format_display_mode || "tabs") as "tabs" | "stacked");
 
