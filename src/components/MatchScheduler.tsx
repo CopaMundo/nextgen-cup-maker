@@ -103,6 +103,15 @@ interface PlannerDragPayload {
   container: "schema" | "unscheduled";
 }
 
+interface RefereeDragPayload {
+  id: string;
+  type: "referee";
+  name: string;
+  from_match_id: string | null;
+}
+
+type SchedulerDragPayload = PlannerDragPayload | RefereeDragPayload;
+
 export const plannerDateStorageKey = (tournamentId: string, categoryId: string | null) =>
   `planner-date:${tournamentId}:${categoryId || "root"}`;
 
@@ -117,7 +126,7 @@ const isInteractivePlannerTarget = (target: EventTarget | null, currentTarget?: 
 
 const DraggablePlannerItem = ({ id, data, className, children }: {
   id: string;
-  data: PlannerDragPayload;
+  data: SchedulerDragPayload;
   className: string;
   children: ReactNode;
 }) => {
@@ -141,6 +150,29 @@ const DraggablePlannerItem = ({ id, data, className, children }: {
     >
       {children}
     </div>
+  );
+};
+
+const DraggableReferee = ({ id, data, className, children }: {
+  id: string;
+  data: RefereeDragPayload;
+  className: string;
+  children: ReactNode;
+}) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data });
+  return (
+    <span
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        className,
+        "cursor-grab active:cursor-grabbing select-none touch-none transition-[opacity,width,transform] duration-150",
+        isDragging && "w-0 min-w-0 overflow-hidden opacity-0 pointer-events-none",
+      )}
+    >
+      {children}
+    </span>
   );
 };
 
@@ -547,7 +579,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
   );
-  const [activeDragPayload, setActiveDragPayload] = useState<PlannerDragPayload | null>(null);
+  const [activeDragPayload, setActiveDragPayload] = useState<SchedulerDragPayload | null>(null);
   const pointerPositionRef = useRef({ x: 0, y: 0 });
   const unscheduledZoneRef = useRef<HTMLDivElement | null>(null);
   const plannerSidebarRef = useRef<HTMLDivElement | null>(null);
@@ -1042,11 +1074,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   };
 
   // === SCHEIDSRECHTER SLEPEN ===
-  const REF_DRAG_TYPE = "application/x-referee";
   const refNames = (value?: string | null) => (value || "").split(",").map(s => s.trim()).filter(Boolean);
-  const [refDropMatchId, setRefDropMatchId] = useState<string | null>(null);
-  const [refDragName, setRefDragName] = useState<string | null>(null);
-  const [refDragFromMatchId, setRefDragFromMatchId] = useState<string | null>(null);
   const [refInsert, setRefInsert] = useState<{ matchId: string; index: number } | null>(null);
   const [refListDropActive, setRefListDropActive] = useState(false);
   const [confirmAssignOpen, setConfirmAssignOpen] = useState(false);
@@ -1061,9 +1089,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     />
   );
 
-  /** Weergaveorde van de scheidsrechters van een wedstrijd (ongewijzigd tijdens het slepen:
-   *  het gesleepte element uit de DOM halen breekt de HTML5-drag). */
-  const displayRefNames = (_matchId: string, value?: string | null) => refNames(value);
+  const activeReferee = activeDragPayload?.type === "referee" ? activeDragPayload : null;
+  const displayRefNames = (matchId: string, value?: string | null) => {
+    const names = refNames(value);
+    if (activeReferee?.from_match_id !== matchId) return names;
+    return names.filter(name => name !== activeReferee.name);
+  };
 
 
   /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
@@ -1118,50 +1149,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   };
 
 
-  /** Zichtbaar sleepvakje met de naam van de scheidsrechter. */
-  const setRefereeDragImage = (e: React.DragEvent, name: string) => {
-    if (typeof document === "undefined") return;
-    const ghost = document.createElement("div");
-    ghost.textContent = name;
-    ghost.style.cssText =
-      "position:fixed;top:-1000px;left:-1000px;padding:4px 10px;border-radius:9999px;" +
-      "background:hsl(var(--card));color:hsl(var(--foreground));border:2px solid hsl(var(--primary));" +
-      "font-size:12px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.25);white-space:nowrap;";
-    document.body.appendChild(ghost);
-    try { e.dataTransfer.setDragImage(ghost, 12, 12); } catch { /* noop */ }
-    window.setTimeout(() => ghost.remove(), 0);
-  };
-
-  const startRefereeDrag = (e: React.DragEvent, name: string, fromMatchId?: string) => {
-    e.dataTransfer.setData(REF_DRAG_TYPE, JSON.stringify({ name, fromMatchId: fromMatchId || null }));
-    e.dataTransfer.setData("text/plain", name);
-    e.dataTransfer.effectAllowed = "move";
-    setRefereeDragImage(e, name);
-    setRefDragName(name);
-    setRefDragFromMatchId(fromMatchId || null);
-    e.stopPropagation();
-  };
-
   const endRefereeDrag = () => {
-    setRefDragName(null);
-    setRefDragFromMatchId(null);
     setRefInsert(null);
-    setRefDropMatchId(null);
     setRefListDropActive(false);
   };
-
-
-  const isRefereeDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes(REF_DRAG_TYPE);
-
-  /** Verwijder een scheidsrechter uit een wedstrijd (sleep terug naar de lijst). */
-  const dropRefereeOnList = async (e: React.DragEvent) => {
-    if (!isRefereeDrag(e)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    endRefereeDrag();
-    let payload: { name: string; fromMatchId: string | null };
-    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
-    const { name, fromMatchId } = payload;
+  const moveRefereeToList = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload) => {
     if (!name || !fromMatchId) return;
     const source = matches.find(m => m.id === fromMatchId);
     if (!source) return;
@@ -1172,44 +1164,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-  const dropRefereeOnMatch = async (e: React.DragEvent, matchId: string) => {
-    if (!isRefereeDrag(e)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    endRefereeDrag();
-    let payload: { name: string; fromMatchId: string | null };
-    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
-    const { name, fromMatchId } = payload;
-    if (!name || fromMatchId === matchId) return;
-
-    const target = matches.find(m => m.id === matchId);
-    if (!target) return;
-    const current = refNames(target.referee);
-    if (current.includes(name)) {
-      toast({ title: `${name} staat al bij deze wedstrijd`, variant: "destructive" });
-      return;
-    }
-    if (current.length >= MAX_REFEREES) {
-      toast({ title: `Maximaal ${MAX_REFEREES} scheidsrechters per wedstrijd`, variant: "destructive" });
-      return;
-    }
-    {
-      const next = [...current, name];
-      await updateMatch(matchId, { referee: next.join(", ") || null } as any);
-    }
-
-
-    if (fromMatchId) {
-      const source = matches.find(m => m.id === fromMatchId);
-      if (source) {
-        const rest = refNames(source.referee).filter(n => n !== name);
-        await updateMatch(fromMatchId, { referee: rest.length ? rest.join(", ") : null } as any);
-      }
-    }
-  };
-
-  /** Bepaal de insertiepositie binnen een wedstrijd op basis van de dichtstbijzijnde badge (client-coördinaten). */
-  const getRefereeInsertIndex = (container: HTMLElement, clientX: number, clientY: number, _currentLength?: number) => {
+  const getRefereeInsertIndex = (container: HTMLElement, clientX: number) => {
     const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'));
     if (badges.length === 0) return 0;
     let nearestIdx = 0;
@@ -1217,10 +1172,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     for (let i = 0; i < badges.length; i++) {
       const r = badges[i].getBoundingClientRect();
       const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
       const dx = clientX - cx;
-      const dy = clientY - cy;
-      const dist = dx * dx + dy * dy;
+      const dist = dx * dx;
       if (dist < nearestDist) {
         nearestDist = dist;
         nearestIdx = i;
@@ -1231,51 +1184,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   };
 
 
-  /** Toon de invoegplek en laat de andere scheidsrechters live opschuiven. */
-  const handleRefereeBadgeDragOver = (e: React.DragEvent, matchId: string) => {
-    if (!isRefereeDrag(e)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    e.dataTransfer.dropEffect = "move";
-    const container = e.currentTarget as HTMLElement;
-    const raw = getRefereeInsertIndex(container, e.clientX, e.clientY);
-    const target = matches.find(m => m.id === matchId);
-    const names = refNames(target?.referee);
-    let index = raw;
-    // Binnen dezelfde wedstrijd staat het gesleepte vakje al in de weergave: corrigeer de index.
-    if (refDragName && refDragFromMatchId === matchId && names.includes(refDragName)) {
-      const shown = displayRefNames(matchId, target?.referee);
-      const pos = shown.indexOf(refDragName);
-      if (pos >= 0 && raw > pos) index = raw - 1;
-      index = Math.max(0, Math.min(index, names.length - 1));
-    } else {
-      index = Math.max(0, Math.min(index, names.length));
-    }
-    setRefDropMatchId(matchId);
-    setRefInsert(prev => (prev && prev.matchId === matchId && prev.index === index ? prev : { matchId, index }));
-  };
-
-
-  /** Sleep een scheidsrechter naar links/rechts in dezelfde wedstrijd om de rolvolgorde te wijzigen,
-   *  of vanuit de lijst/een andere wedstrijd om hem toe te voegen op die positie. */
-  const handleRefereeBadgeDrop = async (e: React.DragEvent, matchId: string) => {
-    if (!isRefereeDrag(e)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    endRefereeDrag();
-    let payload: { name: string; fromMatchId: string | null };
-    try { payload = JSON.parse(e.dataTransfer.getData(REF_DRAG_TYPE)); } catch { return; }
-    const { name, fromMatchId } = payload;
+  const moveRefereeToMatch = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload, matchId: string, insertIndex: number) => {
     if (!name) return;
 
     const target = matches.find(m => m.id === matchId);
     if (!target) return;
     const current = refNames(target.referee);
-    const container = e.currentTarget as HTMLElement;
-    const insertIndex = refInsert?.matchId === matchId
-      ? refInsert.index
-      : getRefereeInsertIndex(container, e.clientX, e.clientY);
-
     if (fromMatchId === matchId) {
       const withoutName = current.filter(n => n !== name);
       const idx = Math.max(0, Math.min(insertIndex, withoutName.length));
