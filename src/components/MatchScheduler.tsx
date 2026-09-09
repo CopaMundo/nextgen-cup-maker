@@ -1103,6 +1103,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const RefereePlaceholder = () => (
     <span
       aria-hidden="true"
+      data-ref-placeholder="true"
       className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in transition-all duration-150 ease-out"
     />
   );
@@ -1180,17 +1181,32 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-  /** Bepaalt in leesrichting (regel per regel) waar de aanwijzer tussen de badges staat. */
+  /**
+   * Bepaalt in leesrichting (regel per regel) waar de aanwijzer tussen de badges staat.
+   * Het lege vak dat al in de rij staat, wordt weggerekend zodat de posities niet meeschuiven
+   * terwijl je sleept (anders klopt slepen naar rechts niet).
+   */
   const getRefereeInsertIndex = (container: HTMLElement, clientX: number, clientY: number) => {
     const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
       .filter(badge => badge.getBoundingClientRect().width > 1);
     if (badges.length === 0) return 0;
+
+    const placeholder = container.querySelector<HTMLElement>('[data-ref-placeholder="true"]');
+    const phRect = placeholder?.getBoundingClientRect();
+    const gap = 4;
+    const shift = phRect ? phRect.width + gap : 0;
+    // Aantal badges dat vóór het lege vak staat in de DOM-volgorde.
+    const badgesBeforePlaceholder = placeholder
+      ? badges.filter(b => b.compareDocumentPosition(placeholder) & Node.DOCUMENT_POSITION_FOLLOWING).length
+      : badges.length;
+
     for (let i = 0; i < badges.length; i++) {
       const r = badges[i].getBoundingClientRect();
       const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
       if (clientY < r.top) return i;
-      // Midden van de badge: links ervan komt de gesleepte ervoor, rechts erna.
-      if (sameRow && clientX < r.left + r.width / 2) return i;
+      // Positie zoals ze zou zijn zonder het lege vak in de rij.
+      const staticLeft = i >= badgesBeforePlaceholder ? r.left - shift : r.left;
+      if (sameRow && clientX < staticLeft + r.width / 2) return i;
     }
     return badges.length;
   };
