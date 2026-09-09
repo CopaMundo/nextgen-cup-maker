@@ -158,6 +158,8 @@ const DraggableReferee = ({ id, data, className, children }: {
   data: RefereeDragPayload;
   className: string;
   children: ReactNode;
+  title?: string;
+  badge?: boolean;
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data });
   return (
@@ -165,6 +167,13 @@ const DraggableReferee = ({ id, data, className, children }: {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      data-ref-badge={badge ? "true" : undefined}
+      title={title}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        listeners?.onPointerDown?.(event);
+      }}
+      onClick={(event) => event.stopPropagation()}
       className={cn(
         className,
         "cursor-grab active:cursor-grabbing select-none touch-none transition-[opacity,width,transform] duration-150",
@@ -3333,7 +3342,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                     <DraggableReferee
                                                       id={`referee-${m.id}-${name}`}
                                                       data={{ id: `referee-${m.id}-${name}`, type: "referee", name, from_match_id: m.id }}
-                                                      data-ref-badge="true"
+                                                      badge
                                                       title={issue?.level === "error" ? issue.reasons.join("\n") : undefined}
                                                       className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
                                                         issue?.level === "error"
