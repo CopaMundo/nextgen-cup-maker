@@ -2090,6 +2090,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const handler = (e: PointerEvent) => {
       pointerPositionRef.current = { x: e.clientX, y: e.clientY };
+      if (activeDragPayload.type === "referee") setRefGhostPos({ x: e.clientX, y: e.clientY });
       if (activeDragPayload.type !== "referee") autoScrollPlanner(e.clientX, e.clientY);
       if (frame) return;
       frame = requestAnimationFrame(() => {
