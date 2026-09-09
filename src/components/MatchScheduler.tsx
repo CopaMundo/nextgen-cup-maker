@@ -4028,10 +4028,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 if (!m) return null;
                 return (
                   <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-2 text-xs shadow-2xl w-[200px] rotate-1">
-                    <div className="flex items-center gap-1 mb-1">
-                      <span className="text-[11px] font-mono font-bold">{formatTime(new Date(m.scheduled_at!))}</span>
-                      <span className="text-[10px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
-                    </div>
+                    <div className="text-[10px] text-muted-foreground mb-1">{getMatchInfoLabel(m)}</div>
                     <div className="flex items-center gap-1">
                       {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
                       <span className="font-medium text-[11px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
