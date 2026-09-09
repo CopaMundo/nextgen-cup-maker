@@ -3261,9 +3261,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 // Empty timeline block (field starts later / other field has a pause)
                                 if (!item) {
                                   return (
-                                    <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
-                                      <div className={`${PLANNER_ROW_H} rounded-lg border border-dashed border-border/60 bg-muted/20 flex items-center justify-center`}>
-                                        <span className="text-[10px] font-mono text-muted-foreground/50">{minutesToTime(rowTime)}</span>
+                                  <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
+                                      <div className={`${PLANNER_ROW_H} rounded-lg bg-muted/10 flex items-center justify-center`}>
+                                         <span className="text-[10px] font-mono text-muted-foreground/40">{minutesToTime(rowTime)}</span>
                                       </div>
                                     </div>
                                   );
