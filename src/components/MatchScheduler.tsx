@@ -3358,8 +3358,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             </div>
                                             {/* Phase/group badge */}
                                             {(phase || group) && (
-                                              <div className="mt-1">
-                                                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-accent/20 text-accent-foreground">{getMatchInfoLabel(m)}</span>
+                                              <div className="mt-0.5">
+                                                <span className="text-[8px] font-semibold px-1 py-0 rounded bg-accent/20 text-accent-foreground">{getMatchInfoLabel(m)}</span>
                                               </div>
                                             )}
                                             {(refNames(m.referee).length > 0 || activeReferee) && (
