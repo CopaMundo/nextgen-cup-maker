@@ -4061,16 +4061,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </div>
                 );
               }
-              if (activeDragPayload.type === "referee") {
-                return (
-                  <div className="pointer-events-none inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl">
-                    <WhistleIcon className="h-3 w-3" /> {activeDragPayload.name}
-                  </div>
-                );
-              }
               return null;
             })()}
           </DragOverlay>
+          {/* Scheidsrechter-ghost volgt exact de muisaanwijzer */}
+          {activeReferee && refGhostPos && (
+            <div
+              className="pointer-events-none fixed z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl"
+              style={{ left: refGhostPos.x, top: refGhostPos.y, transform: "translate(-50%, -140%)" }}
+            >
+              <WhistleIcon className="h-3 w-3" /> {activeReferee.name}
+            </div>
+          )}
           </DndContext>
         </div>
       </div>
