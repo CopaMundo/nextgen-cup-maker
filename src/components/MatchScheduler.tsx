@@ -135,8 +135,8 @@ const DraggablePlannerItem = ({ id, data, className, children }: {
         if (isInteractivePlannerTarget(e.target, e.currentTarget)) return;
         (listeners as any)?.onKeyDown?.(e);
       }}
-      className={`${className} cursor-grab active:cursor-grabbing select-none touch-manipulation transition-all duration-200 ease-out ${
-        isDragging ? 'opacity-20 scale-[0.97]' : 'hover:-translate-y-0.5'
+      className={`${className} cursor-grab active:cursor-grabbing select-none touch-manipulation will-change-transform transition-[transform,opacity] duration-150 ease-out ${
+        isDragging ? 'opacity-40' : 'hover:-translate-y-0.5'
       }`}
     >
       {children}
@@ -547,8 +547,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
   // dnd-kit
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
   );
   const [activeDragPayload, setActiveDragPayload] = useState<PlannerDragPayload | null>(null);
   const pointerPositionRef = useRef({ x: 0, y: 0 });
@@ -2050,42 +2050,45 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     await performDropToUnscheduled(dragged, insertAtIndex);
   };
 
-  // === dnd-kit pointer tracking during drag ===
+  // === dnd-kit pointer tracking during drag (rAF-throttled, alleen updaten bij wijziging) ===
   useEffect(() => {
     if (!activeDragPayload) return;
     const activeId = activeDragPayload.id;
 
-    const handler = (e: PointerEvent) => {
-      pointerPositionRef.current = { x: e.clientX, y: e.clientY };
-      autoScrollPlanner(e.clientX, e.clientY);
+    let frame = 0;
+    let lastKey = "";
 
-      const now = Date.now();
-      if (now - lastPreviewUpdate.current < 16) return;
-      lastPreviewUpdate.current = now;
+    const applyTarget = (field: string | null, index: number | null, preview: boolean) => {
+      const key = `${field}|${index}|${preview}`;
+      if (key === lastKey) return;
+      lastKey = key;
+      setPreviewField(preview ? field : null);
+      setPreviewIndex(preview ? index : null);
+      setDragOverField(field);
+      setDragOverIndex(field ? index : null);
+    };
 
+    const compute = (x: number, y: number) => {
       // Rechterplanner heeft voorrang: overal in dat paneel loslaten = ontplannen.
       // (Veldkolommen kunnen horizontaal onder de planner doorlopen, dus eerst checken.)
       const sidebarEl = plannerSidebarRef.current;
       if (sidebarEl) {
         const sr = sidebarEl.getBoundingClientRect();
-        if (e.clientX >= sr.left && e.clientX <= sr.right && e.clientY >= sr.top && e.clientY <= sr.bottom) {
-          setDragOverField("__unscheduled__");
-          setDragOverIndex(getUnscheduledMatches().length);
-          setPreviewField(null);
-          setPreviewIndex(null);
+        if (x >= sr.left && x <= sr.right && y >= sr.top && y <= sr.bottom) {
+          applyTarget("__unscheduled__", getUnscheduledMatches().length, false);
           return;
         }
       }
 
       // Enkel het zichtbare deel van de veldkolommen telt (niet wat horizontaal weggescrold is)
       const scrollRect = plannerScrollRef.current?.getBoundingClientRect();
-      const insideVisibleFields = !scrollRect || (e.clientX >= scrollRect.left && e.clientX <= scrollRect.right);
+      const insideVisibleFields = !scrollRect || (x >= scrollRect.left && x <= scrollRect.right);
 
       let foundField: string | null = null;
       if (insideVisibleFields) {
         for (const [fieldName, el] of fieldColumnRefs.current.entries()) {
           const rect = el.getBoundingClientRect();
-          if (e.clientX >= rect.left - 10 && e.clientX <= rect.right + 10) {
+          if (x >= rect.left - 10 && x <= rect.right + 10) {
             foundField = fieldName;
             break;
           }
@@ -2100,32 +2103,39 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         let idx = visibleCards.length;
         for (let i = 0; i < visibleCards.length; i++) {
           const rect = visibleCards[i].getBoundingClientRect();
-          if (e.clientY < rect.top + rect.height / 2) { idx = i; break; }
+          if (y < rect.top + rect.height / 2) { idx = i; break; }
         }
-        setPreviewField(foundField);
-        setPreviewIndex(idx);
-        setDragOverField(foundField);
-        setDragOverIndex(idx);
-      } else {
-        const unschedEl = unscheduledZoneRef.current;
-        if (unschedEl) {
-          const rect = unschedEl.getBoundingClientRect();
-          if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            setDragOverField("__unscheduled__");
-            setPreviewField(null);
-            setPreviewIndex(null);
-            return;
-          }
-        }
-        setPreviewField(null);
-        setPreviewIndex(null);
-        setDragOverField(null);
-        setDragOverIndex(null);
+        applyTarget(foundField, idx, true);
+        return;
       }
+
+      const unschedEl = unscheduledZoneRef.current;
+      if (unschedEl) {
+        const rect = unschedEl.getBoundingClientRect();
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+          applyTarget("__unscheduled__", null, false);
+          return;
+        }
+      }
+      applyTarget(null, null, false);
+    };
+
+    const handler = (e: PointerEvent) => {
+      pointerPositionRef.current = { x: e.clientX, y: e.clientY };
+      autoScrollPlanner(e.clientX, e.clientY);
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const { x, y } = pointerPositionRef.current;
+        compute(x, y);
+      });
     };
 
     window.addEventListener("pointermove", handler, { passive: true });
-    return () => window.removeEventListener("pointermove", handler);
+    return () => {
+      window.removeEventListener("pointermove", handler);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, [activeDragPayload]);
 
   // === dnd-kit event handlers ===
@@ -4060,7 +4070,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </div>
 
           {/* dnd-kit DragOverlay */}
-          <DragOverlay dropAnimation={{ duration: 200, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
+          <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.2, 0, 0, 1)' }}>
             {activeDragPayload && (() => {
               if (activeDragPayload.type === "match") {
                 const m = matches.find(x => x.id === activeDragPayload.id);
