@@ -4031,7 +4031,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 if (!m) return null;
                 return (
                   <div className="pointer-events-none rounded-lg border-2 border-primary bg-card p-1.5 text-[10px] shadow-2xl w-[180px] rotate-1">
-                    <div className="text-[9px] text-muted-foreground mb-0.5">{getMatchInfoLabel(m)}</div>
+                    <div className="flex items-baseline gap-1.5 mb-0.5 leading-none">
+                      <span className="text-[10px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
+                      <span className="text-[8px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
+                    </div>
                     <div className="flex items-center gap-1">
                       {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3 w-3 object-contain" />}
                       <span className="font-medium text-[10px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
