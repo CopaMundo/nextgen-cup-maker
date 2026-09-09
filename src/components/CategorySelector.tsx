@@ -60,7 +60,7 @@ const CategorySelector = ({
   if (!isMultiCategory || categories.length === 0) return null;
 
   const selectedName = categories.find((c) => c.id === selectedCategoryId)?.name || "";
-  const displayName = selectedName.length > 16 ? `${selectedName.slice(0, 16).trimEnd()}...` : selectedName;
+  const displayName = selectedName.length > 18 ? `${selectedName.slice(0, 18).trimEnd()}...` : selectedName;
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
