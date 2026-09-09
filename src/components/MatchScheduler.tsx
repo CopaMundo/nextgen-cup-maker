@@ -627,6 +627,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [rightSidebarTab, setRightSidebarTab] = useState<"plannen" | "scheidsrechters" | "ongepland">("plannen");
   const [plannerCollapsed, setPlannerCollapsed] = useState(false);
+  // Mobiel: tegeloverzicht (Velden / Planning) en gekozen veld
+  const [mobileSection, setMobileSection] = useState<"velden" | "planning" | null>(null);
+  const [mobileFieldName, setMobileFieldName] = useState<string | null>(null);
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
   const [pauzeModalDuration, setPauzeModalDuration] = useState(20);
