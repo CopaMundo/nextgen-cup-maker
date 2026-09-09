@@ -102,7 +102,7 @@ const TournamentDetail = () => {
   });
 
   const subTabBar = (
-    items: readonly { id: string; label: string; icon: any }[],
+    items: readonly { id: string; label: string; icon?: any }[],
     active: string,
     onSelect: (id: any) => void,
   ) => (
@@ -119,7 +119,7 @@ const TournamentDetail = () => {
               : ""
           )}
         >
-          <item.icon className="h-4 w-4 shrink-0" />
+          {item.icon && <item.icon className="h-4 w-4 shrink-0" />}
           {item.label}
         </button>
       ))}
