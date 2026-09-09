@@ -137,7 +137,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
 
   const tabs: { id: StatTab; label: string }[] = [
-    ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topschutters" }] : []),
+    ...(showGoals ? [{ id: "scorers" as StatTab, label: "Topscorers" }] : []),
     ...(showAssists ? [{ id: "assists" as StatTab, label: "Assists" }] : []),
     ...(showFairplayRanking ? [{ id: "fairplay" as StatTab, label: "Fairplayklassement" }] : []),
   ];
@@ -428,7 +428,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
               className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                {tab.id === "scorers" && <MaskIcon src={trophyIconAsset.url} label="Topschutters" />}
+                {tab.id === "scorers" && <MaskIcon src={trophyIconAsset.url} label="Topscorers" />}
                 {tab.id === "assists" && <MaskIcon src={bootsIconAsset.url} label="Assists" />}
                 {tab.id === "fairplay" && <MaskIcon src={yellowCardIconAsset.url} label="Fairplay" />}
               </span>
@@ -453,7 +453,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
         <div className="flex h-full min-h-0 gap-3">
           {/* Linkerkolom: klassementen (zelfde stijl als fasenamen bij Resultaten) */}
           <aside className="w-56 shrink-0 h-full min-h-0 overflow-y-auto overscroll-contain border-r border-border pr-2 pt-2">
-            <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Klassementen</p>
+            
             <div className="flex flex-col gap-1">
               {tabs.map(tab => {
                 const isSelected = tab.id === activeTab;
