@@ -1167,6 +1167,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const endRefereeDrag = () => {
     setRefInsert(null);
     setRefListDropActive(false);
+    setRefGhostPos(null);
   };
   const moveRefereeToList = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload) => {
     if (!name || !fromMatchId) return;
