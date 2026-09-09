@@ -1053,14 +1053,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [showClearRefereesConfirm, setShowClearRefereesConfirm] = useState(false);
 
   const MAX_REFEREES = 5;
-  /** Weergaveorde van de scheidsrechters van een wedstrijd, met live opschuiven tijdens het slepen. */
+  /** Leeg badgevak dat de exacte plek aangeeft waar de gesleepte scheidsrechter terechtkomt. */
+  const RefereePlaceholder = () => (
+    <span
+      aria-hidden="true"
+      className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in"
+    />
+  );
+
+  /** Weergaveorde van de scheidsrechters van een wedstrijd. Tijdens het slepen binnen dezelfde wedstrijd
+   *  verdwijnt het gesleepte vakje uit de lijst; een leeg placeholder-vakje toont de nieuwe plek. */
   const displayRefNames = (matchId: string, value?: string | null) => {
     const names = refNames(value);
-    if (!refDragName || refInsert?.matchId !== matchId) return names;
-    if (refDragFromMatchId !== matchId || !names.includes(refDragName)) return names;
-    const rest = names.filter(n => n !== refDragName);
-    const idx = Math.max(0, Math.min(refInsert.index, rest.length));
-    return [...rest.slice(0, idx), refDragName, ...rest.slice(idx)];
+    if (!refDragName || refDragFromMatchId !== matchId) return names;
+    return names.filter(n => n !== refDragName);
   };
 
   /** Controle van één scheidsrechtertoewijzing: rood bij tijdsoverlap, oranje bij een instellingsconflict. */
@@ -3385,11 +3391,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   const issue = getRefereeIssue(m, name, refIdx);
                                                   return (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index === refIdx && (
-                                                      <span className="inline-flex items-center gap-0.5 rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 text-[8px] font-semibold text-transparent animate-fade-in">
-                                                        <WhistleIcon className="h-2.5 w-2.5 text-primary/70" /> {refDragName || "Scheidsrechter"}
-                                                      </span>
-                                                    )}
+                                                    {refInsert?.matchId === m.id && refInsert.index === refIdx && <RefereePlaceholder />}
                                                     <span
                                                       draggable
                                                       data-ref-badge="true"
@@ -3416,11 +3418,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   );
                                                 })}
 
-                                                {refInsert?.matchId === m.id && refDragFromMatchId !== m.id && refInsert.index >= refNames(m.referee).length && (
-                                                  <span className="inline-flex items-center gap-0.5 rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 text-[8px] font-semibold text-transparent animate-fade-in">
-                                                        <WhistleIcon className="h-2.5 w-2.5 text-primary/70" /> {refDragName || "Scheidsrechter"}
-                                                      </span>
-                                                )}
+                                                {refInsert?.matchId === m.id && refInsert.index >= displayRefNames(m.id, m.referee).length && <RefereePlaceholder />}
                                               </div>
 
                                             )}
