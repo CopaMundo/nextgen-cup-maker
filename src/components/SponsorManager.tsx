@@ -133,6 +133,55 @@ const SponsorManager = ({ tournamentId }: { tournamentId: string }) => {
 
   const dialogs = (
     <>
+    <Dialog open={addOpen} onOpenChange={(o) => { if (!o) closeAddDialog(); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Sponsor toevoegen</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <Label className="text-xs">Sponsornaam</Label>
+            <Input
+              value={addName}
+              onChange={(e) => setAddName(e.target.value)}
+              placeholder="Naam sponsor"
+              autoFocus
+              onKeyDown={(e) => { if (e.key === "Enter") addSponsor(); }}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Logo (optioneel)</Label>
+            <div className="flex justify-center">
+              <label className="cursor-pointer relative group">
+                <div className="h-24 w-24 overflow-hidden rounded-xl bg-secondary flex items-center justify-center">
+                  {addPreview ? (
+                    <img src={addPreview} alt="Logo voorbeeld" className="h-full w-full object-contain" />
+                  ) : (
+                    <Upload className="h-6 w-6 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Upload className="h-6 w-6 text-white" />
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => { if (e.target.files?.[0]) pickAddFile(e.target.files[0]); e.target.value = ""; }}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={closeAddDialog}>Annuleren</Button>
+          <Button onClick={addSponsor} disabled={uploading || !addName.trim()} className="bg-foreground text-background hover:bg-foreground/90">
+            {uploading ? "Bezig..." : "Toevoegen"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     <Dialog open={!!editingSponsor} onOpenChange={(o) => { if (!o) setEditingId(null); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
