@@ -35,13 +35,11 @@ import {
   Trash2,
   Award,
   ShieldCheck,
-  ListOrdered,
   BarChart3,
   Check,
   ImageIcon,
   Upload,
   ChevronRight,
-  Presentation,
 } from "lucide-react";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
@@ -524,9 +522,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
       {/* Global toggles */}
       {activeShow && (
         <div className="section-card space-y-4">
-          <h3 className="section-title text-base">
-            <Presentation className="h-5 w-5 text-primary" /> Algemene instellingen
-          </h3>
+          <h3 className="section-title text-base">Algemene instellingen</h3>
           <div className="space-y-3">
             <ToggleRow
               label="Toon toernooinaam op diavoorstelling"
@@ -549,9 +545,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
 
       {/* Show selector + style chips */}
       <div className="section-card space-y-4">
-        <h3 className="section-title text-base">
-          <ListOrdered className="h-5 w-5 text-primary" /> Voorstelling
-        </h3>
+        <h3 className="section-title text-base">Voorstelling</h3>
         <div className={cn("flex items-center justify-between gap-4 flex-wrap", isMobile && "rounded-lg border border-border bg-card p-3")}>
           <div className={cn("flex items-center gap-2 flex-wrap", isMobile && "w-full justify-between")}>
             {!isMobile && <DropdownMenu>
@@ -1064,7 +1058,7 @@ const GroupBracketPicker = ({
           {sources.groups.length > 0 && (
             <div className="border-b border-border">
               <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground flex items-center gap-1">
-                <ListOrdered className="h-3 w-3" /> Groepen
+                Groepen
               </p>
               {sources.groups.map(g => (
                 <button
@@ -1085,7 +1079,7 @@ const GroupBracketPicker = ({
           {sources.brackets.length > 0 && (
             <div>
               <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground flex items-center gap-1">
-                <BracketTreeIcon size={12} /> Brackets
+                Brackets
               </p>
               {sources.brackets.map(b => (
                 <button
