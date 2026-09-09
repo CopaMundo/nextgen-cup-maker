@@ -448,10 +448,20 @@ const TournamentDetail = () => {
           <div className="flex flex-wrap items-center gap-3 mb-4">{scheduleSelectors}</div>
         );
       }
-      case "results":
+      case "results": {
+        const resultsItems = [
+          { id: "results" as const, label: "Uitslagen", icon: ScoreboardIcon },
+          { id: "statistics" as const, label: "Statistieken", icon: BarChart3 },
+        ];
+        if (isMobile && mobileResultsOverview) {
+          return renderMobileOverview(resultsItems, (sid) => { setResultsSubTab(sid); setMobileResultsOverview(false); });
+        }
         return (
           <>
-            {isMobile && subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
+            {isMobile && renderMobileBackHeader(
+              resultsItems.find((i) => i.id === resultsSubTab)?.label ?? "",
+              () => setMobileResultsOverview(true),
+            )}
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
@@ -462,10 +472,24 @@ const TournamentDetail = () => {
             )}
           </>
         );
-      case "presentation":
+      }
+      case "presentation": {
+        const presentationItems = [
+          { id: "website" as const, label: "Website", icon: Globe },
+          { id: "slideshow" as const, label: "Dialoogvoorstelling", icon: MonitorPlay },
+          { id: "visualization" as const, label: "Vormgeving", icon: Palette },
+          { id: "sponsors" as const, label: "Sponsors", icon: Handshake },
+          { id: "polls" as const, label: "Polls", icon: ListChecks },
+        ];
+        if (isMobile && mobilePresentationOverview) {
+          return renderMobileOverview(presentationItems, (sid) => { setPresentationSubTab(sid); setMobilePresentationOverview(false); });
+        }
         return (
           <>
-            {isMobile && subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
+            {isMobile && renderMobileBackHeader(
+              presentationItems.find((i) => i.id === presentationSubTab)?.label ?? "",
+              () => setMobilePresentationOverview(true),
+            )}
             {presentationSubTab === "website" && (
               <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="website" />
             )}
@@ -479,6 +503,7 @@ const TournamentDetail = () => {
             {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
           </>
         );
+      }
 
       default:
         return null;
