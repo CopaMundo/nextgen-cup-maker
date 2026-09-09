@@ -546,104 +546,109 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
       )}
 
       {/* Show selector + style chips */}
-      <div className={cn("flex items-center justify-between gap-4 flex-wrap", isMobile && "rounded-lg border border-border bg-card p-3")}>
-        <div className={cn("flex items-center gap-2 flex-wrap", isMobile && "w-full justify-between")}>
-          {!isMobile && <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold uppercase tracking-wide text-foreground hover:border-foreground/30"
-              >
-                {activeShow?.name || "—"}
-                <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              {shows.map(s => (
-                <DropdownMenuItem
-                  key={s.id}
-                  onClick={() => setActiveId(s.id)}
-                  className="flex items-center justify-between gap-2"
-                >
-                  <span className="truncate">{s.name}</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={e => {
-                        e.stopPropagation();
-                        setRenamingShow(s);
-                      }}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label="Hernoem"
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </button>
-                    {shows.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.stopPropagation();
-                          deleteShow(s.id);
-                        }}
-                        className="text-muted-foreground hover:text-destructive"
-                        aria-label="Verwijder"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={createShow}>
-                <Plus className="h-3.5 w-3.5" /> Nieuwe voorstelling
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>}
-
-          {/* Division filter — only when tournament has multiple categories */}
-          {categories.length > 1 && activeShow && (
-            <DropdownMenu>
+      <div className="section-card space-y-4">
+        <h3 className="section-title text-base">
+          <ListOrdered className="h-5 w-5 text-primary" /> Voorstelling
+        </h3>
+        <div className={cn("flex items-center justify-between gap-4 flex-wrap", isMobile && "rounded-lg border border-border bg-card p-3")}>
+          <div className={cn("flex items-center gap-2 flex-wrap", isMobile && "w-full justify-between")}>
+            {!isMobile && <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  title="Beperk deze voorstelling tot één divisie"
                   className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold uppercase tracking-wide text-foreground hover:border-foreground/30"
                 >
-                  <span className="text-muted-foreground normal-case font-normal">Divisie:</span>
-                  {categories.find(c => c.id === activeShow.category_id)?.name || "Alle"}
+                  {activeShow?.name || "—"}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuItem onClick={() => updateActiveShow({ category_id: null })}>
-                  Alle divisies
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {categories.map(c => (
+                {shows.map(s => (
                   <DropdownMenuItem
-                    key={c.id}
-                    onClick={() => updateActiveShow({ category_id: c.id })}
+                    key={s.id}
+                    onClick={() => setActiveId(s.id)}
+                    className="flex items-center justify-between gap-2"
                   >
-                    {c.name}
+                    <span className="truncate">{s.name}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setRenamingShow(s);
+                        }}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label="Hernoem"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      {shows.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation();
+                            deleteShow(s.id);
+                          }}
+                          className="text-muted-foreground hover:text-destructive"
+                          aria-label="Verwijder"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={createShow}>
+                  <Plus className="h-3.5 w-3.5" /> Nieuwe voorstelling
+                </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+            </DropdownMenu>}
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={openSlideshow}
-            disabled={!activeShow}
-            className="h-9 w-9"
-            aria-label="Open diavoorstelling"
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
+            {/* Division filter — only when tournament has multiple categories */}
+            {categories.length > 1 && activeShow && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    title="Beperk deze voorstelling tot één divisie"
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold uppercase tracking-wide text-foreground hover:border-foreground/30"
+                  >
+                    <span className="text-muted-foreground normal-case font-normal">Divisie:</span>
+                    {categories.find(c => c.id === activeShow.category_id)?.name || "Alle"}
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuItem onClick={() => updateActiveShow({ category_id: null })}>
+                    Alle divisies
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {categories.map(c => (
+                    <DropdownMenuItem
+                      key={c.id}
+                      onClick={() => updateActiveShow({ category_id: c.id })}
+                    >
+                      {c.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={openSlideshow}
+              disabled={!activeShow}
+              className="h-9 w-9"
+              aria-label="Open diavoorstelling"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+
         </div>
-
       </div>
 
       {/* Slides list */}
