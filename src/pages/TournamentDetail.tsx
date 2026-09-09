@@ -470,7 +470,7 @@ const TournamentDetail = () => {
 
   return (
     <div
-      className="h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
+      className="tournament-admin h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
     >
 
 

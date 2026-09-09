@@ -228,6 +228,20 @@ input[type="number"] {
   }
 }
 
+/* De beheeromgeving vult eerst haar maximale werkbreedte. Op grotere
+   desktopmonitoren groeit de volledige rem-schaal in rustige, vaste stappen. */
+@media (min-width: 1920px) {
+  html:has(.tournament-admin) {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 2560px) {
+  html:has(.tournament-admin) {
+    font-size: 18px;
+  }
+}
+
 /* ======================================================================
    PRINT STYLES — Planner
    ====================================================================== */
