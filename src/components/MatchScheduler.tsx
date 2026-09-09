@@ -158,11 +158,8 @@ const PlannerItem = ({ payload, className, children }: {
 const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
   if (!active) return null;
   return (
-    <div className="px-2 py-1.5 animate-fade-in" aria-hidden="true">
-      <div className="relative h-3">
-        <div className="absolute inset-x-1 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-primary/30" />
-        <div className="absolute left-1 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-background bg-primary shadow-sm" />
-      </div>
+    <div className="px-1.5 py-0.5 animate-fade-in" aria-hidden="true">
+      <div className="h-[92px] rounded-lg border-2 border-dashed border-primary/50 bg-primary/10" />
     </div>
   );
 };
