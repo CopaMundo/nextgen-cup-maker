@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, BarChart3, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus } from "lucide-react";
+import { Settings, Tv2, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
@@ -44,8 +44,8 @@ const sidebarItems = [
 ] as const;
 
 const resultsSubTabs = [
-  { id: "results", label: "Uitslagen", icon: ScoreboardIcon },
-  { id: "statistics", label: "Statistieken", icon: BarChart3 },
+  { id: "results", label: "Uitslagen" },
+  { id: "statistics", label: "Statistieken" },
 ] as const;
 
 const presentationSubTabs = [
