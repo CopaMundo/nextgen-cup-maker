@@ -3314,16 +3314,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-1 py-0.5">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[11px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg p-1 text-[11px] transition-all duration-200 shadow-sm ${
                                             refInsert?.matchId === m.id
-                                              ? "border-primary ring-2 ring-primary/50 bg-primary/10"
+                                              ? "ring-2 ring-primary/40 bg-primary/[0.08]"
                                               : mobileSelectedMatchId === m.id
-                                              ? "border-primary ring-2 ring-primary/30 bg-primary/10"
+                                              ? "ring-2 ring-primary/30 bg-primary/[0.08]"
                                               : isDragging
-                                                ? "border-primary ring-2 ring-primary/20 bg-primary/5"
+                                                ? "ring-2 ring-primary/20 bg-primary/[0.04]"
                                                 : getMatchClashes(m).length > 0
-                                                  ? "border-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-destructive hover:shadow-md"
-                                                  : "border-border bg-card hover:border-primary/50 hover:shadow-md"
+                                                  ? "bg-destructive/[0.04] hover:bg-destructive/[0.08] hover:shadow-md ring-1 ring-destructive/20"
+                                                  : "bg-card/60 hover:bg-card hover:shadow-md"
                                           }`}
                                         >
                                           <div
