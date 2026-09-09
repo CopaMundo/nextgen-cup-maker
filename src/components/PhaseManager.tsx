@@ -152,6 +152,22 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
 
   useEffect(() => { fetchFormats(); }, [tournamentId, categoryId]);
 
+  // Lege (concept)fases blijven bewaard, ook als je van tabblad wisselt.
+  const draftsLoadedRef = useRef(draftStorageKey);
+  useEffect(() => {
+    if (draftsLoadedRef.current === draftStorageKey) return;
+    draftsLoadedRef.current = draftStorageKey;
+    try {
+      const raw = localStorage.getItem(draftStorageKey);
+      const parsed = raw ? JSON.parse(raw) : [];
+      setDraftPhaseNumbers(Array.isArray(parsed) ? parsed.filter((n: unknown) => typeof n === "number") as number[] : []);
+    } catch { setDraftPhaseNumbers([]); }
+  }, [draftStorageKey]);
+
+  useEffect(() => {
+    try { localStorage.setItem(draftStorageKey, JSON.stringify(draftPhaseNumbers)); } catch { /* negeren */ }
+  }, [draftStorageKey, draftPhaseNumbers]);
+
   // Reset dialog state when it opens; fetch fresh data once per open
   useEffect(() => {
     if (showAddFormat === null) return;
