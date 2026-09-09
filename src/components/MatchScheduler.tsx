@@ -215,7 +215,7 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
   const [open, setOpen] = useState(false);
   const badge = (
     <span
-      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[8px] font-semibold print:text-[9px] ${
+      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[9px] font-semibold print:text-[10px] ${
         issue ? "cursor-pointer" : ""
       } ${
         issue?.level === "error"
@@ -226,7 +226,7 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
       }`}
     >
       {roleNumber !== null && <span className={issue ? "font-bold" : "text-primary font-bold"}>{roleNumber}</span>}
-      <WhistleIcon className="h-2.5 w-2.5" /> {name}
+      <WhistleIcon className="h-3 w-3" /> {name}
       {issue && <span aria-hidden>⚠</span>}
     </span>
   );
