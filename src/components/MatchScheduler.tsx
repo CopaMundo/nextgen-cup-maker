@@ -1108,6 +1108,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   );
 
   const activeReferee = activeDragPayload?.type === "referee" ? activeDragPayload : null;
+  const [refGhostPos, setRefGhostPos] = useState<{ x: number; y: number } | null>(null);
   const displayRefNames = (_matchId: string, value?: string | null) => refNames(value);
 
 
@@ -1166,6 +1167,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const endRefereeDrag = () => {
     setRefInsert(null);
     setRefListDropActive(false);
+    setRefGhostPos(null);
   };
   const moveRefereeToList = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload) => {
     if (!name || !fromMatchId) return;
@@ -1178,24 +1180,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-  const getRefereeInsertIndex = (container: HTMLElement, clientX: number) => {
+  /** Bepaalt in leesrichting (regel per regel) waar de aanwijzer tussen de badges staat. */
+  const getRefereeInsertIndex = (container: HTMLElement, clientX: number, clientY: number) => {
     const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
       .filter(badge => badge.getBoundingClientRect().width > 1);
     if (badges.length === 0) return 0;
-    let nearestIdx = 0;
-    let nearestDist = Infinity;
     for (let i = 0; i < badges.length; i++) {
       const r = badges[i].getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const dx = clientX - cx;
-      const dist = dx * dx;
-      if (dist < nearestDist) {
-        nearestDist = dist;
-        nearestIdx = i;
-      }
+      const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
+      if (clientY < r.top) return i;
+      if (sameRow && clientX < r.left + r.width / 2) return i;
     }
-    const r = badges[nearestIdx].getBoundingClientRect();
-    return clientX < r.left + r.width / 2 ? nearestIdx : nearestIdx + 1;
+    return badges.length;
   };
 
   const getRefereeDropTarget = (clientX: number, clientY: number) => {
@@ -1211,7 +1207,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return {
       type: "match" as const,
       matchId,
-      index: getRefereeInsertIndex(matchContainer, clientX),
+      index: getRefereeInsertIndex(matchContainer, clientX, clientY),
     };
   };
 
@@ -2089,6 +2085,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const handler = (e: PointerEvent) => {
       pointerPositionRef.current = { x: e.clientX, y: e.clientY };
+      if (activeDragPayload.type === "referee") setRefGhostPos({ x: e.clientX, y: e.clientY });
       if (activeDragPayload.type !== "referee") autoScrollPlanner(e.clientX, e.clientY);
       if (frame) return;
       frame = requestAnimationFrame(() => {
@@ -2110,6 +2107,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const payload = event.active.data.current as SchedulerDragPayload;
     if (!payload) return;
     setActiveDragPayload(payload);
+    if (payload.type === "referee") {
+      const activator = event.activatorEvent as PointerEvent | undefined;
+      const start = activator && typeof activator.clientX === "number"
+        ? { x: activator.clientX, y: activator.clientY }
+        : pointerPositionRef.current;
+      pointerPositionRef.current = start;
+      setRefGhostPos(start);
+    }
     if (payload.type !== "referee") {
       setDragItemId(payload.id);
       setDragItemType(payload.type);
@@ -3362,9 +3367,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   const visualIndex = arr.slice(0, refIdx).filter(candidate => !(
                                                     activeReferee?.from_match_id === m.id && candidate === activeReferee.name
                                                   )).length;
+                                                  const draggedHere = activeReferee?.from_match_id === m.id ? activeReferee.name : null;
+                                                  const isFirstAtIndex = refIdx === 0 || arr[refIdx - 1] !== draggedHere;
                                                   return (
                                                   <span key={name} className="contents">
-                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && name !== activeReferee?.name && <RefereePlaceholder />}
+                                                    {refInsert?.matchId === m.id && refInsert.index === visualIndex && isFirstAtIndex && <RefereePlaceholder />}
                                                     <DraggableReferee
                                                       id={`referee-${m.id}-${name}`}
                                                       data={{ id: `referee-${m.id}-${name}`, type: "referee", name, from_match_id: m.id }}
@@ -4061,16 +4068,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </div>
                 );
               }
-              if (activeDragPayload.type === "referee") {
-                return (
-                  <div className="pointer-events-none inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl">
-                    <WhistleIcon className="h-3 w-3" /> {activeDragPayload.name}
-                  </div>
-                );
-              }
               return null;
             })()}
           </DragOverlay>
+          {/* Scheidsrechter-ghost volgt exact de muisaanwijzer */}
+          {activeReferee && refGhostPos && (
+            <div
+              className="pointer-events-none fixed z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl"
+              style={{ left: refGhostPos.x, top: refGhostPos.y, transform: "translate(-50%, -140%)" }}
+            >
+              <WhistleIcon className="h-3 w-3" /> {activeReferee.name}
+            </div>
+          )}
           </DndContext>
         </div>
       </div>
