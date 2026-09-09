@@ -1180,24 +1180,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-  const getRefereeInsertIndex = (container: HTMLElement, clientX: number) => {
+  /** Bepaalt in leesrichting (regel per regel) waar de aanwijzer tussen de badges staat. */
+  const getRefereeInsertIndex = (container: HTMLElement, clientX: number, clientY: number) => {
     const badges = Array.from(container.querySelectorAll<HTMLElement>('[data-ref-badge="true"]'))
       .filter(badge => badge.getBoundingClientRect().width > 1);
     if (badges.length === 0) return 0;
-    let nearestIdx = 0;
-    let nearestDist = Infinity;
     for (let i = 0; i < badges.length; i++) {
       const r = badges[i].getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const dx = clientX - cx;
-      const dist = dx * dx;
-      if (dist < nearestDist) {
-        nearestDist = dist;
-        nearestIdx = i;
-      }
+      const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
+      if (clientY < r.top) return i;
+      if (sameRow && clientX < r.left + r.width / 2) return i;
     }
-    const r = badges[nearestIdx].getBoundingClientRect();
-    return clientX < r.left + r.width / 2 ? nearestIdx : nearestIdx + 1;
+    return badges.length;
   };
 
   const getRefereeDropTarget = (clientX: number, clientY: number) => {
