@@ -1108,6 +1108,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   );
 
   const activeReferee = activeDragPayload?.type === "referee" ? activeDragPayload : null;
+  const [refGhostPos, setRefGhostPos] = useState<{ x: number; y: number } | null>(null);
   const displayRefNames = (_matchId: string, value?: string | null) => refNames(value);
 
 
