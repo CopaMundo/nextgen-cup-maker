@@ -137,26 +137,21 @@ const TournamentDetail = () => {
   const [mobilePresentationOverview, setMobilePresentationOverview] = useState(true);
 
   const renderMobileOverview = (
-    items: readonly { id: string; label: string; icon: any }[],
+    items: readonly { id: string; label: string; icon?: any }[],
     onPick: (id: any) => void,
   ) => (
     <div className="grid grid-cols-1 gap-2">
-      {items.map((card) => {
-        const Icon = card.icon;
-        return (
-          <button
-            key={card.id}
-            onClick={() => onPick(card.id)}
-            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Icon className="h-4 w-4" />
-            </div>
-            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </button>
-        );
-      })}
+      {items.map((card) => (
+        <button
+          key={card.id}
+          onClick={() => onPick(card.id)}
+          className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+        >
+          <span className="h-6 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+          <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+        </button>
+      ))}
     </div>
   );
 
