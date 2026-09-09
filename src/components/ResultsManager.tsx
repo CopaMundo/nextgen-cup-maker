@@ -1448,8 +1448,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   // Auto-focus: laatste volledig ingegeven tijdsbalk bovenaan (ingeklapt),
   // de eerstvolgende in te geven tijdsbalk staat daar open onder.
+  // Draait opnieuw zodra het anker verandert (bv. na het ingeven van een uitslag),
+  // maar niet als de gebruiker enkel handmatig heeft gescrold.
   useEffect(() => {
-    if (autoFocusDoneRef.current) return;
     const slots = timeSlotGroups.filter(g => g.key !== "__unplanned__");
     if (slots.length === 0) return;
 
@@ -1458,7 +1459,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const nextKey = slots[nextIdx].key;
     const anchorKey = nextIdx > 0 ? slots[nextIdx - 1].key : nextKey;
 
-    autoFocusDoneRef.current = true;
+    if (autoFocusDoneRef.current === anchorKey) return;
+    autoFocusDoneRef.current = anchorKey;
 
     setCollapsedTimeSlots(prev => {
       if (!prev.has(nextKey)) return prev;
@@ -1477,7 +1479,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   }, [timeSlotGroups]);
 
   useEffect(() => {
-    autoFocusDoneRef.current = false;
+    autoFocusDoneRef.current = null;
   }, [categoryId, selectedPhaseNumber]);
 
   // Render standings table with +/- controls
