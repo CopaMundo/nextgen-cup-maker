@@ -4057,7 +4057,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               }
               if (activeDragPayload.type === "break") {
                 return (
-                  <div className="pointer-events-none rounded-lg bg-primary/20 border-2 border-primary/40 px-3 py-1.5 text-xs shadow-2xl w-[200px] rotate-1 font-medium text-primary">
+                  <div className="pointer-events-none rounded-lg bg-primary/10 px-3 py-1.5 text-xs shadow-xl w-[200px] rotate-1 font-medium text-primary ring-1 ring-primary/30">
                     Pauze
                   </div>
                 );
