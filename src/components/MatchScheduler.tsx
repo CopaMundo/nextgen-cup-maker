@@ -2086,12 +2086,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const handler = (e: PointerEvent) => {
       pointerPositionRef.current = { x: e.clientX, y: e.clientY };
-      if (activeDragPayload.type === "referee") setRefGhostPos({ x: e.clientX, y: e.clientY });
       if (activeDragPayload.type !== "referee") autoScrollPlanner(e.clientX, e.clientY);
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
         const { x, y } = pointerPositionRef.current;
+        if (activeDragPayload.type === "referee") {
+          setRefGhostPos(previous => (previous && previous.x === x && previous.y === y ? previous : { x, y }));
+        }
         compute(x, y);
       });
     };
