@@ -3887,37 +3887,52 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     <h3 className="font-display text-sm font-bold text-foreground">Niet gepland ({getUnscheduledMatches().length}/{matches.length})</h3>
 
                     {/* Sidebar filters */}
-                    <div className="flex gap-1 flex-wrap mb-1">
+                    <div className="flex gap-2 flex-wrap mb-1">
                       {phases.length > 1 && (
-                        <select value={sidebarFormat} onChange={(e) => { setSidebarFormat(e.target.value); setSidebarGroup("all"); setSidebarRound("all"); }} className="h-6 rounded border border-input bg-background px-1 text-[10px] focus:outline-none focus:border-y-2 focus:border-y-primary">
-                          <option value="all">Alle formats</option>
-                          {phases.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                        </select>
+                        <Select value={sidebarFormat} onValueChange={(value) => { setSidebarFormat(value); setSidebarGroup("all"); setSidebarRound("all"); }}>
+                          <SelectTrigger className="h-8 w-auto min-w-[6.5rem] text-xs">
+                            <SelectValue placeholder="Alle formats" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Alle formats</SelectItem>
+                            {phases.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       )}
                       {getSidebarGroups().length > 0 && (
-                        <select value={sidebarGroup} onChange={(e) => { setSidebarGroup(e.target.value); setSidebarRound("all"); }} className="h-6 rounded border border-input bg-background px-1 text-[10px] focus:outline-none focus:border-y-2 focus:border-y-primary">
-                          <option value="all">Alle groepen</option>
-                          {getSidebarGroups().map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-                        </select>
+                        <Select value={sidebarGroup} onValueChange={(value) => { setSidebarGroup(value); setSidebarRound("all"); }}>
+                          <SelectTrigger className="h-8 w-auto min-w-[6.5rem] text-xs">
+                            <SelectValue placeholder="Alle groepen" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Alle groepen</SelectItem>
+                            {getSidebarGroups().map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       )}
                       {getSidebarRounds().length > 0 && (
-                        <select value={sidebarRound} onChange={(e) => setSidebarRound(e.target.value)} className="h-6 rounded border border-input bg-background px-1 text-[10px] focus:outline-none focus:border-y-2 focus:border-y-primary">
-                          <option value="all">Alle rondes</option>
-                          {getSidebarRounds().map(r => {
-                            const phase = phases.find(p => p.id === r.phaseId);
-                            const isKnockout = phase && (phase.phase_type === "knockout" || phase.phase_type === "single_match");
-                            let label = phase?.name ? `Ronde ${r.round} (${phase.name})` : `Ronde ${r.round}`;
-                            if (isKnockout) {
-                              const phaseMatches = matches.filter(m => m.phase_id === r.phaseId && m.round_number === r.round);
-                              let base = phase?.name || "Wedstrijden";
-                              if (phaseMatches.length > 0 && phaseMatches[0].match_name) {
-                                base = phaseMatches[0].match_name.replace(/\s*\([^)]+\)\s*$/, "").replace(/\s*\d+$/, "");
+                        <Select value={sidebarRound} onValueChange={(value) => setSidebarRound(value)}>
+                          <SelectTrigger className="h-8 w-auto min-w-[6.5rem] text-xs">
+                            <SelectValue placeholder="Alle rondes" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Alle rondes</SelectItem>
+                            {getSidebarRounds().map(r => {
+                              const phase = phases.find(p => p.id === r.phaseId);
+                              const isKnockout = phase && (phase.phase_type === "knockout" || phase.phase_type === "single_match");
+                              let label = phase?.name ? `Ronde ${r.round} (${phase.name})` : `Ronde ${r.round}`;
+                              if (isKnockout) {
+                                const phaseMatches = matches.filter(m => m.phase_id === r.phaseId && m.round_number === r.round);
+                                let base = phase?.name || "Wedstrijden";
+                                if (phaseMatches.length > 0 && phaseMatches[0].match_name) {
+                                  base = phaseMatches[0].match_name.replace(/\s*\([^)]+\)\s*$/, "").replace(/\s*\d+$/, "");
+                                }
+                                label = `${base} (${phase.name})`;
                               }
-                              label = `${base} (${phase.name})`;
-                            }
-                            return <option key={r.key} value={r.key}>{label}</option>;
-                          })}
-                        </select>
+                              return <SelectItem key={r.key} value={r.key}>{label}</SelectItem>;
+                            })}
+                          </SelectContent>
+                        </Select>
                       )}
                     </div>
 
