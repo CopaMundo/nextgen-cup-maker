@@ -703,7 +703,7 @@ const TournamentDetail = () => {
               </div>
             </header>
           )}
-          <div className="w-full px-3 py-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 sm:py-6 lg:px-8">
+          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" ? "pb-4 sm:pb-6" : "py-4 sm:py-6")}>
             <div className="flex flex-col gap-4">{renderContent()}</div>
           </div>
         </div>
