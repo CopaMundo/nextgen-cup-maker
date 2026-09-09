@@ -1103,7 +1103,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const RefereePlaceholder = () => (
     <span
       aria-hidden="true"
-      className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in"
+      className="inline-flex items-center rounded border-2 border-dashed border-primary/60 bg-primary/10 px-1 py-0.5 h-5 min-w-[2.5rem] animate-fade-in transition-all duration-150 ease-out"
     />
   );
 
@@ -1189,7 +1189,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const r = badges[i].getBoundingClientRect();
       const sameRow = clientY >= r.top - 4 && clientY <= r.bottom + 4;
       if (clientY < r.top) return i;
-      if (sameRow && clientX < r.left + r.width / 2) return i;
+      // Zodra de aanwijzer een badge raakt, geeft de indicator meteen die plek aan.
+      if (sameRow && clientX < r.right - r.width * 0.15) return i;
     }
     return badges.length;
   };
@@ -2085,12 +2086,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const handler = (e: PointerEvent) => {
       pointerPositionRef.current = { x: e.clientX, y: e.clientY };
-      if (activeDragPayload.type === "referee") setRefGhostPos({ x: e.clientX, y: e.clientY });
       if (activeDragPayload.type !== "referee") autoScrollPlanner(e.clientX, e.clientY);
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
         const { x, y } = pointerPositionRef.current;
+        if (activeDragPayload.type === "referee") {
+          setRefGhostPos(previous => (previous && previous.x === x && previous.y === y ? previous : { x, y }));
+        }
         compute(x, y);
       });
     };
@@ -4074,8 +4077,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           {/* Scheidsrechter-ghost volgt exact de muisaanwijzer */}
           {activeReferee && refGhostPos && (
             <div
-              className="pointer-events-none fixed z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl"
-              style={{ left: refGhostPos.x, top: refGhostPos.y, transform: "translate(-50%, -140%)" }}
+              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[10px] font-semibold text-foreground shadow-2xl will-change-transform"
+              style={{ transform: `translate3d(${refGhostPos.x}px, ${refGhostPos.y}px, 0) translate(-50%, -140%)` }}
             >
               <WhistleIcon className="h-3 w-3" /> {activeReferee.name}
             </div>
