@@ -3119,9 +3119,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <div className="flex gap-0 mt-0 items-start">
             {/* Field columns */}
             <div className="flex-1 min-w-0 relative">
-              {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts.
-                  Desktop: vast (niet sticky) — alleen het veldgebied eronder scrollt. */}
-              <div className="flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm pt-2 pb-1 pr-2 print:hidden shrink-0">
+              {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
+              <div className="sticky top-[3.25rem] z-20 flex items-center justify-between gap-2 mb-1 bg-background/95 backdrop-blur-sm pt-2 pb-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button variant="outline" size="sm" onClick={() => {
@@ -3149,8 +3148,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </Button>
                 </div>
               </div>
-              {/* Desktop: eigen scrollgebied onder de vaste actiebalk; mobiel scrollt de pagina */}
-              <div className="lg:h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain min-h-0">
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
@@ -3507,7 +3504,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </div>
                 );
               })()}
-              </div>
             </div>
 
             {/* ===== RIGHT SIDEBAR ===== */}
