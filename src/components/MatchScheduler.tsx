@@ -1353,6 +1353,21 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   };
 
   // === CLASH DETECTION ===
+  // Tijden kunnen zowel "09:30" (lokaal) als "09:30:00" (database) zijn: altijd op HH:MM vergelijken.
+  const normalizeTime = (t?: string | null) => (t ? t.slice(0, 5) : "");
+
+  /** Beschrijft waar een wedstrijd staat: veld en, bij meerdere locaties, ook de locatie. */
+  const describeMatchPlace = (m: Match): string => {
+    const fieldName = m.field || "";
+    if (!fieldName) return "";
+    const label = displayFieldName(fieldName);
+    if ((locations?.length ?? 0) > 1) {
+      const loc = fields.find(f => f.name === fieldName)?.location || getFieldLocation(fieldName) || locations[0]?.name;
+      if (loc) return `${label} (${loc})`;
+    }
+    return label;
+  };
+
   const getMatchClashes = (match: Match): string[] => {
     if (!match.match_date || !match.match_time) return [];
     const clashes: string[] = [];
@@ -1361,31 +1376,34 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const matchMc = (matchPhase?.match_config as any) || {};
     const matchDur = match.duration_minutes ?? matchMc.phaseDuration ?? globalMatchDuration;
     const matchEnd = matchStart + matchDur;
+    const myTime = normalizeTime(match.match_time);
 
-    // Find all matches that overlap in time (not just exact same time)
+    // Find all matches at the same date + time
     const sameTimeMatches = matches.filter(m => {
       if (m.id === match.id || m.match_date !== match.match_date || !m.match_time) return false;
-      return m.match_time === match.match_time;
+      return normalizeTime(m.match_time) === myTime;
     });
 
     // Team clash
     const teamIds = [match.home_team_id, match.away_team_id].filter(Boolean) as string[];
     for (const tid of teamIds) {
       const teamName = teams.find(t => t.id === tid)?.name || "?";
-      for (const other of sameTimeMatches) {
-        if (other.home_team_id === tid || other.away_team_id === tid) {
-          clashes.push(`${teamName} speelt meerdere wedstrijden op hetzelfde tijdstip`);
-          break;
-        }
+      const others = sameTimeMatches.filter(o => o.home_team_id === tid || o.away_team_id === tid);
+      if (others.length > 0) {
+        const places = others.map(describeMatchPlace).filter(Boolean);
+        clashes.push(
+          `${teamName} speelt om ${myTime} ook${places.length ? ` op ${places.join(", ")}` : " een andere wedstrijd"}`
+        );
       }
     }
     // Referee clash
     if (match.referee) {
-      for (const other of sameTimeMatches) {
-        if (other.referee === match.referee) {
-          clashes.push(`Scheidsrechter ${match.referee} is al ingepland op dit tijdslot`);
-          break;
-        }
+      const others = sameTimeMatches.filter(o => o.referee === match.referee);
+      if (others.length > 0) {
+        const places = others.map(describeMatchPlace).filter(Boolean);
+        clashes.push(
+          `Scheidsrechter ${match.referee} fluit om ${myTime} ook${places.length ? ` op ${places.join(", ")}` : " een andere wedstrijd"}`
+        );
       }
     }
     // Dependency clash within same knockout/bracket phase:
