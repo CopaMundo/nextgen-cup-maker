@@ -630,18 +630,16 @@ const TournamentDetail = () => {
           {!isMobile && (
             <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-background/95 backdrop-blur print:hidden">
               <div className="mx-auto grid h-14 w-full max-w-[1920px] grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] items-center gap-6 px-3 sm:px-6 lg:px-8">
-                {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
-                  <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
-                    {categorySelector}
-                    {activeTab === "schedule" && (
-                      <LocationSelector
-                        tournamentId={id!}
-                        selectedLocation={selectedLocation}
-                        onSelect={setSelectedLocation}
-                      />
-                    )}
-                  </div>
-                )}
+                <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
+                  {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
+                  {activeTab === "schedule" && (
+                    <LocationSelector
+                      tournamentId={id!}
+                      selectedLocation={selectedLocation}
+                      onSelect={setSelectedLocation}
+                    />
+                  )}
+                </div>
 
                 <div className="flex min-w-0 justify-center justify-self-center">
                   {activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (

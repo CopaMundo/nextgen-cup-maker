@@ -60,10 +60,10 @@ const CategorySelector = ({
   if (!isMultiCategory || categories.length === 0) return null;
 
   const selectedName = categories.find((c) => c.id === selectedCategoryId)?.name || "";
-  const displayName = selectedName.length > 18 ? `${selectedName.slice(0, 18).trimEnd()}...` : selectedName;
+  const displayName = selectedName.length > 16 ? `${selectedName.slice(0, 16).trimEnd()}...` : selectedName;
 
   return (
-    <div className={cn("flex items-center gap-1", className)}>
+    <div className={cn("flex items-center gap-2.5", className)}>
       <span className={cn("text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground", !isMobile && "w-10")}>Divisie</span>
       <Select value={selectedCategoryId || ""} onValueChange={(value) => onSelect(value || null)}>
         <SelectTrigger
