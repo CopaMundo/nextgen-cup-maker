@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus } from "lucide-react";
+import { Settings, Tv2, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus, Globe, Palette, Handshake, BarChart3, MonitorPlay, ListChecks } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
@@ -87,7 +87,13 @@ const TournamentDetail = () => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(categoryStorageKey(id));
   });
-  const [activeTab, setActiveTab] = useState<TabId>("general");
+  const [activeTab, setActiveTabState] = useState<TabId>("general");
+  const setActiveTab = (tab: TabId) => {
+    setActiveTabState(tab);
+    setMobileResultsOverview(true);
+    setMobilePresentationOverview(true);
+    setMobileDeelnemersOverview(true);
+  };
   const [generalSubTab, setGeneralSubTab] = useState<GeneralSubTab>(() => {
     if (typeof window === "undefined") return "info";
     return window.matchMedia("(max-width: 639px)").matches ? "overview" : "info";
@@ -127,6 +133,41 @@ const TournamentDetail = () => {
   );
 
   const [mobileDeelnemersOverview, setMobileDeelnemersOverview] = useState(true);
+  const [mobileResultsOverview, setMobileResultsOverview] = useState(true);
+  const [mobilePresentationOverview, setMobilePresentationOverview] = useState(true);
+
+  const renderMobileOverview = (
+    items: readonly { id: string; label: string; icon: any }[],
+    onPick: (id: any) => void,
+  ) => (
+    <div className="grid grid-cols-1 gap-2">
+      {items.map((card) => {
+        const Icon = card.icon;
+        return (
+          <button
+            key={card.id}
+            onClick={() => onPick(card.id)}
+            className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <Icon className="h-4 w-4" />
+            </div>
+            <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">{card.label}</span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const renderMobileBackHeader = (label: string, onBack: () => void) => (
+    <div className="flex items-center gap-3 mb-3">
+      <Button variant="outline" size="icon" className="h-8 w-8" onClick={onBack} aria-label="Terug naar overzicht">
+        <ArrowLeft className="h-4 w-4" />
+      </Button>
+      <h2 className="font-display text-lg font-bold text-foreground">{label}</h2>
+    </div>
+  );
   const [teamDetailOpen, setTeamDetailOpen] = useState(false);
   const [selectedLocation, setSelectedLocationState] = useState<string | null>(() => {
     if (typeof window === "undefined" || !id) return null;
@@ -413,10 +454,20 @@ const TournamentDetail = () => {
           <div className="flex flex-wrap items-center gap-3 mb-4">{scheduleSelectors}</div>
         );
       }
-      case "results":
+      case "results": {
+        const resultsItems = [
+          { id: "results" as const, label: "Uitslagen", icon: ScoreboardIcon },
+          { id: "statistics" as const, label: "Statistieken", icon: BarChart3 },
+        ];
+        if (isMobile && mobileResultsOverview) {
+          return renderMobileOverview(resultsItems, (sid) => { setResultsSubTab(sid); setMobileResultsOverview(false); });
+        }
         return (
           <>
-            {isMobile && subTabBar(resultsSubTabs, resultsSubTab, setResultsSubTab)}
+            {isMobile && renderMobileBackHeader(
+              resultsItems.find((i) => i.id === resultsSubTab)?.label ?? "",
+              () => setMobileResultsOverview(true),
+            )}
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
@@ -427,10 +478,24 @@ const TournamentDetail = () => {
             )}
           </>
         );
-      case "presentation":
+      }
+      case "presentation": {
+        const presentationItems = [
+          { id: "website" as const, label: "Website", icon: Globe },
+          { id: "slideshow" as const, label: "Dialoogvoorstelling", icon: MonitorPlay },
+          { id: "visualization" as const, label: "Vormgeving", icon: Palette },
+          { id: "sponsors" as const, label: "Sponsors", icon: Handshake },
+          { id: "polls" as const, label: "Polls", icon: ListChecks },
+        ];
+        if (isMobile && mobilePresentationOverview) {
+          return renderMobileOverview(presentationItems, (sid) => { setPresentationSubTab(sid); setMobilePresentationOverview(false); });
+        }
         return (
           <>
-            {isMobile && subTabBar(presentationSubTabs, presentationSubTab, setPresentationSubTab)}
+            {isMobile && renderMobileBackHeader(
+              presentationItems.find((i) => i.id === presentationSubTab)?.label ?? "",
+              () => setMobilePresentationOverview(true),
+            )}
             {presentationSubTab === "website" && (
               <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="website" />
             )}
@@ -444,6 +509,7 @@ const TournamentDetail = () => {
             {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
           </>
         );
+      }
 
       default:
         return null;
