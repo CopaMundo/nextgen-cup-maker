@@ -176,8 +176,8 @@ const DraggableReferee = ({ id, data, className, children, title, badge }: {
       onClick={(event) => event.stopPropagation()}
       className={cn(
         className,
-        "cursor-grab active:cursor-grabbing select-none touch-none transition-[opacity,width,transform] duration-150",
-        isDragging && "w-0 min-w-0 overflow-hidden opacity-0 pointer-events-none",
+        "cursor-grab active:cursor-grabbing select-none touch-none transition-opacity duration-150",
+        isDragging && "invisible pointer-events-none",
       )}
     >
       {children}
@@ -1189,6 +1189,23 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     return clientX < r.left + r.width / 2 ? nearestIdx : nearestIdx + 1;
   };
 
+  const getRefereeDropTarget = (clientX: number, clientY: number) => {
+    const elements = document.elementsFromPoint(clientX, clientY) as HTMLElement[];
+    const list = elements.map(element => element.closest<HTMLElement>('[data-referee-list-zone="true"]')).find(Boolean);
+    if (list) return { type: "list" as const };
+
+    const matchContainer = elements
+      .map(element => element.closest<HTMLElement>("[data-referee-match-id]"))
+      .find((element): element is HTMLElement => Boolean(element?.dataset.refereeMatchId));
+    const matchId = matchContainer?.dataset.refereeMatchId;
+    if (!matchContainer || !matchId) return null;
+    return {
+      type: "match" as const,
+      matchId,
+      index: getRefereeInsertIndex(matchContainer, clientX),
+    };
+  };
+
 
   const moveRefereeToMatch = async ({ name, from_match_id: fromMatchId }: RefereeDragPayload, matchId: string, insertIndex: number) => {
     if (!name) return;
@@ -1990,22 +2007,18 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     const compute = (x: number, y: number) => {
       if (activeDragPayload.type === "referee") {
-        const hit = document.elementFromPoint(x, y) as HTMLElement | null;
-        const refereeList = hit?.closest<HTMLElement>('[data-referee-list-zone="true"]');
-        if (refereeList) {
+        const target = getRefereeDropTarget(x, y);
+        if (target?.type === "list") {
           setRefListDropActive(true);
           setRefInsert(null);
           return;
         }
 
-        const refereeContainer = hit?.closest<HTMLElement>("[data-referee-match-id]");
-        const matchId = refereeContainer?.dataset.refereeMatchId;
-        if (refereeContainer && matchId) {
-          const index = getRefereeInsertIndex(refereeContainer, x);
+        if (target?.type === "match") {
           setRefListDropActive(false);
-          setRefInsert(previous => previous?.matchId === matchId && previous.index === index
+          setRefInsert(previous => previous?.matchId === target.matchId && previous.index === target.index
             ? previous
-            : { matchId, index });
+            : { matchId: target.matchId, index: target.index });
           return;
         }
 
@@ -2094,21 +2107,26 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
   };
 
-  const handleDndDragEnd = (_event: DragEndEvent) => {
-    const payload = activeDragPayload;
+  const handleDndDragEnd = (event: DragEndEvent) => {
+    const eventPayload = event.active.data.current as SchedulerDragPayload | undefined;
+    const payload = eventPayload || activeDragPayload;
     const targetField = previewField;
     const targetIndex = previewIndex;
     const isUnscheduled = dragOverField === "__unscheduled__";
-    const refereeTarget = refInsert;
-    const removeReferee = refListDropActive;
+    const finalRefereeTarget = payload?.type === "referee"
+      ? getRefereeDropTarget(pointerPositionRef.current.x, pointerPositionRef.current.y)
+      : null;
 
     setActiveDragPayload(null);
     handleDragEnd();
     endRefereeDrag();
 
     if (payload?.type === "referee") {
-      if (refereeTarget) void moveRefereeToMatch(payload, refereeTarget.matchId, refereeTarget.index);
-      else if (removeReferee) void moveRefereeToList(payload);
+      if (finalRefereeTarget?.type === "match") {
+        void moveRefereeToMatch(payload, finalRefereeTarget.matchId, finalRefereeTarget.index);
+      } else if (finalRefereeTarget?.type === "list") {
+        void moveRefereeToList(payload);
+      }
     } else if (payload && targetField && targetIndex !== null) {
       void performDrop(payload, targetField, targetIndex);
     } else if (payload && isUnscheduled) {
@@ -3270,6 +3288,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                                     <div
                                       data-planner-match-card={m.id}
+                                      data-referee-match-id={m.id}
                                       className={`transition-[max-height,opacity,padding,margin,transform] duration-200 ease-out ${isDragging ? "max-h-0 opacity-0 overflow-hidden" : ""}`}
                                       style={isDragging ? { maxHeight: 0, padding: 0, margin: 0, height: 0 } : undefined}
                                     >
