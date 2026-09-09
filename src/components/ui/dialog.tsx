@@ -46,12 +46,12 @@ const DialogContent = React.forwardRef<
         window.setTimeout(() => focusFirstDialogField(content), 60);
       }}
       className={cn(
-        "fixed left-[50%] top-[6%] z-50 grid w-[calc(100%-1.5rem)] max-w-lg max-h-[88dvh] overflow-y-auto overscroll-contain translate-x-[-50%] translate-y-0 sm:top-[50%] sm:translate-y-[-50%] sm:max-h-[85dvh] gap-4 rounded-lg border bg-background p-4 shadow-lg duration-200 sm:w-full sm:p-6 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg relative",
+        "fixed left-[50%] top-[6%] z-50 flex flex-col w-[calc(100%-1.5rem)] max-w-lg max-h-[88dvh] overflow-visible translate-x-[-50%] translate-y-0 sm:top-[50%] sm:translate-y-[-50%] sm:max-h-[85dvh] gap-4 rounded-lg border bg-background p-4 shadow-lg duration-200 sm:w-full sm:p-6 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
         className,
       )}
       {...props}
     >
-      {children}
+      <div className="grid gap-4 min-h-0 overflow-y-auto overscroll-contain">{children}</div>
       <DialogPrimitive.Close
         aria-label="Sluiten"
         className="absolute right-2 top-2 z-[60] rounded-full bg-background/95 p-2 text-foreground shadow-md ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none sm:-right-12 sm:top-2"
