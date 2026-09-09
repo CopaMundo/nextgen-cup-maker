@@ -201,7 +201,7 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
   if (!active) return null;
   return (
     <div className="px-1.5 py-0.5 animate-fade-in" aria-hidden="true">
-      <div className="h-[92px] rounded-lg border-2 border-dashed border-primary/50 bg-primary/10" />
+      <div className={`${PLANNER_ROW_H} rounded-lg border-2 border-dashed border-primary/50 bg-primary/10`} />
     </div>
   );
 };
