@@ -4067,8 +4067,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </DragOverlay>
           {/* Scheidsrechter-ghost volgt exact de muisaanwijzer */}
           {activeReferee && refGhostPos && (
-            <div
-              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded border-2 border-primary bg-card px-2 py-1 text-[11px] font-semibold text-foreground shadow-2xl will-change-transform"
+              <div
+              className="pointer-events-none fixed left-0 top-0 z-[60] inline-flex items-center gap-1 rounded bg-card px-2 py-1 text-[11px] font-semibold text-foreground shadow-xl will-change-transform ring-1 ring-primary/30"
               style={{ transform: `translate3d(${refGhostPos.x}px, ${refGhostPos.y}px, 0) translate(-50%, -140%)` }}
             >
               <WhistleIcon className="h-3 w-3" /> {activeReferee.name}
