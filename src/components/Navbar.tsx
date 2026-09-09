@@ -1,4 +1,4 @@
-import { LogIn, User, LogOut, UserPlus } from "lucide-react";
+import { LogIn, User, LogOut, UserPlus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ChampionsTrophyIcon from "@/components/icons/ChampionsTrophyIcon";
