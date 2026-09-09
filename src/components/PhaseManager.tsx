@@ -1334,24 +1334,20 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
       {isMobile && mobilePhaseOverview && (
         <div className="grid grid-cols-1 gap-2">
           {containers.map((c) => (
-            <div
+            <button
               key={c.phaseNumber}
-              role="button"
-              tabIndex={0}
+              type="button"
               onClick={() => { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActivePhaseNumber(c.phaseNumber); setMobilePhaseOverview(false); setOpenFormatId(null); } }}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                {phaseListIcon("h-4 w-4")}
-              </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+              <span className="h-6 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+              <span className="min-w-0 flex-1 font-display text-sm font-semibold text-foreground">
                 {allFormats.some((f) => f.phase_number === c.phaseNumber)
                   ? getPhaseLabel(c.phaseNumber, allFormats)
                   : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`)}
               </span>
               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-            </div>
+            </button>
           ))}
           <button
             onClick={addNewPhase}
