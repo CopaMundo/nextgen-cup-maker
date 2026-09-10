@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, ChevronDown, ChevronUp, Pencil, Check, X, ImagePlus, Users, Grid3X3, ArrowUp, ArrowDown, Upload } from "lucide-react";
+import { Trash2, ChevronDown, ChevronUp, Pencil, Check, X, ImagePlus, Users, Grid3X3, ArrowUp, ArrowDown, Upload, AlertTriangle } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -64,8 +64,25 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
   const [editLogoPreview, setEditLogoPreview] = useState<string | null>(format.logo_url || null);
   const [editLogoRemoved, setEditLogoRemoved] = useState(false);
   const [localRefreshKey, setLocalRefreshKey] = useState(0);
+  const [unplannedCount, setUnplannedCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Handmatige wedstrijden die nog niet ingepland zijn (geen teams gekozen)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("matches")
+        .select("id, home_slot_label, away_slot_label")
+        .eq("phase_id", format.id)
+        .eq("tournament_id", tournamentId)
+        .not("group_id", "is", null);
+      if (cancelled) return;
+      setUnplannedCount((data || []).filter(m => !m.home_slot_label || !m.away_slot_label).length);
+    })();
+    return () => { cancelled = true; };
+  }, [format.id, tournamentId, refreshKey, localRefreshKey]);
 
   // Scoring system: tracks the value shown in the selector. Special value MIXED_VALUE
   // means current children have multiple different scoring systems.
@@ -341,6 +358,15 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
               <button type="button" aria-label={`${format.name} bewerken`} onClick={(e) => { e.stopPropagation(); openEditDialog(); }} className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-1">
                 <Pencil className="h-4 w-4 sm:h-3 sm:w-3" />
               </button>
+              {unplannedCount > 0 && (
+                <span
+                  title="Wedstrijden nog handmatig in te geven"
+                  className="inline-flex shrink-0 items-center gap-1 rounded border border-amber-500/50 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-400"
+                >
+                  <AlertTriangle className="h-3 w-3" />
+                  {unplannedCount} nog in te geven
+                </span>
+              )}
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:ml-3 sm:gap-1.5">
@@ -374,7 +400,7 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
                 phases={allFormats}
                 categoryId={categoryId}
                 refreshKey={refreshKey}
-                onSlotChange={onSlotChange}
+                onSlotChange={() => { setLocalRefreshKey(k => k + 1); onSlotChange?.(); }}
                 showRandomAssign={format.phase_number === 1}
               />
             )}

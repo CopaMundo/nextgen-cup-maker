@@ -1911,15 +1911,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {/* Action icons */}
           <div className="flex items-center justify-end gap-1.5 min-w-0">
-            {canAssignTeams(match) && (
-              <button
-                onClick={() => openAssignDialog(match)}
-                className="text-muted-foreground hover:text-primary transition-colors"
-                title="Teams wijzigen"
-              >
-                <Users className="h-3.5 w-3.5" />
-              </button>
-            )}
+
 
             {match.group_id && (phase?.phase_type === "group" || phase?.phase_type === "round_robin") && (
               <button
@@ -1977,6 +1969,12 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const standingsDialogGroup = standingsDialogGroupId ? groups.find(g => g.id === standingsDialogGroupId) : null;
   const standingsDialogFormat = standingsDialogGroup ? phases.find(p => p.id === standingsDialogGroup.phase_id) : null;
   const selectedFormatAction = selectedFormatActionId ? phases.find(p => p.id === selectedFormatActionId) : null;
+
+  // Formats waar handmatige wedstrijden nog niet ingepland zijn (geen teams/slots gekozen)
+  const unplannedFormats = phases.filter(p =>
+    matches.some(m => m.phase_id === p.id && m.group_id && (!m.home_slot_label || !m.away_slot_label))
+  );
+
 
   return (
     <div className="space-y-3 lg:h-full lg:min-h-0 lg:space-y-0 lg:overflow-hidden">
@@ -2083,6 +2081,17 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         )}
 
         <div ref={matchesScrollRef} className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
+
+          {unplannedFormats.length > 0 && (
+            <div className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-foreground">
+              <span className="font-semibold">Wedstrijden nog niet ingepland</span>
+              <p className="mt-0.5 text-muted-foreground">
+                Bij {unplannedFormats.map(p => p.name).join(", ")} moet je de wedstrijden nog handmatig ingeven.
+                Ga naar Indeling en gebruik het kalendertje bij de groep.
+              </p>
+            </div>
+          )}
+
 
       {/* Format detail dialog */}
       {(() => {
@@ -2727,51 +2736,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         );
       })()}
 
-      {/* Teams wijzigen aan een wedstrijd */}
-      <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
-        <DialogContent ref={assignMatchDialogRef} className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Teams wijzigen</DialogTitle>
-            <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Thuis</Label>
-              <Select
-                value={assignDraft.homeTeamId || "__none__"}
-                onValueChange={(v) => setAssignDraft(d => ({ ...d, homeTeamId: v === "__none__" ? "" : v }))}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Geen team</SelectItem>
-                  {teams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Uit</Label>
-              <Select
-                value={assignDraft.awayTeamId || "__none__"}
-                onValueChange={(v) => setAssignDraft(d => ({ ...d, awayTeamId: v === "__none__" ? "" : v }))}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Geen team</SelectItem>
-                  {teams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAssigningMatchId(null)}>Annuleren</Button>
-            <Button onClick={saveAssign} disabled={savingAssign}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
 
   );

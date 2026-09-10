@@ -400,6 +400,21 @@ const GroupManager = ({
       toast({ title: "Ongeldige wedstrijd", description: "Een team kan niet tegen zichzelf spelen.", variant: "destructive" });
       return;
     }
+    // Elk team mag per speelronde slechts 1x voorkomen
+    const rounds = new Set(planMatches.map(m => m.round_number ?? 0));
+    for (const round of rounds) {
+      const used = new Set<string>();
+      for (const m of planMatches.filter(x => (x.round_number ?? 0) === round)) {
+        for (const code of [m.home, m.away]) {
+          if (!code) continue;
+          if (used.has(code)) {
+            toast({ title: `Ronde ${round}`, description: "Elk team kan per speelronde maar 1 keer spelen.", variant: "destructive" });
+            return;
+          }
+          used.add(code);
+        }
+      }
+    }
     setPlanSaving(true);
     const slotMap = new Map(planSlots.map(s => [s.slot_code, s]));
     await Promise.all(planMatches.map(m =>
@@ -1204,7 +1219,16 @@ const GroupManager = ({
                       <span className="text-xs text-muted-foreground">({roundMatches.length} {roundMatches.length === 1 ? "wedstrijd" : "wedstrijden"})</span>
                     </div>
                     <div className="space-y-2">
-                      {roundMatches.map((m, i) => (
+                      {roundMatches.map((m, i) => {
+                        // Elk team mag per speelronde slechts 1x gebruikt worden.
+                        const usedInRound = new Set<string>();
+                        roundMatches.forEach(rm => {
+                          if (rm.home) usedInRound.add(rm.home);
+                          if (rm.away) usedInRound.add(rm.away);
+                        });
+                        const optionsFor = (own: string) =>
+                          planSlots.filter(s => s.slot_code === own || !usedInRound.has(s.slot_code));
+                        return (
                         <div key={m.id} className="flex items-center gap-2">
                           <span className="w-6 shrink-0 text-xs text-muted-foreground">{i + 1}.</span>
                           <Select
@@ -1216,7 +1240,7 @@ const GroupManager = ({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="__empty__">Kies team</SelectItem>
-                              {planSlots.map(s => (
+                              {optionsFor(m.home).map(s => (
                                 <SelectItem key={s.slot_code} value={s.slot_code}>{s.label}</SelectItem>
                               ))}
                             </SelectContent>
@@ -1231,13 +1255,14 @@ const GroupManager = ({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="__empty__">Kies team</SelectItem>
-                              {planSlots.map(s => (
+                              {optionsFor(m.away).map(s => (
                                 <SelectItem key={s.slot_code} value={s.slot_code}>{s.label}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );
