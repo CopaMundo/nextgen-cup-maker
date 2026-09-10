@@ -12,6 +12,13 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SlotManager from "./SlotManager";
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
