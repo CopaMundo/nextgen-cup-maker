@@ -141,13 +141,13 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
   const isMobile = useIsMobile();
-  const [mobileOverview, setMobileOverview] = useState(true);
 
   useEffect(() => {
     if (tabs.length > 0 && !tabs.find(t => t.id === activeTab)) {
       setActiveTab(tabs[0].id);
     }
   }, [tabs.map(t => t.id).join("|")]);
+
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
 
