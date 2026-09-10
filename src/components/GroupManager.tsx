@@ -297,6 +297,90 @@ const GroupManager = ({
     onSlotChange?.();
   };
 
+  // ---- Handmatige wedstrijdplanning per groep ----
+  type PlanMatch = { id: string; round_number: number | null; match_name: string | null; home: string; away: string };
+  type PlanSlot = { slot_code: string; team_id: string | null; label: string };
+  const [manualGroupIds, setManualGroupIds] = useState<Set<string>>(new Set());
+  const [planOpen, setPlanOpen] = useState(false);
+  const planDialogRef = useDialogFocus(planOpen);
+  const [planGroup, setPlanGroup] = useState<Group | null>(null);
+  const [planMatches, setPlanMatches] = useState<PlanMatch[]>([]);
+  const [planSlots, setPlanSlots] = useState<PlanSlot[]>([]);
+  const [planSaving, setPlanSaving] = useState(false);
+
+  const refreshManualGroups = async () => {
+    const { data } = await supabase
+      .from("matches")
+      .select("group_id, home_slot_label, away_slot_label")
+      .eq("tournament_id", tournamentId)
+      .eq("phase_id", phaseId)
+      .not("group_id", "is", null);
+    const ids = new Set<string>();
+    for (const m of data || []) {
+      if (m.group_id && (!m.home_slot_label || !m.away_slot_label)) ids.add(m.group_id);
+    }
+    setManualGroupIds(ids);
+  };
+
+  useEffect(() => {
+    refreshManualGroups();
+  }, [phaseId, groups.length, slotRefreshKey, refreshKey]);
+
+  const openPlanDialog = async (group: Group) => {
+    setPlanGroup(group);
+    setPlanOpen(true);
+    setPlanMatches([]);
+    setPlanSlots([]);
+
+    const [{ data: slots }, { data: matches }, { data: teams }] = await Promise.all([
+      supabase.from("slots").select("slot_code, team_id, sort_order").eq("group_id", group.id).eq("tournament_id", tournamentId).order("sort_order"),
+      supabase.from("matches").select("id, round_number, match_name, home_slot_label, away_slot_label").eq("group_id", group.id).eq("tournament_id", tournamentId).eq("phase_id", phaseId).order("round_number").order("created_at"),
+      supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
+    ]);
+
+    const teamNames = new Map((teams || []).map(t => [t.id, t.name]));
+    setPlanSlots((slots || []).map(s => ({
+      slot_code: s.slot_code,
+      team_id: s.team_id,
+      label: (s.team_id ? teamNames.get(s.team_id) : null) || s.slot_code,
+    })));
+    setPlanMatches((matches || []).map(m => ({
+      id: m.id,
+      round_number: m.round_number,
+      match_name: m.match_name,
+      home: m.home_slot_label || "",
+      away: m.away_slot_label || "",
+    })));
+  };
+
+  const setPlanValue = (matchId: string, side: "home" | "away", value: string) => {
+    setPlanMatches(prev => prev.map(m => (m.id === matchId ? { ...m, [side]: value } : m)));
+  };
+
+  const savePlan = async () => {
+    if (!planGroup) return;
+    const invalid = planMatches.find(m => m.home && m.away && m.home === m.away);
+    if (invalid) {
+      toast({ title: "Ongeldige wedstrijd", description: "Een team kan niet tegen zichzelf spelen.", variant: "destructive" });
+      return;
+    }
+    setPlanSaving(true);
+    const slotMap = new Map(planSlots.map(s => [s.slot_code, s]));
+    await Promise.all(planMatches.map(m =>
+      Promise.resolve(supabase.from("matches").update({
+        home_slot_label: m.home || null,
+        away_slot_label: m.away || null,
+        home_team_id: m.home ? (slotMap.get(m.home)?.team_id ?? null) : null,
+        away_team_id: m.away ? (slotMap.get(m.away)?.team_id ?? null) : null,
+      }).eq("id", m.id))
+    ));
+    setPlanSaving(false);
+    setPlanOpen(false);
+    toast({ title: "Wedstrijden opgeslagen" });
+    notifySlotChange();
+    refreshManualGroups();
+  };
+
   const checkAssignedTeams = async () => {
     const { data } = await supabase
       .from("slots")
