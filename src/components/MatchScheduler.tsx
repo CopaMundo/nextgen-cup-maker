@@ -3484,10 +3484,24 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 const phase = phases.find(p => p.id === m.phase_id);
                                 const group = allGroups.find(g => g.id === m.group_id);
 
+                                const selIdx = mobileSelectedMatchId ? fieldMatches.findIndex(x => x.id === mobileSelectedMatchId) : -1;
+                                const showBarBefore = isMobile && !!mobileSelectedMatchId && selIdx !== idx && selIdx !== idx - 1;
+                                const showBarAfterLast = isMobile && !!mobileSelectedMatchId && idx === fieldMatches.length - 1 && selIdx !== idx;
+                                const insertBar = (targetIdx: number) => (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); void handleMobilePlaceMatch(field.name, targetIdx); }}
+                                    className="w-full flex items-center gap-1.5 px-2 py-1 bg-primary/10 border-b border-dashed border-primary/50 text-primary text-[10px] font-semibold"
+                                  >
+                                    <Plus className="h-3 w-3" /> Hier plaatsen
+                                  </button>
+                                );
 
                                 return (
                                   <div key={m.id}>
+                                    {showBarBefore && insertBar(idx)}
                                     <PlannerInsertionMarker active={!!isPreviewHere} />
+
 
                                     <div
                                       data-planner-match-card={m.id}
