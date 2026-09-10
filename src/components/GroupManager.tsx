@@ -633,12 +633,17 @@ const GroupManager = ({
       setPhaseRounds(dialogRounds);
     }
 
-    // If slot count or match type changed, regenerate matches for ALL groups
-    if (slotCountChanged || matchTypeChanged) {
-      const allGroups = await supabase.from("groups").select("id").eq("phase_id", phaseId);
-      for (const g of (allGroups.data || [])) {
-        await generateMatchesForGroup(g.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
-      }
+    // Regenerate matches ONLY for the edited group
+    if (slotCountChanged || matchTypeChanged || genModeChanged) {
+      await generateMatchesForGroup(editingGroup.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
+      setGroups((g) =>
+        g.map((x) =>
+          x.id === editingGroup.id
+            ? { ...x, manual_planning: dialogMatchType === "rounds" && dialogMatchGenMode === "empty" }
+            : x,
+        ),
+      );
+      await refreshManualGroups();
     }
 
     setUploading(true);
