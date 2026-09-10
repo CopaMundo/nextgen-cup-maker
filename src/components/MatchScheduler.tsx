@@ -3518,7 +3518,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 const group = allGroups.find(g => g.id === m.group_id);
 
                                 const selIdx = mobileSelectedMatchId ? fieldMatches.findIndex(x => x.id === mobileSelectedMatchId) : -1;
-                                const showBarBefore = isMobile && !!mobileSelectedMatchId && selIdx !== idx && selIdx !== idx - 1;
+                                const showBarBefore = isMobile && !!mobileSelectedMatchId && selIdx !== idx && !(selIdx >= 0 && selIdx === idx - 1);
                                 const showBarAfterLast = isMobile && !!mobileSelectedMatchId && idx === fieldMatches.length - 1 && selIdx !== idx;
                                 const insertBar = (targetIdx: number) => (
                                   <button
