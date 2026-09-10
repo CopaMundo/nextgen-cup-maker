@@ -3570,17 +3570,26 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                                                 )}
                                               </div>
-                                              <div className="flex items-center gap-1 shrink-0">
-                                                {getMatchClashes(m).length > 0 && (
-                                                  <span className="text-destructive cursor-help" title={getMatchClashes(m).join("\n")}>⚠</span>
-                                                )}
-                                                <button
-                                                  onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
-                                                  className="text-muted-foreground hover:text-foreground print:hidden"
-                                                >
-                                                  <Pencil className="h-2 w-2" />
-                                                </button>
-                                              </div>
+                                               <div className="flex items-center gap-1 shrink-0">
+                                                 {getMatchClashes(m).length > 0 && (
+                                                   <button
+                                                     type="button"
+                                                     onClick={(e) => { e.stopPropagation(); setClashInfo(getMatchClashes(m)); }}
+                                                     title={getMatchClashes(m).join("\n")}
+                                                     aria-label="Conflict bekijken"
+                                                     className="flex h-6 w-6 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 md:h-4 md:w-4"
+                                                   >
+                                                     <AlertTriangle className="h-4 w-4 md:h-3 md:w-3" />
+                                                   </button>
+                                                 )}
+                                                 <button
+                                                   onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
+                                                   className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground print:hidden md:h-4 md:w-4"
+                                                   aria-label="Wedstrijd bewerken"
+                                                 >
+                                                   <Pencil className="h-3.5 w-3.5 md:h-3 md:w-3" />
+                                                 </button>
+                                               </div>
                                             </div>
                                             {/* Teams */}
                                             <div className="flex items-center gap-1">
