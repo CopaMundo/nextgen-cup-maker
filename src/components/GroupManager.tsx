@@ -400,6 +400,21 @@ const GroupManager = ({
       toast({ title: "Ongeldige wedstrijd", description: "Een team kan niet tegen zichzelf spelen.", variant: "destructive" });
       return;
     }
+    // Elk team mag per speelronde slechts 1x voorkomen
+    const rounds = new Set(planMatches.map(m => m.round_number ?? 0));
+    for (const round of rounds) {
+      const used = new Set<string>();
+      for (const m of planMatches.filter(x => (x.round_number ?? 0) === round)) {
+        for (const code of [m.home, m.away]) {
+          if (!code) continue;
+          if (used.has(code)) {
+            toast({ title: `Ronde ${round}`, description: "Elk team kan per speelronde maar 1 keer spelen.", variant: "destructive" });
+            return;
+          }
+          used.add(code);
+        }
+      }
+    }
     setPlanSaving(true);
     const slotMap = new Map(planSlots.map(s => [s.slot_code, s]));
     await Promise.all(planMatches.map(m =>
