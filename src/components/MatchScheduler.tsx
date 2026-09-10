@@ -3634,10 +3634,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             </div>
 
                             {/* + PAUZE button at bottom of each column */}
-                            <div className="border-t border-border">
+                            <div className="border-t border-primary/30 bg-primary/5">
                               <button
                                 onClick={() => { setShowPauzeModal(field.name); setPauzeModalDuration(20); setPauzeModalName("Pauze"); }}
-                                className="w-full py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors font-medium uppercase tracking-wider"
+                                className="w-full py-2 text-xs text-primary/80 hover:text-primary hover:bg-primary/10 transition-colors font-medium uppercase tracking-wider"
                               >
                                 + Pauze
                               </button>
