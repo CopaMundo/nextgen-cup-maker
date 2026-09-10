@@ -3645,9 +3645,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           </div>
                         ))}
                         {/* + Veld toevoegen column */}
-                        <div className="min-w-[140px] flex-shrink-0 flex items-start pt-1 pl-2 print:hidden">
+                        <div className="min-w-[100px] flex-shrink-0 flex items-start pt-1 pl-2 print:hidden">
                           <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="h-8 text-xs gap-1 whitespace-nowrap">
-                            <Plus className="h-3 w-3" /> Veld toevoegen
+                            <Plus className="h-3 w-3" /> Veld
                           </Button>
                         </div>
                       </div>
