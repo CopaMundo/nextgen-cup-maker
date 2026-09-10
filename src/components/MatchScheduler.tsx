@@ -3304,7 +3304,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
                   <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="gap-1 text-xs">
-                    <Plus className="h-3 w-3" /> Veld toevoegen
+                    <Plus className="h-3 w-3" /> Veld
                   </Button>
                 </div>
               ) : (() => {
