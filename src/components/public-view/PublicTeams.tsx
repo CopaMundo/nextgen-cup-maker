@@ -61,10 +61,8 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
 
     return (
-      <div className="px-3 pt-4 space-y-4">
-        <button onClick={() => setSelectedTeam(null)} className={ds(bStyle, "backButton")}>
-          <ArrowLeft className="h-4 w-4" /> Alle teams
-        </button>
+      <div className="px-3 space-y-4">
+        <PublicBackButton onClick={() => setSelectedTeam(null)} label="Alle teams" />
 
         {/* Team header - broadcast style */}
         <div className="flex items-center gap-4">
