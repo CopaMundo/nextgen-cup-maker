@@ -1421,6 +1421,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     categoryId={categoryId}
                     refreshKey={slotRefreshKey}
                     onSlotChange={() => setSlotRefreshKey(k => k + 1)}
+                    initialExpanded
                   />
                 </div>
               ) : (
