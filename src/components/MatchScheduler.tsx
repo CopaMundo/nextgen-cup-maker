@@ -1035,6 +1035,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const newField: FieldConfig = { name, startTime: newFieldStartTime, location: loc };
     const updated = [...fields, newField];
     await saveFields(updated);
+    if (isMobile) setMobileFieldName(name);
     setShowAddFieldDialog(false);
     setNewFieldName("");
     setNewFieldLocation(null);
