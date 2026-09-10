@@ -873,9 +873,18 @@ const GroupManager = ({
               >
                 <CalendarDays className="h-3.5 w-3.5" />
               </button>
-              <span className="absolute -top-2 -right-2 inline-flex items-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground whitespace-nowrap shadow-sm">
-                Plan
-              </span>
+              {planHintGroupId === group.id && (
+                <div className="absolute left-1/2 top-full z-30 mt-2 w-56 -translate-x-1/2 rounded-md border border-primary/40 bg-popover p-2 text-xs text-foreground shadow-lg">
+                  <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-primary/40 bg-popover" />
+                  Hier kan je de wedstrijden handmatig ingeven.
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setPlanHintGroupId(null); }}
+                    className="mt-1 block text-[11px] font-semibold text-primary hover:underline"
+                  >
+                    Begrepen
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
