@@ -64,8 +64,25 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
   const [editLogoPreview, setEditLogoPreview] = useState<string | null>(format.logo_url || null);
   const [editLogoRemoved, setEditLogoRemoved] = useState(false);
   const [localRefreshKey, setLocalRefreshKey] = useState(0);
+  const [unplannedCount, setUnplannedCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Handmatige wedstrijden die nog niet ingepland zijn (geen teams gekozen)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("matches")
+        .select("id, home_slot_label, away_slot_label")
+        .eq("phase_id", format.id)
+        .eq("tournament_id", tournamentId)
+        .not("group_id", "is", null);
+      if (cancelled) return;
+      setUnplannedCount((data || []).filter(m => !m.home_slot_label || !m.away_slot_label).length);
+    })();
+    return () => { cancelled = true; };
+  }, [format.id, tournamentId, refreshKey, localRefreshKey]);
 
   // Scoring system: tracks the value shown in the selector. Special value MIXED_VALUE
   // means current children have multiple different scoring systems.
