@@ -832,6 +832,16 @@ const GroupManager = ({
           >
             <Pencil className="h-3 w-3" />
           </button>
+          {manualGroupIds.has(group.id) && (
+            <button
+              onClick={() => openPlanDialog(group)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
+              aria-label={`Wedstrijden plannen voor ${group.name}`}
+              title="Wedstrijden plannen"
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
         <button onClick={() => setDeleteGroupId(group.id)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1" aria-label={`${group.name} verwijderen`}>
           <Trash2 className="h-3.5 w-3.5" />
