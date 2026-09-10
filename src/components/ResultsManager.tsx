@@ -2727,51 +2727,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         );
       })()}
 
-      {/* Teams wijzigen aan een wedstrijd */}
-      <Dialog open={!!assigningMatchId} onOpenChange={(open) => { if (!open) setAssigningMatchId(null); }}>
-        <DialogContent ref={assignMatchDialogRef} className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Teams wijzigen</DialogTitle>
-            <DialogDescription>Kies het thuis- en uitteam voor deze wedstrijd. Datum, uur, veld en scheidsrechter pas je aan in het Schema-tabblad.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Thuis</Label>
-              <Select
-                value={assignDraft.homeTeamId || "__none__"}
-                onValueChange={(v) => setAssignDraft(d => ({ ...d, homeTeamId: v === "__none__" ? "" : v }))}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Geen team</SelectItem>
-                  {teams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Uit</Label>
-              <Select
-                value={assignDraft.awayTeamId || "__none__"}
-                onValueChange={(v) => setAssignDraft(d => ({ ...d, awayTeamId: v === "__none__" ? "" : v }))}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Kies team" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Geen team</SelectItem>
-                  {teams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAssigningMatchId(null)}>Annuleren</Button>
-            <Button onClick={saveAssign} disabled={savingAssign}>Opslaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
 
   );
