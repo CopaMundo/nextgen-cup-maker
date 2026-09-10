@@ -8,6 +8,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Save, Zap, Trash2 } from "lucide-react";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Match {
   id: string;
