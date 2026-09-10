@@ -1129,6 +1129,66 @@ const GroupManager = ({
         </DialogContent>
       </Dialog>
 
+      {/* Handmatige wedstrijdplanning */}
+      <Dialog open={planOpen} onOpenChange={(open) => { setPlanOpen(open); if (!open) setPlanGroup(null); }}>
+        <DialogContent ref={planDialogRef} className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Wedstrijden plannen{planGroup ? ` — ${planGroup.name}` : ""}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            {planMatches.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Geen wedstrijden gevonden.</p>
+            ) : (
+              Array.from(new Set(planMatches.map(m => m.round_number ?? 0))).sort((a, b) => a - b).map((round) => {
+                const roundMatches = planMatches.filter(m => (m.round_number ?? 0) === round);
+                return (
+                  <div key={round} className="space-y-2">
+                    <div className="flex items-center gap-2 border-b border-border pb-1">
+                      <h5 className="text-sm font-bold uppercase tracking-wide text-foreground">Ronde {round}</h5>
+                      <span className="text-xs text-muted-foreground">({roundMatches.length} {roundMatches.length === 1 ? "wedstrijd" : "wedstrijden"})</span>
+                    </div>
+                    <div className="space-y-2">
+                      {roundMatches.map((m, i) => (
+                        <div key={m.id} className="flex items-center gap-2">
+                          <span className="w-6 shrink-0 text-xs text-muted-foreground">{i + 1}.</span>
+                          <select
+                            value={m.home}
+                            onChange={(e) => setPlanValue(m.id, "home", e.target.value)}
+                            className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                          >
+                            <option value="">Kies team</option>
+                            {planSlots.map(s => (
+                              <option key={s.slot_code} value={s.slot_code}>{s.label}</option>
+                            ))}
+                          </select>
+                          <span className="text-xs text-muted-foreground">vs</span>
+                          <select
+                            value={m.away}
+                            onChange={(e) => setPlanValue(m.id, "away", e.target.value)}
+                            className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                          >
+                            <option value="">Kies team</option>
+                            {planSlots.map(s => (
+                              <option key={s.slot_code} value={s.slot_code}>{s.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPlanOpen(false)}>Annuleren</Button>
+            <Button onClick={savePlan} disabled={planSaving || planMatches.length === 0}>
+              {planSaving ? "Bezig..." : "Opslaan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Clear all confirmation */}
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <AlertDialogContent>
