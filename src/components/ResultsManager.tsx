@@ -1977,15 +1977,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                         {format.logo_url && <img src={format.logo_url} alt="" className="h-3 w-3 object-contain flex-shrink-0" />}
                         <span className="min-w-0 flex-1 break-words text-[10px] font-semibold text-foreground">{phaseLabel} · {format.name}</span>
                       </div>
-                      <div className="mt-1 h-0.5 bg-primary/25 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-300"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: completed ? "hsl(var(--accent))" : "hsl(var(--primary))",
-                          }}
-                        />
-                      </div>
+                      <div className="mt-1 h-0.5 bg-primary rounded-full" />
                       <div className="mt-1 flex items-center justify-between gap-2 text-[10px]">
                         <span className="tabular-nums text-muted-foreground">{playedCount}/{totalCount}</span>
                         {isMobile && (completed || allMatchesPlayed) && (
@@ -2006,7 +1998,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       </div>
                     </button>
                     {!isMobile && (completed || allMatchesPlayed) && (
-                      <div className="mt-1.5 border-t border-border pt-1.5">
+                      <div className="mt-1.5">
                         {completed ? (
                           <Button size="sm" variant="destructive" className="h-6 w-full px-1.5 text-[9px]" onClick={() => requestUndoFormat(format)}>
                             <RotateCcw className="h-3 w-3" /> Ongedaan maken
