@@ -455,7 +455,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
         else if (genMatchType === "home_away") totalRoundsToGenerate = singleLegRounds * 2;
         else totalRoundsToGenerate = customRounds;
 
-        const effectiveGenMode = matchGenMode;
+        const effectiveGenMode = rawMatchType === "rounds" ? matchGenMode : "auto";
         const matchesToInsertGroup: any[] = [];
 
         for (const group of createdGroups) {
@@ -1104,7 +1104,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               </select>
             </div>
           )}
-          {(
+          {groupConfig.matchType === "rounds" && (
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <Label className="text-xs">Wedstrijden genereren</Label>

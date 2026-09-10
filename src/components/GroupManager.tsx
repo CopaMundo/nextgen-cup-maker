@@ -134,8 +134,8 @@ const GroupManager = ({
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId);
 
-    // Respect the chosen gen mode for every competition format
-    const effectiveMode = mode;
+    // Planning mode applies only to "Speelrondes"; other formats always auto-generate
+    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
 
     if (effectiveMode === "auto") {
       const pairings = generateRoundRobin(slots.length, genMatchType as any, customRounds);
@@ -857,7 +857,7 @@ const GroupManager = ({
             </select>
           </div>
         )}
-        {(
+        {dialogMatchType === "rounds" && (
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <Label className="text-xs">Wedstrijden genereren</Label>
