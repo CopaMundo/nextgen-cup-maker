@@ -554,11 +554,31 @@ const GroupManager = ({
     notifySlotChange();
   };
 
+  const editRegenerationNeeded = () => {
+    if (!editingGroup) return false;
+    const slotCountChanged = editSlotCount !== originalSlotCount;
+    const matchTypeChanged = dialogMatchType !== phaseMatchType || dialogEncounters !== phaseEncounters || dialogRounds !== phaseRounds;
+    const genModeChanged =
+      dialogMatchType === "rounds" && (dialogMatchGenMode === "empty") !== !!editingGroup.manual_planning;
+    return slotCountChanged || matchTypeChanged || genModeChanged;
+  };
+
   const saveGroupEdit = async () => {
+    if (!editingGroup) return;
+    if (editRegenerationNeeded()) {
+      setShowEditConfirm(true);
+      return;
+    }
+    await performGroupEdit();
+  };
+
+  const performGroupEdit = async () => {
     if (!editingGroup) return;
 
     const slotCountChanged = editSlotCount !== originalSlotCount;
     const matchTypeChanged = dialogMatchType !== phaseMatchType || dialogEncounters !== phaseEncounters || dialogRounds !== phaseRounds;
+    const genModeChanged =
+      dialogMatchType === "rounds" && (dialogMatchGenMode === "empty") !== !!editingGroup.manual_planning;
 
     // Handle reducing slots
     if (editSlotCount < originalSlotCount) {
