@@ -1988,6 +1988,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       </div>
                       <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
                         <span className="tabular-nums">{playedCount}/{totalCount}</span>
+                        {!isMobile && completed && <span className="font-semibold text-accent">Voltooid</span>}
                       </div>
                     </button>
                     {(completed || allMatchesPlayed) && (
