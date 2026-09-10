@@ -314,6 +314,14 @@ const GroupManager = ({
   const [planMatches, setPlanMatches] = useState<PlanMatch[]>([]);
   const [planSlots, setPlanSlots] = useState<PlanSlot[]>([]);
   const [planSaving, setPlanSaving] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planHintGroupId, setPlanHintGroupId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!planHintGroupId) return;
+    const t = window.setTimeout(() => setPlanHintGroupId(null), 12000);
+    return () => window.clearTimeout(t);
+  }, [planHintGroupId]);
 
   const refreshManualGroups = async () => {
     const { data } = await supabase
@@ -338,26 +346,38 @@ const GroupManager = ({
     setPlanOpen(true);
     setPlanMatches([]);
     setPlanSlots([]);
+    setPlanLoading(true);
+    setPlanHintGroupId(null);
 
-    const [{ data: slots }, { data: matches }, { data: teams }] = await Promise.all([
-      supabase.from("slots").select("slot_code, team_id, sort_order").eq("group_id", group.id).eq("tournament_id", tournamentId).order("sort_order"),
-      supabase.from("matches").select("id, round_number, match_name, home_slot_label, away_slot_label").eq("group_id", group.id).eq("tournament_id", tournamentId).eq("phase_id", phaseId).order("round_number").order("created_at"),
-      supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
-    ]);
+    const loadOnce = async () => {
+      const [{ data: slots }, { data: matches }, { data: teams }] = await Promise.all([
+        supabase.from("slots").select("slot_code, team_id, sort_order").eq("group_id", group.id).eq("tournament_id", tournamentId).order("sort_order"),
+        supabase.from("matches").select("id, round_number, match_name, home_slot_label, away_slot_label").eq("group_id", group.id).eq("tournament_id", tournamentId).eq("phase_id", phaseId).order("round_number").order("created_at"),
+        supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
+      ]);
 
-    const teamNames = new Map((teams || []).map(t => [t.id, t.name]));
-    setPlanSlots((slots || []).map(s => ({
-      slot_code: s.slot_code,
-      team_id: s.team_id,
-      label: (s.team_id ? teamNames.get(s.team_id) : null) || s.slot_code,
-    })));
-    setPlanMatches((matches || []).map(m => ({
-      id: m.id,
-      round_number: m.round_number,
-      match_name: m.match_name,
-      home: m.home_slot_label || "",
-      away: m.away_slot_label || "",
-    })));
+      const teamNames = new Map((teams || []).map(t => [t.id, t.name]));
+      setPlanSlots((slots || []).map(s => ({
+        slot_code: s.slot_code,
+        team_id: s.team_id,
+        label: (s.team_id ? teamNames.get(s.team_id) : null) || s.slot_code,
+      })));
+      setPlanMatches((matches || []).map(m => ({
+        id: m.id,
+        round_number: m.round_number,
+        match_name: m.match_name,
+        home: m.home_slot_label || "",
+        away: m.away_slot_label || "",
+      })));
+      return (matches || []).length;
+    };
+
+    let count = await loadOnce();
+    for (let attempt = 0; attempt < 4 && count === 0; attempt++) {
+      await new Promise((r) => setTimeout(r, 400));
+      count = await loadOnce();
+    }
+    setPlanLoading(false);
   };
 
   const setPlanValue = (matchId: string, side: "home" | "away", value: string) => {
@@ -480,6 +500,10 @@ const GroupManager = ({
       await supabase.from("slots").insert(slotsToInsert);
       await generateMatchesForGroup(data.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
       setGroups((g) => [...g, data]);
+      await refreshManualGroups();
+      if (dialogMatchType === "rounds" && dialogMatchGenMode === "empty") {
+        setPlanHintGroupId(data.id);
+      }
       toast({ title: `${name} toegevoegd met ${dialogSlots} slots en wedstrijden` });
     }
     setUploading(false);
@@ -849,9 +873,18 @@ const GroupManager = ({
               >
                 <CalendarDays className="h-3.5 w-3.5" />
               </button>
-              <span className="absolute -top-2 -right-2 inline-flex items-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground whitespace-nowrap shadow-sm">
-                Plan
-              </span>
+              {planHintGroupId === group.id && (
+                <div className="absolute left-1/2 top-full z-30 mt-2 w-56 -translate-x-1/2 rounded-md border border-primary/40 bg-popover p-2 text-xs text-foreground shadow-lg">
+                  <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-primary/40 bg-popover" />
+                  Hier kan je de wedstrijden handmatig ingeven.
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setPlanHintGroupId(null); }}
+                    className="mt-1 block text-[11px] font-semibold text-primary hover:underline"
+                  >
+                    Begrepen
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1148,7 +1181,13 @@ const GroupManager = ({
             <DialogTitle>Wedstrijden plannen{planGroup ? ` — ${planGroup.name}` : ""}</DialogTitle>
           </DialogHeader>
           <div className="space-y-5">
-            {planMatches.length === 0 ? (
+            {planLoading && planMatches.length === 0 ? (
+              <div className="space-y-2">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="h-9 animate-pulse rounded-md bg-muted" />
+                ))}
+              </div>
+            ) : planMatches.length === 0 ? (
               <p className="text-sm text-muted-foreground">Geen wedstrijden gevonden.</p>
             ) : (
               Array.from(new Set(planMatches.map(m => m.round_number ?? 0))).sort((a, b) => a - b).map((round) => {
