@@ -1035,6 +1035,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const newField: FieldConfig = { name, startTime: newFieldStartTime, location: loc };
     const updated = [...fields, newField];
     await saveFields(updated);
+    if (isMobile) setMobileFieldName(name);
     setShowAddFieldDialog(false);
     setNewFieldName("");
     setNewFieldLocation(null);
@@ -3348,22 +3349,34 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   <div>
 
                     {/* Mobiel: veldkiezer */}
-                    {isMobile && fieldData.length > 1 && (
-                      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1">
-                        {fieldData.map(({ field }) => (
-                          <button
-                            key={field.name}
-                            onClick={() => setMobileFieldName(field.name)}
-                            className={cn(
-                              "shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
-                              field.name === activeMobileField
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border bg-card text-muted-foreground"
-                            )}
-                          >
-                            {displayFieldName(field.name)}
-                          </button>
-                        ))}
+                    {isMobile && fieldData.length > 0 && (
+                      <div className="flex items-center gap-1.5 pb-2 -mx-1 px-1">
+                        <div className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                          <div className="flex gap-1.5 pr-1">
+                            {fieldData.map(({ field }) => (
+                              <button
+                                key={field.name}
+                                onClick={() => setMobileFieldName(field.name)}
+                                className={cn(
+                                  "shrink-0 snap-start rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap",
+                                  field.name === activeMobileField
+                                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                    : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                                )}
+                              >
+                                {displayFieldName(field.name)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
+                          className="shrink-0 h-8 text-xs gap-1 whitespace-nowrap border-primary/40 hover:border-primary hover:bg-primary/10"
+                        >
+                          <Plus className="h-3 w-3" /> Veld
+                        </Button>
                       </div>
                     )}
 
@@ -3644,8 +3657,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             </div>
                           </div>
                         ))}
-                        {/* + Veld toevoegen column */}
-                        <div className="min-w-[100px] flex-shrink-0 flex items-start pt-1 pl-2 print:hidden">
+                        {/* + Veld toevoegen column (desktop only) */}
+                        <div className="hidden md:flex min-w-[100px] flex-shrink-0 items-start pt-1 pl-2 print:hidden">
                           <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="h-8 text-xs gap-1 whitespace-nowrap">
                             <Plus className="h-3 w-3" /> Veld
                           </Button>
