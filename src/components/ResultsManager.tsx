@@ -115,6 +115,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [collapsedTimeSlots, setCollapsedTimeSlots] = useState<Set<string>>(new Set());
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
   const matchesScrollRef = useRef<HTMLDivElement | null>(null);
+  const mobileHeaderRef = useRef<HTMLElement | null>(null);
+  const [mobileStickyOffset, setMobileStickyOffset] = useState(0);
   const slotRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const autoFocusDoneRef = useRef<string | null>(null);
   // Teams wijzigen aan een wedstrijd (draft-state: pas opslaan bij "Opslaan")
@@ -1470,13 +1472,40 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
 
     requestAnimationFrame(() => {
-      const container = matchesScrollRef.current;
       const el = slotRefs.current.get(anchorKey);
-      if (!container || !el) return;
-      const delta = el.getBoundingClientRect().top - container.getBoundingClientRect().top;
-      container.scrollTop += delta;
+      if (!el) return;
+      const container = matchesScrollRef.current;
+      const scrollsInternally = !!container && container.scrollHeight > container.clientHeight + 4;
+
+      if (scrollsInternally) {
+        const delta = el.getBoundingClientRect().top - container!.getBoundingClientRect().top;
+        container!.scrollTop += delta;
+        return;
+      }
+
+      // Mobiel: de pagina scrolt, dus schuif het venster zodat het anker
+      // net onder de vaste fase-/formatbalk staat.
+      const offset = (mobileHeaderRef.current?.getBoundingClientRect().height ?? 0) + 8;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
     });
   }, [timeSlotGroups]);
+
+  // Hoogte van de vaste mobiele fase-/formatbalk bijhouden zodat de
+  // datumkop daar precies onder blijft plakken.
+  useEffect(() => {
+    const el = mobileHeaderRef.current;
+    if (!el || !isMobile) {
+      setMobileStickyOffset(0);
+      return;
+    }
+    const update = () => setMobileStickyOffset(el.getBoundingClientRect().height);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isMobile, selectedPhaseNumber, categoryId, currentPhaseFormats.length]);
+
 
   useEffect(() => {
     autoFocusDoneRef.current = null;
@@ -1918,7 +1947,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       <div className="flex h-full min-h-0 gap-3 lg:flex-row flex-col">
         {/* Format chips – left sidebar (own scroll on desktop) */}
         {phaseNumbers.length > 0 && (
-          <aside className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
+          <aside ref={mobileHeaderRef} className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
             <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:pt-2">
               {phaseNumbers.length > 1 && isMobile && (
                 <Select value={String(selectedPhaseNumber ?? phaseNumbers[0])} onValueChange={value => setSelectedPhaseNumber(Number(value))}>
@@ -2081,7 +2110,10 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 return (
                   <section key={day.key} className="space-y-2">
                     {/* Day header */}
-                    <div className="lg:sticky lg:top-0 z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+                    <div
+                      className="sticky z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70 lg:top-0"
+                      style={isMobile ? { top: mobileStickyOffset } : undefined}
+                    >
                       <span className="text-xs font-black uppercase tracking-[0.18em] text-foreground">
                         {day.label}
                       </span>
