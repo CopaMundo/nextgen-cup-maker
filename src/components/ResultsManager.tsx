@@ -2070,7 +2070,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 return (
                   <section key={day.key} className="space-y-2">
                     {/* Day header */}
-                    <div className="sticky top-0 z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+                    <div className="lg:sticky lg:top-0 z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70">
                       <span className="text-xs font-black uppercase tracking-[0.18em] text-foreground">
                         {day.label}
                       </span>
