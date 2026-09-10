@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ArrowLeft, User } from "lucide-react";
+import { User } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
+import PublicBackButton from "@/components/public-view/PublicBackButton";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
@@ -60,10 +61,8 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
 
 
     return (
-      <div className="px-3 pt-4 space-y-4">
-        <button onClick={() => setSelectedTeam(null)} className={ds(bStyle, "backButton")}>
-          <ArrowLeft className="h-4 w-4" /> Alle teams
-        </button>
+      <div className="px-3 space-y-4">
+        <PublicBackButton onClick={() => setSelectedTeam(null)} label="Alle teams" />
 
         {/* Team header - broadcast style */}
         <div className="flex items-center gap-4">

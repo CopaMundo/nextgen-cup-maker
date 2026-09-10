@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, MessageCircle } from "lucide-react";
+import { Star, ChevronRight, Trophy, Zap, Clock, MessageCircle } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import PublicStandings from "@/components/public-view/PublicStandings";
+import PublicBackButton from "@/components/public-view/PublicBackButton";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { getPhaseLabel } from "@/lib/phaseLabel";
@@ -327,10 +328,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     if (expandedGrid.startsWith("programma:")) {
       const listMatches = globalTab === "next" ? upcomingMatches : playedMatches;
       return (
-        <div className="px-3 pt-4 space-y-4">
-          <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
-            <ArrowLeft className="h-4 w-4" /> Terug
-          </button>
+        <div className="px-3 space-y-4">
+          <PublicBackButton onClick={() => setExpandedGrid(null)} />
           <div className="flex items-center gap-2">
             <div className={ds(bStyle, "sectionDot")} />
             <h2 className={ds(bStyle, "sectionTitle")}>Programma</h2>
@@ -381,10 +380,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     // Volledig klassement: toon de Standen-view (met fases en formattabs) inline op de hoofdpagina
     if (expandedGrid === "fav-standing" && favGroup) {
       return (
-        <div className="px-3 pt-4 space-y-4">
-          <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
-            <ArrowLeft className="h-4 w-4" /> Terug
-          </button>
+        <div className="px-3 space-y-4">
+          <PublicBackButton onClick={() => setExpandedGrid(null)} />
           <PublicStandings data={data} initialPhaseId={favGroup.phase_id} initialGroupId={favGroup.id} favoriteTeam={favoriteTeam} />
         </div>
       );
@@ -392,10 +389,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
     if (expandedGrid === "fav-standing-next" && nextGroupPhaseGroup) {
       return (
-        <div className="px-3 pt-4 space-y-4">
-          <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
-            <ArrowLeft className="h-4 w-4" /> Terug
-          </button>
+        <div className="px-3 space-y-4">
+          <PublicBackButton onClick={() => setExpandedGrid(null)} />
           <PublicStandings data={data} initialPhaseId={nextGroupPhaseGroup.phase_id} initialGroupId={nextGroupPhaseGroup.id} favoriteTeam={favoriteTeam} />
         </div>
       );
@@ -414,10 +409,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
 
       if (koPhase) {
         return (
-          <div className="px-3 pt-4 space-y-4">
-            <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
-              <ArrowLeft className="h-4 w-4" /> Terug
-            </button>
+          <div className="px-3 space-y-4">
+            <PublicBackButton onClick={() => setExpandedGrid(null)} />
             <PublicStandings data={data} initialPhaseId={koPhase.id} initialGroupId={favKoGroup?.id} favoriteTeam={favoriteTeam} />
           </div>
         );
@@ -555,10 +548,8 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
     if (expandedGrid === "last-results") { title = "Laatste resultaten"; matchList = lastBlockMatches; }
 
     return (
-      <div className="px-3 pt-4 space-y-4">
-        <button onClick={() => setExpandedGrid(null)} className={ds(bStyle, "backButton")}>
-          <ArrowLeft className="h-4 w-4" /> Terug
-        </button>
+      <div className="px-3 space-y-4">
+        <PublicBackButton onClick={() => setExpandedGrid(null)} />
         <div className="flex items-center gap-2">
           <div className={ds(bStyle, "sectionDot")} />
           <h2 className={ds(bStyle, "sectionTitle")}>{title}</h2>
@@ -984,10 +975,8 @@ const InlineBracketView = ({ backAction, bStyle, phaseNumberSet, allKnockoutPhas
   }, [favoriteTeam, siblingPhases, allMatches]);
 
   return (
-    <div className="px-3 pt-4 space-y-4" ref={containerRef}>
-      <button onClick={backAction} className={ds(bStyle, "backButton")}>
-        <ArrowLeft className="h-4 w-4" /> Terug
-      </button>
+    <div className="px-3 space-y-4" ref={containerRef}>
+      <PublicBackButton onClick={backAction} />
       {phaseNumberSet.length > 1 && (
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
           {phaseNumberSet.map((pn: any) => {
