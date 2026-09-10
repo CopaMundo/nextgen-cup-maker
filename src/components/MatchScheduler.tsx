@@ -344,9 +344,67 @@ export const DateStripNav = ({
   centerActive?: boolean;
   mobileCarousel?: boolean;
 }) => {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = useRef(false);
   const responsiveSize = useResponsiveWindowSize();
   const windowSize = maxVisible ? Math.min(maxVisible, responsiveSize) : responsiveSize;
   const [windowStart, setWindowStart] = useState(0);
+
+  // Mobile carousel: snap-scroll to the active date when it changes.
+  useEffect(() => {
+    if (!mobileCarousel) return;
+    const container = carouselRef.current;
+    if (!container) return;
+    const idx = dates.indexOf(activeDate);
+    if (idx === -1) return;
+    const item = container.children[idx] as HTMLElement | undefined;
+    if (!item) return;
+    isProgrammaticScroll.current = true;
+    const containerWidth = container.offsetWidth;
+    const itemLeft = item.offsetLeft;
+    const itemWidth = item.offsetWidth;
+    container.scrollTo({ left: itemLeft - (containerWidth - itemWidth) / 2, behavior: "smooth" });
+    const timer = window.setTimeout(() => { isProgrammaticScroll.current = false; }, 400);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDate, mobileCarousel, dates.join(",")]);
+
+  // Mobile carousel: update active date after the user scrolls/snaps.
+  useEffect(() => {
+    if (!mobileCarousel) return;
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const pickCenteredDate = () => {
+      if (isProgrammaticScroll.current) return;
+      const center = container.scrollLeft + container.offsetWidth / 2;
+      let closestIdx = -1;
+      let closestDist = Infinity;
+      Array.from(container.children).forEach((child, i) => {
+        const el = child as HTMLElement;
+        const childCenter = el.offsetLeft + el.offsetWidth / 2;
+        const dist = Math.abs(childCenter - center);
+        if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+      });
+      const next = dates[closestIdx];
+      if (next && next !== activeDate) onSelect(next);
+    };
+
+    let debounceTimer: number | undefined;
+    const onScroll = () => {
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(pickCenteredDate, 120);
+    };
+    const onScrollEnd = () => { window.clearTimeout(debounceTimer); pickCenteredDate(); };
+
+    container.addEventListener("scrollend", onScrollEnd);
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scrollend", onScrollEnd);
+      container.removeEventListener("scroll", onScroll);
+      window.clearTimeout(debounceTimer);
+    };
+  }, [activeDate, dates.join(","), mobileCarousel, onSelect]);
 
   // Keep the active date visible — only when the active date itself changes,
   // so manual scrolling/paging through dates is not auto-corrected back.
