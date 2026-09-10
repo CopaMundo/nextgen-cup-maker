@@ -346,26 +346,38 @@ const GroupManager = ({
     setPlanOpen(true);
     setPlanMatches([]);
     setPlanSlots([]);
+    setPlanLoading(true);
+    setPlanHintGroupId(null);
 
-    const [{ data: slots }, { data: matches }, { data: teams }] = await Promise.all([
-      supabase.from("slots").select("slot_code, team_id, sort_order").eq("group_id", group.id).eq("tournament_id", tournamentId).order("sort_order"),
-      supabase.from("matches").select("id, round_number, match_name, home_slot_label, away_slot_label").eq("group_id", group.id).eq("tournament_id", tournamentId).eq("phase_id", phaseId).order("round_number").order("created_at"),
-      supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
-    ]);
+    const loadOnce = async () => {
+      const [{ data: slots }, { data: matches }, { data: teams }] = await Promise.all([
+        supabase.from("slots").select("slot_code, team_id, sort_order").eq("group_id", group.id).eq("tournament_id", tournamentId).order("sort_order"),
+        supabase.from("matches").select("id, round_number, match_name, home_slot_label, away_slot_label").eq("group_id", group.id).eq("tournament_id", tournamentId).eq("phase_id", phaseId).order("round_number").order("created_at"),
+        supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
+      ]);
 
-    const teamNames = new Map((teams || []).map(t => [t.id, t.name]));
-    setPlanSlots((slots || []).map(s => ({
-      slot_code: s.slot_code,
-      team_id: s.team_id,
-      label: (s.team_id ? teamNames.get(s.team_id) : null) || s.slot_code,
-    })));
-    setPlanMatches((matches || []).map(m => ({
-      id: m.id,
-      round_number: m.round_number,
-      match_name: m.match_name,
-      home: m.home_slot_label || "",
-      away: m.away_slot_label || "",
-    })));
+      const teamNames = new Map((teams || []).map(t => [t.id, t.name]));
+      setPlanSlots((slots || []).map(s => ({
+        slot_code: s.slot_code,
+        team_id: s.team_id,
+        label: (s.team_id ? teamNames.get(s.team_id) : null) || s.slot_code,
+      })));
+      setPlanMatches((matches || []).map(m => ({
+        id: m.id,
+        round_number: m.round_number,
+        match_name: m.match_name,
+        home: m.home_slot_label || "",
+        away: m.away_slot_label || "",
+      })));
+      return (matches || []).length;
+    };
+
+    let count = await loadOnce();
+    for (let attempt = 0; attempt < 4 && count === 0; attempt++) {
+      await new Promise((r) => setTimeout(r, 400));
+      count = await loadOnce();
+    }
+    setPlanLoading(false);
   };
 
   const setPlanValue = (matchId: string, side: "home" | "away", value: string) => {
