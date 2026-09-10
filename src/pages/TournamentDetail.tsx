@@ -325,7 +325,6 @@ const TournamentDetail = () => {
       isMultiCategory={tournament.is_multi_category}
       selectedCategoryId={selectedCategoryId}
       onSelect={setSelectedCategoryId}
-      className="mb-4"
     />
   );
 

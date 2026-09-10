@@ -63,8 +63,7 @@ const CategorySelector = ({
   const displayName = selectedName.length > 16 ? `${selectedName.slice(0, 16).trimEnd()}...` : selectedName;
 
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <span className={cn("text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground", !isMobile && "w-10")}>Divisie</span>
+    <div className={cn("inline-flex items-center", className)}>
       <Select value={selectedCategoryId || ""} onValueChange={(value) => onSelect(value || null)}>
         <SelectTrigger
           title={selectedName}
