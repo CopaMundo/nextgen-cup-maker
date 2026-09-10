@@ -1471,25 +1471,47 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       return next;
     });
 
-    requestAnimationFrame(() => {
+    const scrollAnchorIntoPlace = (attempt = 0) => {
       const el = slotRefs.current.get(anchorKey);
-      if (!el) return;
-      const container = matchesScrollRef.current;
-      const scrollsInternally = !!container && container.scrollHeight > container.clientHeight + 4;
-
-      if (scrollsInternally) {
-        const delta = el.getBoundingClientRect().top - container!.getBoundingClientRect().top;
-        container!.scrollTop += delta;
+      if (!el) {
+        if (attempt < 10) requestAnimationFrame(() => scrollAnchorIntoPlace(attempt + 1));
         return;
       }
 
-      // Mobiel: de pagina scrolt, dus schuif het venster zodat het anker
-      // net onder de vaste fase-/formatbalk staat.
+      if (!isMobile) {
+        const container = matchesScrollRef.current;
+        const scrollsInternally = !!container && container.scrollHeight > container.clientHeight + 4;
+        if (scrollsInternally) {
+          const delta = el.getBoundingClientRect().top - container!.getBoundingClientRect().top;
+          container!.scrollTop += delta;
+          return;
+        }
+      }
+
+      // Mobiel: zoek het element dat werkelijk scrolt (window of een ouder met overflow)
+      // en schuif het anker net onder de vaste fase-/formatbalk.
       const offset = (mobileHeaderRef.current?.getBoundingClientRect().height ?? 0) + 8;
+
+      let scroller: HTMLElement | null = el.parentElement;
+      while (scroller) {
+        const style = window.getComputedStyle(scroller);
+        const scrollableStyle = /(auto|scroll|overlay)/.test(style.overflowY);
+        if (scrollableStyle && scroller.scrollHeight > scroller.clientHeight + 4) break;
+        scroller = scroller.parentElement;
+      }
+
+      if (scroller) {
+        const delta = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top - offset;
+        scroller.scrollTo({ top: Math.max(scroller.scrollTop + delta, 0), behavior: "smooth" });
+        return;
+      }
+
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
-    });
-  }, [timeSlotGroups]);
+    };
+
+    requestAnimationFrame(() => scrollAnchorIntoPlace());
+  }, [timeSlotGroups, isMobile]);
 
   // Hoogte van de vaste mobiele fase-/formatbalk bijhouden zodat de
   // datumkop daar precies onder blijft plakken.
@@ -1509,7 +1531,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   useEffect(() => {
     autoFocusDoneRef.current = null;
-  }, [categoryId, selectedPhaseNumber]);
+  }, [categoryId, selectedPhaseNumber, isMobile]);
 
   // Render standings table with +/- controls
   const renderStandingsTable = (groupId: string, formatId: string, compact?: boolean) => {
