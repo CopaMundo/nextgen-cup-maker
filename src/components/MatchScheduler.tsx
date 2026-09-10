@@ -3442,9 +3442,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <p className="text-[10px] text-muted-foreground">
                                 {field.startTime}
                               </p>
-                              {isMobile && mobileSelectedMatchId && (
-                                <span className="text-[9px] text-primary font-medium">Tap om hier te plaatsen</span>
-                              )}
                             </div>
 
                             {/* Field column body */}
