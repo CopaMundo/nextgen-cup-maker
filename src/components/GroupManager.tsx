@@ -329,24 +329,31 @@ const GroupManager = ({
   };
 
   const refreshManualGroups = async () => {
+    // All groups in this phase that were created with manual planning
+    const manualIds = new Set(groups.filter((g) => g.manual_planning).map((g) => g.id));
+    setManualGroupIds(manualIds);
+
+    // Subset of manual groups that still have matches without both slot labels filled in
     const { data } = await supabase
       .from("matches")
       .select("group_id, home_slot_label, away_slot_label")
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId)
       .not("group_id", "is", null);
-    const ids = new Set<string>();
+    const unplannedIds = new Set<string>();
     for (const m of data || []) {
-      if (m.group_id && (!m.home_slot_label || !m.away_slot_label)) ids.add(m.group_id);
+      if (m.group_id && manualIds.has(m.group_id) && (!m.home_slot_label || !m.away_slot_label)) {
+        unplannedIds.add(m.group_id);
+      }
     }
-    setManualGroupIds(ids);
+    setUnplannedGroupIds(unplannedIds);
 
     let dismissed = false;
     try { dismissed = localStorage.getItem(planHintKey) === "1"; } catch { /* ignore */ }
-    if (!dismissed && ids.size > 0) {
-      const firstGroup = groups.find((g) => ids.has(g.id));
+    if (!dismissed && unplannedIds.size > 0) {
+      const firstGroup = groups.find((g) => unplannedIds.has(g.id));
       if (firstGroup) setPlanHintGroupId(firstGroup.id);
-    } else if (ids.size === 0) {
+    } else if (unplannedIds.size === 0) {
       setPlanHintGroupId(null);
     }
   };
