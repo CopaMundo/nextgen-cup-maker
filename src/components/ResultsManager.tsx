@@ -1531,7 +1531,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   useEffect(() => {
     autoFocusDoneRef.current = null;
-  }, [categoryId, selectedPhaseNumber]);
+  }, [categoryId, selectedPhaseNumber, isMobile]);
 
   // Render standings table with +/- controls
   const renderStandingsTable = (groupId: string, formatId: string, compact?: boolean) => {
