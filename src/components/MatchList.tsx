@@ -231,14 +231,16 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
           {phaseMatches.map((match) => (
                   <div key={match.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
                     <div className="grid grid-cols-3 gap-2 items-center">
-                      <select
-                        value={match.home_team_id || ""}
-                        onChange={(e) => updateMatch(match.id, { home_team_id: e.target.value || null })}
-                        className="h-9 rounded border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                      <Select
+                        value={match.home_team_id || "__none__"}
+                        onValueChange={(v) => updateMatch(match.id, { home_team_id: v === "__none__" ? null : v })}
                       >
-                        <option value="">Thuisteam</option>
-                        {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-                      </select>
+                        <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Thuisteam" /></SelectTrigger>
+                        <SelectContent className="max-h-64">
+                          <SelectItem value="__none__">Thuisteam</SelectItem>
+                          {teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                       <div className="flex items-center justify-center gap-1">
                         <Input
                           type="number" min={0}
@@ -254,14 +256,16 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
                           className="h-9 w-14 text-center" placeholder="-"
                         />
                       </div>
-                      <select
-                        value={match.away_team_id || ""}
-                        onChange={(e) => updateMatch(match.id, { away_team_id: e.target.value || null })}
-                        className="h-9 rounded border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                      <Select
+                        value={match.away_team_id || "__none__"}
+                        onValueChange={(v) => updateMatch(match.id, { away_team_id: v === "__none__" ? null : v })}
                       >
-                        <option value="">Uitteam</option>
-                        {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-                      </select>
+                        <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Uitteam" /></SelectTrigger>
+                        <SelectContent className="max-h-64">
+                          <SelectItem value="__none__">Uitteam</SelectItem>
+                          {teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
                       <DatePicker value={match.match_date || ""} onChange={(date) => updateMatch(match.id, { match_date: date || null })} placeholder="dd/mm/jjjj" className="h-8 text-xs" />
