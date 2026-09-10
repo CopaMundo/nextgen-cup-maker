@@ -3122,6 +3122,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 dates={tournamentDates}
                 activeDate={plannerDate}
                 onSelect={setPlannerDate}
+                mobileCarousel={isMobile}
                 onInvalidPick={(iso) => {
                   toast({
                     title: "Datum buiten toernooiperiode",
