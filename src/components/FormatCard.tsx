@@ -360,11 +360,11 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
               </button>
               {unplannedCount > 0 && (
                 <span
-                  title="Wedstrijden nog handmatig in te geven"
+                  title={`${unplannedCount} handmatige wedstrijd${unplannedCount === 1 ? "" : "en"} nog in te plannen`}
                   className="inline-flex shrink-0 items-center gap-1 rounded border border-amber-500/50 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-400"
                 >
                   <AlertTriangle className="h-3 w-3" />
-                  {unplannedCount} nog in te geven
+                  {unplannedCount} in te plannen
                 </span>
               )}
             </span>
