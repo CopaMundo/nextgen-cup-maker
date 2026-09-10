@@ -268,7 +268,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[60px]";
+const PLANNER_ROW_H = "h-[78px] md:h-[60px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -750,6 +750,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // Mobiel: tegeloverzicht (Velden / Planning) en gekozen veld
   const [mobileSection, setMobileSection] = useState<"velden" | "planning">("velden");
   const [mobileFieldName, setMobileFieldName] = useState<string | null>(null);
+  const [clashInfo, setClashInfo] = useState<string[] | null>(null);
+  const mobileTabsRef = useRef<HTMLDivElement | null>(null);
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
   const [pauzeModalDuration, setPauzeModalDuration] = useState(20);
