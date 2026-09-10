@@ -1979,11 +1979,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       </div>
                       <div className="mt-1 h-0.5 bg-primary/25 rounded-full overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all duration-300"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: completed ? "hsl(var(--accent))" : "hsl(var(--primary))",
-                          }}
+                          className="h-full rounded-full transition-all duration-300 bg-primary"
+                          style={{ width: `${pct}%` }}
                         />
                       </div>
                       <div className="mt-1 flex items-center justify-between gap-2 text-[10px]">
@@ -2006,7 +2003,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       </div>
                     </button>
                     {!isMobile && (completed || allMatchesPlayed) && (
-                      <div className="mt-1.5 border-t border-border pt-1.5">
+                      <div className="mt-1.5">
                         {completed ? (
                           <Button size="sm" variant="destructive" className="h-6 w-full px-1.5 text-[9px]" onClick={() => requestUndoFormat(format)}>
                             <RotateCcw className="h-3 w-3" /> Ongedaan maken
