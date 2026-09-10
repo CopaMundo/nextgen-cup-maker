@@ -1334,6 +1334,27 @@ const GroupManager = ({
         </DialogContent>
       </Dialog>
 
+      {/* Edit confirmation */}
+      <AlertDialog open={showEditConfirm} onOpenChange={setShowEditConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Wijziging toepassen op {editingGroup?.name || "deze poule"}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              De wedstrijden van {editingGroup?.name || "deze poule"} worden opnieuw aangemaakt: reeds ingevulde uitslagen en de planning in het schema van deze poule gaan verloren. Andere poules blijven volledig ongewijzigd.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { setShowEditConfirm(false); performGroupEdit(); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Ja, wijzigen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Clear all confirmation */}
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <AlertDialogContent>
