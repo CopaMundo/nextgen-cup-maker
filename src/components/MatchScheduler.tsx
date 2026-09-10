@@ -3657,6 +3657,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <Plus className="h-3 w-3" /> Veld
                           </Button>
                         </div>
+                        {/* + Veld knop mobiel, naast het veldkader */}
+                        <div className="flex md:hidden flex-shrink-0 items-start pt-1 print:hidden">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
+                            className="h-7 w-7 p-0 text-xs border-primary/40 hover:border-primary hover:bg-primary/10"
+                            title="Veld toevoegen"
+                            aria-label="Veld toevoegen"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
 
