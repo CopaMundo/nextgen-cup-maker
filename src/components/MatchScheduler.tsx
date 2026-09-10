@@ -3374,6 +3374,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       </div>
                     )}
 
+                    {/* Mobiel: geselecteerde wedstrijd duidelijk tonen */}
+                    {isMobile && mobileSelectedMatchId && (() => {
+                      const sel = matches.find(mm => mm.id === mobileSelectedMatchId);
+                      if (!sel) return null;
+                      return (
+                        <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary bg-primary/10 px-2 py-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-primary shrink-0">Geselecteerd</span>
+                          <span className="text-[11px] font-medium text-foreground truncate">
+                            {getMatchLabel(sel.home_team_id, sel.home_slot_label)} - {getMatchLabel(sel.away_team_id, sel.away_slot_label)}
+                          </span>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto shrink-0" onClick={() => setMobileSelectedMatchId(null)} aria-label="Selectie annuleren">
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      );
+                    })()}
+
+
+
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-2 md:gap-4 min-w-0">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
