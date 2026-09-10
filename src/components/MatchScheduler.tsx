@@ -4600,6 +4600,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         </DialogContent>
       </Dialog>
 
+      {/* Conflict info dialog */}
+      <Dialog open={!!clashInfo} onOpenChange={(open) => { if (!open) setClashInfo(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-4 w-4" /> Conflict
+            </DialogTitle>
+          </DialogHeader>
+          <ul className="space-y-2 text-sm text-foreground">
+            {(clashInfo ?? []).map((c, i) => (
+              <li key={i} className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2">{c}</li>
+            ))}
+          </ul>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setClashInfo(null)}>Sluiten</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Add field dialog */}
       <Dialog open={showAddFieldDialog} onOpenChange={setShowAddFieldDialog}>
         <DialogContent ref={addFieldDialogRef} className="max-w-sm">
