@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandMatchDays, MatchDayEntry, getMiddleDate } from "@/lib/dateUtils";
 
-import { Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, ArrowLeft, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { AlertTriangle, Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, ArrowLeft, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import CalendarXIcon from "@/components/icons/CalendarXIcon";
 import { DatePicker } from "@/components/ui/datepicker";
@@ -268,7 +268,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[60px]";
+const PLANNER_ROW_H = "h-[78px] md:h-[60px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -750,6 +750,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   // Mobiel: tegeloverzicht (Velden / Planning) en gekozen veld
   const [mobileSection, setMobileSection] = useState<"velden" | "planning">("velden");
   const [mobileFieldName, setMobileFieldName] = useState<string | null>(null);
+  const [clashInfo, setClashInfo] = useState<string[] | null>(null);
+  const mobileTabsRef = useRef<HTMLDivElement | null>(null);
   const [showPauzeModal, setShowPauzeModal] = useState<string | null>(null);
   const [pauzeModalName, setPauzeModalName] = useState("Pauze");
   const [pauzeModalDuration, setPauzeModalDuration] = useState(20);
@@ -764,6 +766,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     }
     onPlannerDateChange?.(date);
   };
+
+  // Mobiel: actieve veldtab in beeld scrollen
+  useEffect(() => {
+    if (!mobileFieldName) return;
+    const t = window.setTimeout(() => {
+      const strip = mobileTabsRef.current;
+      const btn = strip?.querySelector<HTMLElement>(`[data-field-tab="${CSS.escape(mobileFieldName)}"]`);
+      if (strip && btn) {
+        strip.scrollTo({ left: btn.offsetLeft - strip.clientWidth / 2 + btn.offsetWidth / 2, behavior: "smooth" });
+      }
+      plannerScrollRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [mobileFieldName]);
 
   // dnd-kit
   const sensors = useSensors(
@@ -3352,11 +3368,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     {isMobile && fieldData.length > 0 && (
                       <div className="pb-2 -mx-1 px-1">
                         <div className="flex items-center gap-1.5">
-                          <div className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                          <div ref={mobileTabsRef} className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                             <div className="flex gap-1.5 pr-1">
                               {fieldData.map(({ field }) => (
                                 <button
                                   key={field.name}
+                                  data-field-tab={field.name}
                                   onClick={() => setMobileFieldName(field.name)}
                                   className={cn(
                                     "shrink-0 snap-start rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap",
@@ -3425,9 +3442,6 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               <p className="text-[10px] text-muted-foreground">
                                 {field.startTime}
                               </p>
-                              {isMobile && mobileSelectedMatchId && (
-                                <span className="text-[9px] text-primary font-medium">Tap om hier te plaatsen</span>
-                              )}
                             </div>
 
                             {/* Field column body */}
@@ -3504,7 +3518,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 const group = allGroups.find(g => g.id === m.group_id);
 
                                 const selIdx = mobileSelectedMatchId ? fieldMatches.findIndex(x => x.id === mobileSelectedMatchId) : -1;
-                                const showBarBefore = isMobile && !!mobileSelectedMatchId && selIdx !== idx && selIdx !== idx - 1;
+                                const showBarBefore = isMobile && !!mobileSelectedMatchId && selIdx !== idx && !(selIdx >= 0 && selIdx === idx - 1);
                                 const showBarAfterLast = isMobile && !!mobileSelectedMatchId && idx === fieldMatches.length - 1 && selIdx !== idx;
                                 const insertBar = (targetIdx: number) => (
                                   <button
@@ -3556,17 +3570,26 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                   <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                                                 )}
                                               </div>
-                                              <div className="flex items-center gap-1 shrink-0">
-                                                {getMatchClashes(m).length > 0 && (
-                                                  <span className="text-destructive cursor-help" title={getMatchClashes(m).join("\n")}>⚠</span>
-                                                )}
-                                                <button
-                                                  onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
-                                                  className="text-muted-foreground hover:text-foreground print:hidden"
-                                                >
-                                                  <Pencil className="h-2 w-2" />
-                                                </button>
-                                              </div>
+                                               <div className="flex items-center gap-1 shrink-0">
+                                                 {getMatchClashes(m).length > 0 && (
+                                                   <button
+                                                     type="button"
+                                                     onClick={(e) => { e.stopPropagation(); setClashInfo(getMatchClashes(m)); }}
+                                                     title={getMatchClashes(m).join("\n")}
+                                                     aria-label="Conflict bekijken"
+                                                     className="flex h-6 w-6 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 md:h-4 md:w-4"
+                                                   >
+                                                     <AlertTriangle className="h-4 w-4 md:h-3 md:w-3" />
+                                                   </button>
+                                                 )}
+                                                 <button
+                                                   onClick={(e) => { e.stopPropagation(); setEditMatchId(m.id); const cur = refNames(m.referee); const slots = Math.min(MAX_REFEREES, Math.max(cur.length, refereesPerMatch, 1)); setEditMatchRefs([...cur, ...Array(Math.max(0, slots - cur.length)).fill("")]); setEditMatchDuration(m.duration_minutes != null ? String(m.duration_minutes) : "") }}
+                                                   className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground print:hidden md:h-4 md:w-4"
+                                                   aria-label="Wedstrijd bewerken"
+                                                 >
+                                                   <Pencil className="h-3.5 w-3.5 md:h-3 md:w-3" />
+                                                 </button>
+                                               </div>
                                             </div>
                                             {/* Teams */}
                                             <div className="flex items-center gap-1">
@@ -4573,6 +4596,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <Button variant="outline" onClick={() => setShowPauzeModal(null)}>Annuleren</Button>
               <Button onClick={() => { if (showPauzeModal) addBreakToField(showPauzeModal); }}>Toevoegen</Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Conflict info dialog */}
+      <Dialog open={!!clashInfo} onOpenChange={(open) => { if (!open) setClashInfo(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-4 w-4" /> Conflict
+            </DialogTitle>
+          </DialogHeader>
+          <ul className="space-y-2 text-sm text-foreground">
+            {(clashInfo ?? []).map((c, i) => (
+              <li key={i} className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2">{c}</li>
+            ))}
+          </ul>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setClashInfo(null)}>Sluiten</Button>
           </div>
         </DialogContent>
       </Dialog>
