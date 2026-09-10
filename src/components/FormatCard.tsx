@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, ChevronDown, ChevronUp, Pencil, Check, X, ImagePlus, Users, Grid3X3, ArrowUp, ArrowDown, Upload } from "lucide-react";
+import { Trash2, ChevronDown, ChevronUp, Pencil, Check, X, ImagePlus, Users, Grid3X3, ArrowUp, ArrowDown, Upload, AlertTriangle } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
