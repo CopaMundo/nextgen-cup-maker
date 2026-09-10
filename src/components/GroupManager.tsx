@@ -301,6 +301,7 @@ const GroupManager = ({
   const [originalSlotCount, setOriginalSlotCount] = useState(0);
   const [logoRemoved, setLogoRemoved] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
 
