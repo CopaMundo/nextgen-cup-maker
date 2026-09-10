@@ -895,7 +895,6 @@ const GroupManager = ({
                 ))}
               </div>
             </div>
-          </>
         )}
         {showWarning && (
           <p className="text-xs text-destructive font-medium">
