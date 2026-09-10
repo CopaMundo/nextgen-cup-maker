@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ArrowLeft, User } from "lucide-react";
+import { User } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
+import PublicBackButton from "@/components/public-view/PublicBackButton";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
