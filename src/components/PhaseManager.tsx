@@ -24,6 +24,30 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const NumberSelect = ({
+  value,
+  onChange,
+  options,
+  className,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  options: number[];
+  className?: string;
+}) => (
+  <Select value={String(value)} onValueChange={(v) => onChange(parseInt(v))}>
+    <SelectTrigger className={cn("h-10", className)}>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className="max-h-64">
+      {options.map((n) => (
+        <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
 
 const formatTypeLabel = (t: string) =>
   t === "group" ? "Groepsfase" : t === "knockout" ? "Knock-outfase" : t === "single_match" ? "Losse wedstrijd" : "Round Robin";
@@ -1021,10 +1045,9 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs">Aantal groepen</Label>
-              <select
+              <NumberSelect
                 value={groupConfig.groupCount}
-                onChange={(e) => {
-                  const newCount = parseInt(e.target.value);
+                onChange={(newCount) => {
                   const maxTeams = Math.floor(128 / newCount);
                   setGroupConfig({
                     ...groupConfig,
@@ -1032,24 +1055,18 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     teamsPerGroup: Math.min(groupConfig.teamsPerGroup, Math.max(2, maxTeams)),
                   });
                 }}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 32 }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+                options={Array.from({ length: 32 }, (_, i) => i + 1)}
+                className="w-full"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Teams per groep</Label>
-              <select
+              <NumberSelect
                 value={groupConfig.teamsPerGroup}
-                onChange={(e) => setGroupConfig({ ...groupConfig, teamsPerGroup: parseInt(e.target.value) })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: Math.max(1, Math.min(128, Math.floor(128 / groupConfig.groupCount)) - 1) }, (_, i) => i + 2).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+                onChange={(n) => setGroupConfig({ ...groupConfig, teamsPerGroup: n })}
+                options={Array.from({ length: Math.max(1, Math.min(128, Math.floor(128 / groupConfig.groupCount)) - 1) }, (_, i) => i + 2)}
+                className="w-full"
+              />
             </div>
           </div>
           <div className="space-y-1">
@@ -1079,29 +1096,23 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
           {groupConfig.matchType === "multiple" && (
             <div className="space-y-1">
               <Label className="text-xs">Aantal ontmoetingen per tegenstander</Label>
-              <select
+              <NumberSelect
                 value={groupConfig.encounters}
-                onChange={(e) => setGroupConfig({ ...groupConfig, encounters: parseInt(e.target.value) })}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+                onChange={(n) => setGroupConfig({ ...groupConfig, encounters: n })}
+                options={Array.from({ length: 8 }, (_, i) => i + 3)}
+                className="w-full max-w-[200px]"
+              />
             </div>
           )}
           {groupConfig.matchType === "rounds" && (
             <div className="space-y-1">
               <Label className="text-xs">Aantal speelrondes</Label>
-              <select
+              <NumberSelect
                 value={groupConfig.rounds}
-                onChange={(e) => setGroupConfig({ ...groupConfig, rounds: parseInt(e.target.value) })}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+                onChange={(n) => setGroupConfig({ ...groupConfig, rounds: n })}
+                options={Array.from({ length: 126 }, (_, i) => i + 1)}
+                className="w-full max-w-[200px]"
+              />
             </div>
           )}
           {groupConfig.matchType === "rounds" && (
@@ -1149,15 +1160,12 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
         <div className="space-y-3">
           <div className="space-y-1">
             <Label className="text-xs">Aantal teams</Label>
-            <select
+            <NumberSelect
               value={bracketConfig.teamCount}
-              onChange={(e) => setBracketConfig({ ...bracketConfig, teamCount: parseInt(e.target.value) })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-            >
-              {[2, 4, 8, 16, 32, 64, 128].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+              onChange={(n) => setBracketConfig({ ...bracketConfig, teamCount: n })}
+              options={[2, 4, 8, 16, 32, 64, 128]}
+              className="w-full"
+            />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Wedstrijdformat</Label>
@@ -1259,15 +1267,12 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
         <div className="space-y-3">
           <div className="space-y-1">
             <Label className="text-xs">Aantal losse wedstrijden</Label>
-            <select
+            <NumberSelect
               value={singleMatchConfig.matchCount}
-              onChange={(e) => setSingleMatchConfig({ ...singleMatchConfig, matchCount: parseInt(e.target.value) })}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-            >
-              {Array.from({ length: 32 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+              onChange={(n) => setSingleMatchConfig({ ...singleMatchConfig, matchCount: n })}
+              options={Array.from({ length: 32 }, (_, i) => i + 1)}
+              className="w-full max-w-[200px]"
+            />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Wedstrijdformat</Label>

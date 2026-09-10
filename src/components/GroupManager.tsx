@@ -316,12 +316,12 @@ const GroupManager = ({
   const [planSaving, setPlanSaving] = useState(false);
   const [planLoading, setPlanLoading] = useState(false);
   const [planHintGroupId, setPlanHintGroupId] = useState<string | null>(null);
+  const planHintKey = `plan-hint-dismissed-${phaseId}`;
 
-  useEffect(() => {
-    if (!planHintGroupId) return;
-    const t = window.setTimeout(() => setPlanHintGroupId(null), 12000);
-    return () => window.clearTimeout(t);
-  }, [planHintGroupId]);
+  const dismissPlanHint = () => {
+    setPlanHintGroupId(null);
+    try { localStorage.setItem(planHintKey, "1"); } catch { /* ignore */ }
+  };
 
   const refreshManualGroups = async () => {
     const { data } = await supabase
@@ -335,6 +335,15 @@ const GroupManager = ({
       if (m.group_id && (!m.home_slot_label || !m.away_slot_label)) ids.add(m.group_id);
     }
     setManualGroupIds(ids);
+
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(planHintKey) === "1"; } catch { /* ignore */ }
+    if (!dismissed && ids.size > 0) {
+      const firstGroup = groups.find((g) => ids.has(g.id));
+      if (firstGroup) setPlanHintGroupId(firstGroup.id);
+    } else if (ids.size === 0) {
+      setPlanHintGroupId(null);
+    }
   };
 
   useEffect(() => {
@@ -878,7 +887,7 @@ const GroupManager = ({
                   <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-primary/40 bg-popover" />
                   Hier kan je de wedstrijden handmatig ingeven.
                   <button
-                    onClick={(e) => { e.stopPropagation(); setPlanHintGroupId(null); }}
+                    onClick={(e) => { e.stopPropagation(); dismissPlanHint(); }}
                     className="mt-1 block text-[11px] font-semibold text-primary hover:underline"
                   >
                     Begrepen
@@ -971,29 +980,27 @@ const GroupManager = ({
         {dialogMatchType === "multiple" && (
           <div className="space-y-1">
             <Label className="text-xs">Aantal ontmoetingen per tegenstander</Label>
-            <select
-              value={dialogEncounters}
-              onChange={(e) => setDialogEncounters(parseInt(e.target.value))}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-            >
-              {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+            <Select value={String(dialogEncounters)} onValueChange={(v) => setDialogEncounters(parseInt(v))}>
+              <SelectTrigger className="h-10 w-full max-w-[200px]"><SelectValue /></SelectTrigger>
+              <SelectContent className="max-h-64">
+                {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
         {dialogMatchType === "rounds" && (
           <div className="space-y-1">
             <Label className="text-xs">Aantal speelrondes</Label>
-            <select
-              value={dialogRounds}
-              onChange={(e) => setDialogRounds(parseInt(e.target.value))}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-            >
-              {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+            <Select value={String(dialogRounds)} onValueChange={(v) => setDialogRounds(parseInt(v))}>
+              <SelectTrigger className="h-10 w-full max-w-[200px]"><SelectValue /></SelectTrigger>
+              <SelectContent className="max-h-64">
+                {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
         {dialogMatchType === "rounds" && (
@@ -1104,15 +1111,14 @@ const GroupManager = ({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Aantal teams</label>
-              <select
-                value={dialogSlots}
-                onChange={(e) => setDialogSlots(parseInt(e.target.value))}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
-                  <option key={n} value={n}>{n} teams</option>
-                ))}
-              </select>
+              <Select value={String(dialogSlots)} onValueChange={(v) => setDialogSlots(parseInt(v))}>
+                <SelectTrigger className="w-full h-10"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-64">
+                  {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n} teams</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {renderCompetitionTypeSelector(false)}
             <ScoringSystemSelector
@@ -1147,15 +1153,14 @@ const GroupManager = ({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Aantal teams</label>
-              <select
-                value={editSlotCount}
-                onChange={(e) => setEditSlotCount(parseInt(e.target.value))}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
-                  <option key={n} value={n}>{n} teams</option>
-                ))}
-              </select>
+              <Select value={String(editSlotCount)} onValueChange={(v) => setEditSlotCount(parseInt(v))}>
+                <SelectTrigger className="w-full h-10"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-64">
+                  {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n} teams</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {renderCompetitionTypeSelector(true)}
             <ScoringSystemSelector
