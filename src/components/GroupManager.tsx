@@ -243,7 +243,7 @@ const GroupManager = ({
   const fetchGroups = async () => {
     const { data, error } = await supabase
       .from("groups")
-      .select("id, name, logo_url, scoring_system_id")
+      .select("id, name, logo_url, scoring_system_id, manual_planning")
       .eq("phase_id", phaseId)
       .order("created_at");
 
