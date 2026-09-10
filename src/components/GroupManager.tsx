@@ -501,10 +501,11 @@ const GroupManager = ({
     setUploading(true);
     const name = dialogName.trim() || `Group ${String.fromCharCode(65 + groups.length)}`;
     const groupLetter = name.replace(/[^A-Za-z]/g, "").charAt(0).toUpperCase() || String.fromCharCode(65 + groups.length);
+    const isManualPlanning = dialogMatchType === "rounds" && dialogMatchGenMode === "empty";
     const { data } = await supabase
       .from("groups")
-      .insert({ phase_id: phaseId, tournament_id: tournamentId, name, scoring_system_id: dialogScoringSystemId } as any)
-      .select("id, name, logo_url, scoring_system_id")
+      .insert({ phase_id: phaseId, tournament_id: tournamentId, name, scoring_system_id: dialogScoringSystemId, manual_planning: isManualPlanning } as any)
+      .select("id, name, logo_url, scoring_system_id, manual_planning")
       .single();
     if (data) {
       if (dialogLogoFile) {
