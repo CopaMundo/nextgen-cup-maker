@@ -24,6 +24,30 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const NumberSelect = ({
+  value,
+  onChange,
+  options,
+  className,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  options: number[];
+  className?: string;
+}) => (
+  <Select value={String(value)} onValueChange={(v) => onChange(parseInt(v))}>
+    <SelectTrigger className={cn("h-10", className)}>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className="max-h-64">
+      {options.map((n) => (
+        <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
 
 const formatTypeLabel = (t: string) =>
   t === "group" ? "Groepsfase" : t === "knockout" ? "Knock-outfase" : t === "single_match" ? "Losse wedstrijd" : "Round Robin";
