@@ -154,11 +154,16 @@ const GroupManager = ({
 
       await supabase.from("matches").insert(newMatches);
     } else {
-      // Manual mode for rounds
+      // Manual mode: empty match slots
       const slotCount = slots.length;
       const n = slotCount % 2 === 0 ? slotCount : slotCount + 1;
       const singleLegRounds = n - 1;
-      const totalRoundsToGenerate = customRounds;
+      const totalRoundsToGenerate =
+        rawMatchType === "single_leg"
+          ? singleLegRounds
+          : rawMatchType === "home_away"
+            ? singleLegRounds * 2
+            : customRounds;
       const matchesPerRound = Math.floor(slotCount / 2);
 
       // Get group name for match naming
