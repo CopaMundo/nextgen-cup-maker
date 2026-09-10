@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info } from "lucide-react";
+import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -295,6 +295,90 @@ const GroupManager = ({
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
     onSlotChange?.();
+  };
+
+  // ---- Handmatige wedstrijdplanning per groep ----
+  type PlanMatch = { id: string; round_number: number | null; match_name: string | null; home: string; away: string };
+  type PlanSlot = { slot_code: string; team_id: string | null; label: string };
+  const [manualGroupIds, setManualGroupIds] = useState<Set<string>>(new Set());
+  const [planOpen, setPlanOpen] = useState(false);
+  const planDialogRef = useDialogFocus(planOpen);
+  const [planGroup, setPlanGroup] = useState<Group | null>(null);
+  const [planMatches, setPlanMatches] = useState<PlanMatch[]>([]);
+  const [planSlots, setPlanSlots] = useState<PlanSlot[]>([]);
+  const [planSaving, setPlanSaving] = useState(false);
+
+  const refreshManualGroups = async () => {
+    const { data } = await supabase
+      .from("matches")
+      .select("group_id, home_slot_label, away_slot_label")
+      .eq("tournament_id", tournamentId)
+      .eq("phase_id", phaseId)
+      .not("group_id", "is", null);
+    const ids = new Set<string>();
+    for (const m of data || []) {
+      if (m.group_id && (!m.home_slot_label || !m.away_slot_label)) ids.add(m.group_id);
+    }
+    setManualGroupIds(ids);
+  };
+
+  useEffect(() => {
+    refreshManualGroups();
+  }, [phaseId, groups.length, slotRefreshKey, refreshKey]);
+
+  const openPlanDialog = async (group: Group) => {
+    setPlanGroup(group);
+    setPlanOpen(true);
+    setPlanMatches([]);
+    setPlanSlots([]);
+
+    const [{ data: slots }, { data: matches }, { data: teams }] = await Promise.all([
+      supabase.from("slots").select("slot_code, team_id, sort_order").eq("group_id", group.id).eq("tournament_id", tournamentId).order("sort_order"),
+      supabase.from("matches").select("id, round_number, match_name, home_slot_label, away_slot_label").eq("group_id", group.id).eq("tournament_id", tournamentId).eq("phase_id", phaseId).order("round_number").order("created_at"),
+      supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
+    ]);
+
+    const teamNames = new Map((teams || []).map(t => [t.id, t.name]));
+    setPlanSlots((slots || []).map(s => ({
+      slot_code: s.slot_code,
+      team_id: s.team_id,
+      label: (s.team_id ? teamNames.get(s.team_id) : null) || s.slot_code,
+    })));
+    setPlanMatches((matches || []).map(m => ({
+      id: m.id,
+      round_number: m.round_number,
+      match_name: m.match_name,
+      home: m.home_slot_label || "",
+      away: m.away_slot_label || "",
+    })));
+  };
+
+  const setPlanValue = (matchId: string, side: "home" | "away", value: string) => {
+    setPlanMatches(prev => prev.map(m => (m.id === matchId ? { ...m, [side]: value } : m)));
+  };
+
+  const savePlan = async () => {
+    if (!planGroup) return;
+    const invalid = planMatches.find(m => m.home && m.away && m.home === m.away);
+    if (invalid) {
+      toast({ title: "Ongeldige wedstrijd", description: "Een team kan niet tegen zichzelf spelen.", variant: "destructive" });
+      return;
+    }
+    setPlanSaving(true);
+    const slotMap = new Map(planSlots.map(s => [s.slot_code, s]));
+    await Promise.all(planMatches.map(m =>
+      Promise.resolve(supabase.from("matches").update({
+        home_slot_label: m.home || null,
+        away_slot_label: m.away || null,
+        home_team_id: m.home ? (slotMap.get(m.home)?.team_id ?? null) : null,
+        away_team_id: m.away ? (slotMap.get(m.away)?.team_id ?? null) : null,
+      }).eq("id", m.id))
+    ));
+    setPlanSaving(false);
+    setPlanOpen(false);
+    toast({ title: "Wedstrijden opgeslagen" });
+    notifySlotChange();
+    refreshManualGroups();
   };
 
   const checkAssignedTeams = async () => {
@@ -748,6 +832,16 @@ const GroupManager = ({
           >
             <Pencil className="h-3 w-3" />
           </button>
+          {manualGroupIds.has(group.id) && (
+            <button
+              onClick={() => openPlanDialog(group)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
+              aria-label={`Wedstrijden plannen voor ${group.name}`}
+              title="Wedstrijden plannen"
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
         <button onClick={() => setDeleteGroupId(group.id)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1" aria-label={`${group.name} verwijderen`}>
           <Trash2 className="h-3.5 w-3.5" />
@@ -1030,6 +1124,66 @@ const GroupManager = ({
             <Button variant="outline" onClick={() => setEditOpen(false)}>Annuleren</Button>
             <Button onClick={saveGroupEdit} disabled={uploading}>
               {uploading ? "Bezig..." : "Opslaan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Handmatige wedstrijdplanning */}
+      <Dialog open={planOpen} onOpenChange={(open) => { setPlanOpen(open); if (!open) setPlanGroup(null); }}>
+        <DialogContent ref={planDialogRef} className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Wedstrijden plannen{planGroup ? ` — ${planGroup.name}` : ""}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            {planMatches.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Geen wedstrijden gevonden.</p>
+            ) : (
+              Array.from(new Set(planMatches.map(m => m.round_number ?? 0))).sort((a, b) => a - b).map((round) => {
+                const roundMatches = planMatches.filter(m => (m.round_number ?? 0) === round);
+                return (
+                  <div key={round} className="space-y-2">
+                    <div className="flex items-center gap-2 border-b border-border pb-1">
+                      <h5 className="text-sm font-bold uppercase tracking-wide text-foreground">Ronde {round}</h5>
+                      <span className="text-xs text-muted-foreground">({roundMatches.length} {roundMatches.length === 1 ? "wedstrijd" : "wedstrijden"})</span>
+                    </div>
+                    <div className="space-y-2">
+                      {roundMatches.map((m, i) => (
+                        <div key={m.id} className="flex items-center gap-2">
+                          <span className="w-6 shrink-0 text-xs text-muted-foreground">{i + 1}.</span>
+                          <select
+                            value={m.home}
+                            onChange={(e) => setPlanValue(m.id, "home", e.target.value)}
+                            className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                          >
+                            <option value="">Kies team</option>
+                            {planSlots.map(s => (
+                              <option key={s.slot_code} value={s.slot_code}>{s.label}</option>
+                            ))}
+                          </select>
+                          <span className="text-xs text-muted-foreground">vs</span>
+                          <select
+                            value={m.away}
+                            onChange={(e) => setPlanValue(m.id, "away", e.target.value)}
+                            className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                          >
+                            <option value="">Kies team</option>
+                            {planSlots.map(s => (
+                              <option key={s.slot_code} value={s.slot_code}>{s.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPlanOpen(false)}>Annuleren</Button>
+            <Button onClick={savePlan} disabled={planSaving || planMatches.length === 0}>
+              {planSaving ? "Bezig..." : "Opslaan"}
             </Button>
           </DialogFooter>
         </DialogContent>
