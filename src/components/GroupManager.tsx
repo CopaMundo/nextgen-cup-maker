@@ -316,12 +316,12 @@ const GroupManager = ({
   const [planSaving, setPlanSaving] = useState(false);
   const [planLoading, setPlanLoading] = useState(false);
   const [planHintGroupId, setPlanHintGroupId] = useState<string | null>(null);
+  const planHintKey = `plan-hint-dismissed-${phaseId}`;
 
-  useEffect(() => {
-    if (!planHintGroupId) return;
-    const t = window.setTimeout(() => setPlanHintGroupId(null), 12000);
-    return () => window.clearTimeout(t);
-  }, [planHintGroupId]);
+  const dismissPlanHint = () => {
+    setPlanHintGroupId(null);
+    try { localStorage.setItem(planHintKey, "1"); } catch { /* ignore */ }
+  };
 
   const refreshManualGroups = async () => {
     const { data } = await supabase
@@ -335,6 +335,15 @@ const GroupManager = ({
       if (m.group_id && (!m.home_slot_label || !m.away_slot_label)) ids.add(m.group_id);
     }
     setManualGroupIds(ids);
+
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(planHintKey) === "1"; } catch { /* ignore */ }
+    if (!dismissed && ids.size > 0) {
+      const firstGroup = groups.find((g) => ids.has(g.id));
+      if (firstGroup) setPlanHintGroupId(firstGroup.id);
+    } else if (ids.size === 0) {
+      setPlanHintGroupId(null);
+    }
   };
 
   useEffect(() => {
