@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays } from "lucide-react";
+import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays, Check, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -30,6 +30,7 @@ interface Group {
   name: string;
   logo_url: string | null;
   scoring_system_id?: string | null;
+  manual_planning?: boolean;
 }
 
 interface Phase {
@@ -133,6 +134,13 @@ const GroupManager = ({
     const genMatchType = rawMatchType === "home_away" ? "home_away" : (rawMatchType === "multiple" || rawMatchType === "rounds") ? "custom" : "single_leg";
     const customRounds = rawMatchType === "multiple" ? enc : rnd;
 
+    // Planning mode applies only to "Speelrondes"; other formats always auto-generate
+    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
+    const isManualPlanning = rawMatchType === "rounds" && effectiveMode === "empty";
+
+    // Sync the group's manual_planning flag
+    await supabase.from("groups").update({ manual_planning: isManualPlanning }).eq("id", groupId);
+
     // Delete existing matches for this group
     await supabase
       .from("matches")
@@ -140,9 +148,6 @@ const GroupManager = ({
       .eq("group_id", groupId)
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId);
-
-    // Planning mode applies only to "Speelrondes"; other formats always auto-generate
-    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
 
     if (effectiveMode === "auto") {
       const pairings = generateRoundRobin(slots.length, genMatchType as any, customRounds);
@@ -242,7 +247,7 @@ const GroupManager = ({
   const fetchGroups = async () => {
     const { data, error } = await supabase
       .from("groups")
-      .select("id, name, logo_url, scoring_system_id")
+      .select("id, name, logo_url, scoring_system_id, manual_planning")
       .eq("phase_id", phaseId)
       .order("created_at");
 
@@ -308,6 +313,7 @@ const GroupManager = ({
   type PlanMatch = { id: string; round_number: number | null; match_name: string | null; home: string; away: string };
   type PlanSlot = { slot_code: string; team_id: string | null; label: string };
   const [manualGroupIds, setManualGroupIds] = useState<Set<string>>(new Set());
+  const [unplannedGroupIds, setUnplannedGroupIds] = useState<Set<string>>(new Set());
   const [planOpen, setPlanOpen] = useState(false);
   const planDialogRef = useDialogFocus(planOpen);
   const [planGroup, setPlanGroup] = useState<Group | null>(null);
@@ -324,24 +330,31 @@ const GroupManager = ({
   };
 
   const refreshManualGroups = async () => {
+    // All groups in this phase that were created with manual planning
+    const manualIds = new Set(groups.filter((g) => g.manual_planning).map((g) => g.id));
+    setManualGroupIds(manualIds);
+
+    // Subset of manual groups that still have matches without both slot labels filled in
     const { data } = await supabase
       .from("matches")
       .select("group_id, home_slot_label, away_slot_label")
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId)
       .not("group_id", "is", null);
-    const ids = new Set<string>();
+    const unplannedIds = new Set<string>();
     for (const m of data || []) {
-      if (m.group_id && (!m.home_slot_label || !m.away_slot_label)) ids.add(m.group_id);
+      if (m.group_id && manualIds.has(m.group_id) && (!m.home_slot_label || !m.away_slot_label)) {
+        unplannedIds.add(m.group_id);
+      }
     }
-    setManualGroupIds(ids);
+    setUnplannedGroupIds(unplannedIds);
 
     let dismissed = false;
     try { dismissed = localStorage.getItem(planHintKey) === "1"; } catch { /* ignore */ }
-    if (!dismissed && ids.size > 0) {
-      const firstGroup = groups.find((g) => ids.has(g.id));
+    if (!dismissed && unplannedIds.size > 0) {
+      const firstGroup = groups.find((g) => unplannedIds.has(g.id));
       if (firstGroup) setPlanHintGroupId(firstGroup.id);
-    } else if (ids.size === 0) {
+    } else if (unplannedIds.size === 0) {
       setPlanHintGroupId(null);
     }
   };
@@ -500,10 +513,11 @@ const GroupManager = ({
     setUploading(true);
     const name = dialogName.trim() || `Group ${String.fromCharCode(65 + groups.length)}`;
     const groupLetter = name.replace(/[^A-Za-z]/g, "").charAt(0).toUpperCase() || String.fromCharCode(65 + groups.length);
+    const isManualPlanning = dialogMatchType === "rounds" && dialogMatchGenMode === "empty";
     const { data } = await supabase
       .from("groups")
-      .insert({ phase_id: phaseId, tournament_id: tournamentId, name, scoring_system_id: dialogScoringSystemId } as any)
-      .select("id, name, logo_url, scoring_system_id")
+      .insert({ phase_id: phaseId, tournament_id: tournamentId, name, scoring_system_id: dialogScoringSystemId, manual_planning: isManualPlanning } as any)
+      .select("id, name, logo_url, scoring_system_id, manual_planning")
       .single();
     if (data) {
       if (dialogLogoFile) {
@@ -891,11 +905,20 @@ const GroupManager = ({
             <div className="relative inline-flex items-center">
               <button
                 onClick={() => openPlanDialog(group)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
+                className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
                 aria-label={`Wedstrijden plannen voor ${group.name}`}
                 title="Wedstrijden plannen"
               >
                 <CalendarDays className="h-3.5 w-3.5" />
+                {unplannedGroupIds.has(group.id) ? (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-white">
+                    <AlertTriangle className="h-2.5 w-2.5" />
+                  </span>
+                ) : (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-white">
+                    <Check className="h-2.5 w-2.5" />
+                  </span>
+                )}
               </button>
               {planHintGroupId === group.id && (
                 <div className="absolute left-1/2 top-full z-30 mt-2 w-56 -translate-x-1/2 rounded-md border border-primary/40 bg-popover p-2 text-xs text-foreground shadow-lg">

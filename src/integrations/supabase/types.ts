@@ -71,6 +71,7 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          manual_planning: boolean
           name: string
           phase_id: string
           scoring_system_id: string | null
@@ -81,6 +82,7 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          manual_planning?: boolean
           name?: string
           phase_id: string
           scoring_system_id?: string | null
@@ -91,6 +93,7 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          manual_planning?: boolean
           name?: string
           phase_id?: string
           scoring_system_id?: string | null

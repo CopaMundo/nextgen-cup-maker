@@ -2084,10 +2084,10 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {unplannedFormats.length > 0 && (
             <div className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-foreground">
-              <span className="font-semibold">Wedstrijden nog niet ingepland</span>
+              <span className="font-semibold">Handmatige wedstrijden nog in te plannen</span>
               <p className="mt-0.5 text-muted-foreground">
-                Bij {unplannedFormats.map(p => p.name).join(", ")} moet je de wedstrijden nog handmatig ingeven.
-                Ga naar Indeling en gebruik het kalendertje bij de groep.
+                Bij {unplannedFormats.map(p => p.name).join(", ")} moeten nog wedstrijden handmatig ingepland worden.
+                Ga naar Indeling en tik op het kalendertje bij de groep.
               </p>
             </div>
           )}
