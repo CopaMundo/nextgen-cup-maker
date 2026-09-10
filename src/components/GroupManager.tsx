@@ -134,6 +134,13 @@ const GroupManager = ({
     const genMatchType = rawMatchType === "home_away" ? "home_away" : (rawMatchType === "multiple" || rawMatchType === "rounds") ? "custom" : "single_leg";
     const customRounds = rawMatchType === "multiple" ? enc : rnd;
 
+    // Planning mode applies only to "Speelrondes"; other formats always auto-generate
+    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
+    const isManualPlanning = rawMatchType === "rounds" && effectiveMode === "empty";
+
+    // Sync the group's manual_planning flag
+    await supabase.from("groups").update({ manual_planning: isManualPlanning }).eq("id", groupId);
+
     // Delete existing matches for this group
     await supabase
       .from("matches")
@@ -141,9 +148,6 @@ const GroupManager = ({
       .eq("group_id", groupId)
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId);
-
-    // Planning mode applies only to "Speelrondes"; other formats always auto-generate
-    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
 
     if (effectiveMode === "auto") {
       const pairings = generateRoundRobin(slots.length, genMatchType as any, customRounds);
