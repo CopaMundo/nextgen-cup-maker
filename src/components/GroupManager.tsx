@@ -134,8 +134,8 @@ const GroupManager = ({
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId);
 
-    // For rounds type, respect the gen mode
-    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
+    // Respect the chosen gen mode for every competition format
+    const effectiveMode = mode;
 
     if (effectiveMode === "auto") {
       const pairings = generateRoundRobin(slots.length, genMatchType as any, customRounds);
@@ -154,11 +154,16 @@ const GroupManager = ({
 
       await supabase.from("matches").insert(newMatches);
     } else {
-      // Manual mode for rounds
+      // Manual mode: empty match slots
       const slotCount = slots.length;
       const n = slotCount % 2 === 0 ? slotCount : slotCount + 1;
       const singleLegRounds = n - 1;
-      const totalRoundsToGenerate = customRounds;
+      const totalRoundsToGenerate =
+        rawMatchType === "single_leg"
+          ? singleLegRounds
+          : rawMatchType === "home_away"
+            ? singleLegRounds * 2
+            : customRounds;
       const matchesPerRound = Math.floor(slotCount / 2);
 
       // Get group name for match naming
@@ -839,19 +844,20 @@ const GroupManager = ({
           </div>
         )}
         {dialogMatchType === "rounds" && (
-          <>
-            <div className="space-y-1">
-              <Label className="text-xs">Aantal speelrondes</Label>
-              <select
-                value={dialogRounds}
-                onChange={(e) => setDialogRounds(parseInt(e.target.value))}
-                className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Aantal speelrondes</Label>
+            <select
+              value={dialogRounds}
+              onChange={(e) => setDialogRounds(parseInt(e.target.value))}
+              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+            >
+              {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        {(
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <Label className="text-xs">Wedstrijden genereren</Label>
@@ -889,7 +895,6 @@ const GroupManager = ({
                 ))}
               </div>
             </div>
-          </>
         )}
         {showWarning && (
           <p className="text-xs text-destructive font-medium">
