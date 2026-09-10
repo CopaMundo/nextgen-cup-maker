@@ -334,6 +334,7 @@ export const DateStripNav = ({
   onInvalidPick,
   maxVisible,
   centerActive = false,
+  mobileCarousel = false,
 }: {
   dates: string[];
   activeDate: string;
@@ -341,10 +342,69 @@ export const DateStripNav = ({
   onInvalidPick: (iso: string) => void;
   maxVisible?: number;
   centerActive?: boolean;
+  mobileCarousel?: boolean;
 }) => {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = useRef(false);
   const responsiveSize = useResponsiveWindowSize();
   const windowSize = maxVisible ? Math.min(maxVisible, responsiveSize) : responsiveSize;
   const [windowStart, setWindowStart] = useState(0);
+
+  // Mobile carousel: snap-scroll to the active date when it changes.
+  useEffect(() => {
+    if (!mobileCarousel) return;
+    const container = carouselRef.current;
+    if (!container) return;
+    const idx = dates.indexOf(activeDate);
+    if (idx === -1) return;
+    const item = container.children[idx] as HTMLElement | undefined;
+    if (!item) return;
+    isProgrammaticScroll.current = true;
+    const containerWidth = container.offsetWidth;
+    const itemLeft = item.offsetLeft;
+    const itemWidth = item.offsetWidth;
+    container.scrollTo({ left: itemLeft - (containerWidth - itemWidth) / 2, behavior: "smooth" });
+    const timer = window.setTimeout(() => { isProgrammaticScroll.current = false; }, 400);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDate, mobileCarousel, dates.join(",")]);
+
+  // Mobile carousel: update active date after the user scrolls/snaps.
+  useEffect(() => {
+    if (!mobileCarousel) return;
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const pickCenteredDate = () => {
+      if (isProgrammaticScroll.current) return;
+      const center = container.scrollLeft + container.offsetWidth / 2;
+      let closestIdx = -1;
+      let closestDist = Infinity;
+      Array.from(container.children).forEach((child, i) => {
+        const el = child as HTMLElement;
+        const childCenter = el.offsetLeft + el.offsetWidth / 2;
+        const dist = Math.abs(childCenter - center);
+        if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+      });
+      const next = dates[closestIdx];
+      if (next && next !== activeDate) onSelect(next);
+    };
+
+    let debounceTimer: number | undefined;
+    const onScroll = () => {
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(pickCenteredDate, 120);
+    };
+    const onScrollEnd = () => { window.clearTimeout(debounceTimer); pickCenteredDate(); };
+
+    container.addEventListener("scrollend", onScrollEnd);
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scrollend", onScrollEnd);
+      container.removeEventListener("scroll", onScroll);
+      window.clearTimeout(debounceTimer);
+    };
+  }, [activeDate, dates.join(","), mobileCarousel, onSelect]);
 
   // Keep the active date visible — only when the active date itself changes,
   // so manual scrolling/paging through dates is not auto-corrected back.
@@ -377,6 +437,66 @@ export const DateStripNav = ({
   };
 
   const dateSet = new Set(dates);
+
+  // Mobile: centred snap-carousel with the active date highlighted and the
+  // previous/next dates peeking in from the sides.
+  if (mobileCarousel) {
+    return (
+      <div className="flex items-center justify-center gap-2 w-full">
+        <div
+          ref={carouselRef}
+          className="flex w-full overflow-x-auto snap-x snap-mandatory gap-2 py-1"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {dates.map((d) => {
+            const isActive = activeDate === d;
+            const parts = formatIsoDateForLocale(d, "nl-BE", { weekday: "long", day: "numeric", month: "short" }).split(" ");
+            const weekday = parts[0] || "";
+            const dayNum = parts[1] || "";
+            const month = parts.slice(2).join(" ");
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => onSelect(d)}
+                className={cn(
+                  "snap-center shrink-0 w-[48%] min-w-[140px] max-w-[200px] flex flex-col items-center justify-center rounded-xl border py-1.5 transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card/60 text-muted-foreground border-border/60 opacity-60 hover:opacity-90"
+                )}
+              >
+                <span className={cn("text-[9px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                  {weekday}
+                </span>
+                <div className="flex items-center gap-1">
+                  {isActive && <Calendar className="h-3.5 w-3.5" />}
+                  <span className="text-lg font-black leading-tight">{dayNum}</span>
+                </div>
+                <span className={cn("text-[9px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                  {month}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <DatePicker
+          value={activeDate}
+          onChange={(iso) => {
+            if (!dateSet.has(iso)) {
+              onInvalidPick(iso);
+              return;
+            }
+            onSelect(iso);
+          }}
+          hideInput
+          availableDates={dates}
+          onInvalidPick={onInvalidPick}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center gap-2">
@@ -3002,6 +3122,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 dates={tournamentDates}
                 activeDate={plannerDate}
                 onSelect={setPlannerDate}
+                mobileCarousel={isMobile}
                 onInvalidPick={(iso) => {
                   toast({
                     title: "Datum buiten toernooiperiode",
