@@ -1491,7 +1491,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       // Mobiel: zoek het element dat werkelijk scrolt (window of een ouder met overflow)
       // en schuif het anker net onder de vaste fase-/formatbalk.
-      const offset = (mobileHeaderRef.current?.getBoundingClientRect().height ?? 0) + 8;
+      const offset =
+        (mobileHeaderRef.current?.getBoundingClientRect().height ?? 0) +
+        (dateHeaderRef.current?.getBoundingClientRect().height ?? 0) + 8;
 
       let scroller: HTMLElement | null = el.parentElement;
       while (scroller) {
@@ -2134,6 +2136,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   <section key={day.key} className="space-y-2">
                     {/* Day header */}
                     <div
+                      ref={el => { if (el && !dateHeaderRef.current) dateHeaderRef.current = el; }}
                       className="sticky z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70 lg:top-0"
                       style={isMobile ? { top: mobileStickyOffset } : undefined}
                     >
