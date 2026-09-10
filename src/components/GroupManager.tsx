@@ -30,6 +30,7 @@ interface Group {
   name: string;
   logo_url: string | null;
   scoring_system_id?: string | null;
+  manual_planning?: boolean;
 }
 
 interface Phase {
