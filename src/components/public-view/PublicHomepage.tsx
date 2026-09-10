@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Star, ChevronRight, ArrowLeft, Trophy, Zap, Clock, MessageCircle } from "lucide-react";
+import { Star, ChevronRight, Trophy, Zap, Clock, MessageCircle } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
 import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import PublicStandings from "@/components/public-view/PublicStandings";
+import PublicBackButton from "@/components/public-view/PublicBackButton";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { getPhaseLabel } from "@/lib/phaseLabel";
