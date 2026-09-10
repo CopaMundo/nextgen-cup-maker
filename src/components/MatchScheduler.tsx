@@ -3350,33 +3350,39 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                     {/* Mobiel: veldkiezer */}
                     {isMobile && fieldData.length > 0 && (
-                      <div className="flex items-center gap-1.5 pb-2 -mx-1 px-1">
-                        <div className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                          <div className="flex gap-1.5 pr-1">
-                            {fieldData.map(({ field }) => (
-                              <button
-                                key={field.name}
-                                onClick={() => setMobileFieldName(field.name)}
-                                className={cn(
-                                  "shrink-0 snap-start rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap",
-                                  field.name === activeMobileField
-                                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                                    : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
-                                )}
-                              >
-                                {displayFieldName(field.name)}
-                              </button>
-                            ))}
+                      <div className="space-y-1.5 pb-2 -mx-1 px-1">
+                        <div className="flex items-center gap-1.5">
+                          <div className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                            <div className="flex gap-1.5 pr-1">
+                              {fieldData.map(({ field }) => (
+                                <button
+                                  key={field.name}
+                                  onClick={() => setMobileFieldName(field.name)}
+                                  className={cn(
+                                    "shrink-0 snap-start rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap",
+                                    field.name === activeMobileField
+                                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                      : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                                  )}
+                                >
+                                  {displayFieldName(field.name)}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
-                          className="shrink-0 h-8 text-xs gap-1 whitespace-nowrap border-primary/40 hover:border-primary hover:bg-primary/10"
-                        >
-                          <Plus className="h-3 w-3" /> Veld
-                        </Button>
+                        <div className="flex justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
+                            className="h-7 w-7 p-0 text-xs border-primary/40 hover:border-primary hover:bg-primary/10"
+                            title="Veld toevoegen"
+                            aria-label="Veld toevoegen"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </div>
                     )}
 
