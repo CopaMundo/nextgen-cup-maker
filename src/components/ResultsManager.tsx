@@ -1911,15 +1911,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {/* Action icons */}
           <div className="flex items-center justify-end gap-1.5 min-w-0">
-            {canAssignTeams(match) && (
-              <button
-                onClick={() => openAssignDialog(match)}
-                className="text-muted-foreground hover:text-primary transition-colors"
-                title="Teams wijzigen"
-              >
-                <Users className="h-3.5 w-3.5" />
-              </button>
-            )}
+
 
             {match.group_id && (phase?.phase_type === "group" || phase?.phase_type === "round_robin") && (
               <button
