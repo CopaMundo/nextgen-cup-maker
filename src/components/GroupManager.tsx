@@ -1022,7 +1022,9 @@ const GroupManager = ({
     // Determine if anything has changed that warrants a warning
     const sizeChanged = isEdit && editSlotCount !== originalSlotCount;
     const typeChanged = isEdit && (dialogMatchType !== phaseMatchType || dialogEncounters !== phaseEncounters || dialogRounds !== phaseRounds);
-    const showWarning = sizeChanged || typeChanged;
+    const genChanged =
+      isEdit && dialogMatchType === "rounds" && (dialogMatchGenMode === "empty") !== !!editingGroup?.manual_planning;
+    const showWarning = sizeChanged || typeChanged || genChanged;
 
     return (
       <div className="space-y-3">
