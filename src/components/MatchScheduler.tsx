@@ -3159,15 +3159,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           {!isLocationControlled && locations.length > 1 && (
             <div className="flex items-center gap-2 py-2 print:hidden border-b border-border shrink-0">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
-              <select
-                value={selectedLocation || ""}
-                onChange={(e) => updateSelectedLocation(e.target.value || null)}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm font-medium focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {locations.map(l => (
-                  <option key={l.id} value={l.name}>{l.name}</option>
-                ))}
-              </select>
+              <Select value={selectedLocation || ""} onValueChange={(v) => updateSelectedLocation(v || null)}>
+                <SelectTrigger className="h-9 w-auto min-w-[140px] text-sm font-medium"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-64">
+                  {locations.map(l => (
+                    <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
