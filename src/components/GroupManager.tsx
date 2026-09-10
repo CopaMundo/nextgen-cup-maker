@@ -1115,7 +1115,7 @@ const GroupManager = ({
         )}
         {showWarning && (
           <p className="text-xs text-destructive font-medium">
-            Let op: bij het wijzigen van de {sizeChanged && typeChanged ? "poulegrootte en competitieformat" : sizeChanged ? "poulegrootte" : "competitieformat"} worden de wedstrijden die al gepland zijn uit het schema gehaald.
+            Let op: deze wijziging geldt enkel voor {editingGroup?.name || "deze poule"}. De wedstrijden van deze poule worden opnieuw aangemaakt en uit het schema gehaald. Andere poules blijven ongewijzigd.
           </p>
         )}
       </div>
