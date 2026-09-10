@@ -631,18 +631,6 @@ const TournamentGeneral = ({
               <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onGeneralSubTabChange("overview")} aria-label="Terug naar overzicht">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <h2 className="font-display text-lg font-bold text-foreground">
-                {(() => {
-                  const titles: Record<Exclude<typeof generalSubTab, "overview">, string> = {
-                    info: "Toernooi informatie",
-                    wedstrijddagen: "Wedstrijddagen",
-                    locaties: "Locaties",
-                    divisies: "Divisies",
-                    puntentelling: "Puntensysteem",
-                  };
-                  return titles[generalSubTab];
-                })()}
-              </h2>
             </div>
           )
         ) : null}
