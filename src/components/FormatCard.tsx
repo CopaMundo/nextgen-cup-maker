@@ -400,7 +400,7 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
                 phases={allFormats}
                 categoryId={categoryId}
                 refreshKey={refreshKey}
-                onSlotChange={onSlotChange}
+                onSlotChange={() => { setLocalRefreshKey(k => k + 1); onSlotChange?.(); }}
                 showRandomAssign={format.phase_number === 1}
               />
             )}
