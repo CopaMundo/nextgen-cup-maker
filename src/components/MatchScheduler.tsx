@@ -334,6 +334,7 @@ export const DateStripNav = ({
   onInvalidPick,
   maxVisible,
   centerActive = false,
+  mobileCarousel = false,
 }: {
   dates: string[];
   activeDate: string;
@@ -341,6 +342,7 @@ export const DateStripNav = ({
   onInvalidPick: (iso: string) => void;
   maxVisible?: number;
   centerActive?: boolean;
+  mobileCarousel?: boolean;
 }) => {
   const responsiveSize = useResponsiveWindowSize();
   const windowSize = maxVisible ? Math.min(maxVisible, responsiveSize) : responsiveSize;
