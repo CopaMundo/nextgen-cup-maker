@@ -1970,6 +1970,12 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const standingsDialogFormat = standingsDialogGroup ? phases.find(p => p.id === standingsDialogGroup.phase_id) : null;
   const selectedFormatAction = selectedFormatActionId ? phases.find(p => p.id === selectedFormatActionId) : null;
 
+  // Formats waar handmatige wedstrijden nog niet ingepland zijn (geen teams/slots gekozen)
+  const unplannedFormats = phases.filter(p =>
+    matches.some(m => m.phase_id === p.id && m.group_id && (!m.home_slot_label || !m.away_slot_label))
+  );
+
+
   return (
     <div className="space-y-3 lg:h-full lg:min-h-0 lg:space-y-0 lg:overflow-hidden">
       <div className="flex h-full min-h-0 gap-3 lg:flex-row flex-col">
