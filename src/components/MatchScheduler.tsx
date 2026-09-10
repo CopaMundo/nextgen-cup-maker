@@ -438,6 +438,66 @@ export const DateStripNav = ({
 
   const dateSet = new Set(dates);
 
+  // Mobile: centred snap-carousel with the active date highlighted and the
+  // previous/next dates peeking in from the sides.
+  if (mobileCarousel) {
+    return (
+      <div className="flex items-center justify-center gap-2 w-full">
+        <div
+          ref={carouselRef}
+          className="flex w-full overflow-x-auto snap-x snap-mandatory py-1"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {dates.map((d) => {
+            const isActive = activeDate === d;
+            const parts = formatIsoDateForLocale(d, "nl-BE", { weekday: "long", day: "numeric", month: "short" }).split(" ");
+            const weekday = parts[0] || "";
+            const dayNum = parts[1] || "";
+            const month = parts.slice(2).join(" ");
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => onSelect(d)}
+                className={cn(
+                  "snap-center shrink-0 w-[55%] min-w-[150px] max-w-[220px] flex flex-col items-center justify-center rounded-xl border py-1.5 mx-1 transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card/60 text-muted-foreground border-border/60 hover:border-primary/30"
+                )}
+              >
+                <span className={cn("text-[9px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                  {weekday}
+                </span>
+                <div className="flex items-center gap-1">
+                  {isActive && <Calendar className="h-3.5 w-3.5" />}
+                  <span className="text-lg font-black leading-tight">{dayNum}</span>
+                </div>
+                <span className={cn("text-[9px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                  {month}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <DatePicker
+          value={activeDate}
+          onChange={(iso) => {
+            if (!dateSet.has(iso)) {
+              onInvalidPick(iso);
+              return;
+            }
+            onSelect(iso);
+          }}
+          hideInput
+          availableDates={dates}
+          onInvalidPick={onInvalidPick}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center gap-2">
       <div className="flex items-center gap-2 min-w-0">
