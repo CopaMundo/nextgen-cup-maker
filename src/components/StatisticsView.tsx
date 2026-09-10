@@ -4,11 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from "@/lib/utils";
 import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight } from "lucide-react";
-import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
-import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
-import yellowCardIconAsset from "@/assets/yellow-card_1.png.asset.json";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MaskIcon = ({ src, label }: { src: string; label: string }) => (
   <span
