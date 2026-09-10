@@ -980,29 +980,27 @@ const GroupManager = ({
         {dialogMatchType === "multiple" && (
           <div className="space-y-1">
             <Label className="text-xs">Aantal ontmoetingen per tegenstander</Label>
-            <select
-              value={dialogEncounters}
-              onChange={(e) => setDialogEncounters(parseInt(e.target.value))}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-            >
-              {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+            <Select value={String(dialogEncounters)} onValueChange={(v) => setDialogEncounters(parseInt(v))}>
+              <SelectTrigger className="h-10 w-full max-w-[200px]"><SelectValue /></SelectTrigger>
+              <SelectContent className="max-h-64">
+                {Array.from({ length: 8 }, (_, i) => i + 3).map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
         {dialogMatchType === "rounds" && (
           <div className="space-y-1">
             <Label className="text-xs">Aantal speelrondes</Label>
-            <select
-              value={dialogRounds}
-              onChange={(e) => setDialogRounds(parseInt(e.target.value))}
-              className="flex h-10 w-full max-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-            >
-              {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+            <Select value={String(dialogRounds)} onValueChange={(v) => setDialogRounds(parseInt(v))}>
+              <SelectTrigger className="h-10 w-full max-w-[200px]"><SelectValue /></SelectTrigger>
+              <SelectContent className="max-h-64">
+                {Array.from({ length: 126 }, (_, i) => i + 1).map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
         {dialogMatchType === "rounds" && (
@@ -1113,15 +1111,14 @@ const GroupManager = ({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Aantal teams</label>
-              <select
-                value={dialogSlots}
-                onChange={(e) => setDialogSlots(parseInt(e.target.value))}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
-                  <option key={n} value={n}>{n} teams</option>
-                ))}
-              </select>
+              <Select value={String(dialogSlots)} onValueChange={(v) => setDialogSlots(parseInt(v))}>
+                <SelectTrigger className="w-full h-10"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-64">
+                  {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n} teams</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {renderCompetitionTypeSelector(false)}
             <ScoringSystemSelector
@@ -1156,15 +1153,14 @@ const GroupManager = ({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Aantal teams</label>
-              <select
-                value={editSlotCount}
-                onChange={(e) => setEditSlotCount(parseInt(e.target.value))}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
-              >
-                {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
-                  <option key={n} value={n}>{n} teams</option>
-                ))}
-              </select>
+              <Select value={String(editSlotCount)} onValueChange={(v) => setEditSlotCount(parseInt(v))}>
+                <SelectTrigger className="w-full h-10"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-64">
+                  {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n} teams</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {renderCompetitionTypeSelector(true)}
             <ScoringSystemSelector
