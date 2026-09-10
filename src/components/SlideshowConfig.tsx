@@ -511,19 +511,19 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
 
   return (
     <div className={cn("w-full", isMobile ? "space-y-4" : "space-y-6")}>
-      <div className={cn("space-y-2", isMobile && "hidden")}>
-        <h2 className="font-display text-lg font-bold text-foreground">Dialoogvoorstelling</h2>
-        <p className="text-sm text-muted-foreground">
-          Alleen dia's die gemarkeerd zijn als 'actief' worden getoond. Hoeveel informatie er op één
-          dia past, hangt af van de grootte van de elementen. Open de dialoogvoorstelling op
-          volledig scherm om het resultaat te bekijken.
-        </p>
-      </div>
-
-      {/* Global toggles */}
       {activeShow && (
-        <div className="section-card space-y-4">
-          <h3 className="section-title text-base">Algemene instellingen</h3>
+        <div className="section-card space-y-5">
+          {/* Title + info */}
+          <div className="space-y-2">
+            <h2 className="font-display text-lg font-bold text-foreground">Diavoorstelling</h2>
+            <p className="text-sm text-muted-foreground">
+              Alleen dia's die gemarkeerd zijn als 'actief' worden getoond. Hoeveel informatie er op één
+              dia past, hangt af van de grootte van de elementen. Open de dialoogvoorstelling op
+              volledig scherm om het resultaat te bekijken.
+            </p>
+          </div>
+
+          {/* Global toggles */}
           <div className="space-y-3">
             <ToggleRow
               label="Toon toernooinaam op diavoorstelling"
@@ -541,15 +541,10 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
               onChange={v => updateSponsorBar({ enabled: v })}
             />
           </div>
-        </div>
-      )}
 
-      {/* Show selector + style chips */}
-      <div className="section-card space-y-4">
-        <h3 className="section-title text-base">Voorstelling</h3>
-        <div className={cn("flex items-center justify-between gap-4 flex-wrap", isMobile && "rounded-lg border border-border bg-card p-3")}>
-          <div className={cn("flex items-center gap-2 flex-wrap", isMobile && "w-full justify-between")}>
-            {!isMobile && <DropdownMenu>
+          {/* Show selector + division filter + open */}
+          <div className="flex flex-wrap items-center gap-2">
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
@@ -600,10 +595,10 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
                   <Plus className="h-3.5 w-3.5" /> Nieuwe voorstelling
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>}
+            </DropdownMenu>
 
             {/* Division filter — only when tournament has multiple categories */}
-            {categories.length > 1 && activeShow && (
+            {categories.length > 1 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -645,39 +640,36 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
             </Button>
           </div>
 
-        </div>
-      </div>
-
-      {/* Slides list */}
-      {activeShow && (
-        <div className="space-y-3">
-          {activeShow.slides.length === 0 && (
-            <p className="text-sm text-muted-foreground italic">
-              Nog geen dia's. Klik op "Dia toevoegen" om te beginnen.
-            </p>
-          )}
-          {activeShow.slides.map((slide, idx) => (
-            <SlideCard
-              key={slide.id}
-              index={idx}
-              slide={slide}
-              sources={filteredSources}
-              tournament={tournament}
-              tournamentId={tournamentId}
-              onChange={patch => updateSlide(slide.id, patch)}
-              onRemove={() => removeSlide(slide.id)}
-              onAddBlock={(type, extra) => addBlock(slide.id, type, extra)}
-              onUpdateBlock={(blockId, patch) => updateBlock(slide.id, blockId, patch)}
-              onRemoveBlock={blockId => removeBlock(slide.id, blockId)}
-            />
-          ))}
-          <Button
-            variant="outline"
-            onClick={addSlide}
-            className="w-full border-dashed"
-          >
-            <Plus className="h-4 w-4" /> Dia toevoegen
-          </Button>
+          {/* Slides list */}
+          <div className="space-y-3">
+            {activeShow.slides.length === 0 && (
+              <p className="text-sm text-muted-foreground italic">
+                Nog geen dia's. Klik op "Dia toevoegen" om te beginnen.
+              </p>
+            )}
+            {activeShow.slides.map((slide, idx) => (
+              <SlideCard
+                key={slide.id}
+                index={idx}
+                slide={slide}
+                sources={filteredSources}
+                tournament={tournament}
+                tournamentId={tournamentId}
+                onChange={patch => updateSlide(slide.id, patch)}
+                onRemove={() => removeSlide(slide.id)}
+                onAddBlock={(type, extra) => addBlock(slide.id, type, extra)}
+                onUpdateBlock={(blockId, patch) => updateBlock(slide.id, blockId, patch)}
+                onRemoveBlock={blockId => removeBlock(slide.id, blockId)}
+              />
+            ))}
+            <Button
+              variant="outline"
+              onClick={addSlide}
+              className="w-full border-dashed"
+            >
+              <Plus className="h-4 w-4" /> DIA TOEVOEGEN
+            </Button>
+          </div>
         </div>
       )}
 
