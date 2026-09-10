@@ -767,6 +767,20 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     onPlannerDateChange?.(date);
   };
 
+  // Mobiel: actieve veldtab in beeld scrollen
+  useEffect(() => {
+    if (!mobileFieldName) return;
+    const t = window.setTimeout(() => {
+      const strip = mobileTabsRef.current;
+      const btn = strip?.querySelector<HTMLElement>(`[data-field-tab="${CSS.escape(mobileFieldName)}"]`);
+      if (strip && btn) {
+        strip.scrollTo({ left: btn.offsetLeft - strip.clientWidth / 2 + btn.offsetWidth / 2, behavior: "smooth" });
+      }
+      plannerScrollRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [mobileFieldName]);
+
   // dnd-kit
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
