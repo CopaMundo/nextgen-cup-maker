@@ -445,7 +445,7 @@ export const DateStripNav = ({
       <div className="flex items-center justify-center gap-2 w-full">
         <div
           ref={carouselRef}
-          className="flex w-full overflow-x-auto snap-x snap-mandatory gap-2 py-1"
+          className="flex w-full overflow-x-auto snap-x snap-mandatory gap-2 py-0.5"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {dates.map((d) => {
@@ -460,20 +460,20 @@ export const DateStripNav = ({
                 type="button"
                 onClick={() => onSelect(d)}
                 className={cn(
-                  "snap-center shrink-0 w-[48%] min-w-[140px] max-w-[200px] flex flex-col items-center justify-center rounded-xl border py-1.5 transition-colors",
+                  "snap-center shrink-0 w-[48%] min-w-[110px] max-w-[160px] flex flex-col items-center justify-center rounded-xl border py-1 transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card/60 text-muted-foreground border-border/60 opacity-60 hover:opacity-90"
                 )}
               >
-                <span className={cn("text-[9px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                <span className={cn("text-[8px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
                   {weekday}
                 </span>
                 <div className="flex items-center gap-1">
-                  {isActive && <Calendar className="h-3.5 w-3.5" />}
-                  <span className="text-lg font-black leading-tight">{dayNum}</span>
+                  {isActive && <Calendar className="h-3 w-3" />}
+                  <span className="text-base font-black leading-tight">{dayNum}</span>
                 </div>
-                <span className={cn("text-[9px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                <span className={cn("text-[8px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
                   {month}
                 </span>
               </button>
@@ -3265,18 +3265,26 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="outline" size="sm" onClick={() => {
-                    setDraftMatchDuration(globalMatchDuration);
-                    setDraftBreakDuration(globalBreakDuration);
-                    setDraftPerFormat(perFormatDurationEnabled);
-                    setDraftPhaseConfigs(phases.reduce((acc, p) => {
-                      const cfg = (p.match_config as any) || {};
-                      acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
-                      return acc;
-                    }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
-                    setShowDurationDialog(true);
-                  }} className="gap-1 text-xs h-7">
-                    <Settings className="h-3 w-3" /> Wedstrijdduur
+                  <Button
+                    variant="outline"
+                    size={isMobile ? "icon" : "sm"}
+                    onClick={() => {
+                      setDraftMatchDuration(globalMatchDuration);
+                      setDraftBreakDuration(globalBreakDuration);
+                      setDraftPerFormat(perFormatDurationEnabled);
+                      setDraftPhaseConfigs(phases.reduce((acc, p) => {
+                        const cfg = (p.match_config as any) || {};
+                        acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
+                        return acc;
+                      }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
+                      setShowDurationDialog(true);
+                    }}
+                    className={cn("text-xs", isMobile ? "h-7 w-7 p-0" : "h-7 gap-1")}
+                    title="Wedstrijdduur"
+                    aria-label="Wedstrijdduur"
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                    {!isMobile && <span className="hidden sm:inline">Wedstrijdduur</span>}
                   </Button>
                   {!isMobile && (
                   <Button
@@ -3296,7 +3304,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
                   <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="gap-1 text-xs">
-                    <Plus className="h-3 w-3" /> Veld toevoegen
+                    <Plus className="h-3 w-3" /> Veld
                   </Button>
                 </div>
               ) : (() => {
@@ -3362,14 +3370,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-4 min-w-0">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-border overflow-hidden", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
+                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 overflow-hidden bg-card", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => handleDrop(e, field.name, 0)}
                               onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}
-                              className={`bg-secondary border-b border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
+                              className={`bg-primary/10 border-b border-primary/30 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/20" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/15" : ""}`}
                             >
                               <div className="flex items-center justify-between">
                                 <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
@@ -3626,10 +3634,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             </div>
 
                             {/* + PAUZE button at bottom of each column */}
-                            <div className="border-t border-border">
+                            <div className="border-t border-primary/30 bg-primary/5">
                               <button
                                 onClick={() => { setShowPauzeModal(field.name); setPauzeModalDuration(20); setPauzeModalName("Pauze"); }}
-                                className="w-full py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors font-medium uppercase tracking-wider"
+                                className="w-full py-2 text-xs text-primary/80 hover:text-primary hover:bg-primary/10 transition-colors font-medium uppercase tracking-wider"
                               >
                                 + Pauze
                               </button>
@@ -3637,9 +3645,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           </div>
                         ))}
                         {/* + Veld toevoegen column */}
-                        <div className="min-w-[140px] flex-shrink-0 flex items-start pt-1 pl-2 print:hidden">
+                        <div className="min-w-[100px] flex-shrink-0 flex items-start pt-1 pl-2 print:hidden">
                           <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="h-8 text-xs gap-1 whitespace-nowrap">
-                            <Plus className="h-3 w-3" /> Veld toevoegen
+                            <Plus className="h-3 w-3" /> Veld
                           </Button>
                         </div>
                       </div>
