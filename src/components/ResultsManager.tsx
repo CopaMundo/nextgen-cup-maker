@@ -2197,130 +2197,134 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         open={phaseActionDialog === "format-complete"}
         onOpenChange={(open) => { if (!open) { setPhaseActionDialog(null); setSelectedFormatActionId(null); setConfirmedLotsGroups(new Set()); } }}
       >
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Format voltooien</DialogTitle>
-            <DialogDescription>
-              Alleen dit format wordt vergrendeld en doorgestuurd naar gekoppelde plekken in de volgende fase. Andere formats in dezelfde fase blijven bewerkbaar.
-            </DialogDescription>
-          </DialogHeader>
-          {completePreview ? (
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)]">
-              <div className="space-y-4 min-w-0">
-                <h3 className="font-display text-sm font-bold text-foreground">{completePreview.selectedFormat.name}</h3>
-                {(() => {
-                  const tieGroups = completePreview.formatPreviews
-                    .flatMap(({ groupPreviews }) => groupPreviews.map(({ group }) => group))
-                    .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
-                  if (tieGroups.length === 0) return null;
-                  const allConfirmed = tieGroups.every(g => confirmedLotsGroups.has(g.id));
-                  return (
-                    <div className={cn(
-                      "rounded-lg border p-3 space-y-2",
-                      allConfirmed
-                        ? "border-green-500/50 bg-green-500/10"
-                        : "border-amber-500/50 bg-amber-500/10"
-                    )}>
-                      <p className={cn(
-                        "text-xs font-bold uppercase tracking-wide",
-                        allConfirmed ? "text-green-700 dark:text-green-400" : "text-amber-700 dark:text-amber-400"
-                      )}>Loting vereist</p>
-                      <p className="text-xs text-foreground">
-                        In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig voor de betrokken teams.
-                      </p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {tieGroups.map(g => {
-                          const confirmed = confirmedLotsGroups.has(g.id);
-                          return (
-                            <Button
-                              key={g.id}
-                              variant="outline"
-                              size="sm"
-                              className={cn(
-                                "h-7 text-xs",
-                                confirmed
-                                  ? "border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/20"
-                                  : "border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
-                              )}
-                              onClick={() => setLotsDialogGroupId(g.id)}
-                            >
-                              <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: {confirmed ? "volgorde wijzigen" : "volgorde bepalen"}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })()}
+        <DialogContent scrollable={false} className="max-w-3xl max-h-[85vh] overflow-hidden p-0">
+          <div className="flex h-full max-h-[85vh] flex-col">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-16 sm:p-6 sm:pb-16">
+              <DialogHeader>
+                <DialogTitle>Format voltooien</DialogTitle>
+                <DialogDescription>
+                  Alleen dit format wordt vergrendeld en doorgestuurd naar gekoppelde plekken in de volgende fase. Andere formats in dezelfde fase blijven bewerkbaar.
+                </DialogDescription>
+              </DialogHeader>
+              {completePreview ? (
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)]">
+                  <div className="space-y-4 min-w-0">
+                    <h3 className="font-display text-sm font-bold text-foreground">{completePreview.selectedFormat.name}</h3>
+                    {(() => {
+                      const tieGroups = completePreview.formatPreviews
+                        .flatMap(({ groupPreviews }) => groupPreviews.map(({ group }) => group))
+                        .filter(group => calcStandings(group.id).some(r => r.needsDrawingLots));
+                      if (tieGroups.length === 0) return null;
+                      const allConfirmed = tieGroups.every(g => confirmedLotsGroups.has(g.id));
+                      return (
+                        <div className={cn(
+                          "rounded-lg border p-3 space-y-2",
+                          allConfirmed
+                            ? "border-green-500/50 bg-green-500/10"
+                            : "border-amber-500/50 bg-amber-500/10"
+                        )}>
+                          <p className={cn(
+                            "text-xs font-bold uppercase tracking-wide",
+                            allConfirmed ? "text-green-700 dark:text-green-400" : "text-amber-700 dark:text-amber-400"
+                          )}>Loting vereist</p>
+                          <p className="text-xs text-foreground">
+                            In {tieGroups.map(g => g.name).join(", ")} zijn alle criteria voor gelijke punten identiek. Bepaal de volgorde handmatig voor de betrokken teams.
+                          </p>
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {tieGroups.map(g => {
+                              const confirmed = confirmedLotsGroups.has(g.id);
+                              return (
+                                <Button
+                                  key={g.id}
+                                  variant="outline"
+                                  size="sm"
+                                  className={cn(
+                                    "h-7 text-xs",
+                                    confirmed
+                                      ? "border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/20"
+                                      : "border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
+                                  )}
+                                  onClick={() => setLotsDialogGroupId(g.id)}
+                                >
+                                  <ListOrdered className="h-3 w-3 mr-1" /> {g.name}: {confirmed ? "volgorde wijzigen" : "volgorde bepalen"}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
 
-                {completePreview.formatPreviews.length > 0 ? (
-                  completePreview.formatPreviews.map(({ format, groupPreviews }) => (
-                    <div key={format.id} className="space-y-3">
-                      {groupPreviews.map(({ group }) => (
-                        <div key={group.id}>{renderStandingsTable(group.id, format.id, true)}</div>
-                      ))}
-                    </div>
-                  ))
-                ) : completePreview.selectedFormat.phase_type === "knockout" || completePreview.selectedFormat.phase_type === "single_match" ? (
-                  <BracketView
-                    tournamentId={tournamentId}
-                    phaseId={completePreview.selectedFormat.id}
-                    editable={false}
-                    scoreEditable={false}
-                    showRandomAssign={false}
-                    tournament={tournament}
-                    refreshKey={resultsRefreshKey}
-                  />
-                ) : (
-                  <p className="text-sm text-muted-foreground">Geen stand beschikbaar voor dit format.</p>
-                )}
-              </div>
+                    {completePreview.formatPreviews.length > 0 ? (
+                      completePreview.formatPreviews.map(({ format, groupPreviews }) => (
+                        <div key={format.id} className="space-y-3">
+                          {groupPreviews.map(({ group }) => (
+                            <div key={group.id}>{renderStandingsTable(group.id, format.id, true)}</div>
+                          ))}
+                        </div>
+                      ))
+                    ) : completePreview.selectedFormat.phase_type === "knockout" || completePreview.selectedFormat.phase_type === "single_match" ? (
+                      <BracketView
+                        tournamentId={tournamentId}
+                        phaseId={completePreview.selectedFormat.id}
+                        editable={false}
+                        scoreEditable={false}
+                        showRandomAssign={false}
+                        tournament={tournament}
+                        refreshKey={resultsRefreshKey}
+                      />
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Geen stand beschikbaar voor dit format.</p>
+                    )}
+                  </div>
 
-              <aside className="space-y-3 rounded-lg border border-border bg-muted/20 p-3 min-w-0">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Doorstroming</p>
-                  <h3 className="font-display text-sm font-bold text-foreground">Nieuwe groepen of wedstrijden</h3>
+                  <aside className="space-y-3 rounded-lg border border-border bg-muted/20 p-3 min-w-0">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Doorstroming</p>
+                      <h3 className="font-display text-sm font-bold text-foreground">Nieuwe groepen of wedstrijden</h3>
+                    </div>
+                    {completePreview.nextFormatPreviews.length > 0 ? (
+                      completePreview.nextFormatPreviews.map(({ format, slots: nextSlots, matchPreviews }) => (
+                        <div key={format.id} className="rounded-lg border border-border bg-background/70 p-3 space-y-2">
+                          <p className="text-xs font-semibold text-foreground">{format.name}</p>
+                          {matchPreviews.length > 0 && (format.phase_type === "knockout" || format.phase_type === "single_match") ? (
+                            <ul className="space-y-1.5">
+                              {matchPreviews.map(({ match, homeName, awayName }) => (
+                                <li key={match.id} className="rounded-md border border-border bg-card px-2 py-1.5 text-xs">
+                                  <span className="block font-medium text-foreground">{match.match_name || "Wedstrijd"}</span>
+                                  <span className="text-muted-foreground">{homeName} - {awayName}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : nextSlots.length > 0 ? (
+                            <ul className="space-y-1.5">
+                              {nextSlots.filter(slot => slot.team).map((slot) => (
+                                <li key={slot.id} className="flex items-center justify-between gap-2 text-xs">
+                                  <span className="min-w-0 text-muted-foreground">{groups.find(group => group.id === slot.group_id)?.name ?? format.name}</span>
+                                  <span className="truncate font-medium text-foreground">{slot.team?.name ?? "—"}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">Geen gekoppelde plekken gevonden.</p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Geen volgende fase gevonden.</p>
+                    )}
+                  </aside>
                 </div>
-                {completePreview.nextFormatPreviews.length > 0 ? (
-                  completePreview.nextFormatPreviews.map(({ format, slots: nextSlots, matchPreviews }) => (
-                    <div key={format.id} className="rounded-lg border border-border bg-background/70 p-3 space-y-2">
-                      <p className="text-xs font-semibold text-foreground">{format.name}</p>
-                      {matchPreviews.length > 0 && (format.phase_type === "knockout" || format.phase_type === "single_match") ? (
-                        <ul className="space-y-1.5">
-                          {matchPreviews.map(({ match, homeName, awayName }) => (
-                            <li key={match.id} className="rounded-md border border-border bg-card px-2 py-1.5 text-xs">
-                              <span className="block font-medium text-foreground">{match.match_name || "Wedstrijd"}</span>
-                              <span className="text-muted-foreground">{homeName} - {awayName}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : nextSlots.length > 0 ? (
-                        <ul className="space-y-1.5">
-                          {nextSlots.filter(slot => slot.team).map((slot) => (
-                            <li key={slot.id} className="flex items-center justify-between gap-2 text-xs">
-                              <span className="min-w-0 text-muted-foreground">{groups.find(group => group.id === slot.group_id)?.name ?? format.name}</span>
-                              <span className="truncate font-medium text-foreground">{slot.team?.name ?? "—"}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">Geen gekoppelde plekken gevonden.</p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-muted-foreground">Geen volgende fase gevonden.</p>
-                )}
-              </aside>
+              ) : (
+                <p className="text-sm text-muted-foreground">De stand wordt vastgezet en beschikbare posities worden doorgestuurd.</p>
+              )}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">De stand wordt vastgezet en beschikbare posities worden doorgestuurd.</p>
-          )}
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button variant="outline" onClick={() => { setPhaseActionDialog(null); setSelectedFormatActionId(null); }}>
+          </div>
+          <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => { setPhaseActionDialog(null); setSelectedFormatActionId(null); }}>
               Annuleren
             </Button>
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => { void completeSelectedFormat(); }}>
+            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => { void completeSelectedFormat(); }}>
               <CheckCircle2 className="h-4 w-4" /> Ja, format voltooien
             </Button>
           </div>
