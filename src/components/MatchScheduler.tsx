@@ -3606,6 +3606,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                                     <PlannerInsertionMarker active={!!(isPreviewAfter && idx === fieldMatches.length - 1)} />
+                                    {showBarAfterLast && insertBar(fieldMatches.length)}
                                   </div>
                                 );
                               });
