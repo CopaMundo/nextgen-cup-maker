@@ -241,9 +241,9 @@ const PublicStandings = ({ data, initialPhaseId, initialGroupId, favoriteTeam }:
             {allPhaseNumbers.length > 1 && (
               <div
                 ref={phaseContainerRef}
-                className="ttx-phase-tab-container flex justify-center overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch] border-b border-border"
+                className="ttx-phase-tab-container flex overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch] border-b border-border"
               >
-                <div className="inline-flex flex-nowrap">
+                <div className="inline-flex flex-nowrap mx-auto">
                   {allPhaseNumbers.map(pn => {
                     const isActive = activePhaseNum === pn;
                     return (
