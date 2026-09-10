@@ -61,8 +61,10 @@ const LocationSelector = ({
   const displayName = locationName.length > 16 ? `${locationName.slice(0, 16).trimEnd()}...` : locationName;
 
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <span className="w-10 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
+    <div className={cn("flex items-center", showLabel ? "gap-2.5" : "gap-0", className)}>
+      {showLabel && (
+        <span className="w-10 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
+      )}
       <Select value={selectedLocation || ""} onValueChange={(value) => onSelect(value || null)}>
         <SelectTrigger
           title={selectedLocation || ""}
