@@ -480,6 +480,10 @@ const GroupManager = ({
       await supabase.from("slots").insert(slotsToInsert);
       await generateMatchesForGroup(data.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
       setGroups((g) => [...g, data]);
+      await refreshManualGroups();
+      if (dialogMatchType === "rounds" && dialogMatchGenMode === "empty") {
+        setPlanHintGroupId(data.id);
+      }
       toast({ title: `${name} toegevoegd met ${dialogSlots} slots en wedstrijden` });
     }
     setUploading(false);
