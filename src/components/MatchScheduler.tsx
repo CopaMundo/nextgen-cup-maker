@@ -445,7 +445,7 @@ export const DateStripNav = ({
       <div className="flex items-center justify-center gap-2 w-full">
         <div
           ref={carouselRef}
-          className="flex w-full overflow-x-auto snap-x snap-mandatory gap-2 py-1"
+          className="flex w-full overflow-x-auto snap-x snap-mandatory gap-2 py-0.5"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {dates.map((d) => {
@@ -460,20 +460,20 @@ export const DateStripNav = ({
                 type="button"
                 onClick={() => onSelect(d)}
                 className={cn(
-                  "snap-center shrink-0 w-[48%] min-w-[140px] max-w-[200px] flex flex-col items-center justify-center rounded-xl border py-1.5 transition-colors",
+                  "snap-center shrink-0 w-[48%] min-w-[110px] max-w-[160px] flex flex-col items-center justify-center rounded-xl border py-1 transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card/60 text-muted-foreground border-border/60 opacity-60 hover:opacity-90"
                 )}
               >
-                <span className={cn("text-[9px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                <span className={cn("text-[8px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
                   {weekday}
                 </span>
                 <div className="flex items-center gap-1">
-                  {isActive && <Calendar className="h-3.5 w-3.5" />}
-                  <span className="text-lg font-black leading-tight">{dayNum}</span>
+                  {isActive && <Calendar className="h-3 w-3" />}
+                  <span className="text-base font-black leading-tight">{dayNum}</span>
                 </div>
-                <span className={cn("text-[9px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                <span className={cn("text-[8px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
                   {month}
                 </span>
               </button>
