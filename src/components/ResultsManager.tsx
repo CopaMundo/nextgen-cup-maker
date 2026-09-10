@@ -2082,6 +2082,17 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
         <div ref={matchesScrollRef} className="min-h-0 min-w-0 space-y-4 lg:h-full lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pt-2">
 
+          {unplannedFormats.length > 0 && (
+            <div className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-foreground">
+              <span className="font-semibold">Wedstrijden nog niet ingepland</span>
+              <p className="mt-0.5 text-muted-foreground">
+                Bij {unplannedFormats.map(p => p.name).join(", ")} moet je de wedstrijden nog handmatig ingeven.
+                Ga naar Indeling en gebruik het kalendertje bij de groep.
+              </p>
+            </div>
+          )}
+
+
       {/* Format detail dialog */}
       {(() => {
         const openFormatId = [...expandedFormats][0] ?? null;
