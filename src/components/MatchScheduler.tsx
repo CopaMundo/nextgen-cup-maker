@@ -3265,18 +3265,26 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="outline" size="sm" onClick={() => {
-                    setDraftMatchDuration(globalMatchDuration);
-                    setDraftBreakDuration(globalBreakDuration);
-                    setDraftPerFormat(perFormatDurationEnabled);
-                    setDraftPhaseConfigs(phases.reduce((acc, p) => {
-                      const cfg = (p.match_config as any) || {};
-                      acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
-                      return acc;
-                    }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
-                    setShowDurationDialog(true);
-                  }} className="gap-1 text-xs h-7">
-                    <Settings className="h-3 w-3" /> Wedstrijdduur
+                  <Button
+                    variant="outline"
+                    size={isMobile ? "icon" : "sm"}
+                    onClick={() => {
+                      setDraftMatchDuration(globalMatchDuration);
+                      setDraftBreakDuration(globalBreakDuration);
+                      setDraftPerFormat(perFormatDurationEnabled);
+                      setDraftPhaseConfigs(phases.reduce((acc, p) => {
+                        const cfg = (p.match_config as any) || {};
+                        acc[p.id] = { phaseDuration: cfg.phaseDuration ?? null, phaseBreak: cfg.phaseBreak ?? null };
+                        return acc;
+                      }, {} as Record<string, { phaseDuration: number | null; phaseBreak: number | null }>));
+                      setShowDurationDialog(true);
+                    }}
+                    className={cn("text-xs", isMobile ? "h-7 w-7 p-0" : "h-7 gap-1")}
+                    title="Wedstrijdduur"
+                    aria-label="Wedstrijdduur"
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                    {!isMobile && <span className="hidden sm:inline">Wedstrijdduur</span>}
                   </Button>
                   {!isMobile && (
                   <Button
