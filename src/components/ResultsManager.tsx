@@ -1918,42 +1918,44 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       <div className="flex h-full min-h-0 gap-3 lg:flex-row flex-col">
         {/* Format chips – left sidebar (own scroll on desktop) */}
         {phaseNumbers.length > 0 && (
-          <aside className="lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
-            {phaseNumbers.length > 1 && isMobile && (
-              <Select value={String(selectedPhaseNumber ?? phaseNumbers[0])} onValueChange={value => setSelectedPhaseNumber(Number(value))}>
-                <SelectTrigger className="mb-2 h-9 w-full bg-card text-xs font-semibold uppercase">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {phaseNumbers.map(phaseNumber => (
-                    <SelectItem key={phaseNumber} value={String(phaseNumber)}>
-                      {getPhaseLabel(phaseNumber, phases)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {phaseNumbers.length > 1 && !isMobile && (
-              <div className="mb-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
-                {phaseNumbers.map(phaseNumber => {
-                  const isSelected = phaseNumber === selectedPhaseNumber;
-                  return (
-                    <button
-                      key={phaseNumber}
-                      type="button"
-                      onClick={() => setSelectedPhaseNumber(phaseNumber)}
-                      className={`shrink-0 lg:w-full rounded-md border px-2 py-1 text-[10px] font-semibold uppercase transition-colors text-left ${
-                        isSelected
-                          ? "border-y-2 border-y-primary bg-primary/[0.06] text-primary"
-                          : "border-border bg-card text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {getPhaseLabel(phaseNumber, phases)}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+          <aside className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:pt-2">
+              {phaseNumbers.length > 1 && isMobile && (
+                <Select value={String(selectedPhaseNumber ?? phaseNumbers[0])} onValueChange={value => setSelectedPhaseNumber(Number(value))}>
+                  <SelectTrigger className="mb-2 h-9 w-full bg-card text-xs font-semibold uppercase">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {phaseNumbers.map(phaseNumber => (
+                      <SelectItem key={phaseNumber} value={String(phaseNumber)}>
+                        {getPhaseLabel(phaseNumber, phases)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {phaseNumbers.length > 1 && !isMobile && (
+                <div className="mb-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
+                  {phaseNumbers.map(phaseNumber => {
+                    const isSelected = phaseNumber === selectedPhaseNumber;
+                    return (
+                      <button
+                        key={phaseNumber}
+                        type="button"
+                        onClick={() => setSelectedPhaseNumber(phaseNumber)}
+                        className={`shrink-0 lg:w-full rounded-md border px-2 py-1 text-[10px] font-semibold uppercase transition-colors text-left ${
+                          isSelected
+                            ? "border-y-2 border-y-primary bg-primary/[0.06] text-primary"
+                            : "border-border bg-card text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {getPhaseLabel(phaseNumber, phases)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
             <div className="flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
               {currentPhaseFormats.map(format => {
                 const formatMatches = matches.filter(m => m.phase_id === format.id);
@@ -1962,15 +1964,16 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                 const allMatchesPlayed = totalCount > 0 && playedCount === totalCount;
                 const pct = totalCount > 0 ? (playedCount / totalCount) * 100 : 0;
                 const phaseLabel = getPhaseLabel(format.phase_number, phases);
+                const completed = !!format.match_config?.phaseCompleted;
 
                 return (
-                    <div key={format.id} className="min-w-[12rem] lg:min-w-0 lg:w-full max-w-[15rem] lg:max-w-none rounded-md border border-border bg-card px-2 py-1.5 text-left">
+                    <div key={format.id} className="relative min-w-[12rem] lg:min-w-0 lg:w-full max-w-[15rem] lg:max-w-none rounded-md border border-border bg-card px-2 py-1.5 text-left">
                     <button
                       type="button"
                       onClick={() => setExpandedFormats(new Set([format.id]))}
                       className="w-full text-left hover:text-primary transition-colors"
                     >
-                      <div className="flex min-w-0 items-center gap-1.5">
+                      <div className="flex min-w-0 items-center gap-1.5 pr-6">
                         {format.logo_url && <img src={format.logo_url} alt="" className="h-3 w-3 object-contain flex-shrink-0" />}
                         <span className="min-w-0 flex-1 break-words text-[10px] font-semibold text-foreground">{phaseLabel} · {format.name}</span>
                       </div>
@@ -1979,26 +1982,27 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                           className="h-full rounded-full transition-all duration-300"
                           style={{
                             width: `${pct}%`,
-                            backgroundColor: format.match_config?.phaseCompleted ? "hsl(var(--accent))" : "hsl(var(--primary))",
+                            backgroundColor: completed ? "hsl(var(--accent))" : "hsl(var(--primary))",
                           }}
                         />
                       </div>
                       <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
                         <span className="tabular-nums">{playedCount}/{totalCount}</span>
-                        {format.match_config?.phaseCompleted && <span className="font-semibold text-accent">Voltooid</span>}
+                        {completed && <span className="font-semibold text-accent">Voltooid</span>}
                       </div>
                     </button>
-                    {(format.match_config?.phaseCompleted || allMatchesPlayed) && <div className="mt-1.5 border-t border-border pt-1.5">
-                      {format.match_config?.phaseCompleted ? (
-                        <Button size="sm" variant="destructive" className="h-6 w-full px-1.5 text-[9px]" onClick={() => requestUndoFormat(format)}>
-                          <RotateCcw className="h-3 w-3" /> Ongedaan
-                        </Button>
-                      ) : (
-                        <Button size="sm" className="h-6 w-full px-1.5 text-[9px]" onClick={() => requestCompleteFormat(format, { confirmIncomplete: true })} disabled={!canEditFormat(format)}>
-                          <CheckCircle2 className="h-3 w-3" /> Voltooien
-                        </Button>
-                      )}
-                    </div>}
+                    {(completed || allMatchesPlayed) && (
+                      <Button
+                        size="icon"
+                        variant={completed ? "destructive" : "default"}
+                        className="absolute right-1 top-1 h-5 w-5"
+                        onClick={() => completed ? requestUndoFormat(format) : requestCompleteFormat(format, { confirmIncomplete: true })}
+                        disabled={!completed && !canEditFormat(format)}
+                        title={completed ? "Ongedaan maken" : "Format voltooien"}
+                      >
+                        {completed ? <RotateCcw className="h-3 w-3" /> : <CheckCircle2 className="h-3 w-3" />}
+                      </Button>
+                    )}
                   </div>
                 );
               })}
