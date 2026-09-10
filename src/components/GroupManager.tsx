@@ -301,6 +301,7 @@ const GroupManager = ({
   const [originalSlotCount, setOriginalSlotCount] = useState(0);
   const [logoRemoved, setLogoRemoved] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
 
@@ -554,11 +555,31 @@ const GroupManager = ({
     notifySlotChange();
   };
 
+  const editRegenerationNeeded = () => {
+    if (!editingGroup) return false;
+    const slotCountChanged = editSlotCount !== originalSlotCount;
+    const matchTypeChanged = dialogMatchType !== phaseMatchType || dialogEncounters !== phaseEncounters || dialogRounds !== phaseRounds;
+    const genModeChanged =
+      dialogMatchType === "rounds" && (dialogMatchGenMode === "empty") !== !!editingGroup.manual_planning;
+    return slotCountChanged || matchTypeChanged || genModeChanged;
+  };
+
   const saveGroupEdit = async () => {
+    if (!editingGroup) return;
+    if (editRegenerationNeeded()) {
+      setShowEditConfirm(true);
+      return;
+    }
+    await performGroupEdit();
+  };
+
+  const performGroupEdit = async () => {
     if (!editingGroup) return;
 
     const slotCountChanged = editSlotCount !== originalSlotCount;
     const matchTypeChanged = dialogMatchType !== phaseMatchType || dialogEncounters !== phaseEncounters || dialogRounds !== phaseRounds;
+    const genModeChanged =
+      dialogMatchType === "rounds" && (dialogMatchGenMode === "empty") !== !!editingGroup.manual_planning;
 
     // Handle reducing slots
     if (editSlotCount < originalSlotCount) {
@@ -613,12 +634,17 @@ const GroupManager = ({
       setPhaseRounds(dialogRounds);
     }
 
-    // If slot count or match type changed, regenerate matches for ALL groups
-    if (slotCountChanged || matchTypeChanged) {
-      const allGroups = await supabase.from("groups").select("id").eq("phase_id", phaseId);
-      for (const g of (allGroups.data || [])) {
-        await generateMatchesForGroup(g.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
-      }
+    // Regenerate matches ONLY for the edited group
+    if (slotCountChanged || matchTypeChanged || genModeChanged) {
+      await generateMatchesForGroup(editingGroup.id, dialogMatchType, dialogEncounters, dialogRounds, dialogMatchGenMode);
+      setGroups((g) =>
+        g.map((x) =>
+          x.id === editingGroup.id
+            ? { ...x, manual_planning: dialogMatchType === "rounds" && dialogMatchGenMode === "empty" }
+            : x,
+        ),
+      );
+      await refreshManualGroups();
     }
 
     setUploading(true);
@@ -996,7 +1022,9 @@ const GroupManager = ({
     // Determine if anything has changed that warrants a warning
     const sizeChanged = isEdit && editSlotCount !== originalSlotCount;
     const typeChanged = isEdit && (dialogMatchType !== phaseMatchType || dialogEncounters !== phaseEncounters || dialogRounds !== phaseRounds);
-    const showWarning = sizeChanged || typeChanged;
+    const genChanged =
+      isEdit && dialogMatchType === "rounds" && (dialogMatchGenMode === "empty") !== !!editingGroup?.manual_planning;
+    const showWarning = sizeChanged || typeChanged || genChanged;
 
     return (
       <div className="space-y-3">
@@ -1087,7 +1115,7 @@ const GroupManager = ({
         )}
         {showWarning && (
           <p className="text-xs text-destructive font-medium">
-            Let op: bij het wijzigen van de {sizeChanged && typeChanged ? "poulegrootte en competitieformat" : sizeChanged ? "poulegrootte" : "competitieformat"} worden de wedstrijden die al gepland zijn uit het schema gehaald.
+            Let op: deze wijziging geldt enkel voor {editingGroup?.name || "deze poule"}. De wedstrijden van deze poule worden opnieuw aangemaakt en uit het schema gehaald. Andere poules blijven ongewijzigd.
           </p>
         )}
       </div>
@@ -1305,6 +1333,27 @@ const GroupManager = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit confirmation */}
+      <AlertDialog open={showEditConfirm} onOpenChange={setShowEditConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Wijziging toepassen op {editingGroup?.name || "deze poule"}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              De wedstrijden van {editingGroup?.name || "deze poule"} worden opnieuw aangemaakt: reeds ingevulde uitslagen en de planning in het schema van deze poule gaan verloren. Andere poules blijven volledig ongewijzigd.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { setShowEditConfirm(false); performGroupEdit(); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Ja, wijzigen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Clear all confirmation */}
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
