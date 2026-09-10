@@ -1986,36 +1986,37 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                           }}
                         />
                       </div>
-                      <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-                        <span className="tabular-nums">{playedCount}/{totalCount}</span>
+                      <div className="mt-1 flex items-center justify-between gap-2 text-[10px]">
+                        <span className="tabular-nums text-muted-foreground">{playedCount}/{totalCount}</span>
                         {!isMobile && completed && <span className="font-semibold text-accent">Voltooid</span>}
+                        {isMobile && (completed || allMatchesPlayed) && (
+                          <Button
+                            size="sm"
+                            variant={completed ? "destructive" : "default"}
+                            className="h-5 w-5 p-0 shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              completed ? requestUndoFormat(format) : requestCompleteFormat(format, { confirmIncomplete: true });
+                            }}
+                            disabled={!completed && !canEditFormat(format)}
+                            title={completed ? "Ongedaan maken" : "Format voltooien"}
+                          >
+                            {completed ? <RotateCcw className="h-3 w-3" /> : <CheckCircle2 className="h-3 w-3" />}
+                          </Button>
+                        )}
                       </div>
                     </button>
-                    {(completed || allMatchesPlayed) && (
-                      isMobile ? (
-                        <div className="mt-1.5 border-t border-border pt-1.5">
-                          {completed ? (
-                            <Button size="sm" variant="destructive" className="h-6 w-full px-1.5 text-[9px]" onClick={() => requestUndoFormat(format)}>
-                              <RotateCcw className="h-3 w-3" /> Ongedaan maken
-                            </Button>
-                          ) : (
-                            <Button size="sm" className="h-6 w-full px-1.5 text-[9px]" onClick={() => requestCompleteFormat(format, { confirmIncomplete: true })} disabled={!canEditFormat(format)}>
-                              <CheckCircle2 className="h-3 w-3" /> Voltooien
-                            </Button>
-                          )}
-                        </div>
-                      ) : (
-                        <Button
-                          size="icon"
-                          variant={completed ? "destructive" : "default"}
-                          className="absolute right-1 top-1 h-5 w-5"
-                          onClick={() => completed ? requestUndoFormat(format) : requestCompleteFormat(format, { confirmIncomplete: true })}
-                          disabled={!completed && !canEditFormat(format)}
-                          title={completed ? "Ongedaan maken" : "Format voltooien"}
-                        >
-                          {completed ? <RotateCcw className="h-3 w-3" /> : <CheckCircle2 className="h-3 w-3" />}
-                        </Button>
-                      )
+                    {!isMobile && (completed || allMatchesPlayed) && (
+                      <Button
+                        size="icon"
+                        variant={completed ? "destructive" : "default"}
+                        className="absolute right-1 top-1 h-5 w-5"
+                        onClick={() => completed ? requestUndoFormat(format) : requestCompleteFormat(format, { confirmIncomplete: true })}
+                        disabled={!completed && !canEditFormat(format)}
+                        title={completed ? "Ongedaan maken" : "Format voltooien"}
+                      >
+                        {completed ? <RotateCcw className="h-3 w-3" /> : <CheckCircle2 className="h-3 w-3" />}
+                      </Button>
                     )}
                   </div>
                 );
