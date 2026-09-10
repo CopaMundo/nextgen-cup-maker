@@ -2026,39 +2026,43 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const formatGroups = openFormat ? groups.filter(g => g.phase_id === openFormat.id) : [];
         return (
           <Dialog open={!!openFormat} onOpenChange={(open) => { if (!open) setExpandedFormats(new Set()); }}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{openFormat?.name || ""}</DialogTitle>
-              </DialogHeader>
-              {openFormat && (openFormat.phase_type === "group" || openFormat.phase_type === "round_robin") && (
-                <div className="space-y-3">
-                  {formatGroups.map(group => (
-                    <div key={group.id}>
-                      {renderStandingsTable(group.id, openFormat.id)}
+            <DialogContent scrollable={false} className="max-w-2xl max-h-[80vh] overflow-hidden p-0">
+              <div className="flex h-full max-h-[80vh] flex-col">
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-16 sm:p-6 sm:pb-16">
+                  <DialogHeader>
+                    <DialogTitle>{openFormat?.name || ""}</DialogTitle>
+                  </DialogHeader>
+                  {openFormat && (openFormat.phase_type === "group" || openFormat.phase_type === "round_robin") && (
+                    <div className="space-y-3">
+                      {formatGroups.map(group => (
+                        <div key={group.id}>
+                          {renderStandingsTable(group.id, openFormat.id)}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {openFormat && (openFormat.phase_type === "knockout" || openFormat.phase_type === "single_match") && (
+                    <BracketView
+                      tournamentId={tournamentId}
+                      phaseId={openFormat.id}
+                      editable={false}
+                      scoreEditable={false}
+                      showRandomAssign={false}
+                      tournament={tournament}
+                      refreshKey={resultsRefreshKey}
+                    />
+                  )}
                 </div>
-              )}
-              {openFormat && (openFormat.phase_type === "knockout" || openFormat.phase_type === "single_match") && (
-                <BracketView
-                  tournamentId={tournamentId}
-                  phaseId={openFormat.id}
-                  editable={false}
-                  scoreEditable={false}
-                  showRandomAssign={false}
-                  tournament={tournament}
-                  refreshKey={resultsRefreshKey}
-                />
-              )}
+              </div>
               {openFormat && (
-                <div className="flex justify-end gap-2 border-t border-border pt-4">
+                <div className="absolute bottom-4 right-4 z-10">
                   {openFormat.match_config?.phaseCompleted ? (
                     <Button size="sm" variant="outline" onClick={() => requestUndoFormat(openFormat)}>
                       <RotateCcw className="h-3.5 w-3.5" /> Ongedaan maken
                     </Button>
                   ) : (
                     <Button size="sm" onClick={() => requestCompleteFormat(openFormat, { confirmIncomplete: true })} disabled={!canEditFormat(openFormat)}>
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Format voltooien
+                      <CheckCircle2 className="h-3.5 w-3.5" /> {isMobile ? "Voltooien" : "Format voltooien"}
                     </Button>
                   )}
                 </div>

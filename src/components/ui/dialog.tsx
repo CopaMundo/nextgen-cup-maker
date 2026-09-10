@@ -30,8 +30,8 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, onOpenAutoFocus, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { scrollable?: boolean }
+>(({ className, children, onOpenAutoFocus, scrollable = true, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -51,7 +51,7 @@ const DialogContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="grid gap-4 min-h-0 overflow-y-auto overscroll-contain">{children}</div>
+      <div className={cn("grid gap-4 min-h-0 overscroll-contain", scrollable && "overflow-y-auto")}>{children}</div>
       <DialogPrimitive.Close
         aria-label="Sluiten"
         className="absolute right-3 top-3 z-[60] rounded-full bg-background p-1.5 text-foreground shadow-md ring-1 ring-border/60 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
