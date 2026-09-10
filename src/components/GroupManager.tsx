@@ -134,8 +134,8 @@ const GroupManager = ({
       .eq("tournament_id", tournamentId)
       .eq("phase_id", phaseId);
 
-    // For rounds type, respect the gen mode
-    const effectiveMode = rawMatchType === "rounds" ? mode : "auto";
+    // Respect the chosen gen mode for every competition format
+    const effectiveMode = mode;
 
     if (effectiveMode === "auto") {
       const pairings = generateRoundRobin(slots.length, genMatchType as any, customRounds);
