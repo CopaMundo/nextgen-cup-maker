@@ -3350,7 +3350,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                     {/* Mobiel: veldkiezer */}
                     {isMobile && fieldData.length > 0 && (
-                      <div className="space-y-1.5 pb-2 -mx-1 px-1">
+                      <div className="pb-2 -mx-1 px-1">
                         <div className="flex items-center gap-1.5">
                           <div className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                             <div className="flex gap-1.5 pr-1">
@@ -3371,25 +3371,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
-                            className="h-7 w-7 p-0 text-xs border-primary/40 hover:border-primary hover:bg-primary/10"
-                            title="Veld toevoegen"
-                            aria-label="Veld toevoegen"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
                       </div>
                     )}
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
-                      <div className="flex gap-4 min-w-0">
+                      <div className="flex gap-2 md:gap-4 min-w-0">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 overflow-hidden bg-card", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
+                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 overflow-hidden bg-card", isMobile ? "flex-1 min-w-0" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
@@ -3667,6 +3655,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                         <div className="hidden md:flex min-w-[100px] flex-shrink-0 items-start pt-1 pl-2 print:hidden">
                           <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="h-8 text-xs gap-1 whitespace-nowrap">
                             <Plus className="h-3 w-3" /> Veld
+                          </Button>
+                        </div>
+                        {/* + Veld knop mobiel, naast het veldkader */}
+                        <div className="flex md:hidden flex-shrink-0 items-start pt-1 print:hidden">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
+                            className="h-7 w-7 p-0 text-xs border-primary/40 hover:border-primary hover:bg-primary/10"
+                            title="Veld toevoegen"
+                            aria-label="Veld toevoegen"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
