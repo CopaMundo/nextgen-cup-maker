@@ -313,6 +313,7 @@ const GroupManager = ({
   type PlanMatch = { id: string; round_number: number | null; match_name: string | null; home: string; away: string };
   type PlanSlot = { slot_code: string; team_id: string | null; label: string };
   const [manualGroupIds, setManualGroupIds] = useState<Set<string>>(new Set());
+  const [unplannedGroupIds, setUnplannedGroupIds] = useState<Set<string>>(new Set());
   const [planOpen, setPlanOpen] = useState(false);
   const planDialogRef = useDialogFocus(planOpen);
   const [planGroup, setPlanGroup] = useState<Group | null>(null);
