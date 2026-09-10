@@ -314,6 +314,14 @@ const GroupManager = ({
   const [planMatches, setPlanMatches] = useState<PlanMatch[]>([]);
   const [planSlots, setPlanSlots] = useState<PlanSlot[]>([]);
   const [planSaving, setPlanSaving] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planHintGroupId, setPlanHintGroupId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!planHintGroupId) return;
+    const t = window.setTimeout(() => setPlanHintGroupId(null), 12000);
+    return () => window.clearTimeout(t);
+  }, [planHintGroupId]);
 
   const refreshManualGroups = async () => {
     const { data } = await supabase
