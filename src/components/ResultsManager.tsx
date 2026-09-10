@@ -1505,15 +1505,26 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
       if (scroller) {
         const delta = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top - offset;
-        scroller.scrollTo({ top: Math.max(scroller.scrollTop + delta, 0), behavior: "smooth" });
+        if (Math.abs(delta) > 2) {
+          scroller.scrollTop = Math.max(scroller.scrollTop + delta, 0);
+        }
         return;
       }
 
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+      if (Math.abs(top - window.scrollY) > 2) window.scrollTo({ top: Math.max(top, 0) });
     };
 
-    requestAnimationFrame(() => scrollAnchorIntoPlace());
+    // Eerst meteen, daarna nog enkele correctiepassages: het uitklappen van het
+    // volgende tijdsblok en het laden van logo's verandert de hoogtes nadien nog.
+    const timers: number[] = [];
+    requestAnimationFrame(() => {
+      scrollAnchorIntoPlace();
+      [80, 200, 400, 700].forEach(ms => {
+        timers.push(window.setTimeout(() => scrollAnchorIntoPlace(), ms));
+      });
+    });
+    return () => timers.forEach(t => window.clearTimeout(t));
   }, [timeSlotGroups, isMobile]);
 
   // Hoogte van de vaste mobiele fase-/formatbalk bijhouden zodat de
