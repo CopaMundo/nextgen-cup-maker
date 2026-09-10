@@ -3305,7 +3305,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
                   <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="gap-1 text-xs">
-                    +veld
+                    +Veld
                   </Button>
                 </div>
               ) : (() => {
@@ -3373,6 +3373,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                         </div>
                       </div>
                     )}
+
+                    {/* Mobiel: geselecteerde wedstrijd duidelijk tonen */}
+                    {isMobile && mobileSelectedMatchId && (() => {
+                      const sel = matches.find(mm => mm.id === mobileSelectedMatchId);
+                      if (!sel) return null;
+                      return (
+                        <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary bg-primary/10 px-2 py-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-primary shrink-0">Geselecteerd</span>
+                          <span className="text-[11px] font-medium text-foreground truncate">
+                            {getMatchLabel(sel.home_team_id, sel.home_slot_label)} - {getMatchLabel(sel.away_team_id, sel.away_slot_label)}
+                          </span>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto shrink-0" onClick={() => setMobileSelectedMatchId(null)} aria-label="Selectie annuleren">
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      );
+                    })()}
+
+
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-2 md:gap-4 min-w-0">
@@ -3484,10 +3503,24 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 const phase = phases.find(p => p.id === m.phase_id);
                                 const group = allGroups.find(g => g.id === m.group_id);
 
+                                const selIdx = mobileSelectedMatchId ? fieldMatches.findIndex(x => x.id === mobileSelectedMatchId) : -1;
+                                const showBarBefore = isMobile && !!mobileSelectedMatchId && selIdx !== idx && selIdx !== idx - 1;
+                                const showBarAfterLast = isMobile && !!mobileSelectedMatchId && idx === fieldMatches.length - 1 && selIdx !== idx;
+                                const insertBar = (targetIdx: number) => (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); void handleMobilePlaceMatch(field.name, targetIdx); }}
+                                    className="w-full flex items-center gap-1.5 px-2 py-1 bg-primary/10 border-b border-dashed border-primary/50 text-primary text-[10px] font-semibold"
+                                  >
+                                    <Plus className="h-3 w-3" /> Hier plaatsen
+                                  </button>
+                                );
 
                                 return (
                                   <div key={m.id}>
+                                    {showBarBefore && insertBar(idx)}
                                     <PlannerInsertionMarker active={!!isPreviewHere} />
+
 
                                     <div
                                       data-planner-match-card={m.id}
@@ -3592,6 +3625,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                                     <PlannerInsertionMarker active={!!(isPreviewAfter && idx === fieldMatches.length - 1)} />
+                                    {showBarAfterLast && insertBar(fieldMatches.length)}
                                   </div>
                                 );
                               });
@@ -3657,17 +3691,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <Plus className="h-3 w-3" /> Veld
                           </Button>
                         </div>
-                        {/* +veld knop mobiel, naast het veldkader */}
+                        {/* +Veld knop mobiel, naast het veldkader */}
                         <div className="flex md:hidden flex-shrink-0 items-start pt-1 print:hidden">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
                             className="h-7 px-2 text-xs border-primary/40 hover:border-primary hover:bg-primary/10 whitespace-nowrap"
-                            title="+veld"
-                            aria-label="+veld"
+                            title="+Veld"
+                            aria-label="+Veld"
                           >
-                            +veld
+                            +Veld
                           </Button>
                         </div>
                       </div>
