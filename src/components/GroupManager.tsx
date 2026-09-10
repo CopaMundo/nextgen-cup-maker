@@ -1181,7 +1181,13 @@ const GroupManager = ({
             <DialogTitle>Wedstrijden plannen{planGroup ? ` — ${planGroup.name}` : ""}</DialogTitle>
           </DialogHeader>
           <div className="space-y-5">
-            {planMatches.length === 0 ? (
+            {planLoading && planMatches.length === 0 ? (
+              <div className="space-y-2">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="h-9 animate-pulse rounded-md bg-muted" />
+                ))}
+              </div>
+            ) : planMatches.length === 0 ? (
               <p className="text-sm text-muted-foreground">Geen wedstrijden gevonden.</p>
             ) : (
               Array.from(new Set(planMatches.map(m => m.round_number ?? 0))).sort((a, b) => a - b).map((round) => {
