@@ -905,11 +905,20 @@ const GroupManager = ({
             <div className="relative inline-flex items-center">
               <button
                 onClick={() => openPlanDialog(group)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
+                className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
                 aria-label={`Wedstrijden plannen voor ${group.name}`}
                 title="Wedstrijden plannen"
               >
                 <CalendarDays className="h-3.5 w-3.5" />
+                {unplannedGroupIds.has(group.id) ? (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-white">
+                    <AlertTriangle className="h-2.5 w-2.5" />
+                  </span>
+                ) : (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-white">
+                    <Check className="h-2.5 w-2.5" />
+                  </span>
+                )}
               </button>
               {planHintGroupId === group.id && (
                 <div className="absolute left-1/2 top-full z-30 mt-2 w-56 -translate-x-1/2 rounded-md border border-primary/40 bg-popover p-2 text-xs text-foreground shadow-lg">
