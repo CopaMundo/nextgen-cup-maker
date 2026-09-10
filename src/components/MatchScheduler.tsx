@@ -3370,14 +3370,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
                       <div className="flex gap-4 min-w-0">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-border overflow-hidden", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
+                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 overflow-hidden bg-card", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => handleDrop(e, field.name, 0)}
                               onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}
-                              className={`bg-secondary border-b border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
+                              className={`bg-primary/10 border-b border-primary/30 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/20" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/15" : ""}`}
                             >
                               <div className="flex items-center justify-between">
                                 <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
