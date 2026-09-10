@@ -17,12 +17,14 @@ const LocationSelector = ({
   onSelect,
   className,
   selectClassName,
+  showLabel = true,
 }: {
   tournamentId: string;
   selectedLocation: string | null;
   onSelect: (name: string | null) => void;
   className?: string;
   selectClassName?: string;
+  showLabel?: boolean;
 }) => {
   const [locations, setLocations] = useState<Location[]>([]);
   const isMobile = useIsMobile();
