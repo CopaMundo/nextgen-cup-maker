@@ -3239,16 +3239,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     )}
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
-                      <div className="flex gap-0 min-w-0">
+                      <div className="flex gap-4 min-w-0">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
+                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-border overflow-hidden", isMobile ? "w-full min-w-0 flex-1" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => handleDrop(e, field.name, 0)}
                               onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}
-                              className={`rounded-t-lg bg-secondary border border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
+                              className={`bg-secondary border-b border-border px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "border-primary bg-primary/10" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/10" : ""}`}
                             >
                               <div className="flex items-center justify-between">
                                 <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
@@ -3278,7 +3278,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {/* Field column body */}
                             <div
                               ref={(el) => { if (el) fieldColumnRefs.current.set(field.name, el); }}
-                              className={`border border-t-0 min-h-[200px] transition-[background-color,border-color] duration-200 ${dragItemId ? "border-primary/30 bg-primary/[0.02]" : "border-border"}`}
+                              className={`min-h-[200px] transition-[background-color] duration-200 ${dragItemId ? "bg-primary/[0.02]" : ""}`}
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => {
                                 const idx = previewField === field.name && previewIndex !== null ? previewIndex : fieldMatches.length;
@@ -3309,8 +3309,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 // Empty timeline block (field starts later / other field has a pause)
                                 if (!item) {
                                   return (
-                                    <div key={`empty-${rowTime}`} className="px-1.5 py-0.5">
-                                      <div className={`${PLANNER_ROW_H} rounded-lg border border-dashed border-border/60 bg-muted/20 flex items-center justify-center`}>
+                                    <div key={`empty-${rowTime}`} className="px-0">
+                                      <div className={`${PLANNER_ROW_H} border-b border-dashed border-border/60 bg-muted/20 flex items-center justify-center`}>
                                         <span className="text-[10px] font-mono text-muted-foreground/50">{minutesToTime(rowTime)}</span>
                                       </div>
                                     </div>
@@ -3321,10 +3321,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 if (item.kind === "break") {
                                   const brk = item.brk;
                                   return (
-                                    <div key={`break-${brk.id}`} className="px-1.5 py-0.5">
+                                    <div key={`break-${brk.id}`} className="px-0">
                                       <PlannerItem
                                         payload={{ id: brk.id, type: "break", field_id: field.name, slot_index: brk.afterSlotIndex, container: "schema" }}
-                                        className={`${PLANNER_ROW_H} rounded-lg bg-primary/10 border border-primary/30 px-3 flex flex-col items-start justify-center gap-1`}
+                                        className={`${PLANNER_ROW_H} bg-primary/10 border-b border-primary/30 px-3 flex flex-col items-start justify-center gap-1`}
                                       >
                                         <div className="flex items-center justify-between w-full">
                                           <span className="text-[11px] font-mono font-bold text-primary">{minutesToTime(item.startMin)}</span>
@@ -3359,19 +3359,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       className={`transition-[max-height,opacity,padding,margin,transform] duration-200 ease-out ${isDragging ? "max-h-0 opacity-0 overflow-hidden" : ""}`}
                                       style={isDragging ? { maxHeight: 0, padding: 0, margin: 0, height: 0 } : undefined}
                                     >
-                                      <div className="px-1 py-0.5">
+                                      <div className="px-0">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-lg border p-1 text-[11px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} border-b p-1 text-[11px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
-                                              ? "border-primary ring-2 ring-primary/50 bg-primary/10"
+                                              ? "border-b-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
-                                              ? "border-primary ring-2 ring-primary/30 bg-primary/10"
+                                              ? "border-b-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
-                                                ? "border-primary ring-2 ring-primary/20 bg-primary/5"
+                                                ? "border-b-primary ring-2 ring-primary/20 bg-primary/5"
                                                 : getMatchClashes(m).length > 0
-                                                  ? "border-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-destructive hover:shadow-md"
-                                                  : "border-border bg-card hover:border-primary/50 hover:shadow-md"
+                                                  ? "border-b-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-b-destructive hover:shadow-md"
+                                                  : "border-b-border bg-card hover:border-b-primary/50 hover:shadow-md"
                                           }`}
                                         >
                                           <div
@@ -3479,7 +3479,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                   onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                                   onDrop={(e) => handleDrop(e, field.name, 0)}
                                   onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, 0); }}
-                                  className={`px-3 py-10 text-center transition-all duration-300 rounded-b-lg ${
+                                  className={`px-3 py-10 text-center transition-all duration-300 ${
                                     mobileSelectedMatchId
                                       ? "bg-primary/10 border-2 border-dashed border-primary m-1 rounded-lg cursor-pointer"
                                       : previewField === field.name && dragItemId
@@ -3505,7 +3505,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             </div>
 
                             {/* + PAUZE button at bottom of each column */}
-                            <div className="border border-t-0 border-border rounded-b-lg">
+                            <div className="border-t border-border">
                               <button
                                 onClick={() => { setShowPauzeModal(field.name); setPauzeModalDuration(20); setPauzeModalName("Pauze"); }}
                                 className="w-full py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors font-medium uppercase tracking-wider"
