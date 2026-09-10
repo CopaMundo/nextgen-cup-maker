@@ -1104,7 +1104,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               </select>
             </div>
           )}
-          {groupConfig.matchType === "rounds" && (
+          {(
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <Label className="text-xs">Wedstrijden genereren</Label>
