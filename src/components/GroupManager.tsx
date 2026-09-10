@@ -12,6 +12,13 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SlotManager from "./SlotManager";
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
@@ -833,14 +840,19 @@ const GroupManager = ({
             <Pencil className="h-3 w-3" />
           </button>
           {manualGroupIds.has(group.id) && (
-            <button
-              onClick={() => openPlanDialog(group)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
-              aria-label={`Wedstrijden plannen voor ${group.name}`}
-              title="Wedstrijden plannen"
-            >
-              <CalendarDays className="h-3.5 w-3.5" />
-            </button>
+            <div className="relative inline-flex items-center">
+              <button
+                onClick={() => openPlanDialog(group)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 sm:h-auto sm:w-auto sm:p-1"
+                aria-label={`Wedstrijden plannen voor ${group.name}`}
+                title="Wedstrijden plannen"
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+              </button>
+              <span className="absolute -top-2 -right-2 inline-flex items-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground whitespace-nowrap shadow-sm">
+                Plan
+              </span>
+            </div>
           )}
         </div>
         <button onClick={() => setDeleteGroupId(group.id)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-1" aria-label={`${group.name} verwijderen`}>
@@ -1151,27 +1163,35 @@ const GroupManager = ({
                       {roundMatches.map((m, i) => (
                         <div key={m.id} className="flex items-center gap-2">
                           <span className="w-6 shrink-0 text-xs text-muted-foreground">{i + 1}.</span>
-                          <select
-                            value={m.home}
-                            onChange={(e) => setPlanValue(m.id, "home", e.target.value)}
-                            className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                          <Select
+                            value={m.home || "__empty__"}
+                            onValueChange={(value) => setPlanValue(m.id, "home", value === "__empty__" ? "" : value)}
                           >
-                            <option value="">Kies team</option>
-                            {planSlots.map(s => (
-                              <option key={s.slot_code} value={s.slot_code}>{s.label}</option>
-                            ))}
-                          </select>
+                            <SelectTrigger className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]">
+                              <SelectValue placeholder="Kies team" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__empty__">Kies team</SelectItem>
+                              {planSlots.map(s => (
+                                <SelectItem key={s.slot_code} value={s.slot_code}>{s.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <span className="text-xs text-muted-foreground">vs</span>
-                          <select
-                            value={m.away}
-                            onChange={(e) => setPlanValue(m.id, "away", e.target.value)}
-                            className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]"
+                          <Select
+                            value={m.away || "__empty__"}
+                            onValueChange={(value) => setPlanValue(m.id, "away", value === "__empty__" ? "" : value)}
                           >
-                            <option value="">Kies team</option>
-                            {planSlots.map(s => (
-                              <option key={s.slot_code} value={s.slot_code}>{s.label}</option>
-                            ))}
-                          </select>
+                            <SelectTrigger className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06]">
+                              <SelectValue placeholder="Kies team" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__empty__">Kies team</SelectItem>
+                              {planSlots.map(s => (
+                                <SelectItem key={s.slot_code} value={s.slot_code}>{s.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       ))}
                     </div>
