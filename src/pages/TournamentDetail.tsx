@@ -413,6 +413,7 @@ const TournamentDetail = () => {
                 selectedLocation={selectedLocation}
                 onSelect={setSelectedLocation}
                 selectClassName={compactSelect}
+                showLabel={false}
               />
             )}
           </>
