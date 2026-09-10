@@ -1453,10 +1453,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   // de eerstvolgende in te geven tijdsbalk staat daar open onder.
   // Draait opnieuw zodra het anker verandert (bv. na het ingeven van een uitslag),
   // maar niet als de gebruiker enkel handmatig heeft gescrold.
-  //
-  // Mobiel: alleen de open/dicht-status aanpassen. We scrollen nooit automatisch,
-  // zodat de gebruiker altijd bovenaan de pagina start en zelf naar beneden kan
-  // scrollen (ook bij een nieuw toernooi opent het eerste tijdsblok gewoon).
   useEffect(() => {
     const slots = timeSlotGroups.filter(g => g.key !== "__unplanned__");
     if (slots.length === 0) return;
@@ -1476,8 +1472,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       return next;
     });
 
-    if (isMobile) return;
-
     const scrollAnchorIntoPlace = (attempt = 0) => {
       const el = slotRefs.current.get(anchorKey);
       if (!el) {
@@ -1485,12 +1479,40 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         return;
       }
 
-      const container = matchesScrollRef.current;
-      const scrollsInternally = !!container && container.scrollHeight > container.clientHeight + 4;
-      if (scrollsInternally) {
-        const delta = el.getBoundingClientRect().top - container!.getBoundingClientRect().top;
-        container!.scrollTop += delta;
+      if (!isMobile) {
+        const container = matchesScrollRef.current;
+        const scrollsInternally = !!container && container.scrollHeight > container.clientHeight + 4;
+        if (scrollsInternally) {
+          const delta = el.getBoundingClientRect().top - container!.getBoundingClientRect().top;
+          container!.scrollTop += delta;
+          return;
+        }
       }
+
+      // Mobiel: zoek het element dat werkelijk scrolt (window of een ouder met overflow)
+      // en schuif het anker net onder de vaste fase-/formatbalk.
+      const offset =
+        (mobileHeaderRef.current?.getBoundingClientRect().height ?? 0) +
+        (dateHeaderRef.current?.getBoundingClientRect().height ?? 0) + 8;
+
+      let scroller: HTMLElement | null = el.parentElement;
+      while (scroller) {
+        const style = window.getComputedStyle(scroller);
+        const scrollableStyle = /(auto|scroll|overlay)/.test(style.overflowY);
+        if (scrollableStyle && scroller.scrollHeight > scroller.clientHeight + 4) break;
+        scroller = scroller.parentElement;
+      }
+
+      if (scroller) {
+        const delta = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top - offset;
+        if (Math.abs(delta) > 2) {
+          scroller.scrollTop = Math.max(scroller.scrollTop + delta, 0);
+        }
+        return;
+      }
+
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      if (Math.abs(top - window.scrollY) > 2) window.scrollTo({ top: Math.max(top, 0) });
     };
 
     // Eerst meteen, daarna nog enkele correctiepassages: het uitklappen van het
