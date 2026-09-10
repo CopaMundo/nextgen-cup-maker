@@ -440,6 +440,9 @@ const GroupManager = ({
         away_team_id: m.away ? (slotMap.get(m.away)?.team_id ?? null) : null,
       }).eq("id", m.id))
     ));
+    // Markeer de groep definitief als handmatig gepland zodat het kalendertje blijft staan
+    await supabase.from("groups").update({ manual_planning: true }).eq("id", planGroup.id);
+    setManualGroupIds((prev) => new Set(prev).add(planGroup.id));
     setPlanSaving(false);
     setPlanOpen(false);
     toast({ title: "Wedstrijden opgeslagen" });
