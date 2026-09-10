@@ -3305,7 +3305,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>
                   <Button variant="outline" size="sm" onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }} className="gap-1 text-xs">
-                    +veld
+                    +Veld
                   </Button>
                 </div>
               ) : (() => {
@@ -3672,17 +3672,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <Plus className="h-3 w-3" /> Veld
                           </Button>
                         </div>
-                        {/* +veld knop mobiel, naast het veldkader */}
+                        {/* +Veld knop mobiel, naast het veldkader */}
                         <div className="flex md:hidden flex-shrink-0 items-start pt-1 print:hidden">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => { setNewFieldName(""); setNewFieldStartTime("09:00"); setShowAddFieldDialog(true); }}
                             className="h-7 px-2 text-xs border-primary/40 hover:border-primary hover:bg-primary/10 whitespace-nowrap"
-                            title="+veld"
-                            aria-label="+veld"
+                            title="+Veld"
+                            aria-label="+Veld"
                           >
-                            +veld
+                            +Veld
                           </Button>
                         </div>
                       </div>
