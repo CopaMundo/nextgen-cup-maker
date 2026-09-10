@@ -4,11 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from "@/lib/utils";
 import { computeFairplayRows, getFairplayConfig, type FairplayMatch } from "@/lib/fairplay";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight } from "lucide-react";
-import trophyIconAsset from "@/assets/trophy-icon.png.asset.json";
-import bootsIconAsset from "@/assets/boots-icon.png.asset.json";
-import yellowCardIconAsset from "@/assets/yellow-card_1.png.asset.json";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MaskIcon = ({ src, label }: { src: string; label: string }) => (
   <span
@@ -145,13 +141,13 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   const [activeTab, setActiveTab] = useState<StatTab>("scorers");
   const isMobile = useIsMobile();
-  const [mobileOverview, setMobileOverview] = useState(true);
 
   useEffect(() => {
     if (tabs.length > 0 && !tabs.find(t => t.id === activeTab)) {
       setActiveTab(tabs[0].id);
     }
   }, [tabs.map(t => t.id).join("|")]);
+
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
 
@@ -412,48 +408,28 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
   const activeLabel = tabs.find(t => t.id === activeTab)?.label || "";
 
   return (
-    <div className={cn("w-full", isMobile ? "space-y-6" : "flex h-full min-h-0 flex-col")}>
+    <div className={cn("w-full", isMobile ? "space-y-4" : "flex h-full min-h-0 flex-col")}>
 
-
-      {/* Mobiel: statistieken als tegels */}
-      {isMobile && mobileOverview && (
-        <div className="grid grid-cols-1 gap-2">
-          {tabs.map(tab => (
-            <div
-              key={tab.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => { setActiveTab(tab.id); setMobileOverview(false); }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setActiveTab(tab.id); setMobileOverview(false); } }}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-accent/40"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                {tab.id === "scorers" && <MaskIcon src={trophyIconAsset.url} label="Topscorers" />}
-                {tab.id === "assists" && <MaskIcon src={bootsIconAsset.url} label="Assists" />}
-                {tab.id === "fairplay" && <MaskIcon src={yellowCardIconAsset.url} label="Fairplay" />}
-              </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{tab.label}</span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Mobiel: kop met terugknop */}
-      {isMobile && !mobileOverview && (
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Terug naar statistieken" onClick={() => setMobileOverview(true)}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="min-w-0 flex-1 truncate text-base font-semibold">{activeLabel}</h2>
-        </div>
+      {/* Mobiel: selectorvakje zoals fase-selector bij Resultaten */}
+      {isMobile && tabs.length > 1 && (
+        <Select value={activeTab} onValueChange={(value) => setActiveTab(value as StatTab)}>
+          <SelectTrigger className="h-9 w-full bg-card text-xs font-semibold uppercase">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {tabs.map(tab => (
+              <SelectItem key={tab.id} value={tab.id}>
+                {tab.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )}
 
       {!isMobile && (
         <div className="flex h-full min-h-0 gap-3">
           {/* Linkerkolom: klassementen (zelfde stijl als fasenamen bij Resultaten) */}
           <aside className="w-56 shrink-0 h-full min-h-0 overflow-y-auto overscroll-contain border-r border-border pr-2 pt-2">
-            
             <div className="flex flex-col gap-1">
               {tabs.map(tab => {
                 const isSelected = tab.id === activeTab;
@@ -486,8 +462,8 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
         </div>
       )}
 
-
-      {isMobile && !mobileOverview && (
+      {/* Mobiel: geselecteerde statistieken meteen zichtbaar */}
+      {isMobile && (
         <div className="min-w-0">
           {activeTab === "scorers" && showGoals && renderMobilePlayerStandings(goals, "Goals")}
           {activeTab === "assists" && showAssists && renderMobilePlayerStandings(assists, "Assists")}
