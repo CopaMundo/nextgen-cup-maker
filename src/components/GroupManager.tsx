@@ -887,7 +887,7 @@ const GroupManager = ({
                   <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-primary/40 bg-popover" />
                   Hier kan je de wedstrijden handmatig ingeven.
                   <button
-                    onClick={(e) => { e.stopPropagation(); setPlanHintGroupId(null); }}
+                    onClick={(e) => { e.stopPropagation(); dismissPlanHint(); }}
                     className="mt-1 block text-[11px] font-semibold text-primary hover:underline"
                   >
                     Begrepen
