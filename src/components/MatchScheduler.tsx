@@ -3368,11 +3368,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     {isMobile && fieldData.length > 0 && (
                       <div className="pb-2 -mx-1 px-1">
                         <div className="flex items-center gap-1.5">
-                          <div className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                          <div ref={mobileTabsRef} className="flex-1 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                             <div className="flex gap-1.5 pr-1">
                               {fieldData.map(({ field }) => (
                                 <button
                                   key={field.name}
+                                  data-field-tab={field.name}
                                   onClick={() => setMobileFieldName(field.name)}
                                   className={cn(
                                     "shrink-0 snap-start rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap",
