@@ -772,21 +772,9 @@ const SlideCard = ({
     <div className="rounded-lg border border-border overflow-hidden">
       {/* Header bar */}
       <div className="flex items-center justify-between gap-2 bg-primary text-primary-foreground px-3 py-2.5 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <span className="min-w-0 break-words text-sm font-bold">{slideName}</span>
-          <span className="inline-flex shrink-0 items-center gap-1 sm:gap-2">
-            <span className="inline-flex items-center rounded bg-background/20 px-2 py-0.5 text-sm font-bold text-primary-foreground">
-              {slide.durationSec || 15} seconden
-            </span>
-            <button
-              type="button"
-              onClick={() => setEditingMeta(true)}
-              className="inline-flex h-6 w-6 items-center justify-center rounded text-primary-foreground/90 hover:bg-background/20 hover:text-primary-foreground"
-              aria-label="Dianaam en tijd in beeld bewerken"
-              title="Bewerken"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </button>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="min-w-0 truncate text-sm font-bold">
+            {slideName}: {slide.durationSec || 15} seconden
           </span>
         </div>
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -808,6 +796,15 @@ const SlideCard = ({
               />
             </span>
           </label>
+          <button
+            type="button"
+            onClick={() => setEditingMeta(true)}
+            className="inline-flex h-6 w-6 items-center justify-center rounded text-primary-foreground/90 hover:bg-background/20 hover:text-primary-foreground"
+            aria-label="Dianaam en tijd in beeld bewerken"
+            title="Bewerken"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
           <button
             type="button"
             onClick={() => setConfirmDeleteSlide(true)}
