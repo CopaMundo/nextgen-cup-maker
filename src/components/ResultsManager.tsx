@@ -1472,13 +1472,40 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     });
 
     requestAnimationFrame(() => {
-      const container = matchesScrollRef.current;
       const el = slotRefs.current.get(anchorKey);
-      if (!container || !el) return;
-      const delta = el.getBoundingClientRect().top - container.getBoundingClientRect().top;
-      container.scrollTop += delta;
+      if (!el) return;
+      const container = matchesScrollRef.current;
+      const scrollsInternally = !!container && container.scrollHeight > container.clientHeight + 4;
+
+      if (scrollsInternally) {
+        const delta = el.getBoundingClientRect().top - container!.getBoundingClientRect().top;
+        container!.scrollTop += delta;
+        return;
+      }
+
+      // Mobiel: de pagina scrolt, dus schuif het venster zodat het anker
+      // net onder de vaste fase-/formatbalk staat.
+      const offset = (mobileHeaderRef.current?.getBoundingClientRect().height ?? 0) + 8;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
     });
   }, [timeSlotGroups]);
+
+  // Hoogte van de vaste mobiele fase-/formatbalk bijhouden zodat de
+  // datumkop daar precies onder blijft plakken.
+  useEffect(() => {
+    const el = mobileHeaderRef.current;
+    if (!el || !isMobile) {
+      setMobileStickyOffset(0);
+      return;
+    }
+    const update = () => setMobileStickyOffset(el.getBoundingClientRect().height);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isMobile, selectedPhaseNumber, categoryId, currentPhaseFormats.length]);
+
 
   useEffect(() => {
     autoFocusDoneRef.current = null;
