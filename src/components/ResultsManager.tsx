@@ -116,6 +116,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
   const [manuallyOpenedTimeSlots, setManuallyOpenedTimeSlots] = useState<Set<string>>(new Set());
   const matchesScrollRef = useRef<HTMLDivElement | null>(null);
   const mobileHeaderRef = useRef<HTMLElement | null>(null);
+  const dateHeaderRef = useRef<HTMLDivElement | null>(null);
   const [mobileStickyOffset, setMobileStickyOffset] = useState(0);
   const slotRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const autoFocusDoneRef = useRef<string | null>(null);
