@@ -202,10 +202,22 @@ const PresentationManager = ({
               <h2 className="section-title">Broadcast stijl</h2>
               {(() => {
                 const applyStyle = async (target: BroadcastStyle, name: string) => {
+                  const nextAppearance = target === displayStyle ? appearance : defaultAppearanceForStyle(target);
                   setDisplayStyle(target);
-                  await supabase.from("tournaments").update({ view_display_style: target } as any).eq("id", tournament.id);
-                  onUpdate({ ...tournament, view_display_style: target });
+                  setAppearance(nextAppearance);
+                  await supabase.from("tournaments")
+                    .update({ view_display_style: target, view_display_appearance: nextAppearance } as any)
+                    .eq("id", tournament.id);
+                  onUpdate({ ...tournament, view_display_style: target, view_display_appearance: nextAppearance });
                   toast({ title: `Stijl '${name}' ingesteld` });
+                };
+                const applyAppearance = async (target: BroadcastStyle, value: BroadcastAppearance) => {
+                  setDisplayStyle(target);
+                  setAppearance(value);
+                  await supabase.from("tournaments")
+                    .update({ view_display_style: target, view_display_appearance: value } as any)
+                    .eq("id", tournament.id);
+                  onUpdate({ ...tournament, view_display_style: target, view_display_appearance: value });
                 };
                 const entries = (Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
                   .filter(([key]) => SELECTABLE_BROADCAST_STYLES.includes(key));
@@ -213,20 +225,48 @@ const PresentationManager = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {entries.map(([key, info]) => {
                       const isActive = displayStyle === key;
+                      const options = STYLE_APPEARANCES[key] ?? [];
                       return (
-                        <button
+                        <div
                           key={key}
-                          onClick={() => applyStyle(key, info.name)}
                           className={cn(
-                            "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors",
+                            "flex flex-col gap-3 rounded-lg border p-3 transition-colors",
                             isActive ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
                           )}
                         >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
-                            {info.preview}
-                          </span>
-                          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => applyStyle(key, info.name)}
+                            className="flex items-center gap-3 text-left"
+                          >
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
+                              {info.preview}
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
+                          </button>
+                          {options.length > 1 ? (
+                            <div className="flex gap-1 rounded-md border border-border bg-secondary/60 p-1">
+                              {options.map((opt) => {
+                                const optActive = isActive && appearance === opt;
+                                return (
+                                  <button
+                                    key={opt}
+                                    type="button"
+                                    onClick={() => applyAppearance(key, opt)}
+                                    className={cn(
+                                      "flex-1 rounded px-2 py-1 text-xs font-semibold transition-colors",
+                                      optActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                                    )}
+                                  >
+                                    {appearanceLabel(key, opt)}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="px-1 text-xs text-muted-foreground">Eén vaste layout</p>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
