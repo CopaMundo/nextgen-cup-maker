@@ -8,6 +8,7 @@ import {
   defaultAppearanceForStyle,
   normalizeAppearance,
   normalizeBroadcastStyle,
+  stylePosterUrl,
   type BroadcastAppearance,
   type BroadcastStyle,
 } from "@/lib/broadcastStyles";
