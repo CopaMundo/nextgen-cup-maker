@@ -4,18 +4,16 @@ export type BroadcastStyle =
   | "la_rosa"
   | "teletext"
   | "wc26"
-  | "retro_bw"
-  | "serie_a";
+  | "retro_bw";
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
-  copa_mundo_bc: { name: "Copa Mundo", description: "Broadcast Style #1 — de native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
-  european_nights: { name: "European Nights", description: "Broadcast Style #2 — premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
-  wc26: { name: "World Cup 26", description: "Broadcast Style #7 — internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
-  la_rosa: { name: "La Rosa", description: "Broadcast Style #8 — moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
-  teletext: { name: "Teletext Football", description: "Broadcast Style #12 — klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
-  retro_bw: { name: "Retro Black & White", description: "Broadcast Style #4 — vintage matchdayprogramma in zwart-wit: warm gebroken wit, dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
-  serie_a: { name: "Serie A", description: "Broadcast Style #13 — Italiaanse topflight scoreboardlook: diepe navy met een felgroen-naar-turquoise gradient-accent, scherpe hoeken en Barlow Condensed typografie", preview: "🟢" },
+  copa_mundo_bc: { name: "Copa Mundo", description: "De native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
+  european_nights: { name: "European Nights", description: "Premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
+  wc26: { name: "World Cup 26", description: "Internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
+  la_rosa: { name: "La Rosa", description: "Moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
+  teletext: { name: "Teletext Football", description: "Klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
+  retro_bw: { name: "Stadium Noir", description: "Vintage matchdayprogramma in zwart-wit: dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
 
