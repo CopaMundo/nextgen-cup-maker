@@ -1208,6 +1208,7 @@ export type Database = {
           teams_label: string
           tournament_type: Database["public"]["Enums"]["tournament_type"]
           updated_at: string
+          view_display_appearance: string | null
           view_display_style: string
           view_link_active: boolean
           view_link_token: string | null
@@ -1261,6 +1262,7 @@ export type Database = {
           teams_label?: string
           tournament_type?: Database["public"]["Enums"]["tournament_type"]
           updated_at?: string
+          view_display_appearance?: string | null
           view_display_style?: string
           view_link_active?: boolean
           view_link_token?: string | null
@@ -1314,6 +1316,7 @@ export type Database = {
           teams_label?: string
           tournament_type?: Database["public"]["Enums"]["tournament_type"]
           updated_at?: string
+          view_display_appearance?: string | null
           view_display_style?: string
           view_link_active?: boolean
           view_link_token?: string | null
@@ -1396,6 +1399,7 @@ export type Database = {
           teams_label: string
           tournament_type: Database["public"]["Enums"]["tournament_type"]
           updated_at: string
+          view_display_appearance: string | null
           view_display_style: string
           view_link_active: boolean
           view_link_token: string | null

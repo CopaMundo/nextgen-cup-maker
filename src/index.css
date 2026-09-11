@@ -1,4 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=Libre+Baskerville:wght@400;700&family=Libre+Franklin:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&family=VT323&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,
+wght@0,
+400;0,
+500;0,
+600;0,
+700;0,
+800;0,
+900;1,
+400;1,
+500;1,
+600;1,
+700;1,
+800;1,
+900&family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:ital,
+wght@0,
+400;0,
+500;0,
+600;0,
+700;0,
+800;0,
+900;1,
+400;1,
+500;1,
+600;1,
+700;1,
+800;1,
+900&family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@400;500;700;800;900&family=Roboto+Slab:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=Libre+Baskerville:wght@400;700&family=Libre+Franklin:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Permanent+Marker&family=Caveat+Brush&family=VT323&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -58,33 +84,21 @@ input[type="number"] {
 }
 
 /* World Cup host-nation theme tokens — map primary/accent/ring to host color
-   so generic UI accents (info page, fase tabs, ring around home button, etc.)
-   pick up the selected host color automatically. */
-[data-broadcast="world_cup_mexico"] {
+   so generic UI accents (info page,
+fase tabs,
+ring around home button {
   --primary: 152 100% 20%;
   --primary-foreground: 0 0% 100%;
   --accent: 152 100% 27%;
   --accent-foreground: 0 0% 100%;
   --ring: 152 100% 20%;
 }
-[data-broadcast="world_cup_canada"] {
-  --primary: 0 100% 27%;
-  --primary-foreground: 0 0% 100%;
-  --accent: 352 100% 36%;
-  --accent-foreground: 0 0% 100%;
-  --ring: 0 100% 27%;
-}
-[data-broadcast="world_cup_usa"] {
-  --primary: 224 73% 38%;
-  --primary-foreground: 0 0% 100%;
-  --accent: 222 74% 45%;
-  --accent-foreground: 0 0% 100%;
-  --ring: 224 73% 38%;
-}
 
 /* ======================================================================
    COPA MUNDO THEME — Dark & Light
-   Colors: Green #009C3B, Yellow #FFDF00, Blue #002776
+   Colors: Green #009C3B,
+Yellow #FFDF00,
+Blue #002776
    ====================================================================== */
 @layer base {
   /* Dark Mode (default) */
@@ -189,35 +203,35 @@ input[type="number"] {
 
   /* Scrollbars volgen overal de onderliggende achtergrond. */
   html:not([data-mode="light"]),
-  html:not([data-mode="light"]) *,
-  html[data-mode="dark"],
-  html[data-mode="dark"] * {
+html:not([data-mode="light"]) *,
+html[data-mode="dark"],
+html[data-mode="dark"] * {
     scrollbar-color: hsl(var(--muted-foreground) / 0.5) transparent;
   }
 
   html:not([data-mode="light"])::-webkit-scrollbar,
-  html:not([data-mode="light"]) *::-webkit-scrollbar,
-  html[data-mode="dark"]::-webkit-scrollbar,
-  html[data-mode="dark"] *::-webkit-scrollbar {
+html:not([data-mode="light"]) *::-webkit-scrollbar,
+html[data-mode="dark"]::-webkit-scrollbar,
+html[data-mode="dark"] *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
   html:not([data-mode="light"])::-webkit-scrollbar-track,
-  html:not([data-mode="light"]) *::-webkit-scrollbar-track,
-  html[data-mode="dark"]::-webkit-scrollbar-track,
-  html[data-mode="dark"] *::-webkit-scrollbar-track,
-  html:not([data-mode="light"])::-webkit-scrollbar-corner,
-  html:not([data-mode="light"]) *::-webkit-scrollbar-corner,
-  html[data-mode="dark"]::-webkit-scrollbar-corner,
-  html[data-mode="dark"] *::-webkit-scrollbar-corner {
+html:not([data-mode="light"]) *::-webkit-scrollbar-track,
+html[data-mode="dark"]::-webkit-scrollbar-track,
+html[data-mode="dark"] *::-webkit-scrollbar-track,
+html:not([data-mode="light"])::-webkit-scrollbar-corner,
+html:not([data-mode="light"]) *::-webkit-scrollbar-corner,
+html[data-mode="dark"]::-webkit-scrollbar-corner,
+html[data-mode="dark"] *::-webkit-scrollbar-corner {
     background: transparent;
   }
 
   html:not([data-mode="light"])::-webkit-scrollbar-thumb,
-  html:not([data-mode="light"]) *::-webkit-scrollbar-thumb,
-  html[data-mode="dark"]::-webkit-scrollbar-thumb,
-  html[data-mode="dark"] *::-webkit-scrollbar-thumb {
+html:not([data-mode="light"]) *::-webkit-scrollbar-thumb,
+html[data-mode="dark"]::-webkit-scrollbar-thumb,
+html[data-mode="dark"] *::-webkit-scrollbar-thumb {
     background-color: hsl(var(--muted-foreground) / 0.5);
     background-clip: padding-box;
     border: 3px solid transparent;
@@ -225,9 +239,9 @@ input[type="number"] {
   }
 
   html:not([data-mode="light"])::-webkit-scrollbar-thumb:hover,
-  html:not([data-mode="light"]) *::-webkit-scrollbar-thumb:hover,
-  html[data-mode="dark"]::-webkit-scrollbar-thumb:hover,
-  html[data-mode="dark"] *::-webkit-scrollbar-thumb:hover {
+html:not([data-mode="light"]) *::-webkit-scrollbar-thumb:hover,
+html[data-mode="dark"]::-webkit-scrollbar-thumb:hover,
+html[data-mode="dark"] *::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--foreground) / 0.55);
   }
 
@@ -236,7 +250,12 @@ input[type="number"] {
     font-family: 'Inter', sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Space Grotesk', sans-serif;
   }
 }
@@ -266,7 +285,8 @@ input[type="number"] {
 }
 
 /* ======================================================================
-   DESKTOP REFINEMENT — spacing, typography and section hierarchy
+   DESKTOP REFINEMENT — spacing,
+typography and section hierarchy
    ====================================================================== */
 @layer utilities {
   .section-card {
@@ -292,7 +312,8 @@ input[type="number"] {
 }
 
 /* De beheeromgeving vult eerst haar maximale werkbreedte. Op grotere
-   desktopmonitoren groeit de volledige rem-schaal in rustige, vaste stappen. */
+   desktopmonitoren groeit de volledige rem-schaal in rustige,
+vaste stappen. */
 @media (min-width: 1920px) {
   html:has(.tournament-admin) {
     font-size: 17px;
@@ -384,12 +405,11 @@ input[type="number"] {
 
 /* ======================================================================
    BROADCAST STYLE COLOR OVERRIDES
-   Broadcast kleuren zijn ALLEEN voor accenten, kaders, randen, tekst.
-   Achtergrond blijft neutraal (wit/lichtgrijs in light, donker in dark).
-   ====================================================================== */
-
-/* ── 1. Champions League Elite ── Gold #D4AF37 + Navy #001C58 ── */
-[data-broadcast="champions_league"][data-mode="dark"] {
+   Broadcast kleuren zijn ALLEEN voor accenten,
+kaders,
+randen,
+tekst.
+   Achtergrond blijft neutraal (wit/lichtgrijs in light {
   --background: 220 15% 7%;
   --foreground: 0 0% 95%;
   --card: 220 12% 11%;
@@ -412,539 +432,12 @@ input[type="number"] {
   --input: 217 30% 22%;
   --ring: 43 65% 52%;
 }
-[data-broadcast="champions_league"][data-mode="light"] {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 217 100% 17%;
-  --primary-foreground: 43 65% 90%;
-  --secondary: 220 8% 93%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 220 6% 94%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 43 65% 52%;
-  --accent-foreground: 217 100% 10%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 217 15% 85%;
-  --input: 217 15% 85%;
-  --ring: 217 100% 17%;
-}
-
-/* ── 2. FIFA / Game Style ── Neon Mint #00FFA3 + Petrol #004B57 ── */
-[data-broadcast="fifa"][data-mode="dark"] {
-  --background: 200 15% 7%;
-  --foreground: 0 0% 93%;
-  --card: 200 12% 11%;
-  --card-foreground: 0 0% 93%;
-  --popover: 200 12% 11%;
-  --popover-foreground: 0 0% 93%;
-  --primary: 158 100% 50%;
-  --primary-foreground: 189 100% 5%;
-  --secondary: 200 10% 15%;
-  --secondary-foreground: 0 0% 80%;
-  --muted: 200 8% 15%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 64 100% 50%;
-  --accent-foreground: 0 0% 5%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 189 25% 20%;
-  --input: 189 25% 20%;
-  --ring: 158 100% 50%;
-}
-[data-broadcast="fifa"][data-mode="light"] {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 189 100% 17%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 189 10% 93%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 189 8% 94%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 158 100% 35%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 189 15% 85%;
-  --input: 189 15% 85%;
-  --ring: 189 100% 17%;
-}
-
-/* ── 3. Retro Arcade ── Zwart #000 + Wit #FFF ── */
-[data-broadcast="retro"][data-mode="dark"] {
-  --background: 0 0% 4%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 8%;
-  --card-foreground: 0 0% 90%;
-  --popover: 0 0% 8%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 0 0% 100%;
-  --primary-foreground: 0 0% 0%;
-  --secondary: 0 0% 13%;
-  --secondary-foreground: 0 0% 75%;
-  --muted: 0 0% 13%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 0 0% 75%;
-  --accent-foreground: 0 0% 5%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 0 0% 100%;
-}
-[data-broadcast="retro"][data-mode="light"] {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 8%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 8%;
-  --primary: 0 0% 0%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 93%;
-  --secondary-foreground: 0 0% 20%;
-  --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 45%;
-  --accent: 0 0% 30%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 82%;
-  --input: 0 0% 82%;
-  --ring: 0 0% 0%;
-}
-
-/* ── 4. Breaking News (ESPN/Sky Sports) ── Rood #E20613 + Navy #002D72 ── */
-[data-broadcast="espn"][data-mode="dark"] {
-  --background: 0 0% 7%;
-  --foreground: 0 0% 95%;
-  --card: 0 0% 11%;
-  --card-foreground: 0 0% 95%;
-  --popover: 0 0% 11%;
-  --popover-foreground: 0 0% 95%;
-  --primary: 357 93% 45%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 15%;
-  --secondary-foreground: 0 0% 82%;
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 55%;
-  --accent: 216 100% 30%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 357 93% 45%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 357 93% 45%;
-}
-[data-broadcast="espn"][data-mode="light"] {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 357 93% 45%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 94%;
-  --secondary-foreground: 0 0% 22%;
-  --muted: 0 0% 95%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 216 100% 22%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 357 93% 45%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 86%;
-  --input: 0 0% 86%;
-  --ring: 357 93% 45%;
-}
-
-/* ── 5. Street Football ── Neon Geel #CCFF00 + Oranje #FF5E00 ── */
-[data-broadcast="street"][data-mode="dark"] {
-  --background: 0 0% 8%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 12%;
-  --card-foreground: 0 0% 90%;
-  --popover: 0 0% 12%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 72 100% 50%;
-  --primary-foreground: 0 0% 5%;
-  --secondary: 0 0% 16%;
-  --secondary-foreground: 0 0% 78%;
-  --muted: 0 0% 16%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 22 100% 50%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 80% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 22%;
-  --input: 0 0% 22%;
-  --ring: 72 100% 50%;
-}
-[data-broadcast="street"][data-mode="light"] {
-  --background: 0 0% 95%;
-  --foreground: 0 0% 12%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 12%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 12%;
-  --primary: 0 0% 15%;
-  --primary-foreground: 72 100% 50%;
-  --secondary: 0 0% 90%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 0 0% 91%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 22 100% 50%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 80% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 80%;
-  --input: 0 0% 80%;
-  --ring: 0 0% 15%;
-}
-
-/* ── 6. Data Geek ── Kobaltblauw #2D5AF7 + Oranje #FF9F43 ── */
-[data-broadcast="data_geek"][data-mode="dark"] {
-  --background: 220 12% 7%;
-  --foreground: 0 0% 90%;
-  --card: 220 10% 11%;
-  --card-foreground: 0 0% 90%;
-  --popover: 220 10% 11%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 225 92% 57%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 220 8% 15%;
-  --secondary-foreground: 0 0% 80%;
-  --muted: 220 6% 15%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 29 100% 63%;
-  --accent-foreground: 0 0% 5%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 225 12% 20%;
-  --input: 225 12% 20%;
-  --ring: 225 92% 57%;
-}
-[data-broadcast="data_geek"][data-mode="light"] {
-  --background: 210 20% 98%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 225 92% 57%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 225 10% 94%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 225 8% 95%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 29 100% 63%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 225 10% 87%;
-  --input: 225 10% 87%;
-  --ring: 225 92% 57%;
-}
-
-/* ── 7. La Gazzetta ── Roze #F6D3D8 bg + Inktzwart #1A1A1A + Grijs #5A5A5A ── */
-[data-broadcast="gazette"][data-mode="light"] {
-  --background: 350 55% 93%;
-  --foreground: 0 0% 10%;
-  --card: 350 40% 96%;
-  --card-foreground: 0 0% 10%;
-  --popover: 350 40% 96%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 0 0% 10%;
-  --primary-foreground: 350 55% 93%;
-  --secondary: 350 28% 88%;
-  --secondary-foreground: 0 0% 18%;
-  --muted: 350 22% 89%;
-  --muted-foreground: 0 0% 35%;
-  --accent: 0 75% 45%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 350 18% 82%;
-  --input: 350 18% 82%;
-  --ring: 0 0% 10%;
-}
-[data-broadcast="gazette"][data-mode="dark"] {
-  --background: 350 12% 8%;
-  --foreground: 350 25% 88%;
-  --card: 350 10% 12%;
-  --card-foreground: 350 25% 88%;
-  --popover: 350 10% 12%;
-  --popover-foreground: 350 25% 88%;
-  --primary: 350 50% 72%;
-  --primary-foreground: 0 0% 5%;
-  --secondary: 350 8% 16%;
-  --secondary-foreground: 350 15% 75%;
-  --muted: 350 6% 16%;
-  --muted-foreground: 350 8% 48%;
-  --accent: 0 75% 50%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 350 10% 22%;
-  --input: 350 10% 22%;
-  --ring: 350 50% 72%;
-}
-
-/* ── 8. Social Media Feed ── Paars #833AB4 + Oranje #F56040 (Instagram) ── */
-[data-broadcast="social"][data-mode="light"] {
-  --background: 0 0% 97%;
-  --foreground: 0 0% 8%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 8%;
-  --primary: 275 51% 47%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 275 8% 94%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 275 6% 95%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 11 89% 60%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 275 6% 88%;
-  --input: 275 6% 88%;
-  --ring: 275 51% 47%;
-}
-[data-broadcast="social"][data-mode="dark"] {
-  --background: 0 0% 7%;
-  --foreground: 0 0% 93%;
-  --card: 0 0% 11%;
-  --card-foreground: 0 0% 93%;
-  --popover: 0 0% 11%;
-  --popover-foreground: 0 0% 93%;
-  --primary: 275 51% 55%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 275 8% 16%;
-  --secondary-foreground: 0 0% 78%;
-  --muted: 275 6% 16%;
-  --muted-foreground: 0 0% 48%;
-  --accent: 11 89% 60%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 95%;
-  --border: 275 8% 20%;
-  --input: 275 8% 20%;
-  --ring: 275 51% 55%;
-}
-
-/* ── 9. Copa Mundo ── Premium European night-football: deep navy #050A24 + electric blue #3975FF ── */
-[data-broadcast="copa_mundo"] {
-  font-family: 'Montserrat', 'Inter', sans-serif;
-}
-[data-broadcast="copa_mundo"] .font-display,
-[data-broadcast="copa_mundo"] h1,
-[data-broadcast="copa_mundo"] h2,
-[data-broadcast="copa_mundo"] h3 {
-  font-family: 'Montserrat', 'Inter', sans-serif;
-  letter-spacing: -0.01em;
-}
-[data-broadcast="copa_mundo"][data-mode="dark"] {
-  /* #050A24 background, #0B153A card, #101D4A secondary, #14245A elevated */
-  --background: 230 76% 8%;
-  --foreground: 0 0% 100%;
-  --card: 227 68% 14%;
-  --card-foreground: 0 0% 100%;
-  --popover: 227 68% 14%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 222 100% 61%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 227 64% 18%;
-  --secondary-foreground: 226 35% 85%;
-  --muted: 227 64% 18%;
-  --muted-foreground: 226 30% 68%;
-  --accent: 226 64% 22%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 70% 52%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 226 55% 26%;
-  --input: 226 55% 26%;
-  --ring: 222 100% 61%;
-  --radius: 0.875rem;
-  --gradient-hero: linear-gradient(180deg, hsl(230 76% 8%) 0%, hsl(225 77% 13%) 100%);
-}
-[data-broadcast="copa_mundo"][data-mode="light"] {
-  --background: 225 40% 97%;
-  --foreground: 230 60% 12%;
-  --card: 0 0% 100%;
-  --card-foreground: 230 60% 12%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 230 60% 12%;
-  --primary: 226 100% 57%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 225 35% 93%;
-  --secondary-foreground: 230 45% 20%;
-  --muted: 225 35% 93%;
-  --muted-foreground: 225 19% 45%;
-  --accent: 227 68% 16%;
-  --accent-foreground: 0 0% 100%;
-  --warning: 32 95% 50%;
-  --warning-foreground: 0 0% 100%;
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 225 30% 86%;
-  --input: 225 30% 86%;
-  --ring: 226 100% 57%;
-  --radius: 0.875rem;
-}
-
-/* ── 10. Netflix Docu ── Rood #E50914 + Zilvergrijs #B3B3B3 ── */
-[data-broadcast="netflix"][data-mode="dark"] {
-  --background: 0 0% 4%;
-  --foreground: 0 0% 93%;
-  --card: 0 0% 9%;
-  --card-foreground: 0 0% 93%;
-  --popover: 0 0% 9%;
-  --popover-foreground: 0 0% 93%;
-  --primary: 357 95% 47%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 14%;
-  --secondary-foreground: 0 0% 78%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 48%;
-  --accent: 0 0% 70%;
-  --accent-foreground: 0 0% 5%;
-  --destructive: 357 95% 47%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 18%;
-  --input: 0 0% 18%;
-  --ring: 357 95% 47%;
-}
-[data-broadcast="netflix"][data-mode="light"] {
-  --background: 0 0% 97%;
-  --foreground: 0 0% 8%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 8%;
-  --primary: 357 95% 47%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 94%;
-  --secondary-foreground: 0 0% 22%;
-  --muted: 0 0% 95%;
-  --muted-foreground: 0 0% 42%;
-  --accent: 0 0% 42%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 357 95% 47%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 86%;
-  --input: 0 0% 86%;
-  --ring: 357 95% 47%;
-}
 
 /* ── 15. RETRO FOOTBALL ── 1970s/80s matchday programme: aged cream #E9DFC5,
-   forest green #17392C, burnt red #B13A2C, mustard #D2A431, ink #24231F ── */
-[data-broadcast="retro_football"] {
+forest green #17392C,
+burnt red #B13A2C,
+mustard #D2A431 {
   font-family: 'Roboto Slab', Georgia, serif;
-}
-[data-broadcast="retro_football"] h1,
-[data-broadcast="retro_football"] h2,
-[data-broadcast="retro_football"] h3,
-[data-broadcast="retro_football"] .font-display {
-  font-family: 'Roboto Condensed', 'Oswald', Impact, sans-serif;
-  font-weight: 800;
-  text-transform: uppercase;
-  line-height: 1.02;
-  letter-spacing: 0.01em;
-}
-/* condensed numerals for scores / times / rankings */
-[data-broadcast="retro_football"] .tabular-nums,
-[data-broadcast="retro_football"] table th,
-[data-broadcast="retro_football"] .rf-num {
-  font-family: 'Roboto Condensed', 'Oswald', sans-serif;
-  font-variant-numeric: tabular-nums;
-}
-/* extremely subtle printed-paper grain */
-[data-broadcast="retro_football"] {
-  position: relative;
-  background-image:
-    radial-gradient(circle at 18% 12%, hsl(43 45% 78% / 0.35) 0%, transparent 42%),
-    radial-gradient(circle at 82% 78%, hsl(39 25% 70% / 0.28) 0%, transparent 45%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  background-attachment: fixed, fixed, fixed;
-  background-repeat: no-repeat, no-repeat, repeat;
-}
-[data-broadcast="retro_football"][data-mode="light"] {
-  --background: 43 45% 84%;
-  --foreground: 48 7% 13%;
-  --card: 43 57% 89%;
-  --card-foreground: 48 7% 13%;
-  --popover: 43 57% 89%;
-  --popover-foreground: 48 7% 13%;
-  --primary: 6 60% 43%;
-  --primary-foreground: 43 57% 89%;
-  --secondary: 43 38% 80%;
-  --secondary-foreground: 157 43% 16%;
-  --muted: 43 38% 80%;
-  --muted-foreground: 39 11% 42%;
-  --accent: 157 43% 16%;
-  --accent-foreground: 43 57% 89%;
-  --destructive: 5 58% 33%;
-  --destructive-foreground: 43 57% 89%;
-  --border: 39 11% 42%;
-  --input: 39 11% 42%;
-  --ring: 6 60% 43%;
-  --radius: 0.3rem;
-  --gradient-hero: linear-gradient(180deg, hsl(43 57% 89%) 0%, hsl(43 45% 84%) 100%);
-}
-[data-broadcast="retro_football"][data-mode="dark"] {
-  --background: 157 43% 10%;
-  --foreground: 43 50% 88%;
-  --card: 150 31% 15%;
-  --card-foreground: 43 50% 88%;
-  --popover: 150 31% 15%;
-  --popover-foreground: 43 50% 88%;
-  --primary: 6 60% 48%;
-  --primary-foreground: 43 57% 92%;
-  --secondary: 150 26% 20%;
-  --secondary-foreground: 43 45% 84%;
-  --muted: 150 26% 20%;
-  --muted-foreground: 43 15% 65%;
-  --accent: 43 45% 84%;
-  --accent-foreground: 157 43% 14%;
-  --destructive: 5 58% 40%;
-  --destructive-foreground: 43 57% 92%;
-  --border: 150 18% 30%;
-  --input: 150 18% 30%;
-  --ring: 6 60% 48%;
-  --radius: 0.3rem;
-  --gradient-hero: linear-gradient(180deg, hsl(157 43% 14%) 0%, hsl(157 43% 10%) 100%);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1047,7 +540,8 @@ input[type="number"] {
 }
 
 /* ── Copa Mundo broadcast card text & score overrides ── */
-/* Light mode: teamnamen/context in hun normale kleur, enkel scores blauw met
+/* Light mode: teamnamen/context in hun normale kleur,
+enkel scores blauw met
    zachte gloed — winnaar feller dan verliezer. */
 :is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-score {
   color: hsl(var(--primary) / 0.55);
@@ -1073,7 +567,8 @@ input[type="number"] {
   border-left-color: hsl(var(--primary));
 }
 
-/* Light mode: subtle theme-blue winner marker, visible but not overpowering. */
+/* Light mode: subtle theme-blue winner marker,
+visible but not overpowering. */
 :is([data-broadcast="copa_mundo_bc"][data-mode="light"]) .cm-match-winner {
   background-color: hsl(var(--primary) / 0.18);
   border-left-color: hsl(var(--primary));
@@ -1089,7 +584,9 @@ input[type="number"] {
 }
 
 /* ── BROADCAST #2: EUROPEAN NIGHTS ─────────────────────────────────────────
-   Kick-of-light inspired: night blue base + electric blue, cyan, violet en
+   Kick-of-light inspired: night blue base + electric blue,
+cyan,
+violet en
    magenta als prismatische lichtaccenten. Display: Roboto Condensed — Body: Inter
    ───────────────────────────────────────────────────────────────────────── */
 [data-broadcast="european_nights"] {
@@ -1210,7 +707,8 @@ input[type="number"] {
   background-attachment: fixed;
 }
 
-/* Broadcast typografie: scores, tijden en cijfers in Roboto Condensed */
+/* Broadcast typografie: scores,
+tijden en cijfers in Roboto Condensed */
 [data-broadcast="european_nights"] .tabular-nums {
   font-family: 'Roboto Condensed', 'Inter', sans-serif;
   font-weight: 700;
@@ -1223,7 +721,8 @@ input[type="number"] {
 [data-broadcast="european_nights"] .en-live-dot {
   animation: en-live-pulse 1.6s ease-in-out infinite;
 }
-/* Infobalk in wedstrijdkaarten/brackets: dark = nachtblauw, light = Electric Blue #143CDB */
+/* Infobalk in wedstrijdkaarten/brackets: dark = nachtblauw,
+light = Electric Blue #143CDB */
 [data-broadcast="european_nights"][data-mode="dark"] .en-infobar {
   background-color: hsl(226 58% 16%);
   color: #ffffff;
@@ -1245,7 +744,8 @@ input[type="number"] {
 [data-broadcast="european_nights"][data-mode="light"] .en-timeslot-header * {
   color: #143CDB !important;
 }
-/* Homeknop: cirkel — dark = Electric Blue #143CDB, light = wit */
+/* Homeknop: cirkel — dark = Electric Blue #143CDB,
+light = wit */
 .en-home-btn {
   border-radius: 9999px;
 }
@@ -1287,132 +787,11 @@ input[type="number"] {
   stroke-width: 1.5;
 }
 
-
 /* ── BROADCAST #3: JOGA BONITO ──────────────────────────────────────────────
-   Braziliaanse straatvoetbalcultuur: navy basis, geel als broadcast-accent,
-   groen voor actieve states, warm wit voor rust.
-   Headings: Permanent Marker — UI/data: Barlow Condensed — body: Inter
-   ───────────────────────────────────────────────────────────────────────── */
-[data-broadcast="joga_bonito"] {
+   Braziliaanse straatvoetbalcultuur: navy basis,
+geel als broadcast-accent,
+groen voor actieve states {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-[data-broadcast="joga_bonito"] h1,
-[data-broadcast="joga_bonito"] h2,
-[data-broadcast="joga_bonito"] h3,
-[data-broadcast="joga_bonito"] .font-display,
-[data-broadcast="joga_bonito"] .jb-brush {
-  font-family: 'Permanent Marker', 'Caveat Brush', 'Barlow Condensed', sans-serif;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.015em;
-  line-height: 1.1;
-}
-
-[data-broadcast="joga_bonito"][data-mode="light"] {
-  --background: 48 100% 98%;
-  --foreground: 220 79% 15%;
-  --card: 0 0% 100%;
-  --card-foreground: 220 79% 15%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 220 79% 15%;
-  --primary: 50 100% 50%;
-  --primary-foreground: 222 87% 24%;
-  --secondary: 47 55% 92%;
-  --secondary-foreground: 220 12% 46%;
-  --muted: 47 55% 92%;
-  --muted-foreground: 220 12% 46%;
-  --accent: 133 91% 34%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 4 74% 48%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 45 24% 83%;
-  --input: 45 24% 83%;
-  --ring: 133 91% 34%;
-  --radius: 0.8rem;
-  --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(48 100% 98%) 100%);
-
-  --broadcast-bg: 48 100% 98%;
-  --broadcast-night: 222 87% 24%;
-  --broadcast-surface: 0 0% 100%;
-  --broadcast-surface-secondary: 47 55% 92%;
-  --broadcast-surface-elevated: 47 55% 92%;
-  --broadcast-text: 220 79% 15%;
-  --broadcast-text-secondary: 220 12% 46%;
-  --broadcast-text-muted: 220 10% 58%;
-  --broadcast-border: 45 24% 83%;
-  --broadcast-primary: 50 100% 50%;
-  --broadcast-primary-contrast: 222 87% 24%;
-  --broadcast-score: 133 91% 34%;
-  --broadcast-bright: 132 77% 44%;
-  --broadcast-navy: 222 87% 24%;
-  --broadcast-cyan: 133 91% 34%;
-  --broadcast-violet: 222 87% 24%;
-  --broadcast-magenta: 50 100% 50%;
-  --broadcast-danger: 4 74% 48%;
-  --broadcast-success: 133 91% 34%;
-
-  background-image:
-    radial-gradient(120% 55% at 50% -10%, hsl(50 100% 50% / 0.16) 0%, transparent 60%),
-    radial-gradient(60% 30% at 0% 5%, hsl(133 91% 34% / 0.07) 0%, transparent 70%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-[data-broadcast="joga_bonito"][data-mode="dark"] {
-  --background: 220 90% 15%;
-  --foreground: 0 0% 100%;
-  --card: 222 87% 24%;
-  --card-foreground: 0 0% 100%;
-  --popover: 220 82% 27%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 50 100% 50%;
-  --primary-foreground: 222 87% 24%;
-  --secondary: 220 82% 27%;
-  --secondary-foreground: 218 43% 84%;
-  --muted: 220 82% 27%;
-  --muted-foreground: 218 43% 84%;
-  --accent: 132 77% 44%;
-  --accent-foreground: 222 87% 24%;
-  --destructive: 4 74% 52%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 220 45% 38%;
-  --input: 220 45% 38%;
-  --ring: 50 100% 50%;
-  --radius: 0.8rem;
-  --gradient-hero: linear-gradient(180deg, hsl(222 87% 24%) 0%, hsl(220 90% 15%) 100%);
-
-  --broadcast-bg: 220 90% 15%;
-  --broadcast-night: 220 90% 11%;
-  --broadcast-surface: 222 87% 24%;
-  --broadcast-surface-secondary: 220 82% 27%;
-  --broadcast-surface-elevated: 220 82% 27%;
-  --broadcast-text: 0 0% 100%;
-  --broadcast-text-secondary: 218 43% 84%;
-  --broadcast-text-muted: 218 30% 72%;
-  --broadcast-border: 220 45% 38%;
-  --broadcast-primary: 50 100% 50%;
-  --broadcast-primary-contrast: 222 87% 24%;
-  --broadcast-score: 132 77% 44%;
-  --broadcast-bright: 132 77% 44%;
-  --broadcast-navy: 222 87% 24%;
-  --broadcast-cyan: 132 77% 44%;
-  --broadcast-violet: 222 87% 24%;
-  --broadcast-magenta: 50 100% 50%;
-  --broadcast-danger: 4 74% 52%;
-  --broadcast-success: 132 77% 44%;
-
-  background-image:
-    radial-gradient(120% 55% at 50% -10%, hsl(50 100% 50% / 0.10) 0%, transparent 62%),
-    radial-gradient(70% 35% at 100% 8%, hsl(132 77% 44% / 0.08) 0%, transparent 70%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-/* Data/scores in Barlow Condensed */
-[data-broadcast="joga_bonito"] .tabular-nums {
-  font-family: 'Barlow Condensed', Inter, sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.01em;
 }
 
 /* Hand-painted marker underline onder actieve tabs/titels */
@@ -1457,7 +836,9 @@ input[type="number"] {
 
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #4 — RETRO BLACK & WHITE
-   Vintage matchdayprogramma: warm gebroken wit, zwart, dunne lijnen
+   Vintage matchdayprogramma: warm gebroken wit,
+zwart,
+dunne lijnen
    ══════════════════════════════════════════════════════════════ */
 [data-broadcast="retro_bw"],
 [data-broadcast="retro_bw"] body,
@@ -1573,7 +954,8 @@ body[data-broadcast="retro_bw"] {
   background-image: none;
 }
 
-/* Print-achtige kaders: 3px radius, geen zachte shadows */
+/* Print-achtige kaders: 3px radius,
+geen zachte shadows */
 [data-broadcast="retro_bw"] .rbw-card,
 [data-broadcast="retro_bw"] .rounded-none {
   border-radius: 3px;
@@ -1588,7 +970,8 @@ body[data-broadcast="retro_bw"] {
   border-color: hsl(0 0% 8%) !important;
 }
 
-/* Knockout bracket: doorstotende ploeg witter in dark, lichtzwart in light met zwarte accentbalk */
+/* Knockout bracket: doorstotende ploeg witter in dark,
+lichtzwart in light met zwarte accentbalk */
 [data-broadcast="retro_bw"][data-mode="dark"] .rbw-bracket-winner {
   background-color: hsl(0 0% 24%) !important;
 }
@@ -1633,136 +1016,13 @@ body[data-broadcast="retro_bw"] {
 
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #5 — OLD NEWSPAPER
-   Oude Europese sportkrant: vergeeld papier, drukinkt, serif headlines
-   ══════════════════════════════════════════════════════════════ */
-[data-broadcast="old_newspaper"],
-[data-broadcast="old_newspaper"] body,
-body[data-broadcast="old_newspaper"] {
+   Oude Europese sportkrant: vergeeld papier,
+drukinkt {
   font-family: 'Libre Franklin', Inter, system-ui, sans-serif;
 }
-[data-broadcast="old_newspaper"] h1,
-[data-broadcast="old_newspaper"] h2,
-[data-broadcast="old_newspaper"] .font-display {
-  font-family: 'Playfair Display', 'Libre Baskerville', Georgia, serif;
-  font-weight: 900;
-  letter-spacing: -0.01em;
-  line-height: 1.02;
-}
-[data-broadcast="old_newspaper"] h3 {
-  font-family: 'Roboto Slab', Georgia, serif;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-[data-broadcast="old_newspaper"] .tabular-nums {
-  font-family: 'Roboto Slab', Georgia, serif;
-  font-weight: 800;
-}
 
-[data-broadcast="old_newspaper"][data-mode="light"] {
-  --background: 41 34% 86%;
-  --foreground: 45 8% 9%;
-  --card: 45 44% 91%;
-  --card-foreground: 45 8% 9%;
-  --popover: 45 44% 91%;
-  --popover-foreground: 45 8% 9%;
-  --primary: 45 8% 12%;
-  --primary-foreground: 45 44% 91%;
-  --secondary: 41 24% 80%;
-  --secondary-foreground: 42 8% 36%;
-  --muted: 41 24% 80%;
-  --muted-foreground: 42 8% 36%;
-  --accent: 5 59% 34%;
-  --accent-foreground: 45 44% 95%;
-  --destructive: 5 59% 34%;
-  --destructive-foreground: 45 44% 95%;
-  --border: 40 11% 50%;
-  --input: 40 11% 50%;
-  --ring: 45 8% 12%;
-  --radius: 0.1rem;
-  --gradient-hero: linear-gradient(180deg, hsl(45 44% 91%) 0%, hsl(41 34% 86%) 100%);
-
-  --broadcast-bg: 41 34% 86%;
-  --broadcast-night: 45 8% 13%;
-  --broadcast-surface: 45 44% 91%;
-  --broadcast-surface-secondary: 41 24% 80%;
-  --broadcast-surface-elevated: 41 24% 80%;
-  --broadcast-text: 45 8% 9%;
-  --broadcast-text-secondary: 42 8% 36%;
-  --broadcast-text-muted: 40 9% 48%;
-  --broadcast-border: 40 11% 50%;
-  --broadcast-primary: 45 8% 13%;
-  --broadcast-primary-contrast: 45 44% 93%;
-  --broadcast-score: 45 8% 9%;
-  --broadcast-bright: 5 59% 34%;
-  --broadcast-navy: 45 8% 13%;
-  --broadcast-cyan: 45 8% 13%;
-  --broadcast-violet: 5 59% 34%;
-  --broadcast-magenta: 5 59% 34%;
-  --broadcast-danger: 5 59% 34%;
-  --broadcast-success: 45 8% 13%;
-}
-
-[data-broadcast="old_newspaper"][data-mode="dark"] {
-  --background: 45 8% 11%;
-  --foreground: 42 30% 88%;
-  --card: 45 8% 15%;
-  --card-foreground: 42 30% 88%;
-  --popover: 45 8% 15%;
-  --popover-foreground: 42 30% 88%;
-  --primary: 42 30% 88%;
-  --primary-foreground: 45 8% 11%;
-  --secondary: 44 7% 20%;
-  --secondary-foreground: 41 14% 66%;
-  --muted: 44 7% 20%;
-  --muted-foreground: 41 14% 66%;
-  --accent: 6 52% 51%;
-  --accent-foreground: 45 8% 11%;
-  --destructive: 6 52% 51%;
-  --destructive-foreground: 45 8% 11%;
-  --border: 42 8% 33%;
-  --input: 42 8% 33%;
-  --ring: 42 30% 88%;
-  --radius: 0.1rem;
-  --gradient-hero: linear-gradient(180deg, hsl(45 8% 15%) 0%, hsl(45 8% 11%) 100%);
-
-  --broadcast-bg: 45 8% 11%;
-  --broadcast-night: 45 8% 8%;
-  --broadcast-surface: 45 8% 15%;
-  --broadcast-surface-secondary: 44 7% 20%;
-  --broadcast-surface-elevated: 44 7% 20%;
-  --broadcast-text: 42 30% 88%;
-  --broadcast-text-secondary: 41 14% 66%;
-  --broadcast-text-muted: 41 10% 56%;
-  --broadcast-border: 42 8% 33%;
-  --broadcast-primary: 42 30% 88%;
-  --broadcast-primary-contrast: 45 8% 11%;
-  --broadcast-score: 42 30% 88%;
-  --broadcast-bright: 6 52% 51%;
-  --broadcast-navy: 45 8% 8%;
-  --broadcast-cyan: 42 30% 88%;
-  --broadcast-violet: 6 52% 51%;
-  --broadcast-magenta: 6 52% 51%;
-  --broadcast-danger: 6 52% 51%;
-  --broadcast-success: 42 30% 88%;
-}
-
-/* Krantenpapier: fijne grain + lichte vergeling */
-[data-broadcast="old_newspaper"] {
-  background-image:
-    repeating-linear-gradient(0deg, hsl(var(--broadcast-text) / 0.018) 0px, hsl(var(--broadcast-text) / 0.018) 1px, transparent 1px, transparent 4px),
-    repeating-linear-gradient(90deg, hsl(var(--broadcast-text) / 0.014) 0px, hsl(var(--broadcast-text) / 0.014) 1px, transparent 1px, transparent 5px),
-    radial-gradient(130% 70% at 50% -10%, hsl(var(--broadcast-text) / 0.06) 0%, transparent 60%);
-  background-repeat: repeat, repeat, no-repeat;
-  background-attachment: fixed;
-}
-
-/* Print-look: rechte hoeken, geen shadows */
-[data-broadcast="old_newspaper"] .onp-card,
-[data-broadcast="old_newspaper"] .rounded-none {
+/* Print-look: rechte hoeken {
   border-radius: 1px;
-}
-[data-broadcast="old_newspaper"] [class*="shadow-"] {
-  box-shadow: none !important;
 }
 
 /* Dubbele newspaper rule onder headlines */
@@ -1803,10 +1063,16 @@ body[data-broadcast="old_newspaper"] {
 }
 
 /* ==========================================================================
-   RADIUS NORMALISATIE (hele site, light én dark)
-   Alle grote Tailwind-afrondingen volgen het --radius token, zodat formulieren,
-   modals, dropdowns, tabellen en kaarten dezelfde strakke hoeken hebben.
-   rounded-full blijft bewust ongemoeid (avatars, switches, pills).
+   RADIUS NORMALISATIE (hele site,
+light én dark)
+   Alle grote Tailwind-afrondingen volgen het --radius token,
+zodat formulieren,
+modals,
+dropdowns,
+tabellen en kaarten dezelfde strakke hoeken hebben.
+   rounded-full blijft bewust ongemoeid (avatars,
+switches,
+pills).
    ========================================================================== */
 @layer utilities {
   .rounded-lg,
@@ -1833,138 +1099,25 @@ body[data-broadcast="old_newspaper"] {
 
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #6 — MODERN BLACK & WHITE
-   Strak, premium en minimalistisch: zwart, wit, grijs, Inter,
-   veel witruimte, sterke contrasten, 8px radius, geen textures
-   ══════════════════════════════════════════════════════════════ */
-[data-broadcast="modern_bw"],
-[data-broadcast="modern_bw"] body,
-body[data-broadcast="modern_bw"] {
+   Strak,
+premium en minimalistisch: zwart,
+wit,
+grijs,
+Inter,
+veel witruimte,
+sterke contrasten,
+8px radius {
   font-family: Inter, system-ui, -apple-system, sans-serif;
   background-image: none;
 }
-[data-broadcast="modern_bw"] h1,
-[data-broadcast="modern_bw"] h2,
-[data-broadcast="modern_bw"] .font-display {
-  font-family: Inter, system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  text-transform: none;
-}
-[data-broadcast="modern_bw"] h3 {
-  font-family: Inter, system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-[data-broadcast="modern_bw"] .tabular-nums {
-  font-family: Inter, system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
 
-[data-broadcast="modern_bw"][data-mode="light"] {
-  --background: 0 0% 97%;
-  --foreground: 0 0% 7%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 7%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 7%;
-  --primary: 0 0% 4%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 94%;
-  --secondary-foreground: 0 0% 45%;
-  --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 45%;
-  --accent: 0 0% 0%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 0% 20%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 88%;
-  --input: 0 0% 88%;
-  --ring: 0 0% 7%;
-  --radius: 0.5rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 0 0% 97%;
-  --broadcast-night: 0 0% 4%;
-  --broadcast-surface: 0 0% 100%;
-  --broadcast-surface-secondary: 0 0% 94%;
-  --broadcast-surface-elevated: 0 0% 95%;
-  --broadcast-text: 0 0% 7%;
-  --broadcast-text-secondary: 0 0% 45%;
-  --broadcast-text-muted: 0 0% 58%;
-  --broadcast-border: 0 0% 88%;
-  --broadcast-primary: 0 0% 4%;
-  --broadcast-primary-contrast: 0 0% 100%;
-  --broadcast-score: 0 0% 4%;
-  --broadcast-bright: 0 0% 20%;
-  --broadcast-navy: 0 0% 4%;
-  --broadcast-cyan: 0 0% 4%;
-  --broadcast-violet: 0 0% 4%;
-  --broadcast-magenta: 0 0% 4%;
-  --broadcast-danger: 0 0% 20%;
-  --broadcast-success: 0 0% 4%;
-}
-
-[data-broadcast="modern_bw"][data-mode="dark"] {
-  --background: 0 0% 6%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 10%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 10%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 6%;
-  --secondary: 0 0% 14%;
-  --secondary-foreground: 0 0% 68%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 68%;
-  --accent: 0 0% 100%;
-  --accent-foreground: 0 0% 6%;
-  --destructive: 0 0% 78%;
-  --destructive-foreground: 0 0% 6%;
-  --border: 0 0% 22%;
-  --input: 0 0% 22%;
-  --ring: 0 0% 98%;
-  --radius: 0.5rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 0 0% 6%;
-  --broadcast-night: 0 0% 0%;
-  --broadcast-surface: 0 0% 10%;
-  --broadcast-surface-secondary: 0 0% 14%;
-  --broadcast-surface-elevated: 0 0% 16%;
-  --broadcast-text: 0 0% 98%;
-  --broadcast-text-secondary: 0 0% 68%;
-  --broadcast-text-muted: 0 0% 56%;
-  --broadcast-border: 0 0% 22%;
-  --broadcast-primary: 0 0% 98%;
-  --broadcast-primary-contrast: 0 0% 6%;
-  --broadcast-score: 0 0% 98%;
-  --broadcast-bright: 0 0% 100%;
-  --broadcast-navy: 0 0% 0%;
-  --broadcast-cyan: 0 0% 98%;
-  --broadcast-violet: 0 0% 98%;
-  --broadcast-magenta: 0 0% 98%;
-  --broadcast-danger: 0 0% 78%;
-  --broadcast-success: 0 0% 98%;
-}
-
-/* Kaders: 8px radius, geen gradients, hoogstens een extreem subtiele shadow */
-[data-broadcast="modern_bw"] .mbw-card {
+/* Kaders: 8px radius,
+geen gradients {
   border-radius: 8px;
 }
-[data-broadcast="modern_bw"] .rounded-none {
-  border-radius: 8px;
-}
-[data-broadcast="modern_bw"] [class*="shadow-"] {
-  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04) !important;
-}
-[data-broadcast="modern_bw"] [class*="bg-gradient"] {
-  background-image: none !important;
-}
 
-/* Cover-overlay infopagina: neutrale zwart-wit fade, geen texture */
+/* Cover-overlay infopagina: neutrale zwart-wit fade,
+geen texture */
 .mbw-cover {
   position: absolute;
   inset: 0;
@@ -2097,7 +1250,10 @@ body[data-broadcast="wc26"] {
   --broadcast-success: 173 77% 44%;
 }
 
-/* Kaders: 6px radius, dunne borders, nauwelijks shadows, geen gradients */
+/* Kaders: 6px radius,
+dunne borders,
+nauwelijks shadows,
+geen gradients */
 [data-broadcast="wc26"] .wc26-card {
   border-radius: 6px;
 }
@@ -2138,7 +1294,8 @@ body[data-broadcast="wc26"] {
 [data-broadcast="wc26"][data-mode="dark"] .wc26-cover::after {
   background: hsl(var(--broadcast-primary));
 }
-/* Cover-streep (prism line) volgt bij WC26 het thema: zwart in light, turquoise in dark */
+/* Cover-streep (prism line) volgt bij WC26 het thema: zwart in light,
+turquoise in dark */
 [data-broadcast="wc26"] .en-prism-line {
   background: hsl(0 0% 0%);
   height: 3px;
@@ -2158,7 +1315,6 @@ body[data-broadcast="wc26"] {
   box-shadow: 0 0 12px hsl(var(--broadcast-primary) / 0.45);
 }
 
-
 /* Zwarte infobalk in wedstrijd-/bracketkaarten: alle tekst en icons wit */
 [data-broadcast="wc26"] .wc26-context,
 [data-broadcast="wc26"] .wc26-context * {
@@ -2173,7 +1329,6 @@ body[data-broadcast="wc26"] {
 [data-broadcast="wc26"] .wc26-context .wc26-leg-badge * {
   color: hsl(var(--broadcast-cyan)) !important;
 }
-
 
 /* Bracket connectors: dun en geometrisch */
 .wc26-connector {
@@ -2196,8 +1351,9 @@ body[data-broadcast="wc26"] {
 
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #8 — LA ROSA
-   Moderne Italiaanse sportkrant: roze papier, zwarte inkt,
-   magenta accenten. Roboto Condensed headlines + Roboto body.
+   Moderne Italiaanse sportkrant: roze papier,
+zwarte inkt,
+magenta accenten. Roboto Condensed headlines + Roboto body.
    ══════════════════════════════════════════════════════════════ */
 [data-broadcast="la_rosa"],
 [data-broadcast="la_rosa"] body,
@@ -2314,7 +1470,9 @@ body[data-broadcast="la_rosa"] {
   --broadcast-success: 340 100% 52%;
 }
 
-/* Editorial kaders: 0–4px, dunne borders, geen shadows/gradients */
+/* Editorial kaders: 0–4px,
+dunne borders,
+geen shadows/gradients */
 [data-broadcast="la_rosa"] .lrosa-card {
   border-radius: 2px;
 }
@@ -2333,8 +1491,8 @@ body[data-broadcast="la_rosa"] {
   box-shadow: inset 3px 0 0 hsl(var(--broadcast-primary)) !important;
 }
 
-
-/* Homeknop: light = lichtroze vlak met zwarte rand, dark = licht zwart met roze rand */
+/* Homeknop: light = lichtroze vlak met zwarte rand,
+dark = licht zwart met roze rand */
 [data-broadcast="la_rosa"][data-mode="light"] .lrosa-home-btn {
   background-color: hsl(351 55% 93%);
   border-color: hsl(0 0% 22%);
@@ -2373,32 +1531,14 @@ body[data-broadcast="la_rosa"] {
 
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #9 — SOCCERTEC MASTERS
-   Premium monochroom elite-jeugdtoernooi: zuiver wit, harde
-   zwarte vlakken, Barlow Condensed titels/scores + Inter body.
-   ══════════════════════════════════════════════════════════════ */
-[data-broadcast="soccertec"],
-[data-broadcast="soccertec"] body,
-body[data-broadcast="soccertec"] {
+   Premium monochroom elite-jeugdtoernooi: zuiver wit,
+harde
+   zwarte vlakken {
   font-family: Inter, system-ui, sans-serif;
   background-image: none;
 }
-[data-broadcast="soccertec"] h1,
-[data-broadcast="soccertec"] h2,
-[data-broadcast="soccertec"] h3,
-[data-broadcast="soccertec"] .font-display {
-  font-family: 'Barlow Condensed', Inter, sans-serif;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  line-height: 1.0;
-  text-transform: uppercase;
-}
-[data-broadcast="soccertec"] .tabular-nums {
-  font-family: 'Barlow Condensed', Inter, sans-serif;
-  font-weight: 800;
-}
 
-/* Light: wit papier, zwarte inkt */
-[data-broadcast="soccertec"][data-mode="light"] {
+/* Light: wit papier {
   --background: 0 0% 100%;
   --foreground: 0 0% 3%;
   --card: 0 0% 100%;
@@ -2444,65 +1584,9 @@ body[data-broadcast="soccertec"] {
   --broadcast-success: 0 0% 0%;
 }
 
-/* Dark: geïnverteerd zwart met witte inkt */
-[data-broadcast="soccertec"][data-mode="dark"] {
-  --background: 0 0% 4%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 8%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 8%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 100%;
-  --primary-foreground: 0 0% 0%;
-  --secondary: 0 0% 13%;
-  --secondary-foreground: 0 0% 72%;
-  --muted: 0 0% 13%;
-  --muted-foreground: 0 0% 66%;
-  --accent: 0 0% 100%;
-  --accent-foreground: 0 0% 0%;
-  --destructive: 0 0% 100%;
-  --destructive-foreground: 0 0% 0%;
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 0 0% 100%;
-  --radius: 0.125rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 0 0% 4%;
-  --broadcast-night: 0 0% 0%;
-  --broadcast-paper: 0 0% 8%;
-  --broadcast-surface: 0 0% 8%;
-  --broadcast-surface-secondary: 0 0% 13%;
-  --broadcast-surface-elevated: 0 0% 16%;
-  --broadcast-text: 0 0% 98%;
-  --broadcast-text-secondary: 0 0% 72%;
-  --broadcast-text-muted: 0 0% 60%;
-  --broadcast-border: 0 0% 20%;
-  --broadcast-primary: 0 0% 100%;
-  --broadcast-primary-contrast: 0 0% 0%;
-  --broadcast-score: 0 0% 98%;
-  --broadcast-bright: 0 0% 100%;
-  --broadcast-gold: 0 0% 100%;
-  --broadcast-navy: 0 0% 0%;
-  --broadcast-cyan: 0 0% 100%;
-  --broadcast-violet: 0 0% 100%;
-  --broadcast-magenta: 0 0% 100%;
-  --broadcast-danger: 0 0% 100%;
-  --broadcast-success: 0 0% 100%;
-}
-
-/* Editorial kaders: 0–4px, dunne borders, geen shadows/gradients */
-[data-broadcast="soccertec"] .stec-card {
+/* Editorial kaders: 0–4px,
+dunne borders {
   border-radius: 2px;
-}
-[data-broadcast="soccertec"] .rounded-none {
-  border-radius: 2px;
-}
-[data-broadcast="soccertec"] [class*="shadow-"] {
-  box-shadow: none !important;
-}
-[data-broadcast="soccertec"] [class*="bg-gradient"] {
-  background-image: none !important;
 }
 
 /* Kwalificatie-indicator: dikke zwarte section marker links */
@@ -2559,142 +1643,14 @@ body[data-broadcast="soccertec"] {
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #10 — OLD CLUBHOUSE
    Het oude wedstrijd- en uitslagenbord uit een traditionele
-   voetbalkantine: donkergroen, zwart letterboard, hout en oud
-   crème papier. Oswald titels/scores + Roboto Condensed body.
-   ══════════════════════════════════════════════════════════════ */
-[data-broadcast="old_clubhouse"],
-[data-broadcast="old_clubhouse"] body,
-body[data-broadcast="old_clubhouse"] {
+   voetbalkantine: donkergroen,
+zwart letterboard {
   font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
   background-image: none;
 }
-[data-broadcast="old_clubhouse"] h1,
-[data-broadcast="old_clubhouse"] h2,
-[data-broadcast="old_clubhouse"] h3,
-[data-broadcast="old_clubhouse"] .font-display {
-  font-family: Oswald, 'Roboto Condensed', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-[data-broadcast="old_clubhouse"] .tabular-nums {
-  font-family: Oswald, 'Roboto Condensed', sans-serif;
-  font-weight: 600;
-}
 
-/* Light: oud crème wedstrijdpapier op het clubhuisbord */
-[data-broadcast="old_clubhouse"][data-mode="light"] {
-  --background: 43 53% 87%;
-  --foreground: 60 8% 8%;
-  --card: 45 51% 81%;
-  --card-foreground: 60 8% 8%;
-  --popover: 43 53% 87%;
-  --popover-foreground: 60 8% 8%;
-  --primary: 133 22% 11%;
-  --primary-foreground: 46 51% 88%;
-  --secondary: 45 38% 76%;
-  --secondary-foreground: 42 12% 32%;
-  --muted: 45 38% 76%;
-  --muted-foreground: 42 10% 40%;
-  --accent: 88 28% 33%;
-  --accent-foreground: 46 51% 88%;
-  --destructive: 8 45% 38%;
-  --destructive-foreground: 46 51% 88%;
-  --border: 42 22% 64%;
-  --input: 42 22% 64%;
-  --ring: 88 28% 33%;
-  --radius: 0.125rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 43 53% 87%;
-  --broadcast-night: 60 6% 6%;
-  --broadcast-paper: 43 53% 87%;
-  --broadcast-surface: 45 51% 81%;
-  --broadcast-surface-secondary: 45 38% 76%;
-  --broadcast-surface-elevated: 43 53% 90%;
-  --broadcast-text: 60 8% 8%;
-  --broadcast-text-secondary: 42 10% 40%;
-  --broadcast-text-muted: 42 10% 46%;
-  --broadcast-border: 42 22% 60%;
-  --broadcast-primary: 133 22% 11%;
-  --broadcast-primary-contrast: 46 51% 88%;
-  --broadcast-score: 46 51% 88%;
-  --broadcast-bright: 45 51% 81%;
-  --broadcast-gold: 41 35% 48%;
-  --broadcast-navy: 120 15% 17%;
-  --broadcast-cyan: 88 28% 33%;
-  --broadcast-violet: 26 38% 30%;
-  --broadcast-magenta: 8 45% 38%;
-  --broadcast-danger: 8 45% 38%;
-  --broadcast-success: 88 28% 33%;
-  --broadcast-wood: 26 35% 21%;
-  --broadcast-wood-light: 26 38% 30%;
-  --broadcast-cream: 45 51% 81%;
-}
-
-/* Dark: donkergroen clubhuisbord met zwart letterboard */
-[data-broadcast="old_clubhouse"][data-mode="dark"] {
-  --background: 120 15% 17%;
-  --foreground: 46 51% 88%;
-  --card: 133 22% 11%;
-  --card-foreground: 46 51% 88%;
-  --popover: 133 22% 11%;
-  --popover-foreground: 46 51% 88%;
-  --primary: 45 51% 81%;
-  --primary-foreground: 60 6% 6%;
-  --secondary: 120 13% 22%;
-  --secondary-foreground: 46 30% 76%;
-  --muted: 120 13% 22%;
-  --muted-foreground: 42 16% 66%;
-  --accent: 41 35% 48%;
-  --accent-foreground: 60 6% 6%;
-  --destructive: 8 48% 44%;
-  --destructive-foreground: 46 51% 88%;
-  --border: 120 12% 28%;
-  --input: 120 12% 28%;
-  --ring: 41 35% 48%;
-  --radius: 0.125rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 120 15% 17%;
-  --broadcast-night: 60 6% 6%;
-  --broadcast-paper: 45 51% 81%;
-  --broadcast-surface: 133 22% 11%;
-  --broadcast-surface-secondary: 120 13% 22%;
-  --broadcast-surface-elevated: 120 13% 25%;
-  --broadcast-text: 46 51% 88%;
-  --broadcast-text-secondary: 42 16% 70%;
-  --broadcast-text-muted: 42 12% 60%;
-  --broadcast-border: 120 12% 28%;
-  --broadcast-primary: 45 51% 81%;
-  --broadcast-primary-contrast: 60 6% 6%;
-  --broadcast-score: 46 51% 88%;
-  --broadcast-bright: 45 51% 81%;
-  --broadcast-gold: 41 35% 48%;
-  --broadcast-navy: 133 22% 11%;
-  --broadcast-cyan: 88 28% 33%;
-  --broadcast-violet: 26 38% 30%;
-  --broadcast-magenta: 8 48% 44%;
-  --broadcast-danger: 8 48% 44%;
-  --broadcast-success: 88 28% 33%;
-  --broadcast-wood: 26 35% 21%;
-  --broadcast-wood-light: 26 38% 30%;
-  --broadcast-cream: 45 51% 81%;
-}
-
-/* Geen moderne floating cards: dunne donkere borders, 0–3px radius */
-[data-broadcast="old_clubhouse"] .rounded-none,
-[data-broadcast="old_clubhouse"] .och-card,
-[data-broadcast="old_clubhouse"] .och-board,
-[data-broadcast="old_clubhouse"] .och-frame {
+/* Geen moderne floating cards: dunne donkere borders {
   border-radius: 2px;
-}
-[data-broadcast="old_clubhouse"] [class*="shadow-"] {
-  box-shadow: none !important;
-}
-[data-broadcast="old_clubhouse"] [class*="bg-gradient"] {
-  background-image: none !important;
 }
 
 /* Houten omlijsting: hoofdframes en sectieomkadering */
@@ -2799,137 +1755,17 @@ body[data-broadcast="old_clubhouse"] {
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #11 — STICKER ALBUM
    Klassiek internationaal voetbalstickeralbum als moderne live
-   broadcast interface: warm albumpapier, witte sticker cards,
-   vintage navy en football red. Barlow Condensed + Inter.
-   ══════════════════════════════════════════════════════════════ */
-[data-broadcast="sticker_album"],
-[data-broadcast="sticker_album"] body,
-body[data-broadcast="sticker_album"] {
+   broadcast interface: warm albumpapier,
+witte sticker cards {
   font-family: Inter, system-ui, sans-serif;
   background-image:
     repeating-linear-gradient(180deg, hsl(42 20% 40% / 0.030) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(90deg, hsl(42 20% 40% / 0.022) 0 1px, transparent 1px 6px);
 }
-[data-broadcast="sticker_album"] h1,
-[data-broadcast="sticker_album"] h2,
-[data-broadcast="sticker_album"] h3,
-[data-broadcast="sticker_album"] .font-display {
-  font-family: 'Barlow Condensed', Inter, sans-serif;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  line-height: 1.04;
-  text-transform: uppercase;
-}
-[data-broadcast="sticker_album"] .tabular-nums {
-  font-family: 'Barlow Condensed', Inter, sans-serif;
-  font-weight: 700;
-}
 
-/* Light: albumpapier met witte stickers */
-[data-broadcast="sticker_album"][data-mode="light"] {
-  --background: 40 52% 90%;
-  --foreground: 0 0% 9%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 9%;
-  --primary: 216 51% 18%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 42 44% 85%;
-  --secondary-foreground: 42 13% 40%;
-  --muted: 42 44% 85%;
-  --muted-foreground: 42 13% 45%;
-  --accent: 0 67% 47%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 67% 47%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 42 39% 74%;
-  --input: 42 39% 74%;
-  --ring: 216 51% 18%;
-  --radius: 0.25rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 40 52% 90%;
-  --broadcast-night: 216 51% 18%;
-  --broadcast-paper: 40 52% 90%;
-  --broadcast-surface: 0 0% 100%;
-  --broadcast-surface-secondary: 42 44% 85%;
-  --broadcast-surface-elevated: 0 0% 100%;
-  --broadcast-text: 0 0% 9%;
-  --broadcast-text-secondary: 42 13% 45%;
-  --broadcast-text-muted: 42 13% 52%;
-  --broadcast-border: 42 39% 74%;
-  --broadcast-primary: 216 51% 18%;
-  --broadcast-primary-contrast: 0 0% 100%;
-  --broadcast-score: 0 0% 9%;
-  --broadcast-bright: 0 0% 100%;
-  --broadcast-gold: 42 13% 49%;
-  --broadcast-navy: 216 51% 18%;
-  --broadcast-cyan: 216 51% 18%;
-  --broadcast-violet: 216 51% 30%;
-  --broadcast-magenta: 0 67% 47%;
-  --broadcast-danger: 0 67% 47%;
-  --broadcast-success: 216 51% 18%;
-  --broadcast-cream: 40 52% 90%;
-}
-
-/* Dark: nachtelijk albumpapier — navy karton met crème print */
-[data-broadcast="sticker_album"][data-mode="dark"] {
-  --background: 216 40% 10%;
-  --foreground: 40 45% 92%;
-  --card: 216 38% 14%;
-  --card-foreground: 40 45% 92%;
-  --popover: 216 38% 14%;
-  --popover-foreground: 40 45% 92%;
-  --primary: 40 52% 90%;
-  --primary-foreground: 216 51% 14%;
-  --secondary: 216 32% 19%;
-  --secondary-foreground: 40 30% 80%;
-  --muted: 216 32% 19%;
-  --muted-foreground: 40 16% 68%;
-  --accent: 0 62% 52%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 62% 52%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 216 26% 26%;
-  --input: 216 26% 26%;
-  --ring: 40 52% 90%;
-  --radius: 0.25rem;
-  --gradient-hero: none;
-
-  --broadcast-bg: 216 40% 10%;
-  --broadcast-night: 216 51% 14%;
-  --broadcast-paper: 40 52% 90%;
-  --broadcast-surface: 216 38% 14%;
-  --broadcast-surface-secondary: 216 32% 19%;
-  --broadcast-surface-elevated: 216 32% 22%;
-  --broadcast-text: 40 45% 92%;
-  --broadcast-text-secondary: 40 16% 72%;
-  --broadcast-text-muted: 40 12% 62%;
-  --broadcast-border: 216 26% 28%;
-  --broadcast-primary: 40 52% 90%;
-  --broadcast-primary-contrast: 216 51% 14%;
-  --broadcast-score: 40 45% 92%;
-  --broadcast-bright: 40 52% 90%;
-  --broadcast-gold: 40 22% 62%;
-  --broadcast-navy: 216 51% 14%;
-  --broadcast-cyan: 40 52% 90%;
-  --broadcast-violet: 216 40% 26%;
-  --broadcast-magenta: 0 62% 52%;
-  --broadcast-danger: 0 62% 52%;
-  --broadcast-success: 40 52% 90%;
-  --broadcast-cream: 40 52% 90%;
-}
-
-/* Gedrukt album: geen glans, geen gradients, 2–6px radius */
-[data-broadcast="sticker_album"] .rounded-none,
-[data-broadcast="sticker_album"] .sa-card,
-[data-broadcast="sticker_album"] .sa-sticker,
-[data-broadcast="sticker_album"] .sa-panel {
+/* Gedrukt album: geen glans,
+geen gradients {
   border-radius: 4px;
-}
-[data-broadcast="sticker_album"] [class*="bg-gradient"] {
-  background-image: none !important;
 }
 
 /* Sticker: wit vlak met papierrand en zeer subtiele offset shadow */
@@ -2945,30 +1781,22 @@ body[data-broadcast="sticker_album"] {
   border: 1px dashed hsl(var(--broadcast-border));
 }
 
-/* Navy albumbalk: datum-, groep- en tabelheaders */
+/* Navy albumbalk: datum-,
+groep- en tabelheaders */
 .sa-band {
   background-color: hsl(var(--broadcast-navy));
   border: 1px solid hsl(var(--broadcast-navy));
   color: hsl(0 0% 100%);
-}
-[data-broadcast="sticker_album"][data-mode="dark"] .sa-band {
-  border-color: hsl(var(--broadcast-border));
 }
 
 /* Kwalificatiezone: navy markerstrip aan de rij */
 .sa-qual {
   box-shadow: inset 3px 0 0 hsl(var(--broadcast-navy)) !important;
 }
-[data-broadcast="sticker_album"][data-mode="dark"] .sa-qual {
-  box-shadow: inset 3px 0 0 hsl(var(--broadcast-bright)) !important;
-}
 
 /* Bracket: dunne navy albumlijnen */
 .sa-connector {
   stroke: hsl(var(--broadcast-navy) / 0.55);
-}
-[data-broadcast="sticker_album"][data-mode="dark"] .sa-connector {
-  stroke: hsl(var(--broadcast-bright) / 0.45);
 }
 .sa-connector line {
   stroke-width: 1.25;
@@ -2993,38 +1821,20 @@ body[data-broadcast="sticker_album"] {
   background: hsl(0 67% 47%);
 }
 
-/* Decoratieve stickernummers in het teamsraster (#001, #002, ...) */
-[data-broadcast="sticker_album"] .grid-cols-3 {
+/* Decoratieve stickernummers in het teamsraster (#001,
+#002 {
   counter-reset: sa-sticker;
-}
-[data-broadcast="sticker_album"] .grid-cols-3 > button {
-  counter-increment: sa-sticker;
-  position: relative;
-  background-color: hsl(var(--broadcast-surface));
-  border-color: hsl(var(--broadcast-border));
-  box-shadow: 1px 1px 0 hsl(42 20% 40% / 0.18);
-}
-[data-broadcast="sticker_album"] .grid-cols-3 > button::before {
-  content: "#" counter(sa-sticker, decimal-leading-zero);
-  position: absolute;
-  top: 3px;
-  left: 4px;
-  font-family: 'Barlow Condensed', Inter, sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: hsl(var(--broadcast-text-muted));
-  pointer-events: none;
-}
-[data-broadcast="sticker_album"] .grid-cols-3 > button.border-primary {
-  box-shadow: 2px 2px 0 hsl(216 51% 18% / 0.35);
 }
 
 /* ══════════════════════════════════════════════════════════════
    BROADCAST STYLE #12 — TELETEXT FOOTBALL
    Klassieke Europese voetbalteletekst / results service:
-   zwarte achtergrond, beperkt teletextpalet (cyan/yellow/green/
-   red/blue), VT323 als enige lettertype, 0px radius, geen shadows.
+   zwarte achtergrond,
+beperkt teletextpalet (cyan/yellow/green/
+   red/blue),
+VT323 als enige lettertype,
+0px radius,
+geen shadows.
    ══════════════════════════════════════════════════════════════ */
 [data-broadcast="teletext"],
 [data-broadcast="teletext"] body,
@@ -3146,7 +1956,9 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── Teletekst P500 — Belgische versie ───────────────────────────
-   Oorspronkelijke teletekst-look (cyan primary, gele scores, witte
+   Oorspronkelijke teletekst-look (cyan primary,
+gele scores,
+witte
    tekst) maar op een effen LICHTZWART scherm i.p.v. puur zwart.   */
 [data-broadcast="teletext"][data-ttx-variant="500"] {
   --background: 0 0% 10%;
@@ -3195,8 +2007,9 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── Teletekst P800 — Nederlandse versie ─────────────────────────
-   Effen bijna-zwart scherm, gele tekst/iconen/titels en onderbalk,
-   rode accentlijn en rode balken met gele tekst.                   */
+   Effen bijna-zwart scherm,
+gele tekst/iconen/titels en onderbalk,
+rode accentlijn en rode balken met gele tekst.                   */
 [data-broadcast="teletext"][data-ttx-variant="801"] {
   --background: 0 0% 10%;
   --foreground: 60 100% 50%;
@@ -3268,8 +2081,6 @@ body[data-broadcast="teletext"] {
     hsl(180 100% 50%) 75% 100%);
 }
 
-
-
 /* Harde rechte hoeken: geen enkele afronding in deze stijl */
 [data-broadcast="teletext"] [class*="rounded"] {
   border-radius: 0 !important;
@@ -3294,7 +2105,8 @@ body[data-broadcast="teletext"] {
   }
 }
 
-/* Vlak teletextpaneel: platte regels, geen kaart */
+/* Vlak teletextpaneel: platte regels,
+geen kaart */
 .ttx-panel {
   background-color: hsl(var(--broadcast-surface));
   border: 0;
@@ -3365,7 +2177,9 @@ body[data-broadcast="teletext"] {
     hsl(var(--broadcast-danger)) 75% 100%);
 }
 
-/* Teletext pagenummers in het teamsraster (201, 202, ...) */
+/* Teletext pagenummers in het teamsraster (201,
+202,
+...) */
 [data-broadcast="teletext"] .grid-cols-3 {
   counter-reset: ttx-page 200;
 }
@@ -3390,7 +2204,8 @@ body[data-broadcast="teletext"] {
   border-color: hsl(60 100% 50%);
 }
 
-/* Teletext pagenummers per variant (501…, 801…) */
+/* Teletext pagenummers per variant (501…,
+801…) */
 [data-broadcast="teletext"][data-ttx-variant="500"] .grid-cols-3 {
   counter-reset: ttx-page 500;
 }
@@ -3406,7 +2221,7 @@ body[data-broadcast="teletext"] {
 
 /* ── P500 kleurregels ────────────────────────────────────────────
    Infopagina: prismalijn donkerblauw (zoals klassement-headers),
-   toernooinaam geel. Tijdsblokken: donkerblauw met witte tekst.  */
+toernooinaam geel. Tijdsblokken: donkerblauw met witte tekst.  */
 [data-broadcast="teletext"][data-ttx-variant="500"] .en-prism-line {
   background: hsl(180 100% 50%);
   height: 3px;
@@ -3425,13 +2240,16 @@ body[data-broadcast="teletext"] {
 }
 
 /* ── P800 kleurregels ────────────────────────────────────────────
-   Infopagina: prismalijn blijft fel rood; tekst, iconen, titels en
+   Infopagina: prismalijn blijft fel rood; tekst,
+iconen,
+titels en
    badges zijn geel via de P800-themavariabelen.                   */
 [data-broadcast="teletext"][data-ttx-variant="801"] .en-prism-line {
   background: hsl(0 100% 50%);
   height: 3px;
 }
-/* Klassement: positienummer + teamnaam lichtblauw, statistieken geel */
+/* Klassement: positienummer + teamnaam lichtblauw,
+statistieken geel */
 [data-broadcast="teletext"][data-ttx-variant="500"] table tbody td:first-child span {
   color: hsl(180 100% 50%);
 }
@@ -3458,7 +2276,8 @@ body[data-broadcast="teletext"] {
 [data-broadcast="teletext"] .ttx-section-title * {
   color: hsl(0 0% 100%) !important;
 }
-/* P500: titelbalk = lichtblauwe tekst op donkerblauw, lijn loopt door */
+/* P500: titelbalk = lichtblauwe tekst op donkerblauw,
+lijn loopt door */
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-section-title {
   background-color: hsl(218 100% 50%);
 }
@@ -3529,7 +2348,8 @@ body[data-broadcast="teletext"] {
   color: hsl(60 100% 50%) !important;
 }
 
-/* P500: divisie-opties in het geel, P500-variantlabel in het wit */
+/* P500: divisie-opties in het geel,
+P500-variantlabel in het wit */
 [data-broadcast="teletext"][data-ttx-variant="500"] .ttx-select-content [role="option"] {
   color: hsl(60 100% 50%);
 }
@@ -3617,14 +2437,17 @@ body[data-broadcast="teletext"] {
   color: hsl(0 0% 100%);
 }
 
-/* Meta-teller ("24 teams", "108 wedstrijden") in het geel */
+/* Meta-teller ("24 teams",
+"108 wedstrijden") in het geel */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-meta,
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-stats-toggle,
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-stats-toggle:hover {
   color: hsl(60 100% 50%);
 }
 
-/* Teamsraster: kader zoals P500, teamnaam groen, paginanummer geel */
+/* Teamsraster: kader zoals P500,
+teamnaam groen,
+paginanummer geel */
 [data-broadcast="teletext"][data-ttx-variant="801"] .grid-cols-3 > button {
   background-color: hsl(0 0% 14%);
   border-color: hsl(0 0% 26%);
@@ -3643,7 +2466,8 @@ body[data-broadcast="teletext"] {
 }
 
 /* Wedstrijdkaarten + knockoutbrackets: infobalktekst en scores groen,
-   teamnamen geel, geen rode boven-/onderrand */
+teamnamen geel,
+geen rode boven-/onderrand */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-panel {
   border-top-color: transparent;
   border-bottom-color: transparent;
@@ -3663,7 +2487,8 @@ body[data-broadcast="teletext"] {
   color: hsl(60 100% 50%) !important;
 }
 
-/* P800: "Mijn team" tab-switcher — geselecteerd groen, overige geel */
+/* P800: "Mijn team" tab-switcher — geselecteerd groen,
+overige geel */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-myteam-tabs .ttx-myteam-tab {
   color: hsl(60 100% 50%);
 }
@@ -3672,7 +2497,8 @@ body[data-broadcast="teletext"] {
   border-bottom-color: hsl(120 100% 50%) !important;
 }
 
-/* P800: teamnamen in wedstrijdkaarten geel, favoriete team lichtblauw */
+/* P800: teamnamen in wedstrijdkaarten geel,
+favoriete team lichtblauw */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-team-name {
   color: hsl(60 100% 50%) !important;
 }
@@ -3700,7 +2526,8 @@ body[data-broadcast="teletext"] {
   border-color: hsl(0 0% 26%) !important;
 }
 
-/* P800: klassement groepsfase — teamnamen geel, posities + statistieken groen */
+/* P800: klassement groepsfase — teamnamen geel,
+posities + statistieken groen */
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-standings-table tbody td:first-child span {
   color: hsl(120 100% 50%) !important;
 }

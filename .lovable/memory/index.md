@@ -4,6 +4,7 @@
 - Admin op mobiel: icon-only zijbalk die volledig verdwijnt; dunne contextbalk toont actieve tab en toernooinaam; controleer op 393px.
 
 ## Memories
+- [Broadcaststijlen en vormgevingskeuze](mem://style/broadcast-stijlen-keuze) — 6 stijlen, welke light/dark bestaat, beheerder kiest vormgeving
 - [Admin mobile layout](mem://style/admin-mobile-layout) — Beheer op mobiel gebruikt een volledig inklapbare iconenzijbalk met dunne contextbalk
 - [Broadcast SoccerTec Masters](mem://style/broadcast-soccertec-masters) — soccertec stijl: premium monochroom zwart-wit, Barlow Condensed, 2px radius
 - [Broadcast Old Clubhouse](mem://style/broadcast-old-clubhouse) — old_clubhouse stijl: voetbalkantine-uitslagenbord, hout/letterboard/crème, Oswald

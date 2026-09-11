@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import { type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
+import { type BroadcastStyle, normalizeAppearance, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import {
   type SlideshowRow,
   type Slide,
@@ -387,7 +387,13 @@ const TournamentSlideshow = () => {
     const style = normalizeBroadcastStyle(tournament.view_display_style);
     const prevMode = document.documentElement.getAttribute("data-mode");
     const prevBroadcast = document.documentElement.getAttribute("data-broadcast");
-    document.documentElement.setAttribute("data-mode", "light");
+    const appearance = normalizeAppearance(style, (tournament as any).view_display_appearance);
+    if (style === "teletext") {
+      document.documentElement.setAttribute("data-mode", "dark");
+      document.documentElement.setAttribute("data-ttx-variant", appearance === "dark" ? "500" : "801");
+    } else {
+      document.documentElement.setAttribute("data-mode", appearance);
+    }
     document.documentElement.setAttribute("data-broadcast", style);
     return () => {
       if (prevMode) document.documentElement.setAttribute("data-mode", prevMode);

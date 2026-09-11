@@ -3,7 +3,7 @@ import { registerFieldLocations } from "@/lib/fieldLocations";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import { defaultAppearanceForStyle, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
+import { normalizeAppearance, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import PublicBottomNav from "@/components/public-view/PublicBottomNav";
 import PublicInfo from "@/components/public-view/PublicInfo";
@@ -49,7 +49,6 @@ const PublicView = () => {
   const [loading, setLoading] = useState(true);
   const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [darkMode, setDarkMode] = useState(true);
   const [homeResetKey, setHomeResetKey] = useState(0);
 
   useEffect(() => {
@@ -57,29 +56,20 @@ const PublicView = () => {
     if (stored) setFavoriteTeam(stored);
     const storedCat = localStorage.getItem(`cat-${token}`);
     if (storedCat) setSelectedCategory(storedCat);
-    const storedDark = localStorage.getItem(`dark-${token}`);
-    if (storedDark !== null) setDarkMode(storedDark === "true");
     fetchData();
   }, [token]);
 
-  // Standaard light/dark per broadcaststijl, tenzij de bezoeker zelf al koos
-  useEffect(() => {
-    if (!data?.tournament) return;
-    if (localStorage.getItem(`dark-${token}`) !== null) return;
-    const style = normalizeBroadcastStyle(data.tournament.view_display_style);
-    setDarkMode(defaultAppearanceForStyle(style) === "dark");
-  }, [data?.tournament?.view_display_style, token]);
-
-
+  // De beheerder kiest de vormgeving (light/dark) per stijl; bezoekers kunnen dit niet wijzigen.
   useEffect(() => {
     if (!data?.tournament) return;
     const style = normalizeBroadcastStyle(data.tournament.view_display_style);
-    // Teletekst kent geen light mode: de schakelaar kiest tussen pagina 500 en 800.
+    const appearance = normalizeAppearance(style, data.tournament.view_display_appearance);
+    // Teletekst kent geen light mode: de keuze staat voor pagina 500 of 800.
     if (style === "teletext") {
       document.documentElement.setAttribute("data-mode", "dark");
-      document.documentElement.setAttribute("data-ttx-variant", darkMode ? "500" : "801");
+      document.documentElement.setAttribute("data-ttx-variant", appearance === "dark" ? "500" : "801");
     } else {
-      document.documentElement.setAttribute("data-mode", darkMode ? "dark" : "light");
+      document.documentElement.setAttribute("data-mode", appearance);
       document.documentElement.removeAttribute("data-ttx-variant");
     }
     document.documentElement.setAttribute("data-broadcast", style);
@@ -89,20 +79,7 @@ const PublicView = () => {
       document.documentElement.removeAttribute("data-broadcast");
       document.documentElement.removeAttribute("data-ttx-variant");
     };
-  }, [data?.tournament?.view_display_style, darkMode]);
-
-  const toggleDarkMode = useCallback(() => {
-    setDarkMode(prev => {
-      const next = !prev;
-      localStorage.setItem(`dark-${token}`, String(next));
-      return next;
-    });
-  }, [token]);
-
-  const setDarkModeValue = useCallback((value: boolean) => {
-    setDarkMode(value);
-    localStorage.setItem(`dark-${token}`, String(value));
-  }, [token]);
+  }, [data?.tournament?.view_display_style, data?.tournament?.view_display_appearance]);
 
   // Realtime: de publieke site past meteen mee zodra er iets wijzigt,
   // zonder dat de bezoeker moet vernieuwen.
@@ -276,7 +253,7 @@ const PublicView = () => {
   return (
     <BroadcastStyleContext.Provider value={displayStyle}>
       <div className="min-h-screen bg-background pb-20" data-broadcast={displayStyle}>
-        {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} onSetDarkMode={setDarkModeValue} />}
+        {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} />}
         {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} />}
         {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} homeResetKey={homeResetKey} />}
         {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} />}
