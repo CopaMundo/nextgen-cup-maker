@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import { type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
+import { type BroadcastStyle, normalizeAppearance, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import {
   type SlideshowRow,
   type Slide,
