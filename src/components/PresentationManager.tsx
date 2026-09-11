@@ -48,6 +48,9 @@ const PresentationManager = ({
   const [showQR, setShowQR] = useState(false);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const [displayStyle, setDisplayStyle] = useState<BroadcastStyle>(normalizeBroadcastStyle(tournament.view_display_style));
+  const [appearance, setAppearance] = useState<BroadcastAppearance>(
+    normalizeAppearance(normalizeBroadcastStyle(tournament.view_display_style), tournament.view_display_appearance)
+  );
   const [formatDisplayMode, setFormatDisplayMode] = useState<"tabs" | "stacked">((tournament.format_display_mode || "tabs") as "tabs" | "stacked");
 
   const viewUrl = `${window.location.origin}/view/${tournament.view_link_token}`;
