@@ -1,0 +1,2 @@
+ALTER TABLE public.tournaments ADD COLUMN IF NOT EXISTS view_display_appearance text;
+UPDATE public.tournaments SET view_display_style = 'copa_mundo_bc' WHERE view_display_style IS NOT NULL AND view_display_style NOT IN ('copa_mundo_bc','european_nights','la_rosa','teletext','wc26','retro_bw');
