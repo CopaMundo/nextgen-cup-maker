@@ -257,7 +257,7 @@ const PresentationManager = ({
                             </span>
                             <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
                           </button>
-                          {options.length > 1 ? (
+                          {isActive && options.length > 1 && (
                             <div className="flex gap-1 rounded-md border border-border bg-secondary/60 p-1">
                               {options.map((opt) => {
                                 const optActive = isActive && appearance === opt;
@@ -276,8 +276,6 @@ const PresentationManager = ({
                                 );
                               })}
                             </div>
-                          ) : (
-                            <p className="px-1 text-xs text-muted-foreground">Eén vaste layout</p>
                           )}
                         </div>
                       );
