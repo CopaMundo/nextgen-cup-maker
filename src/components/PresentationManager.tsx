@@ -8,6 +8,7 @@ import {
   defaultAppearanceForStyle,
   normalizeAppearance,
   normalizeBroadcastStyle,
+  stylePosterUrl,
   type BroadcastAppearance,
   type BroadcastStyle,
 } from "@/lib/broadcastStyles";
@@ -250,8 +251,14 @@ const PresentationManager = ({
                           <button
                             type="button"
                             onClick={() => applyStyle(key, info.name)}
-                            className="flex min-w-0 flex-1 items-center text-left"
+                            className="flex min-w-0 flex-1 items-center gap-3 text-left"
                           >
+                            <img
+                              src={stylePosterUrl(key, isActive ? appearance : defaultAppearanceForStyle(key))}
+                              alt={info.name}
+                              className="h-9 w-9 shrink-0 rounded-md border border-border object-contain"
+                              loading="lazy"
+                            />
                             <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
                           </button>
                           {isActive && options.length > 1 && (

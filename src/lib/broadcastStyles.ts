@@ -10,9 +10,9 @@ export type BroadcastStyle =
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
   copa_mundo_bc: { name: "Copa Mundo", description: "De native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
   european_nights: { name: "European Nights", description: "Premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
-  wc26: { name: "World Cup 26", description: "Internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
-  la_rosa: { name: "La Rosa", description: "Moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
-  teletext: { name: "Teletext Football", description: "Klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
+  wc26: { name: "The World Stage", description: "Internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
+  la_rosa: { name: "La Gazzetta Rosa", description: "Moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
+  teletext: { name: "Teletext Classic", description: "Klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
   retro_bw: { name: "Stadium Noir", description: "Vintage matchdayprogramma in zwart-wit: dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
@@ -451,4 +451,35 @@ export function normalizeBroadcastStyle(style: string | null | undefined): Broad
   return SELECTABLE_BROADCAST_STYLES.includes(style as BroadcastStyle)
     ? (style as BroadcastStyle)
     : "copa_mundo_bc";
+}
+
+/* ── Posterafbeeldingen per stijl (en per verschijning waar relevant) ── */
+import copaDark from "@/assets/posters/copa-dark.asset.json";
+import copaLight from "@/assets/posters/copa-light.asset.json";
+import teletextP500 from "@/assets/posters/teletext-p500.asset.json";
+import teletextP800 from "@/assets/posters/teletext-p800.asset.json";
+import europeanNightsPoster from "@/assets/posters/european-nights.asset.json";
+import worldStagePoster from "@/assets/posters/world-stage.asset.json";
+import gazzettaRosaPoster from "@/assets/posters/gazzetta-rosa.asset.json";
+import stadiumNoirPoster from "@/assets/posters/stadium-noir.asset.json";
+
+/** Posterafbeelding voor een stijl; wisselt mee met de gekozen verschijning. */
+export function stylePosterUrl(style: BroadcastStyle, appearance?: BroadcastAppearance): string {
+  const app = normalizeAppearance(style, appearance);
+  switch (style) {
+    case "copa_mundo_bc":
+      return app === "light" ? copaLight.url : copaDark.url;
+    case "teletext":
+      return app === "light" ? teletextP800.url : teletextP500.url;
+    case "european_nights":
+      return europeanNightsPoster.url;
+    case "wc26":
+      return worldStagePoster.url;
+    case "la_rosa":
+      return gazzettaRosaPoster.url;
+    case "retro_bw":
+      return stadiumNoirPoster.url;
+    default:
+      return copaDark.url;
+  }
 }
