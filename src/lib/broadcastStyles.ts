@@ -419,7 +419,7 @@ export type BroadcastAppearance = "light" | "dark";
  * Bij teletext staat "dark" voor pagina 500 en "light" voor pagina 800.
  */
 export const STYLE_APPEARANCES: Record<BroadcastStyle, BroadcastAppearance[]> = {
-  copa_mundo_bc: ["dark", "light"],
+  copa_mundo_bc: ["light", "dark"],
   european_nights: ["dark"],
   wc26: ["light"],
   la_rosa: ["light", "dark"],
@@ -433,15 +433,17 @@ export function appearanceLabel(style: BroadcastStyle, appearance: BroadcastAppe
   return appearance === "dark" ? "Dark" : "Light";
 }
 
-/** Standaard verschijning per broadcaststijl = de eerste beschikbare optie. */
+/** Standaard verschijning per broadcaststijl. */
 export function defaultAppearanceForStyle(style: BroadcastStyle): BroadcastAppearance {
+  if (style === "copa_mundo_bc" || style === "teletext") return "dark";
+  if (style === "la_rosa") return "light";
   return STYLE_APPEARANCES[style]?.[0] ?? "dark";
 }
 
 /** Geeft altijd een verschijning terug die de stijl ondersteunt. */
 export function normalizeAppearance(style: BroadcastStyle, value: string | null | undefined): BroadcastAppearance {
   const options = STYLE_APPEARANCES[style] ?? ["dark"];
-  return options.includes(value as BroadcastAppearance) ? (value as BroadcastAppearance) : options[0];
+  return options.includes(value as BroadcastAppearance) ? (value as BroadcastAppearance) : defaultAppearanceForStyle(style);
 }
 
 /** Zet elke (verwijderde/legacy) stijl om naar een geldige, kiesbare stijl. Fallback = Copa Mundo. */
