@@ -3,7 +3,7 @@ import { registerFieldLocations } from "@/lib/fieldLocations";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BroadcastStyleContext from "@/contexts/BroadcastStyleContext";
-import { defaultAppearanceForStyle, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
+import { normalizeAppearance, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import PublicBottomNav from "@/components/public-view/PublicBottomNav";
 import PublicInfo from "@/components/public-view/PublicInfo";
