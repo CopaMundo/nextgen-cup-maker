@@ -235,7 +235,7 @@ const PresentationManager = ({
                 const entries = (Object.entries(BROADCAST_STYLES) as [BroadcastStyle, { name: string; description: string; preview: string }][])
                   .filter(([key]) => SELECTABLE_BROADCAST_STYLES.includes(key));
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {entries.map(([key, info]) => {
                       const isActive = displayStyle === key;
                       const options = STYLE_APPEARANCES[key] ?? [];
@@ -243,22 +243,19 @@ const PresentationManager = ({
                         <div
                           key={key}
                           className={cn(
-                            "flex flex-col gap-3 rounded-lg border p-3 transition-colors",
+                            "flex min-h-14 items-center gap-3 rounded-lg border p-3 transition-colors",
                             isActive ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
                           )}
                         >
                           <button
                             type="button"
                             onClick={() => applyStyle(key, info.name)}
-                            className="flex items-center gap-3 text-left"
+                            className="flex min-w-0 flex-1 items-center text-left"
                           >
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-lg">
-                              {info.preview}
-                            </span>
                             <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{info.name}</span>
                           </button>
                           {isActive && options.length > 1 && (
-                            <div className="flex gap-1 rounded-md border border-border bg-secondary/60 p-1">
+                            <div className="flex shrink-0 gap-1 rounded-md border border-border bg-secondary/60 p-1">
                               {options.map((opt) => {
                                 const optActive = isActive && appearance === opt;
                                 return (
@@ -267,7 +264,7 @@ const PresentationManager = ({
                                     type="button"
                                     onClick={() => applyAppearance(key, opt)}
                                     className={cn(
-                                      "flex-1 rounded px-2 py-1 text-xs font-semibold transition-colors",
+                                      "min-w-14 rounded px-2 py-1 text-xs font-semibold transition-colors",
                                       optActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
