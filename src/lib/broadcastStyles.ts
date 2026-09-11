@@ -10,9 +10,9 @@ export type BroadcastStyle =
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
   copa_mundo_bc: { name: "Copa Mundo", description: "De native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
   european_nights: { name: "European Nights", description: "Premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
-  wc26: { name: "World Cup 26", description: "Internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
-  la_rosa: { name: "La Rosa", description: "Moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
-  teletext: { name: "Teletext Football", description: "Klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
+  wc26: { name: "The World Stage", description: "Internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
+  la_rosa: { name: "La Gazzetta Rosa", description: "Moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },
+  teletext: { name: "Teletext Classic", description: "Klassieke voetbalteletekst: zwart scherm met cyan/geel/groen/rood, VT323 als enige lettertype, pagenummers en platte kolommen", preview: "▚" },
   retro_bw: { name: "Stadium Noir", description: "Vintage matchdayprogramma in zwart-wit: dunne lijnen en Barlow Condensed scoreboardtypografie", preview: "⬛" },
 };
 
