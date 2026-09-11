@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BROADCAST_STYLES, SELECTABLE_BROADCAST_STYLES, type BroadcastStyle, normalizeBroadcastStyle } from "@/lib/broadcastStyles";
+import {
+  BROADCAST_STYLES,
+  SELECTABLE_BROADCAST_STYLES,
+  STYLE_APPEARANCES,
+  appearanceLabel,
+  defaultAppearanceForStyle,
+  normalizeAppearance,
+  normalizeBroadcastStyle,
+  type BroadcastAppearance,
+  type BroadcastStyle,
+} from "@/lib/broadcastStyles";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
