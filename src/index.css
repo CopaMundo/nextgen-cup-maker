@@ -83,17 +83,6 @@ input[type="number"] {
   .wc-us-ring { box-shadow: 0 0 0 2px rgba(26,63,168,0.35); }
 }
 
-/* World Cup host-nation theme tokens — map primary/accent/ring to host color
-   so generic UI accents (info page,
-fase tabs,
-ring around home button {
-  --primary: 152 100% 20%;
-  --primary-foreground: 0 0% 100%;
-  --accent: 152 100% 27%;
-  --accent-foreground: 0 0% 100%;
-  --ring: 152 100% 20%;
-}
-
 /* ======================================================================
    COPA MUNDO THEME — Dark & Light
    Colors: Green #009C3B,
