@@ -452,3 +452,34 @@ export function normalizeBroadcastStyle(style: string | null | undefined): Broad
     ? (style as BroadcastStyle)
     : "copa_mundo_bc";
 }
+
+/* ── Posterafbeeldingen per stijl (en per verschijning waar relevant) ── */
+import copaDark from "@/assets/posters/copa-dark.asset.json";
+import copaLight from "@/assets/posters/copa-light.asset.json";
+import teletextP500 from "@/assets/posters/teletext-p500.asset.json";
+import teletextP800 from "@/assets/posters/teletext-p800.asset.json";
+import europeanNightsPoster from "@/assets/posters/european-nights.asset.json";
+import worldStagePoster from "@/assets/posters/world-stage.asset.json";
+import gazzettaRosaPoster from "@/assets/posters/gazzetta-rosa.asset.json";
+import stadiumNoirPoster from "@/assets/posters/stadium-noir.asset.json";
+
+/** Posterafbeelding voor een stijl; wisselt mee met de gekozen verschijning. */
+export function stylePosterUrl(style: BroadcastStyle, appearance?: BroadcastAppearance): string {
+  const app = normalizeAppearance(style, appearance);
+  switch (style) {
+    case "copa_mundo_bc":
+      return app === "light" ? copaLight.url : copaDark.url;
+    case "teletext":
+      return app === "light" ? teletextP800.url : teletextP500.url;
+    case "european_nights":
+      return europeanNightsPoster.url;
+    case "wc26":
+      return worldStagePoster.url;
+    case "la_rosa":
+      return gazzettaRosaPoster.url;
+    case "retro_bw":
+      return stadiumNoirPoster.url;
+    default:
+      return copaDark.url;
+  }
+}
