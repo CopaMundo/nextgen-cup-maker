@@ -389,10 +389,10 @@ const STYLES: Record<BroadcastStyle, Record<string, string>> = {
 
 
 /** Nieuwe generatie broadcast styles (light + dark via semantische tokens). */
-export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", "serie_a"];
+export const NEW_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw"];
 
-/** Enkel deze 6 stijlen zijn kiesbaar in de UI. */
-export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw", "serie_a"];
+/** Enkel deze stijlen zijn kiesbaar in de UI. */
+export const SELECTABLE_BROADCAST_STYLES: BroadcastStyle[] = ["copa_mundo_bc", "european_nights", "la_rosa", "teletext", "wc26", "retro_bw"];
 
 
 export const BROADCAST_GENERATION: Record<BroadcastStyle, "broadcast" | "legacy"> = Object.fromEntries(
@@ -411,19 +411,37 @@ export function isSquareStyle(style: BroadcastStyle): boolean {
   return Boolean(w) && !/rounded-(?!none)/.test(w);
 }
 
-/** Standaard verschijning (light/dark) per broadcaststijl. Default = dark. */
-export const STYLE_DEFAULT_APPEARANCE: Partial<Record<BroadcastStyle, "light" | "dark">> = {
-  copa_mundo_bc: "dark",
-  european_nights: "dark",
-  teletext: "dark",
-  retro_bw: "dark",
-  la_rosa: "light",
-  wc26: "light",
-  serie_a: "light",
+export type BroadcastAppearance = "light" | "dark";
+
+/**
+ * Welke verschijningen de beheerder per stijl kan kiezen.
+ * Eén optie = die stijl heeft maar één vaste layout.
+ * Bij teletext staat "dark" voor pagina 500 en "light" voor pagina 800.
+ */
+export const STYLE_APPEARANCES: Record<BroadcastStyle, BroadcastAppearance[]> = {
+  copa_mundo_bc: ["dark", "light"],
+  european_nights: ["dark"],
+  wc26: ["light"],
+  la_rosa: ["light", "dark"],
+  teletext: ["dark", "light"],
+  retro_bw: ["dark"],
 };
 
-export function defaultAppearanceForStyle(style: BroadcastStyle): "light" | "dark" {
-  return STYLE_DEFAULT_APPEARANCE[style] ?? "dark";
+/** Labels van de verschijningskeuze per stijl. */
+export function appearanceLabel(style: BroadcastStyle, appearance: BroadcastAppearance): string {
+  if (style === "teletext") return appearance === "dark" ? "P500" : "P800";
+  return appearance === "dark" ? "Dark" : "Light";
+}
+
+/** Standaard verschijning per broadcaststijl = de eerste beschikbare optie. */
+export function defaultAppearanceForStyle(style: BroadcastStyle): BroadcastAppearance {
+  return STYLE_APPEARANCES[style]?.[0] ?? "dark";
+}
+
+/** Geeft altijd een verschijning terug die de stijl ondersteunt. */
+export function normalizeAppearance(style: BroadcastStyle, value: string | null | undefined): BroadcastAppearance {
+  const options = STYLE_APPEARANCES[style] ?? ["dark"];
+  return options.includes(value as BroadcastAppearance) ? (value as BroadcastAppearance) : options[0];
 }
 
 /** Zet elke (verwijderde/legacy) stijl om naar een geldige, kiesbare stijl. Fallback = Copa Mundo. */
