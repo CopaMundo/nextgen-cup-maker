@@ -820,6 +820,7 @@ body[data-broadcast="retro_bw"] {
   --broadcast-primary: 0 0% 4%;
   --broadcast-primary-contrast: 0 0% 100%;
   --broadcast-score: 0 0% 4%;
+  --broadcast-score-foreground: 0 0% 2%;
   --broadcast-bright: 0 0% 20%;
   --broadcast-navy: 0 0% 4%;
   --broadcast-cyan: 0 0% 4%;
@@ -1164,6 +1165,7 @@ body[data-broadcast="wc26"] {
   --broadcast-primary: 173 77% 44%;
   --broadcast-primary-contrast: 0 0% 2%;
   --broadcast-score: 0 0% 100%;
+  --broadcast-score-foreground: 0 0% 2%;
   --broadcast-bright: 172 73% 55%;
   --broadcast-gold: 46 62% 56%;
   --broadcast-navy: 180 7% 6%;
