@@ -91,7 +91,7 @@ const PublicTeams = ({ data, favoriteTeam }: { data: PublicTournamentData; favor
             { label: "DT", value: ga },
           ].map(s => (
             <div key={s.label} className={`${ds(bStyle, "card")} p-3 text-center`}>
-              <p className={`text-lg font-black ${ds(bStyle, "matchScoreWin")}`}>{s.value}</p>
+              <p className={`${s.label === "W-G-V" ? "team-record-value" : "text-lg"} font-black ${ds(bStyle, "matchScoreWin")}`}>{s.value}</p>
               <p className="text-[8px] font-black text-muted-foreground uppercase tracking-wider">{s.label}</p>
             </div>
           ))}
