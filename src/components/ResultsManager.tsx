@@ -657,6 +657,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       };
 
       for (const group of formatGroups) {
+        if (selectedFormat.phase_type === "single_match") {
+          const positions = computeSingleMatchPositions(selectedFormat.id, group.id);
+          if (positions.length > 0) positionsByGroup.set(group.id, positions);
+          continue;
+        }
         const groupMatches = matches.filter(m => m.phase_id === selectedFormat.id && m.group_id === group.id && m.is_played);
         if (groupMatches.length === 0) continue;
         const maxRound = Math.max(...groupMatches.map(m => m.round_number ?? 0));
