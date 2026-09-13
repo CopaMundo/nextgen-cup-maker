@@ -709,11 +709,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   ...slot,
                   team: directTeam ?? sourceTeam,
                   isReachedBySelectedFormat,
-                  sourceLabel: sourceGroup && slot.ref_position
-                    ? `${slot.ref_position}e ${sourceGroup.name}`
-                    : sourcePhase && slot.ref_position
-                      ? `${slot.ref_position}e ${sourcePhase.name}`
-                      : null,
+                  sourceLabel: slot.ref_position
+                    ? (sourcePhase?.phase_type === "single_match" || (sourceGroup && phases.find(p => p.id === sourceGroup.phase_id)?.phase_type === "single_match")
+                        ? `${slot.ref_position % 2 === 1 ? "Winnaar" : "Verliezer"} Wedstrijd ${Math.ceil(slot.ref_position / 2)}`
+                        : sourceGroup
+                          ? `${slot.ref_position}e ${sourceGroup.name}`
+                          : sourcePhase
+                            ? `${slot.ref_position}e ${sourcePhase.name}`
+                            : null)
+                    : null,
                 };
               });
 
