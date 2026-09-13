@@ -776,8 +776,14 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       const formatMatches = matches.filter(m => m.phase_id === format.id && m.is_played);
 
       for (const group of formatGroups) {
+        if (format.phase_type === "single_match") {
+          const singlePositions = computeSingleMatchPositions(format.id, group.id);
+          if (singlePositions.length > 0) standingsMap[group.id] = singlePositions;
+          continue;
+        }
         const groupMatches = formatMatches.filter(m => m.group_id === group.id);
         if (groupMatches.length === 0) continue;
+
 
         const getWinnerLoser = (m: Match) => {
           if (m.home_score === null || m.away_score === null) return null;
