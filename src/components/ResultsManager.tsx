@@ -538,6 +538,75 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     return standingColors.find(sc => sc.phase_id === phaseId && pos >= sc.position_from && pos <= sc.position_to);
   };
 
+  /**
+   * Doorstroming voor losse wedstrijden (single_match).
+   * Referenties gebruiken: positie 2i-1 = winnaar wedstrijd i, positie 2i = verliezer wedstrijd i.
+   * De wedstrijdnummering volgt de slotvolgorde van het format (zoals in de bracketweergave),
+   * en heen/terug of meerdere ontmoetingen worden samengeteld.
+   */
+  const computeSingleMatchPositions = (formatId: string, groupId: string): { teamId: string; position: number }[] => {
+    const orderedSlots = slots
+      .filter(s => s.phase_id === formatId && (!s.group_id || s.group_id === groupId))
+      .sort((a, b) => a.sort_order - b.sort_order || a.slot_code.localeCompare(b.slot_code, undefined, { numeric: true, sensitivity: "base" }));
+    const slotIndex = new Map(orderedSlots.map((s, i) => [s.slot_code, i]));
+
+    const groupMatches = matches.filter(m => m.phase_id === formatId && m.group_id === groupId);
+
+    // Groepeer alle legs/ontmoetingen per slotpaar
+    const pairs = new Map<string, { key: string; order: number; homeCode: string; awayCode: string; legs: Match[] }>();
+    for (const m of groupMatches) {
+      const h = m.home_slot_label;
+      const a = m.away_slot_label;
+      if (!h || !a) continue;
+      const hi = slotIndex.get(h) ?? 9999;
+      const ai = slotIndex.get(a) ?? 9999;
+      const first = hi <= ai ? h : a;
+      const second = hi <= ai ? a : h;
+      const key = `${first}|${second}`;
+      const existing = pairs.get(key);
+      if (existing) existing.legs.push(m);
+      else pairs.set(key, { key, order: Math.min(hi, ai), homeCode: first, awayCode: second, legs: [m] });
+    }
+
+    const orderedPairs = [...pairs.values()].sort((a, b) => a.order - b.order || a.key.localeCompare(b.key, undefined, { numeric: true }));
+
+    const positions: { teamId: string; position: number }[] = [];
+    orderedPairs.forEach((pair, index) => {
+      const legs = [...pair.legs].sort((a, b) => (a.round_number ?? 0) - (b.round_number ?? 0) || (a.match_name ?? "").localeCompare(b.match_name ?? "", undefined, { numeric: true }));
+      if (legs.length === 0 || legs.some(m => !m.is_played || m.home_score === null || m.away_score === null)) return;
+
+      let scoreA = 0;
+      let scoreB = 0;
+      let penA = 0;
+      let penB = 0;
+      let teamA: string | null = null;
+      let teamB: string | null = null;
+
+      for (const m of legs) {
+        const flipped = m.home_slot_label === pair.awayCode;
+        const hs = m.home_score ?? 0;
+        const as = m.away_score ?? 0;
+        scoreA += flipped ? as : hs;
+        scoreB += flipped ? hs : as;
+        if (m.home_penalties !== null && m.away_penalties !== null) {
+          penA = flipped ? m.away_penalties : m.home_penalties;
+          penB = flipped ? m.home_penalties : m.away_penalties;
+        }
+        if (!teamA) teamA = flipped ? m.away_team_id : m.home_team_id;
+        if (!teamB) teamB = flipped ? m.home_team_id : m.away_team_id;
+      }
+
+      if (scoreA === scoreB && penA === penB) return; // geen beslissing
+      const aWins = scoreA > scoreB || (scoreA === scoreB && penA > penB);
+      const winnerId = aWins ? teamA : teamB;
+      const loserId = aWins ? teamB : teamA;
+      if (winnerId) positions.push({ teamId: winnerId, position: index * 2 + 1 });
+      if (loserId) positions.push({ teamId: loserId, position: index * 2 + 2 });
+    });
+
+    return positions;
+  };
+
   // Preview data for the selected format completion dialog
   const completePreview = useMemo(() => {
     const selectedFormat = selectedFormatActionId ? phases.find(p => p.id === selectedFormatActionId) : null;
