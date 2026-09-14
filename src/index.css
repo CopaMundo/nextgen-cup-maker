@@ -2285,6 +2285,8 @@ lijn loopt door */
 /* Teletekst: losse titel zonder doorgetrokken lijn (bracketnamen) */
 [data-broadcast="teletext"] .ttx-title-solo {
   margin-right: 0 !important;
+  margin-left: 0 !important;
+  min-height: 1.75rem;
 }
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-title,
 [data-broadcast="teletext"][data-ttx-variant="801"] .ttx-section-line {
