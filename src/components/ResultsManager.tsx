@@ -751,16 +751,12 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFormatActionId, phases, groups, slots, groupTeams, matches, scoringSystems, teams, tournament]);
 
-  const completeFormats = async (phaseFormats: Phase[], options?: { advancePhase?: boolean }) => {
-    if (phaseFormats.length === 0) return;
-    const phaseNumber = phaseFormats[0].phase_number;
-
-    if (!isPreviousPhaseCompleted(phaseNumber)) {
-      toast({ title: "Vorige fase nog niet voltooid", description: `Voltooi eerst ${getPhaseLabel(phaseNumber - 1, phases)} voordat je dit format kunt voltooien.`, variant: "destructive" });
-      setPhaseActionDialog(null);
-      return;
-    }
-
+  /**
+   * Vult alle slots die verwijzen naar de opgegeven formats met de juiste ploegen.
+   * Wordt gebruikt bij het voltooien van een format én automatisch wanneer er
+   * later nieuwe fases/slots bijkomen die naar een al voltooid format verwijzen.
+   */
+  const applyProgressionForFormats = async (phaseFormats: Phase[]): Promise<number> => {
     const groupFormats = phaseFormats.filter(p => p.phase_type === "group" || p.phase_type === "round_robin");
 
     const standingsMap: Record<string, { teamId: string; position: number }[]> = {};
