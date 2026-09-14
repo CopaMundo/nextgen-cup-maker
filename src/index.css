@@ -2218,6 +2218,8 @@ statistieken geel */
 [data-broadcast="teletext"] .ttx-section-meta,
 [data-broadcast="teletext"] .ttx-stats-toggle {
   min-height: 2.25rem;
+  margin-right: -0.75rem;
+  padding-right: 0.75rem;
 }
 [data-broadcast="teletext"] .ttx-section-title,
 [data-broadcast="teletext"] .ttx-section-title * {
