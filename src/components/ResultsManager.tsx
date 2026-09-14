@@ -1000,6 +1000,35 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     await fetchData();
   };
 
+  // Nieuwe fases/slots die verwijzen naar een al voltooid format worden meteen gevuld
+  const progressionSyncRef = useRef<string>("");
+  const progressionSyncBusy = useRef(false);
+  useEffect(() => {
+    if (loading || progressionSyncBusy.current) return;
+    const completedFormats = phases.filter(p => Boolean((p.match_config as any)?.phaseCompleted));
+    if (completedFormats.length === 0) return;
+    const completedIds = new Set(completedFormats.map(p => p.id));
+    const pending = slots.filter(s => s.ref_phase_id && completedIds.has(s.ref_phase_id) && s.ref_position && !s.team_id);
+    if (pending.length === 0) return;
+    const key = pending.map(s => s.id).sort().join(",");
+    if (progressionSyncRef.current === key) return;
+    progressionSyncRef.current = key;
+    progressionSyncBusy.current = true;
+    (async () => {
+      try {
+        const targets = completedFormats.filter(f => pending.some(s => s.ref_phase_id === f.id));
+        let filled = 0;
+        for (const format of targets) {
+          filled += await applyProgressionForFormats([format]);
+        }
+        if (filled > 0) await fetchData();
+      } finally {
+        progressionSyncBusy.current = false;
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, phases, slots]);
+
   const completeSelectedFormat = async () => {
     const format = selectedFormatActionId ? phases.find(p => p.id === selectedFormatActionId) : null;
     if (!format) return;
