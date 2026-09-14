@@ -2201,10 +2201,23 @@ statistieken geel */
 
 /* ── Teletekst: elke sectietitel is een volledige gekleurde balk ── */
 [data-broadcast="teletext"] .ttx-section-title {
+  /* De titel is een echte teletekstbalk: volle rijhoogte,
+  tekst verticaal gecentreerd, en links tot tegen de schermrand. */
   margin-right: -0.75rem;
+  margin-left: -0.75rem;
+  padding-left: 0.75rem;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
 }
 [data-broadcast="teletext"] .ttx-section-line {
-  min-height: 1.75rem;
+  align-self: stretch;
+  min-height: 2.25rem;
+}
+[data-broadcast="teletext"] .ttx-section-meta,
+[data-broadcast="teletext"] .ttx-stats-toggle {
+  min-height: 2.25rem;
 }
 [data-broadcast="teletext"] .ttx-section-title,
 [data-broadcast="teletext"] .ttx-section-title * {
