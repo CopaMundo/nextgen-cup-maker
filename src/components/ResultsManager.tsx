@@ -964,6 +964,21 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       }
     }
 
+    return filledCount;
+  };
+
+  const completeFormats = async (phaseFormats: Phase[], options?: { advancePhase?: boolean }) => {
+    if (phaseFormats.length === 0) return;
+    const phaseNumber = phaseFormats[0].phase_number;
+
+    if (!isPreviousPhaseCompleted(phaseNumber)) {
+      toast({ title: "Vorige fase nog niet voltooid", description: `Voltooi eerst ${getPhaseLabel(phaseNumber - 1, phases)} voordat je dit format kunt voltooien.`, variant: "destructive" });
+      setPhaseActionDialog(null);
+      return;
+    }
+
+    const filledCount = await applyProgressionForFormats(phaseFormats);
+
     await updatePhaseCompletionState(phaseFormats, true);
     setPhaseActionDialog(null);
     setSelectedFormatActionId(null);
