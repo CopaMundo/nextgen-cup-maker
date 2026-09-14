@@ -474,7 +474,7 @@ const GroupManager = ({
     setDialogMatchType(phaseMatchType);
     setDialogEncounters(phaseEncounters);
     setDialogRounds(phaseRounds);
-    setDialogMatchGenMode("auto");
+    setDialogMatchGenMode(group.manual_planning ? "empty" : "auto");
     // For existing group: use its own scoring system, fallback to phase, fallback to first
     const sortedSystems = [...scoringSystems].sort((a, b) => a.sort_order - b.sort_order);
     setDialogScoringSystemId(group.scoring_system_id ?? phaseScoringSystemId ?? sortedSystems[0]?.id ?? null);
