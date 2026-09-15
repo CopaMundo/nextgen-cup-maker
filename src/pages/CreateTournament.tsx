@@ -74,7 +74,12 @@ const CreateTournament = () => {
         start_date: startDate,
         end_date: form.date_mode === "period" && form.end_date ? form.end_date : null,
         date_mode: form.date_mode,
-        match_days: form.date_mode === "single" ? form.match_days.filter((d) => d) : [],
+        match_days:
+          form.date_mode === "single"
+            ? form.match_days.filter((d) => d)
+            : form.start_date && form.end_date
+              ? [{ start: form.start_date, end: form.end_date }]
+              : [],
         is_esport: form.is_esport,
       })
       .select("id")

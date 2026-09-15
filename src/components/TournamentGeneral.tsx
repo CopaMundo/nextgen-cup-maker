@@ -541,17 +541,30 @@ const TournamentGeneral = ({
     toast({ title: "Wedstrijddagen opgeslagen" });
   };
 
+  // Oudere toernooien bewaarden hun periode enkel in start_date/end_date.
+  // Neem die periode mee als eerste entry zodat ze niet verdwijnt bij toevoegen.
+  const baseMatchDayEntries = (): MatchDayEntry[] => {
+    const entries = (form.match_days || []) as MatchDayEntry[];
+    if (entries.length > 0) return entries;
+    if (tournament.start_date && tournament.end_date && tournament.start_date !== tournament.end_date) {
+      return [{ start: tournament.start_date, end: tournament.end_date }];
+    }
+    if (tournament.start_date) return [tournament.start_date];
+    return [];
+  };
+
   const addMatchDay = async () => {
     if (!newMatchDay) return;
     // Check duplicates against expanded dates
-    const existingDates = (form.match_days || []).flatMap((e: MatchDayEntry) =>
+    const base = baseMatchDayEntries();
+    const existingDates = base.flatMap((e: MatchDayEntry) =>
       typeof e === "string" ? [e] : listIsoDatesInRange(e.start, e.end)
     );
     if (existingDates.includes(newMatchDay)) {
       toast({ title: "Deze dag staat er al bij", variant: "destructive" });
       return;
     }
-    await saveMatchDays([...(form.match_days || []), newMatchDay]);
+    await saveMatchDays([...base, newMatchDay]);
     setNewMatchDay("");
     setShowAddMatchDay(false);
   };
@@ -589,7 +602,7 @@ const TournamentGeneral = ({
       toast({ title: "Ongeldige periode", variant: "destructive" });
       return;
     }
-    await saveMatchDays([...(form.match_days || []), { start: periodStart, end: periodEnd }]);
+    await saveMatchDays([...baseMatchDayEntries(), { start: periodStart, end: periodEnd }]);
     setPeriodStart("");
     setPeriodEnd("");
     setShowAddPeriod(false);
