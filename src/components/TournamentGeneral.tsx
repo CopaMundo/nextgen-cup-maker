@@ -556,14 +556,15 @@ const TournamentGeneral = ({
   const addMatchDay = async () => {
     if (!newMatchDay) return;
     // Check duplicates against expanded dates
-    const existingDates = (form.match_days || []).flatMap((e: MatchDayEntry) =>
+    const base = baseMatchDayEntries();
+    const existingDates = base.flatMap((e: MatchDayEntry) =>
       typeof e === "string" ? [e] : listIsoDatesInRange(e.start, e.end)
     );
     if (existingDates.includes(newMatchDay)) {
       toast({ title: "Deze dag staat er al bij", variant: "destructive" });
       return;
     }
-    await saveMatchDays([...(form.match_days || []), newMatchDay]);
+    await saveMatchDays([...base, newMatchDay]);
     setNewMatchDay("");
     setShowAddMatchDay(false);
   };
@@ -601,7 +602,7 @@ const TournamentGeneral = ({
       toast({ title: "Ongeldige periode", variant: "destructive" });
       return;
     }
-    await saveMatchDays([...(form.match_days || []), { start: periodStart, end: periodEnd }]);
+    await saveMatchDays([...baseMatchDayEntries(), { start: periodStart, end: periodEnd }]);
     setPeriodStart("");
     setPeriodEnd("");
     setShowAddPeriod(false);
