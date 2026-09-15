@@ -541,6 +541,18 @@ const TournamentGeneral = ({
     toast({ title: "Wedstrijddagen opgeslagen" });
   };
 
+  // Oudere toernooien bewaarden hun periode enkel in start_date/end_date.
+  // Neem die periode mee als eerste entry zodat ze niet verdwijnt bij toevoegen.
+  const baseMatchDayEntries = (): MatchDayEntry[] => {
+    const entries = (form.match_days || []) as MatchDayEntry[];
+    if (entries.length > 0) return entries;
+    if (tournament.start_date && tournament.end_date && tournament.start_date !== tournament.end_date) {
+      return [{ start: tournament.start_date, end: tournament.end_date }];
+    }
+    if (tournament.start_date) return [tournament.start_date];
+    return [];
+  };
+
   const addMatchDay = async () => {
     if (!newMatchDay) return;
     // Check duplicates against expanded dates
