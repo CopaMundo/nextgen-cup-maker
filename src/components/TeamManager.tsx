@@ -52,6 +52,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [newTeam, setNewTeam] = useState({ name: "", country: "" });
+  const [newTeamLogo, setNewTeamLogo] = useState<{ file: File; preview: string } | null>(null);
   const [editTeam, setEditTeam] = useState({ name: "", country: "" });
   const isMobile = useIsMobile();
 
@@ -89,9 +90,25 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
     if (error) {
       toast({ title: "Fout", description: error.message, variant: "destructive" });
     } else if (data) {
-      setTeams(t => [...t, data as Team]);
-      setAllTeams(t => [...t, data as Team]);
+      let created = data as Team;
+      if (newTeamLogo) {
+        try {
+          const file = await compressImage(newTeamLogo.file);
+          const ext = getFileExtension(file);
+          const path = `${tournamentId}/${created.id}_${Date.now()}.${ext}`;
+          const { error: upErr } = await supabase.storage.from("team-logos").upload(path, file, { upsert: true });
+          if (!upErr) {
+            const { data: { publicUrl } } = supabase.storage.from("team-logos").getPublicUrl(path);
+            await supabase.from("teams").update({ logo_url: publicUrl }).eq("id", created.id);
+            created = { ...created, logo_url: publicUrl };
+          }
+        } catch { /* logo upload mislukt: team blijft bestaan */ }
+      }
+      setTeams(t => [...t, created]);
+      setAllTeams(t => [...t, created]);
       setNewTeam({ name: "", country: "" });
+      if (newTeamLogo) URL.revokeObjectURL(newTeamLogo.preview);
+      setNewTeamLogo(null);
       setShowAdd(false);
     }
   };
@@ -261,12 +278,34 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
 
   const modals = (
     <>
-      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+      <Dialog open={showAdd} onOpenChange={(o) => { setShowAdd(o); if (!o && newTeamLogo) { URL.revokeObjectURL(newTeamLogo.preview); setNewTeamLogo(null); } }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{singularLabel} toevoegen</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
+            {!isPlayers && (
+              <div className="flex justify-center">
+                <label className="cursor-pointer relative group">
+                  <div className="h-24 w-24 overflow-hidden flex-shrink-0">
+                    {newTeamLogo ? (
+                      <img src={newTeamLogo.preview} alt="Logo" className="h-full w-full object-contain" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-3xl font-bold text-muted-foreground">{newTeam.name.trim().charAt(0) || "?"}</div>
+                    )}
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Upload className="h-6 w-6 text-foreground" />
+                  </div>
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    if (newTeamLogo) URL.revokeObjectURL(newTeamLogo.preview);
+                    setNewTeamLogo({ file: f, preview: URL.createObjectURL(f) });
+                  }} />
+                </label>
+              </div>
+            )}
             <div className="space-y-1">
               <Label className="text-xs">{isPlayers ? "Naam" : "Teamnaam"} *</Label>
               <Input value={newTeam.name} onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })} placeholder={isPlayers ? "Bijv. Lionel Messi" : "Bijv. RSC Anderlecht"} />
