@@ -2279,6 +2279,17 @@ lijn loopt door */
   color: hsl(0 0% 100%);
   align-self: stretch;
   border-radius: 0;
+  height: 2.25rem !important;
+  width: 2.25rem !important;
+  min-height: 2.25rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+[data-broadcast="teletext"] .ttx-stats-toggle svg {
+  margin: 0 auto;
+  display: block;
 }
 [data-broadcast="teletext"] .ttx-stats-toggle:hover {
   background-color: hsl(var(--broadcast-navy));
