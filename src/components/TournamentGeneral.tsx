@@ -581,6 +581,18 @@ const TournamentGeneral = ({
 
     await saveMatchDays(updated);
 
+    // Als de lijst leeg is, wis ook start_date/end_date zodat de fallback in
+    // baseMatchDayEntries() de zojuist verwijderde periode niet opnieuw toevoegt.
+    if (updated.length === 0 && (tournament.start_date || tournament.end_date)) {
+      const { error } = await supabase
+        .from("tournaments")
+        .update({ start_date: null, end_date: null })
+        .eq("id", tournament.id);
+      if (!error) {
+        onUpdate({ ...tournament, match_days: updated, start_date: null, end_date: null });
+      }
+    }
+
     if (orphanDates.length > 0) {
       await supabase
         .from("matches")
