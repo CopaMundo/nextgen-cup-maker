@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Star, ChevronRight, Trophy, Zap, Clock, MessageCircle } from "lucide-react";
+import { Star, ChevronRight, Trophy, Zap, Clock } from "lucide-react";
 import { useBroadcastStyle } from "@/contexts/BroadcastStyleContext";
 import { ds } from "@/lib/broadcastStyles";
 import CountryFlag from "@/components/CountryFlag";
@@ -7,6 +7,7 @@ import PublicMatchCard from "@/components/public-view/PublicMatchCard";
 import PublicBracketSection from "@/components/public-view/PublicBracketSection";
 import PublicStandings from "@/components/public-view/PublicStandings";
 import PublicBackButton from "@/components/public-view/PublicBackButton";
+import PublicPollDialog from "@/components/public-view/PublicPollDialog";
 import type { PublicTournamentData } from "@/pages/PublicView";
 import { calculateGroupStandings, getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { getPhaseLabel } from "@/lib/phaseLabel";
@@ -19,6 +20,7 @@ interface Props {
   favoriteTeam: string | null;
   toggleFavorite: (id: string) => void;
   setActiveTab: (tab: any, target?: { phaseId?: string }) => void;
+  onPollVoteAdded: (vote: any) => void;
   homeResetKey?: number;
 }
 
@@ -32,7 +34,7 @@ const windowStandings = (rows: any[], favoriteTeam: string | null) => {
 };
 
 
-const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, homeResetKey }: Props) => {
+const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, onPollVoteAdded, homeResetKey }: Props) => {
   const { tournament, teams, matches, groupTeams, groups, phases, slots, stats, standingColors, polls, pollVotes, scoringSystems } = data;
   const bStyle = useBroadcastStyle();
   const homeHeaderCls = ds(bStyle, "homeCardHeader") || ds(bStyle, "cardHeader");
@@ -48,10 +50,6 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
   const [favTab, setFavTab] = useState<"matches" | "standings">("matches");
   const [globalTab, setGlobalTab] = useState<"results" | "next">("next");
   
-  const [votedPolls, setVotedPolls] = useState<Record<string, number>>(() => {
-    try { return JSON.parse(localStorage.getItem(`poll-votes-${tournament.id}`) || "{}"); } catch { return {}; }
-  });
-
   const setExpandedGrid = (value: string | null) => {
     setExpandedGridState(value);
     if (value) {
@@ -588,6 +586,12 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         <div className="flex-1 min-w-0">
           <h1 className="font-display font-black text-foreground leading-tight text-lg uppercase tracking-wide truncate">{tournament.name}</h1>
         </div>
+        <PublicPollDialog
+          tournamentId={tournament.id}
+          polls={polls}
+          pollVotes={pollVotes}
+          onVoteAdded={onPollVoteAdded}
+        />
       </div>
 
       {/* === MIJN TEAM: titel + teamkiezer rechts === */}
@@ -887,61 +891,6 @@ const PublicHomepage = ({ data, favoriteTeam, toggleFavorite, setActiveTab, home
         </div>
       </div>
 
-      {/* === Polls === */}
-      {polls.length > 0 && (
-        <GridCard title="Polls" icon={<MessageCircle className="h-4 w-4" />}>
-          <div className="space-y-4">
-            {polls.map((poll: any) => (
-              <PollCard key={poll.id} poll={poll} pollVotes={pollVotes} votedPolls={votedPolls}
-                onVote={(pollId, optIdx) => {
-                  import("@/integrations/supabase/client").then(({ supabase }) => {
-                    const voterId = localStorage.getItem("voter-id") || crypto.randomUUID();
-                    localStorage.setItem("voter-id", voterId);
-                    supabase.from("poll_votes").insert({ poll_id: pollId, option_index: optIdx, voter_id: voterId }).then(() => {
-                      const updated = { ...votedPolls, [pollId]: optIdx };
-                      setVotedPolls(updated);
-                      localStorage.setItem(`poll-votes-${tournament.id}`, JSON.stringify(updated));
-                    });
-                  });
-                }} />
-            ))}
-          </div>
-        </GridCard>
-      )}
-    </div>
-  );
-};
-
-// Poll card
-const PollCard = ({ poll, pollVotes, votedPolls, onVote }: { poll: any; pollVotes: any[]; votedPolls: Record<string, number>; onVote: (pollId: string, optIdx: number) => void }) => {
-  const options = Array.isArray(poll.options) ? poll.options : [];
-  const votes = pollVotes.filter((v: any) => v.poll_id === poll.id);
-  const totalVotes = votes.length;
-  const hasVoted = votedPolls[poll.id] !== undefined;
-
-  return (
-    <div>
-      <p className="text-sm font-bold text-foreground mb-2">{poll.question}</p>
-      <div className="space-y-1.5">
-        {options.map((opt: string, i: number) => {
-          const count = votes.filter((v: any) => v.option_index === i).length;
-          const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-          const isSelected = votedPolls[poll.id] === i;
-          return (
-            <button key={i} onClick={() => !hasVoted && onVote(poll.id, i)} disabled={hasVoted}
-              className={`relative w-full rounded-lg border px-3 py-2 text-left text-xs transition-all overflow-hidden ${
-                isSelected ? "border-primary bg-primary/10" : "border-border hover:border-primary/30"
-              }`}>
-              {hasVoted && <div className="absolute inset-0 bg-primary/10 rounded-lg" style={{ width: `${pct}%` }} />}
-              <div className="relative flex items-center justify-between">
-                <span className="font-bold text-foreground">{opt}</span>
-                {hasVoted && <span className="text-muted-foreground font-black">{pct}%</span>}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      {hasVoted && <p className="text-[10px] text-muted-foreground mt-1 font-bold">{totalVotes} stemmen</p>}
     </div>
   );
 };

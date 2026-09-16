@@ -200,6 +200,13 @@ const PublicView = () => {
     localStorage.setItem(`cat-${token}`, catId);
   }, [token]);
 
+  const handlePollVoteAdded = useCallback((vote: any) => {
+    setData((current) => current ? {
+      ...current,
+      pollVotes: [...current.pollVotes, vote],
+    } : current);
+  }, []);
+
   const isMultiCat = data?.tournament?.is_multi_category && (data?.categories?.length ?? 0) > 1;
   const needsDivisionSelection = isMultiCat && (!selectedCategory || selectedCategory === "");
 
@@ -255,7 +262,7 @@ const PublicView = () => {
       <div className="min-h-screen bg-background pb-20" data-broadcast={displayStyle}>
         {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} />}
         {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} />}
-        {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} homeResetKey={homeResetKey} />}
+        {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} onPollVoteAdded={handlePollVoteAdded} homeResetKey={homeResetKey} />}
         {activeTab === "standings" && <PublicStandings data={filteredData} initialPhaseId={standingsTarget?.phaseId} />}
         {activeTab === "schedule" && <PublicSchedule data={filteredData} favoriteTeam={favoriteTeam} />}
 
