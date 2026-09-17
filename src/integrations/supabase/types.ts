@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      draw_pot_teams: {
+        Row: {
+          created_at: string
+          id: string
+          pot_id: string
+          sort_order: number
+          team_id: string
+          tournament_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pot_id: string
+          sort_order?: number
+          team_id: string
+          tournament_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pot_id?: string
+          sort_order?: number
+          team_id?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draw_pot_teams_pot_id_fkey"
+            columns: ["pot_id"]
+            isOneToOne: false
+            referencedRelation: "draw_pots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_pot_teams_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_pot_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      draw_pots: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          name: string
+          phase_id: string
+          sort_order: number
+          tournament_id: string
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          phase_id: string
+          sort_order?: number
+          tournament_id: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          phase_id?: string
+          sort_order?: number
+          tournament_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draw_pots_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_pots_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_pots_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_teams: {
         Row: {
           bonus_points: number
