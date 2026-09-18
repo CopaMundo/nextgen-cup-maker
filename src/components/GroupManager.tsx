@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays, Check, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays, Check, AlertTriangle, Trophy } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -24,6 +24,7 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import LiveDrawDialog from "./LiveDrawDialog";
 
 interface Group {
   id: string;
@@ -304,6 +305,7 @@ const GroupManager = ({
   const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
+  const [drawOpen, setDrawOpen] = useState(false);
 
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
@@ -1138,10 +1140,24 @@ const GroupManager = ({
             <Shuffle className="h-3 w-3" /> Willekeurige indeling
           </Button>
         )}
+        {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setDrawOpen(true)}>
+            <Trophy className="h-3 w-3" /> Loting
+          </Button>
+        )}
         <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setShowClearConfirm(true)}>
           <Trash2 className="h-3 w-3" /> Alles leeg maken
         </Button>
       </div>
+
+      <LiveDrawDialog
+        open={drawOpen}
+        onOpenChange={setDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        categoryId={categoryId}
+        onApplied={() => { notifySlotChange(); fetchGroups(); }}
+      />
 
       {/* Grid layout for groups */}
       {!groupsLoaded && groups.length === 0 ? (
