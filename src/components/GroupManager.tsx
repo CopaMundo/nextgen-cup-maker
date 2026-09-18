@@ -1140,10 +1140,24 @@ const GroupManager = ({
             <Shuffle className="h-3 w-3" /> Willekeurige indeling
           </Button>
         )}
+        {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setDrawOpen(true)}>
+            <Trophy className="h-3 w-3" /> Loting
+          </Button>
+        )}
         <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setShowClearConfirm(true)}>
           <Trash2 className="h-3 w-3" /> Alles leeg maken
         </Button>
       </div>
+
+      <LiveDrawDialog
+        open={drawOpen}
+        onOpenChange={setDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        categoryId={categoryId}
+        onApplied={() => { notifySlotChange(); fetchGroups(); }}
+      />
 
       {/* Grid layout for groups */}
       {!groupsLoaded && groups.length === 0 ? (
