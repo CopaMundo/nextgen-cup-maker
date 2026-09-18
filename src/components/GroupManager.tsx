@@ -24,6 +24,7 @@ import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
+import LiveDrawDialog from "./LiveDrawDialog";
 
 interface Group {
   id: string;
