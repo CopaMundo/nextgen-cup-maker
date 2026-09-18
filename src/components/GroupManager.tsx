@@ -304,6 +304,7 @@ const GroupManager = ({
   const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
+  const [drawOpen, setDrawOpen] = useState(false);
 
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
