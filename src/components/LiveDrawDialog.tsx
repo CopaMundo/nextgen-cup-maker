@@ -362,6 +362,7 @@ const LiveDrawDialog = ({
           {([
             { key: "pots", label: "POTTEN" },
             { key: "rules", label: "REGELS" },
+            ...(isRounds ? [{ key: "matchups" as Tab, label: "ONTMOETINGEN" }] : []),
             { key: "draw", label: "LOTING" },
           ] as { key: Tab; label: string }[]).map((t) => (
             <button
