@@ -70,6 +70,22 @@ const LiveDrawDialog = ({
     [teams, assignedTeamIds]
   );
 
+  /** Pot-tegen-pot: hoeveel keer speelt pot A tegen pot B (standaard 1 tussen verschillende potten). */
+  const matrixKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const matrixValue = (a: string, b: string) => potMatrix[matrixKey(a, b)] ?? (a === b ? 0 : 1);
+  const setMatrixValue = (a: string, b: string, value: number) =>
+    setPotMatrix((prev) => ({ ...prev, [matrixKey(a, b)]: value }));
+
+  const effectiveMatrix = useMemo(() => {
+    const result: Record<string, number> = {};
+    for (let i = 0; i < pots.length; i++) {
+      for (let j = i; j < pots.length; j++) {
+        result[`${pots[i].id}|${pots[j].id}`] = matrixValue(pots[i].id, pots[j].id);
+      }
+    }
+    return result;
+  }, [pots, potMatrix]);
+
   const loadAll = async () => {
     setLoading(true);
     try {
