@@ -1156,6 +1156,7 @@ const GroupManager = ({
         tournamentId={tournamentId}
         phaseId={phaseId}
         categoryId={categoryId}
+        phaseMatchType={phaseMatchType}
         onApplied={() => { notifySlotChange(); fetchGroups(); }}
       />
 
