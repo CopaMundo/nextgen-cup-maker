@@ -471,6 +471,43 @@ const LiveDrawDialog = ({
             </div>
           )}
 
+          {!loading && tab === "matchups" && (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Kies hoeveel keer elke pot tegen een andere pot speelt. De wedstrijden worden na de loting over de
+                speelrondes verdeeld, waarbij een deelnemer nooit twee keer in dezelfde speelronde staat.
+              </p>
+              {pots.length < 1 && <p className="text-xs text-muted-foreground">Maak eerst potten aan.</p>}
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                {pots.flatMap((a, i) =>
+                  pots.slice(i).map((b) => (
+                    <div
+                      key={`${a.id}|${b.id}`}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+                    >
+                      <span className="text-sm font-medium">
+                        {a.id === b.id ? `${a.name} onderling` : `${a.name} vs ${b.name}`}
+                      </span>
+                      <div className="w-24">
+                        <Select
+                          value={String(matrixValue(a.id, b.id))}
+                          onValueChange={(v) => setMatrixValue(a.id, b.id, Number(v))}
+                        >
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {[0, 1, 2, 3, 4].map((n) => (
+                              <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
           {!loading && tab === "draw" && (
             <div className="space-y-4">
               {!steps && (
