@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Shuffle, Play, Undo2, RotateCcw, Check } from "lucide-react";
-import { computeDraw, type DrawStep, type PotInput, type GroupInput, type TeamMeta } from "@/lib/drawEngine";
+import { computeDraw, generatePotMatchups, type DrawStep, type PotInput, type GroupInput, type TeamMeta } from "@/lib/drawEngine";
 
 interface Pot {
   id: string;
@@ -23,7 +23,7 @@ interface GroupRow {
   capacity: number;
 }
 
-type Tab = "pots" | "rules" | "draw";
+type Tab = "pots" | "rules" | "matchups" | "draw";
 
 const LiveDrawDialog = ({
   open,
@@ -31,6 +31,7 @@ const LiveDrawDialog = ({
   tournamentId,
   phaseId,
   categoryId,
+  phaseMatchType,
   onApplied,
 }: {
   open: boolean;
@@ -38,8 +39,10 @@ const LiveDrawDialog = ({
   tournamentId: string;
   phaseId: string;
   categoryId?: string | null;
+  phaseMatchType?: string;
   onApplied?: () => void;
 }) => {
+  const isRounds = phaseMatchType === "rounds";
   const { toast } = useToast();
   const [tab, setTab] = useState<Tab>("pots");
   const [loading, setLoading] = useState(false);
