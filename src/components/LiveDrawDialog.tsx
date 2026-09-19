@@ -53,6 +53,7 @@ const LiveDrawDialog = ({
   const [separateSameCountry, setSeparateSameCountry] = useState(false);
   const [newPotName, setNewPotName] = useState("");
   const [potCount, setPotCount] = useState(4);
+  const [potMatrix, setPotMatrix] = useState<Record<string, number>>({});
 
   const [steps, setSteps] = useState<DrawStep[] | null>(null);
   const [revealed, setRevealed] = useState(0);
