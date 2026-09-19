@@ -290,7 +290,52 @@ const LiveDrawDialog = ({
       const groupTeams = updates.map((u) => ({ group_id: u.groupId, team_id: u.teamId, tournament_id: tournamentId }));
       if (groupTeams.length) await supabase.from("group_teams").insert(groupTeams);
 
-      toast({ title: `${updates.length} deelnemers ingedeeld via loting` });
+      let drawnMatches = 0;
+      if (isRounds) {
+        const membersByGroup = new Map<string, { teamId: string; slotCode: string }[]>();
+        for (const u of updates) {
+          const list = membersByGroup.get(u.groupId) || [];
+          list.push({ teamId: u.teamId, slotCode: u.slotCode });
+          membersByGroup.set(u.groupId, list);
+        }
+
+        for (const [groupId, members] of membersByGroup) {
+          const memberIds = new Set(members.map((m) => m.teamId));
+          const slotByTeam = new Map(members.map((m) => [m.teamId, m.slotCode]));
+          const groupPots = pots
+            .map((p) => ({ id: p.id, name: p.name, teamIds: p.teamIds.filter((id) => memberIds.has(id)) }))
+            .filter((p) => p.teamIds.length > 0);
+          const pairings = generatePotMatchups(groupPots, effectiveMatrix);
+          if (pairings.length === 0) continue;
+
+          await supabase
+            .from("matches")
+            .delete()
+            .eq("tournament_id", tournamentId)
+            .eq("phase_id", phaseId)
+            .eq("group_id", groupId);
+
+          const inserts = pairings.map((p) => ({
+            tournament_id: tournamentId,
+            phase_id: phaseId,
+            group_id: groupId,
+            home_team_id: p.homeTeamId,
+            away_team_id: p.awayTeamId,
+            home_slot_label: slotByTeam.get(p.homeTeamId) ?? null,
+            away_slot_label: slotByTeam.get(p.awayTeamId) ?? null,
+            round_number: p.round,
+          }));
+          const { error: insertError } = await supabase.from("matches").insert(inserts);
+          if (insertError) throw insertError;
+          await supabase.from("groups").update({ manual_planning: false }).eq("id", groupId);
+          drawnMatches += inserts.length;
+        }
+      }
+
+      toast({
+        title: `${updates.length} deelnemers ingedeeld via loting`,
+        description: drawnMatches > 0 ? `${drawnMatches} wedstrijden geloot over de speelrondes.` : undefined,
+      });
       onApplied?.();
       onOpenChange(false);
     } catch (error: any) {
