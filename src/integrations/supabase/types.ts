@@ -118,6 +118,106 @@ export type Database = {
           },
         ]
       }
+      draw_reports: {
+        Row: {
+          created_at: string
+          id: string
+          phase_id: string
+          report: Json
+          tournament_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phase_id: string
+          report?: Json
+          tournament_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phase_id?: string
+          report?: Json
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draw_reports_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_reports_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      draw_sessions: {
+        Row: {
+          category_id: string | null
+          config: Json
+          created_at: string
+          id: string
+          is_test: boolean
+          phase_id: string
+          state: Json
+          status: string
+          tournament_id: string
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          config?: Json
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          phase_id: string
+          state?: Json
+          status?: string
+          tournament_id: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          config?: Json
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          phase_id?: string
+          state?: Json
+          status?: string
+          tournament_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draw_sessions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_sessions_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: true
+            referencedRelation: "tournament_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draw_sessions_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_teams: {
         Row: {
           bonus_points: number
