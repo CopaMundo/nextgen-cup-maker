@@ -47,8 +47,10 @@ export interface ContainerRules {
   requiredPairs: [string, string][];
   /** Deelnemers uit dezelfde vorige groep niet samen (knock-out). */
   separateSamePrevGroup: boolean;
-  /** Uit elke pot precies één deelnemer per bakje. */
+  /** Uit elke pot precies één deelnemer per bakje (of het aantal uit potQuota). */
   onePerPot: boolean;
+  /** Maximaal aantal deelnemers uit een pot in een bakje, sleutel `potId|containerId`. */
+  potQuota: Record<string, number>;
 }
 
 export const emptyContainerRules = (): ContainerRules => ({
@@ -59,7 +61,20 @@ export const emptyContainerRules = (): ContainerRules => ({
   requiredPairs: [],
   separateSamePrevGroup: false,
   onePerPot: true,
+  potQuota: {},
 });
+
+/**
+ * Standaardverdeling van een pot over de bakjes: elk bakje krijgt minstens
+ * `floor(potGrootte / aantalBakjes)`, de rest wordt over de eerste bakjes verdeeld.
+ */
+export function defaultPotQuota(potSize: number, containerIds: string[]): number[] {
+  const n = containerIds.length;
+  if (n === 0) return [];
+  const base = Math.floor(potSize / n);
+  const extra = potSize % n;
+  return containerIds.map((_, i) => base + (i < extra ? 1 : 0));
+}
 
 export interface RoundsRules {
   /** Deelnemers uit hetzelfde land spelen nooit tegen elkaar. */
