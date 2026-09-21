@@ -161,7 +161,11 @@ export function containerAllows(container: DrawContainer, teamId: string, ctx: C
 
   if (ctx.rules.onePerPot) {
     const pot = ctx.potByTeam.get(teamId);
-    if (pot && container.teamIds.some((id) => ctx.potByTeam.get(id) === pot)) return false;
+    if (pot) {
+      const limit = ctx.rules.potQuota?.[`${pot}|${container.id}`] ?? 1;
+      const samePot = container.teamIds.filter((id) => ctx.potByTeam.get(id) === pot).length;
+      if (samePot + 1 > limit) return false;
+    }
   }
 
   const limit = countryLimit(ctx.rules, team.country);
