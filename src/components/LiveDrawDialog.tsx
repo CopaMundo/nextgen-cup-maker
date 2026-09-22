@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { DndContext, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,9 +8,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, Play, AlertTriangle, Sparkles } from "lucide-react";
+import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, GripVertical, ArrowLeft, Maximize2 } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
@@ -36,7 +50,34 @@ interface Pot {
   teamIds: string[];
 }
 
-type Tab = "pots" | "spread" | "rules" | "matchups" | "draw";
+type Step = "settings" | "pots" | "draw";
+
+const DraggablePotTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform) }}
+      className={`flex items-center justify-between rounded-md border border-border bg-background px-2 py-2 text-xs ${isDragging ? "relative z-50 opacity-70 shadow-lg" : ""}`}
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <span {...attributes} {...listeners} className="touch-none cursor-grab text-muted-foreground" aria-label="Deelnemer verplaatsen">
+          <GripVertical className="h-4 w-4" />
+        </span>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const PotDropZone = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={`min-h-20 space-y-1.5 rounded-md p-1 transition-colors ${isOver ? "bg-primary/10 ring-2 ring-primary/30" : ""}`}>
+      {children}
+    </div>
+  );
+};
 
 const LiveDrawDialog = ({
   open,
@@ -59,7 +100,9 @@ const LiveDrawDialog = ({
 }) => {
   const isRounds = phaseMatchType === "rounds";
   const { toast } = useToast();
-  const [tab, setTab] = useState<Tab>("pots");
+  const [step, setStep] = useState<Step>("settings");
+  const [advancedSpreadOpen, setAdvancedSpreadOpen] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pots, setPots] = useState<Pot[]>([]);
   const [containers, setContainers] = useState<DrawContainer[]>([]);
@@ -75,6 +118,10 @@ const LiveDrawDialog = ({
   const [pairA, setPairA] = useState("");
   const [pairB, setPairB] = useState("");
   const [manualTeam, setManualTeam] = useState("");
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } })
+  );
 
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
   const assignedTeamIds = useMemo(() => new Set(pots.flatMap((p) => p.teamIds)), [pots]);
@@ -138,7 +185,8 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open) return;
-    setTab("pots");
+    setStep("settings");
+    setAdvancedSpreadOpen(false);
     setSession(null);
     setRules(emptyContainerRules());
     loadAll();
@@ -223,10 +271,14 @@ const LiveDrawDialog = ({
         if (data) created.push({ id: data.id, name: data.name, sort_order: data.sort_order, teamIds: [] });
       }
       const ordered = [...teams];
-      const perPot = Math.ceil(ordered.length / (created.length || 1));
+      const baseSize = Math.floor(ordered.length / (created.length || 1));
+      const extra = ordered.length % (created.length || 1);
+      let cursor = 0;
       const inserts: { pot_id: string; tournament_id: string; team_id: string; sort_order: number }[] = [];
       created.forEach((pot, index) => {
-        const slice = ordered.slice(index * perPot, (index + 1) * perPot);
+        const size = baseSize + (index < extra ? 1 : 0);
+        const slice = ordered.slice(cursor, cursor + size);
+        cursor += size;
         pot.teamIds = slice.map((t) => t.id);
         slice.forEach((t, i) => inserts.push({ pot_id: pot.id, tournament_id: tournamentId, team_id: t.id, sort_order: i }));
       });
@@ -252,6 +304,42 @@ const LiveDrawDialog = ({
   const setQuota = (potId: string, containerId: string, value: number) =>
     setRules((prev) => ({ ...prev, potQuota: { ...prev.potQuota, [`${potId}|${containerId}`]: Math.max(0, value) } }));
   const resetQuota = () => setRules((prev) => ({ ...prev, potQuota: {} }));
+
+  const moveTeamToPot = async (teamId: string, targetPotId: string) => {
+    const source = pots.find((pot) => pot.teamIds.includes(teamId));
+    if (!source || source.id === targetPotId) return;
+    const target = pots.find((pot) => pot.id === targetPotId);
+    if (!target) return;
+    setPots((prev) =>
+      prev.map((pot) => {
+        if (pot.id === source.id) return { ...pot, teamIds: pot.teamIds.filter((id) => id !== teamId) };
+        if (pot.id === targetPotId) return { ...pot, teamIds: [...pot.teamIds, teamId] };
+        return pot;
+      })
+    );
+    const { error: deleteError } = await supabase.from("draw_pot_teams").delete().eq("pot_id", source.id).eq("team_id", teamId);
+    if (deleteError) {
+      await loadAll();
+      toast({ title: "Verplaatsen mislukt", description: deleteError.message, variant: "destructive" });
+      return;
+    }
+    const { error: insertError } = await supabase.from("draw_pot_teams").insert({
+      pot_id: targetPotId,
+      tournament_id: tournamentId,
+      team_id: teamId,
+      sort_order: target.teamIds.length,
+    });
+    if (insertError) {
+      await loadAll();
+      toast({ title: "Verplaatsen mislukt", description: insertError.message, variant: "destructive" });
+    }
+  };
+
+  const handlePotDragEnd = (event: DragEndEvent) => {
+    const targetPotId = event.over ? String(event.over.id) : "";
+    const teamId = String(event.active.id);
+    if (targetPotId) void moveTeamToPot(teamId, targetPotId);
+  };
 
   /** Volledige regels met de standaardverdeling expliciet ingevuld. */
   const effectiveRules = useMemo<ContainerRules>(() => {
@@ -308,7 +396,7 @@ const LiveDrawDialog = ({
         rules: effectiveRules,
       })
     );
-    setTab("draw");
+    setStep("draw");
   };
 
   const pending = session?.pending ?? null;
@@ -330,7 +418,10 @@ const LiveDrawDialog = ({
   };
   const handleUndo = () => session && setSession(undoLast(session));
   const handleDrawAll = () => session && setSession(drawAll(session));
-  const handleReset = () => startDraw();
+  const handleReset = () => {
+    setShowResetConfirm(false);
+    startDraw();
+  };
 
   const remainingPool = session
     ? session.mode === "pots"
@@ -454,538 +545,433 @@ const LiveDrawDialog = ({
   const TeamChip = ({ id }: { id: string }) => {
     const team = teamById.get(id);
     return (
-      <span className="inline-flex items-center gap-1.5">
-        {team?.logoUrl && <img src={team.logoUrl} alt="" className="h-4 w-4 object-contain" />}
-        <CountryFlag country={team?.country} className="h-3 w-4" />
-        <span>{team?.name || "?"}</span>
+      <span className="inline-flex min-w-0 items-center gap-1.5">
+        {team?.logoUrl && <img src={team.logoUrl} alt="" className="h-5 w-5 shrink-0 object-contain" />}
+        <CountryFlag country={team?.country} className="h-3 w-4 shrink-0" />
+        <span className="truncate">{team?.name || "?"}</span>
       </span>
     );
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl">
-        <DialogHeader>
-          <DialogTitle>Live loting{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
-        </DialogHeader>
+  const validationError = () => {
+    if (containers.length === 0) return { step: "settings" as Step, message: "Er zijn nog geen groepen in deze fase." };
+    if (teams.length !== totalCapacity) {
+      return {
+        step: "settings" as Step,
+        message: `${teams.length} beschikbare deelnemers voor ${totalCapacity} vrije plaatsen. Het aantal moet exact overeenkomen.`,
+      };
+    }
+    if (usePots) {
+      if (pots.length === 0) return { step: "settings" as Step, message: "Maak eerst minstens één pot aan." };
+      const allAssigned = pots.flatMap((pot) => pot.teamIds);
+      const uniqueAssigned = new Set(allAssigned);
+      if (allAssigned.length !== teams.length || uniqueAssigned.size !== teams.length || teams.some((team) => !uniqueAssigned.has(team.id))) {
+        return { step: "pots" as Step, message: "Wijs iedere deelnemer precies één keer aan een pot toe." };
+      }
+      for (const pot of pots) {
+        const quotaTotal = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
+        if (quotaTotal !== pot.teamIds.length) {
+          return {
+            step: "settings" as Step,
+            message: `${pot.name} bevat ${pot.teamIds.length} deelnemers, maar de verdeling voorziet ${quotaTotal} plaatsen.`,
+          };
+        }
+      }
+    }
+    const ctx = buildContainerCtx(teams, pots, effectiveRules);
+    const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
+    return check.ok ? null : { step: "settings" as Step, message: check.message || "De gekozen regels zijn niet haalbaar." };
+  };
 
-        <div className="flex gap-1 rounded-lg border border-border p-1">
-          {([
-            { key: "pots", label: "POTTEN" },
-            ...(usePots ? [{ key: "spread" as Tab, label: "VERDELING" }] : []),
-            { key: "rules", label: "REGELS" },
-            ...(isRounds ? [{ key: "matchups" as Tab, label: "ONTMOETINGEN" }] : []),
-            { key: "draw", label: "LOTING" },
-          ] as { key: Tab; label: string }[]).map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-                tab === t.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"
-              }`}
+  const openDraw = () => {
+    const error = validationError();
+    if (error) {
+      setStep(error.step);
+      toast({
+        title: error.step === "pots" ? "Controleer de potten" : "Controleer de instellingen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    startDraw();
+  };
+
+  const renderRules = () => (
+    <div className="space-y-3">
+      <h3 className="text-sm font-bold">Regels</h3>
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
+        <div>
+          <p className="text-sm font-medium">Zelfde land nooit samen</p>
+          <p className="text-xs text-muted-foreground">Deelnemers uit hetzelfde land komen niet in dezelfde groep.</p>
+        </div>
+        <Switch checked={rules.separateSameCountry} onCheckedChange={(value) => setRules((previous) => ({ ...previous, separateSameCountry: value }))} />
+      </div>
+
+      <div className="space-y-3 rounded-lg border border-border p-3">
+        <div>
+          <Label className="text-xs">Maximum aantal teams per land in een groep</Label>
+          <Select
+            value={rules.countryMaxDefault == null ? "none" : String(rules.countryMaxDefault)}
+            onValueChange={(value) => setRules((previous) => ({ ...previous, countryMaxDefault: value === "none" ? null : Number(value) }))}
+          >
+            <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Geen beperking</SelectItem>
+              {[1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>Maximaal {number}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-xs">Uitzonderingen per land</Label>
+          {Object.entries(rules.countryMax).map(([country, max]) => (
+            <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
+              <CountryFlag country={country} className="h-3 w-4" />
+              <span className="flex-1">{country}</span>
+              <Input
+                type="number"
+                min={1}
+                value={max}
+                onChange={(event) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(event.target.value) } }))}
+                className="h-8 w-16 text-center"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                aria-label={`${country} verwijderen`}
+                onClick={() => setRules((previous) => {
+                  const countryMax = { ...previous.countryMax };
+                  delete countryMax[country];
+                  return { ...previous, countryMax };
+                })}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Select value={newCountry} onValueChange={setNewCountry}>
+              <SelectTrigger><SelectValue placeholder="Land kiezen" /></SelectTrigger>
+              <SelectContent>
+                {countries.filter((country) => rules.countryMax[country] == null).map((country) => <SelectItem key={country} value={country}>{country}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!newCountry}
+              onClick={() => {
+                setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [newCountry]: 1 } }));
+                setNewCountry("");
+              }}
             >
-              {t.label}
-            </button>
+              <Plus className="h-3.5 w-3.5" /> Toevoegen
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3 rounded-lg border border-border p-3">
+        <Label className="text-xs">Teams niet samen of samen in één groep</Label>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Select value={pairA} onValueChange={setPairA}>
+            <SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger>
+            <SelectContent>{teams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+          </Select>
+          <Select value={pairB} onValueChange={setPairB}>
+            <SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger>
+            <SelectContent>{teams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!pairA || !pairB}
+            onClick={() => {
+              setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] }));
+              setPairA(""); setPairB("");
+            }}
+          >Teams niet samen</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!pairA || !pairB}
+            onClick={() => {
+              setRules((previous) => ({ ...previous, requiredPairs: [...previous.requiredPairs, [pairA, pairB]] }));
+              setPairA(""); setPairB("");
+            }}
+          >Teams samen in één groep</Button>
+        </div>
+        <div className="space-y-1">
+          {rules.forbiddenPairs.map(([first, second], index) => (
+            <div key={`forbidden-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
+              <span>Niet samen: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button>
+            </div>
+          ))}
+          {rules.requiredPairs.map(([first, second], index) => (
+            <div key={`required-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
+              <span>Samen: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, requiredPairs: previous.requiredPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button>
+            </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
 
-        <div className="max-h-[62vh] overflow-y-auto pr-1">
-          {loading && (
-            <div className="flex justify-center py-8">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+  const drawContent = session && (
+    <div className="grid min-h-0 flex-1 gap-5 overflow-hidden lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]">
+      <section className="min-h-0 overflow-y-auto border-b border-border pb-5 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Actueel overzicht</p>
+            <h2 className="text-xl font-bold">{phaseName || "Fase"}</h2>
+          </div>
+          <span className="text-xs text-muted-foreground">{session.history.length}/{teams.length} geplaatst</span>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {session.containers.map((container) => (
+            <div key={container.id} className="rounded-lg border border-border bg-card p-3">
+              <h3 className="mb-2 text-sm font-bold">{container.name}</h3>
+              <div className="space-y-1.5">
+                {container.teamIds.map((id) => <div key={id} className="rounded-md bg-muted/50 px-2 py-2 text-xs"><TeamChip id={id} /></div>)}
+                {Array.from({ length: Math.max(0, container.capacity - container.teamIds.length) }).map((_, index) => (
+                  <div key={`empty-${index}`} className="rounded-md border border-dashed border-border px-2 py-2 text-xs text-muted-foreground">Lege plaats</div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <aside className="min-h-0 overflow-y-auto">
+        <div className="space-y-4 rounded-lg border border-border bg-card p-4">
+          <div>
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Actieve trekking</p>
+            <h2 className="text-lg font-bold">{activePot ? activePot.name : "Volledig willekeurig"}</h2>
+            <p className="text-sm text-muted-foreground">{session.remaining.length} teams resterend</p>
+          </div>
+
+          {!pending && !session.finished && (
+            <div className="space-y-3">
+              <Button className="w-full" size="lg" onClick={() => handleDrawNext()}><Shuffle className="h-4 w-4" /> Trek team</Button>
+              <Select value={manualTeam} onValueChange={(value) => handleDrawNext(value)}>
+                <SelectTrigger><SelectValue placeholder="Handmatig kiezen" /></SelectTrigger>
+                <SelectContent>{remainingPool.map((id) => <SelectItem key={id} value={id}>{teamName(session, id)}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
           )}
 
-          {!loading && tab === "pots" && (
+          {pending && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-border p-3">
-                <div>
-                  <p className="text-sm font-medium">Met potten loten</p>
-                  <p className="text-xs text-muted-foreground">
-                    Deelnemers worden per pot getrokken. Zet uit voor een volledig willekeurige loting.
-                  </p>
+              <div className="flex items-center gap-3 rounded-lg bg-primary/10 p-4">
+                {pendingTeam?.logoUrl && <img src={pendingTeam.logoUrl} alt="" className="h-12 w-12 object-contain" />}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2"><CountryFlag country={pendingTeam?.country} /><span className="truncate text-lg font-bold">{pendingTeam?.name}</span></div>
+                  <p className="text-xs text-muted-foreground">Getrokken team</p>
                 </div>
-                <Switch checked={usePots} onCheckedChange={setUsePots} />
               </div>
+              <div>
+                <p className="mb-2 text-xs font-semibold text-muted-foreground">Geldige groepen</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {pending.options.map((option) => <Button key={option.id} variant="outline" onClick={() => handleConfirm(option.id)}>{option.label}</Button>)}
+                </div>
+                {pending.options.length === 0 && <p className="text-sm text-destructive">Geen geldige groep. Maak de vorige trekking ongedaan.</p>}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button onClick={() => handleConfirm()} disabled={pending.options.length === 0}><Check className="h-4 w-4" /> Bevestig plaatsing</Button>
+                <Button variant="outline" onClick={handleRedraw}><RotateCcw className="h-4 w-4" /> Opnieuw trekken</Button>
+              </div>
+            </div>
+          )}
+
+          {session.finished && (
+            <div className="space-y-3">
+              <p className="rounded-lg bg-primary/10 p-3 text-sm font-semibold text-primary">De loting is volledig.</p>
+              <Button className="w-full" onClick={applyDraw} disabled={applying}><Check className="h-4 w-4" /> Indeling toepassen</Button>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-1 border-t border-border pt-3">
+            <Button variant="ghost" size="sm" onClick={handleUndo} disabled={session.history.length === 0}><Undo2 className="h-3.5 w-3.5" /> Ongedaan</Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)}><RotateCcw className="h-3.5 w-3.5" /> Opnieuw loten</Button>
+            <Button variant="outline" size="sm" onClick={handleDrawAll} disabled={session.finished}><Sparkles className="h-3.5 w-3.5" /> Alles trekken</Button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className={step === "draw" ? "inset-0 left-0 top-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-4 sm:p-6" : "max-w-5xl"}>
+          <DialogHeader className={step === "draw" ? "shrink-0 border-b border-border pb-3" : ""}>
+            <DialogTitle className="flex items-center gap-2">
+              {step === "draw" && <Maximize2 className="h-4 w-4" />}
+              Live loting{phaseName ? ` · ${phaseName}` : ""}
+            </DialogTitle>
+          </DialogHeader>
+
+          {loading ? (
+            <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
+          ) : step === "settings" ? (
+            <div className="max-h-[68vh] space-y-5 overflow-y-auto pr-1">
+              <section className="space-y-3">
+                <div>
+                  <h2 className="text-base font-bold">Instellingen & regels</h2>
+                  <p className="text-xs text-muted-foreground">Kies eerst hoe je de teams wilt loten.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Lotingsmethode</Label>
+                  <RadioGroup value={usePots ? "pots" : "random"} onValueChange={(value) => setUsePots(value === "pots")} className="grid gap-2 sm:grid-cols-2">
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${!usePots ? "border-primary bg-primary/[0.06]" : "border-border"}`}>
+                      <RadioGroupItem value="random" className="mt-0.5" />
+                      <span><span className="block text-sm font-semibold">Volledig willekeurige loting</span><span className="block text-xs text-muted-foreground">Alle teams worden zonder potten getrokken.</span></span>
+                    </label>
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${usePots ? "border-primary bg-primary/[0.06]" : "border-border"}`}>
+                      <RadioGroupItem value="pots" className="mt-0.5" />
+                      <span><span className="block text-sm font-semibold">Met potten loten</span><span className="block text-xs text-muted-foreground">Teams worden eerst volgens niveau of een eigen indeling verdeeld.</span></span>
+                    </label>
+                  </RadioGroup>
+                </div>
+              </section>
 
               {usePots && (
-                <>
-                  <div className="flex flex-col gap-2 rounded-lg border border-border p-3 sm:flex-row sm:items-end">
-                    <div className="w-full sm:w-40">
+                <section className="space-y-3 border-t border-border pt-5">
+                  <h3 className="text-sm font-bold">Potinstellingen</h3>
+                  <div className="grid gap-3 sm:grid-cols-[minmax(0,180px)_minmax(0,180px)_1fr] sm:items-end">
+                    <div>
                       <Label className="text-xs">Aantal potten</Label>
-                      <Select value={String(potCount)} onValueChange={(v) => setPotCount(Number(v))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
-                            <SelectItem key={n} value={String(n)}>
-                              {n} potten · {Math.ceil((teams.length || 0) / n)} per pot
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                      <Select value={String(potCount)} onValueChange={(value) => setPotCount(Number(value))}>
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>{Array.from({ length: Math.min(12, Math.max(1, teams.length)) }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>{number}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
-                    <Button variant="outline" size="sm" onClick={autoDistribute}>
-                      <Shuffle className="h-3.5 w-3.5" /> Potten aanmaken en verdelen
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={addPot}>
-                      <Plus className="h-3.5 w-3.5" /> Lege pot
-                    </Button>
+                    <div>
+                      <Label className="text-xs">Teams per pot</Label>
+                      <div className="mt-1 flex h-10 items-center rounded-md border border-input bg-muted/30 px-3 text-sm">{Math.floor(teams.length / Math.max(1, potCount))}–{Math.ceil(teams.length / Math.max(1, potCount))}</div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={autoDistribute}><Shuffle className="h-3.5 w-3.5" /> Potten automatisch aanmaken</Button>
+                      <Button variant="ghost" size="sm" onClick={addPot}><Plus className="h-3.5 w-3.5" /> Lege pot toevoegen</Button>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {pots.map((pot) => (
-                      <div key={pot.id} className="space-y-2 rounded-lg border border-border p-3">
-                        <div className="flex items-center gap-2">
-                          <Input
-                            value={pot.name}
-                            onChange={(e) => renamePot(pot.id, e.target.value)}
-                            className="h-8 text-sm font-bold"
-                          />
-                          <span className="whitespace-nowrap text-xs text-muted-foreground">{pot.teamIds.length}</span>
-                          <button
-                            onClick={() => deletePot(pot.id)}
-                            className="text-muted-foreground hover:text-destructive"
-                            aria-label={`${pot.name} verwijderen`}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                  <div className="rounded-lg border border-border p-3">
+                    <p className="text-sm font-medium">Verdeling per groep</p>
+                    <p className="text-xs text-muted-foreground">Elke groep krijgt automatisch één team uit elke pot. Zijn er meer teams dan groepen, dan worden de extra plaatsen evenwichtig aangevuld.</p>
+                    <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
+                      <CollapsibleTrigger asChild>
+                        <Button variant="outline" size="sm">Geavanceerde verdeling aanpassen <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedSpreadOpen ? "rotate-180" : ""}`} /></Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-3 space-y-3">
+                        <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
+                        <div className="overflow-x-auto">
+                          <table className="w-full min-w-[520px] text-xs">
+                            <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
+                            <tbody>{pots.map((pot) => {
+                              const total = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
+                              return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium">{pot.name} <span className={total === pot.teamIds.length ? "text-muted-foreground" : "text-destructive"}>{total}/{pot.teamIds.length}</span></td>{containers.map((container) => <td key={container.id} className="p-1"><Input type="number" min={0} value={quotaFor(pot.id, container.id)} onChange={(event) => setQuota(pot.id, container.id, Number(event.target.value))} className="mx-auto h-8 w-16 text-center" /></td>)}</tr>;
+                            })}</tbody>
+                          </table>
                         </div>
-                        <div className="space-y-1">
-                          {pot.teamIds.map((id) => (
-                            <div key={id} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
-                              <TeamChip id={id} />
-                              <button onClick={() => removeTeamFromPot(pot.id, id)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
-                          {pot.teamIds.length === 0 && <p className="text-xs text-muted-foreground">Nog geen deelnemers.</p>}
-                        </div>
-                        {unassignedTeams.length > 0 && (
-                          <Select value="" onValueChange={(v) => addTeamToPot(pot.id, v)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Deelnemer toevoegen" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {unassignedTeams.map((t) => (
-                                <SelectItem key={t.id} value={t.id}>
-                                  {t.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
-                    ))}
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
-                </>
+
+                  {isRounds && (
+                    <div className="space-y-2 rounded-lg border border-border p-3">
+                      <p className="text-sm font-medium">Ontmoetingen tussen potten</p>
+                      <div className="grid gap-2 md:grid-cols-2">
+                        {pots.flatMap((first, index) => pots.slice(index).map((second) => (
+                          <div key={`${first.id}|${second.id}`} className="flex items-center justify-between gap-3 rounded-md bg-muted/40 p-2">
+                            <span className="text-xs font-medium">{first.id === second.id ? `${first.name} onderling` : `${first.name} tegen ${second.name}`}</span>
+                            <Select value={String(matrixValue(first.id, second.id))} onValueChange={(value) => setMatrixValue(first.id, second.id, Number(value))}>
+                              <SelectTrigger className="h-8 w-20"><SelectValue /></SelectTrigger>
+                              <SelectContent>{[0, 1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>{number}x</SelectItem>)}</SelectContent>
+                            </Select>
+                          </div>
+                        ))) }
+                      </div>
+                    </div>
+                  )}
+                </section>
               )}
 
-              <div
-                className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${
-                  usePots && potTeamTotal !== totalCapacity ? "border-destructive text-destructive" : "border-border text-muted-foreground"
-                }`}
-              >
-                {usePots && potTeamTotal !== totalCapacity && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-                <span>
-                  {potTeamTotal} van {teams.length} deelnemers in potten · {totalCapacity} vrije plaatsen in {containers.length} groepen.
-                  {usePots && potTeamTotal !== totalCapacity && " Het aantal deelnemers in de potten moet exact gelijk zijn aan het aantal plaatsen."}
-                </span>
-              </div>
+              <section className="border-t border-border pt-5">{renderRules()}</section>
             </div>
-          )}
-
-          {!loading && tab === "spread" && (
-            <div className="space-y-3">
-              <p className="text-xs text-muted-foreground">
-                Hoeveel deelnemers uit een pot mogen in dezelfde groep. Standaard krijgt elke groep één deelnemer per pot;
-                zitten er meer deelnemers in een pot dan er groepen zijn, dan wordt het verschil automatisch verdeeld.
-              </p>
-              <Button variant="outline" size="sm" onClick={resetQuota}>
-                <RotateCcw className="h-3.5 w-3.5" /> Automatisch verdelen
-              </Button>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr>
-                      <th className="p-2 text-left font-semibold">Pot</th>
-                      {containers.map((c) => (
-                        <th key={c.id} className="p-2 text-center font-semibold">
-                          {c.name}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pots.map((pot) => {
-                      const total = containers.reduce((sum, c) => sum + quotaFor(pot.id, c.id), 0);
-                      return (
-                        <tr key={pot.id} className="border-t border-border">
-                          <td className="p-2 font-medium">
-                            {pot.name}
-                            <span className={`ml-2 ${total < pot.teamIds.length ? "text-destructive" : "text-muted-foreground"}`}>
-                              {total}/{pot.teamIds.length}
-                            </span>
-                          </td>
-                          {containers.map((c) => (
-                            <td key={c.id} className="p-1 text-center">
-                              <Input
-                                type="number"
-                                min={0}
-                                value={quotaFor(pot.id, c.id)}
-                                onChange={(e) => setQuota(pot.id, c.id, Number(e.target.value))}
-                                className="h-8 w-16 text-center"
-                              />
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+          ) : step === "pots" ? (
+            <div className="max-h-[68vh] space-y-4 overflow-y-auto pr-1">
+              <div>
+                <h2 className="text-base font-bold">Potten</h2>
+                <p className="text-sm text-muted-foreground">Verdeel alle teams over de potten. Bij de live loting wordt telkens een team uit de actieve pot getrokken.</p>
               </div>
-            </div>
-          )}
-
-          {!loading && tab === "rules" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-border p-3">
-                <div>
-                  <p className="text-sm font-medium">Zelfde land nooit samen</p>
-                  <p className="text-xs text-muted-foreground">Deelnemers uit hetzelfde land komen niet in dezelfde groep.</p>
-                </div>
-                <Switch
-                  checked={rules.separateSameCountry}
-                  onCheckedChange={(v) => setRules((p) => ({ ...p, separateSameCountry: v }))}
-                />
+              <div className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${potTeamTotal !== teams.length || unassignedTeams.length > 0 ? "border-destructive text-destructive" : "border-border text-muted-foreground"}`}>
+                {(potTeamTotal !== teams.length || unassignedTeams.length > 0) && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
+                <span>{potTeamTotal} van {teams.length} teams toegewezen · {totalCapacity} vrije plaatsen in {containers.length} groepen.</span>
               </div>
-
-              <div className="space-y-2 rounded-lg border border-border p-3">
-                <Label className="text-xs">Maximum per land in een groep (alle landen)</Label>
-                <Select
-                  value={rules.countryMaxDefault == null ? "none" : String(rules.countryMaxDefault)}
-                  onValueChange={(v) => setRules((p) => ({ ...p, countryMaxDefault: v === "none" ? null : Number(v) }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Geen beperking</SelectItem>
-                    {[1, 2, 3, 4].map((n) => (
-                      <SelectItem key={n} value={String(n)}>
-                        Maximaal {n}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Label className="pt-2 text-xs">Uitzondering per land</Label>
-                <div className="space-y-1">
-                  {Object.entries(rules.countryMax).map(([country, max]) => (
-                    <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1 text-xs">
-                      <CountryFlag country={country} className="h-3 w-4" />
-                      <span className="flex-1">{country}</span>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={max}
-                        onChange={(e) =>
-                          setRules((p) => ({ ...p, countryMax: { ...p.countryMax, [country]: Number(e.target.value) } }))
-                        }
-                        className="h-7 w-16 text-center"
-                      />
-                      <button
-                        onClick={() =>
-                          setRules((p) => {
-                            const next = { ...p.countryMax };
-                            delete next[country];
-                            return { ...p, countryMax: next };
-                          })
-                        }
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Select value={newCountry} onValueChange={setNewCountry}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Land kiezen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries
-                        .filter((c) => rules.countryMax[c] == null)
-                        .map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!newCountry}
-                    onClick={() => {
-                      setRules((p) => ({ ...p, countryMax: { ...p.countryMax, [newCountry]: 1 } }));
-                      setNewCountry("");
-                    }}
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Toevoegen
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2 rounded-lg border border-border p-3">
-                <Label className="text-xs">Deelnemers koppelen</Label>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Select value={pairA} onValueChange={setPairA}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Deelnemer 1" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teams.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>
-                          {t.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={pairB} onValueChange={setPairB}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Deelnemer 2" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teams
-                        .filter((t) => t.id !== pairA)
-                        .map((t) => (
-                          <SelectItem key={t.id} value={t.id}>
-                            {t.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pairA || !pairB}
-                    onClick={() => {
-                      setRules((p) => ({ ...p, forbiddenPairs: [...p.forbiddenPairs, [pairA, pairB]] }));
-                      setPairA("");
-                      setPairB("");
-                    }}
-                  >
-                    Niet samen
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pairA || !pairB}
-                    onClick={() => {
-                      setRules((p) => ({ ...p, requiredPairs: [...p.requiredPairs, [pairA, pairB]] }));
-                      setPairA("");
-                      setPairB("");
-                    }}
-                  >
-                    Samen in één groep
-                  </Button>
-                </div>
-                <div className="space-y-1 pt-1">
-                  {rules.forbiddenPairs.map(([a, b], i) => (
-                    <div key={`f${i}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
-                      <span>
-                        Niet samen: {teamById.get(a)?.name} · {teamById.get(b)?.name}
-                      </span>
-                      <button
-                        onClick={() => setRules((p) => ({ ...p, forbiddenPairs: p.forbiddenPairs.filter((_, idx) => idx !== i) }))}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                  {rules.requiredPairs.map(([a, b], i) => (
-                    <div key={`r${i}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
-                      <span>
-                        Samen: {teamById.get(a)?.name} · {teamById.get(b)?.name}
-                      </span>
-                      <button
-                        onClick={() => setRules((p) => ({ ...p, requiredPairs: p.requiredPairs.filter((_, idx) => idx !== i) }))}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!loading && tab === "matchups" && (
-            <div className="space-y-3">
-              <p className="text-xs text-muted-foreground">
-                Kies hoeveel keer elke pot tegen een andere pot speelt. De wedstrijden worden na de loting over de
-                speelrondes verdeeld, waarbij een deelnemer nooit twee keer in dezelfde speelronde staat.
-              </p>
-              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                {pots.flatMap((a, i) =>
-                  pots.slice(i).map((b) => (
-                    <div key={`${a.id}|${b.id}`} className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
-                      <span className="text-sm font-medium">{a.id === b.id ? `${a.name} onderling` : `${a.name} vs ${b.name}`}</span>
-                      <div className="w-24">
-                        <Select value={String(matrixValue(a.id, b.id))} onValueChange={(v) => setMatrixValue(a.id, b.id, Number(v))}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[0, 1, 2, 3, 4].map((n) => (
-                              <SelectItem key={n} value={String(n)}>
-                                {n}x
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
+              <DndContext sensors={dndSensors} onDragEnd={handlePotDragEnd}>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {pots.map((pot) => (
+                    <div key={pot.id} className="space-y-2 rounded-lg border border-border p-3">
+                      <div className="flex items-center gap-2">
+                        <Input value={pot.name} onChange={(event) => renamePot(pot.id, event.target.value)} className="h-9 text-sm font-bold" />
+                        <span className="whitespace-nowrap text-xs text-muted-foreground">{pot.teamIds.length} teams</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => deletePot(pot.id)} aria-label={`${pot.name} verwijderen`}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      </div>
+                      <PotDropZone id={pot.id}>
+                        {pot.teamIds.map((id) => <DraggablePotTeam key={id} id={id}><TeamChip id={id} /><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeTeamFromPot(pot.id, id)} aria-label="Uit pot verwijderen"><Trash2 className="h-3 w-3" /></Button></DraggablePotTeam>)}
+                        {pot.teamIds.length === 0 && <p className="px-2 py-4 text-center text-xs text-muted-foreground">Sleep een team naar deze pot.</p>}
+                      </PotDropZone>
+                      {unassignedTeams.length > 0 && (
+                        <Select value="" onValueChange={(value) => addTeamToPot(pot.id, value)}>
+                          <SelectTrigger><SelectValue placeholder="Team handmatig toevoegen" /></SelectTrigger>
+                          <SelectContent>{unassignedTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
                         </Select>
-                      </div>
+                      )}
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
-          {!loading && tab === "draw" && (
-            <div className="space-y-4">
-              {!session && (
-                <div className="space-y-3 rounded-lg border border-border p-4 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Start de loting met de ingestelde potten, verdeling en regels.
-                  </p>
-                  <Button onClick={startDraw}>
-                    <Play className="h-4 w-4" /> Loting starten
-                  </Button>
+                  ))}
+                </div>
+              </DndContext>
+              {unassignedTeams.length > 0 && (
+                <div className="rounded-lg border border-dashed border-border p-3">
+                  <p className="mb-2 text-xs font-semibold">Niet toegewezen teams</p>
+                  <div className="flex flex-wrap gap-2">{unassignedTeams.map((team) => <span key={team.id} className="rounded-md bg-muted px-2 py-1 text-xs"><TeamChip id={team.id} /></span>)}</div>
                 </div>
               )}
-
-              {session && (
-                <>
-                  <div className="space-y-3 rounded-lg border border-border p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-xs text-muted-foreground">
-                        {activePot ? `Actieve pot: ${activePot.name} · ` : ""}
-                        {session.remaining.length} deelnemers te trekken
-                      </div>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" onClick={handleUndo} disabled={session.history.length === 0}>
-                          <Undo2 className="h-3.5 w-3.5" /> Ongedaan
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={handleReset}>
-                          <RotateCcw className="h-3.5 w-3.5" /> Opnieuw loten
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={handleDrawAll} disabled={session.finished}>
-                          <Sparkles className="h-3.5 w-3.5" /> Alles trekken
-                        </Button>
-                      </div>
-                    </div>
-
-                    {!pending && !session.finished && (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Button onClick={() => handleDrawNext()}>
-                          <Shuffle className="h-4 w-4" /> Trek deelnemer
-                        </Button>
-                        <div className="w-56">
-                          <Select value={manualTeam} onValueChange={(v) => handleDrawNext(v)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Handmatig kiezen" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {remainingPool.map((id) => (
-                                <SelectItem key={id} value={id}>
-                                  {teamName(session, id)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    )}
-
-                    {pending && (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2">
-                          {pendingTeam?.logoUrl && <img src={pendingTeam.logoUrl} alt="" className="h-8 w-8 object-contain" />}
-                          <CountryFlag country={pendingTeam?.country} />
-                          <span className="text-base font-bold">{pendingTeam?.name}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Geldige groepen:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {pending.options.map((o) => (
-                            <Button key={o.id} variant="outline" size="sm" onClick={() => handleConfirm(o.id)}>
-                              {o.label}
-                            </Button>
-                          ))}
-                          {pending.options.length === 0 && (
-                            <p className="text-xs text-destructive">Geen geldige groep. Maak de vorige trekking ongedaan.</p>
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={() => handleConfirm()} disabled={pending.options.length === 0}>
-                            <Check className="h-3.5 w-3.5" /> Bevestig
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={handleRedraw}>
-                            <RotateCcw className="h-3.5 w-3.5" /> Opnieuw trekken
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {session.finished && <p className="text-sm font-semibold text-primary">De loting is volledig.</p>}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {session.containers.map((c) => (
-                      <div key={c.id} className="rounded-lg border border-border p-3">
-                        <h4 className="mb-2 text-sm font-bold">{c.name}</h4>
-                        <div className="space-y-1">
-                          {c.teamIds.map((id) => (
-                            <div key={id} className="rounded-md bg-muted/50 px-2 py-1 text-xs">
-                              <TeamChip id={id} />
-                            </div>
-                          ))}
-                          {Array.from({ length: Math.max(0, c.capacity - c.teamIds.length) }).map((_, i) => (
-                            <div key={`e${i}`} className="rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground">
-                              —
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
-          )}
-        </div>
+          ) : drawContent}
 
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Sluiten
-          </Button>
-          {tab !== "draw" && <Button onClick={() => setTab("draw")}>Naar de loting</Button>}
-          {tab === "draw" && (
-            <Button onClick={applyDraw} disabled={!session || !session.finished || applying}>
-              <Check className="h-4 w-4" /> Indeling toepassen
-            </Button>
+          {step !== "draw" && (
+            <DialogFooter className="border-t border-border pt-4">
+              <Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button>
+              {step === "pots" && <Button variant="outline" onClick={() => setStep("settings")}><ArrowLeft className="h-4 w-4" /> Terug naar instellingen</Button>}
+              {step === "settings" && usePots && <Button onClick={() => setStep("pots")}>Verder naar potten</Button>}
+              {step === "settings" && !usePots && <Button onClick={openDraw}>Naar de loting</Button>}
+              {step === "pots" && <Button onClick={openDraw}>Naar de loting</Button>}
+            </DialogFooter>
           )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Loting opnieuw starten?</AlertDialogTitle>
+            <AlertDialogDescription>Alle bevestigde trekkingen van deze huidige sessie worden verwijderd. De instellingen en potten blijven behouden.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleReset}>Opnieuw starten</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

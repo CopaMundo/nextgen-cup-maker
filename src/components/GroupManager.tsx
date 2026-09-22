@@ -1142,7 +1142,7 @@ const GroupManager = ({
         )}
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setDrawOpen(true)}>
-            <Trophy className="h-3 w-3" /> Loting
+            <Trophy className="h-3 w-3" /> Live loting
           </Button>
         )}
         <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setShowClearConfirm(true)}>
@@ -1157,6 +1157,7 @@ const GroupManager = ({
         phaseId={phaseId}
         categoryId={categoryId}
         phaseMatchType={phaseMatchType}
+        phaseName={phases.find((phase) => phase.id === phaseId)?.name}
         onApplied={() => { notifySlotChange(); fetchGroups(); }}
       />
 
