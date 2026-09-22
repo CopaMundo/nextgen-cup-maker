@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { DndContext, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,9 +8,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, Play, AlertTriangle, Sparkles } from "lucide-react";
+import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, GripVertical, ArrowLeft, Maximize2 } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
@@ -36,7 +50,34 @@ interface Pot {
   teamIds: string[];
 }
 
-type Tab = "pots" | "spread" | "rules" | "matchups" | "draw";
+type Step = "settings" | "pots" | "draw";
+
+const DraggablePotTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform) }}
+      className={`flex items-center justify-between rounded-md border border-border bg-background px-2 py-2 text-xs ${isDragging ? "relative z-50 opacity-70 shadow-lg" : ""}`}
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <span {...attributes} {...listeners} className="touch-none cursor-grab text-muted-foreground" aria-label="Deelnemer verplaatsen">
+          <GripVertical className="h-4 w-4" />
+        </span>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const PotDropZone = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={`min-h-20 space-y-1.5 rounded-md p-1 transition-colors ${isOver ? "bg-primary/10 ring-2 ring-primary/30" : ""}`}>
+      {children}
+    </div>
+  );
+};
 
 const LiveDrawDialog = ({
   open,
@@ -59,7 +100,9 @@ const LiveDrawDialog = ({
 }) => {
   const isRounds = phaseMatchType === "rounds";
   const { toast } = useToast();
-  const [tab, setTab] = useState<Tab>("pots");
+  const [step, setStep] = useState<Step>("settings");
+  const [advancedSpreadOpen, setAdvancedSpreadOpen] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pots, setPots] = useState<Pot[]>([]);
   const [containers, setContainers] = useState<DrawContainer[]>([]);
@@ -75,6 +118,10 @@ const LiveDrawDialog = ({
   const [pairA, setPairA] = useState("");
   const [pairB, setPairB] = useState("");
   const [manualTeam, setManualTeam] = useState("");
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } })
+  );
 
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
   const assignedTeamIds = useMemo(() => new Set(pots.flatMap((p) => p.teamIds)), [pots]);
@@ -138,7 +185,8 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open) return;
-    setTab("pots");
+    setStep("settings");
+    setAdvancedSpreadOpen(false);
     setSession(null);
     setRules(emptyContainerRules());
     loadAll();
@@ -223,10 +271,14 @@ const LiveDrawDialog = ({
         if (data) created.push({ id: data.id, name: data.name, sort_order: data.sort_order, teamIds: [] });
       }
       const ordered = [...teams];
-      const perPot = Math.ceil(ordered.length / (created.length || 1));
+      const baseSize = Math.floor(ordered.length / (created.length || 1));
+      const extra = ordered.length % (created.length || 1);
+      let cursor = 0;
       const inserts: { pot_id: string; tournament_id: string; team_id: string; sort_order: number }[] = [];
       created.forEach((pot, index) => {
-        const slice = ordered.slice(index * perPot, (index + 1) * perPot);
+        const size = baseSize + (index < extra ? 1 : 0);
+        const slice = ordered.slice(cursor, cursor + size);
+        cursor += size;
         pot.teamIds = slice.map((t) => t.id);
         slice.forEach((t, i) => inserts.push({ pot_id: pot.id, tournament_id: tournamentId, team_id: t.id, sort_order: i }));
       });
@@ -252,6 +304,42 @@ const LiveDrawDialog = ({
   const setQuota = (potId: string, containerId: string, value: number) =>
     setRules((prev) => ({ ...prev, potQuota: { ...prev.potQuota, [`${potId}|${containerId}`]: Math.max(0, value) } }));
   const resetQuota = () => setRules((prev) => ({ ...prev, potQuota: {} }));
+
+  const moveTeamToPot = async (teamId: string, targetPotId: string) => {
+    const source = pots.find((pot) => pot.teamIds.includes(teamId));
+    if (!source || source.id === targetPotId) return;
+    const target = pots.find((pot) => pot.id === targetPotId);
+    if (!target) return;
+    setPots((prev) =>
+      prev.map((pot) => {
+        if (pot.id === source.id) return { ...pot, teamIds: pot.teamIds.filter((id) => id !== teamId) };
+        if (pot.id === targetPotId) return { ...pot, teamIds: [...pot.teamIds, teamId] };
+        return pot;
+      })
+    );
+    const { error: deleteError } = await supabase.from("draw_pot_teams").delete().eq("pot_id", source.id).eq("team_id", teamId);
+    if (deleteError) {
+      await loadAll();
+      toast({ title: "Verplaatsen mislukt", description: deleteError.message, variant: "destructive" });
+      return;
+    }
+    const { error: insertError } = await supabase.from("draw_pot_teams").insert({
+      pot_id: targetPotId,
+      tournament_id: tournamentId,
+      team_id: teamId,
+      sort_order: target.teamIds.length,
+    });
+    if (insertError) {
+      await loadAll();
+      toast({ title: "Verplaatsen mislukt", description: insertError.message, variant: "destructive" });
+    }
+  };
+
+  const handlePotDragEnd = (event: DragEndEvent) => {
+    const targetPotId = event.over ? String(event.over.id) : "";
+    const teamId = String(event.active.id);
+    if (targetPotId) void moveTeamToPot(teamId, targetPotId);
+  };
 
   /** Volledige regels met de standaardverdeling expliciet ingevuld. */
   const effectiveRules = useMemo<ContainerRules>(() => {
@@ -308,7 +396,7 @@ const LiveDrawDialog = ({
         rules: effectiveRules,
       })
     );
-    setTab("draw");
+    setStep("draw");
   };
 
   const pending = session?.pending ?? null;
@@ -330,7 +418,10 @@ const LiveDrawDialog = ({
   };
   const handleUndo = () => session && setSession(undoLast(session));
   const handleDrawAll = () => session && setSession(drawAll(session));
-  const handleReset = () => startDraw();
+  const handleReset = () => {
+    setShowResetConfirm(false);
+    startDraw();
+  };
 
   const remainingPool = session
     ? session.mode === "pots"
