@@ -76,6 +76,47 @@ export function defaultPotQuota(potSize: number, containerIds: string[]): number
   return containerIds.map((_, i) => base + (i < extra ? 1 : 0));
 }
 
+/**
+ * Gezamenlijke standaardverdeling van álle potten over de bakjes. In tegenstelling
+ * tot defaultPotQuota (per pot, onafhankelijk) houdt deze rekening met de capaciteit
+ * van elk bakje: de resterende plaats van een pot gaat telkens naar het bakje met de
+ * meeste vrije ruimte, zodat geen enkel bakje boven zijn capaciteit uitkomt.
+ * Sleutel: potId, waarde: quota per containerId (zelfde volgorde als `containers`).
+ */
+export function defaultPotQuotas(
+  pots: { id: string; size: number }[],
+  containers: { id: string; capacity: number }[]
+): Record<string, number[]> {
+  const n = containers.length;
+  const result: Record<string, number[]> = {};
+  if (n === 0) {
+    pots.forEach((p) => (result[p.id] = []));
+    return result;
+  }
+  const load = new Array(n).fill(0);
+  // Grote potten eerst verdelen, zodat ze het ruimst gespreid worden.
+  const ordered = [...pots].sort((a, b) => b.size - a.size);
+  for (const pot of ordered) {
+    const quotas = new Array(n).fill(0);
+    for (let k = 0; k < pot.size; k++) {
+      let best = -1;
+      for (let i = 0; i < n; i++) {
+        if (load[i] >= containers[i].capacity) continue;
+        if (best === -1 || load[i] < load[best]) best = i;
+      }
+      if (best === -1) {
+        // Alle bakjes zitten vol; plaats in het minst beladen bakje (ongeldige
+        // toestand, haalbaarheidscontrole vangt dit af met een duidelijke melding).
+        best = load.indexOf(Math.min(...load));
+      }
+      quotas[best] += 1;
+      load[best] += 1;
+    }
+    result[pot.id] = quotas;
+  }
+  return result;
+}
+
 export interface RoundsRules {
   /** Deelnemers uit hetzelfde land spelen nooit tegen elkaar. */
   neverSameCountry: boolean;

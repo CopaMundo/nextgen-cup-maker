@@ -91,7 +91,7 @@ const PublicPollDialog = ({ tournamentId, polls, pollVotes, onVoteAdded }: Publi
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl p-0" scrollable={false}>
+      <DialogContent className="max-h-[88dvh] overflow-hidden p-0 sm:max-w-xl" scrollable={false}>
         <DialogHeader className="border-b border-border px-4 pb-3 pt-4 pr-14 text-left sm:px-6 sm:pt-6">
           <DialogTitle className="font-display text-xl font-black uppercase text-foreground">Polls</DialogTitle>
           <DialogDescription>
@@ -100,7 +100,7 @@ const PublicPollDialog = ({ tournamentId, polls, pollVotes, onVoteAdded }: Publi
               : "Je hebt op alle polls gestemd."}
           </DialogDescription>
         </DialogHeader>
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pb-5 sm:px-6 sm:pb-6">
+        <div className="max-h-[calc(88dvh-7rem)] space-y-3 overflow-y-auto overscroll-contain px-4 pb-5 sm:px-6 sm:pb-6">
           {sortedPolls.map((poll) => (
             <PublicPollCard
               key={poll.id}

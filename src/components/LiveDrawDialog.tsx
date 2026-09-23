@@ -27,7 +27,7 @@ import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
   buildContainerCtx,
-  defaultPotQuota,
+  defaultPotQuotas,
   emptyContainerRules,
   type ContainerRules,
   type DrawContainer,
@@ -294,12 +294,19 @@ const LiveDrawDialog = ({
   /* ------------------------------ verdeling ----------------------------- */
 
   const containerIds = containers.map((c) => c.id);
+  /** Gezamenlijke standaardverdeling die de capaciteit van elke groep respecteert. */
+  const jointDefaults = useMemo(
+    () =>
+      defaultPotQuotas(
+        pots.map((p) => ({ id: p.id, size: p.teamIds.length })),
+        containers.map((c) => ({ id: c.id, capacity: c.capacity }))
+      ),
+    [pots, containers]
+  );
   const quotaFor = (potId: string, containerId: string) => {
     const explicit = rules.potQuota[`${potId}|${containerId}`];
     if (explicit != null) return explicit;
-    const pot = pots.find((p) => p.id === potId);
-    const defaults = defaultPotQuota(pot?.teamIds.length || 0, containerIds);
-    return defaults[containerIds.indexOf(containerId)] ?? 0;
+    return jointDefaults[potId]?.[containerIds.indexOf(containerId)] ?? 0;
   };
   const setQuota = (potId: string, containerId: string, value: number) =>
     setRules((prev) => ({ ...prev, potQuota: { ...prev.potQuota, [`${potId}|${containerId}`]: Math.max(0, value) } }));
@@ -345,13 +352,12 @@ const LiveDrawDialog = ({
   const effectiveRules = useMemo<ContainerRules>(() => {
     const potQuota: Record<string, number> = {};
     for (const pot of pots) {
-      const defaults = defaultPotQuota(pot.teamIds.length, containerIds);
       containers.forEach((c, i) => {
-        potQuota[`${pot.id}|${c.id}`] = rules.potQuota[`${pot.id}|${c.id}`] ?? defaults[i] ?? 0;
+        potQuota[`${pot.id}|${c.id}`] = rules.potQuota[`${pot.id}|${c.id}`] ?? jointDefaults[pot.id]?.[i] ?? 0;
       });
     }
     return { ...rules, potQuota, onePerPot: usePots };
-  }, [rules, pots, containers, usePots]);
+  }, [rules, pots, containers, usePots, jointDefaults]);
 
   /* ------------------------------ ontmoetingen -------------------------- */
 
