@@ -246,49 +246,53 @@ const LiveDrawDialog = ({
     setPots((prev) => prev.map((p) => (p.id === potId ? { ...p, teamIds: p.teamIds.filter((id) => id !== teamId) } : p)));
   };
 
-  /** Maakt `potCount` potten en verdeelt alle deelnemers gelijk (pot 1 eerst). */
-  const autoDistribute = async () => {
+  /** Maakt `count` lege potten aan (Pot 1, Pot 2, ...) en vervangt de bestaande. */
+  const createEmptyPots = async (count: number) => {
+    setPotCount(count);
     setLoading(true);
     try {
-      for (const pot of pots) {
-        await supabase.from("draw_pot_teams").delete().eq("pot_id", pot.id);
-        await supabase.from("draw_pots").delete().eq("id", pot.id);
+      if (pots.length) {
+        await supabase.from("draw_pot_teams").delete().in("pot_id", pots.map((p) => p.id));
+        await supabase.from("draw_pots").delete().in("id", pots.map((p) => p.id));
       }
-      const count = Math.max(1, Math.min(potCount, teams.length || 1));
-      const created: Pot[] = [];
-      for (let i = 0; i < count; i++) {
-        const { data } = await supabase
-          .from("draw_pots")
-          .insert({
+      const { data, error } = await supabase
+        .from("draw_pots")
+        .insert(
+          Array.from({ length: count }, (_, i) => ({
             tournament_id: tournamentId,
             phase_id: phaseId,
             category_id: categoryId ?? null,
             name: `Pot ${i + 1}`,
             sort_order: i,
-          })
-          .select("id, name, sort_order")
-          .single();
-        if (data) created.push({ id: data.id, name: data.name, sort_order: data.sort_order, teamIds: [] });
+          }))
+        )
+        .select("id, name, sort_order");
+      if (error) {
+        toast({ title: "Potten aanmaken mislukt", description: error.message, variant: "destructive" });
+        return;
       }
-      const ordered = [...teams];
-      const baseSize = Math.floor(ordered.length / (created.length || 1));
-      const extra = ordered.length % (created.length || 1);
-      let cursor = 0;
-      const inserts: { pot_id: string; tournament_id: string; team_id: string; sort_order: number }[] = [];
-      created.forEach((pot, index) => {
-        const size = baseSize + (index < extra ? 1 : 0);
-        const slice = ordered.slice(cursor, cursor + size);
-        cursor += size;
-        pot.teamIds = slice.map((t) => t.id);
-        slice.forEach((t, i) => inserts.push({ pot_id: pot.id, tournament_id: tournamentId, team_id: t.id, sort_order: i }));
-      });
-      if (inserts.length) await supabase.from("draw_pot_teams").insert(inserts);
-      setPots(created);
+      setPots(
+        (data || [])
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((p) => ({ id: p.id, name: p.name, sort_order: p.sort_order, teamIds: [] }))
+      );
       setRules((prev) => ({ ...prev, potQuota: {} }));
-      toast({ title: `${created.length} potten aangemaakt`, description: `${inserts.length} deelnemers verdeeld.` });
     } finally {
       setLoading(false);
     }
+  };
+
+  /** Verwacht aantal teams per pot volgens het gekozen aantal potten. */
+  const expectedSizes = (count: number) => {
+    const base = Math.floor(teams.length / Math.max(1, count));
+    const extra = teams.length % Math.max(1, count);
+    return Array.from({ length: count }, (_, i) => base + (i < extra ? 1 : 0));
+  };
+  const potOptionLabel = (count: number) => {
+    const base = Math.floor(teams.length / count);
+    const extra = teams.length % count;
+    if (extra === 0) return `${base} teams per pot`;
+    return `${extra} ${extra === 1 ? "pot" : "potten"} met ${base + 1} en ${count - extra} met ${base} teams`;
   };
 
   /* ------------------------------ verdeling ----------------------------- */
@@ -314,7 +318,15 @@ const LiveDrawDialog = ({
 
   const moveTeamToPot = async (teamId: string, targetPotId: string) => {
     const source = pots.find((pot) => pot.teamIds.includes(teamId));
-    if (!source || source.id === targetPotId) return;
+    if (targetPotId === "unassigned") {
+      if (source) await removeTeamFromPot(source.id, teamId);
+      return;
+    }
+    if (!source) {
+      await addTeamToPot(targetPotId, teamId);
+      return;
+    }
+    if (source.id === targetPotId) return;
     const target = pots.find((pot) => pot.id === targetPotId);
     if (!target) return;
     setPots((prev) =>
