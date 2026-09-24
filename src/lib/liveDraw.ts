@@ -94,23 +94,30 @@ export function defaultPotQuotas(
     return result;
   }
   const load = new Array(n).fill(0);
-  // Grote potten eerst verdelen, zodat ze het ruimst gespreid worden.
+  // Willekeurige volgorde voor gelijke gevallen: welke groep een extra team krijgt is toeval.
+  const tieOrder = shuffle(containers.map((_, i) => i));
+  const rank = new Array(n).fill(0);
+  tieOrder.forEach((idx, pos) => (rank[idx] = pos));
+  // Grote potten eerst verdelen.
   const ordered = [...pots].sort((a, b) => b.size - a.size);
   for (const pot of ordered) {
-    const quotas = new Array(n).fill(0);
-    for (let k = 0; k < pot.size; k++) {
-      let best = -1;
-      for (let i = 0; i < n; i++) {
-        if (load[i] >= containers[i].capacity) continue;
-        if (best === -1 || load[i] < load[best]) best = i;
-      }
-      if (best === -1) {
-        // Alle bakjes zitten vol; plaats in het minst beladen bakje (ongeldige
-        // toestand, haalbaarheidscontrole vangt dit af met een duidelijke melding).
-        best = load.indexOf(Math.min(...load));
-      }
-      quotas[best] += 1;
-      load[best] += 1;
+    // Per pot: iedere groep krijgt floor(size/n), het verschil tussen groepen is max. 1.
+    const base = Math.floor(pot.size / n);
+    const quotas = new Array(n).fill(base);
+    for (let i = 0; i < n; i++) load[i] += base;
+    let extra = pot.size - base * n;
+    const candidates = containers
+      .map((_, i) => i)
+      .sort((a, b) => {
+        const freeA = containers[a].capacity - load[a];
+        const freeB = containers[b].capacity - load[b];
+        return freeB - freeA || rank[a] - rank[b];
+      });
+    for (const i of candidates) {
+      if (extra <= 0) break;
+      quotas[i] += 1;
+      load[i] += 1;
+      extra--;
     }
     result[pot.id] = quotas;
   }

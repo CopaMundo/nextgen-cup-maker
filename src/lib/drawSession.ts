@@ -153,14 +153,15 @@ function roundsCtxFor(state: DrawSessionState) {
 }
 
 /** Trekt de volgende deelnemer en berekent de geldige keuzes. */
-export function drawNext(state: DrawSessionState, forcedTeamId?: string): DrawSessionState {
+export function drawNext(state: DrawSessionState, forcedTeamId?: string, potId?: string | null): DrawSessionState {
   if (state.finished || state.pending) return state;
 
   if (state.kind === "containers") {
     let pool = state.remaining;
     if (state.mode === "pots") {
-      // Volg de potvolgorde: eerst pot 1 leeg trekken, dan pot 2, enzovoort.
-      const activePot = state.pots.find((p) => p.teamIds.some((id) => state.remaining.includes(id)));
+      // Gekozen actieve pot, anders de eerste pot met resterende teams.
+      const chosen = potId ? state.pots.find((p) => p.id === potId && p.teamIds.some((id) => state.remaining.includes(id))) : null;
+      const activePot = chosen || state.pots.find((p) => p.teamIds.some((id) => state.remaining.includes(id)));
       if (activePot) pool = state.remaining.filter((id) => activePot.teamIds.includes(id));
       if (!activePot) return { ...state, finished: true };
     }
