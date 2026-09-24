@@ -712,8 +712,9 @@ const LiveDrawDialog = ({
         </div>
       </div>
 
+      <h3 className="pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Teamregels</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
-        <Label className="text-xs">Teams niet samen of samen in één groep</Label>
+        <p className="text-sm font-medium">Kies twee teams en stel in: niet samen of samen in één groep.</p>
         <div className="grid gap-2 sm:grid-cols-2">
           <Select value={pairA} onValueChange={setPairA}>
             <SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger>
@@ -733,7 +734,7 @@ const LiveDrawDialog = ({
               setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] }));
               setPairA(""); setPairB("");
             }}
-          >Teams niet samen</Button>
+          >Niet samen in één groep</Button>
           <Button
             variant="outline"
             size="sm"
@@ -742,7 +743,7 @@ const LiveDrawDialog = ({
               setRules((previous) => ({ ...previous, requiredPairs: [...previous.requiredPairs, [pairA, pairB]] }));
               setPairA(""); setPairB("");
             }}
-          >Teams samen in één groep</Button>
+          >Samen in één groep</Button>
         </div>
         <div className="space-y-1">
           {rules.forbiddenPairs.map(([first, second], index) => (
@@ -791,9 +792,39 @@ const LiveDrawDialog = ({
         <div className="space-y-4 rounded-lg border border-border bg-card p-4">
           <div>
             <p className="text-xs font-semibold uppercase text-muted-foreground">Actieve trekking</p>
-            <h2 className="text-lg font-bold">{activePot ? activePot.name : "Volledig willekeurig"}</h2>
+            <h2 className="text-lg font-bold">{session.mode === "pots" ? (pending ? activePot?.name : activePotChoice?.name) || "Pot" : "Volledig willekeurig"}</h2>
             <p className="text-sm text-muted-foreground">{session.remaining.length} teams resterend</p>
           </div>
+
+          {session.mode === "pots" && !session.finished && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground">Actieve pot</p>
+              <div className="grid grid-cols-2 gap-2">
+                {pots.map((pot) => {
+                  const left = pot.teamIds.filter((id) => session.remaining.includes(id)).length;
+                  const selected = activePotChoice?.id === pot.id;
+                  return (
+                    <button
+                      key={pot.id}
+                      type="button"
+                      disabled={left === 0 || !!pending}
+                      onClick={() => setSelectedPotId(pot.id)}
+                      className={`rounded-md border-2 px-2 py-1.5 text-left text-xs transition-all disabled:opacity-40 ${selected ? "border-primary bg-primary/[0.06]" : "border-border hover:border-primary/30"}`}
+                    >
+                      <span className="block font-bold">{pot.name}</span>
+                      <span className="text-muted-foreground">{left} resterend</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {!pending && !session.finished && remainingPool.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {remainingPool.map((id) => <span key={id} className="rounded-md bg-muted/60 px-2 py-1 text-xs"><TeamChip id={id} /></span>)}
+            </div>
+          )}
 
           {!pending && !session.finished && (
             <div className="space-y-3">
@@ -856,142 +887,181 @@ const LiveDrawDialog = ({
             </DialogTitle>
           </DialogHeader>
 
-          {loading ? (
+          {loading && step !== "draw" ? (
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
-          ) : step === "settings" ? (
-            <div className="max-h-[68vh] space-y-5 overflow-y-auto pr-1">
-              <section className="space-y-3">
-                <div>
-                  <h2 className="text-base font-bold">Instellingen & regels</h2>
-                  <p className="text-xs text-muted-foreground">Kies eerst hoe je de teams wilt loten.</p>
-                </div>
-                <div className="space-y-2">
-                  <Label>Lotingsmethode</Label>
-                  <RadioGroup value={usePots ? "pots" : "random"} onValueChange={(value) => setUsePots(value === "pots")} className="grid gap-2 sm:grid-cols-2">
-                    <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${!usePots ? "border-primary bg-primary/[0.06]" : "border-border"}`}>
-                      <RadioGroupItem value="random" className="mt-0.5" />
-                      <span><span className="block text-sm font-semibold">Volledig willekeurige loting</span><span className="block text-xs text-muted-foreground">Alle teams worden zonder potten getrokken.</span></span>
-                    </label>
-                    <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${usePots ? "border-primary bg-primary/[0.06]" : "border-border"}`}>
-                      <RadioGroupItem value="pots" className="mt-0.5" />
-                      <span><span className="block text-sm font-semibold">Met potten loten</span><span className="block text-xs text-muted-foreground">Teams worden eerst volgens niveau of een eigen indeling verdeeld.</span></span>
-                    </label>
-                  </RadioGroup>
+          ) : step === "method" ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-bold">Kies je lotingsmethode</h2>
+                <p className="text-xs text-muted-foreground">{teams.length} teams · {containers.length} groepen · {totalCapacity} vrije plaatsen</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  { value: false, label: "Volledig willekeurige loting", title: "Verdeel alle teams volledig willekeurig", text: "De teams worden zonder voorafgaande indeling willekeurig over de beschikbare groepen verdeeld." },
+                  { value: true, label: "Loting met potten", title: "Trek teams pot per pot", text: "Verdeel de teams vooraf over verschillende potten, bijvoorbeeld op basis van niveau, ranking of je eigen voorkeur. Tijdens de loting trek je vervolgens team per team uit de gekozen pot." },
+                ].map((opt) => {
+                  const selected = usePots === opt.value;
+                  return (
+                    <button
+                      key={opt.label}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => setUsePots(opt.value)}
+                      className={`relative rounded-lg border-2 p-5 text-left transition-all ${selected ? "border-primary bg-primary/[0.06]" : "border-border hover:border-primary/30"}`}
+                    >
+                      {selected && <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3 w-3" /></span>}
+                      <p className="text-xs font-bold uppercase tracking-wide text-foreground">{opt.label}</p>
+                      <p className="mt-2 text-sm font-semibold">{opt.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{opt.text}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : step === "pots" ? (
+            <div className="max-h-[70vh] space-y-5 overflow-y-auto pr-1">
+              <div>
+                <h2 className="text-lg font-bold">Potindeling</h2>
+                <p className="text-xs text-muted-foreground">Maak je potten aan, verdeel de teams en stel indien nodig geavanceerde lotingsregels in.</p>
+              </div>
+
+              <section className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Aantal potten</Label>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                  {Array.from({ length: Math.min(12, Math.max(1, teams.length)) }, (_, i) => i + 1).filter((n) => n >= 2 || teams.length < 2).map((count) => {
+                    const selected = pots.length === count;
+                    return (
+                      <button
+                        key={count}
+                        type="button"
+                        onClick={() => { if (pots.length !== count || pots.some((p) => p.teamIds.length)) void createEmptyPots(count); }}
+                        className={`rounded-lg border-2 p-3 text-left transition-all ${selected ? "border-primary bg-primary/[0.06]" : "border-border hover:border-primary/30"}`}
+                      >
+                        <p className="text-sm font-bold">{count} potten</p>
+                        <p className="text-[11px] text-muted-foreground">{teams.length} teams · {potOptionLabel(count)}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               </section>
 
-              {usePots && (
-                <section className="space-y-3 border-t border-border pt-5">
-                  <h3 className="text-sm font-bold">Potinstellingen</h3>
-                  <div className="grid gap-3 sm:grid-cols-[minmax(0,180px)_minmax(0,180px)_1fr] sm:items-end">
-                    <div>
-                      <Label className="text-xs">Aantal potten</Label>
-                      <Select value={String(potCount)} onValueChange={(value) => setPotCount(Number(value))}>
-                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                        <SelectContent>{Array.from({ length: Math.min(12, Math.max(1, teams.length)) }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>{number}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-xs">Teams per pot</Label>
-                      <div className="mt-1 flex h-10 items-center rounded-md border border-input bg-muted/30 px-3 text-sm">{Math.floor(teams.length / Math.max(1, potCount))}–{Math.ceil(teams.length / Math.max(1, potCount))}</div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={autoDistribute}><Shuffle className="h-3.5 w-3.5" /> Potten automatisch aanmaken</Button>
-                      <Button variant="ghost" size="sm" onClick={addPot}><Plus className="h-3.5 w-3.5" /> Lege pot toevoegen</Button>
-                    </div>
+              {pots.length > 0 && (
+                <DndContext sensors={dndSensors} onDragEnd={handlePotDragEnd}>
+                  <div className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${unassignedTeams.length > 0 ? "border-destructive/50 text-destructive" : "border-border text-muted-foreground"}`}>
+                    {unassignedTeams.length > 0 && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
+                    <span>{potTeamTotal} van {teams.length} teams toegewezen. Sleep teams naar een pot of kies ze handmatig.</span>
                   </div>
-
-                  <div className="rounded-lg border border-border p-3">
-                    <p className="text-sm font-medium">Verdeling per groep</p>
-                    <p className="text-xs text-muted-foreground">Elke groep krijgt automatisch één team uit elke pot. Zijn er meer teams dan groepen, dan worden de extra plaatsen evenwichtig aangevuld.</p>
-                    <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="outline" size="sm">Geavanceerde verdeling aanpassen <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedSpreadOpen ? "rotate-180" : ""}`} /></Button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="mt-3 space-y-3">
-                        <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
-                        <div className="overflow-x-auto">
-                          <table className="w-full min-w-[520px] text-xs">
-                            <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
-                            <tbody>{pots.map((pot) => {
-                              const total = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
-                              return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium">{pot.name} <span className={total === pot.teamIds.length ? "text-muted-foreground" : "text-destructive"}>{total}/{pot.teamIds.length}</span></td>{containers.map((container) => <td key={container.id} className="p-1"><Input type="number" min={0} value={quotaFor(pot.id, container.id)} onChange={(event) => setQuota(pot.id, container.id, Number(event.target.value))} className="mx-auto h-8 w-16 text-center" /></td>)}</tr>;
-                            })}</tbody>
-                          </table>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-
-                  {isRounds && (
-                    <div className="space-y-2 rounded-lg border border-border p-3">
-                      <p className="text-sm font-medium">Ontmoetingen tussen potten</p>
-                      <div className="grid gap-2 md:grid-cols-2">
-                        {pots.flatMap((first, index) => pots.slice(index).map((second) => (
-                          <div key={`${first.id}|${second.id}`} className="flex items-center justify-between gap-3 rounded-md bg-muted/40 p-2">
-                            <span className="text-xs font-medium">{first.id === second.id ? `${first.name} onderling` : `${first.name} tegen ${second.name}`}</span>
-                            <Select value={String(matrixValue(first.id, second.id))} onValueChange={(value) => setMatrixValue(first.id, second.id, Number(value))}>
-                              <SelectTrigger className="h-8 w-20"><SelectValue /></SelectTrigger>
-                              <SelectContent>{[0, 1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>{number}x</SelectItem>)}</SelectContent>
-                            </Select>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {pots.map((pot, index) => {
+                      const expected = expectedSizes(pots.length)[index] ?? 0;
+                      return (
+                        <div key={pot.id} className="space-y-2 rounded-lg border border-border bg-card p-3">
+                          <div className="flex items-center gap-2">
+                            <Input value={pot.name} onChange={(event) => renamePot(pot.id, event.target.value)} className="h-9 text-sm font-bold" aria-label="Potnaam" />
+                            <span className={`whitespace-nowrap text-xs font-semibold ${pot.teamIds.length === expected ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length} / {expected} teams</span>
                           </div>
-                        ))) }
+                          <PotDropZone id={pot.id}>
+                            {pot.teamIds.map((id) => <DraggablePotTeam key={id} id={id}><TeamChip id={id} /><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeTeamFromPot(pot.id, id)} aria-label="Uit pot verwijderen"><Trash2 className="h-3 w-3" /></Button></DraggablePotTeam>)}
+                            {pot.teamIds.length === 0 && <p className="px-2 py-4 text-center text-xs text-muted-foreground">Sleep een team naar deze pot.</p>}
+                          </PotDropZone>
+                          {unassignedTeams.length > 0 && (
+                            <Select value="" onValueChange={(value) => addTeamToPot(pot.id, value)}>
+                              <SelectTrigger><SelectValue placeholder="Team handmatig toevoegen" /></SelectTrigger>
+                              <SelectContent>{unassignedTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="rounded-lg border border-dashed border-border p-3">
+                    <p className="mb-2 text-xs font-semibold">Niet toegewezen teams ({unassignedTeams.length})</p>
+                    <PotDropZone id="unassigned">
+                      <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+                        {unassignedTeams.map((team) => <DraggablePotTeam key={team.id} id={team.id}><TeamChip id={team.id} /></DraggablePotTeam>)}
                       </div>
-                    </div>
-                  )}
-                </section>
+                      {unassignedTeams.length === 0 && <p className="px-2 py-2 text-center text-xs text-muted-foreground">Alle teams zitten in een pot.</p>}
+                    </PotDropZone>
+                  </div>
+                </DndContext>
               )}
 
-              <section className="border-t border-border pt-5">{renderRules()}</section>
-            </div>
-          ) : step === "pots" ? (
-            <div className="max-h-[68vh] space-y-4 overflow-y-auto pr-1">
-              <div>
-                <h2 className="text-base font-bold">Potten</h2>
-                <p className="text-sm text-muted-foreground">Verdeel alle teams over de potten. Bij de live loting wordt telkens een team uit de actieve pot getrokken.</p>
-              </div>
-              <div className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${potTeamTotal !== teams.length || unassignedTeams.length > 0 ? "border-destructive text-destructive" : "border-border text-muted-foreground"}`}>
-                {(potTeamTotal !== teams.length || unassignedTeams.length > 0) && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-                <span>{potTeamTotal} van {teams.length} teams toegewezen · {totalCapacity} vrije plaatsen in {containers.length} groepen.</span>
-              </div>
-              <DndContext sensors={dndSensors} onDragEnd={handlePotDragEnd}>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {pots.map((pot) => (
-                    <div key={pot.id} className="space-y-2 rounded-lg border border-border p-3">
-                      <div className="flex items-center gap-2">
-                        <Input value={pot.name} onChange={(event) => renamePot(pot.id, event.target.value)} className="h-9 text-sm font-bold" />
-                        <span className="whitespace-nowrap text-xs text-muted-foreground">{pot.teamIds.length} teams</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => deletePot(pot.id)} aria-label={`${pot.name} verwijderen`}><Trash2 className="h-3.5 w-3.5" /></Button>
+              {pots.length > 0 && (
+                <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="rounded-lg border border-border">
+                  <CollapsibleTrigger asChild>
+                    <button type="button" className="flex w-full items-center justify-between gap-3 p-3 text-left">
+                      <span>
+                        <span className="block text-sm font-bold">Geavanceerde instellingen</span>
+                        <span className="block text-xs text-muted-foreground">Pas de verdeling en regels aan wanneer je meer controle nodig hebt.</span>
+                      </span>
+                      <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-5 border-t border-border p-3">
+                    <section className="space-y-2">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verdeling van potten over groepen</h3>
+                      <div className="rounded-lg border border-border p-3">
+                        <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
+                        <p className="text-xs text-muted-foreground">Copa Mundo verdeelt de teams uit elke pot zo gelijk mogelijk over de groepen. Het verschil tussen groepen is maximaal één team; welke groepen een extra team krijgen, wordt willekeurig bepaald.</p>
+                        <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
+                          <CollapsibleTrigger asChild>
+                            <Button variant="outline" size="sm">Verdeling handmatig aanpassen <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedSpreadOpen ? "rotate-180" : ""}`} /></Button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="mt-3 space-y-3">
+                            <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
+                            <div className="overflow-x-auto">
+                              <table className="w-full min-w-[520px] text-xs">
+                                <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
+                                <tbody>
+                                  {pots.map((pot) => {
+                                    const total = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
+                                    return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium">{pot.name} <span className={total === pot.teamIds.length ? "text-muted-foreground" : "text-destructive"}>{total}/{pot.teamIds.length}</span></td>{containers.map((container) => <td key={container.id} className="p-1"><Input type="number" min={0} value={quotaFor(pot.id, container.id)} onChange={(event) => setQuota(pot.id, container.id, Number(event.target.value))} className="mx-auto h-8 w-16 text-center" /></td>)}</tr>;
+                                  })}
+                                  <tr className="border-t border-border">
+                                    <td className="p-2 font-semibold">Totaal</td>
+                                    {containers.map((container) => {
+                                      const total = pots.reduce((sum, pot) => sum + quotaFor(pot.id, container.id), 0);
+                                      return <td key={container.id} className={`p-2 text-center font-semibold ${total === container.capacity ? "text-muted-foreground" : "text-destructive"}`}>{total}/{container.capacity}</td>;
+                                    })}
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
                       </div>
-                      <PotDropZone id={pot.id}>
-                        {pot.teamIds.map((id) => <DraggablePotTeam key={id} id={id}><TeamChip id={id} /><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeTeamFromPot(pot.id, id)} aria-label="Uit pot verwijderen"><Trash2 className="h-3 w-3" /></Button></DraggablePotTeam>)}
-                        {pot.teamIds.length === 0 && <p className="px-2 py-4 text-center text-xs text-muted-foreground">Sleep een team naar deze pot.</p>}
-                      </PotDropZone>
-                      {unassignedTeams.length > 0 && (
-                        <Select value="" onValueChange={(value) => addTeamToPot(pot.id, value)}>
-                          <SelectTrigger><SelectValue placeholder="Team handmatig toevoegen" /></SelectTrigger>
-                          <SelectContent>{unassignedTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
-                        </Select>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </DndContext>
-              {unassignedTeams.length > 0 && (
-                <div className="rounded-lg border border-dashed border-border p-3">
-                  <p className="mb-2 text-xs font-semibold">Niet toegewezen teams</p>
-                  <div className="flex flex-wrap gap-2">{unassignedTeams.map((team) => <span key={team.id} className="rounded-md bg-muted px-2 py-1 text-xs"><TeamChip id={team.id} /></span>)}</div>
-                </div>
+                    </section>
+
+                    {isRounds && (
+                      <section className="space-y-2">
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ontmoetingen tussen potten</h3>
+                        <div className="grid gap-2 md:grid-cols-2">
+                          {pots.flatMap((first, index) => pots.slice(index).map((second) => (
+                            <div key={`${first.id}|${second.id}`} className="flex items-center justify-between gap-3 rounded-md bg-muted/40 p-2">
+                              <span className="text-xs font-medium">{first.id === second.id ? `${first.name} onderling` : `${first.name} tegen ${second.name}`}</span>
+                              <Select value={String(matrixValue(first.id, second.id))} onValueChange={(value) => setMatrixValue(first.id, second.id, Number(value))}>
+                                <SelectTrigger className="h-8 w-20"><SelectValue /></SelectTrigger>
+                                <SelectContent>{[0, 1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>{number}x</SelectItem>)}</SelectContent>
+                              </Select>
+                            </div>
+                          )))}
+                        </div>
+                      </section>
+                    )}
+
+                    {renderRules()}
+                  </CollapsibleContent>
+                </Collapsible>
               )}
             </div>
           ) : drawContent}
 
           {step !== "draw" && (
             <DialogFooter className="border-t border-border pt-4">
-              <Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button>
-              {step === "pots" && <Button variant="outline" onClick={() => setStep("settings")}><ArrowLeft className="h-4 w-4" /> Terug naar instellingen</Button>}
-              {step === "settings" && usePots && <Button onClick={() => setStep("pots")}>Verder naar potten</Button>}
-              {step === "settings" && !usePots && <Button onClick={openDraw}>Naar de loting</Button>}
+              {step === "method" && <Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button>}
+              {step === "pots" && <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar lotingsmethode</Button>}
+              {step === "method" && usePots && <Button onClick={() => setStep("pots")}>Verder naar potindeling</Button>}
+              {step === "method" && !usePots && <Button onClick={openDraw}>Start loting</Button>}
               {step === "pots" && <Button onClick={openDraw}>Naar de loting</Button>}
             </DialogFooter>
           )}
