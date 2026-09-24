@@ -50,7 +50,7 @@ interface Pot {
   teamIds: string[];
 }
 
-type Step = "settings" | "pots" | "draw";
+type Step = "method" | "pots" | "draw";
 
 const DraggablePotTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
@@ -100,9 +100,11 @@ const LiveDrawDialog = ({
 }) => {
   const isRounds = phaseMatchType === "rounds";
   const { toast } = useToast();
-  const [step, setStep] = useState<Step>("settings");
+  const [step, setStep] = useState<Step>("method");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [advancedSpreadOpen, setAdvancedSpreadOpen] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [selectedPotId, setSelectedPotId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pots, setPots] = useState<Pot[]>([]);
   const [containers, setContainers] = useState<DrawContainer[]>([]);
@@ -185,8 +187,10 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open) return;
-    setStep("settings");
+    setStep("method");
+    setAdvancedOpen(false);
     setAdvancedSpreadOpen(false);
+    setSelectedPotId(null);
     setSession(null);
     setRules(emptyContainerRules());
     loadAll();
@@ -421,9 +425,15 @@ const LiveDrawDialog = ({
   const activePot = session?.activePotId ? pots.find((p) => p.id === session.activePotId) : null;
   const pendingTeam = pending ? teamById.get(pending.teamId) : null;
 
+  const activePotChoice =
+    session?.mode === "pots"
+      ? pots.find((p) => p.id === selectedPotId && p.teamIds.some((id) => session.remaining.includes(id))) ||
+        pots.find((p) => p.teamIds.some((id) => session.remaining.includes(id))) ||
+        null
+      : null;
   const handleDrawNext = (forcedTeamId?: string) => {
     if (!session) return;
-    setSession(drawNext(session, forcedTeamId));
+    setSession(drawNext(session, forcedTeamId, activePotChoice?.id ?? null));
     setManualTeam("");
   };
   const handleConfirm = (targetId?: string) => {
@@ -443,9 +453,7 @@ const LiveDrawDialog = ({
 
   const remainingPool = session
     ? session.mode === "pots"
-      ? (pots.find((p) => p.teamIds.some((id) => session.remaining.includes(id)))?.teamIds || []).filter((id) =>
-          session.remaining.includes(id)
-        )
+      ? (activePotChoice?.teamIds || []).filter((id) => session.remaining.includes(id))
       : session.remaining
     : [];
 
@@ -571,45 +579,58 @@ const LiveDrawDialog = ({
     );
   };
 
-  const validationError = () => {
-    if (containers.length === 0) return { step: "settings" as Step, message: "Er zijn nog geen groepen in deze fase." };
+  const validationError = (): { step: Step; message: string } | null => {
+    if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
     if (teams.length !== totalCapacity) {
       return {
-        step: "settings" as Step,
-        message: `${teams.length} beschikbare deelnemers voor ${totalCapacity} vrije plaatsen. Het aantal moet exact overeenkomen.`,
+        step: usePots ? "pots" : "method",
+        message: `${teams.length} beschikbare teams voor ${totalCapacity} vrije plaatsen. Het aantal moet exact overeenkomen.`,
       };
     }
     if (usePots) {
-      if (pots.length === 0) return { step: "settings" as Step, message: "Maak eerst minstens één pot aan." };
+      if (pots.length === 0) return { step: "pots", message: "Kies eerst het aantal potten." };
       const allAssigned = pots.flatMap((pot) => pot.teamIds);
       const uniqueAssigned = new Set(allAssigned);
-      if (allAssigned.length !== teams.length || uniqueAssigned.size !== teams.length || teams.some((team) => !uniqueAssigned.has(team.id))) {
-        return { step: "pots" as Step, message: "Wijs iedere deelnemer precies één keer aan een pot toe." };
-      }
+      if (unassignedTeams.length > 0)
+        return { step: "pots", message: `${unassignedTeams.length} teams zijn nog niet aan een pot toegewezen.` };
+      if (allAssigned.length !== teams.length || uniqueAssigned.size !== teams.length)
+        return { step: "pots", message: "Wijs ieder team precies één keer aan een pot toe." };
+      const emptyPot = pots.find((pot) => pot.teamIds.length === 0);
+      if (emptyPot) return { step: "pots", message: `${emptyPot.name} is nog leeg. Voeg teams toe of kies minder potten.` };
       for (const pot of pots) {
         const quotaTotal = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
         if (quotaTotal !== pot.teamIds.length) {
+          setAdvancedOpen(true);
+          setAdvancedSpreadOpen(true);
           return {
-            step: "settings" as Step,
-            message: `${pot.name} bevat ${pot.teamIds.length} deelnemers, maar de verdeling voorziet ${quotaTotal} plaatsen.`,
+            step: "pots",
+            message: `Verdeling: ${pot.name} bevat ${pot.teamIds.length} teams, maar de verdeling over de groepen voorziet ${quotaTotal} plaatsen.`,
+          };
+        }
+      }
+      for (const container of containers) {
+        const groupTotal = pots.reduce((sum, pot) => sum + quotaFor(pot.id, container.id), 0);
+        if (groupTotal !== container.capacity) {
+          setAdvancedOpen(true);
+          setAdvancedSpreadOpen(true);
+          return {
+            step: "pots",
+            message: `Verdeling: ${container.name} krijgt ${groupTotal} teams, maar heeft exact ${container.capacity} plaatsen.`,
           };
         }
       }
     }
     const ctx = buildContainerCtx(teams, pots, effectiveRules);
     const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
-    return check.ok ? null : { step: "settings" as Step, message: check.message || "De gekozen regels zijn niet haalbaar." };
+    if (!check.ok && usePots) setAdvancedOpen(true);
+    return check.ok ? null : { step: usePots ? "pots" : "method", message: check.message || "De gekozen regels zijn niet haalbaar." };
   };
 
   const openDraw = () => {
     const error = validationError();
     if (error) {
       setStep(error.step);
-      toast({
-        title: error.step === "pots" ? "Controleer de potten" : "Controleer de instellingen",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Loting kan nog niet starten", description: error.message, variant: "destructive" });
       return;
     }
     startDraw();
@@ -617,7 +638,7 @@ const LiveDrawDialog = ({
 
   const renderRules = () => (
     <div className="space-y-3">
-      <h3 className="text-sm font-bold">Regels</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Landenregels</h3>
       <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
         <div>
           <p className="text-sm font-medium">Zelfde land nooit samen</p>
