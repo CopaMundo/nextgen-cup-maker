@@ -307,6 +307,33 @@ const GroupManager = ({
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
   const [drawOpen, setDrawOpen] = useState(false);
+  const [roundsDrawOpen, setRoundsDrawOpen] = useState(false);
+  const [drawChoiceOpen, setDrawChoiceOpen] = useState(false);
+  type DrawMode = "full" | "groups" | "rounds";
+  const [drawMode, setDrawMode] = useState<DrawMode>("groups");
+  const [pendingDrawMode, setPendingDrawMode] = useState<DrawMode | null>(null);
+  const startDraw = (mode: DrawMode) => {
+    setDrawMode(mode);
+    if (mode === "rounds") setRoundsDrawOpen(true);
+    else setDrawOpen(true);
+  };
+  const requestDraw = async (mode: DrawMode) => {
+    let needsConfirm = false;
+    if (mode === "rounds") {
+      const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
+      if (!filled?.length) {
+        toast({ title: "Nog geen poule-indeling", description: "Loot eerst de poules of kies Volledige loting.", variant: "destructive" });
+        return;
+      }
+      const { data: existing } = await supabase.from("matches").select("id").eq("phase_id", phaseId).limit(1);
+      needsConfirm = !!existing?.length;
+    } else {
+      const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
+      needsConfirm = !!filled?.length;
+    }
+    if (needsConfirm) setPendingDrawMode(mode);
+    else startDraw(mode);
+  };
 
   const notifySlotChange = () => {
     setSlotRefreshKey((k) => k + 1);
@@ -1142,7 +1169,10 @@ const GroupManager = ({
           </Button>
         )}
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
-          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setDrawOpen(true)}>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
+            if (phaseMatchType === "rounds") setDrawChoiceOpen(true);
+            else requestDraw("groups");
+          }}>
             <Trophy className="h-3 w-3" /> Live loting
           </Button>
         )}
@@ -1151,29 +1181,76 @@ const GroupManager = ({
         </Button>
       </div>
 
-      {phaseMatchType === "rounds" ? (
-        <RoundsDrawDialog
-          open={drawOpen}
-          onOpenChange={setDrawOpen}
-          tournamentId={tournamentId}
-          phaseId={phaseId}
-          categoryId={categoryId}
-          phaseName={phases.find((phase) => phase.id === phaseId)?.name}
-          defaultRounds={phaseRounds}
-          onApplied={() => { notifySlotChange(); fetchGroups(); }}
-        />
-      ) : (
-        <LiveDrawDialog
-          open={drawOpen}
-          onOpenChange={setDrawOpen}
-          tournamentId={tournamentId}
-          phaseId={phaseId}
-          categoryId={categoryId}
-          phaseMatchType={phaseMatchType}
-          phaseName={phases.find((phase) => phase.id === phaseId)?.name}
-          onApplied={() => { notifySlotChange(); fetchGroups(); }}
-        />
-      )}
+      <Dialog open={drawChoiceOpen} onOpenChange={setDrawChoiceOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Wat wil je loten?</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-2">
+            {([
+              ["full", "Volledige loting", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
+              ["groups", "Alleen poules loten", "Teams over de poules verdelen. De speelrondes blijven ongewijzigd."],
+              ["rounds", "Alleen speelrondes loten", "De huidige poule-indeling behouden en enkel de tegenstanders loten."],
+            ] as const).map(([mode, title, text]) => (
+              <button
+                key={mode}
+                onClick={() => { setDrawChoiceOpen(false); requestDraw(mode); }}
+                className="rounded-lg border border-border bg-card p-4 text-left transition-colors hover:border-primary hover:bg-accent"
+              >
+                <div className="text-sm font-semibold text-foreground">{title}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{text}</div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!pendingDrawMode} onOpenChange={(o) => !o && setPendingDrawMode(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bestaande indeling overschrijven?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDrawMode === "rounds"
+                ? "De bestaande speelrondes en wedstrijden van deze fase worden bij het toepassen van de loting vervangen."
+                : "De huidige poule-indeling (en de bijhorende wedstrijden) wordt bij het toepassen van de loting vervangen."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { const m = pendingDrawMode; setPendingDrawMode(null); if (m) startDraw(m); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Ja, overschrijven
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <RoundsDrawDialog
+        open={roundsDrawOpen}
+        onOpenChange={setRoundsDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        categoryId={categoryId}
+        phaseName={phases.find((phase) => phase.id === phaseId)?.name}
+        defaultRounds={phaseRounds}
+        onApplied={() => { notifySlotChange(); fetchGroups(); }}
+      />
+      <LiveDrawDialog
+        open={drawOpen}
+        onOpenChange={setDrawOpen}
+        tournamentId={tournamentId}
+        phaseId={phaseId}
+        categoryId={categoryId}
+        phaseMatchType={phaseMatchType}
+        phaseName={phases.find((phase) => phase.id === phaseId)?.name}
+        onApplied={() => {
+          notifySlotChange();
+          fetchGroups();
+          if (drawMode === "full") setTimeout(() => setRoundsDrawOpen(true), 300);
+        }}
+      />
 
       {/* Grid layout for groups */}
       {!groupsLoaded && groups.length === 0 ? (
