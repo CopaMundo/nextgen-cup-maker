@@ -25,6 +25,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import LiveDrawDialog from "./LiveDrawDialog";
+import RoundsDrawDialog from "./RoundsDrawDialog";
 
 interface Group {
   id: string;
@@ -1150,16 +1151,29 @@ const GroupManager = ({
         </Button>
       </div>
 
-      <LiveDrawDialog
-        open={drawOpen}
-        onOpenChange={setDrawOpen}
-        tournamentId={tournamentId}
-        phaseId={phaseId}
-        categoryId={categoryId}
-        phaseMatchType={phaseMatchType}
-        phaseName={phases.find((phase) => phase.id === phaseId)?.name}
-        onApplied={() => { notifySlotChange(); fetchGroups(); }}
-      />
+      {phaseMatchType === "rounds" ? (
+        <RoundsDrawDialog
+          open={drawOpen}
+          onOpenChange={setDrawOpen}
+          tournamentId={tournamentId}
+          phaseId={phaseId}
+          categoryId={categoryId}
+          phaseName={phases.find((phase) => phase.id === phaseId)?.name}
+          defaultRounds={phaseRounds}
+          onApplied={() => { notifySlotChange(); fetchGroups(); }}
+        />
+      ) : (
+        <LiveDrawDialog
+          open={drawOpen}
+          onOpenChange={setDrawOpen}
+          tournamentId={tournamentId}
+          phaseId={phaseId}
+          categoryId={categoryId}
+          phaseMatchType={phaseMatchType}
+          phaseName={phases.find((phase) => phase.id === phaseId)?.name}
+          onApplied={() => { notifySlotChange(); fetchGroups(); }}
+        />
+      )}
 
       {/* Grid layout for groups */}
       {!groupsLoaded && groups.length === 0 ? (
