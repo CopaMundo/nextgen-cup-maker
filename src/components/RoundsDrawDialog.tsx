@@ -172,16 +172,15 @@ const RoundsDrawDialog = ({
     load();
   }, [open, phaseId]);
 
-  const canShare = useMemo(() => {
-    if (groups.length < 2) return false;
-    const sig = (g: GroupInfo) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}`;
-    return groups.every((g) => sig(g) === sig(groups[0]));
-  }, [groups]);
-
   // Vrij loten negeert bestaande potten; met niveau-potten blijft de bestaande potindeling leidend.
   const drawGroups = useMemo(() => method === "pots" ? groups : groups.map((g) => ({
     ...g, pots: [{ id: "all", name: "Alle teams", teamIds: g.teamIds }],
   })), [groups, method]);
+  const canShare = useMemo(() => {
+    if (drawGroups.length < 2) return false;
+    const sig = (g: GroupInfo) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}`;
+    return drawGroups.every((g) => sig(g) === sig(drawGroups[0]));
+  }, [drawGroups]);
   const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
 
   const nextToRules = () => {
