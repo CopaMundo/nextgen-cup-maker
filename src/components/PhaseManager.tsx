@@ -386,6 +386,10 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
 
   const addFormatToPhase = async (phaseNumber: number) => {
     if (creatingFormat) return;
+    if (newFormatType === "group" && groupConfig.matchType === "rounds" && (groupConfig.teamsPerGroup < 4 || groupConfig.teamsPerGroup % 2 !== 0)) {
+      toast({ title: "Speelrondes niet beschikbaar", description: "Speelrondes vereisen minimaal 4 teams en een even aantal teams per poule", variant: "destructive" });
+      return;
+    }
 
     setCreatingFormat(true);
     const name = newFormatName.trim() || getAutoName(newFormatType, phaseNumber);
@@ -1053,6 +1057,9 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     ...groupConfig,
                     groupCount: newCount,
                     teamsPerGroup: Math.min(groupConfig.teamsPerGroup, Math.max(2, maxTeams)),
+                    matchType: maxTeams < 4 || Math.min(groupConfig.teamsPerGroup, maxTeams) % 2 !== 0
+                      ? (groupConfig.matchType === "rounds" ? "single_leg" : groupConfig.matchType)
+                      : groupConfig.matchType,
                   });
                 }}
                 options={Array.from({ length: 32 }, (_, i) => i + 1)}
@@ -1063,7 +1070,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               <Label className="text-xs">Teams per groep</Label>
               <NumberSelect
                 value={groupConfig.teamsPerGroup}
-                onChange={(n) => setGroupConfig({ ...groupConfig, teamsPerGroup: n })}
+                onChange={(n) => setGroupConfig({ ...groupConfig, teamsPerGroup: n, matchType: groupConfig.matchType === "rounds" && (n < 4 || n % 2 !== 0) ? "single_leg" : groupConfig.matchType })}
                 options={Array.from({ length: Math.max(1, Math.min(128, Math.floor(128 / groupConfig.groupCount)) - 1) }, (_, i) => i + 2)}
                 className="w-full"
               />
@@ -1079,9 +1086,12 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                 { value: "rounds", label: "SPEELRONDES", desc: "Bepaal zelf het totaal aantal wedstrijden dat elk team moet spelen" },
               ].map((opt) => (
                 <button
+                   type="button"
                   key={opt.value}
+                   disabled={opt.value === "rounds" && (groupConfig.teamsPerGroup < 4 || groupConfig.teamsPerGroup % 2 !== 0)}
                   onClick={() => setGroupConfig({ ...groupConfig, matchType: opt.value as any })}
                   className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
+                     opt.value === "rounds" && (groupConfig.teamsPerGroup < 4 || groupConfig.teamsPerGroup % 2 !== 0) ? "border-border opacity-40 cursor-not-allowed" :
                     groupConfig.matchType === opt.value
                       ? "border-y-2 border-y-primary bg-primary/[0.06]"
                       : "border-border hover:border-primary/20"
@@ -1089,6 +1099,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                 >
                   <p className="font-bold text-foreground uppercase tracking-wide">{opt.label}</p>
                   <p className="text-muted-foreground mt-0.5">{opt.desc}</p>
+                   {opt.value === "rounds" && (groupConfig.teamsPerGroup < 4 || groupConfig.teamsPerGroup % 2 !== 0) && <p className="mt-1 text-muted-foreground">Speelrondes vereisen minimaal 4 teams en een even aantal teams per poule</p>}
                 </button>
               ))}
             </div>

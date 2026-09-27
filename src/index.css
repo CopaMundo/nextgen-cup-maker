@@ -2509,3 +2509,25 @@ posities + statistieken groen */
   box-shadow: none !important;
 }
 
+/* Beheerloting speelrondes: dezelfde donkere Copa Mundo-rollen, ook bij licht beheerthema. */
+.rounds-draw-theme {
+  color-scheme: dark;
+  --background: 150 20% 6%;
+  --foreground: 0 0% 95%;
+  --card: 150 15% 10%;
+  --card-foreground: 0 0% 95%;
+  --popover: 150 15% 10%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 52 100% 50%;
+  --primary-foreground: 150 30% 6%;
+  --secondary: 150 12% 15%;
+  --secondary-foreground: 0 0% 85%;
+  --muted: 150 10% 15%;
+  --muted-foreground: 150 8% 60%;
+  --accent: 52 100% 60%;
+  --accent-foreground: 150 30% 6%;
+  --border: 150 12% 18%;
+  --input: 150 12% 18%;
+  --ring: 52 100% 50%;
+}
+
