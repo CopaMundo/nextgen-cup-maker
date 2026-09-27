@@ -19,6 +19,9 @@ import {
   type ScheduledMatch,
 } from "@/lib/roundsSchedule";
 import { shuffle } from "@/lib/liveDraw";
+import { DndContext, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 interface Team {
   id: string;
@@ -46,6 +49,18 @@ interface GroupDraw {
 
 const REVEAL_MS = 1300;
 
+const DraggableTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  return <div ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform) }} className={`flex min-w-0 items-center gap-2 border border-border bg-background px-2 py-2 text-sm ${isDragging ? "relative z-50 opacity-70" : ""}`}>
+    <span {...attributes} {...listeners} aria-label="Team verplaatsen" className="cursor-grab touch-none text-muted-foreground"><GripVertical className="h-4 w-4" /></span>{children}
+  </div>;
+};
+
+const PotZone = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return <div ref={setNodeRef} className={`min-h-16 space-y-1 p-1 ${isOver ? "bg-primary/10 ring-2 ring-primary/30" : ""}`}>{children}</div>;
+};
+
 const RoundsDrawDialog = ({
   open,
   onOpenChange,
@@ -67,10 +82,14 @@ const RoundsDrawDialog = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"method" | "settings" | "draw">("method");
+  const [step, setStep] = useState<"method" | "pots" | "settings" | "draw">("method");
   const [method, setMethod] = useState<"free" | "pots">("free");
   const [teams, setTeams] = useState<Team[]>([]);
   const [groups, setGroups] = useState<GroupInfo[]>([]);
+  const [potGroups, setPotGroups] = useState<Record<string, GroupInfo["pots"]>>({});
+  const [potError, setPotError] = useState("");
+  const [potGroupId, setPotGroupId] = useState("");
+  const potSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
   const [sameForAll, setSameForAll] = useState(true);
   const [matrices, setMatrices] = useState<Record<string, number[][]>>({});
   const [editGroupId, setEditGroupId] = useState<string>("");
@@ -139,6 +158,8 @@ const RoundsDrawDialog = ({
         };
       });
       setGroups(infos);
+      setPotGroups(Object.fromEntries(infos.map((g) => [g.id, g.pots.length > 1 && g.pots.every((p) => p.teamIds.length === g.teamIds.length / g.pots.length) ? g.pots : []])));
+      setPotGroupId(infos[0]?.id || "");
       setEditGroupId(infos[0]?.id || "");
       const initial: Record<string, number[][]> = {};
       infos.forEach((g) => {
@@ -160,6 +181,7 @@ const RoundsDrawDialog = ({
     if (!open) return;
     setStep("method");
     setMethod("free");
+    setPotError("");
     setDraws([]);
     setTeamIdx({});
     setRevealed({});
@@ -172,16 +194,53 @@ const RoundsDrawDialog = ({
     load();
   }, [open, phaseId]);
 
-  // Vrij loten negeert bestaande potten; met niveau-potten blijft de bestaande potindeling leidend.
-  const drawGroups = useMemo(() => method === "pots" ? groups : groups.map((g) => ({
+  // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
+  const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
     ...g, pots: [{ id: "all", name: "Alle teams", teamIds: g.teamIds }],
-  })), [groups, method]);
+  })), [groups, method, potGroups]);
   const canShare = useMemo(() => {
     if (drawGroups.length < 2) return false;
     const sig = (g: GroupInfo) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}`;
     return drawGroups.every((g) => sig(g) === sig(drawGroups[0]));
   }, [drawGroups]);
   const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
+
+  const selectPotCount = (group: GroupInfo, count: number) => {
+    setPotGroups((prev) => ({ ...prev, [group.id]: Array.from({ length: count }, (_, i) => ({
+      id: crypto.randomUUID(), name: `Pot ${i + 1}`, teamIds: [],
+    })) }));
+    setPotError("");
+  };
+
+  const movePotTeam = (groupId: string, teamId: string, targetId: string) => {
+    const group = groups.find((g) => g.id === groupId);
+    const pots = potGroups[groupId] || [];
+    if (!group?.teamIds.includes(teamId) || (targetId !== "unassigned" && !pots.some((p) => p.id === targetId))) return;
+    if (targetId !== "unassigned" && pots.find((p) => p.id === targetId)?.teamIds.length === group.teamIds.length / pots.length && !pots.find((p) => p.id === targetId)?.teamIds.includes(teamId)) {
+      setPotError("Deze pot is al gevuld. Kies een andere pot.");
+      return;
+    }
+    setPotGroups((prev) => ({ ...prev, [groupId]: pots.map((p) => ({ ...p, teamIds: p.id === targetId ? [...new Set([...p.teamIds, teamId])] : p.teamIds.filter((id) => id !== teamId) })) }));
+    setPotError("");
+  };
+
+  const checkPots = () => {
+    for (const group of groups) {
+      const pots = potGroups[group.id] || [];
+      if (!pots.length) return `${group.name}: kies eerst een gelijkmatige potverdeling.`;
+      const size = group.teamIds.length / pots.length;
+      if (pots.some((p) => p.teamIds.length !== size)) return `${group.name}: vul elke pot met precies ${size} teams.`;
+      const assigned = pots.flatMap((p) => p.teamIds);
+      if (assigned.length !== group.teamIds.length || new Set(assigned).size !== group.teamIds.length || assigned.some((id) => !group.teamIds.includes(id))) return `${group.name}: wijs elk team precies één keer toe.`;
+    }
+    return "";
+  };
+
+  const proceedFromPots = () => {
+    const error = checkPots();
+    if (error) { setPotError(error); return; }
+    nextToRules();
+  };
 
   const nextToRules = () => {
     if (method === "pots" && !potDrawAvailable) return;
@@ -223,6 +282,10 @@ const RoundsDrawDialog = ({
   /* ------------------------ planning vooraf aanmaken ------------------------ */
 
   const prepare = async () => {
+    if (method === "pots") {
+      const error = checkPots();
+      if (error) { setPotError(error); setStep("pots"); return; }
+    }
     for (const g of drawGroups) {
       if (g.freeSlots > 0) {
         toast({ title: `${g.name} is nog niet volledig`, description: "Deel eerst alle teams in de groepen in.", variant: "destructive" });
@@ -446,7 +509,7 @@ const RoundsDrawDialog = ({
           const selected = method === option.id;
           return <Button key={option.id} type="button" variant="outline" aria-pressed={selected} disabled={disabled}
             onClick={() => setMethod(option.id)}
-            className={`relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal border-2 border-y-2 p-5 text-left hover:bg-secondary ${selected ? "border-y-primary border-x-primary/40 bg-primary/[0.06]" : "border-border bg-card"}`}>
+            className={`relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal border-x-0 border-y-2 p-5 text-left hover:bg-secondary ${selected ? "border-y-primary bg-primary/[0.06]" : "border-y-border bg-card"}`}>
             <span className="flex w-full items-start justify-between gap-2 text-sm font-bold text-foreground">
               {option.label}{selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
             </span>
@@ -455,6 +518,39 @@ const RoundsDrawDialog = ({
         })}
       </div>
       {!potDrawAvailable && <p className="flex items-start gap-2 text-sm text-warning"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Loting met niveau-potten vereist minimaal 4 teams en een even aantal teams per poule. Vul ook alle plaatsen in.</p>}
+    </div>
+  );
+
+  const potGroup = groups.find((g) => g.id === potGroupId) || groups[0];
+  const groupPots = potGroup ? potGroups[potGroup.id] || [] : [];
+  const assigned = new Set(groupPots.flatMap((p) => p.teamIds));
+  const unassigned = potGroup?.teamIds.filter((id) => !assigned.has(id)) || [];
+  const potOptions = potGroup ? Array.from({ length: Math.max(0, potGroup.teamIds.length - 1) }, (_, i) => i + 2)
+    .filter((count) => count <= potGroup.teamIds.length && potGroup.teamIds.length % count === 0) : [];
+  const potScreen = (
+    <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
+      <div><h3 className="text-lg font-bold">Potindeling</h3><p className="text-sm text-muted-foreground">Verdeel de teams per poule gelijkmatig over de niveau-potten.</p></div>
+      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant={potGroup?.id === g.id ? "default" : "outline"} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
+      {potGroup && <>
+        <div className="space-y-2"><Label>Aantal potten · {potGroup.teamIds.length} teams</Label><div className="flex flex-wrap gap-2">
+          {potOptions.map((count) => <Button key={count} variant="outline" aria-pressed={groupPots.length === count} onClick={() => selectPotCount(potGroup, count)} className={`h-auto flex-col items-start border-x-0 border-y-2 px-4 py-2 ${groupPots.length === count ? "border-y-primary bg-primary/[0.06]" : "border-y-border bg-card"}`}>
+            <span className="font-semibold">{count} potten</span><span className="text-xs text-muted-foreground">{potGroup.teamIds.length / count} teams per pot</span>
+          </Button>)}
+        </div></div>
+        {groupPots.length > 0 && <DndContext sensors={potSensors} onDragEnd={(event: DragEndEvent) => { if (event.over) movePotTeam(potGroup.id, String(event.active.id), String(event.over.id)); }}>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="border border-border bg-card p-3"><div className="mb-2 font-semibold">Niet ingedeeld <span className="text-muted-foreground">{unassigned.length}</span></div>
+              <PotZone id="unassigned">{unassigned.map((id) => <DraggableTeam key={id} id={id}><TeamChip id={id} /></DraggableTeam>)}</PotZone>
+            </div>
+            {groupPots.map((pot) => <div key={pot.id} className="border border-border bg-card p-3">
+              <div className="mb-2 flex items-center gap-2"><Input aria-label="Potnaam" value={pot.name} onChange={(e) => setPotGroups((prev) => ({ ...prev, [potGroup.id]: (prev[potGroup.id] || []).map((p) => p.id === pot.id ? { ...p, name: e.target.value } : p) }))} className="h-8 min-w-0 flex-1 font-semibold" /><span className={`shrink-0 text-sm font-bold ${pot.teamIds.length === potGroup.teamIds.length / groupPots.length ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length}/{potGroup.teamIds.length / groupPots.length}</span></div>
+              <PotZone id={pot.id}>{pot.teamIds.map((id) => <div key={id} className="flex items-center gap-1"><div className="min-w-0 flex-1"><DraggableTeam id={id}><TeamChip id={id} /></DraggableTeam></div><Button size="icon" variant="ghost" aria-label={`${teamById.get(id)?.name || "Team"} verwijderen uit ${pot.name}`} onClick={() => movePotTeam(potGroup.id, id, "unassigned")}><Trash2 className="h-4 w-4" /></Button></div>)}</PotZone>
+              {unassigned.length > 0 && pot.teamIds.length < potGroup.teamIds.length / groupPots.length && <Select onValueChange={(id) => movePotTeam(potGroup.id, id, pot.id)}><SelectTrigger className="mt-2 h-8"><SelectValue placeholder="Team toevoegen" /></SelectTrigger><SelectContent>{unassigned.map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent></Select>}
+            </div>)}
+          </div>
+        </DndContext>}
+      </>}
+      {potError && <p role="alert" className="flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="h-4 w-4" />{potError}</p>}
     </div>
   );
 
@@ -692,24 +788,17 @@ const RoundsDrawDialog = ({
          <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
           <DialogTitle>Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
         </DialogHeader>
-         <div aria-label="Voortgang live loting" className="grid grid-cols-3 gap-2 border-b border-primary/20 pb-3">
-           {(["Type loting", "Regels & matrix", "Loting & Schema"] as const).map((label, index) => {
-             const active = ["method", "settings", "draw"].indexOf(step) === index;
-             const done = ["method", "settings", "draw"].indexOf(step) > index;
-             return <div key={label} aria-current={active ? "step" : undefined} className={`min-w-0 border-y-2 px-2 py-2 text-xs font-semibold sm:px-3 ${active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/50 bg-card text-foreground" : "border-border bg-card text-muted-foreground"}`}>
-               <span className="block text-[10px] uppercase">Stap {index + 1}</span><span>{label}</span>
-             </div>;
-           })}
-         </div>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
-         ) : step === "method" ? methodScreen : step === "settings" ? settings : drawScreen}
+         ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? settings : drawScreen}
         <DialogFooter className="shrink-0 gap-2">
            {step === "method" ? (
-             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={nextToRules} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>Verder naar regels & matrix</Button></>
+             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>{method === "pots" ? "Verder naar potindeling" : "Verder naar instellingen"}</Button></>
+           ) : step === "pots" ? (
+             <><Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button><Button onClick={proceedFromPots}>Verder naar instellingen</Button></>
            ) : step === "settings" ? (
             <>
-               <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button>
+               <Button variant="outline" onClick={() => setStep(method === "pots" ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> {method === "pots" ? "Terug naar potindeling" : "Terug naar type loting"}</Button>
               <Button onClick={prepare} disabled={checking || groups.length === 0}>
                 {checking ? "Speelrondes aanmaken..." : "Naar de loting"}
               </Button>

@@ -4,3 +4,4 @@
 - [x] Alle enkelvoudige en meervoudige selectors in de beheeromgeving visueel gelijkgetrokken; aanvinkvakken alleen bij meervoudige keuzes.
 - [x] Speelrondes bij format aanmaken blokkeren voor minder dan vier of oneven teams per poule.
 - [x] Live loting speelrondes voorzien van typekeuze, regels/matrix en lotingsscherm in Copa Mundo-stijl.
+- [x] Stappenbalk verwijderen en speelrondes met niveau-potten per poule exact gelijk indelen vóór de instellingen.
