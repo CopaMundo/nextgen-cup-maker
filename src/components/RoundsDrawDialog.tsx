@@ -788,24 +788,17 @@ const RoundsDrawDialog = ({
          <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
           <DialogTitle>Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
         </DialogHeader>
-         <div aria-label="Voortgang live loting" className="grid grid-cols-3 gap-2 border-b border-primary/20 pb-3">
-           {(["Type loting", "Regels & matrix", "Loting & Schema"] as const).map((label, index) => {
-             const active = ["method", "settings", "draw"].indexOf(step) === index;
-             const done = ["method", "settings", "draw"].indexOf(step) > index;
-             return <div key={label} aria-current={active ? "step" : undefined} className={`min-w-0 border-y-2 px-2 py-2 text-xs font-semibold sm:px-3 ${active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/50 bg-card text-foreground" : "border-border bg-card text-muted-foreground"}`}>
-               <span className="block text-[10px] uppercase">Stap {index + 1}</span><span>{label}</span>
-             </div>;
-           })}
-         </div>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
-         ) : step === "method" ? methodScreen : step === "settings" ? settings : drawScreen}
+         ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? settings : drawScreen}
         <DialogFooter className="shrink-0 gap-2">
            {step === "method" ? (
-             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={nextToRules} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>Verder naar regels & matrix</Button></>
+             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>{method === "pots" ? "Verder naar potindeling" : "Verder naar instellingen"}</Button></>
+           ) : step === "pots" ? (
+             <><Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button><Button onClick={proceedFromPots}>Verder naar instellingen</Button></>
            ) : step === "settings" ? (
             <>
-               <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button>
+               <Button variant="outline" onClick={() => setStep(method === "pots" ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> {method === "pots" ? "Terug naar potindeling" : "Terug naar type loting"}</Button>
               <Button onClick={prepare} disabled={checking || groups.length === 0}>
                 {checking ? "Speelrondes aanmaken..." : "Naar de loting"}
               </Button>
