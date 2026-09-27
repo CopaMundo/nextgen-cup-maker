@@ -195,15 +195,52 @@ const RoundsDrawDialog = ({
   }, [open, phaseId]);
 
   // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
-  const drawGroups = useMemo(() => method === "pots" ? groups : groups.map((g) => ({
+  const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
     ...g, pots: [{ id: "all", name: "Alle teams", teamIds: g.teamIds }],
-  })), [groups, method]);
+  })), [groups, method, potGroups]);
   const canShare = useMemo(() => {
     if (drawGroups.length < 2) return false;
     const sig = (g: GroupInfo) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}`;
     return drawGroups.every((g) => sig(g) === sig(drawGroups[0]));
   }, [drawGroups]);
   const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
+
+  const selectPotCount = (group: GroupInfo, count: number) => {
+    setPotGroups((prev) => ({ ...prev, [group.id]: Array.from({ length: count }, (_, i) => ({
+      id: crypto.randomUUID(), name: `Pot ${i + 1}`, teamIds: [],
+    })) }));
+    setPotError("");
+  };
+
+  const movePotTeam = (groupId: string, teamId: string, targetId: string) => {
+    const group = groups.find((g) => g.id === groupId);
+    const pots = potGroups[groupId] || [];
+    if (!group?.teamIds.includes(teamId) || (targetId !== "unassigned" && !pots.some((p) => p.id === targetId))) return;
+    if (targetId !== "unassigned" && pots.find((p) => p.id === targetId)?.teamIds.length === group.teamIds.length / pots.length && !pots.find((p) => p.id === targetId)?.teamIds.includes(teamId)) {
+      setPotError("Deze pot is al gevuld. Kies een andere pot.");
+      return;
+    }
+    setPotGroups((prev) => ({ ...prev, [groupId]: pots.map((p) => ({ ...p, teamIds: p.id === targetId ? [...new Set([...p.teamIds, teamId])] : p.teamIds.filter((id) => id !== teamId) })) }));
+    setPotError("");
+  };
+
+  const checkPots = () => {
+    for (const group of groups) {
+      const pots = potGroups[group.id] || [];
+      if (!pots.length) return `${group.name}: kies eerst een gelijkmatige potverdeling.`;
+      const size = group.teamIds.length / pots.length;
+      if (pots.some((p) => p.teamIds.length !== size)) return `${group.name}: vul elke pot met precies ${size} teams.`;
+      const assigned = pots.flatMap((p) => p.teamIds);
+      if (assigned.length !== group.teamIds.length || new Set(assigned).size !== group.teamIds.length || assigned.some((id) => !group.teamIds.includes(id))) return `${group.name}: wijs elk team precies één keer toe.`;
+    }
+    return "";
+  };
+
+  const proceedFromPots = () => {
+    const error = checkPots();
+    if (error) { setPotError(error); return; }
+    nextToRules();
+  };
 
   const nextToRules = () => {
     if (method === "pots" && !potDrawAvailable) return;
@@ -245,6 +282,10 @@ const RoundsDrawDialog = ({
   /* ------------------------ planning vooraf aanmaken ------------------------ */
 
   const prepare = async () => {
+    if (method === "pots") {
+      const error = checkPots();
+      if (error) { setPotError(error); setStep("pots"); return; }
+    }
     for (const g of drawGroups) {
       if (g.freeSlots > 0) {
         toast({ title: `${g.name} is nog niet volledig`, description: "Deel eerst alle teams in de groepen in.", variant: "destructive" });
