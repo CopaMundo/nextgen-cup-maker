@@ -525,7 +525,7 @@ const RoundsDrawDialog = ({
   const groupPots = potGroup ? potGroups[potGroup.id] || [] : [];
   const assigned = new Set(groupPots.flatMap((p) => p.teamIds));
   const unassigned = potGroup?.teamIds.filter((id) => !assigned.has(id)) || [];
-  const potOptions = potGroup ? Array.from({ length: Math.floor(potGroup.teamIds.length / 2) }, (_, i) => i + 2)
+  const potOptions = potGroup ? Array.from({ length: Math.max(0, potGroup.teamIds.length - 1) }, (_, i) => i + 2)
     .filter((count) => count <= potGroup.teamIds.length && potGroup.teamIds.length % count === 0) : [];
   const potScreen = (
     <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
