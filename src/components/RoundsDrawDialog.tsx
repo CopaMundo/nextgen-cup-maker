@@ -67,7 +67,8 @@ const RoundsDrawDialog = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"settings" | "draw">("settings");
+  const [step, setStep] = useState<"method" | "settings" | "draw">("method");
+  const [method, setMethod] = useState<"free" | "pots">("free");
   const [teams, setTeams] = useState<Team[]>([]);
   const [groups, setGroups] = useState<GroupInfo[]>([]);
   const [sameForAll, setSameForAll] = useState(true);
@@ -157,7 +158,8 @@ const RoundsDrawDialog = ({
 
   useEffect(() => {
     if (!open) return;
-    setStep("settings");
+    setStep("method");
+    setMethod("free");
     setDraws([]);
     setTeamIdx({});
     setRevealed({});
@@ -176,9 +178,27 @@ const RoundsDrawDialog = ({
     return groups.every((g) => sig(g) === sig(groups[0]));
   }, [groups]);
 
+  // Vrij loten negeert bestaande potten; met niveau-potten blijft de bestaande potindeling leidend.
+  const drawGroups = useMemo(() => method === "pots" ? groups : groups.map((g) => ({
+    ...g, pots: [{ id: "all", name: "Alle teams", teamIds: g.teamIds }],
+  })), [groups, method]);
+  const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
+
+  const nextToRules = () => {
+    if (method === "pots" && !potDrawAvailable) return;
+    const next: Record<string, number[][]> = {};
+    drawGroups.forEach((g) => {
+      next[g.id] = defaultOpponentMatrix(g.pots.map((p) => p.teamIds.length), matchesPerTeam(g.teamIds.length, g.rounds));
+    });
+    setMatrices(next);
+    setEditGroupId(drawGroups[0]?.id || "");
+    setSameForAll(drawGroups.length > 1 && drawGroups.every((g) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}` === `${drawGroups[0].pots.length}|${drawGroups[0].pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(drawGroups[0].teamIds.length, drawGroups[0].rounds)}`));
+    setStep("settings");
+  };
+
   const setCell = (groupId: string, i: number, j: number, value: number) => {
     setMatrices((prev) => {
-      const targets = sameForAll && canShare ? groups.map((g) => g.id) : [groupId];
+      const targets = sameForAll && canShare ? drawGroups.map((g) => g.id) : [groupId];
       const next = { ...prev };
       for (const id of targets) {
         const m = (next[id] || []).map((row) => [...row]);
@@ -191,7 +211,7 @@ const RoundsDrawDialog = ({
   };
 
   const resetMatrix = (groupId: string) => {
-    const targets = sameForAll && canShare ? groups : groups.filter((g) => g.id === groupId);
+    const targets = sameForAll && canShare ? drawGroups : drawGroups.filter((g) => g.id === groupId);
     setMatrices((prev) => {
       const next = { ...prev };
       targets.forEach((g) => {
@@ -204,7 +224,7 @@ const RoundsDrawDialog = ({
   /* ------------------------ planning vooraf aanmaken ------------------------ */
 
   const prepare = async () => {
-    for (const g of groups) {
+    for (const g of drawGroups) {
       if (g.freeSlots > 0) {
         toast({ title: `${g.name} is nog niet volledig`, description: "Deel eerst alle teams in de groepen in.", variant: "destructive" });
         return;
@@ -230,7 +250,7 @@ const RoundsDrawDialog = ({
     await new Promise((r) => setTimeout(r, 30));
     try {
       const result: GroupDraw[] = [];
-      for (const g of groups) {
+      for (const g of drawGroups) {
         const potIndex = new Map<string, number>();
         g.pots.forEach((p, i) => p.teamIds.forEach((id) => potIndex.set(id, i)));
         const schedule = buildSchedule(
@@ -256,7 +276,7 @@ const RoundsDrawDialog = ({
         });
       }
       result.forEach((d) => {
-        if (d.warning) toast({ title: groups.find((g) => g.id === d.groupId)?.name, description: d.warning });
+        if (d.warning) toast({ title: drawGroups.find((g) => g.id === d.groupId)?.name, description: d.warning });
       });
       setDraws(result);
       setTeamIdx({});
@@ -272,7 +292,7 @@ const RoundsDrawDialog = ({
   /* ------------------------------- onthulling ------------------------------- */
 
   const activeDraw = draws[activeGroupIdx];
-  const activeGroup = groups.find((g) => g.id === activeDraw?.groupId);
+  const activeGroup = drawGroups.find((g) => g.id === activeDraw?.groupId);
   const potOf = (group: GroupInfo | undefined, teamId: string) => group?.pots.findIndex((p) => p.teamIds.includes(teamId)) ?? 0;
   const currentIdx = activeDraw ? teamIdx[activeDraw.groupId] ?? -1 : -1;
   const currentTeamId = activeDraw && currentIdx >= 0 ? activeDraw.order[currentIdx] : null;
@@ -326,7 +346,7 @@ const RoundsDrawDialog = ({
     try {
       let total = 0;
       for (const d of draws) {
-        const g = groups.find((x) => x.id === d.groupId)!;
+        const g = drawGroups.find((x) => x.id === d.groupId)!;
         const { data: existing } = await supabase
           .from("matches")
           .select("id, round_number")
@@ -375,7 +395,7 @@ const RoundsDrawDialog = ({
           phaseName: phaseName || null,
           rules: { sameCountry, maxMeetings, forbiddenPairs },
           groups: draws.map((d) => {
-            const g = groups.find((x) => x.id === d.groupId)!;
+             const g = drawGroups.find((x) => x.id === d.groupId)!;
             return {
               group: g.name,
               pots: g.pots.map((p) => ({ name: p.name, teams: p.teamIds.map((id) => teamById.get(id)?.name || id) })),
@@ -409,31 +429,58 @@ const RoundsDrawDialog = ({
     );
   };
 
-  const editGroup = groups.find((g) => g.id === editGroupId) || groups[0];
-  const matrixGroup = sameForAll && canShare ? groups[0] : editGroup;
+  const editGroup = drawGroups.find((g) => g.id === editGroupId) || drawGroups[0];
+  const matrixGroup = sameForAll && canShare ? drawGroups[0] : editGroup;
+
+  const methodScreen = (
+    <div className="space-y-5 overflow-y-auto pr-1">
+      <div>
+        <h3 className="text-lg font-bold">Kies je type loting</h3>
+        <p className="text-sm text-muted-foreground">{phaseName || "Speelrondes"} · {groups.length} poules</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {([
+          { id: "free" as const, label: "VRIJE SPEELRONDELOTING", description: "Elk team speelt het opgegeven aantal rondes tegen willekeurige tegenstanders." },
+          { id: "pots" as const, label: "LOTING MET NIVEAU-POTTEN", description: "Teams worden via potten ingedeeld en het schema volgt een potmatrix." },
+        ]).map((option) => {
+          const disabled = option.id === "pots" && !potDrawAvailable;
+          const selected = method === option.id;
+          return <Button key={option.id} type="button" variant="outline" aria-pressed={selected} disabled={disabled}
+            onClick={() => setMethod(option.id)}
+            className={`relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal border-2 border-y-2 p-5 text-left hover:bg-secondary ${selected ? "border-y-primary border-x-primary/40 bg-primary/[0.06]" : "border-border bg-card"}`}>
+            <span className="flex w-full items-start justify-between gap-2 text-sm font-bold text-foreground">
+              {option.label}{selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
+            </span>
+            <span className="text-xs font-normal leading-relaxed text-muted-foreground">{option.description}</span>
+          </Button>;
+        })}
+      </div>
+      {!potDrawAvailable && <p className="flex items-start gap-2 text-sm text-warning"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Loting met niveau-potten vereist minimaal 4 teams en een even aantal teams per poule. Vul ook alle plaatsen in.</p>}
+    </div>
+  );
 
   const settings = (
-    <div className="space-y-5 overflow-y-auto pr-1">
+    <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
       <div>
         <h3 className="text-lg font-semibold">Speelrondes loten</h3>
         <p className="text-sm text-muted-foreground">Bepaal hoeveel tegenstanders elk team uit iedere pot loot. De speelrondes worden vóór de loting volledig aangemaakt en gecontroleerd.</p>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        {groups.map((g) => (
-          <div key={g.id} className="rounded-lg border border-border bg-card p-3 text-sm">
+        {drawGroups.map((g) => (
+          <div key={g.id} className="rounded-md border border-primary/25 bg-card p-3 text-sm">
             <div className="font-semibold">{g.name}</div>
             <div className="text-muted-foreground">
               {g.teamIds.length} teams · {g.rounds} speelrondes · {matchesPerTeam(g.teamIds.length, g.rounds)} wedstrijden per team
             </div>
-            <div className="text-xs text-muted-foreground">{g.pots.map((p) => `${p.name} (${p.teamIds.length})`).join(" · ")}</div>
+            {method === "pots" && <div className="text-xs text-muted-foreground">{g.pots.map((p) => `${p.name} (${p.teamIds.length})`).join(" · ")}</div>}
             {g.freeSlots > 0 && <div className="mt-1 text-xs text-destructive">Nog {g.freeSlots} lege plaatsen in deze groep.</div>}
             {g.hasPlayed && <div className="mt-1 text-xs text-destructive">Er zijn al wedstrijden gespeeld.</div>}
           </div>
         ))}
       </div>
 
-      {groups.length > 1 && (
+      {drawGroups.length > 1 && (
         <RadioGroup value={sameForAll && canShare ? "same" : "per"} onValueChange={(v) => setSameForAll(v === "same")} className="flex flex-wrap gap-4">
           <label className={`flex items-center gap-2 text-sm ${!canShare ? "opacity-50" : ""}`}>
             <RadioGroupItem value="same" disabled={!canShare} /> Dezelfde instellingen voor alle groepen
@@ -445,7 +492,7 @@ const RoundsDrawDialog = ({
       )}
 
       {matrixGroup && (
-        <div className="rounded-lg border border-border bg-card p-4">
+        <div className="rounded-md border border-primary/25 bg-card p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <div className="font-semibold">Verdeling van tegenstanders per pot</div>
@@ -455,7 +502,7 @@ const RoundsDrawDialog = ({
               {!(sameForAll && canShare) && groups.length > 1 && (
                 <Select value={editGroup?.id} onValueChange={setEditGroupId}>
                   <SelectTrigger className="h-8 w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>{groups.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{drawGroups.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}</SelectContent>
                 </Select>
               )}
               <Button size="sm" variant="outline" onClick={() => resetMatrix(matrixGroup.id)}>Standaard</Button>
@@ -501,9 +548,9 @@ const RoundsDrawDialog = ({
 
       <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
         <CollapsibleTrigger asChild>
-          <Button variant="outline" className="w-full justify-between">Geavanceerde regels <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
+            <Button variant="outline" className="w-full justify-between">Geavanceerde regels <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-4 rounded-lg border border-border bg-card p-4">
+        <CollapsibleContent className="mt-3 space-y-4 rounded-md border border-primary/25 bg-card p-4">
           <div>
             <Label className="font-semibold">Teams uit hetzelfde land</Label>
             <RadioGroup value={sameCountry} onValueChange={(v) => setSameCountry(v as SameCountryMode)} className="mt-2 space-y-1">
@@ -521,11 +568,11 @@ const RoundsDrawDialog = ({
             <div className="mt-2 flex flex-wrap gap-2">
               <Select value={pairA} onValueChange={setPairA}>
                 <SelectTrigger className="h-8 w-44"><SelectValue placeholder="Team" /></SelectTrigger>
-                <SelectContent>{groups.flatMap((g) => g.teamIds).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
+                 <SelectContent>{drawGroups.flatMap((g) => g.teamIds).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={pairB} onValueChange={setPairB}>
                 <SelectTrigger className="h-8 w-44"><SelectValue placeholder="Team" /></SelectTrigger>
-                <SelectContent>{groups.flatMap((g) => g.teamIds).filter((id) => id !== pairA).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
+                 <SelectContent>{drawGroups.flatMap((g) => g.teamIds).filter((id) => id !== pairA).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
               </Select>
               <Button size="sm" variant="outline" disabled={!pairA || !pairB} onClick={() => { setForbiddenPairs((p) => [...p, [pairA, pairB]]); setPairA(""); setPairB(""); }}>
                 <Plus className="h-4 w-4" /> Toevoegen
@@ -552,7 +599,7 @@ const RoundsDrawDialog = ({
         {draws.length > 1 && (
           <div className="mb-3 flex flex-wrap gap-2">
             {draws.map((d, i) => {
-              const g = groups.find((x) => x.id === d.groupId);
+               const g = drawGroups.find((x) => x.id === d.groupId);
               return (
                 <Button key={d.groupId} size="sm" variant={i === activeGroupIdx ? "default" : "outline"} disabled={queue.length > 0} onClick={() => setActiveGroupIdx(i)}>
                   {g?.name} {groupDone(d) && <Check className="h-3.5 w-3.5" />}
@@ -642,17 +689,28 @@ const RoundsDrawDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={step === "draw" ? "inset-0 left-0 top-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-4 sm:p-6" : "max-w-4xl"}>
-        <DialogHeader className={step === "draw" ? "shrink-0 border-b border-border pb-3" : ""}>
+       <DialogContent scrollable={false} className={step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-4xl border-primary/30 bg-background"}>
+         <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
           <DialogTitle>Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
         </DialogHeader>
+         <div aria-label="Voortgang live loting" className="grid grid-cols-3 gap-2 border-b border-primary/20 pb-3">
+           {(["Type loting", "Regels & matrix", "Loting & Schema"] as const).map((label, index) => {
+             const active = ["method", "settings", "draw"].indexOf(step) === index;
+             const done = ["method", "settings", "draw"].indexOf(step) > index;
+             return <div key={label} aria-current={active ? "step" : undefined} className={`min-w-0 border-y-2 px-2 py-2 text-xs font-semibold sm:px-3 ${active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/50 bg-card text-foreground" : "border-border bg-card text-muted-foreground"}`}>
+               <span className="block text-[10px] uppercase">Stap {index + 1}</span><span>{label}</span>
+             </div>;
+           })}
+         </div>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
-        ) : step === "settings" ? settings : drawScreen}
+         ) : step === "method" ? methodScreen : step === "settings" ? settings : drawScreen}
         <DialogFooter className="shrink-0 gap-2">
-          {step === "settings" ? (
+           {step === "method" ? (
+             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={nextToRules} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>Verder naar regels & matrix</Button></>
+           ) : step === "settings" ? (
             <>
-              <Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button>
+               <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button>
               <Button onClick={prepare} disabled={checking || groups.length === 0}>
                 {checking ? "Speelrondes aanmaken..." : "Naar de loting"}
               </Button>
