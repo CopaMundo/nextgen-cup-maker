@@ -688,7 +688,7 @@ const RoundsDrawDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-       <DialogContent scrollable={false} className={step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-4xl border-primary/30 bg-background"}>
+       <DialogContent scrollable={false} className={`rounds-draw-theme text-foreground ${step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-4xl border-primary/30 bg-background"}`}>
          <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
           <DialogTitle>Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
         </DialogHeader>
