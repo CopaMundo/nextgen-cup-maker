@@ -19,6 +19,9 @@ import {
   type ScheduledMatch,
 } from "@/lib/roundsSchedule";
 import { shuffle } from "@/lib/liveDraw";
+import { DndContext, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 interface Team {
   id: string;
@@ -46,6 +49,18 @@ interface GroupDraw {
 
 const REVEAL_MS = 1300;
 
+const DraggableTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  return <div ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform) }} className={`flex min-w-0 items-center gap-2 border border-border bg-background px-2 py-2 text-sm ${isDragging ? "relative z-50 opacity-70" : ""}`}>
+    <span {...attributes} {...listeners} aria-label="Team verplaatsen" className="cursor-grab touch-none text-muted-foreground"><GripVertical className="h-4 w-4" /></span>{children}
+  </div>;
+};
+
+const PotZone = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return <div ref={setNodeRef} className={`min-h-16 space-y-1 p-1 ${isOver ? "bg-primary/10 ring-2 ring-primary/30" : ""}`}>{children}</div>;
+};
+
 const RoundsDrawDialog = ({
   open,
   onOpenChange,
@@ -67,10 +82,14 @@ const RoundsDrawDialog = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"method" | "settings" | "draw">("method");
+  const [step, setStep] = useState<"method" | "pots" | "settings" | "draw">("method");
   const [method, setMethod] = useState<"free" | "pots">("free");
   const [teams, setTeams] = useState<Team[]>([]);
   const [groups, setGroups] = useState<GroupInfo[]>([]);
+  const [potGroups, setPotGroups] = useState<Record<string, GroupInfo["pots"]>>({});
+  const [potError, setPotError] = useState("");
+  const [potGroupId, setPotGroupId] = useState("");
+  const potSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
   const [sameForAll, setSameForAll] = useState(true);
   const [matrices, setMatrices] = useState<Record<string, number[][]>>({});
   const [editGroupId, setEditGroupId] = useState<string>("");
@@ -139,6 +158,8 @@ const RoundsDrawDialog = ({
         };
       });
       setGroups(infos);
+      setPotGroups(Object.fromEntries(infos.map((g) => [g.id, g.pots.length > 1 && g.pots.every((p) => p.teamIds.length === g.teamIds.length / g.pots.length) ? g.pots : []])));
+      setPotGroupId(infos[0]?.id || "");
       setEditGroupId(infos[0]?.id || "");
       const initial: Record<string, number[][]> = {};
       infos.forEach((g) => {
@@ -160,6 +181,7 @@ const RoundsDrawDialog = ({
     if (!open) return;
     setStep("method");
     setMethod("free");
+    setPotError("");
     setDraws([]);
     setTeamIdx({});
     setRevealed({});
@@ -172,7 +194,7 @@ const RoundsDrawDialog = ({
     load();
   }, [open, phaseId]);
 
-  // Vrij loten negeert bestaande potten; met niveau-potten blijft de bestaande potindeling leidend.
+  // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
   const drawGroups = useMemo(() => method === "pots" ? groups : groups.map((g) => ({
     ...g, pots: [{ id: "all", name: "Alle teams", teamIds: g.teamIds }],
   })), [groups, method]);
