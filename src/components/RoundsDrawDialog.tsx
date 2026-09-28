@@ -530,7 +530,7 @@ const RoundsDrawDialog = ({
   const potScreen = (
     <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
       <div><h3 className="text-lg font-bold">Potindeling</h3><p className="text-sm text-muted-foreground">Verdeel de teams per poule gelijkmatig over de niveau-potten.</p></div>
-      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant={potGroup?.id === g.id ? "default" : "outline"} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
+      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
       {potGroup && <>
         <div className="space-y-2"><Label>Aantal potten · {potGroup.teamIds.length} teams</Label><div className="flex flex-wrap gap-2">
           {potOptions.map((count) => <Button key={count} variant="outline" aria-pressed={groupPots.length === count} onClick={() => selectPotCount(potGroup, count)} className={`draw-choice h-auto flex-col items-start px-4 py-2 ${groupPots.length === count ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
@@ -714,7 +714,7 @@ const RoundsDrawDialog = ({
             {draws.map((d, i) => {
                const g = drawGroups.find((x) => x.id === d.groupId);
               return (
-                <Button key={d.groupId} size="sm" variant={i === activeGroupIdx ? "default" : "outline"} disabled={queue.length > 0} onClick={() => setActiveGroupIdx(i)}>
+                <Button key={d.groupId} size="sm" variant="outline" aria-pressed={i === activeGroupIdx} className={`draw-choice ${i === activeGroupIdx ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} disabled={queue.length > 0} onClick={() => setActiveGroupIdx(i)}>
                   {g?.name} {groupDone(d) && <Check className="h-3.5 w-3.5" />}
                 </Button>
               );
