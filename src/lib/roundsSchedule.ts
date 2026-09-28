@@ -115,6 +115,7 @@ export function buildSchedule(
   const byId = new Map(teams.map((t) => [t.id, t]));
   const deadline = Date.now() + timeBudgetMs;
   const maxMeet = Math.max(1, rules.maxMeetings);
+  let homeAwayFailed = false;
 
   for (let attempt = 0; Date.now() < deadline; attempt++) {
     // need[team][pot]
@@ -197,10 +198,18 @@ export function buildSchedule(
       const c = byId.get(m.homeId)?.country;
       return c && c === byId.get(m.awayId)?.country;
     }).length;
+    // Topaffiches (Pot 1 tegen Pot 1) evenwichtig over de speelrondes spreiden.
+    const tops = new Array(rounds).fill(0);
+    matches.forEach((m) => {
+      if (byId.get(m.homeId)!.potIndex === 0 && byId.get(m.awayId)!.potIndex === 0) tops[m.round - 1]++;
+    });
+    if (Math.max(...tops) - Math.min(...tops) > 1 && Date.now() < deadline - timeBudgetMs / 3) continue;
     const oriented = assignHomeAway(matches, byId);
-    if (!oriented) continue;
+    if (!oriented) { homeAwayFailed = true; continue; }
     return { ok: true, matches: oriented, sameCountryCount };
   }
+  if (homeAwayFailed)
+    return fail("Er is geen schema gevonden met een evenwichtige thuis/uit-verdeling (max. 2x op rij thuis of uit). Pas het aantal speelrondes of de verdeling per pot aan.");
   return fail(
     "Met deze instellingen kunnen de speelrondes niet volledig worden aangemaakt. Pas de verdeling per pot of de regels aan."
   );
@@ -260,7 +269,7 @@ export function assignHomeAway(
     }
     if (!ok) continue;
     // Controle: balans per pot max. 1 verschil.
-    if ([...bal.values()].some((v) => Math.abs(v) > 1) && t < attempts - 1) continue;
+    if ([...bal.values()].some((v) => Math.abs(v) > 1)) continue;
     return out;
   }
   return null;
