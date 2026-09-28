@@ -509,7 +509,7 @@ const RoundsDrawDialog = ({
           const selected = method === option.id;
           return <Button key={option.id} type="button" variant="outline" aria-pressed={selected} disabled={disabled}
             onClick={() => setMethod(option.id)}
-            className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal p-5 text-left hover:bg-secondary ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
+            className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal p-5 text-left ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
             <span className="flex w-full items-start justify-between gap-2 text-sm font-bold text-foreground">
               {option.label}{selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
             </span>
