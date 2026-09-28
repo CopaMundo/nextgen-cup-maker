@@ -2537,6 +2537,12 @@ posities + statistieken groen */
   background: hsl(var(--card));
 }
 
+.draw-dialog-theme > div:first-child {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .draw-dialog-theme .draw-choice {
   border-left: 0;
   border-right: 0;
