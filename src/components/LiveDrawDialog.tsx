@@ -912,7 +912,7 @@ const LiveDrawDialog = ({
                       onClick={() => setUsePots(opt.value)}
                       className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-0 whitespace-normal p-5 text-left transition-all ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}
                     >
-                      {selected && <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3 w-3" /></span>}
+                      {selected && <Check className="absolute right-3 top-3 h-4 w-4 text-primary" />}
                       <p className="text-xs font-bold uppercase tracking-wide text-foreground">{opt.label}</p>
                       <p className="mt-2 text-sm font-semibold">{opt.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{opt.text}</p>
