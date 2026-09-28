@@ -775,7 +775,7 @@ const LiveDrawDialog = ({
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {session.containers.map((container) => (
-            <div key={container.id} className="rounded-lg border border-border bg-card p-3">
+            <div key={container.id} className="draw-panel p-3">
               <h3 className="mb-2 text-sm font-bold">{container.name}</h3>
               <div className="space-y-1.5">
                 {container.teamIds.map((id) => <div key={id} className="rounded-md bg-muted/50 px-2 py-2 text-xs"><TeamChip id={id} /></div>)}
@@ -789,7 +789,7 @@ const LiveDrawDialog = ({
       </section>
 
       <aside className="min-h-0 overflow-y-auto">
-        <div className="space-y-4 rounded-lg border border-border bg-card p-4">
+        <div className="draw-panel space-y-4 p-4">
           <div>
             <p className="text-xs font-semibold uppercase text-muted-foreground">Actieve trekking</p>
             <h2 className="text-lg font-bold">{session.mode === "pots" ? (pending ? activePot?.name : activePotChoice?.name) || "Pot" : "Volledig willekeurig"}</h2>
@@ -804,16 +804,18 @@ const LiveDrawDialog = ({
                   const left = pot.teamIds.filter((id) => session.remaining.includes(id)).length;
                   const selected = activePotChoice?.id === pot.id;
                   return (
-                    <button
+                    <Button
                       key={pot.id}
                       type="button"
+                      variant="outline"
+                      aria-pressed={selected}
                       disabled={left === 0 || !!pending}
                       onClick={() => setSelectedPotId(pot.id)}
-                      className={`rounded-md border-2 px-2 py-1.5 text-left text-xs transition-all disabled:opacity-40 ${selected ? "border-primary bg-primary/[0.06]" : "border-border hover:border-primary/30"}`}
+                      className={`draw-choice h-auto flex-col items-start px-2 py-1.5 text-left text-xs transition-all disabled:opacity-40 ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}
                     >
                       <span className="block font-bold">{pot.name}</span>
                       <span className="text-muted-foreground">{left} resterend</span>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -838,7 +840,7 @@ const LiveDrawDialog = ({
 
           {pending && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 rounded-lg bg-primary/10 p-4">
+              <div className="draw-choice flex items-center gap-3 border-y-2 border-y-primary bg-primary/[0.06] p-4">
                 {pendingTeam?.logoUrl && <img src={pendingTeam.logoUrl} alt="" className="h-12 w-12 object-contain" />}
                 <div className="min-w-0">
                   <div className="flex items-center gap-2"><CountryFlag country={pendingTeam?.country} /><span className="truncate text-lg font-bold">{pendingTeam?.name}</span></div>
@@ -879,8 +881,8 @@ const LiveDrawDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className={step === "draw" ? "inset-0 left-0 top-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-4 sm:p-6" : "max-w-5xl"}>
-          <DialogHeader className={step === "draw" ? "shrink-0 border-b border-border pb-3" : ""}>
+        <DialogContent scrollable={false} className={`draw-dialog-theme text-foreground ${step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-5xl border-primary/30 bg-background"}`}>
+          <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
             <DialogTitle className="flex items-center gap-2">
               {step === "draw" && <Maximize2 className="h-4 w-4" />}
               Live loting{phaseName ? ` · ${phaseName}` : ""}
@@ -890,7 +892,7 @@ const LiveDrawDialog = ({
           {loading && step !== "draw" ? (
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
           ) : step === "method" ? (
-            <div className="space-y-4">
+            <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
               <div>
                 <h2 className="text-lg font-bold">Kies je lotingsmethode</h2>
                 <p className="text-xs text-muted-foreground">{teams.length} teams · {containers.length} groepen · {totalCapacity} vrije plaatsen</p>
@@ -902,18 +904,19 @@ const LiveDrawDialog = ({
                 ].map((opt) => {
                   const selected = usePots === opt.value;
                   return (
-                    <button
+                    <Button
                       key={opt.label}
                       type="button"
+                      variant="outline"
                       aria-pressed={selected}
                       onClick={() => setUsePots(opt.value)}
-                      className={`relative rounded-lg border-2 p-5 text-left transition-all ${selected ? "border-primary bg-primary/[0.06]" : "border-border hover:border-primary/30"}`}
+                      className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-0 whitespace-normal p-5 text-left transition-all ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}
                     >
                       {selected && <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3 w-3" /></span>}
                       <p className="text-xs font-bold uppercase tracking-wide text-foreground">{opt.label}</p>
                       <p className="mt-2 text-sm font-semibold">{opt.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{opt.text}</p>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -931,15 +934,17 @@ const LiveDrawDialog = ({
                   {Array.from({ length: Math.min(12, Math.max(1, teams.length)) }, (_, i) => i + 1).filter((n) => n >= 2 || teams.length < 2).map((count) => {
                     const selected = pots.length === count;
                     return (
-                      <button
+                      <Button
                         key={count}
                         type="button"
+                        variant="outline"
+                        aria-pressed={selected}
                         onClick={() => { if (pots.length !== count || pots.some((p) => p.teamIds.length)) void createEmptyPots(count); }}
-                        className={`rounded-lg border-2 p-3 text-left transition-all ${selected ? "border-primary bg-primary/[0.06]" : "border-border hover:border-primary/30"}`}
+                        className={`draw-choice h-auto flex-col items-start gap-0 whitespace-normal p-3 text-left transition-all ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}
                       >
                         <p className="text-sm font-bold">{count} potten</p>
                         <p className="text-[11px] text-muted-foreground">{teams.length} teams · {potOptionLabel(count)}</p>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -955,7 +960,7 @@ const LiveDrawDialog = ({
                     {pots.map((pot, index) => {
                       const expected = expectedSizes(pots.length)[index] ?? 0;
                       return (
-                        <div key={pot.id} className="space-y-2 rounded-lg border border-border bg-card p-3">
+                        <div key={pot.id} className="draw-panel space-y-2 p-3">
                           <div className="flex items-center gap-2">
                             <Input value={pot.name} onChange={(event) => renamePot(pot.id, event.target.value)} className="h-9 text-sm font-bold" aria-label="Potnaam" />
                             <span className={`whitespace-nowrap text-xs font-semibold ${pot.teamIds.length === expected ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length} / {expected} teams</span>
@@ -987,20 +992,20 @@ const LiveDrawDialog = ({
               )}
 
               {pots.length > 0 && (
-                <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="rounded-lg border border-border">
+                <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="draw-panel">
                   <CollapsibleTrigger asChild>
-                    <button type="button" className="flex w-full items-center justify-between gap-3 p-3 text-left">
+                    <Button type="button" variant="ghost" className="h-auto w-full justify-between gap-3 whitespace-normal p-3 text-left">
                       <span>
                         <span className="block text-sm font-bold">Geavanceerde instellingen</span>
                         <span className="block text-xs text-muted-foreground">Pas de verdeling en regels aan wanneer je meer controle nodig hebt.</span>
                       </span>
                       <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
-                    </button>
+                    </Button>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="space-y-5 border-t border-border p-3">
                     <section className="space-y-2">
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verdeling van potten over groepen</h3>
-                      <div className="rounded-lg border border-border p-3">
+                      <div className="draw-panel p-3">
                         <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
                         <p className="text-xs text-muted-foreground">Copa Mundo verdeelt de teams uit elke pot zo gelijk mogelijk over de groepen. Het verschil tussen groepen is maximaal één team; welke groepen een extra team krijgen, wordt willekeurig bepaald.</p>
                         <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
@@ -1010,7 +1015,7 @@ const LiveDrawDialog = ({
                           <CollapsibleContent className="mt-3 space-y-3">
                             <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
                             <div className="overflow-x-auto">
-                              <table className="w-full min-w-[520px] text-xs">
+                              <table className="draw-table min-w-[520px] text-xs">
                                 <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
                                 <tbody>
                                   {pots.map((pot) => {
@@ -1057,7 +1062,7 @@ const LiveDrawDialog = ({
           ) : drawContent}
 
           {step !== "draw" && (
-            <DialogFooter className="border-t border-border pt-4">
+            <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
               {step === "method" && <Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button>}
               {step === "pots" && <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar lotingsmethode</Button>}
               {step === "method" && usePots && <Button onClick={() => setStep("pots")}>Verder naar potindeling</Button>}
