@@ -189,10 +189,7 @@ export function buildSchedule(
         failed = true;
         break;
       }
-      for (const [a, b] of pairs) {
-        const flip = Math.random() < 0.5;
-        matches.push({ round, homeId: flip ? b : a, awayId: flip ? a : b });
-      }
+      for (const [a, b] of pairs) matches.push({ round, homeId: a, awayId: b });
     }
     if (failed) continue;
     if (teams.some((t) => total(t.id) !== 0)) continue;
@@ -200,9 +197,77 @@ export function buildSchedule(
       const c = byId.get(m.homeId)?.country;
       return c && c === byId.get(m.awayId)?.country;
     }).length;
-    return { ok: true, matches, sameCountryCount };
+    const oriented = assignHomeAway(matches, byId);
+    if (!oriented) continue;
+    return { ok: true, matches: oriented, sameCountryCount };
   }
   return fail(
     "Met deze instellingen kunnen de speelrondes niet volledig worden aangemaakt. Pas de verdeling per pot of de regels aan."
   );
+}
+
+/**
+ * Vaste kwaliteitsregels voor thuis/uit:
+ * - twee ontmoetingen tussen dezelfde teams: 1x thuis, 1x uit;
+ * - per team en per tegenstanderspot een evenwichtige thuis/uit-balans (verschil max. 1);
+ * - nooit meer dan 2 opeenvolgende thuis- of uitwedstrijden.
+ */
+export function assignHomeAway(
+  matches: ScheduledMatch[],
+  byId: Map<string, ScheduleTeam>,
+  attempts = 400
+): ScheduledMatch[] | null {
+  const sorted = [...matches].sort((a, b) => a.round - b.round);
+  for (let t = 0; t < attempts; t++) {
+    const out: ScheduledMatch[] = [];
+    const last = new Map<string, { side: "H" | "A"; streak: number; round: number }>();
+    const bal = new Map<string, number>(); // team|pot -> thuis - uit
+    const pairHome = new Map<string, string[]>();
+    let ok = true;
+    for (const m of shuffleWithinRounds(sorted)) {
+      const key = pairKey(m.homeId, m.awayId);
+      const prev = pairHome.get(key) || [];
+      const score = (h: string, a: string) => {
+        let s = 0;
+        const lh = last.get(h);
+        const la = last.get(a);
+        if (lh && lh.side === "H" && lh.round === m.round - 1 && lh.streak >= 2) return Infinity;
+        if (la && la.side === "A" && la.round === m.round - 1 && la.streak >= 2) return Infinity;
+        const homes = prev.filter((x) => x === h).length;
+        if (prev.length % 2 === 1 && homes > prev.length - homes) return Infinity;
+        const bh = bal.get(`${h}|${byId.get(a)!.potIndex}`) || 0;
+        const ba = bal.get(`${a}|${byId.get(h)!.potIndex}`) || 0;
+        if (bh >= 1 || ba <= -1) s += 10;
+        if (lh?.side === "H" && lh.round === m.round - 1) s += 1;
+        if (la?.side === "A" && la.round === m.round - 1) s += 1;
+        return s + Math.random();
+      };
+      const s1 = score(m.homeId, m.awayId);
+      const s2 = score(m.awayId, m.homeId);
+      if (s1 === Infinity && s2 === Infinity) { ok = false; break; }
+      const [h, a] = s1 <= s2 ? [m.homeId, m.awayId] : [m.awayId, m.homeId];
+      const push = (id: string, side: "H" | "A") => {
+        const l = last.get(id);
+        const streak = l && l.side === side && l.round === m.round - 1 ? l.streak + 1 : 1;
+        last.set(id, { side, streak, round: m.round });
+      };
+      push(h, "H");
+      push(a, "A");
+      bal.set(`${h}|${byId.get(a)!.potIndex}`, (bal.get(`${h}|${byId.get(a)!.potIndex}`) || 0) + 1);
+      bal.set(`${a}|${byId.get(h)!.potIndex}`, (bal.get(`${a}|${byId.get(h)!.potIndex}`) || 0) - 1);
+      pairHome.set(key, [...prev, h]);
+      out.push({ round: m.round, homeId: h, awayId: a });
+    }
+    if (!ok) continue;
+    // Controle: balans per pot max. 1 verschil.
+    if ([...bal.values()].some((v) => Math.abs(v) > 1) && t < attempts - 1) continue;
+    return out;
+  }
+  return null;
+}
+
+function shuffleWithinRounds(ms: ScheduledMatch[]): ScheduledMatch[] {
+  const byRound = new Map<number, ScheduledMatch[]>();
+  ms.forEach((m) => byRound.set(m.round, [...(byRound.get(m.round) || []), m]));
+  return [...byRound.keys()].sort((a, b) => a - b).flatMap((r) => shuffle(byRound.get(r)!));
 }

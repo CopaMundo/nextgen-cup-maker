@@ -638,8 +638,25 @@ const RoundsDrawDialog = ({
               </tbody>
             </table>
           </div>
+          {(() => {
+            const target = matchesPerTeam(matrixGroup.teamIds.length, matrixGroup.rounds);
+            const err = validateMatrix(matrices[matrixGroup.id] || [], matrixGroup.pots.map((p) => p.teamIds.length), matrixGroup.pots.map((p) => p.name), target, maxMeetings);
+            return (
+              <p className={`mt-3 text-xs ${err ? "text-destructive" : "text-primary"}`}>
+                {err ?? `Klopt: elk team speelt exact ${target} wedstrijden over ${matrixGroup.rounds} speelrondes.`}
+              </p>
+            );
+          })()}
         </div>
       )}
+
+      <div className="rounded-md border border-primary/25 bg-card p-4 text-sm">
+        <div className="font-semibold">Vaste kwaliteitsregels</div>
+        <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
+          <li>Evenwichtige thuis/uit-balans per pot: bij 2 ontmoetingen speelt elk team 1x thuis en 1x uit.</li>
+          <li>Nooit meer dan 2 opeenvolgende thuis- of uitwedstrijden.</li>
+        </ul>
+      </div>
 
       <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
         <CollapsibleTrigger asChild>
@@ -649,9 +666,9 @@ const RoundsDrawDialog = ({
           <div>
             <Label className="font-semibold">Teams uit hetzelfde land</Label>
             <RadioGroup value={sameCountry} onValueChange={(v) => setSameCountry(v as SameCountryMode)} className="mt-2 space-y-1">
-              <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="allow" /> Niet vermijden</label>
-              <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="avoid" /> Zo lang mogelijk vermijden</label>
-              <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="never" /> Nooit tegen elkaar</label>
+              <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="allow" /> Altijd toestaan</label>
+              <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="avoid" /> Zo lang mogelijk vermijden (voorkeur)</label>
+              <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="never" /> Strikt verbieden</label>
             </RadioGroup>
           </div>
           <div className="flex items-center gap-3">
@@ -659,7 +676,8 @@ const RoundsDrawDialog = ({
             <Input type="number" min={1} className="h-8 w-16" value={maxMeetings} onChange={(e) => setMaxMeetings(Math.max(1, Number(e.target.value) || 1))} />
           </div>
           <div>
-            <Label className="font-semibold">Teams nooit tegen elkaar</Label>
+            <Label className="font-semibold">Geblokkeerde ontmoetingen</Label>
+            <p className="text-xs text-muted-foreground">Deze teams worden nooit tegen elkaar geloot.</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <Select value={pairA} onValueChange={setPairA}>
                 <SelectTrigger className="h-8 w-44"><SelectValue placeholder="Team" /></SelectTrigger>
