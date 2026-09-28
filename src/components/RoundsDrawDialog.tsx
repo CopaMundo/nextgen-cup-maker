@@ -509,7 +509,7 @@ const RoundsDrawDialog = ({
           const selected = method === option.id;
           return <Button key={option.id} type="button" variant="outline" aria-pressed={selected} disabled={disabled}
             onClick={() => setMethod(option.id)}
-            className={`relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal border-x-0 border-y-2 p-5 text-left hover:bg-secondary ${selected ? "border-y-primary bg-primary/[0.06]" : "border-y-border bg-card"}`}>
+            className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal p-5 text-left ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
             <span className="flex w-full items-start justify-between gap-2 text-sm font-bold text-foreground">
               {option.label}{selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
             </span>
@@ -530,19 +530,19 @@ const RoundsDrawDialog = ({
   const potScreen = (
     <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
       <div><h3 className="text-lg font-bold">Potindeling</h3><p className="text-sm text-muted-foreground">Verdeel de teams per poule gelijkmatig over de niveau-potten.</p></div>
-      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant={potGroup?.id === g.id ? "default" : "outline"} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
+      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
       {potGroup && <>
         <div className="space-y-2"><Label>Aantal potten · {potGroup.teamIds.length} teams</Label><div className="flex flex-wrap gap-2">
-          {potOptions.map((count) => <Button key={count} variant="outline" aria-pressed={groupPots.length === count} onClick={() => selectPotCount(potGroup, count)} className={`h-auto flex-col items-start border-x-0 border-y-2 px-4 py-2 ${groupPots.length === count ? "border-y-primary bg-primary/[0.06]" : "border-y-border bg-card"}`}>
+          {potOptions.map((count) => <Button key={count} variant="outline" aria-pressed={groupPots.length === count} onClick={() => selectPotCount(potGroup, count)} className={`draw-choice h-auto flex-col items-start px-4 py-2 ${groupPots.length === count ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
             <span className="font-semibold">{count} potten</span><span className="text-xs text-muted-foreground">{potGroup.teamIds.length / count} teams per pot</span>
           </Button>)}
         </div></div>
         {groupPots.length > 0 && <DndContext sensors={potSensors} onDragEnd={(event: DragEndEvent) => { if (event.over) movePotTeam(potGroup.id, String(event.active.id), String(event.over.id)); }}>
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="border border-border bg-card p-3"><div className="mb-2 font-semibold">Niet ingedeeld <span className="text-muted-foreground">{unassigned.length}</span></div>
+            <div className="draw-panel p-3"><div className="mb-2 text-sm font-bold">Niet ingedeeld <span className="text-muted-foreground">{unassigned.length}</span></div>
               <PotZone id="unassigned">{unassigned.map((id) => <DraggableTeam key={id} id={id}><TeamChip id={id} /></DraggableTeam>)}</PotZone>
             </div>
-            {groupPots.map((pot) => <div key={pot.id} className="border border-border bg-card p-3">
+            {groupPots.map((pot) => <div key={pot.id} className="draw-panel p-3">
               <div className="mb-2 flex items-center gap-2"><Input aria-label="Potnaam" value={pot.name} onChange={(e) => setPotGroups((prev) => ({ ...prev, [potGroup.id]: (prev[potGroup.id] || []).map((p) => p.id === pot.id ? { ...p, name: e.target.value } : p) }))} className="h-8 min-w-0 flex-1 font-semibold" /><span className={`shrink-0 text-sm font-bold ${pot.teamIds.length === potGroup.teamIds.length / groupPots.length ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length}/{potGroup.teamIds.length / groupPots.length}</span></div>
               <PotZone id={pot.id}>{pot.teamIds.map((id) => <div key={id} className="flex items-center gap-1"><div className="min-w-0 flex-1"><DraggableTeam id={id}><TeamChip id={id} /></DraggableTeam></div><Button size="icon" variant="ghost" aria-label={`${teamById.get(id)?.name || "Team"} verwijderen uit ${pot.name}`} onClick={() => movePotTeam(potGroup.id, id, "unassigned")}><Trash2 className="h-4 w-4" /></Button></div>)}</PotZone>
               {unassigned.length > 0 && pot.teamIds.length < potGroup.teamIds.length / groupPots.length && <Select onValueChange={(id) => movePotTeam(potGroup.id, id, pot.id)}><SelectTrigger className="mt-2 h-8"><SelectValue placeholder="Team toevoegen" /></SelectTrigger><SelectContent>{unassigned.map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent></Select>}
@@ -563,7 +563,7 @@ const RoundsDrawDialog = ({
 
       <div className="grid gap-2 sm:grid-cols-2">
         {drawGroups.map((g) => (
-          <div key={g.id} className="rounded-md border border-primary/25 bg-card p-3 text-sm">
+          <div key={g.id} className="draw-panel p-3 text-sm">
             <div className="font-semibold">{g.name}</div>
             <div className="text-muted-foreground">
               {g.teamIds.length} teams · {g.rounds} speelrondes · {matchesPerTeam(g.teamIds.length, g.rounds)} wedstrijden per team
@@ -587,7 +587,7 @@ const RoundsDrawDialog = ({
       )}
 
       {matrixGroup && (
-        <div className="rounded-md border border-primary/25 bg-card p-4">
+        <div className="draw-panel p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <div className="font-semibold">Verdeling van tegenstanders per pot</div>
@@ -604,7 +604,7 @@ const RoundsDrawDialog = ({
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="text-sm">
+            <table className="draw-table text-sm">
               <thead>
                 <tr>
                   <th className="px-2 py-1 text-left text-xs text-muted-foreground">Eigen pot</th>
@@ -650,7 +650,7 @@ const RoundsDrawDialog = ({
         </div>
       )}
 
-      <div className="rounded-md border border-primary/25 bg-card p-4 text-sm">
+      <div className="draw-panel p-4 text-sm">
         <div className="font-semibold">Vaste kwaliteitsregels</div>
         <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
           <li>Evenwichtige thuis/uit-balans per pot: bij 2 ontmoetingen speelt elk team 1x thuis en 1x uit.</li>
@@ -662,7 +662,7 @@ const RoundsDrawDialog = ({
         <CollapsibleTrigger asChild>
             <Button variant="outline" className="w-full justify-between">Geavanceerde regels <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-4 rounded-md border border-primary/25 bg-card p-4">
+        <CollapsibleContent className="draw-panel mt-3 space-y-4 p-4">
           <div>
             <Label className="font-semibold">Teams uit hetzelfde land</Label>
             <RadioGroup value={sameCountry} onValueChange={(v) => setSameCountry(v as SameCountryMode)} className="mt-2 space-y-1">
@@ -708,13 +708,13 @@ const RoundsDrawDialog = ({
   const drawScreen = activeDraw && activeGroup && (
     <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]">
       {/* Links: overzicht */}
-      <div className="min-h-0 overflow-y-auto rounded-lg border border-border bg-card p-3">
+      <div className="draw-panel min-h-0 overflow-y-auto p-3">
         {draws.length > 1 && (
           <div className="mb-3 flex flex-wrap gap-2">
             {draws.map((d, i) => {
                const g = drawGroups.find((x) => x.id === d.groupId);
               return (
-                <Button key={d.groupId} size="sm" variant={i === activeGroupIdx ? "default" : "outline"} disabled={queue.length > 0} onClick={() => setActiveGroupIdx(i)}>
+                <Button key={d.groupId} size="sm" variant="outline" aria-pressed={i === activeGroupIdx} className={`draw-choice ${i === activeGroupIdx ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} disabled={queue.length > 0} onClick={() => setActiveGroupIdx(i)}>
                   {g?.name} {groupDone(d) && <Check className="h-3.5 w-3.5" />}
                 </Button>
               );
@@ -727,7 +727,7 @@ const RoundsDrawDialog = ({
             const known = list.filter((x) => revealedSet.has(x.i));
             const status = teamId === currentTeamId && queue.length ? "Bezig" : known.length === list.length ? "Volledig geloot" : known.length ? "Deels bekend" : "Nog niet gestart";
             return (
-              <div key={teamId} className={`rounded-md border px-2 py-1.5 text-sm ${teamId === currentTeamId ? "border-primary bg-primary/10" : "border-border"}`}>
+              <div key={teamId} className={`draw-choice border-y-2 px-2 py-1.5 text-sm ${teamId === currentTeamId ? "border-y-primary bg-primary/[0.06]" : "border-y-border"}`}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex min-w-0 items-center gap-2">
                     <span className="text-xs text-muted-foreground">{activeGroup.pots[potOf(activeGroup, teamId)]?.name}</span>
@@ -747,11 +747,11 @@ const RoundsDrawDialog = ({
       </div>
 
       {/* Rechts: actieve trekking */}
-      <div className="flex min-h-0 flex-col gap-3 overflow-y-auto rounded-lg border border-border bg-card p-4">
+      <div className="draw-panel flex min-h-0 flex-col gap-3 overflow-y-auto p-4">
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{activeGroup.name}</div>
         {currentTeamId ? (
           <>
-            <div className="rounded-lg border border-primary/40 bg-primary/5 p-4">
+            <div className="draw-choice border-y-2 border-y-primary bg-primary/[0.06] p-4">
               <div className="text-xs text-muted-foreground">{activeGroup.pots[potOf(activeGroup, currentTeamId)]?.name}</div>
               <TeamChip id={currentTeamId} big />
             </div>
@@ -802,14 +802,14 @@ const RoundsDrawDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-       <DialogContent scrollable={false} className={`rounds-draw-theme text-foreground ${step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-4xl border-primary/30 bg-background"}`}>
+       <DialogContent scrollable={false} className={`draw-dialog-theme text-foreground ${step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-5xl border-primary/30 bg-background"}`}>
          <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
           <DialogTitle>Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
         </DialogHeader>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
          ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? settings : drawScreen}
-        <DialogFooter className="shrink-0 gap-2">
+        <DialogFooter className="shrink-0 gap-2 border-t border-primary/30 pt-4">
            {step === "method" ? (
              <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>{method === "pots" ? "Verder naar potindeling" : "Verder naar instellingen"}</Button></>
            ) : step === "pots" ? (
