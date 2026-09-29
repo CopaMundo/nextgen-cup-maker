@@ -2509,29 +2509,17 @@ posities + statistieken groen */
   box-shadow: none !important;
 }
 
-/* Beide live lotingen gebruiken dezelfde donkere Copa Mundo-rollen, ook bij licht beheerthema. */
+/* Beide live lotingen volgen het actieve beheerthema met dezelfde Copa Mundo-accenten. */
 .draw-dialog-theme {
-  color-scheme: dark;
-  --background: 150 20% 6%;
-  --foreground: 0 0% 95%;
-  --card: 150 15% 10%;
-  --card-foreground: 0 0% 95%;
-  --popover: 150 15% 10%;
-  --popover-foreground: 0 0% 95%;
-  --primary: 52 100% 50%;
-  --primary-foreground: 150 30% 6%;
-  --secondary: 150 12% 15%;
-  --secondary-foreground: 0 0% 85%;
-  --muted: 150 10% 15%;
-  --muted-foreground: 150 8% 60%;
-  --accent: 52 100% 60%;
-  --accent-foreground: 150 30% 6%;
-  --border: 150 12% 18%;
-  --input: 150 12% 18%;
-  --ring: 52 100% 50%;
+  color-scheme: light;
 }
 
-.draw-dialog-theme .draw-panel {
+[data-mode="dark"] .draw-dialog-theme {
+  color-scheme: dark;
+}
+
+.draw-dialog-theme .draw-panel,
+.draw-panel {
   border: 1px solid hsl(var(--border));
   border-radius: 0.375rem;
   background: hsl(var(--card));
@@ -2543,7 +2531,8 @@ posities + statistieken groen */
   overflow: hidden;
 }
 
-.draw-dialog-theme .draw-choice {
+.draw-dialog-theme .draw-choice,
+.draw-choice {
   border-left: 0;
   border-right: 0;
   border-top-width: 2px;
@@ -2552,22 +2541,26 @@ posities + statistieken groen */
   background: hsl(var(--card));
 }
 
-.draw-dialog-theme .draw-choice[aria-pressed="true"] {
+.draw-dialog-theme .draw-choice[aria-pressed="true"],
+.draw-choice[aria-pressed="true"] {
   background: hsl(var(--primary) / 0.06);
 }
 
-.draw-dialog-theme .draw-table {
+.draw-dialog-theme .draw-table,
+.draw-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.draw-dialog-theme .draw-table th {
+.draw-dialog-theme .draw-table th,
+.draw-table th {
   border-bottom: 1px solid hsl(var(--border));
   color: hsl(var(--muted-foreground));
   font-weight: 600;
 }
 
-.draw-dialog-theme .draw-table tbody tr + tr {
+.draw-dialog-theme .draw-table tbody tr + tr,
+.draw-table tbody tr + tr {
   border-top: 1px solid hsl(var(--border));
 }
 

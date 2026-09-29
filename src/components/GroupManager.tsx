@@ -306,16 +306,24 @@ const GroupManager = ({
   const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [hasAssignedTeams, setHasAssignedTeams] = useState(false);
-  const [drawOpen, setDrawOpen] = useState(false);
-  const [roundsDrawOpen, setRoundsDrawOpen] = useState(false);
-  const [drawChoiceOpen, setDrawChoiceOpen] = useState(false);
+  type DrawView = "choice" | "groups" | "rounds" | null;
+  const [drawView, setDrawView] = useState<DrawView>(null);
   type DrawMode = "full" | "groups" | "rounds";
   const [drawMode, setDrawMode] = useState<DrawMode>("groups");
   const [pendingDrawMode, setPendingDrawMode] = useState<DrawMode | null>(null);
+  const drawViewStorageKey = `copa-live-draw-view:${phaseId}`;
+  useEffect(() => {
+    const saved = localStorage.getItem(drawViewStorageKey);
+    if (saved === "choice" || saved === "groups" || saved === "rounds") setDrawView(saved);
+  }, [drawViewStorageKey]);
+  useEffect(() => {
+    if (drawView) localStorage.setItem(drawViewStorageKey, drawView);
+    else localStorage.removeItem(drawViewStorageKey);
+  }, [drawView, drawViewStorageKey]);
+  const closeDrawView = () => setDrawView(null);
   const startDraw = (mode: DrawMode) => {
     setDrawMode(mode);
-    if (mode === "rounds") setRoundsDrawOpen(true);
-    else setDrawOpen(true);
+    setDrawView(mode === "rounds" ? "rounds" : "groups");
   };
   const requestDraw = async (mode: DrawMode) => {
     let needsConfirm = false;
@@ -1170,7 +1178,10 @@ const GroupManager = ({
         )}
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
-            if (phaseMatchType === "rounds") setDrawChoiceOpen(true);
+            if (phaseMatchType === "rounds") {
+              if (groups.length === 1) void requestDraw("rounds");
+              else setDrawView("choice");
+            }
             else requestDraw("groups");
           }}>
             <Trophy className="h-3 w-3" /> Live loting
@@ -1181,29 +1192,36 @@ const GroupManager = ({
         </Button>
       </div>
 
-      <Dialog open={drawChoiceOpen} onOpenChange={setDrawChoiceOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Wat wil je loten?</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-2">
+      {drawView === "choice" && (
+        <section className="draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
+          <div className="mx-auto flex min-h-full max-w-5xl flex-col gap-6">
+            <header className="border-b border-primary/30 pb-4">
+              <Button variant="ghost" className="mb-3 px-0" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
+              <h2 className="text-xl font-bold">Wat wil je loten?</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Kies welk deel van deze fase je live wilt loten.</p>
+            </header>
+            <div className="grid gap-3 md:grid-cols-3">
             {([
               ["full", "Volledige loting", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
               ["groups", "Alleen poules loten", "Teams over de poules verdelen. De speelrondes blijven ongewijzigd."],
               ["rounds", "Alleen speelrondes loten", "De huidige poule-indeling behouden en enkel de tegenstanders loten."],
             ] as const).map(([mode, title, text]) => (
-              <button
+              <Button
                 key={mode}
-                onClick={() => { setDrawChoiceOpen(false); requestDraw(mode); }}
-                className="rounded-lg border border-border bg-card p-4 text-left transition-colors hover:border-primary hover:bg-accent"
+                type="button"
+                variant="outline"
+                aria-pressed="true"
+                onClick={() => void requestDraw(mode)}
+                className="draw-choice h-auto min-h-40 w-full flex-col items-start justify-start whitespace-normal border-y-2 border-y-primary bg-primary/[0.06] p-5 text-left"
               >
                 <div className="text-sm font-semibold text-foreground">{title}</div>
                 <div className="mt-1 text-xs text-muted-foreground">{text}</div>
-              </button>
+              </Button>
             ))}
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </section>
+      )}
 
       <AlertDialog open={!!pendingDrawMode} onOpenChange={(o) => !o && setPendingDrawMode(null)}>
         <AlertDialogContent>
@@ -1228,8 +1246,8 @@ const GroupManager = ({
       </AlertDialog>
 
       <RoundsDrawDialog
-        open={roundsDrawOpen}
-        onOpenChange={setRoundsDrawOpen}
+        open={drawView === "rounds"}
+        onOpenChange={(next) => setDrawView(next ? "rounds" : null)}
         tournamentId={tournamentId}
         phaseId={phaseId}
         categoryId={categoryId}
@@ -1238,8 +1256,8 @@ const GroupManager = ({
         onApplied={() => { notifySlotChange(); fetchGroups(); }}
       />
       <LiveDrawDialog
-        open={drawOpen}
-        onOpenChange={setDrawOpen}
+        open={drawView === "groups"}
+        onOpenChange={(next) => setDrawView(next ? "groups" : null)}
         tournamentId={tournamentId}
         phaseId={phaseId}
         categoryId={categoryId}
@@ -1248,12 +1266,12 @@ const GroupManager = ({
         onApplied={() => {
           notifySlotChange();
           fetchGroups();
-          if (drawMode === "full") setTimeout(() => setRoundsDrawOpen(true), 300);
+          if (drawMode === "full") setTimeout(() => setDrawView("rounds"), 300);
         }}
       />
 
       {/* Grid layout for groups */}
-      {!groupsLoaded && groups.length === 0 ? (
+      {drawView === "choice" || drawView === "groups" || drawView === "rounds" ? null : !groupsLoaded && groups.length === 0 ? (
         <div className="flex justify-center py-6">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>

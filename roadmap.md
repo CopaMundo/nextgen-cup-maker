@@ -6,3 +6,4 @@
 - [x] Live loting speelrondes voorzien van typekeuze, regels/matrix en lotingsscherm in Copa Mundo-stijl.
 - [x] Stappenbalk verwijderen en speelrondes met niveau-potten per poule exact gelijk indelen vóór de instellingen.
 - [x] Groepsloting en speelrondeloting dezelfde donker-gouden venster-, selectie-, paneel-, tabel- en schermvullende stijl geven.
+- [x] Live lotingen als vaste toernooiweergave tonen, per fase automatisch hervatten, het actieve thema volgen en één poule direct naar speelrondes sturen.
