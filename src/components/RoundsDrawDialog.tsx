@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -45,6 +44,22 @@ interface GroupDraw {
   matches: ScheduledMatch[];
   order: string[];
   warning?: string;
+}
+
+interface RoundsDrawDraft {
+  version: 1;
+  step: "method" | "pots" | "settings" | "draw";
+  method: "free" | "pots";
+  potGroups: Record<string, GroupInfo["pots"]>;
+  matrices: Record<string, number[][]>;
+  sameForAll: boolean;
+  sameCountry: SameCountryMode;
+  maxMeetings: number;
+  forbiddenPairs: [string, string][];
+  draws: GroupDraw[];
+  activeGroupIdx: number;
+  teamIdx: Record<string, number>;
+  revealed: Record<string, number[]>;
 }
 
 const REVEAL_MS = 1300;
@@ -110,6 +125,8 @@ const RoundsDrawDialog = ({
   const [queue, setQueue] = useState<number[]>([]);
   const [paused, setPaused] = useState(false);
   const timer = useRef<number | null>(null);
+  const [draftReady, setDraftReady] = useState(false);
+  const draftKey = `copa-live-draw:rounds:v1:${phaseId}`;
 
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
 
@@ -172,13 +189,39 @@ const RoundsDrawDialog = ({
       // Structuur gelijk voor alle groepen? Anders per groep instellen.
       const sig = (g: GroupInfo) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}`;
       setSameForAll(infos.every((g) => sig(g) === sig(infos[0])));
+      try {
+        const raw = localStorage.getItem(draftKey);
+        const draft = raw ? JSON.parse(raw) as RoundsDrawDraft : null;
+        if (draft?.version === 1) {
+          const validGroupIds = new Set(infos.map((group) => group.id));
+          const teamIdsByGroup = new Map(infos.map((group) => [group.id, new Set(group.teamIds)]));
+          const restoredPots = Object.fromEntries(Object.entries(draft.potGroups).filter(([groupId, groupPots]) => validGroupIds.has(groupId) && groupPots.every((pot) => pot.teamIds.every((id) => teamIdsByGroup.get(groupId)?.has(id)))));
+          const drawsValid = draft.draws.every((draw) => validGroupIds.has(draw.groupId) && draw.order.every((id) => teamIdsByGroup.get(draw.groupId)?.has(id)));
+          setStep(drawsValid ? draft.step : "method");
+          setMethod(draft.method);
+          setPotGroups(restoredPots);
+          setMatrices(Object.fromEntries(Object.entries(draft.matrices).filter(([groupId]) => validGroupIds.has(groupId))));
+          setSameForAll(draft.sameForAll);
+          setSameCountry(draft.sameCountry);
+          setMaxMeetings(draft.maxMeetings);
+          setForbiddenPairs(draft.forbiddenPairs.filter(([a, b]) => infos.some((group) => group.teamIds.includes(a) && group.teamIds.includes(b))));
+          setDraws(drawsValid ? draft.draws : []);
+          setActiveGroupIdx(drawsValid ? Math.min(draft.activeGroupIdx, Math.max(0, draft.draws.length - 1)) : 0);
+          setTeamIdx(drawsValid ? draft.teamIdx : {});
+          setRevealed(drawsValid ? draft.revealed : {});
+        }
+      } catch {
+        localStorage.removeItem(draftKey);
+      }
     } finally {
+      setDraftReady(true);
       setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!open) return;
+    setDraftReady(false);
     setStep("method");
     setMethod("free");
     setPotError("");
@@ -193,6 +236,12 @@ const RoundsDrawDialog = ({
     setMaxMeetings(2);
     load();
   }, [open, phaseId]);
+
+  useEffect(() => {
+    if (!open || !draftReady) return;
+    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed };
+    localStorage.setItem(draftKey, JSON.stringify(draft));
+  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed]);
 
   // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
   const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
@@ -469,6 +518,7 @@ const RoundsDrawDialog = ({
         } as unknown as never,
       });
       toast({ title: `${total} wedstrijden ingepland over de speelrondes` });
+      localStorage.removeItem(draftKey);
       onApplied?.();
       onOpenChange(false);
     } catch (error: any) {
@@ -800,18 +850,21 @@ const RoundsDrawDialog = ({
     </div>
   );
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-       <DialogContent scrollable={false} className={`draw-dialog-theme text-foreground ${step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-5xl border-primary/30 bg-background"}`}>
-         <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
-          <DialogTitle>Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</DialogTitle>
-        </DialogHeader>
+    <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
+      <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-7xl flex-col gap-4">
+        <header className="shrink-0 border-b border-primary/30 pb-3">
+          <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
+          <h1 className="text-lg font-semibold">Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</h1>
+        </header>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
          ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? settings : drawScreen}
-        <DialogFooter className="shrink-0 gap-2 border-t border-primary/30 pt-4">
+        <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:justify-end">
            {step === "method" ? (
-             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>{method === "pots" ? "Verder naar potindeling" : "Verder naar instellingen"}</Button></>
+             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Terug naar toernooi</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>{method === "pots" ? "Verder naar potindeling" : "Verder naar instellingen"}</Button></>
            ) : step === "pots" ? (
              <><Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button><Button onClick={proceedFromPots}>Verder naar instellingen</Button></>
            ) : step === "settings" ? (
@@ -831,9 +884,9 @@ const RoundsDrawDialog = ({
               )}
             </>
           )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </footer>
+      </div>
+    </section>
   );
 };
 

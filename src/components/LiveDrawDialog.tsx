@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, GripVertical, ArrowLeft, Maximize2 } from "lucide-react";
+import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, GripVertical, ArrowLeft } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
@@ -51,6 +50,19 @@ interface Pot {
 }
 
 type Step = "method" | "pots" | "draw";
+
+interface LiveDrawDraft {
+  version: 1;
+  step: Step;
+  usePots: boolean;
+  potCount: number;
+  rules: ContainerRules;
+  potMatrix: Record<string, number>;
+  session: DrawSessionState | null;
+  selectedPotId: string | null;
+  advancedOpen: boolean;
+  advancedSpreadOpen: boolean;
+}
 
 const DraggablePotTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
@@ -120,6 +132,8 @@ const LiveDrawDialog = ({
   const [pairA, setPairA] = useState("");
   const [pairB, setPairB] = useState("");
   const [manualTeam, setManualTeam] = useState("");
+  const [draftReady, setDraftReady] = useState(false);
+  const draftKey = `copa-live-draw:groups:v1:${phaseId}`;
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } })
@@ -170,7 +184,7 @@ const LiveDrawDialog = ({
       setTeams(available.map((t) => ({ id: t.id, name: t.name, country: t.country, logoUrl: t.logo_url })));
 
       const availableIds = new Set(available.map((t) => t.id));
-      setPots(
+      const nextPots =
         (potRows || []).map((p) => ({
           id: p.id,
           name: p.name,
@@ -178,15 +192,41 @@ const LiveDrawDialog = ({
           teamIds: (potTeamRows || [])
             .filter((pt) => pt.pot_id === p.id && availableIds.has(pt.team_id))
             .map((pt) => pt.team_id),
-        }))
-      );
+        }));
+      setPots(nextPots);
+      try {
+        const raw = localStorage.getItem(draftKey);
+        const draft = raw ? JSON.parse(raw) as LiveDrawDraft : null;
+        if (draft?.version === 1) {
+          const validTeamIds = new Set(available.map((team) => team.id));
+          const validContainerIds = new Set(nextContainers.map((container) => container.id));
+          const validPotIds = new Set(nextPots.map((pot) => pot.id));
+          const sessionValid = !draft.session || (
+            draft.session.remaining.every((id) => validTeamIds.has(id)) &&
+            draft.session.containers.every((container) => validContainerIds.has(container.id) && container.teamIds.every((id) => validTeamIds.has(id)))
+          );
+          setStep(sessionValid ? draft.step : "method");
+          setUsePots(draft.usePots);
+          setPotCount(draft.potCount);
+          setRules(draft.rules);
+          setPotMatrix(draft.potMatrix);
+          setSession(sessionValid ? draft.session : null);
+          setSelectedPotId(draft.selectedPotId && validPotIds.has(draft.selectedPotId) ? draft.selectedPotId : null);
+          setAdvancedOpen(draft.advancedOpen);
+          setAdvancedSpreadOpen(draft.advancedSpreadOpen);
+        }
+      } catch {
+        localStorage.removeItem(draftKey);
+      }
     } finally {
+      setDraftReady(true);
       setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!open) return;
+    setDraftReady(false);
     setStep("method");
     setAdvancedOpen(false);
     setAdvancedSpreadOpen(false);
@@ -195,6 +235,12 @@ const LiveDrawDialog = ({
     setRules(emptyContainerRules());
     loadAll();
   }, [open, phaseId, categoryId]);
+
+  useEffect(() => {
+    if (!open || !draftReady) return;
+    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen };
+    localStorage.setItem(draftKey, JSON.stringify(draft));
+  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen]);
 
   /* -------------------------------- potten ------------------------------ */
 
@@ -557,6 +603,7 @@ const LiveDrawDialog = ({
         title: `${updates.length} deelnemers ingedeeld via de live loting`,
         description: drawnMatches > 0 ? `${drawnMatches} wedstrijden geloot over de speelrondes.` : undefined,
       });
+      localStorage.removeItem(draftKey);
       onApplied?.();
       onOpenChange(false);
     } catch (error: any) {
@@ -878,16 +925,16 @@ const LiveDrawDialog = ({
     </div>
   );
 
+  if (!open) return null;
+
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent scrollable={false} className={`draw-dialog-theme text-foreground ${step === "draw" ? "inset-0 left-0 top-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border border-primary/30 bg-background p-4 sm:p-6" : "max-w-5xl border-primary/30 bg-background"}`}>
-          <DialogHeader className="shrink-0 border-b border-primary/30 pb-3">
-            <DialogTitle className="flex items-center gap-2">
-              {step === "draw" && <Maximize2 className="h-4 w-4" />}
-              Live loting{phaseName ? ` · ${phaseName}` : ""}
-            </DialogTitle>
-          </DialogHeader>
+      <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
+        <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-7xl flex-col gap-4">
+          <header className="shrink-0 border-b border-primary/30 pb-3">
+            <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
+            <h1 className="text-lg font-semibold">Live loting{phaseName ? ` · ${phaseName}` : ""}</h1>
+          </header>
 
           {loading && step !== "draw" ? (
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
@@ -1062,16 +1109,16 @@ const LiveDrawDialog = ({
           ) : drawContent}
 
           {step !== "draw" && (
-            <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
-              {step === "method" && <Button variant="ghost" onClick={() => onOpenChange(false)}>Sluiten</Button>}
+            <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:justify-end">
+              {step === "method" && <Button variant="ghost" onClick={() => onOpenChange(false)}>Terug naar toernooi</Button>}
               {step === "pots" && <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar lotingsmethode</Button>}
               {step === "method" && usePots && <Button onClick={() => setStep("pots")}>Verder naar potindeling</Button>}
               {step === "method" && !usePots && <Button onClick={openDraw}>Start loting</Button>}
               {step === "pots" && <Button onClick={openDraw}>Naar de loting</Button>}
-            </DialogFooter>
+            </footer>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
+      </section>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
         <AlertDialogContent>

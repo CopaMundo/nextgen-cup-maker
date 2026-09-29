@@ -72,6 +72,7 @@ const generalSubTabs = [
 
 const categoryStorageKey = (tournamentId: string) => `tournament-category:${tournamentId}`;
 const locationStorageKey = (tournamentId: string) => `tournament-location:${tournamentId}`;
+const activeTabStorageKey = (tournamentId: string) => `tournament-admin-tab:${tournamentId}`;
 const mobileSidebarStorageKey = "admin-mobile-sidebar-collapsed";
 
 const TournamentDetail = () => {
@@ -87,9 +88,14 @@ const TournamentDetail = () => {
     if (typeof window === "undefined" || !id) return null;
     return localStorage.getItem(categoryStorageKey(id));
   });
-  const [activeTab, setActiveTabState] = useState<TabId>("general");
+  const [activeTab, setActiveTabState] = useState<TabId>(() => {
+    if (typeof window === "undefined" || !id) return "general";
+    const saved = localStorage.getItem(activeTabStorageKey(id));
+    return sidebarItems.some((item) => item.id === saved) ? saved as TabId : "general";
+  });
   const setActiveTab = (tab: TabId) => {
     setActiveTabState(tab);
+    if (id) localStorage.setItem(activeTabStorageKey(id), tab);
     setMobileResultsOverview(true);
     setMobilePresentationOverview(true);
     setMobileDeelnemersOverview(true);
