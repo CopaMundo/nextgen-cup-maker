@@ -312,14 +312,29 @@ const GroupManager = ({
   const [drawMode, setDrawMode] = useState<DrawMode>("groups");
   const [pendingDrawMode, setPendingDrawMode] = useState<DrawMode | null>(null);
   const drawViewStorageKey = `copa-live-draw-view:${phaseId}`;
+  const drawModeStorageKey = `copa-live-draw-mode:${phaseId}`;
+  const drawViewHydrated = useRef(false);
   useEffect(() => {
+    drawViewHydrated.current = false;
     const saved = localStorage.getItem(drawViewStorageKey);
+    const savedMode = localStorage.getItem(drawModeStorageKey);
     if (saved === "choice" || saved === "groups" || saved === "rounds") setDrawView(saved);
-  }, [drawViewStorageKey]);
+    if (savedMode === "full" || savedMode === "groups" || savedMode === "rounds") setDrawMode(savedMode);
+  }, [drawViewStorageKey, drawModeStorageKey]);
   useEffect(() => {
+    if (!drawViewHydrated.current) {
+      drawViewHydrated.current = true;
+      return;
+    }
     if (drawView) localStorage.setItem(drawViewStorageKey, drawView);
-    else localStorage.removeItem(drawViewStorageKey);
-  }, [drawView, drawViewStorageKey]);
+    else {
+      localStorage.removeItem(drawViewStorageKey);
+      localStorage.removeItem(drawModeStorageKey);
+    }
+  }, [drawView, drawViewStorageKey, drawModeStorageKey]);
+  useEffect(() => {
+    if (drawView) localStorage.setItem(drawModeStorageKey, drawMode);
+  }, [drawMode, drawView, drawModeStorageKey]);
   const closeDrawView = () => setDrawView(null);
   const startDraw = (mode: DrawMode) => {
     setDrawMode(mode);
@@ -1161,7 +1176,7 @@ const GroupManager = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${drawView ? "draw-manager-active" : ""}`}>
       {phaseType === "knockout" && (
         <p className="text-xs text-muted-foreground">
           Bracket (knockout). Wijs teams of posities toe aan de bracket slots.
@@ -1193,7 +1208,7 @@ const GroupManager = ({
       </div>
 
       {drawView === "choice" && (
-        <section className="draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
+        <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
           <div className="mx-auto flex min-h-full max-w-5xl flex-col gap-6">
             <header className="border-b border-primary/30 pb-4">
               <Button variant="ghost" className="mb-3 px-0" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>

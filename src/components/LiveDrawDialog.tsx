@@ -929,7 +929,7 @@ const LiveDrawDialog = ({
 
   return (
     <>
-      <section className="draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
+      <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
         <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-7xl flex-col gap-4">
           <header className="shrink-0 border-b border-primary/30 pb-3">
             <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>

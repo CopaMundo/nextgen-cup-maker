@@ -2514,6 +2514,10 @@ posities + statistieken groen */
   color-scheme: light;
 }
 
+.draw-manager-active > :not(.draw-surface) {
+  display: none;
+}
+
 [data-mode="dark"] .draw-dialog-theme {
   color-scheme: dark;
 }
