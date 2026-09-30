@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { DndContext, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
+import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, GripVertical, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
@@ -63,33 +62,6 @@ interface LiveDrawDraft {
   advancedOpen: boolean;
   advancedSpreadOpen: boolean;
 }
-
-const DraggablePotTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
-  return (
-    <div
-      ref={setNodeRef}
-      style={{ transform: CSS.Translate.toString(transform) }}
-      className={`flex items-center justify-between rounded-md border border-border bg-background px-2 py-2 text-xs ${isDragging ? "relative z-50 opacity-70 shadow-lg" : ""}`}
-    >
-      <div className="flex min-w-0 items-center gap-2">
-        <span {...attributes} {...listeners} className="touch-none cursor-grab text-muted-foreground" aria-label="Deelnemer verplaatsen">
-          <GripVertical className="h-4 w-4" />
-        </span>
-        {children}
-      </div>
-    </div>
-  );
-};
-
-const PotDropZone = ({ id, children }: { id: string; children: React.ReactNode }) => {
-  const { setNodeRef, isOver } = useDroppable({ id });
-  return (
-    <div ref={setNodeRef} className={`min-h-20 space-y-1.5 rounded-md p-1 transition-colors ${isOver ? "bg-primary/10 ring-2 ring-primary/30" : ""}`}>
-      {children}
-    </div>
-  );
-};
 
 const LiveDrawDialog = ({
   open,
@@ -134,10 +106,8 @@ const LiveDrawDialog = ({
   const [manualTeam, setManualTeam] = useState("");
   const [draftReady, setDraftReady] = useState(false);
   const draftKey = `copa-live-draw:groups:v1:${phaseId}`;
-  const dndSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } })
-  );
+  const [savingSlot, setSavingSlot] = useState(false);
+  const [pendingPotCount, setPendingPotCount] = useState<number | null>(null);
 
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
   const assignedTeamIds = useMemo(() => new Set(pots.flatMap((p) => p.teamIds)), [pots]);
@@ -244,66 +214,21 @@ const LiveDrawDialog = ({
 
   /* -------------------------------- potten ------------------------------ */
 
-  const addPot = async () => {
-    const { data, error } = await supabase
-      .from("draw_pots")
-      .insert({
-        tournament_id: tournamentId,
-        phase_id: phaseId,
-        category_id: categoryId ?? null,
-        name: `Pot ${pots.length + 1}`,
-        sort_order: pots.length,
-      })
-      .select("id, name, sort_order")
-      .single();
-    if (error || !data) {
-      toast({ title: "Pot toevoegen mislukt", description: error?.message, variant: "destructive" });
-      return;
-    }
-    setPots((prev) => [...prev, { id: data.id, name: data.name, sort_order: data.sort_order, teamIds: [] }]);
-  };
-
-  const deletePot = async (potId: string) => {
-    await supabase.from("draw_pot_teams").delete().eq("pot_id", potId);
-    const { error } = await supabase.from("draw_pots").delete().eq("id", potId);
-    if (error) {
-      toast({ title: "Pot verwijderen mislukt", description: error.message, variant: "destructive" });
-      return;
-    }
-    setPots((prev) => prev.filter((p) => p.id !== potId));
-  };
-
   const renamePot = async (potId: string, name: string) => {
     setPots((prev) => prev.map((p) => (p.id === potId ? { ...p, name } : p)));
     await supabase.from("draw_pots").update({ name }).eq("id", potId);
   };
 
-  const addTeamToPot = async (potId: string, teamId: string) => {
-    const pot = pots.find((p) => p.id === potId);
-    if (!pot) return;
-    const { error } = await supabase
-      .from("draw_pot_teams")
-      .insert({ pot_id: potId, tournament_id: tournamentId, team_id: teamId, sort_order: pot.teamIds.length });
-    if (error) {
-      toast({ title: "Toevoegen mislukt", description: error.message, variant: "destructive" });
-      return;
-    }
-    setPots((prev) => prev.map((p) => (p.id === potId ? { ...p, teamIds: [...p.teamIds, teamId] } : p)));
-  };
-
-  const removeTeamFromPot = async (potId: string, teamId: string) => {
-    await supabase.from("draw_pot_teams").delete().eq("pot_id", potId).eq("team_id", teamId);
-    setPots((prev) => prev.map((p) => (p.id === potId ? { ...p, teamIds: p.teamIds.filter((id) => id !== teamId) } : p)));
-  };
-
   /** Maakt `count` lege potten aan (Pot 1, Pot 2, ...) en vervangt de bestaande. */
   const createEmptyPots = async (count: number) => {
-    setPotCount(count);
+    if (teams.length % count !== 0 || count < 2 || count > teams.length) return;
     setLoading(true);
     try {
       if (pots.length) {
-        await supabase.from("draw_pot_teams").delete().in("pot_id", pots.map((p) => p.id));
-        await supabase.from("draw_pots").delete().in("id", pots.map((p) => p.id));
+        const { error: assignmentsError } = await supabase.from("draw_pot_teams").delete().in("pot_id", pots.map((p) => p.id));
+        if (assignmentsError) throw assignmentsError;
+        const { error: potsError } = await supabase.from("draw_pots").delete().in("id", pots.map((p) => p.id));
+        if (potsError) throw potsError;
       }
       const { data, error } = await supabase
         .from("draw_pots")
@@ -326,23 +251,22 @@ const LiveDrawDialog = ({
           .sort((a, b) => a.sort_order - b.sort_order)
           .map((p) => ({ id: p.id, name: p.name, sort_order: p.sort_order, teamIds: [] }))
       );
+      setPotCount(count);
       setRules((prev) => ({ ...prev, potQuota: {} }));
+    } catch (error: any) {
+      toast({ title: "Potverdeling wijzigen mislukt", description: error?.message, variant: "destructive" });
+      await loadAll();
     } finally {
       setLoading(false);
     }
   };
 
-  /** Verwacht aantal teams per pot volgens het gekozen aantal potten. */
-  const expectedSizes = (count: number) => {
-    const base = Math.floor(teams.length / Math.max(1, count));
-    const extra = teams.length % Math.max(1, count);
-    return Array.from({ length: count }, (_, i) => base + (i < extra ? 1 : 0));
-  };
-  const potOptionLabel = (count: number) => {
-    const base = Math.floor(teams.length / count);
-    const extra = teams.length % count;
-    if (extra === 0) return `${base} teams per pot`;
-    return `${extra} ${extra === 1 ? "pot" : "potten"} met ${base + 1} en ${count - extra} met ${base} teams`;
+  const potOptions = Array.from({ length: teams.length }, (_, i) => i + 1)
+    .filter((count) => count >= 2 && teams.length % count === 0);
+  const requestPotCount = (count: number) => {
+    if (count === pots.length) return;
+    if (pots.some((pot) => pot.teamIds.length)) setPendingPotCount(count);
+    else void createEmptyPots(count);
   };
 
   /* ------------------------------ verdeling ----------------------------- */
@@ -366,48 +290,38 @@ const LiveDrawDialog = ({
     setRules((prev) => ({ ...prev, potQuota: { ...prev.potQuota, [`${potId}|${containerId}`]: Math.max(0, value) } }));
   const resetQuota = () => setRules((prev) => ({ ...prev, potQuota: {} }));
 
-  const moveTeamToPot = async (teamId: string, targetPotId: string) => {
-    const source = pots.find((pot) => pot.teamIds.includes(teamId));
-    if (targetPotId === "unassigned") {
-      if (source) await removeTeamFromPot(source.id, teamId);
-      return;
-    }
-    if (!source) {
-      await addTeamToPot(targetPotId, teamId);
-      return;
-    }
-    if (source.id === targetPotId) return;
-    const target = pots.find((pot) => pot.id === targetPotId);
-    if (!target) return;
-    setPots((prev) =>
-      prev.map((pot) => {
-        if (pot.id === source.id) return { ...pot, teamIds: pot.teamIds.filter((id) => id !== teamId) };
-        if (pot.id === targetPotId) return { ...pot, teamIds: [...pot.teamIds, teamId] };
-        return pot;
-      })
-    );
-    const { error: deleteError } = await supabase.from("draw_pot_teams").delete().eq("pot_id", source.id).eq("team_id", teamId);
-    if (deleteError) {
+  const setPotSlot = async (potId: string, index: number, teamId: string | null) => {
+    if (savingSlot) return;
+    const pot = pots.find((p) => p.id === potId);
+    if (!pot || teams.length % pots.length !== 0 || index >= teams.length / pots.length) return;
+    const previous = pot.teamIds[index];
+    if (previous === teamId || (teamId && assignedTeamIds.has(teamId))) return;
+    setSavingSlot(true);
+    try {
+      if (previous) {
+        const { error } = await supabase.from("draw_pot_teams").delete().eq("pot_id", potId).eq("team_id", previous);
+        if (error) throw error;
+      }
+      if (teamId) {
+        const { error } = await supabase.from("draw_pot_teams").insert({ pot_id: potId, tournament_id: tournamentId, team_id: teamId, sort_order: index });
+        if (error) {
+          if (previous) await supabase.from("draw_pot_teams").insert({ pot_id: potId, tournament_id: tournamentId, team_id: previous, sort_order: index });
+          throw error;
+        }
+      }
+      setPots((prev) => prev.map((p) => {
+        if (p.id !== potId) return p;
+        const teamIds = [...p.teamIds];
+        if (teamId) teamIds[index] = teamId;
+        else teamIds.splice(index, 1);
+        return { ...p, teamIds };
+      }));
+    } catch (error: any) {
+      toast({ title: "Toewijzen mislukt", description: error?.message, variant: "destructive" });
       await loadAll();
-      toast({ title: "Verplaatsen mislukt", description: deleteError.message, variant: "destructive" });
-      return;
+    } finally {
+      setSavingSlot(false);
     }
-    const { error: insertError } = await supabase.from("draw_pot_teams").insert({
-      pot_id: targetPotId,
-      tournament_id: tournamentId,
-      team_id: teamId,
-      sort_order: target.teamIds.length,
-    });
-    if (insertError) {
-      await loadAll();
-      toast({ title: "Verplaatsen mislukt", description: insertError.message, variant: "destructive" });
-    }
-  };
-
-  const handlePotDragEnd = (event: DragEndEvent) => {
-    const targetPotId = event.over ? String(event.over.id) : "";
-    const teamId = String(event.active.id);
-    if (targetPotId) void moveTeamToPot(teamId, targetPotId);
   };
 
   /** Volledige regels met de standaardverdeling expliciet ingevuld. */
@@ -636,6 +550,7 @@ const LiveDrawDialog = ({
     }
     if (usePots) {
       if (pots.length === 0) return { step: "pots", message: "Kies eerst het aantal potten." };
+      if (teams.length % pots.length !== 0 || pots.some((pot) => pot.teamIds.length !== teams.length / pots.length)) return { step: "pots", message: `Vul elke pot met precies ${teams.length / pots.length} teams.` };
       const allAssigned = pots.flatMap((pot) => pot.teamIds);
       const uniqueAssigned = new Set(allAssigned);
       if (unassignedTeams.length > 0)
@@ -975,81 +890,42 @@ const LiveDrawDialog = ({
                 <p className="text-xs text-muted-foreground">Maak je potten aan, verdeel de teams en stel indien nodig geavanceerde lotingsregels in.</p>
               </div>
 
-              <section className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Aantal potten</Label>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                  {Array.from({ length: Math.min(12, Math.max(1, teams.length)) }, (_, i) => i + 1).filter((n) => n >= 2 || teams.length < 2).map((count) => {
-                    const selected = pots.length === count;
-                    return (
-                      <Button
-                        key={count}
-                        type="button"
-                        variant="outline"
-                        aria-pressed={selected}
-                        onClick={() => { if (pots.length !== count || pots.some((p) => p.teamIds.length)) void createEmptyPots(count); }}
-                        className={`draw-choice h-auto flex-col items-start gap-0 whitespace-normal p-3 text-left transition-all ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}
-                      >
-                        <p className="text-sm font-bold">{count} potten</p>
-                        <p className="text-[11px] text-muted-foreground">{teams.length} teams · {potOptionLabel(count)}</p>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </section>
+               <div className="flex flex-wrap items-end gap-2">
+                 <div className="min-w-[220px] flex-1 sm:max-w-sm">
+                   <Label htmlFor="group-pot-distribution">Potverdeling · {teams.length} teams</Label>
+                   <Select value={potOptions.includes(pots.length) ? String(pots.length) : undefined} onValueChange={(value) => requestPotCount(Number(value))}>
+                     <SelectTrigger id="group-pot-distribution" className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
+                     <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {teams.length / count} teams</SelectItem>)}</SelectContent>
+                   </Select>
+                 </div>
+                 <Button type="button" variant="outline" aria-expanded={advancedOpen} onClick={() => setAdvancedOpen((open) => !open)}>Geavanceerde instellingen <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
+               </div>
 
-              {pots.length > 0 && (
-                <DndContext sensors={dndSensors} onDragEnd={handlePotDragEnd}>
+               {potOptions.includes(pots.length) && (
+                 <>
                   <div className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${unassignedTeams.length > 0 ? "border-destructive/50 text-destructive" : "border-border text-muted-foreground"}`}>
                     {unassignedTeams.length > 0 && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-                    <span>{potTeamTotal} van {teams.length} teams toegewezen. Sleep teams naar een pot of kies ze handmatig.</span>
+                     <span>{potTeamTotal} van {teams.length} teams toegewezen.</span>
                   </div>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {pots.map((pot, index) => {
-                      const expected = expectedSizes(pots.length)[index] ?? 0;
+                     {pots.map((pot) => {
+                       const expected = teams.length / pots.length;
                       return (
                         <div key={pot.id} className="draw-panel space-y-2 p-3">
                           <div className="flex items-center gap-2">
                             <Input value={pot.name} onChange={(event) => renamePot(pot.id, event.target.value)} className="h-9 text-sm font-bold" aria-label="Potnaam" />
                             <span className={`whitespace-nowrap text-xs font-semibold ${pot.teamIds.length === expected ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length} / {expected} teams</span>
                           </div>
-                          <PotDropZone id={pot.id}>
-                            {pot.teamIds.map((id) => <DraggablePotTeam key={id} id={id}><TeamChip id={id} /><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeTeamFromPot(pot.id, id)} aria-label="Uit pot verwijderen"><Trash2 className="h-3 w-3" /></Button></DraggablePotTeam>)}
-                            {pot.teamIds.length === 0 && <p className="px-2 py-4 text-center text-xs text-muted-foreground">Sleep een team naar deze pot.</p>}
-                          </PotDropZone>
-                          {unassignedTeams.length > 0 && (
-                            <Select value="" onValueChange={(value) => addTeamToPot(pot.id, value)}>
-                              <SelectTrigger><SelectValue placeholder="Team handmatig toevoegen" /></SelectTrigger>
-                              <SelectContent>{unassignedTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
-                            </Select>
-                          )}
+                           <PotTeamSlots teams={teams} teamIds={pot.teamIds} assignedIds={assignedTeamIds} capacity={expected} disabled={savingSlot} onChange={(index, teamId) => void setPotSlot(pot.id, index, teamId)} />
                         </div>
                       );
                     })}
                   </div>
-                  <div className="rounded-lg border border-dashed border-border p-3">
-                    <p className="mb-2 text-xs font-semibold">Niet toegewezen teams ({unassignedTeams.length})</p>
-                    <PotDropZone id="unassigned">
-                      <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
-                        {unassignedTeams.map((team) => <DraggablePotTeam key={team.id} id={team.id}><TeamChip id={team.id} /></DraggablePotTeam>)}
-                      </div>
-                      {unassignedTeams.length === 0 && <p className="px-2 py-2 text-center text-xs text-muted-foreground">Alle teams zitten in een pot.</p>}
-                    </PotDropZone>
-                  </div>
-                </DndContext>
+                 </>
               )}
 
-              {pots.length > 0 && (
-                <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="draw-panel">
-                  <CollapsibleTrigger asChild>
-                    <Button type="button" variant="ghost" className="h-auto w-full justify-between gap-3 whitespace-normal p-3 text-left">
-                      <span>
-                        <span className="block text-sm font-bold">Geavanceerde instellingen</span>
-                        <span className="block text-xs text-muted-foreground">Pas de verdeling en regels aan wanneer je meer controle nodig hebt.</span>
-                      </span>
-                      <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-5 border-t border-border p-3">
+               {advancedOpen && potOptions.includes(pots.length) && (
+                  <div className="space-y-5 border-t border-primary/30 pt-4">
                     <section className="space-y-2">
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verdeling van potten over groepen</h3>
                       <div className="draw-panel p-3">
@@ -1102,8 +978,7 @@ const LiveDrawDialog = ({
                     )}
 
                     {renderRules()}
-                  </CollapsibleContent>
-                </Collapsible>
+                 </div>
               )}
             </div>
           ) : drawContent}
@@ -1129,6 +1004,18 @@ const LiveDrawDialog = ({
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleReset}>Opnieuw starten</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={pendingPotCount !== null} onOpenChange={(open) => { if (!open) setPendingPotCount(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Potverdeling wijzigen?</AlertDialogTitle>
+            <AlertDialogDescription>De huidige toewijzingen aan potten worden verwijderd. Je kunt de teams daarna opnieuw indelen.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { const count = pendingPotCount; setPendingPotCount(null); if (count !== null) void createEmptyPots(count); }}>Verdeling wijzigen</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
