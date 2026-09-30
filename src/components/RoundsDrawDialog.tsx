@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
 import { AlertTriangle, ArrowLeft, Check, ChevronDown, Pause, Play, Plus, Trash2, FastForward } from "lucide-react";
 import {
@@ -18,9 +17,7 @@ import {
   type ScheduledMatch,
 } from "@/lib/roundsSchedule";
 import { shuffle } from "@/lib/liveDraw";
-import { DndContext, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 
 interface Team {
   id: string;
@@ -64,18 +61,6 @@ interface RoundsDrawDraft {
 
 const REVEAL_MS = 1300;
 
-const DraggableTeam = ({ id, children }: { id: string; children: React.ReactNode }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
-  return <div ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform) }} className={`flex min-w-0 items-center gap-2 border border-border bg-background px-2 py-2 text-sm ${isDragging ? "relative z-50 opacity-70" : ""}`}>
-    <span {...attributes} {...listeners} aria-label="Team verplaatsen" className="cursor-grab touch-none text-muted-foreground"><GripVertical className="h-4 w-4" /></span>{children}
-  </div>;
-};
-
-const PotZone = ({ id, children }: { id: string; children: React.ReactNode }) => {
-  const { setNodeRef, isOver } = useDroppable({ id });
-  return <div ref={setNodeRef} className={`min-h-16 space-y-1 p-1 ${isOver ? "bg-primary/10 ring-2 ring-primary/30" : ""}`}>{children}</div>;
-};
-
 const RoundsDrawDialog = ({
   open,
   onOpenChange,
@@ -104,7 +89,6 @@ const RoundsDrawDialog = ({
   const [potGroups, setPotGroups] = useState<Record<string, GroupInfo["pots"]>>({});
   const [potError, setPotError] = useState("");
   const [potGroupId, setPotGroupId] = useState("");
-  const potSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
   const [sameForAll, setSameForAll] = useState(true);
   const [matrices, setMatrices] = useState<Record<string, number[][]>>({});
   const [editGroupId, setEditGroupId] = useState<string>("");
@@ -255,21 +239,27 @@ const RoundsDrawDialog = ({
   const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
 
   const selectPotCount = (group: GroupInfo, count: number) => {
+    if (potGroups[group.id]?.length === count) return;
     setPotGroups((prev) => ({ ...prev, [group.id]: Array.from({ length: count }, (_, i) => ({
       id: crypto.randomUUID(), name: `Pot ${i + 1}`, teamIds: [],
     })) }));
+    setMatrices((prev) => ({ ...prev, [group.id]: defaultOpponentMatrix(Array(count).fill(group.teamIds.length / count), matchesPerTeam(group.teamIds.length, group.rounds)) }));
     setPotError("");
   };
 
-  const movePotTeam = (groupId: string, teamId: string, targetId: string) => {
+  const setPotSlot = (groupId: string, potId: string, index: number, teamId: string | null) => {
     const group = groups.find((g) => g.id === groupId);
     const pots = potGroups[groupId] || [];
-    if (!group?.teamIds.includes(teamId) || (targetId !== "unassigned" && !pots.some((p) => p.id === targetId))) return;
-    if (targetId !== "unassigned" && pots.find((p) => p.id === targetId)?.teamIds.length === group.teamIds.length / pots.length && !pots.find((p) => p.id === targetId)?.teamIds.includes(teamId)) {
-      setPotError("Deze pot is al gevuld. Kies een andere pot.");
-      return;
-    }
-    setPotGroups((prev) => ({ ...prev, [groupId]: pots.map((p) => ({ ...p, teamIds: p.id === targetId ? [...new Set([...p.teamIds, teamId])] : p.teamIds.filter((id) => id !== teamId) })) }));
+    const assigned = new Set(pots.flatMap((pot) => pot.teamIds));
+    const previous = pots.find((pot) => pot.id === potId)?.teamIds[index];
+    if (!group || !pots.length || (teamId && (!group.teamIds.includes(teamId) || (assigned.has(teamId) && teamId !== previous)))) return;
+    setPotGroups((prev) => ({ ...prev, [groupId]: (prev[groupId] || []).map((pot) => {
+      if (pot.id !== potId) return pot;
+      const teamIds = [...pot.teamIds];
+      if (teamId) teamIds[index] = teamId;
+      else teamIds.splice(index, 1);
+      return { ...pot, teamIds };
+    }) }));
     setPotError("");
   };
 
@@ -295,7 +285,7 @@ const RoundsDrawDialog = ({
     if (method === "pots" && !potDrawAvailable) return;
     const next: Record<string, number[][]> = {};
     drawGroups.forEach((g) => {
-      next[g.id] = defaultOpponentMatrix(g.pots.map((p) => p.teamIds.length), matchesPerTeam(g.teamIds.length, g.rounds));
+      next[g.id] = matrices[g.id]?.length === g.pots.length ? matrices[g.id] : defaultOpponentMatrix(g.pots.map((p) => p.teamIds.length), matchesPerTeam(g.teamIds.length, g.rounds));
     });
     setMatrices(next);
     setEditGroupId(drawGroups[0]?.id || "");
@@ -574,36 +564,8 @@ const RoundsDrawDialog = ({
   const potGroup = groups.find((g) => g.id === potGroupId) || groups[0];
   const groupPots = potGroup ? potGroups[potGroup.id] || [] : [];
   const assigned = new Set(groupPots.flatMap((p) => p.teamIds));
-  const unassigned = potGroup?.teamIds.filter((id) => !assigned.has(id)) || [];
   const potOptions = potGroup ? Array.from({ length: Math.max(0, potGroup.teamIds.length - 1) }, (_, i) => i + 2)
     .filter((count) => count <= potGroup.teamIds.length && potGroup.teamIds.length % count === 0) : [];
-  const potScreen = (
-    <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
-      <div><h3 className="text-lg font-bold">Potindeling</h3><p className="text-sm text-muted-foreground">Verdeel de teams per poule gelijkmatig over de niveau-potten.</p></div>
-      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
-      {potGroup && <>
-        <div className="space-y-2"><Label>Aantal potten · {potGroup.teamIds.length} teams</Label><div className="flex flex-wrap gap-2">
-          {potOptions.map((count) => <Button key={count} variant="outline" aria-pressed={groupPots.length === count} onClick={() => selectPotCount(potGroup, count)} className={`draw-choice h-auto flex-col items-start px-4 py-2 ${groupPots.length === count ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
-            <span className="font-semibold">{count} potten</span><span className="text-xs text-muted-foreground">{potGroup.teamIds.length / count} teams per pot</span>
-          </Button>)}
-        </div></div>
-        {groupPots.length > 0 && <DndContext sensors={potSensors} onDragEnd={(event: DragEndEvent) => { if (event.over) movePotTeam(potGroup.id, String(event.active.id), String(event.over.id)); }}>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="draw-panel p-3"><div className="mb-2 text-sm font-bold">Niet ingedeeld <span className="text-muted-foreground">{unassigned.length}</span></div>
-              <PotZone id="unassigned">{unassigned.map((id) => <DraggableTeam key={id} id={id}><TeamChip id={id} /></DraggableTeam>)}</PotZone>
-            </div>
-            {groupPots.map((pot) => <div key={pot.id} className="draw-panel p-3">
-              <div className="mb-2 flex items-center gap-2"><Input aria-label="Potnaam" value={pot.name} onChange={(e) => setPotGroups((prev) => ({ ...prev, [potGroup.id]: (prev[potGroup.id] || []).map((p) => p.id === pot.id ? { ...p, name: e.target.value } : p) }))} className="h-8 min-w-0 flex-1 font-semibold" /><span className={`shrink-0 text-sm font-bold ${pot.teamIds.length === potGroup.teamIds.length / groupPots.length ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length}/{potGroup.teamIds.length / groupPots.length}</span></div>
-              <PotZone id={pot.id}>{pot.teamIds.map((id) => <div key={id} className="flex items-center gap-1"><div className="min-w-0 flex-1"><DraggableTeam id={id}><TeamChip id={id} /></DraggableTeam></div><Button size="icon" variant="ghost" aria-label={`${teamById.get(id)?.name || "Team"} verwijderen uit ${pot.name}`} onClick={() => movePotTeam(potGroup.id, id, "unassigned")}><Trash2 className="h-4 w-4" /></Button></div>)}</PotZone>
-              {unassigned.length > 0 && pot.teamIds.length < potGroup.teamIds.length / groupPots.length && <Select onValueChange={(id) => movePotTeam(potGroup.id, id, pot.id)}><SelectTrigger className="mt-2 h-8"><SelectValue placeholder="Team toevoegen" /></SelectTrigger><SelectContent>{unassigned.map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent></Select>}
-            </div>)}
-          </div>
-        </DndContext>}
-      </>}
-      {potError && <p role="alert" className="flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="h-4 w-4" />{potError}</p>}
-    </div>
-  );
-
   const settings = (
     <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
       <div>
@@ -708,11 +670,7 @@ const RoundsDrawDialog = ({
         </ul>
       </div>
 
-      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-        <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">Geavanceerde regels <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="draw-panel mt-3 space-y-4 p-4">
+      <div className="draw-panel space-y-4 p-4">
           <div>
             <Label className="font-semibold">Teams uit hetzelfde land</Label>
             <RadioGroup value={sameCountry} onValueChange={(v) => setSameCountry(v as SameCountryMode)} className="mt-2 space-y-1">
@@ -750,8 +708,36 @@ const RoundsDrawDialog = ({
               ))}
             </div>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
+      </div>
+    </div>
+  );
+
+  const potScreen = (
+    <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
+      <div><h3 className="text-lg font-bold">Potindeling</h3><p className="text-sm text-muted-foreground">Verdeel de teams per poule gelijkmatig over de niveau-potten.</p></div>
+      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
+      {potGroup && <>
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="min-w-[220px] flex-1 sm:max-w-sm"><Label>Potverdeling · {potGroup.teamIds.length} teams</Label>
+            <Select value={groupPots.length ? String(groupPots.length) : undefined} onValueChange={(value) => selectPotCount(potGroup, Number(value))}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
+              <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {potGroup.teamIds.length / count} teams</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <Button variant="outline" aria-expanded={advancedOpen} onClick={() => setAdvancedOpen((open) => !open)}>Geavanceerde instellingen <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
+        </div>
+        {groupPots.length > 0 && <>
+          <p className="text-xs text-muted-foreground">{assigned.size}/{potGroup.teamIds.length} teams ingedeeld</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {groupPots.map((pot) => <div key={pot.id} className="draw-panel p-3">
+              <div className="mb-3 flex items-center gap-2"><Input aria-label="Potnaam" value={pot.name} onChange={(e) => setPotGroups((prev) => ({ ...prev, [potGroup.id]: (prev[potGroup.id] || []).map((p) => p.id === pot.id ? { ...p, name: e.target.value } : p) }))} className="h-8 min-w-0 flex-1 font-semibold" /><span className={`shrink-0 text-sm font-bold ${pot.teamIds.length === potGroup.teamIds.length / groupPots.length ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length}/{potGroup.teamIds.length / groupPots.length}</span></div>
+              <PotTeamSlots teams={potGroup.teamIds.map((id) => teamById.get(id)).filter((team): team is Team => Boolean(team))} teamIds={pot.teamIds} assignedIds={assigned} capacity={potGroup.teamIds.length / groupPots.length} onChange={(index, teamId) => setPotSlot(potGroup.id, pot.id, index, teamId)} />
+            </div>)}
+          </div>
+        </>}
+        {advancedOpen && <div className="border-t border-primary/30 pt-4">{settings}</div>}
+      </>}
+      {potError && <p role="alert" className="flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="h-4 w-4" />{potError}</p>}
     </div>
   );
 
