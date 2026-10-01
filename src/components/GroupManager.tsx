@@ -1258,10 +1258,7 @@ const GroupManager = ({
           />
           <LiveDrawDialog
             open={drawView === "groups"}
-            onOpenChange={(next) => {
-              if (next) setDrawView("groups");
-              else if (drawMode !== "full") setDrawView(null);
-            }}
+            onOpenChange={(next) => setDrawView(next ? "groups" : null)}
             tournamentId={tournamentId}
             phaseId={phaseId}
             categoryId={categoryId}
