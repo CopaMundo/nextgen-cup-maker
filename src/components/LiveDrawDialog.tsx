@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -20,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Plus, Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft } from "lucide-react";
+import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
@@ -48,7 +47,7 @@ interface Pot {
   teamIds: string[];
 }
 
-type Step = "method" | "pots" | "draw";
+type Step = "method" | "pots" | "settings" | "draw";
 
 interface LiveDrawDraft {
   version: 1;
@@ -100,7 +99,6 @@ const LiveDrawDialog = ({
 
   const [session, setSession] = useState<DrawSessionState | null>(null);
   const [applying, setApplying] = useState(false);
-  const [newCountry, setNewCountry] = useState("");
   const [pairA, setPairA] = useState("");
   const [pairB, setPairB] = useState("");
   const [manualTeam, setManualTeam] = useState("");
@@ -116,6 +114,15 @@ const LiveDrawDialog = ({
     () => Array.from(new Set(teams.map((t) => t.country).filter(Boolean) as string[])).sort(),
     [teams]
   );
+  const countryCounts = useMemo(() => teams.reduce<Record<string, number>>((counts, team) => {
+    if (team.country) counts[team.country] = (counts[team.country] || 0) + 1;
+    return counts;
+  }, {}), [teams]);
+  const exceptionalCountries = useMemo(
+    () => countries.filter((country) => countryCounts[country] > containers.length),
+    [countries, countryCounts, containers.length]
+  );
+  const maxGroupCapacity = Math.max(1, ...containers.map((container) => container.capacity));
   const totalCapacity = containers.reduce((sum, c) => sum + c.capacity, 0);
   const potTeamTotal = pots.reduce((sum, p) => sum + p.teamIds.length, 0);
 
@@ -178,12 +185,21 @@ const LiveDrawDialog = ({
           setStep(sessionValid ? draft.step : "method");
           setUsePots(draft.usePots);
           setPotCount(draft.potCount);
-          setRules(draft.rules);
+          setRules({ ...draft.rules, separateSameCountry: false, requiredPairs: [] });
           setPotMatrix(draft.potMatrix);
           setSession(sessionValid ? draft.session : null);
           setSelectedPotId(draft.selectedPotId && validPotIds.has(draft.selectedPotId) ? draft.selectedPotId : null);
           setAdvancedOpen(draft.advancedOpen);
           setAdvancedSpreadOpen(draft.advancedSpreadOpen);
+        } else {
+          const counts = available.reduce<Record<string, number>>((result, team) => {
+            if (team.country) result[team.country] = (result[team.country] || 0) + 1;
+            return result;
+          }, {});
+          const automaticLimit = nextContainers.length
+            ? Math.max(1, ...Object.values(counts).map((count) => Math.ceil(count / nextContainers.length)))
+            : null;
+          setRules((previous) => ({ ...previous, countryMaxDefault: automaticLimit, separateSameCountry: false, requiredPairs: [] }));
         }
       } catch {
         localStorage.removeItem(draftKey);
@@ -544,7 +560,7 @@ const LiveDrawDialog = ({
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
     if (teams.length !== totalCapacity) {
       return {
-        step: usePots ? "pots" : "method",
+        step: usePots ? "pots" : "settings",
         message: `${teams.length} beschikbare teams voor ${totalCapacity} vrije plaatsen. Het aantal moet exact overeenkomen.`,
       };
     }
@@ -585,7 +601,7 @@ const LiveDrawDialog = ({
     const ctx = buildContainerCtx(teams, pots, effectiveRules);
     const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
     if (!check.ok && usePots) setAdvancedOpen(true);
-    return check.ok ? null : { step: usePots ? "pots" : "method", message: check.message || "De gekozen regels zijn niet haalbaar." };
+    return check.ok ? null : { step: "settings", message: check.message || "De gekozen regels zijn niet haalbaar." };
   };
 
   const openDraw = () => {
@@ -600,83 +616,45 @@ const LiveDrawDialog = ({
 
   const renderRules = () => (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Landenregels</h3>
-      <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
-        <div>
-          <p className="text-sm font-medium">Zelfde land nooit samen</p>
-          <p className="text-xs text-muted-foreground">Deelnemers uit hetzelfde land komen niet in dezelfde groep.</p>
-        </div>
-        <Switch checked={rules.separateSameCountry} onCheckedChange={(value) => setRules((previous) => ({ ...previous, separateSameCountry: value }))} />
-      </div>
-
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Landenlimiet per poule</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
         <div>
-          <Label className="text-xs">Maximum aantal teams per land in een groep</Label>
+          <Label className="text-xs">Maximum aantal teams uit hetzelfde land</Label>
           <Select
             value={rules.countryMaxDefault == null ? "none" : String(rules.countryMaxDefault)}
-            onValueChange={(value) => setRules((previous) => ({ ...previous, countryMaxDefault: value === "none" ? null : Number(value) }))}
+            onValueChange={(value) => setRules((previous) => ({
+              ...previous,
+              separateSameCountry: false,
+              countryMaxDefault: value === "none" ? null : Number(value),
+              countryMax: value === "none" ? {} : previous.countryMax,
+            }))}
           >
             <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Geen beperking</SelectItem>
-              {[1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>Maximaal {number}</SelectItem>)}
+              {Array.from({ length: maxGroupCapacity }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-xs">Uitzonderingen per land</Label>
-          {Object.entries(rules.countryMax).map(([country, max]) => (
+        {rules.countryMaxDefault != null && exceptionalCountries.length > 0 && <div className="space-y-2">
+          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Alleen landen met meer teams dan poules kunnen hier afwijken.</p></div>
+          {exceptionalCountries.map((country) => (
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
-              <span className="flex-1">{country}</span>
-              <Input
-                type="number"
-                min={1}
-                value={max}
-                onChange={(event) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(event.target.value) } }))}
-                className="h-8 w-16 text-center"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                aria-label={`${country} verwijderen`}
-                onClick={() => setRules((previous) => {
-                  const countryMax = { ...previous.countryMax };
-                  delete countryMax[country];
-                  return { ...previous, countryMax };
-                })}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
+              <span className="flex-1">{country} · {countryCounts[country]} teams</span>
+              <Select value={String(rules.countryMax[country] ?? rules.countryMaxDefault)} onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}>
+                <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
+                <SelectContent>{Array.from({ length: maxGroupCapacity }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>Max {number}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
           ))}
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Select value={newCountry} onValueChange={setNewCountry}>
-              <SelectTrigger><SelectValue placeholder="Land kiezen" /></SelectTrigger>
-              <SelectContent>
-                {countries.filter((country) => rules.countryMax[country] == null).map((country) => <SelectItem key={country} value={country}>{country}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!newCountry}
-              onClick={() => {
-                setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [newCountry]: 1 } }));
-                setNewCountry("");
-              }}
-            >
-              <Plus className="h-3.5 w-3.5" /> Toevoegen
-            </Button>
-          </div>
-        </div>
+        </div>}
       </div>
 
       <h3 className="pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Teamregels</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
-        <p className="text-sm font-medium">Kies twee teams en stel in: niet samen of samen in één groep.</p>
+        <p className="text-sm font-medium">Kies twee teams die niet samen in één poule mogen komen.</p>
         <div className="grid gap-2 sm:grid-cols-2">
           <Select value={pairA} onValueChange={setPairA}>
             <SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger>
@@ -687,8 +665,7 @@ const LiveDrawDialog = ({
             <SelectContent>{teams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
+        <div className="flex flex-wrap gap-2"><Button
             variant="outline"
             size="sm"
             disabled={!pairA || !pairB}
@@ -696,28 +673,13 @@ const LiveDrawDialog = ({
               setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] }));
               setPairA(""); setPairB("");
             }}
-          >Niet samen in één groep</Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!pairA || !pairB}
-            onClick={() => {
-              setRules((previous) => ({ ...previous, requiredPairs: [...previous.requiredPairs, [pairA, pairB]] }));
-              setPairA(""); setPairB("");
-            }}
-          >Samen in één groep</Button>
+          >Niet samen in één poule</Button>
         </div>
         <div className="space-y-1">
           {rules.forbiddenPairs.map(([first, second], index) => (
             <div key={`forbidden-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
               <span>Niet samen: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span>
               <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button>
-            </div>
-          ))}
-          {rules.requiredPairs.map(([first, second], index) => (
-            <div key={`required-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
-              <span>Samen: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, requiredPairs: previous.requiredPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button>
             </div>
           ))}
         </div>
