@@ -806,10 +806,10 @@ const LiveDrawDialog = ({
 
   return (
     <>
-      <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
-        <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-7xl flex-col gap-4">
+      <section className="draw-surface draw-dialog-theme flex min-h-0 flex-1 bg-background p-4 text-foreground sm:p-6">
+        <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4">
           <header className="shrink-0 border-b border-primary/30 pb-3">
-            <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
+            <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Sluiten</Button>
             <h1 className="text-lg font-semibold">Live loting{phaseName ? ` · ${phaseName}` : ""}</h1>
           </header>
 
@@ -939,9 +939,16 @@ const LiveDrawDialog = ({
                       </section>
                     )}
 
-                    {renderRules()}
                  </div>
               )}
+            </div>
+          ) : step === "settings" ? (
+            <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
+              <div>
+                <h2 className="text-lg font-bold">Instellingen pouleloting</h2>
+                <p className="text-xs text-muted-foreground">Stel de landenlimiet en teams in die niet samen in één poule mogen komen.</p>
+              </div>
+              {renderRules()}
             </div>
           ) : drawContent}
 
@@ -949,9 +956,18 @@ const LiveDrawDialog = ({
             <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:justify-end">
               {step === "method" && <Button variant="ghost" onClick={() => onOpenChange(false)}>Terug naar toernooi</Button>}
               {step === "pots" && <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar lotingsmethode</Button>}
-              {step === "method" && usePots && <Button onClick={() => setStep("pots")}>Verder naar potindeling</Button>}
-              {step === "method" && !usePots && <Button onClick={openDraw}>Start loting</Button>}
-              {step === "pots" && <Button onClick={openDraw}>Naar de loting</Button>}
+              {step === "method" && usePots && <Button onClick={() => setStep("pots")}>Volgende</Button>}
+              {step === "method" && !usePots && <Button onClick={() => setStep("settings")}>Volgende</Button>}
+              {step === "pots" && <Button onClick={() => {
+                const error = validationError();
+                if (error?.step === "pots") {
+                  toast({ title: "Potindeling nog niet compleet", description: error.message, variant: "destructive" });
+                  return;
+                }
+                setStep("settings");
+              }}>Volgende</Button>}
+              {step === "settings" && <Button variant="outline" onClick={() => setStep(usePots ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
+              {step === "settings" && <Button onClick={openDraw}>Naar de loting</Button>}
             </footer>
           )}
         </div>
