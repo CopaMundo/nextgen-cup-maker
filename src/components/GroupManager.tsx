@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays, Check, AlertTriangle, Trophy, ArrowLeft } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -309,7 +309,7 @@ const GroupManager = ({
   type DrawView = "choice" | "groups" | "rounds" | null;
   const [drawView, setDrawView] = useState<DrawView>(null);
   type DrawMode = "full" | "groups" | "rounds";
-  const [drawMode, setDrawMode] = useState<DrawMode>("groups");
+  const [drawMode, setDrawMode] = useState<DrawMode>("full");
   const [pendingDrawMode, setPendingDrawMode] = useState<DrawMode | null>(null);
   const drawViewStorageKey = `copa-live-draw-view:${phaseId}`;
   const drawModeStorageKey = `copa-live-draw-mode:${phaseId}`;
@@ -1207,15 +1207,20 @@ const GroupManager = ({
         </Button>
       </div>
 
-      {drawView === "choice" && (
-        <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
-          <div className="mx-auto flex min-h-full max-w-5xl flex-col gap-6">
-            <header className="border-b border-primary/30 pb-4">
-              <Button variant="ghost" className="mb-3 px-0" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
-              <h2 className="text-xl font-bold">Wat wil je loten?</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Kies welk deel van deze fase je live wilt loten.</p>
-            </header>
-            <div className="grid gap-3 md:grid-cols-3">
+      <Dialog open={drawView !== null} onOpenChange={(next) => { if (!next) closeDrawView(); }}>
+        <DialogContent
+          scrollable={false}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onEscapeKeyDown={(event) => event.preventDefault()}
+          className="draw-dialog-theme h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl"
+        >
+          {drawView === "choice" && (
+            <section className="draw-surface flex min-h-0 flex-1 flex-col bg-background p-4 text-foreground sm:p-6">
+              <DialogHeader className="shrink-0 border-b border-primary/30 pb-4 pr-10">
+                <DialogTitle>Wat wil je loten?</DialogTitle>
+                <DialogDescription>Kies welk deel van deze fase je live wilt loten.</DialogDescription>
+              </DialogHeader>
+              <div className="grid min-h-0 flex-1 content-start gap-3 overflow-y-auto py-5 md:grid-cols-3">
             {([
               ["full", "Volledige loting", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
               ["groups", "Alleen poules loten", "Teams over de poules verdelen. De speelrondes blijven ongewijzigd."],
@@ -1225,18 +1230,51 @@ const GroupManager = ({
                 key={mode}
                 type="button"
                 variant="outline"
-                aria-pressed="true"
-                onClick={() => void requestDraw(mode)}
-                className="draw-choice h-auto min-h-40 w-full flex-col items-start justify-start whitespace-normal border-y-2 border-y-primary bg-primary/[0.06] p-5 text-left"
+                 aria-pressed={drawMode === mode}
+                 onClick={() => setDrawMode(mode)}
+                 className={`draw-choice h-auto min-h-40 w-full flex-col items-start justify-start whitespace-normal p-5 text-left ${drawMode === mode ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`}
               >
                 <div className="text-sm font-semibold text-foreground">{title}</div>
                 <div className="mt-1 text-xs text-muted-foreground">{text}</div>
               </Button>
             ))}
-            </div>
-          </div>
-        </section>
-      )}
+              </div>
+              <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
+                <Button variant="outline" onClick={closeDrawView}>Sluiten</Button>
+                <Button onClick={() => void requestDraw(groups.length === 1 && drawMode === "full" ? "rounds" : drawMode)}>Volgende</Button>
+              </DialogFooter>
+            </section>
+          )}
+
+          <RoundsDrawDialog
+            open={drawView === "rounds"}
+            onOpenChange={(next) => setDrawView(next ? "rounds" : null)}
+            tournamentId={tournamentId}
+            phaseId={phaseId}
+            categoryId={categoryId}
+            phaseName={phases.find((phase) => phase.id === phaseId)?.name}
+            defaultRounds={phaseRounds}
+            onApplied={() => { notifySlotChange(); void fetchGroups(); }}
+          />
+          <LiveDrawDialog
+            open={drawView === "groups"}
+            onOpenChange={(next) => setDrawView(next ? "groups" : null)}
+            tournamentId={tournamentId}
+            phaseId={phaseId}
+            categoryId={categoryId}
+            phaseMatchType={phaseMatchType}
+            phaseName={phases.find((phase) => phase.id === phaseId)?.name}
+            onApplied={async () => {
+              notifySlotChange();
+              await fetchGroups();
+              if (drawMode === "full") {
+                localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
+                setDrawView("rounds");
+              }
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!pendingDrawMode} onOpenChange={(o) => !o && setPendingDrawMode(null)}>
         <AlertDialogContent>
@@ -1259,31 +1297,6 @@ const GroupManager = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <RoundsDrawDialog
-        open={drawView === "rounds"}
-        onOpenChange={(next) => setDrawView(next ? "rounds" : null)}
-        tournamentId={tournamentId}
-        phaseId={phaseId}
-        categoryId={categoryId}
-        phaseName={phases.find((phase) => phase.id === phaseId)?.name}
-        defaultRounds={phaseRounds}
-        onApplied={() => { notifySlotChange(); fetchGroups(); }}
-      />
-      <LiveDrawDialog
-        open={drawView === "groups"}
-        onOpenChange={(next) => setDrawView(next ? "groups" : null)}
-        tournamentId={tournamentId}
-        phaseId={phaseId}
-        categoryId={categoryId}
-        phaseMatchType={phaseMatchType}
-        phaseName={phases.find((phase) => phase.id === phaseId)?.name}
-        onApplied={() => {
-          notifySlotChange();
-          fetchGroups();
-          if (drawMode === "full") setTimeout(() => setDrawView("rounds"), 300);
-        }}
-      />
 
       {/* Grid layout for groups */}
       {drawView === "choice" || drawView === "groups" || drawView === "rounds" ? null : !groupsLoaded && groups.length === 0 ? (

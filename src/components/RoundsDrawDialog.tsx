@@ -839,10 +839,10 @@ const RoundsDrawDialog = ({
   if (!open) return null;
 
   return (
-    <section className="draw-surface draw-dialog-theme -mx-3 min-h-[calc(100dvh-8rem)] bg-background px-3 py-4 text-foreground sm:-mx-6 sm:px-6">
-      <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-7xl flex-col gap-4">
+    <section className="draw-surface draw-dialog-theme flex min-h-0 flex-1 bg-background p-4 text-foreground sm:p-6">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4">
         <header className="shrink-0 border-b border-primary/30 pb-3">
-          <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
+          <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Sluiten</Button>
           <h1 className="text-lg font-semibold">Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</h1>
         </header>
         {loading ? (
