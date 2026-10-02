@@ -70,6 +70,10 @@ const RoundsDrawDialog = ({
   phaseName,
   defaultRounds,
   onApplied,
+  overwrite = false,
+  onBack,
+  onRestart,
+  onStepChange,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -79,6 +83,10 @@ const RoundsDrawDialog = ({
   phaseName?: string;
   defaultRounds: number;
   onApplied?: () => void;
+  overwrite?: boolean;
+  onBack?: () => void;
+  onRestart?: () => void;
+  onStepChange?: (step: string) => void;
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -112,6 +120,7 @@ const RoundsDrawDialog = ({
   const [draftReady, setDraftReady] = useState(false);
   const draftKey = `copa-live-draw:rounds:v1:${phaseId}`;
 
+  useEffect(() => { if (open) onStepChange?.(step); }, [open, step]);
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
 
   const load = async () => {
@@ -445,6 +454,10 @@ const RoundsDrawDialog = ({
   const apply = async () => {
     setApplying(true);
     try {
+      if (overwrite) {
+        const { error } = await supabase.from("matches").delete().eq("tournament_id", tournamentId).eq("phase_id", phaseId);
+        if (error) throw error;
+      }
       let total = 0;
       for (const d of draws) {
         const g = drawGroups.find((x) => x.id === d.groupId)!;
@@ -724,7 +737,6 @@ const RoundsDrawDialog = ({
               <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {potGroup.teamIds.length / count} teams</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <Button variant="outline" aria-expanded={advancedOpen} onClick={() => setAdvancedOpen((open) => !open)}>Geavanceerde instellingen <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} /></Button>
         </div>
         {groupPots.length > 0 && <>
           <p className="text-xs text-muted-foreground">{assigned.size}/{potGroup.teamIds.length} teams ingedeeld</p>
@@ -735,7 +747,6 @@ const RoundsDrawDialog = ({
             </div>)}
           </div>
         </>}
-        {advancedOpen && <div className="border-t border-primary/30 pt-4">{settings}</div>}
       </>}
       {potError && <p role="alert" className="flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="h-4 w-4" />{potError}</p>}
     </div>
@@ -842,27 +853,28 @@ const RoundsDrawDialog = ({
     <section className="draw-surface draw-dialog-theme flex min-h-0 flex-1 bg-background p-4 text-foreground sm:p-6">
       <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4">
         <header className="shrink-0 border-b border-primary/30 pb-3">
-          <Button variant="ghost" className="mb-2 px-0" onClick={() => onOpenChange(false)}><ArrowLeft className="h-4 w-4" /> Sluiten</Button>
           <h1 className="text-lg font-semibold">Live loting speelrondes{phaseName ? ` · ${phaseName}` : ""}</h1>
         </header>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
          ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? settings : drawScreen}
-        <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:justify-end">
+        <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:items-center">
+          {onRestart && <Button variant="ghost" className="sm:mr-auto" onClick={onRestart} disabled={applying}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>}
+          <div className="flex flex-col-reverse gap-2 sm:ml-auto sm:flex-row">
            {step === "method" ? (
-             <><Button variant="ghost" onClick={() => onOpenChange(false)}>Terug naar toernooi</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>{method === "pots" ? "Verder naar potindeling" : "Verder naar instellingen"}</Button></>
+             <><Button variant="outline" onClick={() => (onBack ? onBack() : onOpenChange(false))}><ArrowLeft className="h-4 w-4" /> Vorige</Button><Button onClick={() => method === "pots" ? setStep("pots") : nextToRules()} disabled={loading || groups.length === 0 || (method === "pots" && !potDrawAvailable)}>Volgende</Button></>
            ) : step === "pots" ? (
-             <><Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Terug naar type loting</Button><Button onClick={proceedFromPots}>Verder naar instellingen</Button></>
+             <><Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button><Button onClick={proceedFromPots}>Volgende</Button></>
            ) : step === "settings" ? (
             <>
-               <Button variant="outline" onClick={() => setStep(method === "pots" ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> {method === "pots" ? "Terug naar potindeling" : "Terug naar type loting"}</Button>
+               <Button variant="outline" onClick={() => setStep(method === "pots" ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
               <Button onClick={prepare} disabled={checking || groups.length === 0}>
-                {checking ? "Speelrondes aanmaken..." : "Naar de loting"}
+                {checking ? "Speelrondes aanmaken..." : "Volgende"}
               </Button>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setStep("settings")} disabled={applying}><ArrowLeft className="h-4 w-4" /> Terug naar instellingen</Button>
+              <Button variant="outline" onClick={() => setStep("settings")} disabled={applying}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
               {allDone ? (
                 <Button onClick={apply} disabled={applying}><Check className="h-4 w-4" /> {applying ? "Opslaan..." : "Wedstrijden opslaan"}</Button>
               ) : (
@@ -870,6 +882,7 @@ const RoundsDrawDialog = ({
               )}
             </>
           )}
+          </div>
         </footer>
       </div>
     </section>
