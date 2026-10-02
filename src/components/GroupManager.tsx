@@ -335,8 +335,38 @@ const GroupManager = ({
   useEffect(() => {
     if (drawView) localStorage.setItem(drawModeStorageKey, drawMode);
   }, [drawMode, drawView, drawModeStorageKey]);
+  const drawOverwriteKey = `copa-live-draw-overwrite:${phaseId}`;
+  const [drawOverwrite, setDrawOverwrite] = useState(false);
+  const [drawSubStep, setDrawSubStep] = useState("method");
+  const [drawResetKey, setDrawResetKey] = useState(0);
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+  useEffect(() => { setDrawOverwrite(localStorage.getItem(drawOverwriteKey) === "1"); }, [drawOverwriteKey]);
+  const updateOverwrite = (value: boolean) => {
+    setDrawOverwrite(value);
+    if (value) localStorage.setItem(drawOverwriteKey, "1"); else localStorage.removeItem(drawOverwriteKey);
+  };
   const closeDrawView = () => setDrawView(null);
-  const startDraw = (mode: DrawMode) => {
+  const backToChoice = () => {
+    if (phaseMatchType === "rounds" && groups.length > 1) setDrawView("choice");
+    else closeDrawView();
+  };
+  const restartDraw = () => {
+    setShowRestartConfirm(false);
+    localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`);
+    localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
+    updateOverwrite(false);
+    setDrawMode("full");
+    setDrawResetKey((k) => k + 1);
+    setDrawSubStep("method");
+    if (phaseMatchType === "rounds" && groups.length > 1) setDrawView("choice");
+    else if (phaseMatchType === "rounds") setDrawView("rounds");
+    else setDrawView("groups");
+  };
+  const startDraw = (mode: DrawMode, overwrite = false) => {
+    updateOverwrite(overwrite);
+    localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`);
+    localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
+    setDrawResetKey((k) => k + 1);
     setDrawMode(mode);
     setDrawView(mode === "rounds" ? "rounds" : "groups");
   };
@@ -1212,11 +1242,42 @@ const GroupManager = ({
           scrollable={false}
           onPointerDownOutside={(event) => event.preventDefault()}
           onEscapeKeyDown={(event) => event.preventDefault()}
-          className="draw-dialog-theme h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl"
+          hideClose
+          className="draw-dialog-theme flex flex-col h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl"
         >
+          {drawView && (() => {
+            const steps = drawMode === "groups" || phaseMatchType !== "rounds"
+              ? ["Type loting", "Poules & Potten", "Regels", "Loting show"]
+              : drawMode === "rounds" || groups.length === 1
+                ? ["Type loting", "Speelrondes", "Loting show"]
+                : ["Type loting", "Poules & Potten", "Regels", "Speelrondes", "Loting show"];
+            const label = drawView === "choice" ? "Type loting"
+              : drawSubStep === "draw" ? (drawView === "rounds" || drawMode !== "full" || phaseMatchType !== "rounds" ? "Loting show" : "Loting show")
+              : drawView === "rounds" ? "Speelrondes"
+              : drawSubStep === "settings" ? "Regels"
+              : drawSubStep === "pots" ? "Poules & Potten"
+              : (phaseMatchType === "rounds" && drawMode === "full") ? "Poules & Potten" : "Type loting";
+            const current = Math.max(0, steps.indexOf(label));
+            return (
+              <div className="shrink-0 border-b border-primary/30 bg-background px-4 pt-3 pb-3 sm:px-6">
+                <div className="flex items-center justify-between gap-3">
+                  <Button variant="ghost" size="sm" className="px-0" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
+                  <span className="text-xs text-muted-foreground">Stap {current + 1} van {steps.length}</span>
+                </div>
+                <ol className="mt-2 flex gap-1.5" aria-label="Voortgang loting">
+                  {steps.map((name, i) => (
+                    <li key={name} className="min-w-0 flex-1" aria-current={i === current ? "step" : undefined}>
+                      <div className={`h-1 rounded-full ${i <= current ? "bg-primary" : "bg-border"}`} />
+                      <span className={`mt-1 hidden truncate text-[11px] sm:block ${i === current ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{name}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            );
+          })()}
           {drawView === "choice" && (
             <section className="draw-surface flex min-h-0 flex-1 flex-col bg-background p-4 text-foreground sm:p-6">
-              <DialogHeader className="shrink-0 border-b border-primary/30 pb-4 pr-10">
+              <DialogHeader className="shrink-0 border-b border-primary/30 pb-4">
                 <DialogTitle>Wat wil je loten?</DialogTitle>
                 <DialogDescription>Kies welk deel van deze fase je live wilt loten.</DialogDescription>
               </DialogHeader>
@@ -1240,13 +1301,19 @@ const GroupManager = ({
             ))}
               </div>
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
-                <Button variant="outline" onClick={closeDrawView}>Sluiten</Button>
+                <Button variant="ghost" className="sm:mr-auto" onClick={() => setShowRestartConfirm(true)}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>
+                <Button variant="outline" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
                 <Button onClick={() => void requestDraw(groups.length === 1 && drawMode === "full" ? "rounds" : drawMode)}>Volgende</Button>
               </DialogFooter>
             </section>
           )}
 
           <RoundsDrawDialog
+            key={`rounds-${drawResetKey}`}
+            overwrite={drawOverwrite}
+            onBack={() => (drawMode === "full" && groups.length > 1 ? setDrawView("groups") : backToChoice())}
+            onRestart={() => setShowRestartConfirm(true)}
+            onStepChange={setDrawSubStep}
             open={drawView === "rounds"}
             onOpenChange={(next) => setDrawView(next ? "rounds" : null)}
             tournamentId={tournamentId}
@@ -1257,6 +1324,11 @@ const GroupManager = ({
             onApplied={() => { notifySlotChange(); void fetchGroups(); }}
           />
           <LiveDrawDialog
+            key={`groups-${drawResetKey}`}
+            overwrite={drawOverwrite}
+            onBack={backToChoice}
+            onRestart={() => setShowRestartConfirm(true)}
+            onStepChange={setDrawSubStep}
             open={drawView === "groups"}
             onOpenChange={(next) => setDrawView(next ? "groups" : null)}
             tournamentId={tournamentId}
@@ -1276,20 +1348,33 @@ const GroupManager = ({
         </DialogContent>
       </Dialog>
 
+      <AlertDialog open={showRestartConfirm} onOpenChange={setShowRestartConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Opnieuw beginnen?</AlertDialogTitle>
+            <AlertDialogDescription>De volledige lotingsdraft van deze fase wordt gewist. Je begint opnieuw bij de eerste stap.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={restartDraw}>Opnieuw beginnen</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={!!pendingDrawMode} onOpenChange={(o) => !o && setPendingDrawMode(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Bestaande indeling overschrijven?</AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDrawMode === "rounds"
-                ? "De bestaande speelrondes en wedstrijden van deze fase worden bij het toepassen van de loting vervangen."
-                : "De huidige poule-indeling (en de bijhorende wedstrijden) wordt bij het toepassen van de loting vervangen."}
+                ? "Alle bestaande speelrondes en wedstrijden van deze fase worden volledig gewist voordat de nieuwe loting wordt opgeslagen."
+                : "Alle groepstoewijzingen en gegenereerde wedstrijden van deze fase worden volledig gewist voordat de nieuwe loting wordt opgeslagen."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { const m = pendingDrawMode; setPendingDrawMode(null); if (m) startDraw(m); }}
+              onClick={() => { const m = pendingDrawMode; setPendingDrawMode(null); if (m) startDraw(m, true); }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Ja, overschrijven

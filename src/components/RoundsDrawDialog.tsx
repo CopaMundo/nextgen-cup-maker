@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CountryFlag from "@/components/CountryFlag";
-import { AlertTriangle, ArrowLeft, Check, ChevronDown, Pause, Play, Plus, Trash2, FastForward } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, ChevronDown, Pause, Play, Plus, Trash2, FastForward, RotateCcw } from "lucide-react";
 import {
   buildSchedule,
   defaultOpponentMatrix,
