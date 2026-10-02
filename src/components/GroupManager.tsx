@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays, Check, AlertTriangle, Trophy, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, Pencil, Shuffle, Upload, X, Info, CalendarDays, Check, AlertTriangle, Trophy, ArrowLeft, RotateCcw } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -1242,7 +1242,6 @@ const GroupManager = ({
           scrollable={false}
           onPointerDownOutside={(event) => event.preventDefault()}
           onEscapeKeyDown={(event) => event.preventDefault()}
-          hideClose
           className="draw-dialog-theme flex flex-col h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl"
         >
           {drawView && (() => {
