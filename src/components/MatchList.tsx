@@ -76,7 +76,7 @@ const MatchList = ({ tournamentId }: { tournamentId: string }) => {
       }),
       supabase.from("teams").select("id, name").eq("tournament_id", tournamentId),
       supabase.from("tournament_phases").select("id, name, phase_type").eq("tournament_id", tournamentId).order("phase_number"),
-      supabase.from("groups").select("id, name, phase_id").eq("tournament_id", tournamentId),
+      supabase.from("groups").select("id, name, phase_id").eq("tournament_id", tournamentId).order("created_at"),
       supabase.from("group_teams").select("group_id, team_id").eq("tournament_id", tournamentId),
     ]);
     setMatches(matchesRes as any);

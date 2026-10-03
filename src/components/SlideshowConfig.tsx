@@ -158,7 +158,7 @@ const SlideshowConfig = ({ tournamentId, tournament, onUpdate, mobileOverview = 
           .from("groups")
           .select("id, name, phase_id, sort_order")
           .eq("tournament_id", tournamentId)
-          .order("sort_order"),
+          .order("created_at"),
         supabase
           .from("tournament_categories")
           .select("id, name")

@@ -94,7 +94,7 @@ const StandingsTable = ({ tournamentId, tournament, categoryId }: { tournamentId
     if (categoryId) phaseQuery = phaseQuery.eq("category_id", categoryId);
     const [pRes, gRes, tRes, mRes, gtRes, scRes, ssRes] = await Promise.all([
       phaseQuery,
-      supabase.from("groups").select("*").eq("tournament_id", tournamentId),
+      supabase.from("groups").select("*").eq("tournament_id", tournamentId).order("created_at"),
       supabase.from("teams").select("*").eq("tournament_id", tournamentId),
       fetchTournamentMatches({ tournamentId, maxRows: 5000 }),
       supabase.from("group_teams").select("*").eq("tournament_id", tournamentId),
