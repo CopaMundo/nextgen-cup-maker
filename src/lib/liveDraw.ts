@@ -239,6 +239,36 @@ export function containerAllows(container: DrawContainer, teamId: string, ctx: C
   return true;
 }
 
+
+/**
+ * Optimale landenspreiding: bij een actieve landenlimiet krijgt elk bakje
+ * hoogstens ceil(totaal/n) en minstens floor(totaal/n) teams van dat land.
+ */
+function spreadOk(containers: DrawContainer[], remaining: string[], ctx: ContainerCtx): boolean {
+  const n = containers.length;
+  if (n === 0) return true;
+  const totals = new Map<string, number>();
+  const left = new Map<string, number>();
+  const add = (map: Map<string, number>, id: string) => {
+    const c = ctx.teamById.get(id)?.country;
+    if (c && countryLimit(ctx.rules, c) != null) map.set(c, (map.get(c) || 0) + 1);
+  };
+  containers.forEach((c) => c.teamIds.forEach((id) => add(totals, id)));
+  remaining.forEach((id) => { add(totals, id); add(left, id); });
+  for (const [country, total] of totals) {
+    const hi = Math.ceil(total / n);
+    const lo = Math.floor(total / n);
+    let deficit = 0;
+    for (const c of containers) {
+      const count = c.teamIds.filter((id) => ctx.teamById.get(id)?.country === country).length;
+      if (count > hi) return false;
+      if (count < lo) deficit += lo - count;
+    }
+    if (deficit > (left.get(country) || 0)) return false;
+  }
+  return true;
+}
+
 /**
  * Zoekt een volledige geldige verdeling van `teamIds` over de bakjes.
  * Geeft null als het niet kan (binnen de tijdslimiet).
@@ -279,7 +309,7 @@ export function solveContainers(
       if (!containerAllows(container, teamId, ctx)) continue;
       container.teamIds.push(teamId);
       assignment[teamId] = container.id;
-      if (solve(index + 1)) return true;
+      if (spreadOk(working, order.slice(index + 1), ctx) && solve(index + 1)) return true;
       container.teamIds.pop();
       delete assignment[teamId];
     }
@@ -310,6 +340,7 @@ export function validContainersFor(
     const hypothetical = containers.map((c) =>
       c.id === container.id ? { ...c, teamIds: [...c.teamIds, teamId] } : { ...c, teamIds: [...c.teamIds] }
     );
+    if (!spreadOk(hypothetical, remainingAfter, ctx)) continue;
     if (remainingAfter.length === 0 || solveContainers(remainingAfter, hypothetical, ctx, 600)) {
       valid.push(container.id);
     }
