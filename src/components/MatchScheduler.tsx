@@ -873,7 +873,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       teamQuery,
       phaseQuery,
       supabase.from("slots").select("id, slot_code, team_id, group_id, phase_id, sort_order").eq("tournament_id", tournamentId).order("sort_order"),
-      supabase.from("groups").select("id, name, phase_id, sort_order, created_at").eq("tournament_id", tournamentId).order("sort_order"),
+      supabase.from("groups").select("id, name, phase_id, sort_order, created_at").eq("tournament_id", tournamentId).order("created_at"),
     ]);
 
     // Load category-specific fields/referees if categoryId is set
