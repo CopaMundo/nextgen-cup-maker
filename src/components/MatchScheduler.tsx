@@ -873,7 +873,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       teamQuery,
       phaseQuery,
       supabase.from("slots").select("id, slot_code, team_id, group_id, phase_id, sort_order").eq("tournament_id", tournamentId).order("sort_order"),
-      supabase.from("groups").select("id, name, phase_id, sort_order, created_at").eq("tournament_id", tournamentId).order("sort_order"),
+      supabase.from("groups").select("id, name, phase_id, sort_order, created_at").eq("tournament_id", tournamentId).order("created_at"),
     ]);
 
     // Load category-specific fields/referees if categoryId is set
@@ -1748,7 +1748,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
     const groupPhases = phases.filter(p => groupPhaseTypes.has(p.phase_type) && unschedPhaseIds.has(p.id));
     for (const gp of groupPhases) {
       const phaseIdx = phases.indexOf(gp);
-      const groups = allGroups.filter(g => g.phase_id === gp.id && unschedGroupIds.has(g.id)).sort((a, b) => a.sort_order - b.sort_order);
+      const groups = allGroups.filter(g => g.phase_id === gp.id && unschedGroupIds.has(g.id)).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
       for (const g of groups) {
         items.push({ type: "group", id: g.id, label: `${g.name} (${gp.name})`, phaseId: gp.id, phaseSortOrder: phaseIdx, subSortOrder: g.sort_order });
       }

@@ -140,7 +140,7 @@ const TournamentSlideshow = () => {
             .from("groups")
             .select("*")
             .eq("tournament_id", t.id)
-            .order("sort_order"),
+            .order("created_at"),
           supabase.from("teams").select("*").eq("tournament_id", t.id),
           supabase.from("group_teams").select("*").eq("tournament_id", t.id),
           fetchTournamentMatches({

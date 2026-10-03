@@ -144,7 +144,7 @@ const LiveDrawDialog = ({
     try {
       const [{ data: groupRows }, { data: slotRows }, { data: teamRows }, { data: potRows }, { data: potTeamRows }] =
         await Promise.all([
-          supabase.from("groups").select("id, name, sort_order").eq("phase_id", phaseId).order("sort_order"),
+          supabase.from("groups").select("id, name, sort_order").eq("phase_id", phaseId).order("created_at").order("name"),
           supabase.from("slots").select("id, group_id, team_id, slot_code, sort_order").eq("phase_id", phaseId).order("sort_order"),
           supabase.from("teams").select("id, name, country, logo_url, category_id").eq("tournament_id", tournamentId).order("name"),
           supabase.from("draw_pots").select("id, name, sort_order").eq("phase_id", phaseId).order("sort_order"),
@@ -655,14 +655,14 @@ const LiveDrawDialog = ({
         </div>
 
         {rules.countryMaxDefault != null && exceptionalCountries.length > 0 && <div className="space-y-2">
-          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Alleen landen met meer teams dan poules kunnen hier afwijken.</p></div>
+          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Alleen landen met meer teams dan poules. Ze worden optimaal gespreid: elke poule krijgt eerst één team van dat land en het verschil tussen poules is maximaal één.</p></div>
           {exceptionalCountries.map((country) => (
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
               <span className="flex-1">{country} · {countryCounts[country]} teams</span>
-              <Select value={String(rules.countryMax[country] ?? rules.countryMaxDefault)} onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}>
+              <Select value={String(Math.max(Math.ceil(countryCounts[country] / Math.max(1, containers.length)), rules.countryMax[country] ?? rules.countryMaxDefault))} onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}>
                 <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
-                <SelectContent>{Array.from({ length: maxGroupCapacity }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>Max {number}</SelectItem>)}</SelectContent>
+                <SelectContent>{[Math.ceil(countryCounts[country] / Math.max(1, containers.length))].map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}</SelectContent>
               </Select>
             </div>
           ))}
@@ -916,11 +916,7 @@ const LiveDrawDialog = ({
                       <div className="draw-panel p-3">
                         <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
                         <p className="text-xs text-muted-foreground">Copa Mundo verdeelt de teams uit elke pot zo gelijk mogelijk over de groepen. Het verschil tussen groepen is maximaal één team; welke groepen een extra team krijgen, wordt willekeurig bepaald.</p>
-                        <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
-                          <CollapsibleTrigger asChild>
-                            <Button variant="outline" size="sm">Verdeling handmatig aanpassen <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedSpreadOpen ? "rotate-180" : ""}`} /></Button>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="mt-3 space-y-3">
+                        <div className="mt-3 space-y-3">
                             <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
                             <div className="overflow-x-auto">
                               <table className="draw-table min-w-[520px] text-xs">
@@ -940,27 +936,10 @@ const LiveDrawDialog = ({
                                 </tbody>
                               </table>
                             </div>
-                          </CollapsibleContent>
-                        </Collapsible>
+                        </div>
                       </div>
                     </section>
 
-                    {isRounds && (
-                      <section className="space-y-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ontmoetingen tussen potten</h3>
-                        <div className="grid gap-2 md:grid-cols-2">
-                          {pots.flatMap((first, index) => pots.slice(index).map((second) => (
-                            <div key={`${first.id}|${second.id}`} className="flex items-center justify-between gap-3 rounded-md bg-muted/40 p-2">
-                              <span className="text-xs font-medium">{first.id === second.id ? `${first.name} onderling` : `${first.name} tegen ${second.name}`}</span>
-                              <Select value={String(matrixValue(first.id, second.id))} onValueChange={(value) => setMatrixValue(first.id, second.id, Number(value))}>
-                                <SelectTrigger className="h-8 w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>{[0, 1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>{number}x</SelectItem>)}</SelectContent>
-                              </Select>
-                            </div>
-                          )))}
-                        </div>
-                      </section>
-                    )}
 
                  </div>
               )}
