@@ -655,14 +655,14 @@ const LiveDrawDialog = ({
         </div>
 
         {rules.countryMaxDefault != null && exceptionalCountries.length > 0 && <div className="space-y-2">
-          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Alleen landen met meer teams dan poules kunnen hier afwijken.</p></div>
+          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Alleen landen met meer teams dan poules. Ze worden optimaal gespreid: elke poule krijgt eerst één team van dat land en het verschil tussen poules is maximaal één.</p></div>
           {exceptionalCountries.map((country) => (
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
               <span className="flex-1">{country} · {countryCounts[country]} teams</span>
-              <Select value={String(rules.countryMax[country] ?? rules.countryMaxDefault)} onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}>
+              <Select value={String(Math.max(Math.ceil(countryCounts[country] / Math.max(1, containers.length)), rules.countryMax[country] ?? rules.countryMaxDefault))} onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}>
                 <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
-                <SelectContent>{Array.from({ length: maxGroupCapacity }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>Max {number}</SelectItem>)}</SelectContent>
+                <SelectContent>{[Math.ceil(countryCounts[country] / Math.max(1, containers.length))].map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}</SelectContent>
               </Select>
             </div>
           ))}
