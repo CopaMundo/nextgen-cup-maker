@@ -916,11 +916,7 @@ const LiveDrawDialog = ({
                       <div className="draw-panel p-3">
                         <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
                         <p className="text-xs text-muted-foreground">Copa Mundo verdeelt de teams uit elke pot zo gelijk mogelijk over de groepen. Het verschil tussen groepen is maximaal één team; welke groepen een extra team krijgen, wordt willekeurig bepaald.</p>
-                        <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
-                          <CollapsibleTrigger asChild>
-                            <Button variant="outline" size="sm">Verdeling handmatig aanpassen <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedSpreadOpen ? "rotate-180" : ""}`} /></Button>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="mt-3 space-y-3">
+                        <div className="mt-3 space-y-3">
                             <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
                             <div className="overflow-x-auto">
                               <table className="draw-table min-w-[520px] text-xs">
@@ -940,27 +936,10 @@ const LiveDrawDialog = ({
                                 </tbody>
                               </table>
                             </div>
-                          </CollapsibleContent>
-                        </Collapsible>
+                        </div>
                       </div>
                     </section>
 
-                    {isRounds && (
-                      <section className="space-y-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ontmoetingen tussen potten</h3>
-                        <div className="grid gap-2 md:grid-cols-2">
-                          {pots.flatMap((first, index) => pots.slice(index).map((second) => (
-                            <div key={`${first.id}|${second.id}`} className="flex items-center justify-between gap-3 rounded-md bg-muted/40 p-2">
-                              <span className="text-xs font-medium">{first.id === second.id ? `${first.name} onderling` : `${first.name} tegen ${second.name}`}</span>
-                              <Select value={String(matrixValue(first.id, second.id))} onValueChange={(value) => setMatrixValue(first.id, second.id, Number(value))}>
-                                <SelectTrigger className="h-8 w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>{[0, 1, 2, 3, 4].map((number) => <SelectItem key={number} value={String(number)}>{number}x</SelectItem>)}</SelectContent>
-                              </Select>
-                            </div>
-                          )))}
-                        </div>
-                      </section>
-                    )}
 
                  </div>
               )}
