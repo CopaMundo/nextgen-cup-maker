@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
+import { DrawShow } from "@/components/draw/DrawShow";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft } from "lucide-react";
+import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import {
   checkContainerFeasibility,
@@ -60,6 +61,7 @@ interface LiveDrawDraft {
   selectedPotId: string | null;
   advancedOpen: boolean;
   advancedSpreadOpen: boolean;
+  placementMode?: "manual" | "automatic";
 }
 
 const LiveDrawDialog = ({
@@ -110,6 +112,11 @@ const LiveDrawDialog = ({
   const [pairA, setPairA] = useState("");
   const [pairB, setPairB] = useState("");
   const [manualTeam, setManualTeam] = useState("");
+  const [placementMode, setPlacementMode] = useState<"manual" | "automatic">("manual");
+  const [spotlightId, setSpotlightId] = useState<string | null>(null);
+  const [rolling, setRolling] = useState(false);
+  const timers = useRef<number[]>([]);
+  const syncQueue = useRef<Promise<unknown>>(Promise.resolve());
   const [draftReady, setDraftReady] = useState(false);
   const draftKey = `copa-live-draw:groups:v1:${phaseId}`;
   const [savingSlot, setSavingSlot] = useState(false);
@@ -202,6 +209,7 @@ const LiveDrawDialog = ({
           setSelectedPotId(draft.selectedPotId && validPotIds.has(draft.selectedPotId) ? draft.selectedPotId : null);
           setAdvancedOpen(draft.advancedOpen);
           setAdvancedSpreadOpen(draft.advancedSpreadOpen);
+          setPlacementMode(draft.placementMode ?? "manual");
         } else {
           const counts = available.reduce<Record<string, number>>((result, team) => {
             if (team.country) result[team.country] = (result[team.country] || 0) + 1;
@@ -229,15 +237,34 @@ const LiveDrawDialog = ({
     setAdvancedSpreadOpen(false);
     setSelectedPotId(null);
     setSession(null);
+    setPlacementMode("manual");
+    setSpotlightId(null);
     setRules(emptyContainerRules());
     loadAll();
   }, [open, phaseId, categoryId]);
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen };
+    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen]);
+  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode]);
+
+  useEffect(() => {
+    if (!open || !draftReady || !session || step !== "draw") return;
+    const picture = { session, spotlightId };
+    syncQueue.current = syncQueue.current.then(async () => {
+      const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: "running", state: picture as unknown as never }, { onConflict: "phase_id" });
+      if (error) console.warn("Live loting niet gesynchroniseerd", error.message);
+    });
+  }, [open, draftReady, session, step, spotlightId, tournamentId, phaseId, categoryId]);
+
+  useEffect(() => {
+    if (open && step === "draw") return;
+    timers.current.forEach(window.clearTimeout);
+    timers.current = [];
+    setRolling(false);
+    if (draftReady) syncQueue.current = syncQueue.current.then(() => supabase.from("draw_sessions").update({ status: "closed" }).eq("phase_id", phaseId));
+  }, [open, step, phaseId, draftReady]);
 
   /* -------------------------------- potten ------------------------------ */
 
@@ -424,9 +451,34 @@ const LiveDrawDialog = ({
     setManualTeam("");
   };
   const handleConfirm = (targetId?: string) => {
-    if (!session) return;
+    if (!session || rolling) return;
     setSession(confirmPending(session, targetId));
+    setSpotlightId(null);
   };
+  const drawGroup = () => {
+    if (!session?.pending?.options.length || rolling) return;
+    const options = session.pending.options;
+    setRolling(true);
+    let count = 0;
+    const light = () => {
+      setSpotlightId(options[count % options.length].id);
+      count++;
+      if (count < Math.max(7, options.length * 2)) timers.current.push(window.setTimeout(light, 155 + count * 28));
+      else timers.current.push(window.setTimeout(() => {
+        setSession((current) => current?.pending ? confirmPending(current, options[(count - 1) % options.length].id) : current);
+        setSpotlightId(null);
+        setRolling(false);
+      }, 420));
+    };
+    light();
+  };
+  useEffect(() => {
+    if (step !== "draw" || placementMode !== "automatic" || !session?.pending?.options.length || rolling) return;
+    const id = window.setTimeout(() => {
+      setSession((current) => current?.pending ? confirmPending(current, current.pending.options[0]?.id) : current);
+    }, 1100);
+    return () => window.clearTimeout(id);
+  }, [step, placementMode, session?.pending?.teamId, rolling]);
   const handleRedraw = () => {
     if (!session) return;
     setSession(drawNext({ ...session, pending: null }));
@@ -705,36 +757,13 @@ const LiveDrawDialog = ({
   );
 
   const drawContent = session && (
-    <div className="grid min-h-0 flex-1 gap-5 overflow-hidden lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]">
-      <section className="min-h-0 overflow-y-auto border-b border-border pb-5 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-5">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase text-muted-foreground">Actueel overzicht</p>
-            <h2 className="text-xl font-bold">{phaseName || "Fase"}</h2>
-          </div>
-          <span className="text-xs text-muted-foreground">{session.history.length}/{teams.length} geplaatst</span>
-        </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {session.containers.map((container) => (
-            <div key={container.id} className="draw-panel p-3">
-              <h3 className="mb-2 text-sm font-bold">{container.name}</h3>
-              <div className="space-y-1.5">
-                {container.teamIds.map((id) => <div key={id} className="rounded-md bg-muted/50 px-2 py-2 text-xs"><TeamChip id={id} /></div>)}
-                {Array.from({ length: Math.max(0, container.capacity - container.teamIds.length) }).map((_, index) => (
-                  <div key={`empty-${index}`} className="rounded-md border border-dashed border-border px-2 py-2 text-xs text-muted-foreground">Lege plaats</div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <aside className="min-h-0 overflow-y-auto">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto lg:overflow-hidden">
+      <div className="min-h-[350px] shrink-0 overflow-hidden border border-border lg:min-h-0 lg:flex-1"><DrawShow session={session} spotlightId={spotlightId} /></div>
+      <aside className="shrink-0 lg:max-h-[32%] lg:overflow-y-auto">
         <div className="draw-panel space-y-4 p-4">
-          <div>
-            <p className="text-xs font-semibold uppercase text-muted-foreground">Actieve trekking</p>
-            <h2 className="text-lg font-bold">{session.mode === "pots" ? (pending ? activePot?.name : activePotChoice?.name) || "Pot" : "Volledig willekeurig"}</h2>
-            <p className="text-sm text-muted-foreground">{session.remaining.length} teams resterend</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div><h2 className="text-sm font-bold">{session.mode === "pots" ? (pending ? activePot?.name : activePotChoice?.name) || "Pot" : "Volledig willekeurig"}</h2><p className="text-xs text-muted-foreground">{session.remaining.length} teams resterend</p></div>
+            <Button variant="outline" size="sm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink className="h-4 w-4" /> Beamerscherm</Button>
           </div>
 
           {session.mode === "pots" && !session.finished && (
@@ -779,28 +808,16 @@ const LiveDrawDialog = ({
             </div>
           )}
 
-          {pending && (
-            <div className="space-y-4">
-              <div className="draw-choice flex items-center gap-3 border-y-2 border-y-primary bg-primary/[0.06] p-4">
-                {pendingTeam?.logoUrl && <img src={pendingTeam.logoUrl} alt="" className="h-12 w-12 object-contain" />}
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2"><CountryFlag country={pendingTeam?.country} /><span className="truncate text-lg font-bold">{pendingTeam?.name}</span></div>
-                  <p className="text-xs text-muted-foreground">Getrokken team</p>
-                </div>
-              </div>
-              <div>
-                <p className="mb-2 text-xs font-semibold text-muted-foreground">Geldige groepen</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {pending.options.map((option) => <Button key={option.id} variant="outline" onClick={() => handleConfirm(option.id)}>{option.label}</Button>)}
-                </div>
-                {pending.options.length === 0 && <p className="text-sm text-destructive">Geen geldige groep. Maak de vorige trekking ongedaan.</p>}
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button onClick={() => handleConfirm()} disabled={pending.options.length === 0}><Check className="h-4 w-4" /> Bevestig plaatsing</Button>
-                <Button variant="outline" onClick={handleRedraw}><RotateCcw className="h-4 w-4" /> Opnieuw trekken</Button>
-              </div>
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+            <span className="text-xs font-semibold">Groepstoewijzing</span>
+            <Button size="sm" variant={placementMode === "manual" ? "default" : "outline"} aria-pressed={placementMode === "manual"} onClick={() => setPlacementMode("manual")}>Groepstrekking</Button>
+            <Button size="sm" variant={placementMode === "automatic" ? "default" : "outline"} aria-pressed={placementMode === "automatic"} onClick={() => setPlacementMode("automatic")}>Automatisch</Button>
+          </div>
+          {pending && <div className="flex flex-wrap gap-2">
+            {pending.options.length === 0 && <p className="text-sm text-destructive">Geen geldige poule. Maak de vorige trekking ongedaan.</p>}
+            {placementMode === "manual" && <Button onClick={drawGroup} disabled={!pending.options.length || rolling}>Groep loten</Button>}
+            <Button variant="outline" onClick={handleRedraw} disabled={rolling}><RotateCcw className="h-4 w-4" /> Opnieuw trekken</Button>
+          </div>}
 
           {session.finished && (
             <div className="space-y-3">
@@ -810,9 +827,9 @@ const LiveDrawDialog = ({
           )}
 
           <div className="flex flex-wrap gap-1 border-t border-border pt-3">
-            <Button variant="ghost" size="sm" onClick={handleUndo} disabled={session.history.length === 0}><Undo2 className="h-3.5 w-3.5" /> Ongedaan</Button>
-            <Button variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)}><RotateCcw className="h-3.5 w-3.5" /> Opnieuw loten</Button>
-            <Button variant="outline" size="sm" onClick={handleDrawAll} disabled={session.finished}><Sparkles className="h-3.5 w-3.5" /> Alles trekken</Button>
+            <Button variant="ghost" size="sm" onClick={handleUndo} disabled={rolling || session.history.length === 0}><Undo2 className="h-3.5 w-3.5" /> Ongedaan</Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} disabled={rolling}><RotateCcw className="h-3.5 w-3.5" /> Opnieuw loten</Button>
+            <Button variant="outline" size="sm" onClick={handleDrawAll} disabled={rolling || session.finished}><Sparkles className="h-3.5 w-3.5" /> Alles trekken</Button>
           </div>
         </div>
       </aside>
