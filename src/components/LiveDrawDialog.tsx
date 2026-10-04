@@ -437,7 +437,6 @@ const LiveDrawDialog = ({
 
   const pending = session?.pending ?? null;
   const activePot = session?.activePotId ? pots.find((p) => p.id === session.activePotId) : null;
-  const pendingTeam = pending ? teamById.get(pending.teamId) : null;
 
   const activePotChoice =
     session?.mode === "pots"
@@ -449,11 +448,6 @@ const LiveDrawDialog = ({
     if (!session) return;
     setSession(drawNext(session, forcedTeamId, activePotChoice?.id ?? null));
     setManualTeam("");
-  };
-  const handleConfirm = (targetId?: string) => {
-    if (!session || rolling) return;
-    setSession(confirmPending(session, targetId));
-    setSpotlightId(null);
   };
   const drawGroup = () => {
     if (!session?.pending?.options.length || rolling) return;
@@ -476,7 +470,7 @@ const LiveDrawDialog = ({
     if (step !== "draw" || placementMode !== "automatic" || !session?.pending?.options.length || rolling) return;
     const id = window.setTimeout(() => {
       setSession((current) => current?.pending ? confirmPending(current, current.pending.options[0]?.id) : current);
-    }, 1100);
+    }, 2000);
     return () => window.clearTimeout(id);
   }, [step, placementMode, session?.pending?.teamId, rolling]);
   const handleRedraw = () => {

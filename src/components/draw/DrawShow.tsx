@@ -9,7 +9,7 @@ export function DrawShow({ session, spotlightId }: { session: DrawSessionState; 
   const shown = team ?? session.teams.find((item) => item.id === last?.teamId);
   const eligible = pending?.options ?? [];
 
-  return <div className="draw-show flex min-h-0 flex-col bg-background text-foreground">
+  return <div className="draw-show flex h-full min-h-0 w-full flex-col bg-background text-foreground">
     <div className="flex shrink-0 items-center justify-between border-b border-primary/30 px-5 py-3">
       <span className="text-sm font-bold uppercase text-primary">Copa Mundo · Live loting</span>
       <span className="text-xs text-muted-foreground">{session.phaseName} · {session.history.length}/{session.teams.length}</span>
