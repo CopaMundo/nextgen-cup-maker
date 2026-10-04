@@ -117,6 +117,7 @@ const LiveDrawDialog = ({
   const [rolling, setRolling] = useState(false);
   const timers = useRef<number[]>([]);
   const syncQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const publishedHere = useRef(false);
   const [draftReady, setDraftReady] = useState(false);
   const draftKey = `copa-live-draw:groups:v1:${phaseId}`;
   const [savingSlot, setSavingSlot] = useState(false);
@@ -252,6 +253,7 @@ const LiveDrawDialog = ({
   useEffect(() => {
     if (!open || !draftReady || !session || step !== "draw") return;
     const picture = { session, spotlightId };
+    publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: "running", state: picture as unknown as never }, { onConflict: "phase_id" });
       if (error) console.warn("Live loting niet gesynchroniseerd", error.message);
@@ -263,7 +265,10 @@ const LiveDrawDialog = ({
     timers.current.forEach(window.clearTimeout);
     timers.current = [];
     setRolling(false);
-    if (draftReady) syncQueue.current = syncQueue.current.then(() => supabase.from("draw_sessions").update({ status: "closed" }).eq("phase_id", phaseId));
+    if (publishedHere.current && (!open || step !== "draw")) {
+      publishedHere.current = false;
+      syncQueue.current = syncQueue.current.then(() => supabase.from("draw_sessions").update({ status: "closed" }).eq("phase_id", phaseId));
+    }
   }, [open, step, phaseId, draftReady]);
 
   /* -------------------------------- potten ------------------------------ */
