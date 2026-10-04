@@ -9,3 +9,4 @@
 - [x] Live lotingen als vaste toernooiweergave tonen, per fase automatisch hervatten, het actieve thema volgen en één poule direct naar speelrondes sturen.
 - [x] Potverdelingen in beide lotingen via een keuzelijst met uitsluitend gelijke potten tonen, geavanceerde instellingen ernaast zetten en teams via vaste begrensde vakjes automatisch opslaan.
 - [x] Live loting terugbrengen als beveiligde modalwizard met startkeuze, vereenvoudigde pouleregels en automatische doorstroom naar speelrondes.
+- [x] Pouletrekking als stille balonthulling met enkel geldige poules, handmatige groepstrekking en hetzelfde beamerbeeld in de beheerpop-up.
