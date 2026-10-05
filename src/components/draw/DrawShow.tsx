@@ -1,6 +1,6 @@
 import type { DrawSessionState } from "@/lib/drawSession";
 import CountryFlag from "@/components/CountryFlag";
-import liveDrawStage from "@/assets/live-draw-stage.jpg";
+import liveDrawStage from "@/assets/live-draw-stage.png";
 
 /** The exact same read-only picture is used in the control window and on the projector. */
 export function DrawShow({ session, spotlightId }: { session?: DrawSessionState | null; spotlightId?: string | null }) {
