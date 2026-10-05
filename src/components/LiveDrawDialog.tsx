@@ -756,10 +756,10 @@ const LiveDrawDialog = ({
   );
 
   const drawContent = session && (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto lg:overflow-hidden">
-      <div className="min-h-[350px] shrink-0 overflow-hidden border border-border lg:min-h-0 lg:flex-1"><DrawShow session={session} spotlightId={spotlightId} /></div>
-      <aside className="shrink-0 lg:max-h-[32%] lg:overflow-y-auto">
-        <div className="draw-panel space-y-4 p-4">
+    <div className="draw-control-stage relative flex min-h-0 flex-1 overflow-hidden">
+      <DrawShow session={session} spotlightId={spotlightId} />
+      <aside className="draw-control-dock">
+        <div className="draw-control-dock-inner space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div><h2 className="text-sm font-bold">{session.mode === "pots" ? (pending ? activePot?.name : activePotChoice?.name) || "Pot" : "Volledig willekeurig"}</h2><p className="text-xs text-muted-foreground">{session.remaining.length} teams resterend</p></div>
             <Button variant="outline" size="sm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink className="h-4 w-4" /> Beamerscherm</Button>
@@ -791,17 +791,11 @@ const LiveDrawDialog = ({
             </div>
           )}
 
-          {!pending && !session.finished && remainingPool.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {remainingPool.map((id) => <span key={id} className="rounded-md bg-muted/60 px-2 py-1 text-xs"><TeamChip id={id} /></span>)}
-            </div>
-          )}
-
           {!pending && !session.finished && (
-            <div className="space-y-3">
-              <Button className="w-full" size="lg" onClick={() => handleDrawNext()}><Shuffle className="h-4 w-4" /> Trek team</Button>
+            <div className="flex flex-wrap gap-2">
+              <Button size="lg" onClick={() => handleDrawNext()}><Shuffle className="h-4 w-4" /> Trek team</Button>
               <Select value={manualTeam} onValueChange={(value) => handleDrawNext(value)}>
-                <SelectTrigger><SelectValue placeholder="Handmatig kiezen" /></SelectTrigger>
+                <SelectTrigger className="w-48"><SelectValue placeholder="Handmatig kiezen" /></SelectTrigger>
                 <SelectContent>{remainingPool.map((id) => <SelectItem key={id} value={id}>{teamName(session, id)}</SelectItem>)}</SelectContent>
               </Select>
             </div>
@@ -825,7 +819,7 @@ const LiveDrawDialog = ({
             </div>
           )}
 
-          <div className="flex flex-wrap gap-1 border-t border-border pt-3">
+          <div className="flex flex-wrap gap-1 border-t border-border/60 pt-2">
             <Button variant="ghost" size="sm" onClick={handleUndo} disabled={rolling || session.history.length === 0}><Undo2 className="h-3.5 w-3.5" /> Ongedaan</Button>
             <Button variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} disabled={rolling}><RotateCcw className="h-3.5 w-3.5" /> Opnieuw loten</Button>
             <Button variant="outline" size="sm" onClick={handleDrawAll} disabled={rolling || session.finished}><Sparkles className="h-3.5 w-3.5" /> Alles trekken</Button>
