@@ -23,7 +23,7 @@ export default function DrawProjector() {
     const interval = window.setInterval(() => { void refresh(); }, 3000);
     return () => { active = false; window.clearInterval(interval); void supabase.removeChannel(channel); };
   }, [phaseId]);
-  return <main className="flex h-dvh bg-background text-foreground">
-    {picture ? <div className="flex w-full"><DrawShow session={picture.session} spotlightId={picture.spotlightId} /></div> : <div className="m-auto text-center"><p className="text-xl font-bold text-primary">Copa Mundo</p><p className="mt-2 text-muted-foreground">Wachten op de live loting</p></div>}
+  return <main className="flex h-dvh overflow-hidden bg-background text-foreground">
+    <DrawShow session={picture?.session} spotlightId={picture?.spotlightId} />
   </main>;
 }
