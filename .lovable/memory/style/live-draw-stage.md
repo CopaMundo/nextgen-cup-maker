@@ -15,3 +15,4 @@ type: design
 - Pot tag is a clearly readable gold label, placed lower on the bowl base; bowl balls are larger.
 - The central team name is centered on the bar itself, with the logo left and the flag independently right-aligned.
 - Rounds use the same studio and bowl: pot-organized rosters left (drawn dimmed, current highlighted), current team's schedule right, known matches immediately visible and remaining opponents revealed per click or automatically. Draw pot 1 before pot 2 and reveal each team's opponents before drawing the next team.
+- Rounds default to the format's configured count and remain editable in the live-draw settings. Label the left roster with the active group name. The right card shows the revealed team's identity and opponent rows with pot labels, logos, flags and home/away icons; identities stay hidden until the reveal finishes. Order by pot, never by round; in free draws show previously known opponents first.

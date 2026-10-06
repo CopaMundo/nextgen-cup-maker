@@ -21,7 +21,7 @@ import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
 import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
 import { initRoundsState } from "@/lib/drawSession";
-import { roundsStage } from "@/lib/roundsDrawPresentation";
+import { orderedTeamFixtures, opponentRevealDuration, roundsStage } from "@/lib/roundsDrawPresentation";
 import { revealDuration, type DrawPicture } from "@/lib/drawPresentation";
 import { ExternalLink, Settings2, Shuffle } from "lucide-react";
 
@@ -66,6 +66,7 @@ interface RoundsDrawDraft {
   autoReveal?: boolean;
   revealAt?: number;
   revealTimes?: Record<string, Record<string, number>>;
+  groupRounds?: Record<string, number>;
 }
 
 const REVEAL_MS = 1300;
@@ -103,6 +104,7 @@ const RoundsDrawDialog = ({
   const [method, setMethod] = useState<"free" | "pots">("free");
   const [teams, setTeams] = useState<Team[]>([]);
   const [groups, setGroups] = useState<GroupInfo[]>([]);
+  const [roundInputs, setRoundInputs] = useState<Record<string, string>>({});
   const [potGroups, setPotGroups] = useState<Record<string, GroupInfo["pots"]>>({});
   const [potError, setPotError] = useState("");
   const [potGroupId, setPotGroupId] = useState("");
@@ -177,7 +179,7 @@ const RoundsDrawDialog = ({
           name: g.name,
           teamIds,
           slotByTeam,
-          rounds: maxRound || defaultRounds,
+          rounds: defaultRounds > 0 ? defaultRounds : maxRound || 1,
           pots,
           hasPlayed: groupMatches.some((m) => m.is_played),
           freeSlots: groupSlots.filter((s) => !s.team_id).length,
@@ -203,6 +205,11 @@ const RoundsDrawDialog = ({
         const draft = raw ? JSON.parse(raw) as RoundsDrawDraft : null;
         if (draft?.version === 1) {
           const validGroupIds = new Set(infos.map((group) => group.id));
+          infos.forEach((group) => {
+            const savedRounds = draft.groupRounds?.[group.id];
+            if (savedRounds && Number.isInteger(savedRounds) && savedRounds > 0) group.rounds = savedRounds;
+          });
+          setGroups([...infos]);
           const teamIdsByGroup = new Map(infos.map((group) => [group.id, new Set(group.teamIds)]));
           const restoredPots = Object.fromEntries(Object.entries(draft.potGroups).filter(([groupId, groupPots]) => validGroupIds.has(groupId) && groupPots.every((pot) => pot.teamIds.every((id) => teamIdsByGroup.get(groupId)?.has(id)))));
           const drawsValid = draft.draws.every((draw) => validGroupIds.has(draw.groupId) && draw.order.every((id) => teamIdsByGroup.get(draw.groupId)?.has(id)));
@@ -237,6 +244,7 @@ const RoundsDrawDialog = ({
     setStep("method");
     setMethod("free");
     setPotError("");
+    setRoundInputs({});
     setDraws([]);
     setTeamIdx({});
     setRevealed({});
@@ -252,9 +260,9 @@ const RoundsDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes };
+    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes, groupRounds: Object.fromEntries(groups.map((g) => [g.id, g.rounds])) };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes]);
+  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes, groups]);
 
   // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
   const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
@@ -349,7 +357,25 @@ const RoundsDrawDialog = ({
 
   /* ------------------------ planning vooraf aanmaken ------------------------ */
 
+  const updateRounds = (groupId: string, value: string) => {
+    setRoundInputs((prev) => ({ ...prev, [groupId]: value }));
+    const count = Number(value);
+    if (!value || !Number.isInteger(count) || count < 1) return;
+    const group = drawGroups.find((g) => g.id === groupId);
+    if (!group) return;
+    setGroups((prev) => prev.map((g) => g.id === groupId ? { ...g, rounds: count } : g));
+    setMatrices((prev) => ({ ...prev, [groupId]: defaultOpponentMatrix(group.pots.map((p) => p.teamIds.length), matchesPerTeam(group.teamIds.length, count)) }));
+    setDraws([]);
+    setTeamIdx({});
+    setRevealed({});
+    setRevealTimes({});
+  };
+
   const prepare = async () => {
+    if (drawGroups.some((g) => roundInputs[g.id] !== undefined && (!roundInputs[g.id] || !Number.isInteger(Number(roundInputs[g.id])) || Number(roundInputs[g.id]) < 1))) {
+      toast({ title: "Vul een geldig aantal speelrondes in", variant: "destructive" });
+      return;
+    }
     if (method === "pots") {
       const error = checkPots();
       if (error) { setPotError(error); setStep("pots"); return; }
@@ -424,17 +450,13 @@ const RoundsDrawDialog = ({
 
   const activeDraw = draws[activeGroupIdx];
   const activeGroup = drawGroups.find((g) => g.id === activeDraw?.groupId);
-  const potOf = (group: GroupInfo | undefined, teamId: string) => group?.pots.findIndex((p) => p.teamIds.includes(teamId)) ?? 0;
   const currentIdx = activeDraw ? teamIdx[activeDraw.groupId] ?? -1 : -1;
   const currentTeamId = activeDraw && currentIdx >= 0 ? activeDraw.order[currentIdx] : null;
   const revealedSet = new Set(activeDraw ? revealed[activeDraw.groupId] || [] : []);
 
   /** Wedstrijden van een team, gesorteerd op pot van de tegenstander. */
   const teamMatches = (draw: GroupDraw, group: GroupInfo, teamId: string) =>
-    draw.matches
-      .map((m, i) => ({ m, i, opp: m.homeId === teamId ? m.awayId : m.homeId }))
-      .filter(({ m }) => m.homeId === teamId || m.awayId === teamId)
-      .sort((a, b) => potOf(group, a.opp) - potOf(group, b.opp) || a.m.round - b.m.round);
+    orderedTeamFixtures(draw.matches, teamId, group.pots, revealed[draw.groupId] || [], method === "pots");
 
   const queue = activeDraw && activeGroup && currentTeamId
     ? teamMatches(activeDraw, activeGroup, currentTeamId).map((item) => item.i).filter((index) => !revealedSet.has(index))
@@ -463,6 +485,8 @@ const RoundsDrawDialog = ({
     const groupId = activeDraw.groupId;
     setRevealed((prev) => ({ ...prev, [groupId]: [...new Set([...(prev[groupId] || []), head])] }));
     setRevealTimes((prev) => ({ ...prev, [groupId]: { ...prev[groupId], [String(head)]: Date.now() } }));
+    setRevealReady(false);
+    window.setTimeout(() => setRevealReady(true), opponentRevealDuration);
   };
 
   useEffect(() => {
@@ -626,6 +650,8 @@ const RoundsDrawDialog = ({
             <div className="text-muted-foreground">
               {g.teamIds.length} teams · {g.rounds} speelrondes · {matchesPerTeam(g.teamIds.length, g.rounds)} wedstrijden per team
             </div>
+            <Label htmlFor={`draw-rounds-${g.id}`} className="mt-3 block">Aantal speelrondes</Label>
+            <Input id={`draw-rounds-${g.id}`} type="number" min={1} step={1} className="mt-1 w-24" value={roundInputs[g.id] ?? String(g.rounds)} disabled={g.hasPlayed} onChange={(event) => updateRounds(g.id, event.target.value)} />
             {method === "pots" && <div className="text-xs text-muted-foreground">{g.pots.map((p) => `${p.name} (${p.teamIds.length})`).join(" · ")}</div>}
             {g.freeSlots > 0 && <div className="mt-1 text-xs text-destructive">Nog {g.freeSlots} lege plaatsen in deze groep.</div>}
             {g.hasPlayed && <div className="mt-1 text-xs text-destructive">Er zijn al wedstrijden gespeeld.</div>}
@@ -802,7 +828,7 @@ const RoundsDrawDialog = ({
     session.finished = groupDone(activeDraw);
     return { session, spotlightId: null, presentation: {
       revealAt, speed: 1, activePotId: currentPot?.id ?? null, selection: null,
-      rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {} }),
+      rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
     } };
   }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, revealed, revealTimes, revealAt]);
 

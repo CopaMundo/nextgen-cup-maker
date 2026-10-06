@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { DrawSessionState } from "@/lib/drawSession";
-import { needsGroupOverview, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { needsGroupOverview, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { opponentRevealDuration } from "@/lib/roundsDrawPresentation";
+import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import liveDrawStage from "@/assets/live-draw-raised-bowl-stage.png";
@@ -25,6 +27,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const rounds = presentation?.rounds;
   const selectedId = presentation?.selection?.targetId;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
+  const teamReady = !presentation?.revealAt || now >= presentation.revealAt + revealDuration(presentation.speed);
   const last = session?.history[session.history.length - 1];
   const eligible = selectedId ? pending?.options.filter((option) => option.id === selectedId) ?? [] : pending?.options ?? [];
   const overview = needsGroupOverview(session?.containers ?? []);
@@ -78,22 +81,30 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
       {rounds ? <>
-        <div className="draw-show-rounds-roster draw-show-wing-left" aria-label="Teams per pot">
-          {session.pots.map((pot) => <section className="draw-show-group-card" key={pot.id}>
-            <h2>{pot.name}</h2>
+        <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
+          <h2>{rounds.groupName}</h2>
+          <div className="draw-show-rounds-roster-list">
+          {session.pots.map((pot) => <div className="draw-show-rounds-pot" key={pot.id}>
+            {session.mode === "pots" && <h3>{pot.name}</h3>}
             <div className="draw-show-rounds-teams">
               {pot.teamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); return <div key={id} className={`draw-show-slot ${id === pending?.teamId ? "is-active" : rounds.drawnTeamIds.includes(id) ? "is-drawn" : ""}`}>
                 <span className="draw-show-slot-mark">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-slot-name">{item?.name}</span>
               </div>; })}
             </div>
-          </section>)}
-        </div>
+          </div>)}
+          </div>
+        </section>
         <section className="draw-show-rounds-schedule draw-show-wing-right draw-show-group-card" aria-label="Speelschema getrokken team">
-          <h2>Speelschema</h2>
+          <h2>{rounds.groupName}</h2>
+          <div className="draw-show-rounds-team-header">
+            {team && teamReady && <><span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><div><strong>{team.name}</strong><CountryFlag country={team.country} />{session.mode === "pots" && <small>{activePot?.name}</small>}</div></>}
+          </div>
           <div className="draw-show-rounds-fixtures">
-            {rounds.fixtures.map((fixture) => { const opponent = session.teams.find((item) => item.id === fixture.opponentId); return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture ${opponent ? "is-known" : ""}`} style={{ "--opponent-offset": `${fixture.revealAt ? -Math.max(0, Date.now() - fixture.revealAt) : -1000}ms` } as CSSProperties}>
-              <span className="draw-show-rounds-meta">R{fixture.round} · {fixture.home ? "THUIS" : "UIT"} · {fixture.potName}</span>
-              <span className="draw-show-slot"><span className="draw-show-slot-mark">{opponent?.logoUrl && <AutoTrimLogo src={opponent.logoUrl} />}</span><span className="draw-show-slot-name">{opponent?.name ?? "—"}</span></span>
+            {rounds.fixtures.map((fixture) => { const finished = teamReady && (!fixture.revealAt || now >= fixture.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)); const opponent = finished ? session.teams.find((item) => item.id === fixture.opponentId) : undefined; return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture draw-show-slot ${opponent ? "is-known" : fixture.opponentId && teamReady ? "is-revealing" : ""}`}>
+              {session.mode === "pots" && <span className="draw-show-rounds-pot-tag">{fixture.potName}</span>}
+              <span className="draw-show-slot-mark">{opponent?.logoUrl ? <AutoTrimLogo src={opponent.logoUrl} /> : opponent?.name.slice(0, 2).toUpperCase()}</span>
+              <span className="draw-show-slot-name">{opponent?.name ?? "—"}</span>
+              {opponent && <><CountryFlag country={opponent.country} className="draw-show-rounds-flag" /><span className="draw-show-rounds-venue" aria-label={fixture.home ? "Thuis" : "Uit"} title={fixture.home ? "Thuis" : "Uit"}>{fixture.home ? <House /> : <Plane />}</span></>}
             </div>; })}
           </div>
         </section>
