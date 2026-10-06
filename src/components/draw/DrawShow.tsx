@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { DrawSessionState } from "@/lib/drawSession";
-import { needsGroupOverview, stageSelection, type DrawPresentation } from "@/lib/drawPresentation";
+import { needsGroupOverview, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import CountryFlag from "@/components/CountryFlag";
 import liveDrawStage from "@/assets/live-draw-compact-stage.png";
 
@@ -19,13 +19,14 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     return () => window.clearInterval(timer);
   }, [session?.pending?.teamId]);
   const selectionPhase = stageSelection(presentation, now);
+  const activeSpotlight = sweepSpotlight(presentation, now) ?? spotlightId;
   const pending = session?.pending;
   const selectedId = presentation?.selection?.targetId;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
   const last = session?.history[session.history.length - 1];
   const eligible = selectedId ? pending?.options.filter((option) => option.id === selectedId) ?? [] : pending?.options ?? [];
   const overview = needsGroupOverview(session?.containers ?? []);
-  const focusId = selectedId ?? spotlightId ?? pending?.options[0]?.id ?? last?.targetId ?? session?.containers[0]?.id;
+  const focusId = selectedId ?? activeSpotlight ?? pending?.options[0]?.id ?? last?.targetId ?? session?.containers[0]?.id;
   const focus = session?.containers.find((container) => container.id === focusId);
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -58,7 +59,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   );
   const teamContent = team && <>{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}<CountryFlag country={team.country} className="draw-show-flag" /><strong>{team.name}</strong></>;
   const speed = presentation?.speed ?? 1;
-  const elapsed = pending && presentation?.revealAt ? Math.max(0, now - presentation.revealAt) : 0;
+  const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": `${-elapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
   return <div ref={stageRef} className={`draw-show draw-show-stage ${overview ? "draw-show-overview-mode" : ""}`} style={{ backgroundImage: `url(${liveDrawStage})`, ...motionStyle }}>
@@ -75,14 +76,16 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
         <div className="draw-show-team-card">
           {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
         </div>
-        {pending && selectionPhase !== "complete" && <div className="draw-show-eligible draw-reveal-name"><div className="draw-show-eligible-groups">{eligible.map((option) => <span key={option.id} className={spotlightId === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
+        {pending && selectionPhase !== "complete" && <div className="draw-show-eligible draw-reveal-name"><div className="draw-show-eligible-groups">{eligible.map((option) => <span key={option.id} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
       </main>
       {selectionPhase === "transfer" && team && <div className="draw-show-transfer" key={`${team.id}-${selectedId}`}>{teamContent}</div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}>
         {remainingIds.map((id, index) => {
-          const row = Math.floor(index / 7);
-          const column = index % 7;
-          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${28 + column * 7 + (row % 2 ? 2 : 0)}%`, top: `${82 - row * 8 + Math.abs(column - 3) * -1.4}%`, "--drift-delay": `${-index * .37}s`, zIndex: index + 1 } as CSSProperties} />;
+          const columns = remainingIds.length > 49 ? 12 : 7;
+          const row = Math.floor(index / columns);
+          const column = index % columns;
+          const totalRows = Math.ceil(remainingIds.length / columns);
+          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${25 + column * 50 / columns + (row % 2 ? 1 : 0)}%`, top: `${82 - row * Math.min(8, 45 / totalRows)}%`, "--drift-delay": `${-index * .37}s`, "--ball-size": remainingIds.length > 49 ? ".95cqw" : "1.7cqw", zIndex: index + 1 } as CSSProperties} />;
         })}
       </div>
       {pending && !selectedId && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}

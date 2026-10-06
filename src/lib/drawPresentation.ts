@@ -5,6 +5,7 @@ export interface DrawPresentation {
   speed: number;
   activePotId: string | null;
   selection: { targetId: string; startedAt: number } | null;
+  sweep?: { startedAt: number; optionIds: string[] } | null;
 }
 
 export interface DrawPicture {
@@ -15,6 +16,14 @@ export interface DrawPicture {
 
 export const revealDuration = (speed: number) => 1900 / speed;
 export const selectionDuration = (speed: number) => 2100 / speed;
+export const sweepDuration = (count: number, speed: number) => Math.max(12, count * 3) * 100 / speed;
+
+export function sweepSpotlight(presentation: DrawPresentation | undefined, now: number) {
+  const sweep = presentation?.sweep;
+  if (!sweep?.optionIds.length) return null;
+  const index = Math.floor(Math.max(0, now - sweep.startedAt) * presentation.speed / 100);
+  return sweep.optionIds[index % sweep.optionIds.length];
+}
 
 export function stageSelection(presentation: DrawPresentation | undefined, now: number) {
   if (!presentation?.selection) return "idle";

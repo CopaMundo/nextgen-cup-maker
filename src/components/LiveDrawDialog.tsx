@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
-import { revealDuration, selectionDuration, type DrawPresentation } from "@/lib/drawPresentation";
+import { revealDuration, selectionDuration, sweepDuration, type DrawPresentation } from "@/lib/drawPresentation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
@@ -470,7 +470,7 @@ const LiveDrawDialog = ({
   const placeSelection = (targetId: string) => {
     setRolling(true);
     setSpotlightId(targetId);
-    setPresentation((previous) => ({ ...previous, speed: animationSpeed, selection: { targetId, startedAt: Date.now() } }));
+    setPresentation((previous) => ({ ...previous, speed: animationSpeed, sweep: null, selection: { targetId, startedAt: Date.now() } }));
     timers.current.push(window.setTimeout(() => {
       setSession((current) => current?.pending ? confirmPending(current, targetId) : current);
       setPresentation((previous) => ({ ...previous, selection: null }));
@@ -483,14 +483,8 @@ const LiveDrawDialog = ({
     const options = session.pending.options;
     setRolling(true);
     const winner = options[Math.floor(Math.random() * options.length)].id;
-    let count = 0;
-    const light = () => {
-      setSpotlightId(options[count % options.length].id);
-      count++;
-      if (count < Math.max(12, options.length * 3)) timers.current.push(window.setTimeout(light, (65 + count * 5) / animationSpeed));
-      else placeSelection(winner);
-    };
-    light();
+    setPresentation((previous) => ({ ...previous, speed: animationSpeed, sweep: { startedAt: Date.now(), optionIds: options.map((option) => option.id) } }));
+    timers.current.push(window.setTimeout(() => placeSelection(winner), sweepDuration(options.length, animationSpeed)));
   };
   useEffect(() => {
     if (step !== "draw" || placementMode !== "automatic" || !session?.pending?.options.length || rolling || revealing) return;
