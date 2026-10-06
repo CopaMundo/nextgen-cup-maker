@@ -22,6 +22,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const selectionPhase = stageSelection(presentation, now);
   const activeSpotlight = sweepSpotlight(presentation, now) ?? spotlightId;
   const pending = session?.pending;
+  const rounds = presentation?.rounds;
   const selectedId = presentation?.selection?.targetId;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
   const last = session?.history[session.history.length - 1];
@@ -67,7 +68,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
       </div>
     </section>
   );
-  const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span>{team.country && <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span>}</>;
+   const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span>{team.country && <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span>}</>;
   const speed = presentation?.speed ?? 1;
   const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId, speed]);
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
@@ -75,8 +76,28 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
 
   return <div ref={stageRef} className={`draw-show draw-show-stage ${overview ? "draw-show-overview-mode" : ""}`} style={{ backgroundImage: `url(${liveDrawStage})`, ...motionStyle }}>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
-      <div className="draw-show-phase">{session.phaseName} · {session.history.length}/{session.containers.reduce((sum, item) => sum + item.capacity, 0)}</div>
-      {overview ? <>
+      <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
+      {rounds ? <>
+        <div className="draw-show-rounds-roster draw-show-wing-left" aria-label="Teams per pot">
+          {session.pots.map((pot) => <section className="draw-show-group-card" key={pot.id}>
+            <h2>{pot.name}</h2>
+            <div className="draw-show-rounds-teams">
+              {pot.teamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); return <div key={id} className={`draw-show-slot ${id === pending?.teamId ? "is-active" : rounds.drawnTeamIds.includes(id) ? "is-drawn" : ""}`}>
+                <span className="draw-show-slot-mark">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-slot-name">{item?.name}</span>
+              </div>; })}
+            </div>
+          </section>)}
+        </div>
+        <section className="draw-show-rounds-schedule draw-show-wing-right draw-show-group-card" aria-label="Speelschema getrokken team">
+          <h2>Speelschema</h2>
+          <div className="draw-show-rounds-fixtures">
+            {rounds.fixtures.map((fixture) => { const opponent = session.teams.find((item) => item.id === fixture.opponentId); return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture ${opponent ? "is-known" : ""}`} style={{ "--opponent-offset": `${fixture.revealAt ? -Math.max(0, Date.now() - fixture.revealAt) : -1000}ms` } as CSSProperties}>
+              <span className="draw-show-rounds-meta">R{fixture.round} · {fixture.home ? "THUIS" : "UIT"} · {fixture.potName}</span>
+              <span className="draw-show-slot"><span className="draw-show-slot-mark">{opponent?.logoUrl && <AutoTrimLogo src={opponent.logoUrl} />}</span><span className="draw-show-slot-name">{opponent?.name ?? "—"}</span></span>
+            </div>; })}
+          </div>
+        </section>
+      </> : overview ? <>
         <div className="draw-show-group-overview">{session.containers.map((container) => <div key={container.id} className={focusId === container.id ? "is-active" : ""}><strong>{container.name}</strong><span>{container.teamIds.length}/{container.capacity}</span></div>)}</div>
         <div className="draw-show-wing draw-show-wing-right draw-show-active-group">{focus && renderContainer(focus)}</div>
       </> : <>
@@ -87,16 +108,16 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
         <div className="draw-show-team-card">
           {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
         </div>
-        {pending && selectionPhase !== "complete" && <div className="draw-show-eligible draw-reveal-name"><div className="draw-show-eligible-groups">{eligible.map((option) => <span key={option.id} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
+        {!rounds && pending && selectionPhase !== "complete" && <div className="draw-show-eligible draw-reveal-name"><div className="draw-show-eligible-groups">{eligible.map((option) => <span key={option.id} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
       </main>
       {selectionPhase === "transfer" && team && <div className="draw-show-transfer" key={`${team.id}-${selectedId}`}>{teamContent}</div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}>
         {remainingIds.map((id, index) => {
-          const columns = remainingIds.length > 49 ? 10 : 6;
+          const columns = remainingIds.length > 49 ? 10 : 5;
           const row = Math.floor(index / columns);
           const column = index % columns;
           const totalRows = Math.ceil(remainingIds.length / columns);
-          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${27 + column * 46 / columns + (row % 2 ? 1 : 0)}%`, top: `${84 - row * Math.min(8, 38 / totalRows)}%`, "--drift-delay": `${-index * .37}s`, "--ball-size": remainingIds.length > 49 ? ".45cqw" : ".8cqw", zIndex: index + 1 } as CSSProperties} />;
+          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${24 + column * 52 / columns + (row % 2 ? 2 : 0)}%`, top: `${84 - row * Math.min(11, 40 / totalRows)}%`, "--drift-delay": `${-index * .37}s`, "--ball-size": remainingIds.length > 49 ? ".65cqw" : "1.15cqw", zIndex: index + 1 } as CSSProperties} />;
         })}
       </div>
       {pending && !selectedId && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}

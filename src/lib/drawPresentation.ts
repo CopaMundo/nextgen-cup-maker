@@ -6,6 +6,13 @@ export interface DrawPresentation {
   activePotId: string | null;
   selection: { targetId: string; startedAt: number } | null;
   sweep?: { startedAt: number; optionIds: string[] } | null;
+  rounds?: RoundsStage;
+}
+
+export interface RoundsStage {
+  groupName: string;
+  drawnTeamIds: string[];
+  fixtures: { id: string; round: number; potName: string; home: boolean; opponentId: string | null; revealAt: number | null }[];
 }
 
 export interface DrawPicture {

@@ -16,8 +16,14 @@ import {
   type SameCountryMode,
   type ScheduledMatch,
 } from "@/lib/roundsSchedule";
-import { shuffle } from "@/lib/liveDraw";
+import { emptyRoundsRules, shuffle } from "@/lib/liveDraw";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
+import { DrawShow } from "@/components/draw/DrawShow";
+import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
+import { initRoundsState } from "@/lib/drawSession";
+import { roundsStage } from "@/lib/roundsDrawPresentation";
+import { revealDuration, type DrawPicture } from "@/lib/drawPresentation";
+import { ExternalLink, Settings2, Shuffle } from "lucide-react";
 
 interface Team {
   id: string;
@@ -57,6 +63,9 @@ interface RoundsDrawDraft {
   activeGroupIdx: number;
   teamIdx: Record<string, number>;
   revealed: Record<string, number[]>;
+  autoReveal?: boolean;
+  revealAt?: number;
+  revealTimes?: Record<string, Record<string, number>>;
 }
 
 const REVEAL_MS = 1300;
@@ -114,7 +123,14 @@ const RoundsDrawDialog = ({
   const [activeGroupIdx, setActiveGroupIdx] = useState(0);
   const [teamIdx, setTeamIdx] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<Record<string, number[]>>({});
-  const [queue, setQueue] = useState<number[]>([]);
+  const [autoReveal, setAutoReveal] = useState(true);
+  const [revealAt, setRevealAt] = useState(0);
+  const [revealReady, setRevealReady] = useState(true);
+  const [revealTimes, setRevealTimes] = useState<Record<string, Record<string, number>>>({});
+  const directorRef = useRef<HTMLDivElement>(null);
+  const syncQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const publishedHere = useRef(false);
+  const syncFailed = useRef(false);
   const [paused, setPaused] = useState(false);
   const timer = useRef<number | null>(null);
   const [draftReady, setDraftReady] = useState(false);
@@ -202,6 +218,9 @@ const RoundsDrawDialog = ({
           setActiveGroupIdx(drawsValid ? Math.min(draft.activeGroupIdx, Math.max(0, draft.draws.length - 1)) : 0);
           setTeamIdx(drawsValid ? draft.teamIdx : {});
           setRevealed(drawsValid ? draft.revealed : {});
+          setAutoReveal(draft.autoReveal ?? true);
+          setRevealAt(draft.revealAt ?? 0);
+          setRevealTimes(draft.revealTimes ?? {});
         }
       } catch {
         localStorage.removeItem(draftKey);
@@ -221,7 +240,8 @@ const RoundsDrawDialog = ({
     setDraws([]);
     setTeamIdx({});
     setRevealed({});
-    setQueue([]);
+    setRevealAt(0);
+    setRevealTimes({});
     setActiveGroupIdx(0);
     setPaused(false);
     setForbiddenPairs([]);
@@ -232,9 +252,9 @@ const RoundsDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed };
+    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed]);
+  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes]);
 
   // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
   const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
@@ -391,7 +411,8 @@ const RoundsDrawDialog = ({
       setDraws(result);
       setTeamIdx({});
       setRevealed({});
-      setQueue([]);
+      setRevealAt(0);
+      setRevealTimes({});
       setActiveGroupIdx(0);
       setStep("draw");
     } finally {
@@ -415,38 +436,48 @@ const RoundsDrawDialog = ({
       .filter(({ m }) => m.homeId === teamId || m.awayId === teamId)
       .sort((a, b) => potOf(group, a.opp) - potOf(group, b.opp) || a.m.round - b.m.round);
 
+  const queue = activeDraw && activeGroup && currentTeamId
+    ? teamMatches(activeDraw, activeGroup, currentTeamId).map((item) => item.i).filter((index) => !revealedSet.has(index))
+    : [];
+
+  useEffect(() => {
+    const wait = Math.max(0, revealAt + revealDuration(1) - Date.now());
+    setRevealReady(wait === 0);
+    const timeout = window.setTimeout(() => setRevealReady(true), wait);
+    return () => window.clearTimeout(timeout);
+  }, [revealAt]);
+
   const drawNextTeam = () => {
-    if (!activeDraw || !activeGroup || queue.length) return;
+    if (!activeDraw || !activeGroup || queue.length || !revealReady) return;
     const next = currentIdx + 1;
     if (next >= activeDraw.order.length) return;
-    const teamId = activeDraw.order[next];
+    setRevealAt(Date.now());
+    setRevealReady(false);
+    setPaused(false);
     setTeamIdx((prev) => ({ ...prev, [activeDraw.groupId]: next }));
-    const pendingIdx = teamMatches(activeDraw, activeGroup, teamId)
-      .map((x) => x.i)
-      .filter((i) => !revealedSet.has(i));
-    setQueue(pendingIdx);
+  };
+
+  const revealNextOpponent = () => {
+    const head = queue[0];
+    if (!activeDraw || head === undefined || !revealReady) return;
+    const groupId = activeDraw.groupId;
+    setRevealed((prev) => ({ ...prev, [groupId]: [...new Set([...(prev[groupId] || []), head])] }));
+    setRevealTimes((prev) => ({ ...prev, [groupId]: { ...prev[groupId], [String(head)]: Date.now() } }));
   };
 
   useEffect(() => {
-    if (!queue.length || paused || !activeDraw) return;
-    timer.current = window.setTimeout(() => {
-      const [head, ...rest] = queue;
-      setRevealed((prev) => ({ ...prev, [activeDraw.groupId]: [...(prev[activeDraw.groupId] || []), head] }));
-      setQueue(rest);
-    }, REVEAL_MS);
-    return () => {
-      if (timer.current) window.clearTimeout(timer.current);
-    };
-  }, [queue, paused, activeDraw]);
+    if (!open || step !== "draw" || !queue.length || paused || !autoReveal || !revealReady) return;
+    timer.current = window.setTimeout(revealNextOpponent, REVEAL_MS);
+    return () => { if (timer.current) window.clearTimeout(timer.current); };
+  }, [open, step, queue.join(","), paused, autoReveal, revealReady, activeDraw?.groupId]);
 
   const revealAll = () => {
     if (!activeDraw) return;
-    setQueue([]);
     setRevealed((prev) => ({ ...prev, [activeDraw.groupId]: activeDraw.matches.map((_, i) => i) }));
     setTeamIdx((prev) => ({ ...prev, [activeDraw.groupId]: activeDraw.order.length - 1 }));
   };
 
-  const groupDone = (d: GroupDraw) => (revealed[d.groupId] || []).length >= d.matches.length && !(d.groupId === activeDraw?.groupId && queue.length);
+  const groupDone = (d: GroupDraw) => (teamIdx[d.groupId] ?? -1) >= d.order.length - 1 && (revealed[d.groupId] || []).length >= d.matches.length;
   const allDone = draws.length > 0 && draws.every(groupDone);
 
   /* --------------------------------- opslaan -------------------------------- */
@@ -460,7 +491,8 @@ const RoundsDrawDialog = ({
       }
       let total = 0;
       for (const d of draws) {
-        const g = drawGroups.find((x) => x.id === d.groupId)!;
+        const g = drawGroups.find((x) => x.id === d.groupId);
+        if (!g) throw new Error("Poule niet gevonden");
         const { data: existing } = await supabase
           .from("matches")
           .select("id, round_number")
@@ -509,7 +541,8 @@ const RoundsDrawDialog = ({
           phaseName: phaseName || null,
           rules: { sameCountry, maxMeetings, forbiddenPairs },
           groups: draws.map((d) => {
-             const g = drawGroups.find((x) => x.id === d.groupId)!;
+             const g = drawGroups.find((x) => x.id === d.groupId);
+              if (!g) throw new Error("Poule niet gevonden");
             return {
               group: g.name,
               pots: g.pots.map((p) => ({ name: p.name, teams: p.teamIds.map((id) => teamById.get(id)?.name || id) })),
@@ -752,98 +785,65 @@ const RoundsDrawDialog = ({
     </div>
   );
 
-  const drawScreen = activeDraw && activeGroup && (
-    <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]">
-      {/* Links: overzicht */}
-      <div className="draw-panel min-h-0 overflow-y-auto p-3">
-        {draws.length > 1 && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {draws.map((d, i) => {
-               const g = drawGroups.find((x) => x.id === d.groupId);
-              return (
-                <Button key={d.groupId} size="sm" variant="outline" aria-pressed={i === activeGroupIdx} className={`draw-choice ${i === activeGroupIdx ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} disabled={queue.length > 0} onClick={() => setActiveGroupIdx(i)}>
-                  {g?.name} {groupDone(d) && <Check className="h-3.5 w-3.5" />}
-                </Button>
-              );
-            })}
-          </div>
-        )}
-        <div className="space-y-1.5">
-          {activeDraw.order.map((teamId) => {
-            const list = teamMatches(activeDraw, activeGroup, teamId);
-            const known = list.filter((x) => revealedSet.has(x.i));
-            const status = teamId === currentTeamId && queue.length ? "Bezig" : known.length === list.length ? "Volledig geloot" : known.length ? "Deels bekend" : "Nog niet gestart";
-            return (
-              <div key={teamId} className={`draw-choice border-y-2 px-2 py-1.5 text-sm ${teamId === currentTeamId ? "border-y-primary bg-primary/[0.06]" : "border-y-border"}`}>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{activeGroup.pots[potOf(activeGroup, teamId)]?.name}</span>
-                    <TeamChip id={teamId} />
-                  </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">{known.length}/{list.length} · {status}</span>
-                </div>
-                {known.length > 0 && (
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 pl-1 text-xs text-muted-foreground">
-                    {known.map((x) => <span key={x.i}>{teamById.get(x.opp)?.name}</span>)}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+  const picture = useMemo<DrawPicture | null>(() => {
+    if (!activeDraw || !activeGroup) return null;
+    const pots = activeGroup.pots.map((pot, index) => ({ ...pot, sortOrder: index }));
+    const currentPot = currentTeamId ? pots.find((pot) => pot.teamIds.includes(currentTeamId)) : pots[0];
+    const session = initRoundsState({
+      phaseName: phaseName || "Speelrondes", mode: method === "pots" ? "pots" : "random",
+      teams: teams.filter((team) => activeGroup.teamIds.includes(team.id)), pots,
+      groups: [{ groupId: activeGroup.id, groupName: activeGroup.name, totalRounds: activeGroup.rounds, teamIds: activeGroup.teamIds }],
+      rules: emptyRoundsRules(),
+    });
+    session.pots = pots;
+    session.remaining = activeDraw.order.slice(currentIdx + 1);
+    session.activePotId = currentPot?.id ?? null;
+    session.pending = currentTeamId ? { teamId: currentTeamId, options: [] } : null;
+    session.finished = groupDone(activeDraw);
+    return { session, spotlightId: null, presentation: {
+      revealAt, speed: 1, activePotId: currentPot?.id ?? null, selection: null,
+      rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {} }),
+    } };
+  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, revealed, revealTimes, revealAt]);
 
-      {/* Rechts: actieve trekking */}
-      <div className="draw-panel flex min-h-0 flex-col gap-3 overflow-y-auto p-4">
-        <div className="text-xs uppercase tracking-wider text-muted-foreground">{activeGroup.name}</div>
-        {currentTeamId ? (
-          <>
-            <div className="draw-choice border-y-2 border-y-primary bg-primary/[0.06] p-4">
-              <div className="text-xs text-muted-foreground">{activeGroup.pots[potOf(activeGroup, currentTeamId)]?.name}</div>
-              <TeamChip id={currentTeamId} big />
-            </div>
-            <div className="space-y-3">
-              {activeGroup.pots.map((pot, pi) => {
-                const list = teamMatches(activeDraw, activeGroup, currentTeamId).filter((x) => potOf(activeGroup, x.opp) === pi);
-                if (!list.length) return null;
-                const open = list.filter((x) => !revealedSet.has(x.i)).length;
-                return (
-                  <div key={pot.id}>
-                    <div className="mb-1 flex justify-between text-xs font-semibold uppercase text-muted-foreground">
-                      <span>Tegen {pot.name}</span><span>nog {open}</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      {list.map((x) => (
-                        <div key={x.i} className={`flex h-10 items-center rounded-md border px-3 text-sm transition-all duration-500 ${revealedSet.has(x.i) ? "border-primary/40 bg-background" : "border-dashed border-border text-muted-foreground"}`}>
-                          {revealedSet.has(x.i) ? <TeamChip id={x.opp} /> : "?"}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <p className="text-sm text-muted-foreground">Trek het eerste team{activeGroup.pots.length > 1 ? ` uit ${activeGroup.pots[0].name}` : ""}. Zijn tegenstanders verschijnen daarna één voor één.</p>
-        )}
-        <div className="mt-auto flex flex-wrap gap-2 pt-2">
-          {currentIdx + 1 < activeDraw.order.length && (
-            <Button onClick={drawNextTeam} disabled={queue.length > 0}>
-              Trek team{activeGroup.pots.length > 1 ? ` (${activeGroup.pots[potOf(activeGroup, activeDraw.order[currentIdx + 1])]?.name})` : ""}
-            </Button>
-          )}
-          {queue.length > 0 && (
-            <Button variant="outline" onClick={() => setPaused((p) => !p)}>
-              {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} {paused ? "Verder" : "Pauze"}
-            </Button>
-          )}
-          {!groupDone(activeDraw) && <Button variant="ghost" onClick={revealAll}><FastForward className="h-4 w-4" /> Alles tonen</Button>}
-          {groupDone(activeDraw) && activeGroupIdx + 1 < draws.length && (
-            <Button onClick={() => setActiveGroupIdx(activeGroupIdx + 1)}>Volgende groep</Button>
-          )}
+  useEffect(() => {
+    if (!open || !draftReady || step !== "draw" || !picture) return;
+    publishedHere.current = true;
+    syncQueue.current = syncQueue.current.then(async () => {
+      const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: "running", state: picture as unknown as never }, { onConflict: "phase_id" });
+      if (error && !syncFailed.current) {
+        syncFailed.current = true;
+        toast({ title: "Beamerscherm niet bijgewerkt", description: "Controleer de verbinding en open de loting opnieuw.", variant: "destructive" });
+      }
+      if (!error) syncFailed.current = false;
+    });
+  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId]);
+
+  useEffect(() => {
+    if (open && step === "draw") return;
+    if (!publishedHere.current) return;
+    publishedHere.current = false;
+    syncQueue.current = syncQueue.current.then(() => supabase.from("draw_sessions").update({ status: "closed" }).eq("phase_id", phaseId).eq("tournament_id", tournamentId));
+  }, [open, step, phaseId, tournamentId]);
+
+  const drawScreen = picture && activeDraw && activeGroup && (
+    <div ref={directorRef} className="draw-control-stage">
+      <DrawShow {...picture} controls={<>
+        <div className="draw-control-primary">
+          {queue.length ? <Button className="draw-scene-button" disabled={!revealReady || (autoReveal && !paused)} onClick={revealNextOpponent}><Play />Onthul wedstrijd</Button>
+            : currentIdx + 1 < activeDraw.order.length ? <Button className="draw-scene-button" disabled={!revealReady} onClick={drawNextTeam}><Shuffle />Trek team</Button>
+            : activeGroupIdx + 1 < draws.length ? <Button className="draw-scene-button" disabled={!revealReady} onClick={() => setActiveGroupIdx(activeGroupIdx + 1)}>Volgende groep</Button>
+            : <Button className="draw-scene-button" disabled={!allDone || applying} onClick={apply}><Check />Wedstrijden opslaan</Button>}
         </div>
-      </div>
+        <aside className="draw-control-dock">
+          <DrawFullscreenButton target={directorRef} />
+          <Button className="draw-scene-button" variant="ghost" aria-pressed={autoReveal} onClick={() => { setAutoReveal((value) => !value); setPaused(false); }}>{autoReveal ? <Play /> : <Pause />}{autoReveal ? "Achter elkaar" : "Per klik"}</Button>
+          {autoReveal && queue.length > 0 && <Button className="draw-scene-button" variant="ghost" onClick={() => setPaused((value) => !value)}>{paused ? <Play /> : <Pause />}{paused ? "Verder" : "Pauze"}</Button>}
+          <Button className="draw-scene-button" variant="ghost" disabled={!revealReady || groupDone(activeDraw)} onClick={revealAll}><FastForward />Alles tonen</Button>
+          <Button className="draw-scene-button" variant="ghost" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}><Settings2 />Instellingen</Button>
+          <Button className="draw-scene-button" variant="ghost" aria-label="Beamerscherm" title="Beamerscherm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink /></Button>
+        </aside>
+      </>} />
     </div>
   );
 

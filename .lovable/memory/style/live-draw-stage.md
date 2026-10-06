@@ -12,3 +12,6 @@ type: design
 - Organizer has a fullscreen toggle for the complete stage and controls.
 - Large groups use left progress overview and right active group; ordinary setups show every group.
 - Organizer primary action sits on bowl; compact bottom actions and settings, invisible to fans.
+- Pot tag is a clearly readable gold label, placed lower on the bowl base; bowl balls are larger.
+- The central team name is centered on the bar itself, with the logo left and the flag independently right-aligned.
+- Rounds use the same studio and bowl: pot-organized rosters left (drawn dimmed, current highlighted), current team's schedule right, known matches immediately visible and remaining opponents revealed per click or automatically. Draw pot 1 before pot 2 and reveal each team's opponents before drawing the next team.

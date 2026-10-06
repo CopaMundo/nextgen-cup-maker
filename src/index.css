@@ -2608,8 +2608,9 @@ posities + statistieken groen */
 .draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; overflow: hidden; }
 .draw-show-reveal-logo { display: grid; place-items: center; width: 3cqw; height: 3cqw; flex: 0 0 3cqw; }
 .draw-show-team-logo { width: 3cqw; height: 3cqw; object-fit: contain; flex-shrink: 0; }
-.draw-show-team-identity { display: flex; flex: 1; min-width: 0; align-items: center; justify-content: center; gap: .8cqw; }
-.draw-show-flag-backdrop { display: grid; place-items: center; width: 4cqw; height: 100%; flex: 0 0 4cqw; pointer-events: none; opacity: .55; }
+.draw-show-team-identity { display: grid; grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; width: 100%; min-width: 0; align-items: center; padding-inline: 1.4cqw; }
+.draw-show-team-identity strong { grid-column: 2; width: 100%; }
+.draw-show-flag-backdrop { position: absolute; right: 0; top: 0; display: grid; place-items: center; width: 3.7cqw; height: 100%; pointer-events: none; opacity: .65; }
 .draw-show-flag-backdrop .draw-show-flag { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
 .draw-show-reveal-logo, .draw-show-team strong { filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; color: hsl(var(--foreground)); font-size: 1.6cqw; line-height: 1.2; text-align: center; text-shadow: 0 1px 3px hsl(var(--background)); }
@@ -2625,7 +2626,7 @@ posities + statistieken groen */
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(250ms / var(--draw-rate)) calc(1650ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
-.draw-show-pot-label { position: absolute; z-index: 3; left: 46.2%; width: 7.7%; top: 71%; height: 1.45%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; border: 0; background: none; color: hsl(var(--background)); font-size: .66cqw; font-weight: 800; letter-spacing: .08em; line-height: 1; text-transform: uppercase; text-shadow: 0 0 2px hsl(var(--primary) / .8); white-space: nowrap; pointer-events: none; }
+.draw-show-pot-label { position: absolute; z-index: 3; left: 46%; width: 8%; top: 71.8%; height: 2.1%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; border: 0; border-radius: 3px; background: hsl(var(--stage-glass) / .9); color: hsl(var(--primary)); font-size: .85cqw; font-weight: 800; letter-spacing: 0; line-height: 1; text-transform: uppercase; text-shadow: 0 1px 2px hsl(var(--background)); white-space: nowrap; pointer-events: none; }
 .draw-show-pot { position: absolute; left: 29%; width: 42%; top: 75.5%; display: flex; justify-content: center; text-align: center; }
 .draw-show-pot-teams { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: .25cqw; width: calc(var(--pot-columns) * var(--pot-cell-width) + (var(--pot-columns) - 1) * .25cqw); max-width: 100%; padding: 0; }
 .draw-show-pot-teams > span { display: flex; flex: 0 0 var(--pot-cell-width); width: var(--pot-cell-width); height: 2.1cqw; min-width: 0; align-items: center; justify-content: flex-start; gap: var(--pot-cell-gap, .3cqw); padding: .15cqw .3cqw; overflow: hidden; border: 1px solid hsl(var(--border) / .42); border-radius: 4px; background: hsl(var(--stage-glass) / .88); color: hsl(var(--foreground)); transition: opacity 180ms, filter 180ms; }
@@ -2634,6 +2635,18 @@ posities + statistieken groen */
 .draw-show-pot-logo { display: flex; align-items: center; justify-content: center; width: var(--pot-logo-size, 1.45cqw); height: var(--pot-logo-size, 1.45cqw); flex: 0 0 var(--pot-logo-size, 1.45cqw); border: 0; border-radius: 0; background: none; }
 .draw-show-pot-teams img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
 .draw-show-group-overview { position: absolute; left: 2%; top: 13%; bottom: 24%; width: 25%; overflow-y: auto; display: flex; flex-direction: column; gap: .5cqw; }
+.draw-show-rounds-roster { position: absolute; top: 13%; bottom: 7%; width: 25%; display: flex; flex-direction: column; gap: .5cqw; overflow-y: auto; scrollbar-width: thin; }
+.draw-show-rounds-roster .draw-show-group-card { flex-shrink: 0; }
+.draw-show-rounds-teams { display: grid; grid-template-columns: minmax(0, 1fr); gap: .2cqw; padding: .35cqw; }
+.draw-show-rounds-teams .draw-show-slot { min-height: 2cqw; }
+.draw-show-rounds-teams .is-drawn { opacity: .3; filter: grayscale(1); }
+.draw-show-rounds-teams .is-active { border-color: hsl(var(--primary)); background: hsl(var(--accent)); box-shadow: inset 0 0 .6cqw hsl(var(--stage-glow) / .35); }
+.draw-show-rounds-schedule { position: absolute; top: 13%; bottom: 7%; width: 25%; }
+.draw-show-rounds-fixtures { display: flex; flex-direction: column; gap: .5cqw; overflow-y: auto; padding: .5cqw; scrollbar-width: thin; }
+.draw-show-rounds-meta { display: block; color: hsl(var(--muted-foreground)); font-size: .7cqw; line-height: 1.4; padding-bottom: .2cqw; }
+.draw-show-rounds-fixture .draw-show-slot { min-height: 2.5cqw; }
+.draw-show-rounds-fixture.is-known .draw-show-slot { animation: draw-opponent-reveal 500ms var(--opponent-offset) ease-out both; }
+@keyframes draw-opponent-reveal { from { opacity: 0; transform: translateY(.4cqw); } to { opacity: 1; transform: translateY(0); } }
 .draw-show-group-overview > div { display: flex; justify-content: space-between; gap: .4cqw; padding: .7cqw; border-block: 1px solid hsl(var(--border) / .6); background: hsl(var(--background) / .75); font-size: 1cqw; }
 .draw-show-group-overview .is-active { color: hsl(var(--primary)); background: hsl(var(--accent) / .85); border-color: hsl(var(--primary)); }
 .draw-show-active-group { grid-template-columns: minmax(0, 1fr); }

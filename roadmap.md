@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Potlabel goud en lager op de bokaal, grotere ballen en onafhankelijk gecentreerde teamnaam/vlag; visueel gecontroleerd met lokale testteams.
+- [x] Speelrondeloting op hetzelfde podium met potrosters, bekende ontmoetingen, klik-/automatische onthulling en beamerbeeld; klikflow, potvolgorde, bekende tegenstanders en beamerbeeld gecontroleerd met lokale testteams.
 - [x] Transparante logoranden automatisch uitgesneden en compactere potteamblokjes met een randloze pottitel direct op de bokaalvoet geplaatst.
 - [x] Bokaal op 61% gezet, pot-tabel binnen de centrale balkbreedte gehouden, ronde logo’s gecentreerd en volledige vlag rechts van de onthulde naam getoond; met 2/8/16/32 clubs en Belgische/Nepalese vlag gecontroleerd met lokale testgegevens.
 - [x] Bokaal sterk verkleind, potteams zonder scrollen in een gelijkmatig grid getoond en vlag/centrale balonthulling verbeterd; 2/8/16/32 lange clubnamen en balopening gecontroleerd met lokale testgegevens.
