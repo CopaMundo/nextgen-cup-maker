@@ -33,7 +33,7 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
   const leftContainers = session.containers.slice(0, splitAt);
   const rightContainers = session.containers.slice(splitAt);
   const activePot = session.mode === "pots"
-    ? session.pots.find((pot) => pot.id === session.activePotId) ?? session.pots.find((pot) => pot.teamIds.some((id) => session.remaining.includes(id)))
+    ? session.pots.find((pot) => pot.id === session.activePotId && pot.teamIds.some((id) => session.remaining.includes(id))) ?? session.pots.find((pot) => pot.teamIds.some((id) => session.remaining.includes(id)))
     : null;
   const remainingBallIds = (activePot
     ? activePot.teamIds.filter((id) => session.remaining.includes(id))

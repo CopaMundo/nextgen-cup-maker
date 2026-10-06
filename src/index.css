@@ -2698,7 +2698,7 @@ posities + statistieken groen */
   height: clamp(5rem, 8vw, 8rem);
   border-radius: 50%;
   display: flex;
-  animation: draw-ball-forward 1.2s ease-out both;
+  animation: draw-ball-forward 0.55s 0.82s ease-out both;
   pointer-events: none;
   z-index: 1;
 }
@@ -2709,9 +2709,9 @@ posities + statistieken groen */
   border: 2px solid hsl(43 88% 67%);
   box-shadow: inset 0 0 0 0.55rem hsl(42 22% 10% / 0.42), 0 0 1.4rem hsl(44 100% 61% / 0.45);
 }
-.draw-ball-left { border-radius: 7rem 0 0 7rem; animation: draw-half-left 0.8s 0.9s ease-in-out both; }
-.draw-ball-right { border-radius: 0 7rem 7rem 0; animation: draw-half-right 0.8s 0.9s ease-in-out both; }
-.draw-reveal-name { animation: draw-name-reveal 0.7s 1s ease-out both; }
+.draw-ball-left { border-radius: 7rem 0 0 7rem; animation: draw-half-left 0.72s 1.25s ease-in-out both; }
+.draw-ball-right { border-radius: 0 7rem 7rem 0; animation: draw-half-right 0.72s 1.25s ease-in-out both; }
+.draw-reveal-name { animation: draw-name-reveal 0.55s 1.42s ease-out both; }
 .draw-show-spotlight { animation: draw-spotlight 0.4s ease-out both; }
 @keyframes draw-ball-forward { 0% { opacity: 0; transform: scale(0.35); } 45% { opacity: 1; transform: scale(1); } 100% { opacity: 1; transform: scale(1.18); } }
 @keyframes draw-ball-rise { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.9); } 72% { opacity: 1; transform: translate(-50%, -430%) scale(1.08); } 100% { opacity: 0; transform: translate(-50%, -500%) scale(1.15); } }
