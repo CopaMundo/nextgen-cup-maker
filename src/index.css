@@ -2614,7 +2614,7 @@ posities + statistieken groen */
 .draw-show-eligible-groups span { border: 1px solid hsl(var(--border)); border-radius: 5px; padding: .4cqw .7cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .92cqw; font-weight: 700; }
 .draw-show-eligible-groups .is-spotlight { background: hsl(var(--accent)); box-shadow: 0 0 1.2cqw hsl(var(--stage-glow) / .65); border-color: hsl(var(--primary)); }
 .draw-show-bowl { position: absolute; left: 38.3%; top: 64%; width: 23.4%; height: 20%; pointer-events: none; }
-.draw-show-bowl-ball { position: absolute; width: 1.7cqw; aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
+.draw-show-bowl-ball { position: absolute; width: var(--ball-size, 1.7cqw); aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
 .draw-show-flying-ball { position: absolute; z-index: 8; left: 50%; top: 80%; width: 3.8cqw; aspect-ratio: 1; display: flex; pointer-events: none; animation: draw-ball-rise calc(1100ms / var(--draw-rate)) var(--reveal-offset) cubic-bezier(.2,.7,.2,1) both; }
 .draw-ball-half { width: 50%; height: 100%; background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); border: 1px solid hsl(var(--primary)); }
 .draw-ball-left { border-radius: 100px 0 0 100px; animation: draw-half-left calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
@@ -2633,8 +2633,8 @@ posities + statistieken groen */
 .draw-show-active-group .draw-show-slot-name { font-size: .8cqw; }
 .draw-show-active-group .draw-show-slot-mark { width: 1cqw; height: 1cqw; flex-basis: 1cqw; }
 .draw-show-waiting { position: absolute; top: 40%; left: 30%; width: 40%; padding: 1cqw; text-align: center; color: hsl(var(--primary)); font-size: 1.3cqw; }
-.draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; }
-.draw-control-stage > .draw-show-stage { flex: 0 0 auto; }
+.draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; container-type: size; }
+.draw-control-stage > .draw-show-stage { flex: 0 0 auto; width: min(100cqw, 177.7778cqh); }
 .draw-control-primary { position: absolute; z-index: 11; left: 40%; width: 20%; top: 72%; display: flex; justify-content: center; }
 .draw-control-dock { position: absolute; z-index: 11; bottom: 1%; left: 20%; width: 60%; display: flex; justify-content: center; gap: .3cqw; border-block: 1px solid hsl(var(--border) / .65); border-radius: 4px; background: hsl(var(--background) / .87); }
 .draw-scene-button { color: hsl(var(--primary)); background: hsl(var(--background) / .86); border: 1px solid hsl(var(--border) / .5); font-size: .82cqw; height: 2.6cqw; min-height: 0; padding: .3cqw .7cqw; gap: .35cqw; box-shadow: none; }
