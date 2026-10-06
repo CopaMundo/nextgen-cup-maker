@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Speelrondeteams met onthulde tegenstanderbadges, compacte gecentreerde kaders, twee kolommen tot 24 teams en focusvenster vanaf 25 teams; bekende tegenstanders vast bovenaan en vlag rechts achter de naam. Twaalf tests en onthullingsflow met voorbeeldteams gecontroleerd, plus schermcontrole met 4/24/25/32/64 teams.
 - [x] Speelrondes overgenomen uit het format en aanpasbaar gehouden; groepstitel links en tegenstanderskaart rechts met potlabels, vlaggen en thuis/uit-iconen; namen pas na voltooide onthulling, bekende tegenstanders eerst bij vrije loting. Negen tests en klik-/automatische onthulling met lokale testteams gecontroleerd.
 - [x] Potlabel goud en lager op de bokaal, grotere ballen en onafhankelijk gecentreerde teamnaam/vlag; visueel gecontroleerd met lokale testteams.
 - [x] Speelrondeloting op hetzelfde podium met potrosters, bekende ontmoetingen, klik-/automatische onthulling en beamerbeeld; klikflow, potvolgorde, bekende tegenstanders en beamerbeeld gecontroleerd met lokale testteams.
