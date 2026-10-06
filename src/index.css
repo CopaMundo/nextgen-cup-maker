@@ -2628,7 +2628,7 @@ posities + statistieken groen */
 .draw-show-pot > strong { align-self: center; flex-shrink: 0; padding: .12cqw 1.2cqw; border-block: 1px solid hsl(var(--primary)); color: hsl(var(--primary)); background: hsl(var(--background) / .9); font-size: .85cqw; line-height: 1.2; text-transform: uppercase; }
 .draw-show-pot-teams { display: grid; grid-template-columns: repeat(var(--pot-columns), minmax(0, 1fr)); grid-template-rows: repeat(var(--pot-rows), minmax(0, 1fr)); gap: .2cqw; flex: 1; min-height: 0; border: 1px solid hsl(var(--border) / .7); border-radius: 5px; background: hsl(var(--background) / .92); padding: .25cqw; }
 .draw-show-pot-teams > span { display: flex; min-width: 0; min-height: 0; align-items: center; justify-content: center; gap: .4cqw; padding: .12cqw .3cqw; border: 1px solid hsl(var(--border) / .4); border-radius: 4px; background: hsl(var(--stage-glass) / .82); color: hsl(var(--foreground)); transition: opacity 180ms, filter 180ms; }
-.draw-show-pot-name { flex: 1; min-width: 0; text-align: center; font-size: .78cqw; font-weight: 600; line-height: 1.12; overflow-wrap: anywhere; }
+.draw-show-pot-name { flex: 1; min-width: 0; text-align: center; font-size: .65cqw; font-weight: 600; line-height: 1.1; overflow-wrap: anywhere; }
 .draw-show-pot-teams > .is-drawn { opacity: .3; filter: grayscale(1); color: hsl(var(--muted-foreground)); }
 .draw-show-pot-logo { display: grid; place-items: center; width: 1.45cqw; height: 1.45cqw; flex: 0 0 1.45cqw; border-radius: 50%; border: 1px solid hsl(var(--border) / .6); background: hsl(var(--background)); }
 .draw-show-pot-teams img { width: 76%; height: 76%; object-fit: contain; }
