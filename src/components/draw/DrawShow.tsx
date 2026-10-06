@@ -48,9 +48,10 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const remainingIds = (activePot ? activePot.teamIds : session?.remaining ?? [])
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
   const potTeamIds = activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [];
-  const potColumns = potTeamIds.length > 16 ? 8 : Math.min(Math.max(1, potTeamIds.length), 4);
-  const potRows = Math.max(1, Math.ceil(potTeamIds.length / potColumns));
-  const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "5cqw" : "9cqw", "--pot-name-size": potRows > 4 ? ".42cqw" : ".5cqw" } as CSSProperties;
+  const potMaxColumns = potTeamIds.length > 16 ? 8 : 4;
+  const potRows = Math.max(1, Math.ceil(potTeamIds.length / potMaxColumns));
+  const potColumns = Math.max(1, Math.ceil(potTeamIds.length / potRows));
+  const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-name-lines": potColumns > 4 ? 3 : 2, "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
@@ -99,7 +100,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
         })}
       </div>
       {pending && !selectedId && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}
-      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
+      <strong className="draw-show-pot-label">{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot"><div className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
     </>}
     {controls}
   </div>;

@@ -18,4 +18,5 @@
 - [x] Aangeleverde schone studio gebruiken met dynamische bokaalballen, centrale teamvlucht, toelaatbare poules en een vrije gouden regiebalk.
 - [x] Groepsvleugels naast de teamnaambalk houden, de vliegende bal in de balk laten openen en ronde logomarkers verwijderen.
 - [x] Compact podium met potlijst, gesynchroniseerde onthulling/plaatsing, leesbare grote groepen en geïntegreerde regiebediening; gecontroleerd met lokale testgegevens.
+- [x] Potnaam op de bokaalvoet, potteams met afstand onder de bokaal in evenwichtige gecentreerde rijen (5 = 3/2, 6 = 3/3), logo’s zonder rondje en grotere namen; logo’s vierkant bijgesneden en exact gecentreerd.
 - [ ] Echte regieloting en apart beamerscherm samen controleren; wacht op een ingelogde previewsessie (veilig automatisch aanmelden niet beschikbaar voor dit account).
