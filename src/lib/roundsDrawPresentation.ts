@@ -9,7 +9,16 @@ export function orderedTeamFixtures(matches: ScheduledMatch[], teamId: string, p
   const potIndex = (id: string) => pots.findIndex((pot) => pot.teamIds.includes(id));
   return matches.map((m, i) => ({ m, i, opp: m.homeId === teamId ? m.awayId : m.homeId }))
     .filter(({ m }) => m.homeId === teamId || m.awayId === teamId)
-    .sort((a, b) => usePots ? potIndex(a.opp) - potIndex(b.opp) : Number(known.has(b.i)) - Number(known.has(a.i)));
+    .sort((a, b) => Number(known.has(b.i)) - Number(known.has(a.i)) || (usePots ? potIndex(a.opp) - potIndex(b.opp) : 0));
+}
+
+/** Fixed focus bounds leave completed teams above and upcoming teams below. */
+export function roundsRosterWindow(order: string[], activeId: string | undefined) {
+  if (order.length <= 24) return order;
+  const size = order.length > 40 ? 10 : 8;
+  const index = Math.max(0, order.indexOf(activeId ?? ""));
+  const start = Math.max(0, Math.min(order.length - size, index - Math.floor(size / 2)));
+  return order.slice(start, start + size);
 }
 
 /** Never publish hidden opponent identities to the fan picture. */
@@ -25,10 +34,16 @@ export function roundsStage(input: {
 }): RoundsStage {
   const currentId = input.order[input.currentIndex];
   const known = new Set(input.revealed);
+  const earlier = new Set(input.order.slice(0, input.currentIndex));
+  const previouslyKnown = input.matches.flatMap((match, index) => known.has(index) && (earlier.has(match.homeId) || earlier.has(match.awayId)) ? [index] : []);
+  const drawnTeamIds = input.order.slice(0, input.currentIndex + 1);
   return {
     groupName: input.groupName,
-    drawnTeamIds: input.order.slice(0, input.currentIndex + 1),
-    fixtures: currentId ? orderedTeamFixtures(input.matches, currentId, input.pots, input.revealed, input.usePots ?? input.pots.length > 1).map(({ m, i, opp }) => ({
+    drawnTeamIds,
+    teamOrder: input.order,
+    roster: drawnTeamIds.map((teamId) => ({ teamId, opponents: orderedTeamFixtures(input.matches, teamId, input.pots, [], input.usePots ?? input.pots.length > 1)
+      .filter(({ i }) => known.has(i)).map(({ i, opp }) => ({ id: String(i), opponentId: opp, revealAt: input.revealTimes[String(i)] ?? null })) })),
+    fixtures: currentId ? orderedTeamFixtures(input.matches, currentId, input.pots, previouslyKnown, input.usePots ?? input.pots.length > 1).map(({ m, i, opp }) => ({
       id: String(i), round: m.round, potName: input.pots.find((pot) => pot.teamIds.includes(opp))?.name ?? "Alle teams",
       home: m.homeId === currentId, opponentId: known.has(i) ? opp : null, revealAt: known.has(i) ? input.revealTimes[String(i)] ?? null : null,
     })) : [],
