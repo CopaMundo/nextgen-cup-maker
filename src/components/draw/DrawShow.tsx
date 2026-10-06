@@ -64,7 +64,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const teamContent = team && <>{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}<CountryFlag country={team.country} className="draw-show-flag" /><strong>{team.name}</strong></>;
   const speed = presentation?.speed ?? 1;
   const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId, speed]);
-  const motionStyle = { "--draw-rate": speed, "--reveal-offset": `${-elapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
+  const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
+  const motionStyle = { "--draw-rate": speed, "--reveal-offset": `${-elapsed}ms`, "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
   return <div ref={stageRef} className={`draw-show draw-show-stage ${overview ? "draw-show-overview-mode" : ""}`} style={{ backgroundImage: `url(${liveDrawStage})`, ...motionStyle }}>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>

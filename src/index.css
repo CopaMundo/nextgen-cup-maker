@@ -2620,7 +2620,7 @@ posities + statistieken groen */
 .draw-ball-left { border-radius: 100px 0 0 100px; animation: draw-half-left calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(250ms / var(--draw-rate)) calc(1650ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
-.draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) ease-in-out both; }
+.draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
 .draw-show-pot { position: absolute; left: 29%; width: 42%; top: 87%; text-align: center; }
 .draw-show-pot > strong { display: inline-block; padding: .2cqw 1.2cqw; border-block: 1px solid hsl(var(--primary)); color: hsl(var(--primary)); background: hsl(var(--background) / .8); font-size: 1cqw; text-transform: uppercase; }
 .draw-show-pot-teams { margin-top: .45cqw; display: flex; gap: .6cqw; overflow-x: auto; scrollbar-width: thin; white-space: nowrap; padding: .2cqw; }
