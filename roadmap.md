@@ -11,3 +11,4 @@
 - [x] Live loting terugbrengen als beveiligde modalwizard met startkeuze, vereenvoudigde pouleregels en automatische doorstroom naar speelrondes.
 - [x] Pouletrekking als stille balonthulling met enkel geldige poules, handmatige groepstrekking en hetzelfde beamerbeeld in de beheerpop-up.
 - [x] Gouden fanbeeld met dynamische poulevleugels, centraal teamonthulling en zwevende regiebediening delen tussen beheer en beamer.
+- [x] Aangeleverde schone studio gebruiken met dynamische bokaalballen, centrale teamvlucht, toelaatbare poules en een vrije gouden regiebalk.
