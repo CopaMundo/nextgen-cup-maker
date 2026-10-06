@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DrawShow } from "@/components/draw/DrawShow";
-import type { DrawSessionState } from "@/lib/drawSession";
+import type { DrawPicture } from "@/lib/drawPresentation";
 
-type Picture = { session: DrawSessionState; spotlightId: string | null };
+type Picture = DrawPicture;
 
 export default function DrawProjector() {
   const { phaseId } = useParams<{ phaseId: string }>();
@@ -24,6 +24,6 @@ export default function DrawProjector() {
     return () => { active = false; window.clearInterval(interval); void supabase.removeChannel(channel); };
   }, [phaseId]);
   return <main className="draw-projector-stage flex h-dvh items-center justify-center overflow-hidden bg-background text-foreground">
-    <DrawShow session={picture?.session} spotlightId={picture?.spotlightId} />
+    <DrawShow session={picture?.session} spotlightId={picture?.spotlightId} presentation={picture?.presentation} />
   </main>;
 }
