@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Bokaal sterk verkleinen, potteams zonder scrollen in een gelijkmatig grid tot 32 teams tonen en vlag/centrale balonthulling verbeteren voor regie en beamer.
+- [x] Bokaal sterk verkleind, potteams zonder scrollen in een gelijkmatig grid getoond en vlag/centrale balonthulling verbeterd; 2/8/16/32 lange clubnamen en balopening gecontroleerd met lokale testgegevens.
 - [x] Referentiestijl toegepast: cijferloze gouden groepsvakken, vaste logocirkels, gedimde potclubs, achtergrondvlag en fullscreen regie gecontroleerd met lokale testgegevens.
 
 - [x] Mobiele beheerpagina voorzien van een volledig inklapbare iconenzijbalk en dunne contextbalk; desktop en publieke site ongewijzigd laten.
