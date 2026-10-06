@@ -7,3 +7,4 @@
 - Share one timestamp-driven 16:9 draw stage between admin and projector; inject organizer-only bowl and bottom controls into that stage, and publish presentation timing with the active phase session so reveal, selection hold and transfer stay synchronized without exposing controls.
 - Fullscreen the director stage container rather than the document; mount its popovers and selectors within that container so controls remain usable in browser fullscreen.
 - Auto-trim transparent logo margins in the shared draw stage at render time and cache the result; source uploads stay unchanged while projector and director receive identical optical alignment.
+- Publish rounds through the shared draw picture using only revealed opponent identities and timestamped reveals; the precomputed schedule stays in the phase draft so both stages synchronize without disclosing upcoming opponents.
