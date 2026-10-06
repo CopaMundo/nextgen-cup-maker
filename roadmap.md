@@ -13,3 +13,4 @@
 - [x] Gouden fanbeeld met dynamische poulevleugels, centraal teamonthulling en zwevende regiebediening delen tussen beheer en beamer.
 - [x] Aangeleverde schone studio gebruiken met dynamische bokaalballen, centrale teamvlucht, toelaatbare poules en een vrije gouden regiebalk.
 - [x] Groepsvleugels naast de teamnaambalk houden, de vliegende bal in de balk laten openen en ronde logomarkers verwijderen.
+- [ ] Compact podium met potlijst, gesynchroniseerde onthulling/plaatsing, leesbare grote groepen en geïntegreerde regiebediening bouwen en controleren.
