@@ -72,9 +72,6 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
 
     <main className="draw-show-center">
       <div className="draw-show-team-card">
-        {pending && <div key={pending.teamId} className="draw-reveal-ball" aria-hidden="true">
-          <span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" />
-        </div>}
         {shown ? <div key={`${shown.id}-${session.history.length}`} className={`draw-show-team ${pending ? "draw-reveal-name" : ""}`}>
           {shown.logoUrl && <img src={shown.logoUrl} alt="" className="draw-show-team-logo" />}
           <div className="draw-show-team-country"><CountryFlag country={shown.country} className="h-4 w-6" /><span>{shown.country}</span></div>
@@ -101,6 +98,9 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
         />;
       })}
     </div>
-    {pending && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true" />}
+    {pending && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true">
+      <span className="draw-ball-half draw-ball-left" />
+      <span className="draw-ball-half draw-ball-right" />
+    </span>}
   </div>;
 }
