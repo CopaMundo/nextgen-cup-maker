@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Speelrondeloting: één doorschuivende lijst van maximaal 12 teams, volledig gevulde onthullingsrijen en expliciet starten via Loot speelrondes met automatische of handmatige regie.
+- [x] Speelrondeloting: één doorschuivende lijst van maximaal 12 teams, volledig gevulde onthullingsrijen en expliciet starten via Loot speelrondes met automatische of handmatige regie; 12 tests en browsercontroles met voorbeeldteams (4–64) geslaagd.
 - [x] Speelrondeteams met onthulde tegenstanderbadges, compacte gecentreerde kaders, twee kolommen tot 24 teams en focusvenster vanaf 25 teams; bekende tegenstanders vast bovenaan en vlag rechts achter de naam. Twaalf tests en onthullingsflow met voorbeeldteams gecontroleerd, plus schermcontrole met 4/24/25/32/64 teams.
 - [x] Speelrondes overgenomen uit het format en aanpasbaar gehouden; groepstitel links en tegenstanderskaart rechts met potlabels, vlaggen en thuis/uit-iconen; namen pas na voltooide onthulling, bekende tegenstanders eerst bij vrije loting. Negen tests en klik-/automatische onthulling met lokale testteams gecontroleerd.
 - [x] Potlabel goud en lager op de bokaal, grotere ballen en onafhankelijk gecentreerde teamnaam/vlag; visueel gecontroleerd met lokale testteams.
