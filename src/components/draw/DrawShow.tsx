@@ -51,7 +51,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const potMaxColumns = potTeamIds.length > 16 ? 8 : 4;
   const potRows = Math.max(1, Math.ceil(potTeamIds.length / potMaxColumns));
   const potColumns = Math.max(1, Math.ceil(potTeamIds.length / potRows));
-  const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "4.9cqw" : "9.2cqw", "--pot-name-size": potColumns > 4 ? ".56cqw" : ".74cqw", "--pot-logo-size": potColumns > 4 ? "1.05cqw" : "1.45cqw" } as CSSProperties;
+  const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-name-lines": potColumns > 4 ? 3 : 2, "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
