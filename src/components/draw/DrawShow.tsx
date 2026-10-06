@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import type { DrawSessionState } from "@/lib/drawSession";
 import { needsGroupOverview, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import CountryFlag from "@/components/CountryFlag";
-import liveDrawStage from "@/assets/live-draw-compact-stage.png";
+import liveDrawStage from "@/assets/live-draw-small-bowl-stage.png";
 
 export function DrawShow({ session, spotlightId, presentation, controls }: {
   session?: DrawSessionState | null;
@@ -47,6 +47,9 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const remainingIds = (activePot ? activePot.teamIds : session?.remaining ?? [])
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
   const potTeamIds = activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [];
+  const potColumns = Math.min(Math.max(1, potTeamIds.length), potTeamIds.length <= 8 ? 4 : potTeamIds.length <= 16 ? 6 : 8);
+  const potRows = Math.max(1, Math.ceil(potTeamIds.length / potColumns));
+  const potGridStyle = { "--pot-columns": potColumns, "--pot-rows": potRows } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
@@ -87,15 +90,15 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
       {selectionPhase === "transfer" && team && <div className="draw-show-transfer" key={`${team.id}-${selectedId}`}>{teamContent}</div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}>
         {remainingIds.map((id, index) => {
-          const columns = remainingIds.length > 49 ? 12 : 7;
+          const columns = remainingIds.length > 49 ? 10 : 6;
           const row = Math.floor(index / columns);
           const column = index % columns;
           const totalRows = Math.ceil(remainingIds.length / columns);
-          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${25 + column * 50 / columns + (row % 2 ? 1 : 0)}%`, top: `${82 - row * Math.min(8, 45 / totalRows)}%`, "--drift-delay": `${-index * .37}s`, "--ball-size": remainingIds.length > 49 ? ".95cqw" : "1.7cqw", zIndex: index + 1 } as CSSProperties} />;
+          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${27 + column * 46 / columns + (row % 2 ? 1 : 0)}%`, top: `${84 - row * Math.min(8, 38 / totalRows)}%`, "--drift-delay": `${-index * .37}s`, "--ball-size": remainingIds.length > 49 ? ".45cqw" : ".8cqw", zIndex: index + 1 } as CSSProperties} />;
         })}
       </div>
       {pending && !selectedId && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}
-      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <img src={item.logoUrl} alt="" />}</span>{item?.name}</span>; })}</div></div>
+      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <img src={item.logoUrl} alt="" />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
     </>}
     {controls}
   </div>;
