@@ -4,4 +4,4 @@
 - Style both live-draw dialogs with the shared draw-dialog-theme, draw-choice, draw-panel, and draw-table roles; shared tokens prevent the group and rounds workflows from drifting visually.
 - Render both live draws inside one secured modal wizard that blocks outside-click and Escape dismissal; phase drafts preserve refresh recovery.
 - Use equal-size pot choices and the shared fixed PotTeamSlots selector in both draw views; a bounded slot cannot overfill a pot and keeps assignment behavior consistent.
-- Share one decorative read-only draw stage between admin and projector, render the active pot as dynamic bowl balls, keep controls in a separate admin-only gold dock outside the 16:9 stage, and publish only the current phase's active draw session; this keeps fan display synchronized without obscuring the bowl or exposing organizer controls.
+- Share one timestamp-driven 16:9 draw stage between admin and projector; inject organizer-only bowl and bottom controls into that stage, and publish presentation timing with the active phase session so reveal, selection hold and transfer stay synchronized without exposing controls.
