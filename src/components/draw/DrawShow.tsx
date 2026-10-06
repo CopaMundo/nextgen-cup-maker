@@ -46,22 +46,23 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     : null;
   const remainingIds = (activePot ? activePot.teamIds : session?.remaining ?? [])
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
+  const potTeamIds = activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [];
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
-      <h2>{container.name}<small>{container.teamIds.length}/{container.capacity}</small></h2>
+      <h2>{container.name}</h2>
       <div className="draw-show-slots" style={{ "--slot-columns": 1 } as CSSProperties}>
         {Array.from({ length: container.capacity }, (_, index) => {
           const placed = session?.teams.find((item) => item.id === container.teamIds[index]);
           return <div key={index} className="draw-show-slot" data-transfer-target={container.id === selectedId && index === container.teamIds.length}>
-            <span className="draw-show-slot-mark">{placed?.logoUrl ? <img src={placed.logoUrl} alt="" /> : placed ? null : index + 1}</span>
+            <span className="draw-show-slot-mark">{placed?.logoUrl && <img src={placed.logoUrl} alt="" />}</span>
             <span className="draw-show-slot-name" title={placed?.name}>{placed?.name ?? ""}</span>
           </div>;
         })}
       </div>
     </section>
   );
-  const teamContent = team && <>{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}<CountryFlag country={team.country} className="draw-show-flag" /><strong>{team.name}</strong></>;
+  const teamContent = team && <><span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span><span className="draw-show-reveal-logo">{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}</span><strong>{team.name}</strong></>;
   const speed = presentation?.speed ?? 1;
   const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId, speed]);
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
@@ -94,7 +95,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
         })}
       </div>
       {pending && !selectedId && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}
-      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" aria-label="Resterende teams in actieve pot">{remainingIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); return <span key={id}>{item?.logoUrl && <img src={item.logoUrl} alt="" />}{item?.name}</span>; })}</div></div>
+      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <img src={item.logoUrl} alt="" />}</span>{item?.name}</span>; })}</div></div>
     </>}
     {controls}
   </div>;

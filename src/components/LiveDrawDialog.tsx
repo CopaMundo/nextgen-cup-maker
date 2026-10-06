@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
+import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
 import { revealDuration, selectionDuration, sweepDuration, type DrawPresentation } from "@/lib/drawPresentation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
@@ -124,6 +125,7 @@ const LiveDrawDialog = ({
   const [presentation, setPresentation] = useState<DrawPresentation>({ revealAt: 0, speed: 1, activePotId: null, selection: null });
   const [revealing, setRevealing] = useState(false);
   const timers = useRef<number[]>([]);
+  const directorRef = useRef<HTMLDivElement>(null);
   const syncQueue = useRef<Promise<unknown>>(Promise.resolve());
   const publishedHere = useRef(false);
   const [draftReady, setDraftReady] = useState(false);
@@ -778,13 +780,14 @@ const LiveDrawDialog = ({
 
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
-    <div className="draw-control-stage">
+    <div ref={directorRef} className="draw-control-stage">
       <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
         <div className="draw-control-primary">
           {session.finished ? <Button onClick={applyDraw} disabled={applying} className="draw-scene-button"><Check />Indeling toepassen</Button>
             : <Button className="draw-scene-button" disabled={sceneBusy || (Boolean(pending) && !pending?.options.length)} onClick={() => pending ? drawGroup() : handleDrawNext()}><Shuffle />{pending ? "Loot groep" : "Trek team"}</Button>}
         </div>
         <aside className="draw-control-dock">
+          <DrawFullscreenButton target={directorRef} />
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleUndo} disabled={sceneBusy || !session.history.length}><Undo2 />Ongedaan maken</Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleDrawAll} disabled={sceneBusy || session.finished}><Sparkles />Alles loten</Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} disabled={sceneBusy}><RotateCcw />Opnieuw beginnen</Button>
