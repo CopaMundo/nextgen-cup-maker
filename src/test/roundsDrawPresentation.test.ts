@@ -48,12 +48,14 @@ describe("Rounds fan picture", () => {
     ]);
     expect(roundsStage({ ...input, revealed: [0, 1], revealTimes: { "0": 3000 } }).roster?.[1].opponents[1]).toMatchObject({ opponentId: "d", revealAt: 3000 });
   });
-  it("shows all 24 teams and bounded centered windows for larger groups", () => {
+  it("shows one twelve-team list and drops the oldest team for each new draw", () => {
     const order = Array.from({ length: 64 }, (_, i) => String(i));
-    expect(roundsRosterWindow(order.slice(0, 24), "12")).toHaveLength(24);
-    expect(roundsRosterWindow(order.slice(0, 32), "16")).toEqual(order.slice(12, 20));
-    expect(roundsRosterWindow(order, "32")).toEqual(order.slice(27, 37));
-    expect(roundsRosterWindow(order, "63")).toEqual(order.slice(54));
-    expect(roundsRosterWindow(order, undefined)).toEqual(order.slice(0, 10));
+    expect(roundsRosterWindow(order.slice(0, 12), "5")).toEqual(order.slice(0, 12));
+    expect(roundsRosterWindow(order, "11")).toEqual(order.slice(0, 12));
+    expect(roundsRosterWindow(order, "12")).toEqual(order.slice(1, 13));
+    expect(roundsRosterWindow(order.slice(0, 32), "16")).toEqual(order.slice(5, 17));
+    expect(roundsRosterWindow(order, "32")).toEqual(order.slice(21, 33));
+    expect(roundsRosterWindow(order, "63")).toEqual(order.slice(52));
+    expect(roundsRosterWindow(order, undefined)).toEqual(order.slice(0, 12));
   });
 });
