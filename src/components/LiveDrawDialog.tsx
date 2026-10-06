@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
+import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
 import { revealDuration, selectionDuration, sweepDuration, type DrawPresentation } from "@/lib/drawPresentation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
@@ -124,6 +125,7 @@ const LiveDrawDialog = ({
   const [presentation, setPresentation] = useState<DrawPresentation>({ revealAt: 0, speed: 1, activePotId: null, selection: null });
   const [revealing, setRevealing] = useState(false);
   const timers = useRef<number[]>([]);
+  const directorRef = useRef<HTMLDivElement>(null);
   const syncQueue = useRef<Promise<unknown>>(Promise.resolve());
   const publishedHere = useRef(false);
   const [draftReady, setDraftReady] = useState(false);
@@ -778,23 +780,24 @@ const LiveDrawDialog = ({
 
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
-    <div className="draw-control-stage">
+    <div ref={directorRef} className="draw-control-stage">
       <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
         <div className="draw-control-primary">
           {session.finished ? <Button onClick={applyDraw} disabled={applying} className="draw-scene-button"><Check />Indeling toepassen</Button>
             : <Button className="draw-scene-button" disabled={sceneBusy || (Boolean(pending) && !pending?.options.length)} onClick={() => pending ? drawGroup() : handleDrawNext()}><Shuffle />{pending ? "Loot groep" : "Trek team"}</Button>}
         </div>
         <aside className="draw-control-dock">
+          <DrawFullscreenButton target={directorRef} />
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleUndo} disabled={sceneBusy || !session.history.length}><Undo2 />Ongedaan maken</Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleDrawAll} disabled={sceneBusy || session.finished}><Sparkles />Alles loten</Button>
-          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} disabled={sceneBusy}><RotateCcw />Opnieuw beginnen</Button>
+          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setShowResetConfirm(true); }} disabled={sceneBusy}><RotateCcw />Opnieuw beginnen</Button>
           <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="sm" disabled={sceneBusy}><Settings2 />Instellingen</Button></PopoverTrigger>
-            <PopoverContent className="draw-scene-settings space-y-4" side="top">
+            <PopoverContent portalContainer={directorRef.current} className="draw-scene-settings space-y-4" side="top">
               <h2 className="font-semibold">Regie-instellingen</h2>
-              <div><Label>Animatiesnelheid</Label><Select value={String(animationSpeed)} onValueChange={(value) => setAnimationSpeed(Number(value))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{[{ value: .75, label: "Rustig" }, { value: 1, label: "Normaal" }, { value: 1.5, label: "Snel" }].map((item) => <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>)}</SelectContent></Select></div>
+              <div><Label>Animatiesnelheid</Label><Select value={String(animationSpeed)} onValueChange={(value) => setAnimationSpeed(Number(value))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{[{ value: .75, label: "Rustig" }, { value: 1, label: "Normaal" }, { value: 1.5, label: "Snel" }].map((item) => <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>)}</SelectContent></Select></div>
               <div className="flex items-center justify-between gap-4"><Label htmlFor="automatic-placement">Automatisch toewijzen</Label><Switch id="automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>
-              {session.mode === "pots" && <div><Label>Actieve pot</Label><Select value={activePotChoice?.id} onValueChange={setSelectedPotId} disabled={Boolean(pending)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{pots.map((pot) => <SelectItem key={pot.id} value={pot.id} disabled={!pot.teamIds.some((id) => session.remaining.includes(id))}>{pot.name}</SelectItem>)}</SelectContent></Select></div>}
-              {!pending && !session.finished && <div><Label>Handmatig kiezen</Label><Select value={manualTeam} onValueChange={handleDrawNext}><SelectTrigger><SelectValue placeholder="Selecteer team" /></SelectTrigger><SelectContent>{remainingPool.map((id) => <SelectItem key={id} value={id}>{teamName(session, id)}</SelectItem>)}</SelectContent></Select></div>}
+              {session.mode === "pots" && <div><Label>Actieve pot</Label><Select value={activePotChoice?.id} onValueChange={setSelectedPotId} disabled={Boolean(pending)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{pots.map((pot) => <SelectItem key={pot.id} value={pot.id} disabled={!pot.teamIds.some((id) => session.remaining.includes(id))}>{pot.name}</SelectItem>)}</SelectContent></Select></div>}
+              {!pending && !session.finished && <div><Label>Handmatig kiezen</Label><Select value={manualTeam} onValueChange={handleDrawNext}><SelectTrigger><SelectValue placeholder="Selecteer team" /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{remainingPool.map((id) => <SelectItem key={id} value={id}>{teamName(session, id)}</SelectItem>)}</SelectContent></Select></div>}
               {pending && <Button className="draw-scene-button w-full" variant="outline" onClick={handleRedraw}><RotateCcw />Opnieuw trekken</Button>}
               <Button className="draw-scene-button w-full" variant="outline" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink />Beamerscherm</Button>
             </PopoverContent>
