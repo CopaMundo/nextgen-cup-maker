@@ -2635,17 +2635,29 @@ posities + statistieken groen */
 .draw-show-pot-logo { display: flex; align-items: center; justify-content: center; width: var(--pot-logo-size, 1.45cqw); height: var(--pot-logo-size, 1.45cqw); flex: 0 0 var(--pot-logo-size, 1.45cqw); border: 0; border-radius: 0; background: none; }
 .draw-show-pot-teams img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
 .draw-show-group-overview { position: absolute; left: 2%; top: 13%; bottom: 24%; width: 25%; overflow-y: auto; display: flex; flex-direction: column; gap: .5cqw; }
-.draw-show-rounds-roster { position: absolute; top: 13%; bottom: 7%; width: 25%; display: flex; flex-direction: column; gap: .5cqw; overflow-y: auto; scrollbar-width: thin; }
-.draw-show-rounds-roster .draw-show-group-card { flex-shrink: 0; }
+.draw-show-rounds-roster { position: absolute; top: 13%; bottom: 7%; width: 25%; display: flex; flex-direction: column; }
+.draw-show-rounds-roster-list { min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.draw-show-rounds-pot h3 { padding: .3cqw .7cqw; color: hsl(var(--muted-foreground)); font-size: .75cqw; text-transform: uppercase; }
 .draw-show-rounds-teams { display: grid; grid-template-columns: minmax(0, 1fr); gap: .2cqw; padding: .35cqw; }
 .draw-show-rounds-teams .draw-show-slot { min-height: 2cqw; }
 .draw-show-rounds-teams .is-drawn { opacity: .3; filter: grayscale(1); }
 .draw-show-rounds-teams .is-active { border-color: hsl(var(--primary)); background: hsl(var(--accent)); box-shadow: inset 0 0 .6cqw hsl(var(--stage-glow) / .35); }
 .draw-show-rounds-schedule { position: absolute; top: 13%; bottom: 7%; width: 25%; }
 .draw-show-rounds-fixtures { display: flex; flex-direction: column; gap: .5cqw; overflow-y: auto; padding: .5cqw; scrollbar-width: thin; }
-.draw-show-rounds-meta { display: block; color: hsl(var(--muted-foreground)); font-size: .7cqw; line-height: 1.4; padding-bottom: .2cqw; }
-.draw-show-rounds-fixture .draw-show-slot { min-height: 2.5cqw; }
-.draw-show-rounds-fixture.is-known .draw-show-slot { animation: draw-opponent-reveal 500ms var(--opponent-offset) ease-out both; }
+.draw-show-rounds-team-header { display: flex; align-items: center; gap: .65cqw; min-height: 5.5cqw; flex-shrink: 0; padding: .7cqw; border-bottom: 1px solid hsl(var(--border) / .35); }
+.draw-show-rounds-team-header > .draw-show-slot-mark { width: 3.3cqw; height: 3.3cqw; flex-basis: 3.3cqw; font-size: 1cqw; }
+.draw-show-rounds-team-header > div { min-width: 0; flex: 1; }
+.draw-show-rounds-team-header strong { font-size: 1.15cqw; line-height: 1.25; overflow-wrap: anywhere; }
+.draw-show-rounds-team-header .country-flag-img { margin-left: .5cqw; width: 1.4cqw; height: 1cqw; object-fit: contain; }
+.draw-show-rounds-team-header small { display: block; width: fit-content; margin-top: .3cqw; color: hsl(var(--primary)); font-size: .65cqw; text-transform: uppercase; }
+.draw-show-rounds-fixture { min-height: 3cqw; flex-shrink: 0; gap: .35cqw; }
+.draw-show-rounds-fixture .draw-show-slot-name { flex: 1; white-space: normal; overflow-wrap: anywhere; }
+.draw-show-rounds-pot-tag { flex: 0 0 2.7cqw; color: hsl(var(--primary)); font-size: .65cqw; text-align: center; text-transform: uppercase; }
+.draw-show-rounds-fixture .draw-show-slot-mark { font-size: .65cqw; }
+.draw-show-rounds-fixture .draw-show-rounds-flag { width: 1.4cqw; height: 1.1cqw; object-fit: contain; flex-shrink: 0; }
+.draw-show-rounds-venue { display: grid; place-items: center; flex: 0 0 1.3cqw; color: hsl(var(--muted-foreground)); }
+.draw-show-rounds-venue svg { width: 1cqw; height: 1cqw; }
+.draw-show-rounds-fixture.is-revealing { animation: draw-opponent-reveal 500ms ease-out both; }
 @keyframes draw-opponent-reveal { from { opacity: 0; transform: translateY(.4cqw); } to { opacity: 1; transform: translateY(0); } }
 .draw-show-group-overview > div { display: flex; justify-content: space-between; gap: .4cqw; padding: .7cqw; border-block: 1px solid hsl(var(--border) / .6); background: hsl(var(--background) / .75); font-size: 1cqw; }
 .draw-show-group-overview .is-active { color: hsl(var(--primary)); background: hsl(var(--accent) / .85); border-color: hsl(var(--primary)); }
@@ -2676,6 +2688,6 @@ posities + statistieken groen */
 @keyframes draw-team-transfer { 0% { transform: translate(-50%, -50%); } 85%,100% { transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))) scale(.3); opacity: .65; } }
 @media (prefers-reduced-motion: reduce) {
   .draw-show-flying-ball { display: none; }
-  .draw-ball-half, .draw-reveal-name, .draw-show-bowl-ball, .draw-show-transfer { animation: none; }
+  .draw-ball-half, .draw-reveal-name, .draw-show-bowl-ball, .draw-show-transfer, .draw-show-rounds-fixture.is-revealing { animation: none; }
   .draw-show-transfer { transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))) scale(.3); }
 }
