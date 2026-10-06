@@ -16,7 +16,7 @@ export default function DrawProjector() {
       const { data } = await supabase.from("draw_sessions").select("status, state").eq("phase_id", phaseId).maybeSingle();
       if (!active) return;
       const state = data?.state as unknown as Picture | undefined;
-      setPicture(data?.status === "running" && state?.session?.kind === "containers" ? state : null);
+      setPicture(data?.status === "running" && (state?.session?.kind === "containers" || state?.session?.kind === "rounds") ? state : null);
     };
     void refresh();
     const channel = supabase.channel(`draw-projector-${phaseId}`).on("postgres_changes", { event: "*", schema: "public", table: "draw_sessions", filter: `phase_id=eq.${phaseId}` }, () => { void refresh(); }).subscribe();

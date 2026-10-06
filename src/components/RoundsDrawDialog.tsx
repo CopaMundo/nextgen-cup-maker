@@ -16,7 +16,7 @@ import {
   type SameCountryMode,
   type ScheduledMatch,
 } from "@/lib/roundsSchedule";
-import { shuffle } from "@/lib/liveDraw";
+import { emptyRoundsRules, shuffle } from "@/lib/liveDraw";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
 import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
@@ -793,7 +793,7 @@ const RoundsDrawDialog = ({
       phaseName: phaseName || "Speelrondes", mode: method === "pots" ? "pots" : "random",
       teams: teams.filter((team) => activeGroup.teamIds.includes(team.id)), pots,
       groups: [{ groupId: activeGroup.id, groupName: activeGroup.name, totalRounds: activeGroup.rounds, teamIds: activeGroup.teamIds }],
-      rules: { sameCountry: "allow", forbiddenPairs: [], maxMeetings: 2 },
+      rules: emptyRoundsRules(),
     });
     session.pots = pots;
     session.remaining = activeDraw.order.slice(currentIdx + 1);
