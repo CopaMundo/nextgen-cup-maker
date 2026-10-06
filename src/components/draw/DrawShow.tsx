@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import type { DrawSessionState } from "@/lib/drawSession";
 import { needsGroupOverview, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import CountryFlag from "@/components/CountryFlag";
-import liveDrawStage from "@/assets/live-draw-small-bowl-stage.png";
+import liveDrawStage from "@/assets/live-draw-raised-bowl-stage.png";
 
 export function DrawShow({ session, spotlightId, presentation, controls }: {
   session?: DrawSessionState | null;
@@ -47,9 +47,9 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const remainingIds = (activePot ? activePot.teamIds : session?.remaining ?? [])
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
   const potTeamIds = activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [];
-  const potColumns = Math.min(Math.max(1, potTeamIds.length), potTeamIds.length <= 8 ? 4 : potTeamIds.length <= 16 ? 6 : 8);
+  const potColumns = Math.min(Math.max(1, potTeamIds.length), 4);
   const potRows = Math.max(1, Math.ceil(potTeamIds.length / potColumns));
-  const potGridStyle = { "--pot-columns": potColumns, "--pot-rows": potRows } as CSSProperties;
+  const potGridStyle = { "--pot-columns": potColumns, "--pot-rows": potRows, "--pot-name-size": potRows > 4 ? ".48cqw" : ".65cqw" } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
@@ -65,7 +65,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
       </div>
     </section>
   );
-  const teamContent = team && <><span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span><span className="draw-show-reveal-logo">{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}</span><strong>{team.name}</strong></>;
+  const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span>{team.country && <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span>}</>;
   const speed = presentation?.speed ?? 1;
   const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId, speed]);
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
