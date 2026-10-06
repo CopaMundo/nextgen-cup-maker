@@ -12,12 +12,12 @@ export function orderedTeamFixtures(matches: ScheduledMatch[], teamId: string, p
     .sort((a, b) => Number(known.has(b.i)) - Number(known.has(a.i)) || (usePots ? potIndex(a.opp) - potIndex(b.opp) : 0));
 }
 
-/** Fixed focus bounds leave completed teams above and upcoming teams below. */
+/** A single twelve-team list advances only when a new team is drawn. */
 export function roundsRosterWindow(order: string[], activeId: string | undefined) {
-  if (order.length <= 24) return order;
-  const size = order.length > 40 ? 10 : 8;
+  const size = 12;
+  if (order.length <= size) return order;
   const index = Math.max(0, order.indexOf(activeId ?? ""));
-  const start = Math.max(0, Math.min(order.length - size, index - Math.floor(size / 2)));
+  const start = Math.max(0, index - size + 1);
   return order.slice(start, start + size);
 }
 
