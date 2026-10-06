@@ -2593,21 +2593,23 @@ posities + statistieken groen */
 .draw-show-wing { position: absolute; top: 13%; bottom: 14%; width: 25%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
-.draw-show-group-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .7); border-radius: 8px; background: hsl(var(--card) / .72); transition: box-shadow 140ms; }
-.draw-show-group-card h2 { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: .3cqw; padding: .55cqw; border-bottom: 1px solid hsl(var(--border) / .6); color: hsl(var(--primary)); font-size: 1cqw; font-weight: 700; line-height: 1.3; }
+.draw-show-group-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .85); border-radius: 8px; background: hsl(var(--card) / .78); box-shadow: inset 0 0 .5cqw hsl(var(--stage-glow) / .12); transition: box-shadow 140ms; }
+.draw-show-group-card h2 { flex-shrink: 0; text-align: center; padding: .75cqw .4cqw; color: hsl(var(--primary)); font-size: 1.1cqw; text-transform: uppercase; font-weight: 700; line-height: 1.3; }
 .draw-show-group-card h2 small { color: hsl(var(--muted-foreground)); font-size: .7cqw; }
 .draw-show-slots { display: grid; flex: 1; min-height: 0; grid-template-columns: repeat(var(--slot-columns, 1), minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(16, minmax(0, 1fr)); gap: .2cqw; padding: .35cqw; }
 .draw-show-wing:not(.draw-show-active-group) .draw-show-slots { grid-auto-flow: row; grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); }
-.draw-show-slot { display: flex; align-items: center; gap: .35cqw; min-height: 0; overflow: hidden; border-radius: 3px; background: hsl(var(--stage-glass) / .62); padding: .15cqw .25cqw; }
-.draw-show-slot-mark { display: grid; width: 1.5cqw; height: 1.5cqw; flex: 0 0 1.5cqw; place-items: center; color: hsl(var(--muted-foreground)); font-size: .65cqw; }
-.draw-show-slot-mark img { width: 100%; height: 100%; object-fit: contain; }
+.draw-show-slot { display: flex; align-items: center; gap: .4cqw; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--border) / .68); border-radius: 5px; background: hsl(var(--stage-glass) / .82); padding: .2cqw .4cqw; }
+.draw-show-slot-mark { display: grid; width: 1.8cqw; height: 1.8cqw; flex: 0 0 1.8cqw; place-items: center; border-radius: 50%; border: 1px solid hsl(var(--border) / .5); background: hsl(var(--background) / .75); }
+.draw-show-slot-mark img { width: 76%; height: 76%; object-fit: contain; }
 .draw-show-slot-name { min-width: 0; overflow: hidden; font-size: .82cqw; font-weight: 600; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .draw-show-group-card.is-placed { box-shadow: inset 0 0 1cqw hsl(var(--stage-glow) / .2), 0 0 1cqw hsl(var(--stage-glow) / .35); }
 .draw-show-center { position: absolute; z-index: 5; top: 39%; left: 29%; width: 42%; height: 10%; }
 .draw-show-team-card { display: flex; height: 100%; width: 100%; align-items: center; justify-content: center; padding: .7cqw 1.7cqw; }
-.draw-show-team { display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; min-width: 0; }
+.draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; overflow: hidden; }
+.draw-show-reveal-logo { display: grid; place-items: center; width: 3cqw; height: 3cqw; flex: 0 0 3cqw; }
 .draw-show-team-logo { width: 3cqw; height: 3cqw; object-fit: contain; flex-shrink: 0; }
-.draw-show-flag { width: 1.7cqw; height: 1.2cqw; flex-shrink: 0; }
+.draw-show-flag-backdrop { position: absolute; z-index: -1; inset: 0; display: flex; justify-content: flex-end; align-items: center; pointer-events: none; opacity: .12; }
+.draw-show-flag-backdrop .draw-show-flag { width: 34%; height: 100%; object-fit: cover; }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; color: hsl(var(--foreground)); font-size: 1.6cqw; line-height: 1.2; text-align: center; }
 .draw-show-eligible { position: absolute; top: 135%; width: 100%; }
 .draw-show-eligible-groups { display: flex; flex-wrap: wrap; justify-content: center; gap: .6cqw; }
@@ -2621,10 +2623,12 @@ posities + statistieken groen */
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(250ms / var(--draw-rate)) calc(1650ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
-.draw-show-pot { position: absolute; left: 29%; width: 42%; top: 87%; text-align: center; }
+.draw-show-pot { position: absolute; left: 29%; width: 42%; top: 86%; height: 8%; text-align: center; }
 .draw-show-pot > strong { display: inline-block; padding: .2cqw 1.2cqw; border-block: 1px solid hsl(var(--primary)); color: hsl(var(--primary)); background: hsl(var(--background) / .8); font-size: 1cqw; text-transform: uppercase; }
-.draw-show-pot-teams { margin-top: .45cqw; display: flex; gap: .6cqw; overflow-x: auto; scrollbar-width: thin; white-space: nowrap; padding: .2cqw; }
-.draw-show-pot-teams span { display: inline-flex; align-items: center; gap: .25cqw; color: hsl(var(--muted-foreground)); font-size: .7cqw; }
+.draw-show-pot-teams { margin-top: .3cqw; display: flex; align-items: center; gap: .5cqw; height: 2.5cqw; border: 1px solid hsl(var(--border) / .7); border-radius: 5px; background: hsl(var(--background) / .85); overflow-x: auto; scrollbar-width: thin; white-space: nowrap; padding: .25cqw .5cqw; }
+.draw-show-pot-teams > span { display: inline-flex; flex-shrink: 0; align-items: center; gap: .25cqw; color: hsl(var(--foreground)); font-size: .75cqw; transition: opacity 180ms, filter 180ms; }
+.draw-show-pot-teams > .is-drawn { opacity: .28; filter: grayscale(1); }
+.draw-show-pot-logo { display: grid; place-items: center; width: 1.2cqw; height: 1.2cqw; flex-shrink: 0; }
 .draw-show-pot-teams img { width: 1cqw; height: 1cqw; object-fit: contain; }
 .draw-show-group-overview { position: absolute; left: 2%; top: 13%; bottom: 14%; width: 25%; overflow-y: auto; display: flex; flex-direction: column; gap: .5cqw; }
 .draw-show-group-overview > div { display: flex; justify-content: space-between; gap: .4cqw; padding: .7cqw; border-block: 1px solid hsl(var(--border) / .6); background: hsl(var(--background) / .75); font-size: 1cqw; }
@@ -2633,10 +2637,11 @@ posities + statistieken groen */
 .draw-show-active-group .draw-show-slots { display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: thin; }
 .draw-show-active-group .draw-show-slot { min-height: 2cqw; flex-shrink: 0; }
 .draw-show-active-group .draw-show-slot-name { font-size: 1cqw; white-space: normal; overflow-wrap: anywhere; }
-.draw-show-active-group .draw-show-slot-mark { width: 1cqw; height: 1cqw; flex-basis: 1cqw; }
+.draw-show-active-group .draw-show-slot-mark { width: 1.6cqw; height: 1.6cqw; flex-basis: 1.6cqw; }
 .draw-show-waiting { position: absolute; top: 40%; left: 30%; width: 40%; padding: 1cqw; text-align: center; color: hsl(var(--primary)); font-size: 1.3cqw; }
 .draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; container-type: size; }
 .draw-control-stage > .draw-show-stage { flex: 0 0 auto; width: min(100cqw, 177.7778cqh); }
+.draw-control-stage:fullscreen { width: 100vw; height: 100dvh; background: hsl(var(--background)); }
 .draw-control-primary { position: absolute; z-index: 11; left: 40%; width: 20%; top: 72%; display: flex; justify-content: center; }
 .draw-control-dock { position: absolute; z-index: 11; bottom: 1%; left: 20%; width: 60%; display: flex; justify-content: center; gap: .3cqw; border-block: 1px solid hsl(var(--border) / .65); border-radius: 4px; background: hsl(var(--background) / .87); }
 .draw-show-stage .draw-scene-button, .draw-scene-settings .draw-scene-button { color: hsl(var(--primary)); background: hsl(var(--background) / .86); border: 1px solid hsl(var(--border) / .5); font-size: .82cqw; height: 2.6cqw; min-height: 0; padding: .3cqw .7cqw; gap: .35cqw; box-shadow: none; }
