@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { roundsStage } from "@/lib/roundsDrawPresentation";
+import { orderedTeamFixtures, roundsStage } from "@/lib/roundsDrawPresentation";
 
 describe("Rounds fan picture", () => {
   const input = {
@@ -20,5 +20,14 @@ describe("Rounds fan picture", () => {
   });
   it("publishes no fixtures or drawn teams before the first ball", () => {
     expect(roundsStage({ ...input, currentIndex: -1 })).toMatchObject({ drawnTeamIds: [], fixtures: [] });
+  });
+  it("puts already known opponents first in free draws, regardless of round", () => {
+    const matches = [{ round: 1, homeId: "b", awayId: "d" }, { round: 4, homeId: "a", awayId: "b" }];
+    const picture = roundsStage({ ...input, matches, pots: [{ name: "Alle teams", teamIds: input.order }], usePots: false });
+    expect(picture.fixtures.map((fixture) => fixture.opponentId)).toEqual(["a", null]);
+  });
+  it("keeps match order within each pot, not round order", () => {
+    const matches = [{ round: 4, homeId: "b", awayId: "c" }, { round: 1, homeId: "b", awayId: "d" }];
+    expect(orderedTeamFixtures(matches, "b", input.pots, [], true).map(({ i }) => i)).toEqual([0, 1]);
   });
 });
