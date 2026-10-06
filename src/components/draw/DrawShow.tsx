@@ -46,7 +46,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
       <h2>{container.name}<small>{container.teamIds.length}/{container.capacity}</small></h2>
-      <div className="draw-show-slots" style={{ "--slot-columns": overview ? Math.ceil(container.capacity / 16) : 1 } as CSSProperties}>
+      <div className="draw-show-slots" style={{ "--slot-columns": 1 } as CSSProperties}>
         {Array.from({ length: container.capacity }, (_, index) => {
           const placed = session?.teams.find((item) => item.id === container.teamIds[index]);
           return <div key={index} className="draw-show-slot" data-transfer-target={container.id === selectedId && index === container.teamIds.length}>
@@ -59,7 +59,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   );
   const teamContent = team && <>{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}<CountryFlag country={team.country} className="draw-show-flag" /><strong>{team.name}</strong></>;
   const speed = presentation?.speed ?? 1;
-  const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId]);
+  const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId, speed]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": `${-elapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
   return <div ref={stageRef} className={`draw-show draw-show-stage ${overview ? "draw-show-overview-mode" : ""}`} style={{ backgroundImage: `url(${liveDrawStage})`, ...motionStyle }}>

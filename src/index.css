@@ -2630,15 +2630,17 @@ posities + statistieken groen */
 .draw-show-group-overview > div { display: flex; justify-content: space-between; gap: .4cqw; padding: .7cqw; border-block: 1px solid hsl(var(--border) / .6); background: hsl(var(--background) / .75); font-size: 1cqw; }
 .draw-show-group-overview .is-active { color: hsl(var(--primary)); background: hsl(var(--accent) / .85); border-color: hsl(var(--primary)); }
 .draw-show-active-group { grid-template-columns: minmax(0, 1fr); }
-.draw-show-active-group .draw-show-slot-name { font-size: .8cqw; }
+.draw-show-active-group .draw-show-slots { display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: thin; }
+.draw-show-active-group .draw-show-slot { min-height: 2cqw; flex-shrink: 0; }
+.draw-show-active-group .draw-show-slot-name { font-size: 1cqw; white-space: normal; overflow-wrap: anywhere; }
 .draw-show-active-group .draw-show-slot-mark { width: 1cqw; height: 1cqw; flex-basis: 1cqw; }
 .draw-show-waiting { position: absolute; top: 40%; left: 30%; width: 40%; padding: 1cqw; text-align: center; color: hsl(var(--primary)); font-size: 1.3cqw; }
 .draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; container-type: size; }
 .draw-control-stage > .draw-show-stage { flex: 0 0 auto; width: min(100cqw, 177.7778cqh); }
 .draw-control-primary { position: absolute; z-index: 11; left: 40%; width: 20%; top: 72%; display: flex; justify-content: center; }
 .draw-control-dock { position: absolute; z-index: 11; bottom: 1%; left: 20%; width: 60%; display: flex; justify-content: center; gap: .3cqw; border-block: 1px solid hsl(var(--border) / .65); border-radius: 4px; background: hsl(var(--background) / .87); }
-.draw-scene-button { color: hsl(var(--primary)); background: hsl(var(--background) / .86); border: 1px solid hsl(var(--border) / .5); font-size: .82cqw; height: 2.6cqw; min-height: 0; padding: .3cqw .7cqw; gap: .35cqw; box-shadow: none; }
-.draw-scene-button:hover { color: hsl(var(--foreground)); background: hsl(var(--accent)); }
+.draw-show-stage .draw-scene-button, .draw-scene-settings .draw-scene-button { color: hsl(var(--primary)); background: hsl(var(--background) / .86); border: 1px solid hsl(var(--border) / .5); font-size: .82cqw; height: 2.6cqw; min-height: 0; padding: .3cqw .7cqw; gap: .35cqw; box-shadow: none; }
+.draw-show-stage .draw-scene-button:hover, .draw-scene-settings .draw-scene-button:hover { color: hsl(var(--foreground)); background: hsl(var(--accent)); }
 .draw-scene-button svg { height: 1cqw; width: 1cqw; }
 .draw-control-primary .draw-scene-button { border-block: 2px solid hsl(var(--primary)); height: 3.5cqw; font-size: 1.1cqw; }
 .draw-control-primary .draw-scene-button svg { width: 1.3cqw; height: 1.3cqw; }
