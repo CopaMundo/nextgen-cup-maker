@@ -9,3 +9,4 @@
 - Auto-trim transparent logo margins in the shared draw stage at render time and cache the result; source uploads stay unchanged while projector and director receive identical optical alignment.
 - Publish rounds through the shared draw picture using only revealed opponent identities and timestamped reveals; the precomputed schedule stays in the phase draft so both stages synchronize without disclosing upcoming opponents.
 - Keep fixture show order separate from scheduled rounds, anchoring previously revealed encounters using earlier drawn teams before sorting open rows by pot; gate fixture and roster-badge identities by shared reveal timestamps so both stages reveal together without row jumps or schedule changes.
+- Keep the rounds reveal start gate in the phase draft and reset it on each team draw; director controls start sequential or manual reveals explicitly without changing the precomputed schedule or published identity timing.

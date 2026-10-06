@@ -64,6 +64,7 @@ interface RoundsDrawDraft {
   teamIdx: Record<string, number>;
   revealed: Record<string, number[]>;
   autoReveal?: boolean;
+  revealsStarted?: boolean;
   revealAt?: number;
   revealTimes?: Record<string, Record<string, number>>;
   groupRounds?: Record<string, number>;
@@ -126,6 +127,7 @@ const RoundsDrawDialog = ({
   const [teamIdx, setTeamIdx] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<Record<string, number[]>>({});
   const [autoReveal, setAutoReveal] = useState(true);
+  const [revealsStarted, setRevealsStarted] = useState(false);
   const [revealAt, setRevealAt] = useState(0);
   const [revealReady, setRevealReady] = useState(true);
   const [revealTimes, setRevealTimes] = useState<Record<string, Record<string, number>>>({});
@@ -226,6 +228,7 @@ const RoundsDrawDialog = ({
           setTeamIdx(drawsValid ? draft.teamIdx : {});
           setRevealed(drawsValid ? draft.revealed : {});
           setAutoReveal(draft.autoReveal ?? true);
+          setRevealsStarted(draft.revealsStarted ?? false);
           setRevealAt(draft.revealAt ?? 0);
           setRevealTimes(draft.revealTimes ?? {});
         }
@@ -249,6 +252,7 @@ const RoundsDrawDialog = ({
     setTeamIdx({});
     setRevealed({});
     setRevealAt(0);
+    setRevealsStarted(false);
     setRevealTimes({});
     setActiveGroupIdx(0);
     setPaused(false);
@@ -260,9 +264,9 @@ const RoundsDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes, groupRounds: Object.fromEntries(groups.map((g) => [g.id, g.rounds])) };
+    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealsStarted, revealAt, revealTimes, groupRounds: Object.fromEntries(groups.map((g) => [g.id, g.rounds])) };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealAt, revealTimes, groups]);
+  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealsStarted, revealAt, revealTimes, groups]);
 
   // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
   const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
@@ -435,6 +439,7 @@ const RoundsDrawDialog = ({
         if (d.warning) toast({ title: drawGroups.find((g) => g.id === d.groupId)?.name, description: d.warning });
       });
       setDraws(result);
+      setRevealsStarted(false);
       setTeamIdx({});
       setRevealed({});
       setRevealAt(0);
@@ -474,6 +479,7 @@ const RoundsDrawDialog = ({
     const next = currentIdx + 1;
     if (next >= activeDraw.order.length) return;
     setRevealAt(Date.now());
+    setRevealsStarted(false);
     setRevealReady(false);
     setPaused(false);
     setTeamIdx((prev) => ({ ...prev, [activeDraw.groupId]: next }));
@@ -490,10 +496,10 @@ const RoundsDrawDialog = ({
   };
 
   useEffect(() => {
-    if (!open || step !== "draw" || !queue.length || paused || !autoReveal || !revealReady) return;
+    if (!open || step !== "draw" || !queue.length || paused || !autoReveal || !revealReady || !revealsStarted) return;
     timer.current = window.setTimeout(revealNextOpponent, REVEAL_MS);
     return () => { if (timer.current) window.clearTimeout(timer.current); };
-  }, [open, step, queue.join(","), paused, autoReveal, revealReady, activeDraw?.groupId]);
+  }, [open, step, queue.join(","), paused, autoReveal, revealReady, revealsStarted, activeDraw?.groupId]);
 
   const revealAll = () => {
     if (!activeDraw) return;
@@ -856,15 +862,17 @@ const RoundsDrawDialog = ({
     <div ref={directorRef} className="draw-control-stage">
       <DrawShow {...picture} controls={<>
         <div className="draw-control-primary">
-          {queue.length ? <Button className="draw-scene-button" disabled={!revealReady || (autoReveal && !paused)} onClick={revealNextOpponent}><Play />Onthul wedstrijd</Button>
+          {queue.length ? !revealsStarted
+            ? <Button className="draw-scene-button" disabled={!revealReady} onClick={() => { setRevealsStarted(true); setPaused(false); revealNextOpponent(); }}><Play />Loot speelrondes</Button>
+            : <Button className="draw-scene-button" disabled={!revealReady} onClick={() => autoReveal ? setPaused((value) => !value) : revealNextOpponent()}>{autoReveal && !paused ? <Pause /> : <Play />}{autoReveal ? paused ? "Verder" : "Pauze" : "Onthul wedstrijd"}</Button>
             : currentIdx + 1 < activeDraw.order.length ? <Button className="draw-scene-button" disabled={!revealReady} onClick={drawNextTeam}><Shuffle />Trek team</Button>
-            : activeGroupIdx + 1 < draws.length ? <Button className="draw-scene-button" disabled={!revealReady} onClick={() => setActiveGroupIdx(activeGroupIdx + 1)}>Volgende groep</Button>
+            : activeGroupIdx + 1 < draws.length ? <Button className="draw-scene-button" disabled={!revealReady} onClick={() => { setRevealsStarted(false); setActiveGroupIdx(activeGroupIdx + 1); }}>Volgende groep</Button>
             : <Button className="draw-scene-button" disabled={!allDone || applying} onClick={apply}><Check />Wedstrijden opslaan</Button>}
         </div>
         <aside className="draw-control-dock">
           <DrawFullscreenButton target={directorRef} />
-          <Button className="draw-scene-button" variant="ghost" aria-pressed={autoReveal} onClick={() => { setAutoReveal((value) => !value); setPaused(false); }}>{autoReveal ? <Play /> : <Pause />}{autoReveal ? "Achter elkaar" : "Per klik"}</Button>
-          {autoReveal && queue.length > 0 && <Button className="draw-scene-button" variant="ghost" onClick={() => setPaused((value) => !value)}>{paused ? <Play /> : <Pause />}{paused ? "Verder" : "Pauze"}</Button>}
+          <Button className="draw-scene-button" variant="ghost" aria-pressed={autoReveal} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button>
+          <Button className="draw-scene-button" variant="ghost" aria-pressed={!autoReveal} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button>
           <Button className="draw-scene-button" variant="ghost" disabled={!revealReady || groupDone(activeDraw)} onClick={revealAll}><FastForward />Alles tonen</Button>
           <Button className="draw-scene-button" variant="ghost" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}><Settings2 />Instellingen</Button>
           <Button className="draw-scene-button" variant="ghost" aria-label="Beamerscherm" title="Beamerscherm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink /></Button>
