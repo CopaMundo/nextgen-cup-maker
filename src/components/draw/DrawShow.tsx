@@ -1,16 +1,17 @@
 import type { DrawSessionState } from "@/lib/drawSession";
 import CountryFlag from "@/components/CountryFlag";
-import liveDrawStage from "@/assets/live-draw-stage.png";
+import liveDrawStage from "@/assets/live-draw-empty-stage.png";
+
+const BALL_POSITIONS = [
+  [48, 72], [37, 68], [59, 67], [28, 62], [49, 59], [69, 61], [39, 52], [59, 51],
+  [20, 54], [77, 54], [29, 45], [49, 43], [68, 44], [39, 36], [59, 35], [49, 28],
+] as const;
 
 /** The exact same read-only picture is used in the control window and on the projector. */
 export function DrawShow({ session, spotlightId }: { session?: DrawSessionState | null; spotlightId?: string | null }) {
   if (!session) {
     return (
       <div className="draw-show draw-show-stage" style={{ backgroundImage: `url(${liveDrawStage})` }}>
-        <div className="draw-show-brand" aria-label="Copa Mundo Live loting">
-          <strong>COPA MUNDO</strong>
-          <span>LIVE LOTING</span>
-        </div>
         <div className="draw-show-waiting">
           <strong>Wachten op de live loting</strong>
           <span>Het fanbeeld verschijnt zodra de organisator start.</span>
@@ -27,6 +28,13 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
   const splitAt = Math.ceil(session.containers.length / 2);
   const leftContainers = session.containers.slice(0, splitAt);
   const rightContainers = session.containers.slice(splitAt);
+  const activePot = session.mode === "pots"
+    ? session.pots.find((pot) => pot.id === session.activePotId && pot.teamIds.some((id) => session.remaining.includes(id))) ?? session.pots.find((pot) => pot.teamIds.some((id) => session.remaining.includes(id)))
+    : null;
+  const remainingBallIds = (activePot
+    ? activePot.teamIds.filter((id) => session.remaining.includes(id))
+    : session.remaining
+  ).filter((id) => id !== pending?.teamId);
 
   const renderContainer = (container: DrawSessionState["containers"][number]) => {
     const isEligible = Boolean(pending && eligibleIds.has(container.id));
@@ -57,11 +65,7 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
   };
 
   return <div className="draw-show draw-show-stage" style={{ backgroundImage: `url(${liveDrawStage})` }}>
-    <div className="draw-show-brand">
-      <strong>COPA MUNDO</strong>
-      <span>LIVE LOTING</span>
-      <small>{session.phaseName} · {session.history.length}/{session.teams.length}</small>
-    </div>
+    <div className="draw-show-phase">{session.phaseName} · {session.history.length}/{session.teams.length}</div>
 
     <div className="draw-show-wing draw-show-wing-left">{leftContainers.map(renderContainer)}</div>
     <div className="draw-show-wing draw-show-wing-right">{rightContainers.map(renderContainer)}</div>
@@ -78,7 +82,25 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
           <p>{pending ? "GETROKKEN TEAM" : last ? `GEPLAATST IN ${last.label}` : "VOLGENDE TREKKING"}</p>
         </div> : <p className="draw-show-ready">{session.finished ? "LOTING AFGEROND" : "KLAAR VOOR DE VOLGENDE TREKKING"}</p>}
       </div>
-      {pending && <p className="draw-show-eligible-label">{eligible.length} TOELAATBARE {eligible.length === 1 ? "POULE" : "POULES"}</p>}
+      {pending && <div className="draw-show-eligible">
+        <p className="draw-show-eligible-label">TOELAATBARE {eligible.length === 1 ? "POULE" : "POULES"}</p>
+        <div className="draw-show-eligible-groups">
+          {eligible.map((option) => <span key={option.id} className={spotlightId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}
+        </div>
+      </div>}
     </main>
+
+    <div className="draw-show-bowl" aria-label={`${remainingBallIds.length} ballen resterend`}>
+      {remainingBallIds.map((teamId, index) => {
+        const [left, top] = BALL_POSITIONS[index % BALL_POSITIONS.length];
+        const layer = Math.floor(index / BALL_POSITIONS.length);
+        return <span
+          key={teamId}
+          className="draw-show-bowl-ball"
+          style={{ left: `${Math.min(84, left + (layer % 2 ? 3 : 0))}%`, top: `${Math.max(18, top - layer * 7)}%`, zIndex: index + 1 }}
+        />;
+      })}
+    </div>
+    {pending && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true" />}
   </div>;
 }
