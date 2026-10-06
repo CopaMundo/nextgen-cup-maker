@@ -12,10 +12,6 @@ export function DrawShow({ session, spotlightId }: { session?: DrawSessionState 
   if (!session) {
     return (
       <div className="draw-show draw-show-stage" style={{ backgroundImage: `url(${liveDrawStage})` }}>
-        <div className="draw-show-brand" aria-label="Copa Mundo Live loting">
-          <strong>COPA MUNDO</strong>
-          <span>LIVE LOTING</span>
-        </div>
         <div className="draw-show-waiting">
           <strong>Wachten op de live loting</strong>
           <span>Het fanbeeld verschijnt zodra de organisator start.</span>

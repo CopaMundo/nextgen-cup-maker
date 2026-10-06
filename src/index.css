@@ -2586,6 +2586,7 @@ posities + statistieken groen */
   color: hsl(45 62% 92%);
   container-type: size;
 }
+.draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); min-height: 0; flex: 0 0 auto; }
 .draw-show-stage::after {
   content: "";
   position: absolute;
