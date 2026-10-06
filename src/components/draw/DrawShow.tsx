@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import type { DrawSessionState } from "@/lib/drawSession";
 import { needsGroupOverview, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import CountryFlag from "@/components/CountryFlag";
+import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import liveDrawStage from "@/assets/live-draw-raised-bowl-stage.png";
 
 export function DrawShow({ session, spotlightId, presentation, controls }: {
@@ -47,9 +48,9 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const remainingIds = (activePot ? activePot.teamIds : session?.remaining ?? [])
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
   const potTeamIds = activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [];
-  const potColumns = Math.min(Math.max(1, potTeamIds.length), 4);
+  const potColumns = potTeamIds.length > 16 ? 8 : Math.min(Math.max(1, potTeamIds.length), 4);
   const potRows = Math.max(1, Math.ceil(potTeamIds.length / potColumns));
-  const potGridStyle = { "--pot-columns": potColumns, "--pot-rows": potRows, "--pot-name-size": potRows > 4 ? ".48cqw" : ".65cqw" } as CSSProperties;
+  const potGridStyle = { "--pot-columns": potColumns, "--pot-name-size": potRows > 4 ? ".42cqw" : ".5cqw" } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
@@ -58,14 +59,14 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
         {Array.from({ length: container.capacity }, (_, index) => {
           const placed = session?.teams.find((item) => item.id === container.teamIds[index]);
           return <div key={index} className="draw-show-slot" data-transfer-target={container.id === selectedId && index === container.teamIds.length}>
-            <span className="draw-show-slot-mark">{placed?.logoUrl && <img src={placed.logoUrl} alt="" />}</span>
+            <span className="draw-show-slot-mark">{placed?.logoUrl && <AutoTrimLogo src={placed.logoUrl} />}</span>
             <span className="draw-show-slot-name" title={placed?.name}>{placed?.name ?? ""}</span>
           </div>;
         })}
       </div>
     </section>
   );
-  const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <img src={team.logoUrl} alt="" className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span>{team.country && <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span>}</>;
+  const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span>{team.country && <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span>}</>;
   const speed = presentation?.speed ?? 1;
   const elapsed = useMemo(() => presentation?.revealAt ? Math.max(0, Date.now() - presentation.revealAt) : 0, [presentation?.revealAt, pending?.teamId, speed]);
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
@@ -98,7 +99,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
         })}
       </div>
       {pending && !selectedId && <span key={`flight-${pending.teamId}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}
-      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <img src={item.logoUrl} alt="" />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
+      <div className="draw-show-pot"><strong>{activePot?.name ?? (session.finished ? "LOTING AFGEROND" : "ALLE TEAMS")}</strong><div className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potTeamIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
     </>}
     {controls}
   </div>;
