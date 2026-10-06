@@ -32,6 +32,10 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     const stage = stageRef.current;
     const slot = stage?.querySelector<HTMLElement>("[data-transfer-target='true']");
     if (!stage || !slot) return;
+    if (overview && slot.parentElement) {
+      const list = slot.parentElement;
+      list.scrollTop = Math.max(0, slot.offsetTop - list.offsetTop - list.clientHeight / 2);
+    }
     const rect = stage.getBoundingClientRect();
     const target = slot.getBoundingClientRect();
     setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .44 });

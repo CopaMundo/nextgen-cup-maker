@@ -66,6 +66,7 @@ interface LiveDrawDraft {
   advancedSpreadOpen: boolean;
   placementMode?: "manual" | "automatic";
   animationSpeed?: number;
+  presentation?: DrawPresentation;
 }
 
 const LiveDrawDialog = ({
@@ -213,7 +214,9 @@ const LiveDrawDialog = ({
           setPotCount(draft.potCount);
           setRules({ ...draft.rules, separateSameCountry: false, requiredPairs: [] });
           setPotMatrix(draft.potMatrix);
-          setSession(sessionValid ? draft.session : null);
+          const recovered = sessionValid ? draft.session : null;
+          setSession(recovered?.pending && draft.presentation?.selection ? confirmPending(recovered, draft.presentation.selection.targetId) : recovered);
+          setPresentation({ revealAt: draft.presentation?.revealAt ?? 0, speed: draft.animationSpeed ?? 1, activePotId: draft.presentation?.activePotId ?? null, selection: null, sweep: null });
           setSelectedPotId(draft.selectedPotId && validPotIds.has(draft.selectedPotId) ? draft.selectedPotId : null);
           setAdvancedOpen(draft.advancedOpen);
           setAdvancedSpreadOpen(draft.advancedSpreadOpen);
@@ -254,9 +257,9 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed };
+    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed]);
+  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation]);
 
   useEffect(() => {
     if (!open || !draftReady || !session || step !== "draw") return;
