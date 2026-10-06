@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Referentiestijl toepassen: cijferloze gouden groepsvakken, vaste logocirkels, gedimde potclubs, achtergrondvlag en fullscreen regie controleren.
+- [x] Referentiestijl toegepast: cijferloze gouden groepsvakken, vaste logocirkels, gedimde potclubs, achtergrondvlag en fullscreen regie gecontroleerd met lokale testgegevens.
 
 - [x] Mobiele beheerpagina voorzien van een volledig inklapbare iconenzijbalk en dunne contextbalk; desktop en publieke site ongewijzigd laten.
 - [x] Alle enkelvoudige en meervoudige selectors in de beheeromgeving visueel gelijkgetrokken; aanvinkvakken alleen bij meervoudige keuzes.

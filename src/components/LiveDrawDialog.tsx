@@ -790,7 +790,7 @@ const LiveDrawDialog = ({
           <DrawFullscreenButton target={directorRef} />
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleUndo} disabled={sceneBusy || !session.history.length}><Undo2 />Ongedaan maken</Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleDrawAll} disabled={sceneBusy || session.finished}><Sparkles />Alles loten</Button>
-          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} disabled={sceneBusy}><RotateCcw />Opnieuw beginnen</Button>
+          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setShowResetConfirm(true); }} disabled={sceneBusy}><RotateCcw />Opnieuw beginnen</Button>
           <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="sm" disabled={sceneBusy}><Settings2 />Instellingen</Button></PopoverTrigger>
             <PopoverContent portalContainer={directorRef.current} className="draw-scene-settings space-y-4" side="top">
               <h2 className="font-semibold">Regie-instellingen</h2>
