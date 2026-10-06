@@ -20,7 +20,7 @@ describe("Shared draw presentation", () => {
     expect(selectionDuration(1.5)).toBe(1400);
   });
   it("preserves normal eight-group layouts and summarizes large capacities", () => {
-    const groups = (count: number, capacity: number) => Array.from({ length: count }, (_, index) => ({ id: String(index), name: `Groep ${index}`, capacity, teamIds: [] }));
+    const groups = (count: number, capacity: number) => Array.from({ length: count }, (_, index) => ({ id: String(index), name: `Groep ${index}`, capacity, teamIds: [], slotIds: [] }));
     expect(needsGroupOverview(groups(8, 4))).toBe(false);
     expect(needsGroupOverview(groups(8, 16))).toBe(true);
     expect(needsGroupOverview(groups(2, 64))).toBe(true);
