@@ -12,9 +12,9 @@ export function orderedTeamFixtures(matches: ScheduledMatch[], teamId: string, p
     .sort((a, b) => Number(known.has(b.i)) - Number(known.has(a.i)) || (usePots ? potIndex(a.opp) - potIndex(b.opp) : 0));
 }
 
-/** A single twelve-team list advances only when a new team is drawn. */
+/** A single five-team list advances only when a new team is drawn. */
 export function roundsRosterWindow(order: string[], activeId: string | undefined) {
-  const size = 12;
+  const size = 5;
   if (order.length <= size) return order;
   const index = Math.max(0, order.indexOf(activeId ?? ""));
   const start = Math.max(0, index - size + 1);
