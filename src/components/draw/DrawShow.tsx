@@ -1,10 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { DrawSessionState } from "@/lib/drawSession";
 import { needsGroupOverview, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
-import { opponentRevealDuration, roundsRosterWindow } from "@/lib/roundsDrawPresentation";
+import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
+import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import liveDrawStage from "@/assets/live-draw-raised-bowl-stage.png";
 
 export function DrawShow({ session, spotlightId, presentation, controls }: {
@@ -25,9 +26,6 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const activeSpotlight = sweepSpotlight(presentation, now) ?? spotlightId;
   const pending = session?.pending;
   const rounds = presentation?.rounds;
-  const rosterOrder = rounds?.teamOrder ?? session?.pots.flatMap((pot) => pot.teamIds) ?? [];
-   const rosterFocus = rosterOrder.length > 5;
-  const visibleRoster = new Set(rosterFocus ? roundsRosterWindow(rosterOrder, session?.pending?.teamId) : rosterOrder);
   const selectedId = presentation?.selection?.targetId;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
   const teamReady = !presentation?.revealAt || now >= presentation.revealAt + revealDuration(presentation.speed);
@@ -54,7 +52,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     : null;
   const remainingIds = (activePot ? activePot.teamIds : session?.remaining ?? [])
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
-  const potTeamIds = activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [];
+  const potTeamIds = alphabeticalTeamIds(activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [], session?.teams ?? []);
+  const rosterIds = alphabeticalTeamIds(session?.mode === "pots" ? activePot?.teamIds ?? session?.pots[0]?.teamIds ?? [] : session?.teams.map((item) => item.id) ?? [], session?.teams ?? []);
   const potMaxColumns = potTeamIds.length > 16 ? 8 : 4;
   const potRows = Math.max(1, Math.ceil(potTeamIds.length / potMaxColumns));
   const potColumns = Math.max(1, Math.ceil(potTeamIds.length / potRows));
@@ -84,26 +83,31 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
       {rounds ? <>
-        <section className={`draw-show-rounds-roster draw-show-wing-left draw-show-group-card ${rosterFocus ? "is-focus-window" : ""}`} aria-label={`Teams ${rounds.groupName}`}>
-          <h2>{rounds.groupName}</h2>
-          <div className="draw-show-rounds-roster-list">
-          {session.pots.filter((pot) => pot.teamIds.some((id) => visibleRoster.has(id))).map((pot) => <div className="draw-show-rounds-pot" key={pot.id}>
-            {session.mode === "pots" && <h3>{pot.name}</h3>}
+        <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
+          <h2>{rounds.groupName}{session.mode === "pots" && <small> · {activePot?.name ?? session.pots[0]?.name}</small>}</h2>
+          <RoundsRosterLoop rosterKey={`${rounds.groupName}-${activePot?.id ?? "all"}`}>
             <div className="draw-show-rounds-teams">
-              {rosterOrder.filter((id) => pot.teamIds.includes(id) && visibleRoster.has(id)).map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const opponents = rounds.roster?.find((entry) => entry.teamId === id)?.opponents ?? []; return <div key={id} data-team-id={id} className={`draw-show-slot draw-show-rounds-roster-team ${id === pending?.teamId ? "is-active" : rounds.drawnTeamIds.includes(id) ? "is-drawn" : ""}`}>
-                <span className="draw-show-slot-mark draw-show-rounds-club-logo">{item?.logoUrl ? <AutoTrimLogo src={item.logoUrl} /> : item?.name.slice(0, 2).toUpperCase()}</span>
-                <div className="draw-show-rounds-roster-identity"><span className="draw-show-slot-name">{item?.name}</span></div>
-                {rounds.drawnTeamIds.includes(id) && (id !== pending?.teamId || teamReady) && <div className="draw-show-rounds-opponent-badges">{opponents.filter((opponent) => !opponent.revealAt || now >= opponent.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)).map((opponent) => { const opponentTeam = session.teams.find((candidate) => candidate.id === opponent.opponentId); return <span key={opponent.id} className="draw-show-slot-mark" title={opponentTeam?.name} aria-label={opponentTeam?.name}>{opponentTeam?.logoUrl ? <AutoTrimLogo src={opponentTeam.logoUrl} /> : opponentTeam?.name.slice(0, 2).toUpperCase()}</span>; })}</div>}
-              </div>; })}
+              {rosterIds.map((id) => {
+                const item = session.teams.find((candidate) => candidate.id === id);
+                const entry = rounds.roster?.find((candidate) => candidate.teamId === id);
+                const complete = roundsTeamComplete(entry, now, presentation?.speed ?? 1) && (id !== pending?.teamId || teamReady);
+                return <div key={id} data-team-id={id} data-complete={complete} className={`draw-show-slot draw-show-rounds-roster-team ${complete ? "is-complete" : "is-inactive"}`}>
+                  <span className="draw-show-slot-mark draw-show-rounds-club-logo">{item?.logoUrl ? <AutoTrimLogo src={item.logoUrl} /> : item?.name.slice(0, 2).toUpperCase()}</span>
+                  <div className="draw-show-rounds-roster-identity"><span className="draw-show-slot-name">{item?.name}</span></div>
+                  <div className="draw-show-rounds-opponent-badges">{complete && entry?.opponents.map((opponent) => {
+                    const opponentTeam = session.teams.find((candidate) => candidate.id === opponent.opponentId);
+                    return <span key={opponent.id} className="draw-show-slot-mark" title={opponentTeam?.name} aria-label={opponentTeam?.name}>{opponentTeam?.logoUrl ? <AutoTrimLogo src={opponentTeam.logoUrl} /> : opponentTeam?.name.slice(0, 2).toUpperCase()}</span>;
+                  })}</div>
+                </div>;
+              })}
             </div>
-          </div>)}
-          </div>
+          </RoundsRosterLoop>
         </section>
         <section className="draw-show-rounds-schedule draw-show-wing-right draw-show-group-card" aria-label="Speelschema getrokken team">
           <div className="draw-show-rounds-team-header">
             {team && teamReady && <><span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><div><strong>{team.name}</strong>{session.mode === "pots" && <small>{activePot?.name}</small>}</div><CountryFlag country={team.country} className="draw-show-rounds-header-flag" /></>}
           </div>
-          <div className="draw-show-rounds-fixtures">
+          <div className={`draw-show-rounds-fixtures ${rounds.fixtures.length > 10 ? "is-two-columns" : ""}`} style={{ "--fixture-rows": Math.max(1, Math.ceil(rounds.fixtures.length / (rounds.fixtures.length > 10 ? 2 : 1))) } as CSSProperties}>
             {rounds.fixtures.map((fixture) => { const finished = teamReady && (!fixture.revealAt || now >= fixture.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)); const opponent = finished ? session.teams.find((item) => item.id === fixture.opponentId) : undefined; return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture draw-show-slot ${opponent ? "is-known" : ""}`}>
               {session.mode === "pots" && <span className="draw-show-rounds-pot-tag">{fixture.potName}</span>}
               <span className="draw-show-slot-mark">{opponent?.logoUrl ? <AutoTrimLogo src={opponent.logoUrl} /> : opponent?.name.slice(0, 2).toUpperCase()}</span>

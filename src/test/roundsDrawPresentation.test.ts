@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { orderedTeamFixtures, roundsRosterWindow, roundsStage } from "@/lib/roundsDrawPresentation";
+import { alphabeticalTeamIds, orderedTeamFixtures, roundsRosterWindow, roundsStage, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 
 describe("Rounds fan picture", () => {
   const input = {
@@ -43,10 +43,25 @@ describe("Rounds fan picture", () => {
   it("publishes roster badges only for drawn teams and revealed encounters", () => {
     const picture = roundsStage(input);
     expect(picture.roster).toEqual([
-      { teamId: "a", opponents: [{ id: "1", opponentId: "b", revealAt: null }] },
+      { teamId: "a", completedAt: null, opponents: [{ id: "1", opponentId: "b", revealAt: null }] },
       { teamId: "b", opponents: [{ id: "1", opponentId: "a", revealAt: null }] },
     ]);
     expect(roundsStage({ ...input, revealed: [0, 1], revealTimes: { "0": 3000 } }).roster?.[1].opponents[1]).toMatchObject({ opponentId: "d", revealAt: 3000 });
+  });
+  it("marks completion only after every fixture has been published and finished revealing", () => {
+    const partial = roundsStage(input).roster?.[1];
+    expect(roundsTeamComplete(partial, 10000, 1)).toBe(false);
+    const complete = roundsStage({ ...input, revealed: [0, 1], revealTimes: { "0": 3000 } }).roster?.[1];
+    expect(roundsTeamComplete(complete, 3499, 1)).toBe(false);
+    expect(roundsTeamComplete(complete, 3500, 1)).toBe(true);
+    expect(roundsTeamComplete(complete, 3250, 2)).toBe(true);
+    expect(roundsTeamComplete(undefined, 10000, 1)).toBe(false);
+    expect(roundsTeamComplete(roundsStage(input).roster?.[0], 10000, 1)).toBe(true);
+  });
+  it("sorts the displayed roster and bowl independently of draw order", () => {
+    const ids = ["z", "a", "b"];
+    expect(alphabeticalTeamIds(ids, [{ id: "z", name: "Zulte" }, { id: "a", name: "anderlecht" }, { id: "b", name: "Brugge" }])).toEqual(["a", "b", "z"]);
+    expect(ids).toEqual(["z", "a", "b"]);
   });
   it("shows at most five teams and drops the oldest team for each new draw", () => {
     const order = Array.from({ length: 64 }, (_, i) => String(i));
