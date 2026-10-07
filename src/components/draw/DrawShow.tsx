@@ -26,7 +26,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const pending = session?.pending;
   const rounds = presentation?.rounds;
   const rosterOrder = rounds?.teamOrder ?? session?.pots.flatMap((pot) => pot.teamIds) ?? [];
-   const rosterFocus = rosterOrder.length > 12;
+   const rosterFocus = rosterOrder.length > 5;
   const visibleRoster = new Set(rosterFocus ? roundsRosterWindow(rosterOrder, session?.pending?.teamId) : rosterOrder);
   const selectedId = presentation?.selection?.targetId;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
@@ -91,7 +91,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
             {session.mode === "pots" && <h3>{pot.name}</h3>}
             <div className="draw-show-rounds-teams">
               {rosterOrder.filter((id) => pot.teamIds.includes(id) && visibleRoster.has(id)).map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const opponents = rounds.roster?.find((entry) => entry.teamId === id)?.opponents ?? []; return <div key={id} data-team-id={id} className={`draw-show-slot draw-show-rounds-roster-team ${id === pending?.teamId ? "is-active" : rounds.drawnTeamIds.includes(id) ? "is-drawn" : ""}`}>
-                <div className="draw-show-rounds-roster-identity"><span className="draw-show-slot-mark">{item?.logoUrl ? <AutoTrimLogo src={item.logoUrl} /> : item?.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{item?.name}</span></div>
+                <span className="draw-show-slot-mark draw-show-rounds-club-logo">{item?.logoUrl ? <AutoTrimLogo src={item.logoUrl} /> : item?.name.slice(0, 2).toUpperCase()}</span>
+                <div className="draw-show-rounds-roster-identity"><span className="draw-show-slot-name">{item?.name}</span></div>
                 {rounds.drawnTeamIds.includes(id) && (id !== pending?.teamId || teamReady) && <div className="draw-show-rounds-opponent-badges">{opponents.filter((opponent) => !opponent.revealAt || now >= opponent.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)).map((opponent) => { const opponentTeam = session.teams.find((candidate) => candidate.id === opponent.opponentId); return <span key={opponent.id} className="draw-show-slot-mark" title={opponentTeam?.name} aria-label={opponentTeam?.name}>{opponentTeam?.logoUrl ? <AutoTrimLogo src={opponentTeam.logoUrl} /> : opponentTeam?.name.slice(0, 2).toUpperCase()}</span>; })}</div>}
               </div>; })}
             </div>
@@ -106,8 +107,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
             {rounds.fixtures.map((fixture) => { const finished = teamReady && (!fixture.revealAt || now >= fixture.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)); const opponent = finished ? session.teams.find((item) => item.id === fixture.opponentId) : undefined; return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture draw-show-slot ${opponent ? "is-known" : ""}`}>
               {session.mode === "pots" && <span className="draw-show-rounds-pot-tag">{fixture.potName}</span>}
               <span className="draw-show-slot-mark">{opponent?.logoUrl ? <AutoTrimLogo src={opponent.logoUrl} /> : opponent?.name.slice(0, 2).toUpperCase()}</span>
-              <span className="draw-show-slot-name">{opponent?.name ?? "—"}</span>
-              {opponent && <><CountryFlag country={opponent.country} className="draw-show-rounds-flag" /><span className="draw-show-rounds-venue" aria-label={fixture.home ? "Thuis" : "Uit"} title={fixture.home ? "Thuis" : "Uit"}>{fixture.home ? <House /> : <Plane />}</span></>}
+              <span className="draw-show-rounds-opponent-identity"><span className="draw-show-slot-name">{opponent?.name ?? "—"}</span>{opponent && <CountryFlag country={opponent.country} className="draw-show-rounds-flag" />}</span>
+              {opponent && <span className="draw-show-rounds-venue" aria-label={fixture.home ? "Thuis" : "Uit"} title={fixture.home ? "Thuis" : "Uit"}>{fixture.home ? <House /> : <Plane />}</span>}
             </div>; })}
           </div>
         </section>
