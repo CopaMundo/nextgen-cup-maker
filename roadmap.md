@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Live loting: losse linkerteamkaarten, maximaal tien badges per rij, vaste gecentreerde wedstrijdrijen en groepsloting behouden boven twintig speelrondes.
 - [x] Schuifbalk bij lange teamlijsten verwijderd; rustige loop bij normale beweging en pagina-overgangen bij verminderde beweging. Balonthulling hersteld met openen of rustige vervaging. Zestien tests en schermcontroles met 24 voorbeeldteams in beide bewegingsstanden geslaagd.
 - [x] Speelrondeloting: volledige paneelhoogte, alfabetische actieve pot/poule met rustige doorlopende scroll, goud en grotere badges pas na volledige teamonthulling, alfabetisch bokaaloverzicht en twee programmakolommen pas boven tien wedstrijden. Veertien tests en schermcontroles met voorbeeldteams geslaagd.
 - [x] Speelrondeloting: maximaal vijf teamblokjes links met groot logo, grotere naam en aparte badgerij; tegenstandervlag direct naast de naam en thuis/uit-icoon uiterst rechts. Acht tests en doorschuiven van het vijfde naar het zesde team met voorbeeldgegevens gecontroleerd.
