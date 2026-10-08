@@ -761,10 +761,19 @@ const LiveDrawDialog = ({
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
               <span className="flex-1">{country} · {countryCounts[country]} teams</span>
-              <Select value={String(Math.max(Math.ceil(countryCounts[country] / Math.max(1, containers.length)), rules.countryMax[country] ?? rules.countryMaxDefault))} onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}>
-                <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
-                <SelectContent>{[Math.ceil(countryCounts[country] / Math.max(1, containers.length))].map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}</SelectContent>
-              </Select>
+              {(() => {
+                const minNeeded = Math.ceil(countryCounts[country] / Math.max(1, containers.length));
+                const options = Array.from({ length: Math.max(0, maxGroupCapacity - minNeeded + 1) }, (_, index) => minNeeded + index);
+                return (
+                  <Select
+                    value={rules.countryMax[country] != null ? String(rules.countryMax[country]) : undefined}
+                    onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}
+                  >
+                    <SelectTrigger className="h-8 w-28"><SelectValue placeholder="Kies max" /></SelectTrigger>
+                    <SelectContent>{options.map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}</SelectContent>
+                  </Select>
+                );
+              })()}
             </div>
           ))}
         </div>}

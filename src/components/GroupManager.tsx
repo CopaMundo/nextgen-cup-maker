@@ -1233,7 +1233,13 @@ const GroupManager = ({
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
             if (phaseMatchType === "rounds") {
-              if (groups.length === 1 && roundsShowAvailable) void requestDraw("rounds");
+              if (groups.length === 1 && roundsShowAvailable) {
+                void (async () => {
+                  const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
+                  if (filled?.length) void requestDraw("rounds");
+                  else setDrawView("choice");
+                })();
+              }
               else setDrawView("choice");
             }
             else requestDraw("groups");
