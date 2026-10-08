@@ -2594,7 +2594,9 @@ posities + statistieken groen */
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
 .draw-show-layout-A .draw-show-wing,
-.draw-show-layout-B .draw-show-wing { grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, max-content)); align-content: center; }
+.draw-show-layout-B .draw-show-wing { grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, max-content)); align-content: start; }
+.draw-show-layout-A .draw-show-wing:has(> .draw-show-group-card:only-child),
+.draw-show-layout-B .draw-show-wing:has(> .draw-show-group-card:only-child) { align-content: center; }
 .draw-show-wing[data-density="royal"] { --group-card-width: 21cqw; --group-slot-height: 3.2cqw; --group-logo-size: 2.2cqw; --group-name-size: 1.15cqw; --group-title-size: 1.3cqw; }
 .draw-show-wing[data-density="comfortable"] { --group-card-width: 18.5cqw; --group-slot-height: 2.4cqw; --group-logo-size: 1.8cqw; --group-name-size: .95cqw; --group-title-size: 1.1cqw; }
 .draw-show-wing[data-density="standard"] { --group-card-width: 16.5cqw; --group-slot-height: 2cqw; --group-logo-size: 1.5cqw; --group-name-size: .82cqw; --group-title-size: .95cqw; }
