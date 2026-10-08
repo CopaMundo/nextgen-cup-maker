@@ -2702,10 +2702,12 @@ posities + statistieken groen */
 @keyframes draw-ball-drift { from { transform: translate(-50%, -50%) rotate(-3deg); } to { transform: translate(calc(-50% + .1cqw), calc(-50% - .08cqw)) rotate(3deg); } }
 @keyframes draw-team-transfer { 0% { transform: translate(-50%, -50%); } 85%,100% { transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))) scale(.3); opacity: .65; } }
 @media (prefers-reduced-motion: reduce) {
-  .draw-show-rounds-roster-list { overflow-y: auto; }
-  .draw-show-rounds-roster-list.is-looping .draw-show-rounds-roster-track { animation: none; }
-  .draw-show-rounds-roster-copy { display: none; }
-  .draw-show-flying-ball { display: none; }
-  .draw-ball-half, .draw-reveal-name, .draw-show-bowl-ball, .draw-show-transfer, .draw-show-rounds-fixture.is-known { animation: none; }
+  /* Keep all clubs accessible without a scrollbar or continuous movement. */
+  .draw-show-rounds-roster-list.is-looping .draw-show-rounds-roster-track { animation: draw-roster-loop var(--roster-page-duration) steps(var(--roster-pages), end) infinite; }
+  /* The reveal remains visible, but without the upward flight or lateral split. */
+  .draw-show-flying-ball { top: 44%; transform: translate(-50%, -50%); animation: none; }
+  .draw-ball-left, .draw-ball-right { animation-name: draw-half-fade; }
+  .draw-show-bowl-ball, .draw-show-transfer, .draw-show-rounds-fixture.is-known { animation: none; }
   .draw-show-transfer { transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))) scale(.3); }
 }
+@keyframes draw-half-fade { to { opacity: 0; } }
