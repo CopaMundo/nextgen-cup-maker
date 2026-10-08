@@ -52,12 +52,14 @@ export type GroupWingDensity = "royal" | "comfortable" | "standard" | "compact" 
 /** Five studio profiles, selected independently from each wing's actual load. */
 export function calculateWingDensity(containers: DrawSessionState["containers"], layout: GroupDrawLayout): GroupWingDensity {
   if (layout.mode === "C") return "logo-only";
-  if (layout.mode === "B") return "compact";
+  // Density follows the real vertical occupancy per team column, so split
+  // cards and side-by-side wings with few teams still get readable sizes.
   const wingRows = Math.max(1, Math.ceil(containers.length / layout.wingColumns));
   const slotRows = Math.max(0, ...containers.map((container) => Math.ceil(container.capacity / layout.teamColumns)));
   const load = wingRows * slotRows;
-  if (layout.teamColumns === 1 && wingRows === 1 && slotRows <= 5) return "royal";
-  if (layout.teamColumns === 1 && wingRows <= 2 && load <= 16) return "comfortable";
+  if (layout.mode === "A" && layout.teamColumns === 1 && wingRows === 1 && slotRows <= 5) return "royal";
+  if (wingRows <= 2 && load <= 16) return "comfortable";
+  if (layout.mode === "B") return load <= 24 ? "standard" : "compact";
   return "standard";
 }
 
