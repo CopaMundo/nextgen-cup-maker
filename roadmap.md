@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Schuifbalk bij lange teamlijsten verwijderen en balopening herstellen, ook bij verminderde beweging; controleren in beide bewegingsstanden.
+- [x] Schuifbalk bij lange teamlijsten verwijderd; rustige loop bij normale beweging en pagina-overgangen bij verminderde beweging. Balonthulling hersteld met openen of rustige vervaging. Zestien tests en schermcontroles met 24 voorbeeldteams in beide bewegingsstanden geslaagd.
 - [x] Speelrondeloting: volledige paneelhoogte, alfabetische actieve pot/poule met rustige doorlopende scroll, goud en grotere badges pas na volledige teamonthulling, alfabetisch bokaaloverzicht en twee programmakolommen pas boven tien wedstrijden. Veertien tests en schermcontroles met voorbeeldteams geslaagd.
 - [x] Speelrondeloting: maximaal vijf teamblokjes links met groot logo, grotere naam en aparte badgerij; tegenstandervlag direct naast de naam en thuis/uit-icoon uiterst rechts. Acht tests en doorschuiven van het vijfde naar het zesde team met voorbeeldgegevens gecontroleerd.
 - [x] Speelrondeloting: één doorschuivende lijst van maximaal 12 teams, volledig gevulde onthullingsrijen en expliciet starten via Loot speelrondes met automatische of handmatige regie; 12 tests en browsercontroles met voorbeeldteams (4–64) geslaagd.
