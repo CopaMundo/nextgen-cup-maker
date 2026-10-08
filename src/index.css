@@ -2617,9 +2617,9 @@ posities + statistieken groen */
 .draw-show-wing .draw-show-group-card h2 { padding: .35cqw; font-size: var(--group-title-size, .85cqw); }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card h2,
 .draw-show-layout-B .draw-show-wing .draw-show-group-card h2 { padding-block: .3cqw; }
-.draw-show-wing .draw-show-slot { display: grid; grid-template-columns: minmax(0, var(--group-logo-size, 1.5cqw)) minmax(0, 1fr); gap: .3cqw; padding: .15cqw .25cqw; }
+.draw-show-wing .draw-show-slot { display: grid; grid-template-columns: minmax(0, var(--group-logo-size, 1.5cqw)) minmax(0, 1fr); gap: .3cqw; padding: .25cqw; }
 .draw-show-wing .draw-show-slot-mark { width: 100%; height: auto; aspect-ratio: 1; max-height: 100%; min-height: 0; font-size: .65cqw; }
-.draw-show-wing .draw-show-slot-name { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; font-size: var(--group-name-size, .78cqw); line-height: 1.15; }
+.draw-show-wing .draw-show-slot-name { align-self: center; white-space: nowrap; overflow-wrap: normal; overflow: hidden; text-overflow: ellipsis; font-size: var(--group-name-size, .78cqw); line-height: 1.25; }
 .draw-show-layout-A .draw-show-slots[style*="--slot-columns: 2"] .draw-show-slot,
 .draw-show-layout-B .draw-show-slot { grid-template-columns: minmax(0, var(--group-logo-size, 1.2cqw)) minmax(0, 1fr); gap: .25cqw; }
 .draw-show-layout-A .draw-show-slots[style*="--slot-columns: 2"] .draw-show-slot-name,
