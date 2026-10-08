@@ -1345,6 +1345,7 @@ const GroupManager = ({
             phaseId={phaseId}
             categoryId={categoryId}
             phaseMatchType={phaseMatchType}
+            automaticRounds={!roundsShowAvailable ? phaseRounds : undefined}
             phaseName={phases.find((phase) => phase.id === phaseId)?.name}
             onApplied={async () => {
               notifySlotChange();

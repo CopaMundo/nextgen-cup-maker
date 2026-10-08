@@ -26,6 +26,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import CountryFlag from "@/components/CountryFlag";
 import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2 } from "lucide-react";
 import { generatePotMatchups } from "@/lib/drawEngine";
+import { generateRoundRobin } from "@/lib/matchGenerator";
 import {
   checkContainerFeasibility,
   buildContainerCtx,
@@ -83,6 +84,7 @@ const LiveDrawDialog = ({
   onBack,
   onRestart,
   onStepChange,
+  automaticRounds,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -96,6 +98,7 @@ const LiveDrawDialog = ({
   onBack?: () => void;
   onRestart?: () => void;
   onStepChange?: (step: string) => void;
+  automaticRounds?: number;
 }) => {
   const isRounds = phaseMatchType === "rounds";
   const { toast } = useToast();
@@ -577,7 +580,31 @@ const LiveDrawDialog = ({
           .insert(updates.map((u) => ({ group_id: u.groupId, team_id: u.teamId, tournament_id: tournamentId })));
 
       let drawnMatches = 0;
-      if (isRounds) {
+      if (isRounds && automaticRounds) {
+        for (const container of session.containers) {
+          const members = (slotRows || []).filter((slot) => slot.group_id === container.id).map((slot) => ({
+            slotCode: slot.slot_code,
+            teamId: updates.find((update) => update.slotId === slot.id)?.teamId ?? slot.team_id,
+          }));
+          const pairings = generateRoundRobin(members.length, "custom", automaticRounds);
+          if (!pairings.length) continue;
+          const { error: deleteError } = await supabase.from("matches").delete().eq("tournament_id", tournamentId).eq("phase_id", phaseId).eq("group_id", container.id);
+          if (deleteError) throw deleteError;
+          const inserts = pairings.map((pairing) => ({
+            tournament_id: tournamentId, phase_id: phaseId, group_id: container.id,
+            home_team_id: members[pairing.homeIdx]?.teamId ?? null,
+            away_team_id: members[pairing.awayIdx]?.teamId ?? null,
+            home_slot_label: members[pairing.homeIdx]?.slotCode ?? null,
+            away_slot_label: members[pairing.awayIdx]?.slotCode ?? null,
+            round_number: pairing.round,
+          }));
+          const { error: insertError } = await supabase.from("matches").insert(inserts);
+          if (insertError) throw insertError;
+          const { error: groupError } = await supabase.from("groups").update({ manual_planning: false }).eq("tournament_id", tournamentId).eq("phase_id", phaseId).eq("id", container.id);
+          if (groupError) throw groupError;
+          drawnMatches += inserts.length;
+        }
+      } else if (isRounds) {
         const membersByGroup = new Map<string, { teamId: string; slotCode: string }[]>();
         for (const u of updates) {
           membersByGroup.set(u.groupId, [...(membersByGroup.get(u.groupId) || []), { teamId: u.teamId, slotCode: u.slotCode }]);
