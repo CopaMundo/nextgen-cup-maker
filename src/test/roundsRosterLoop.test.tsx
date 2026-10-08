@@ -25,7 +25,7 @@ describe("Rounds roster overflow", () => {
     expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
   });
 
-  it("measures a seamless loop and discreet pages for reduced motion", () => {
+  it("measures a seamless continuous loop", () => {
     const { container } = measureRoster(1200, 400);
     const list = container.querySelector<HTMLElement>(".draw-show-rounds-roster-list");
     expect(list).toHaveClass("is-looping");
