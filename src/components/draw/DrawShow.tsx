@@ -118,8 +118,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
           </div>
         </section>
       </> : <>
-        <div className="draw-show-wing draw-show-wing-left">{session.containers.slice(0, splitAt).map(renderContainer)}</div>
-        <div className="draw-show-wing draw-show-wing-right">{session.containers.slice(splitAt).map(renderContainer)}</div>
+        <div className="draw-show-wing draw-show-wing-left" style={{ "--wing-rows": Math.max(1, Math.ceil(splitAt / layout.wingColumns)) } as CSSProperties}>{session.containers.slice(0, splitAt).map(renderContainer)}</div>
+        <div className="draw-show-wing draw-show-wing-right" style={{ "--wing-rows": Math.max(1, Math.ceil((session.containers.length - splitAt) / layout.wingColumns)) } as CSSProperties}>{session.containers.slice(splitAt).map(renderContainer)}</div>
       </>}
       <main className="draw-show-center">
         <div className="draw-show-team-card">
