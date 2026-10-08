@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Vaste compacte teamregels en inhoudsluitende poulekaders in A/B; centrering en transferlanding controleren bij 8×3 en 4×4.
 - [x] Vleugels onafhankelijk verticaal gecentreerd met compacte kaarthoogtes; 5×4, 3×4, 4×8, 6×12 en 4×16 plus exacte transferlanding links/rechts gecontroleerd. Vier presentatietests geslaagd.
 - [x] Enkelkoloms poulekaders compact (13.5cqw) en horizontaal gecentreerd; één kader per vleugel verticaal gecentreerd. Negen voorbeeldformaten en exacte transferlanding gecontroleerd; vier presentatietests geslaagd.
 - [x] Automatische poule-layout A/B/C: 8×8 en 12×4 kiezen B; 6×12 en 4×16 kiezen A; 2×64 en 16×6 kiezen C. Zestien tests en zes voorbeeldpodiums zonder afgekapte namen, overflow of afwijkende transferdoelen gecontroleerd.
