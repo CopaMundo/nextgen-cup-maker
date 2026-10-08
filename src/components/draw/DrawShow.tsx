@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { DrawSessionState } from "@/lib/drawSession";
-import { needsGroupOverview, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { calculateGroupLayout, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
@@ -31,21 +31,22 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const teamReady = !presentation?.revealAt || now >= presentation.revealAt + revealDuration(presentation.speed);
   const last = session?.history[session.history.length - 1];
   const eligible = selectedId ? pending?.options.filter((option) => option.id === selectedId) ?? [] : pending?.options ?? [];
-  const overview = needsGroupOverview(session?.containers ?? []);
-  const focusId = selectedId ?? activeSpotlight ?? pending?.options[0]?.id ?? last?.targetId ?? session?.containers[0]?.id;
-  const focus = session?.containers.find((container) => container.id === focusId);
+  const layout = calculateGroupLayout(session?.containers ?? []);
   useLayoutEffect(() => {
     const stage = stageRef.current;
-    const slot = stage?.querySelector<HTMLElement>("[data-transfer-target='true']");
-    if (!stage || !slot) return;
-    if (overview && slot.parentElement) {
-      const list = slot.parentElement;
-      list.scrollTop = Math.max(0, slot.offsetTop - list.offsetTop - list.clientHeight / 2);
-    }
-    const rect = stage.getBoundingClientRect();
-    const target = slot.getBoundingClientRect();
-    setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .44 });
-  }, [selectedId, focusId, overview]);
+    if (!stage) return;
+    const measure = () => {
+      const slot = stage.querySelector<HTMLElement>("[data-transfer-target='true']");
+      if (!slot) return;
+      const rect = stage.getBoundingClientRect();
+      const target = slot.getBoundingClientRect();
+      setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .44 });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, [selectedId, pending?.teamId, session?.containers, layout.mode, layout.teamColumns, layout.wingRows]);
 
   const activePot = session?.mode === "pots"
     ? session.pots.find((pot) => pot.id === (presentation?.activePotId ?? session.activePotId)) ?? session.pots.find((pot) => pot.teamIds.some((id) => session.remaining.includes(id)))
@@ -60,14 +61,14 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-name-lines": potColumns > 4 ? 3 : 2, "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
-    <section key={container.id} className={`draw-show-group-card ${container.id === selectedId || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
+    <section key={container.id} data-group-id={container.id} className={`draw-show-group-card ${container.id === selectedId || container.id === activeSpotlight || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
       <h2>{container.name}</h2>
-      <div className="draw-show-slots" style={{ "--slot-columns": 1 } as CSSProperties}>
+      <div className="draw-show-slots" style={{ "--slot-columns": layout.teamColumns, "--slot-rows": Math.max(1, Math.ceil(container.capacity / layout.teamColumns)) } as CSSProperties}>
         {Array.from({ length: container.capacity }, (_, index) => {
           const placed = session?.teams.find((item) => item.id === container.teamIds[index]);
-          return <div key={index} className="draw-show-slot" data-transfer-target={container.id === selectedId && index === container.teamIds.length}>
-            <span className="draw-show-slot-mark">{placed?.logoUrl && <AutoTrimLogo src={placed.logoUrl} />}</span>
-            <span className="draw-show-slot-name" title={placed?.name}>{placed?.name ?? ""}</span>
+          return <div key={index} className="draw-show-slot" title={placed?.name} aria-label={placed?.name} data-transfer-target={container.id === selectedId && index === container.teamIds.length}>
+            <span className="draw-show-slot-mark">{placed?.logoUrl ? <AutoTrimLogo src={placed.logoUrl} /> : placed?.name.slice(0, 2).toUpperCase()}</span>
+            {layout.mode !== "C" && <span className="draw-show-slot-name">{placed?.name ?? ""}</span>}
           </div>;
         })}
       </div>
@@ -79,7 +80,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": `${-elapsed}ms`, "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
-  return <div ref={stageRef} className={`draw-show draw-show-stage ${overview ? "draw-show-overview-mode" : ""}`} style={{ backgroundImage: `url(${liveDrawStage})`, ...motionStyle }}>
+  return <div ref={stageRef} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${liveDrawStage})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
       {rounds ? <>
@@ -116,9 +117,6 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
             </div>; })}
           </div>
         </section>
-      </> : overview ? <>
-        <div className="draw-show-group-overview">{session.containers.map((container) => <div key={container.id} className={focusId === container.id ? "is-active" : ""}><strong>{container.name}</strong><span>{container.teamIds.length}/{container.capacity}</span></div>)}</div>
-        <div className="draw-show-wing draw-show-wing-right draw-show-active-group">{focus && renderContainer(focus)}</div>
       </> : <>
         <div className="draw-show-wing draw-show-wing-left">{session.containers.slice(0, splitAt).map(renderContainer)}</div>
         <div className="draw-show-wing draw-show-wing-right">{session.containers.slice(splitAt).map(renderContainer)}</div>

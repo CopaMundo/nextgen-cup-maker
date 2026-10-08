@@ -2590,19 +2590,30 @@ posities + statistieken groen */
 }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
 .draw-show-phase { position: absolute; top: 8%; left: 28%; width: 44%; text-align: center; color: hsl(var(--muted-foreground)); font-size: 1cqw; }
-.draw-show-wing { position: absolute; top: 13%; bottom: 24%; width: 25%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: .7cqw; }
+.draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
 .draw-show-group-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .85); border-radius: 8px; background: hsl(var(--card) / .78); box-shadow: inset 0 0 .5cqw hsl(var(--stage-glow) / .12); transition: box-shadow 140ms; }
 .draw-show-group-card h2 { flex-shrink: 0; text-align: center; padding: .75cqw .4cqw; color: hsl(var(--primary)); font-size: 1.1cqw; text-transform: uppercase; font-weight: 700; line-height: 1.3; }
 .draw-show-group-card h2 small { color: hsl(var(--muted-foreground)); font-size: .7cqw; }
-.draw-show-slots { display: grid; flex: 1; min-height: 0; grid-template-columns: repeat(var(--slot-columns, 1), minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(16, minmax(0, 1fr)); gap: .2cqw; padding: .35cqw; }
-.draw-show-wing:not(.draw-show-active-group) .draw-show-slots { grid-auto-flow: row; grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); }
+.draw-show-slots { display: grid; flex: 1; min-height: 0; grid-template-columns: repeat(var(--slot-columns, 1), minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(var(--slot-rows, 1), minmax(0, 1fr)); gap: .2cqw; padding: .35cqw; overflow: hidden; }
 .draw-show-slot { display: flex; align-items: center; gap: .4cqw; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--border) / .68); border-radius: 5px; background: hsl(var(--stage-glass) / .82); padding: .2cqw .4cqw; }
 .draw-show-slot-mark { display: flex; align-items: center; justify-content: center; width: 1.8cqw; height: 1.8cqw; flex: 0 0 1.8cqw; overflow: hidden; border-radius: 50%; border: 1px solid hsl(var(--border) / .5); background: hsl(var(--background) / .75); }
 .draw-show-slot-mark img { display: block; width: 72%; height: 72%; flex: 0 0 auto; margin: 0; padding: 0; object-fit: contain; object-position: center; }
 .draw-show-slot-name { min-width: 0; overflow: hidden; font-size: .82cqw; font-weight: 600; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .draw-show-group-card.is-placed { box-shadow: inset 0 0 1cqw hsl(var(--stage-glow) / .2), 0 0 1cqw hsl(var(--stage-glow) / .35); }
+.draw-show-wing .draw-show-group-card { min-width: 0; }
+.draw-show-wing .draw-show-group-card h2 { padding: .35cqw; font-size: .95cqw; }
+.draw-show-wing .draw-show-slot { display: grid; grid-template-columns: minmax(0, 1.5cqw) minmax(0, 1fr); gap: .3cqw; padding: .15cqw .25cqw; }
+.draw-show-wing .draw-show-slot-mark { width: 100%; height: auto; aspect-ratio: 1; max-height: 100%; min-height: 0; font-size: .65cqw; }
+.draw-show-wing .draw-show-slot-name { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; font-size: .78cqw; line-height: 1.15; }
+.draw-show-layout-A .draw-show-slots[style*="--slot-columns: 2"] .draw-show-slot,
+.draw-show-layout-B .draw-show-slot { grid-template-columns: minmax(0, 1.2cqw) minmax(0, 1fr); gap: .25cqw; }
+.draw-show-layout-A .draw-show-slots[style*="--slot-columns: 2"] .draw-show-slot-name,
+.draw-show-layout-B .draw-show-slot-name { font-size: .7cqw; }
+.draw-show-layout-C .draw-show-slots { grid-auto-flow: row; gap: .22cqw; }
+.draw-show-layout-C .draw-show-wing .draw-show-slot { display: flex; justify-content: center; padding: .15cqw; border-color: hsl(var(--primary) / .5); container-type: size; }
+.draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; max-width: 100%; flex: 0 0 auto; font-size: 30cqmin; border-color: hsl(var(--primary) / .65); }
 .draw-show-center { position: absolute; z-index: 5; top: 39%; left: 29%; width: 42%; height: 10%; }
 .draw-show-team-card { display: flex; height: 100%; width: 100%; align-items: center; justify-content: center; padding: .7cqw 1.7cqw; }
 .draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; overflow: hidden; }
@@ -2634,7 +2645,6 @@ posities + statistieken groen */
 .draw-show-pot-teams > .is-drawn { opacity: .3; filter: grayscale(1); color: hsl(var(--muted-foreground)); }
 .draw-show-pot-logo { display: flex; align-items: center; justify-content: center; width: var(--pot-logo-size, 1.45cqw); height: var(--pot-logo-size, 1.45cqw); flex: 0 0 var(--pot-logo-size, 1.45cqw); border: 0; border-radius: 0; background: none; }
 .draw-show-pot-teams img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
-.draw-show-group-overview { position: absolute; left: 2%; top: 13%; bottom: 24%; width: 25%; overflow-y: auto; display: flex; flex-direction: column; gap: .5cqw; }
 .draw-show-rounds-roster, .draw-show-rounds-schedule { position: absolute; top: 13%; bottom: 7%; width: 25%; display: flex; flex-direction: column; }
 .draw-show-rounds-roster { border: 0; border-radius: 0; background: none; box-shadow: none; }
 .draw-show-rounds-roster h2 { border: 1px solid hsl(var(--primary) / .65); border-radius: 5px; background: hsl(var(--card) / .45); margin-bottom: .35cqw; }
@@ -2677,13 +2687,6 @@ posities + statistieken groen */
 .draw-show-rounds-venue svg { width: 1cqw; height: 1cqw; }
 .draw-show-rounds-fixture.is-known { animation: draw-opponent-reveal 250ms ease-out both; }
 @keyframes draw-opponent-reveal { from { opacity: 0; transform: translateY(.4cqw); } to { opacity: 1; transform: translateY(0); } }
-.draw-show-group-overview > div { display: flex; justify-content: space-between; gap: .4cqw; padding: .7cqw; border-block: 1px solid hsl(var(--border) / .6); background: hsl(var(--background) / .75); font-size: 1cqw; }
-.draw-show-group-overview .is-active { color: hsl(var(--primary)); background: hsl(var(--accent) / .85); border-color: hsl(var(--primary)); }
-.draw-show-active-group { grid-template-columns: minmax(0, 1fr); }
-.draw-show-active-group .draw-show-slots { display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: thin; }
-.draw-show-active-group .draw-show-slot { min-height: 2cqw; flex-shrink: 0; }
-.draw-show-active-group .draw-show-slot-name { font-size: 1cqw; white-space: normal; overflow-wrap: anywhere; }
-.draw-show-active-group .draw-show-slot-mark { width: 1.6cqw; height: 1.6cqw; flex-basis: 1.6cqw; }
 .draw-show-waiting { position: absolute; top: 40%; left: 30%; width: 40%; padding: 1cqw; text-align: center; color: hsl(var(--primary)); font-size: 1.3cqw; }
 .draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; container-type: size; }
 .draw-control-stage > .draw-show-stage { flex: 0 0 auto; width: min(100cqw, 177.7778cqh); }

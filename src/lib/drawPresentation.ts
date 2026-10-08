@@ -40,9 +40,25 @@ export function stageSelection(presentation: DrawPresentation | undefined, now: 
   return elapsed < 850 ? "hold" : elapsed < 2100 ? "transfer" : "complete";
 }
 
-/** Use a fixed slot height budget, not a team-count guess, to choose the overview. */
-export function needsGroupOverview(containers: DrawSessionState["containers"]) {
-  const split = Math.ceil(containers.length / 2);
-  const rows = Math.max(1, Math.ceil(split / 2));
-  return containers.some((container) => container.capacity > 12 || container.capacity * rows > 20);
+export interface GroupDrawLayout {
+  mode: "A" | "B" | "C";
+  wingColumns: number;
+  wingRows: number;
+  teamColumns: number;
+}
+
+/** Fixed 16:9 wing budgets preserve names before falling back to logo tiles. */
+export function calculateGroupLayout(containers: DrawSessionState["containers"]): GroupDrawLayout {
+  const count = containers.length;
+  const capacity = Math.max(0, ...containers.map((container) => container.capacity));
+  const nameLimit = count <= 2 ? 32 : count <= 4 ? 16 : 12;
+  const mode = count <= 6 && capacity <= nameLimit ? "A"
+    : count <= 12 && capacity <= (count <= 8 ? 8 : 5) ? "B" : "C";
+  const wingColumns = mode === "A" || count <= 2 ? 1
+    : mode === "C" && count > 24 ? Math.ceil(Math.sqrt(Math.ceil(count / 2) / 2)) : 2;
+  const wingRows = Math.max(1, Math.ceil(Math.ceil(count / 2) / wingColumns));
+  const splitThreshold = count <= 2 ? 16 : count <= 4 ? 8 : 6;
+  const teamColumns = mode === "C" ? Math.max(1, Math.ceil(Math.sqrt(capacity * wingRows / wingColumns)))
+    : mode === "A" && capacity > splitThreshold ? 2 : 1;
+  return { mode, wingColumns, wingRows, teamColumns };
 }
