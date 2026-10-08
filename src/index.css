@@ -2607,6 +2607,7 @@ posities + statistieken groen */
 .draw-show-slot-name { min-width: 0; overflow: hidden; font-size: .82cqw; font-weight: 600; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .draw-show-group-card.is-placed { box-shadow: inset 0 0 1cqw hsl(var(--stage-glow) / .2), 0 0 1cqw hsl(var(--stage-glow) / .35); }
 .draw-show-wing .draw-show-group-card { min-width: 0; }
+.draw-show-wing[data-wing-columns="2"] > .draw-show-group-card:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc((100% - .7cqw) / 2); }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card { width: 100%; justify-self: center; }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card[data-team-columns="1"] { width: min(100%, var(--group-card-width, 16.5cqw)); }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card,
