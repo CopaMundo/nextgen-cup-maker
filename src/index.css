@@ -2612,7 +2612,7 @@ posities + statistieken groen */
 .draw-show-layout-A .draw-show-wing .draw-show-group-card,
 .draw-show-layout-B .draw-show-wing .draw-show-group-card { align-self: center; height: auto; max-height: 100%; }
 .draw-show-layout-A .draw-show-wing .draw-show-slots,
-.draw-show-layout-B .draw-show-wing .draw-show-slots { flex: none; grid-template-rows: repeat(var(--slot-rows, 1), var(--group-slot-height, 1.8cqw)); gap: .15cqw; padding: .25cqw; }
+.draw-show-layout-B .draw-show-wing .draw-show-slots { flex: 0 1 auto; height: calc(var(--slot-rows, 1) * var(--group-slot-height, 1.8cqw) + (var(--slot-rows, 1) - 1) * .15cqw + .5cqw); grid-template-rows: repeat(var(--slot-rows, 1), minmax(0, 1fr)); gap: .15cqw; padding: .25cqw; }
 .draw-show-wing .draw-show-group-card h2 { padding: .35cqw; font-size: var(--group-title-size, .85cqw); }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card h2,
 .draw-show-layout-B .draw-show-wing .draw-show-group-card h2 { padding-block: .3cqw; }
