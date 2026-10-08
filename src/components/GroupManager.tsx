@@ -1262,7 +1262,7 @@ const GroupManager = ({
           {drawView && (() => {
             const steps = drawMode === "groups" || phaseMatchType !== "rounds"
               ? ["Type loting", "Poules & Potten", "Regels", "Loting show"]
-              : drawMode === "rounds" || groups.length === 1
+              : drawMode === "rounds"
                 ? ["Type loting", "Speelrondes", "Loting show"]
                 : ["Type loting", "Poules & Potten", "Regels", "Speelrondes", "Loting show"];
             const label = drawView === "choice" ? "Type loting"
@@ -1319,7 +1319,7 @@ const GroupManager = ({
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
                 <Button variant="ghost" className="sm:mr-auto" onClick={() => setShowRestartConfirm(true)}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>
                 <Button variant="outline" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
-                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(groups.length === 1 && drawMode === "full" ? "rounds" : drawMode)}>Volgende</Button>
+                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(drawMode)}>Volgende</Button>
               </DialogFooter>
             </section>
           )}
