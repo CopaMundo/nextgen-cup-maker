@@ -26,6 +26,7 @@ import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import LiveDrawDialog from "./LiveDrawDialog";
 import RoundsDrawDialog from "./RoundsDrawDialog";
+import { canChooseLiveDraw, liveRoundsAvailable, liveRoundsLimitMessage } from "@/lib/liveDrawLimits";
 
 interface Group {
   id: string;
@@ -103,6 +104,7 @@ const GroupManager = ({
   const [phaseMatchType, setPhaseMatchType] = useState<MatchType>("single_leg");
   const [phaseEncounters, setPhaseEncounters] = useState(3);
   const [phaseRounds, setPhaseRounds] = useState(3);
+  const roundsShowAvailable = phaseMatchType !== "rounds" || liveRoundsAvailable(phaseRounds);
 
   const fetchMatchConfig = async () => {
     const { data } = await supabase
@@ -340,6 +342,11 @@ const GroupManager = ({
   const [drawSubStep, setDrawSubStep] = useState("method");
   const [drawResetKey, setDrawResetKey] = useState(0);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+  useEffect(() => {
+    if (roundsShowAvailable) return;
+    setDrawMode("groups");
+    if (drawView === "rounds") setDrawView("choice");
+  }, [roundsShowAvailable, drawView]);
   useEffect(() => { setDrawOverwrite(localStorage.getItem(drawOverwriteKey) === "1"); }, [drawOverwriteKey]);
   const updateOverwrite = (value: boolean) => {
     setDrawOverwrite(value);
@@ -347,7 +354,7 @@ const GroupManager = ({
   };
   const closeDrawView = () => setDrawView(null);
   const backToChoice = () => {
-    if (phaseMatchType === "rounds" && groups.length > 1) setDrawView("choice");
+    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable)) setDrawView("choice");
     else closeDrawView();
   };
   const restartDraw = () => {
@@ -355,14 +362,15 @@ const GroupManager = ({
     localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`);
     localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
     updateOverwrite(false);
-    setDrawMode("full");
+    setDrawMode(roundsShowAvailable ? "full" : "groups");
     setDrawResetKey((k) => k + 1);
     setDrawSubStep("method");
-    if (phaseMatchType === "rounds" && groups.length > 1) setDrawView("choice");
+    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable)) setDrawView("choice");
     else if (phaseMatchType === "rounds") setDrawView("rounds");
     else setDrawView("groups");
   };
   const startDraw = (mode: DrawMode, overwrite = false) => {
+    if (phaseMatchType === "rounds" && !canChooseLiveDraw(mode, phaseRounds)) return;
     updateOverwrite(overwrite);
     localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`);
     localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
@@ -371,6 +379,7 @@ const GroupManager = ({
     setDrawView(mode === "rounds" ? "rounds" : "groups");
   };
   const requestDraw = async (mode: DrawMode) => {
+    if (phaseMatchType === "rounds" && !canChooseLiveDraw(mode, phaseRounds)) return;
     let needsConfirm = false;
     if (mode === "rounds") {
       const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
@@ -1224,7 +1233,7 @@ const GroupManager = ({
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
             if (phaseMatchType === "rounds") {
-              if (groups.length === 1) void requestDraw("rounds");
+              if (groups.length === 1 && roundsShowAvailable) void requestDraw("rounds");
               else setDrawView("choice");
             }
             else requestDraw("groups");
@@ -1280,10 +1289,11 @@ const GroupManager = ({
                 <DialogTitle>Wat wil je loten?</DialogTitle>
                 <DialogDescription>Kies welk deel van deze fase je live wilt loten.</DialogDescription>
               </DialogHeader>
+              {!roundsShowAvailable && <p role="status" className="mt-4 shrink-0 text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
               <div className="grid min-h-0 flex-1 content-start gap-3 overflow-y-auto py-5 md:grid-cols-3">
             {([
               ["full", "Volledige loting", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
-              ["groups", "Alleen poules loten", "Teams over de poules verdelen. De speelrondes blijven ongewijzigd."],
+               ["groups", "Groepen loten", roundsShowAvailable ? "Teams over de poules verdelen. De speelrondes blijven ongewijzigd." : "Teams over de poules verdelen. De speelrondes worden automatisch gegenereerd."],
               ["rounds", "Alleen speelrondes loten", "De huidige poule-indeling behouden en enkel de tegenstanders loten."],
             ] as const).map(([mode, title, text]) => (
               <Button
@@ -1291,6 +1301,7 @@ const GroupManager = ({
                 type="button"
                 variant="outline"
                  aria-pressed={drawMode === mode}
+                 disabled={!roundsShowAvailable && mode !== "groups"}
                  onClick={() => setDrawMode(mode)}
                  className={`draw-choice h-auto min-h-40 w-full flex-col items-start justify-start whitespace-normal p-5 text-left ${drawMode === mode ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`}
               >
@@ -1302,7 +1313,7 @@ const GroupManager = ({
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
                 <Button variant="ghost" className="sm:mr-auto" onClick={() => setShowRestartConfirm(true)}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>
                 <Button variant="outline" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
-                <Button onClick={() => void requestDraw(groups.length === 1 && drawMode === "full" ? "rounds" : drawMode)}>Volgende</Button>
+                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(groups.length === 1 && drawMode === "full" ? "rounds" : drawMode)}>Volgende</Button>
               </DialogFooter>
             </section>
           )}
@@ -1338,7 +1349,7 @@ const GroupManager = ({
             onApplied={async () => {
               notifySlotChange();
               await fetchGroups();
-              if (drawMode === "full") {
+               if (drawMode === "full" && roundsShowAvailable) {
                 localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
                 setDrawView("rounds");
               }

@@ -24,6 +24,7 @@ import { initRoundsState } from "@/lib/drawSession";
 import { orderedTeamFixtures, opponentRevealDuration, roundsStage } from "@/lib/roundsDrawPresentation";
 import { revealDuration, type DrawPicture } from "@/lib/drawPresentation";
 import { ExternalLink, Settings2, Shuffle } from "lucide-react";
+import { MAX_LIVE_DRAW_ROUNDS, liveRoundsAvailable, liveRoundsLimitMessage } from "@/lib/liveDrawLimits";
 
 interface Team {
   id: string;
@@ -214,7 +215,7 @@ const RoundsDrawDialog = ({
           setGroups([...infos]);
           const teamIdsByGroup = new Map(infos.map((group) => [group.id, new Set(group.teamIds)]));
           const restoredPots = Object.fromEntries(Object.entries(draft.potGroups).filter(([groupId, groupPots]) => validGroupIds.has(groupId) && groupPots.every((pot) => pot.teamIds.every((id) => teamIdsByGroup.get(groupId)?.has(id)))));
-          const drawsValid = draft.draws.every((draw) => validGroupIds.has(draw.groupId) && draw.order.every((id) => teamIdsByGroup.get(draw.groupId)?.has(id)));
+           const drawsValid = infos.every((group) => liveRoundsAvailable(group.rounds)) && draft.draws.every((draw) => validGroupIds.has(draw.groupId) && draw.order.every((id) => teamIdsByGroup.get(draw.groupId)?.has(id)));
           setStep(drawsValid ? draft.step : "method");
           setMethod(draft.method);
           setPotGroups(restoredPots);
@@ -278,6 +279,7 @@ const RoundsDrawDialog = ({
     return drawGroups.every((g) => sig(g) === sig(drawGroups[0]));
   }, [drawGroups]);
   const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
+  const exceedsShowLimit = groups.some((g) => !liveRoundsAvailable(Number(roundInputs[g.id] ?? g.rounds)));
 
   const selectPotCount = (group: GroupInfo, count: number) => {
     if (potGroups[group.id]?.length === count) return;
@@ -376,6 +378,10 @@ const RoundsDrawDialog = ({
   };
 
   const prepare = async () => {
+    if (exceedsShowLimit) {
+      toast({ title: "Maximaal 20 speelrondes in de live show", description: liveRoundsLimitMessage, variant: "destructive" });
+      return;
+    }
     if (drawGroups.some((g) => roundInputs[g.id] !== undefined && (!roundInputs[g.id] || !Number.isInteger(Number(roundInputs[g.id])) || Number(roundInputs[g.id]) < 1))) {
       toast({ title: "Vul een geldig aantal speelrondes in", variant: "destructive" });
       return;
@@ -657,13 +663,15 @@ const RoundsDrawDialog = ({
               {g.teamIds.length} teams · {g.rounds} speelrondes · {matchesPerTeam(g.teamIds.length, g.rounds)} wedstrijden per team
             </div>
             <Label htmlFor={`draw-rounds-${g.id}`} className="mt-3 block">Aantal speelrondes</Label>
-            <Input id={`draw-rounds-${g.id}`} type="number" min={1} step={1} className="mt-1 w-24" value={roundInputs[g.id] ?? String(g.rounds)} disabled={g.hasPlayed} onChange={(event) => updateRounds(g.id, event.target.value)} />
+             <Input id={`draw-rounds-${g.id}`} type="number" min={1} max={MAX_LIVE_DRAW_ROUNDS} step={1} className="mt-1 w-24" value={roundInputs[g.id] ?? String(g.rounds)} disabled={g.hasPlayed} onChange={(event) => updateRounds(g.id, event.target.value)} />
             {method === "pots" && <div className="text-xs text-muted-foreground">{g.pots.map((p) => `${p.name} (${p.teamIds.length})`).join(" · ")}</div>}
             {g.freeSlots > 0 && <div className="mt-1 text-xs text-destructive">Nog {g.freeSlots} lege plaatsen in deze groep.</div>}
             {g.hasPlayed && <div className="mt-1 text-xs text-destructive">Er zijn al wedstrijden gespeeld.</div>}
           </div>
         ))}
       </div>
+
+      {exceedsShowLimit && <p role="status" className="text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
 
       {drawGroups.length > 1 && (
         <RadioGroup value={sameForAll && canShare ? "same" : "per"} onValueChange={(v) => setSameForAll(v === "same")} className="flex flex-wrap gap-4">
@@ -902,7 +910,7 @@ const RoundsDrawDialog = ({
            ) : step === "settings" ? (
             <>
                <Button variant="outline" onClick={() => setStep(method === "pots" ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
-              <Button onClick={prepare} disabled={checking || groups.length === 0}>
+               <Button onClick={prepare} disabled={checking || groups.length === 0 || exceedsShowLimit}>
                 {checking ? "Speelrondes aanmaken..." : "Volgende"}
               </Button>
             </>
