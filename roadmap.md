@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Automatische poule-layout A/B/C met volledige namen of compacte logo-vakken; voorbeeldformaten en transferdoelen controleren.
 - [x] Live loting: losse linkerteamkaarten, maximaal tien badges per rij, vaste gecentreerde wedstrijdrijen en groepsloting behouden boven twintig speelrondes met automatische wedstrijdgeneratie; schermcontrole met voorbeeldteams bij 4/10/11/20 en keuzescherm bij 21 rondes. Echte aangemelde regie-beamercontrole niet beschikbaar: geen gekoppeld testaccount.
 - [x] Schuifbalk bij lange teamlijsten verwijderd; rustige loop bij normale beweging en pagina-overgangen bij verminderde beweging. Balonthulling hersteld met openen of rustige vervaging. Zestien tests en schermcontroles met 24 voorbeeldteams in beide bewegingsstanden geslaagd.
 - [x] Speelrondeloting: volledige paneelhoogte, alfabetische actieve pot/poule met rustige doorlopende scroll, goud en grotere badges pas na volledige teamonthulling, alfabetisch bokaaloverzicht en twee programmakolommen pas boven tien wedstrijden. Veertien tests en schermcontroles met voorbeeldteams geslaagd.
