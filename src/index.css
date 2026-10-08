@@ -2636,6 +2636,9 @@ posities + statistieken groen */
 .draw-show-pot-teams img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
 .draw-show-group-overview { position: absolute; left: 2%; top: 13%; bottom: 24%; width: 25%; overflow-y: auto; display: flex; flex-direction: column; gap: .5cqw; }
 .draw-show-rounds-roster, .draw-show-rounds-schedule { position: absolute; top: 13%; bottom: 7%; width: 25%; display: flex; flex-direction: column; }
+.draw-show-rounds-roster { border: 0; border-radius: 0; background: none; box-shadow: none; }
+.draw-show-rounds-roster h2 { border: 1px solid hsl(var(--primary) / .65); border-radius: 5px; background: hsl(var(--card) / .45); margin-bottom: .35cqw; }
+.draw-show-rounds-schedule { top: 53%; bottom: auto; transform: translateY(-50%); }
 .draw-show-rounds-roster-list { flex: 1; min-height: 0; overflow: hidden; }
 .draw-show-rounds-roster-track { will-change: transform; }
 .draw-show-rounds-roster-list.is-looping .draw-show-rounds-roster-track { animation: draw-roster-loop var(--roster-duration) linear infinite; }
@@ -2646,12 +2649,12 @@ posities + statistieken groen */
 .draw-show-rounds-club-logo img { width: 100%; height: 100%; max-height: 5cqw; }
 .draw-show-rounds-roster-identity { grid-column: 2; grid-row: 1; min-width: 0; }
 .draw-show-rounds-roster-identity .draw-show-slot-name { display: block; font-size: 1.05cqw; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
-.draw-show-rounds-opponent-badges { grid-column: 2; grid-row: 2; display: flex; flex-wrap: wrap; gap: .3cqw; min-width: 0; min-height: 1.9cqw; }
-.draw-show-rounds-opponent-badges .draw-show-slot-mark { width: 1.9cqw; height: 1.9cqw; flex-basis: 1.9cqw; color: hsl(var(--foreground)); font-size: .7cqw; border-color: hsl(var(--primary)); }
+.draw-show-rounds-opponent-badges { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); grid-auto-rows: 1.65cqw; gap: .15cqw; min-width: 0; min-height: 1.9cqw; align-content: start; }
+.draw-show-rounds-opponent-badges .draw-show-slot-mark { width: 100%; max-width: 1.65cqw; height: auto; aspect-ratio: 1; color: hsl(var(--foreground)); font-size: .6cqw; border-color: hsl(var(--primary)); }
 .draw-show-rounds-roster-team.is-inactive .draw-show-rounds-roster-identity,
 .draw-show-rounds-roster-team.is-inactive .draw-show-rounds-club-logo { opacity: .35; filter: grayscale(1); }
 .draw-show-rounds-roster-team.is-complete { border-color: hsl(var(--primary)); background: hsl(var(--accent)); color: hsl(var(--primary)); }
-.draw-show-rounds-fixtures { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(var(--fixture-rows), minmax(0, 1fr)); flex: 1; min-height: 0; gap: .4cqw; overflow-y: auto; padding: .5cqw; scrollbar-width: thin; }
+.draw-show-rounds-fixtures { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(var(--fixture-rows), 3.6cqw); flex: 0 0 auto; gap: .3cqw; overflow: hidden; padding: .5cqw; }
 .draw-show-rounds-fixtures.is-two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; gap: .3cqw; }
 .draw-show-rounds-team-header { position: relative; isolation: isolate; display: flex; align-items: center; gap: .65cqw; min-height: 4.5cqw; flex-shrink: 0; padding: .7cqw; border-bottom: 1px solid hsl(var(--border) / .35); }
 .draw-show-rounds-team-header > .draw-show-slot-mark { width: 3.3cqw; height: 3.3cqw; flex-basis: 3.3cqw; font-size: 1cqw; }
