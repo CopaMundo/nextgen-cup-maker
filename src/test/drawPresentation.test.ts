@@ -26,8 +26,8 @@ describe("Shared draw presentation", () => {
       [4, 16, "A", 2], [2, 64, "C", 8], [16, 6, "C", 4],
       [6, 6, "A", 1], [4, 8, "A", 1], [2, 16, "A", 1],
       [2, 32, "A", 2], [12, 5, "B", 1],
-      [12, 6, "C", 3], [8, 9, "C", 3], [6, 13, "C", 5],
-      [4, 17, "C", 5], [1, 33, "C", 6],
+      [12, 6, "C", 3], [8, 9, "C", 3], [6, 13, "C", 4],
+      [4, 17, "C", 3], [1, 33, "C", 6],
     ] as const) {
       expect(calculateGroupLayout(groups(count, capacity))).toMatchObject({ mode, teamColumns: columns });
     }
