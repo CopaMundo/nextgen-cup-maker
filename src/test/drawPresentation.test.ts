@@ -8,8 +8,8 @@ describe("Shared draw presentation", () => {
     for (const [count, capacity, expected] of [
       [2, 3, "royal"], [2, 4, "royal"], [2, 5, "royal"],
       [4, 4, "comfortable"], [2, 6, "comfortable"], [4, 8, "comfortable"],
-      [6, 4, "standard"], [6, 12, "standard"], [4, 16, "standard"], [2, 32, "standard"],
-      [8, 3, "compact"], [8, 4, "compact"], [8, 8, "compact"], [12, 4, "compact"], [12, 5, "compact"],
+      [4, 16, "comfortable"], [2, 32, "comfortable"], [8, 3, "comfortable"], [8, 4, "comfortable"], [8, 8, "comfortable"],
+      [6, 4, "standard"], [6, 12, "standard"], [12, 4, "standard"], [12, 5, "standard"],
       [2, 64, "logo-only"], [16, 6, "logo-only"],
     ] as const) {
       const containers = groups(count, capacity);
