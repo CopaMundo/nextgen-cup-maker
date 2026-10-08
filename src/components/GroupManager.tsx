@@ -354,7 +354,7 @@ const GroupManager = ({
   };
   const closeDrawView = () => setDrawView(null);
   const backToChoice = () => {
-    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable)) setDrawView("choice");
+    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable || drawMode === "full")) setDrawView("choice");
     else closeDrawView();
   };
   const restartDraw = () => {
@@ -365,8 +365,8 @@ const GroupManager = ({
     setDrawMode(roundsShowAvailable ? "full" : "groups");
     setDrawResetKey((k) => k + 1);
     setDrawSubStep("method");
-    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable)) setDrawView("choice");
-    else if (phaseMatchType === "rounds") setDrawView("rounds");
+    if (phaseMatchType === "rounds" && groups.length === 1 && roundsShowAvailable && drawMode === "rounds") setDrawView("rounds");
+    else if (phaseMatchType === "rounds") setDrawView("choice");
     else setDrawView("groups");
   };
   const startDraw = (mode: DrawMode, overwrite = false) => {
