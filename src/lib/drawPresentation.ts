@@ -47,6 +47,17 @@ export interface GroupDrawLayout {
   teamColumns: number;
 }
 
+export type GroupWingDensity = "spacious" | "normal" | "compact";
+
+/** Count displayed slot rows, not teams, so internal splits retain readable sizes. */
+export function calculateWingDensity(containers: DrawSessionState["containers"], layout: GroupDrawLayout): GroupWingDensity {
+  if (layout.mode === "C") return "compact";
+  const wingRows = Math.max(1, Math.ceil(containers.length / layout.wingColumns));
+  const slotRows = Math.max(0, ...containers.map((container) => Math.ceil(container.capacity / layout.teamColumns)));
+  const load = wingRows * slotRows;
+  return load <= 12 ? "spacious" : load <= 16 ? "normal" : "compact";
+}
+
 /** Fixed 16:9 wing budgets preserve names before falling back to logo tiles. */
 export function calculateGroupLayout(containers: DrawSessionState["containers"]): GroupDrawLayout {
   const count = containers.length;

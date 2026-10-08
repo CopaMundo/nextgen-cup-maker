@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { DrawSessionState } from "@/lib/drawSession";
-import { calculateGroupLayout, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { calculateGroupLayout, calculateWingDensity, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
@@ -32,6 +32,11 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const last = session?.history[session.history.length - 1];
   const eligible = selectedId ? pending?.options.filter((option) => option.id === selectedId) ?? [] : pending?.options ?? [];
   const layout = calculateGroupLayout(session?.containers ?? []);
+  const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
+  const leftContainers = session?.containers.slice(0, splitAt) ?? [];
+  const rightContainers = session?.containers.slice(splitAt) ?? [];
+  const leftDensity = calculateWingDensity(leftContainers, layout);
+  const rightDensity = calculateWingDensity(rightContainers, layout);
   useLayoutEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -45,8 +50,10 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(stage);
+    const target = stage.querySelector<HTMLElement>("[data-transfer-target='true']");
+    if (target) observer.observe(target);
     return () => observer.disconnect();
-  }, [selectedId, pending?.teamId, session?.containers, layout.mode, layout.teamColumns, layout.wingRows]);
+  }, [selectedId, pending?.teamId, session?.containers, layout.mode, layout.teamColumns, layout.wingRows, leftDensity, rightDensity]);
 
   const activePot = session?.mode === "pots"
     ? session.pots.find((pot) => pot.id === (presentation?.activePotId ?? session.activePotId)) ?? session.pots.find((pot) => pot.teamIds.some((id) => session.remaining.includes(id)))
@@ -59,7 +66,6 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const potRows = Math.max(1, Math.ceil(potTeamIds.length / potMaxColumns));
   const potColumns = Math.max(1, Math.ceil(potTeamIds.length / potRows));
   const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-name-lines": potColumns > 4 ? 3 : 2, "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
-  const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} data-group-id={container.id} data-team-columns={layout.teamColumns} style={{ "--group-slot-rows": Math.max(1, Math.ceil(container.capacity / layout.teamColumns)) } as CSSProperties} className={`draw-show-group-card ${container.id === selectedId || container.id === activeSpotlight || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
       <h2>{container.name}</h2>
@@ -118,8 +124,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
           </div>
         </section>
       </> : <>
-        <div className="draw-show-wing draw-show-wing-left" style={{ "--wing-rows": Math.max(1, Math.ceil(splitAt / layout.wingColumns)) } as CSSProperties}>{session.containers.slice(0, splitAt).map(renderContainer)}</div>
-        <div className="draw-show-wing draw-show-wing-right" style={{ "--wing-rows": Math.max(1, Math.ceil((session.containers.length - splitAt) / layout.wingColumns)) } as CSSProperties}>{session.containers.slice(splitAt).map(renderContainer)}</div>
+        <div className="draw-show-wing draw-show-wing-left" data-density={leftDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(leftContainers.length / layout.wingColumns)) } as CSSProperties}>{leftContainers.map(renderContainer)}</div>
+        <div className="draw-show-wing draw-show-wing-right" data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)) } as CSSProperties}>{rightContainers.map(renderContainer)}</div>
       </>}
       <main className="draw-show-center">
         <div className="draw-show-team-card">

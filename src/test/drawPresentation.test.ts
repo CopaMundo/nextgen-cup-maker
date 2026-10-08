@@ -1,8 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { calculateGroupLayout, revealDuration, selectionDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { calculateGroupLayout, calculateWingDensity, revealDuration, selectionDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 
 const picture: DrawPresentation = { revealAt: 1000, speed: 1, activePotId: "p1", selection: { targetId: "g1", startedAt: 1000 } };
 describe("Shared draw presentation", () => {
+  it("caps density independently per wing using displayed slot rows", () => {
+    const groups = (count: number, capacity: number) => Array.from({ length: count }, (_, index) => ({ id: String(index), name: `Groep ${index}`, capacity, teamIds: [], slotIds: [] }));
+    for (const [count, capacity, expected] of [[2, 4, "spacious"], [8, 3, "spacious"], [8, 8, "normal"], [12, 5, "normal"], [6, 12, "compact"], [4, 16, "normal"], [2, 64, "compact"]] as const) {
+      const containers = groups(count, capacity);
+      expect(calculateWingDensity(containers.slice(0, Math.ceil(count / 2)), calculateGroupLayout(containers))).toBe(expected);
+    }
+    const uneven = groups(5, 6);
+    const layout = calculateGroupLayout(uneven);
+    expect(calculateWingDensity(uneven.slice(0, 3), layout)).toBe("compact");
+    expect(calculateWingDensity(uneven.slice(3), layout)).toBe("spacious");
+    expect(calculateWingDensity([], calculateGroupLayout([]))).toBe("spacious");
+  });
   it("holds the selected group before transferring and clearing the team", () => {
     expect(stageSelection(picture, 1500)).toBe("hold");
     expect(stageSelection(picture, 1900)).toBe("transfer");
