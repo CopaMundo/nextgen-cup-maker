@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Getrapte dichtheid per groepsvleugel met begrensde grotere logo’s/namen; content-hugging, overflow en transferlanding controleren.
+- [x] Getrapte dichtheid per groepsvleugel met begrensde grotere logo’s/namen; vijf tests en negen voorbeeldformaten links/rechts gecontroleerd zonder slot-overflow en met exacte transferdoelen. Kaders blijven inhoudsluitend en gecentreerd.
 - [x] Vaste compacte teamregels en inhoudsluitende poulekaders in A/B; 8×3 en 4×4 visueel gecontroleerd, zeven formaten zonder overflow met exacte transferlanding links/rechts en vier presentatietests geslaagd.
 - [x] Vleugels onafhankelijk verticaal gecentreerd met compacte kaarthoogtes; 5×4, 3×4, 4×8, 6×12 en 4×16 plus exacte transferlanding links/rechts gecontroleerd. Vier presentatietests geslaagd.
 - [x] Enkelkoloms poulekaders compact (13.5cqw) en horizontaal gecentreerd; één kader per vleugel verticaal gecentreerd. Negen voorbeeldformaten en exacte transferlanding gecontroleerd; vier presentatietests geslaagd.
