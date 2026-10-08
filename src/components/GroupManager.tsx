@@ -354,7 +354,7 @@ const GroupManager = ({
   };
   const closeDrawView = () => setDrawView(null);
   const backToChoice = () => {
-    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable)) setDrawView("choice");
+    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable || drawMode === "full")) setDrawView("choice");
     else closeDrawView();
   };
   const restartDraw = () => {
@@ -365,8 +365,8 @@ const GroupManager = ({
     setDrawMode(roundsShowAvailable ? "full" : "groups");
     setDrawResetKey((k) => k + 1);
     setDrawSubStep("method");
-    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable)) setDrawView("choice");
-    else if (phaseMatchType === "rounds") setDrawView("rounds");
+    if (phaseMatchType === "rounds" && groups.length === 1 && roundsShowAvailable && drawMode === "rounds") setDrawView("rounds");
+    else if (phaseMatchType === "rounds") setDrawView("choice");
     else setDrawView("groups");
   };
   const startDraw = (mode: DrawMode, overwrite = false) => {
@@ -1233,7 +1233,13 @@ const GroupManager = ({
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
             if (phaseMatchType === "rounds") {
-              if (groups.length === 1 && roundsShowAvailable) void requestDraw("rounds");
+              if (groups.length === 1 && roundsShowAvailable) {
+                void (async () => {
+                  const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
+                  if (filled?.length) void requestDraw("rounds");
+                  else setDrawView("choice");
+                })();
+              }
               else setDrawView("choice");
             }
             else requestDraw("groups");
@@ -1256,7 +1262,7 @@ const GroupManager = ({
           {drawView && (() => {
             const steps = drawMode === "groups" || phaseMatchType !== "rounds"
               ? ["Type loting", "Poules & Potten", "Regels", "Loting show"]
-              : drawMode === "rounds" || groups.length === 1
+              : drawMode === "rounds"
                 ? ["Type loting", "Speelrondes", "Loting show"]
                 : ["Type loting", "Poules & Potten", "Regels", "Speelrondes", "Loting show"];
             const label = drawView === "choice" ? "Type loting"
@@ -1313,7 +1319,7 @@ const GroupManager = ({
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
                 <Button variant="ghost" className="sm:mr-auto" onClick={() => setShowRestartConfirm(true)}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>
                 <Button variant="outline" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
-                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(groups.length === 1 && drawMode === "full" ? "rounds" : drawMode)}>Volgende</Button>
+                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(drawMode)}>Volgende</Button>
               </DialogFooter>
             </section>
           )}
