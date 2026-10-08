@@ -47,15 +47,18 @@ export interface GroupDrawLayout {
   teamColumns: number;
 }
 
-export type GroupWingDensity = "spacious" | "normal" | "compact";
+export type GroupWingDensity = "royal" | "comfortable" | "standard" | "compact" | "logo-only";
 
-/** Count displayed slot rows, not teams, so internal splits retain readable sizes. */
+/** Five studio profiles, selected independently from each wing's actual load. */
 export function calculateWingDensity(containers: DrawSessionState["containers"], layout: GroupDrawLayout): GroupWingDensity {
-  if (layout.mode === "C") return "compact";
+  if (layout.mode === "C") return "logo-only";
+  if (layout.mode === "B") return "compact";
   const wingRows = Math.max(1, Math.ceil(containers.length / layout.wingColumns));
   const slotRows = Math.max(0, ...containers.map((container) => Math.ceil(container.capacity / layout.teamColumns)));
   const load = wingRows * slotRows;
-  return load <= 12 ? "spacious" : load <= 16 ? "normal" : "compact";
+  if (layout.teamColumns === 1 && wingRows === 1 && slotRows <= 5) return "royal";
+  if (layout.teamColumns === 1 && wingRows <= 2 && load <= 16) return "comfortable";
+  return "standard";
 }
 
 /** Fixed 16:9 wing budgets preserve names before falling back to logo tiles. */
