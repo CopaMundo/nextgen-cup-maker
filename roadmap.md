@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Vijf schaalniveaus voor groepsloting: royaal, comfortabel, standaard, compact met namen en logo-only; vijf tests en veertien voorbeeldformaten links/rechts gecontroleerd zonder overflow, met exacte transferdoelen en correcte hermeting bij schermvergroting.
 - [x] Poulekaders verfijnd: tekst maximaal .85cqw, bescheiden logo’s/slots en enkelkolomskaders 17cqw; negen voorbeeldformaten zonder slot-overflow en met exacte transferdoelen links/rechts gecontroleerd, vijf tests geslaagd.
 - [x] Getrapte dichtheid per groepsvleugel met begrensde grotere logo’s/namen; vijf tests en negen voorbeeldformaten links/rechts gecontroleerd zonder slot-overflow en met exacte transferdoelen. Kaders blijven inhoudsluitend en gecentreerd.
 - [x] Vaste compacte teamregels en inhoudsluitende poulekaders in A/B; 8×3 en 4×4 visueel gecontroleerd, zeven formaten zonder overflow met exacte transferlanding links/rechts en vier presentatietests geslaagd.

@@ -3,17 +3,26 @@ import { calculateGroupLayout, calculateWingDensity, revealDuration, selectionDu
 
 const picture: DrawPresentation = { revealAt: 1000, speed: 1, activePotId: "p1", selection: { targetId: "g1", startedAt: 1000 } };
 describe("Shared draw presentation", () => {
-  it("caps density independently per wing using displayed slot rows", () => {
+  it("selects all five studio profiles from actual wing groups and internal slot rows", () => {
     const groups = (count: number, capacity: number) => Array.from({ length: count }, (_, index) => ({ id: String(index), name: `Groep ${index}`, capacity, teamIds: [], slotIds: [] }));
-    for (const [count, capacity, expected] of [[2, 4, "spacious"], [8, 3, "spacious"], [8, 8, "normal"], [12, 5, "normal"], [6, 12, "compact"], [4, 16, "normal"], [2, 64, "compact"]] as const) {
+    for (const [count, capacity, expected] of [
+      [2, 3, "royal"], [2, 4, "royal"], [2, 5, "royal"],
+      [4, 4, "comfortable"], [2, 6, "comfortable"], [4, 8, "comfortable"],
+      [6, 4, "standard"], [6, 12, "standard"], [4, 16, "standard"], [2, 32, "standard"],
+      [8, 3, "compact"], [8, 4, "compact"], [8, 8, "compact"], [12, 4, "compact"], [12, 5, "compact"],
+      [2, 64, "logo-only"], [16, 6, "logo-only"],
+    ] as const) {
       const containers = groups(count, capacity);
       expect(calculateWingDensity(containers.slice(0, Math.ceil(count / 2)), calculateGroupLayout(containers))).toBe(expected);
     }
     const uneven = groups(5, 6);
     const layout = calculateGroupLayout(uneven);
-    expect(calculateWingDensity(uneven.slice(0, 3), layout)).toBe("compact");
-    expect(calculateWingDensity(uneven.slice(3), layout)).toBe("spacious");
-    expect(calculateWingDensity([], calculateGroupLayout([]))).toBe("spacious");
+    expect(calculateWingDensity(uneven.slice(0, 3), layout)).toBe("standard");
+    expect(calculateWingDensity(uneven.slice(3), layout)).toBe("comfortable");
+    const fiveSmall = groups(5, 4);
+    expect(calculateWingDensity(fiveSmall.slice(0, 3), calculateGroupLayout(fiveSmall))).toBe("standard");
+    expect(calculateWingDensity(fiveSmall.slice(3), calculateGroupLayout(fiveSmall))).toBe("comfortable");
+    expect(calculateWingDensity([], calculateGroupLayout([]))).toBe("royal");
   });
   it("holds the selected group before transferring and clearing the team", () => {
     expect(stageSelection(picture, 1500)).toBe("hold");

@@ -2593,8 +2593,10 @@ posities + statistieken groen */
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
-.draw-show-wing[data-density="spacious"] { --group-slot-height: 2.1cqw; --group-logo-size: 1.7cqw; --group-name-size: .85cqw; }
-.draw-show-wing[data-density="normal"] { --group-slot-height: 2cqw; --group-logo-size: 1.6cqw; --group-name-size: .82cqw; }
+.draw-show-wing[data-density="royal"] { --group-card-width: 21cqw; --group-slot-height: 3.2cqw; --group-logo-size: 2.2cqw; --group-name-size: 1.15cqw; --group-title-size: 1.3cqw; }
+.draw-show-wing[data-density="comfortable"] { --group-card-width: 18.5cqw; --group-slot-height: 2.4cqw; --group-logo-size: 1.8cqw; --group-name-size: .95cqw; --group-title-size: 1.1cqw; }
+.draw-show-wing[data-density="standard"] { --group-card-width: 16.5cqw; --group-slot-height: 2cqw; --group-logo-size: 1.5cqw; --group-name-size: .82cqw; --group-title-size: .95cqw; }
+.draw-show-wing[data-density="compact"] { --group-slot-height: 1.6cqw; --group-logo-size: 1.2cqw; --group-name-size: .7cqw; --group-title-size: .85cqw; }
 .draw-show-group-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .85); border-radius: 8px; background: hsl(var(--card) / .78); box-shadow: inset 0 0 .5cqw hsl(var(--stage-glow) / .12); transition: box-shadow 140ms; }
 .draw-show-group-card h2 { flex-shrink: 0; text-align: center; padding: .75cqw .4cqw; color: hsl(var(--primary)); font-size: 1.1cqw; text-transform: uppercase; font-weight: 700; line-height: 1.3; }
 .draw-show-group-card h2 small { color: hsl(var(--muted-foreground)); font-size: .7cqw; }
@@ -2606,12 +2608,12 @@ posities + statistieken groen */
 .draw-show-group-card.is-placed { box-shadow: inset 0 0 1cqw hsl(var(--stage-glow) / .2), 0 0 1cqw hsl(var(--stage-glow) / .35); }
 .draw-show-wing .draw-show-group-card { min-width: 0; }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card { width: 100%; justify-self: center; }
-.draw-show-layout-A .draw-show-wing .draw-show-group-card[data-team-columns="1"] { width: min(100%, 17cqw); }
+.draw-show-layout-A .draw-show-wing .draw-show-group-card[data-team-columns="1"] { width: min(100%, var(--group-card-width, 16.5cqw)); }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card,
 .draw-show-layout-B .draw-show-wing .draw-show-group-card { align-self: center; height: auto; max-height: 100%; }
 .draw-show-layout-A .draw-show-wing .draw-show-slots,
-.draw-show-layout-B .draw-show-wing .draw-show-slots { flex: none; grid-template-rows: repeat(var(--slot-rows, 1), var(--group-slot-height, 1.8cqw)); gap: .15cqw; padding: .25cqw; }
-.draw-show-wing .draw-show-group-card h2 { padding: .35cqw; font-size: .85cqw; }
+.draw-show-layout-B .draw-show-wing .draw-show-slots { flex: 0 1 auto; height: calc(var(--slot-rows, 1) * var(--group-slot-height, 1.8cqw) + (var(--slot-rows, 1) - 1) * .15cqw + .5cqw); grid-template-rows: repeat(var(--slot-rows, 1), minmax(0, 1fr)); gap: .15cqw; padding: .25cqw; }
+.draw-show-wing .draw-show-group-card h2 { padding: .35cqw; font-size: var(--group-title-size, .85cqw); }
 .draw-show-layout-A .draw-show-wing .draw-show-group-card h2,
 .draw-show-layout-B .draw-show-wing .draw-show-group-card h2 { padding-block: .3cqw; }
 .draw-show-wing .draw-show-slot { display: grid; grid-template-columns: minmax(0, var(--group-logo-size, 1.5cqw)) minmax(0, 1fr); gap: .3cqw; padding: .15cqw .25cqw; }
