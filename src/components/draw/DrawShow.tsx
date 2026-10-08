@@ -61,7 +61,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const potGridStyle = { "--pot-columns": potColumns, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-name-lines": potColumns > 4 ? 3 : 2, "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
   const splitAt = Math.ceil((session?.containers.length ?? 0) / 2);
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
-    <section key={container.id} data-group-id={container.id} className={`draw-show-group-card ${container.id === selectedId || container.id === activeSpotlight || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
+    <section key={container.id} data-group-id={container.id} data-team-columns={layout.teamColumns} style={{ "--group-slot-rows": Math.max(1, Math.ceil(container.capacity / layout.teamColumns)) } as CSSProperties} className={`draw-show-group-card ${container.id === selectedId || container.id === activeSpotlight || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
       <h2>{container.name}</h2>
       <div className="draw-show-slots" style={{ "--slot-columns": layout.teamColumns, "--slot-rows": Math.max(1, Math.ceil(container.capacity / layout.teamColumns)) } as CSSProperties}>
         {Array.from({ length: container.capacity }, (_, index) => {

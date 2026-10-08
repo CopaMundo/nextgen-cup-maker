@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Enkelkoloms poulekaders compact en horizontaal centreren; één kader per vleugel verticaal centreren en transferdoelen na herschaling controleren.
 - [x] Automatische poule-layout A/B/C: 8×8 en 12×4 kiezen B; 6×12 en 4×16 kiezen A; 2×64 en 16×6 kiezen C. Zestien tests en zes voorbeeldpodiums zonder afgekapte namen, overflow of afwijkende transferdoelen gecontroleerd.
 - [x] Live loting: losse linkerteamkaarten, maximaal tien badges per rij, vaste gecentreerde wedstrijdrijen en groepsloting behouden boven twintig speelrondes met automatische wedstrijdgeneratie; schermcontrole met voorbeeldteams bij 4/10/11/20 en keuzescherm bij 21 rondes. Echte aangemelde regie-beamercontrole niet beschikbaar: geen gekoppeld testaccount.
 - [x] Schuifbalk bij lange teamlijsten verwijderd; rustige loop bij normale beweging en pagina-overgangen bij verminderde beweging. Balonthulling hersteld met openen of rustige vervaging. Zestien tests en schermcontroles met 24 voorbeeldteams in beide bewegingsstanden geslaagd.
