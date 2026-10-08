@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Poulekaders verfijnen: tekst maximaal .85cqw, bescheiden logo’s/slots en enkelkolomskaders 17cqw; centrering en transfer controleren.
+- [x] Poulekaders verfijnd: tekst maximaal .85cqw, bescheiden logo’s/slots en enkelkolomskaders 17cqw; negen voorbeeldformaten zonder slot-overflow en met exacte transferdoelen links/rechts gecontroleerd, vijf tests geslaagd.
 - [x] Getrapte dichtheid per groepsvleugel met begrensde grotere logo’s/namen; vijf tests en negen voorbeeldformaten links/rechts gecontroleerd zonder slot-overflow en met exacte transferdoelen. Kaders blijven inhoudsluitend en gecentreerd.
 - [x] Vaste compacte teamregels en inhoudsluitende poulekaders in A/B; 8×3 en 4×4 visueel gecontroleerd, zeven formaten zonder overflow met exacte transferlanding links/rechts en vier presentatietests geslaagd.
 - [x] Vleugels onafhankelijk verticaal gecentreerd met compacte kaarthoogtes; 5×4, 3×4, 4×8, 6×12 en 4×16 plus exacte transferlanding links/rechts gecontroleerd. Vier presentatietests geslaagd.
