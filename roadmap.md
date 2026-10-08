@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Vleugels onafhankelijk verticaal centreren met compacte kaarthoogtes; 5×4 en transferlanding links/rechts controleren.
 - [x] Enkelkoloms poulekaders compact (13.5cqw) en horizontaal gecentreerd; één kader per vleugel verticaal gecentreerd. Negen voorbeeldformaten en exacte transferlanding gecontroleerd; vier presentatietests geslaagd.
 - [x] Automatische poule-layout A/B/C: 8×8 en 12×4 kiezen B; 6×12 en 4×16 kiezen A; 2×64 en 16×6 kiezen C. Zestien tests en zes voorbeeldpodiums zonder afgekapte namen, overflow of afwijkende transferdoelen gecontroleerd.
 - [x] Live loting: losse linkerteamkaarten, maximaal tien badges per rij, vaste gecentreerde wedstrijdrijen en groepsloting behouden boven twintig speelrondes met automatische wedstrijdgeneratie; schermcontrole met voorbeeldteams bij 4/10/11/20 en keuzescherm bij 21 rondes. Echte aangemelde regie-beamercontrole niet beschikbaar: geen gekoppeld testaccount.
