@@ -2612,8 +2612,8 @@ posities + statistieken groen */
 .draw-show-layout-A .draw-show-slots[style*="--slot-columns: 2"] .draw-show-slot-name,
 .draw-show-layout-B .draw-show-slot-name { font-size: .7cqw; }
 .draw-show-layout-C .draw-show-slots { grid-auto-flow: row; gap: .22cqw; }
-.draw-show-layout-C .draw-show-wing .draw-show-slot { display: flex; justify-content: center; padding: .15cqw; border-color: hsl(var(--primary) / .5); }
-.draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: auto; height: 90%; max-width: 100%; flex: 0 1 auto; border-color: hsl(var(--primary) / .65); }
+.draw-show-layout-C .draw-show-wing .draw-show-slot { display: flex; justify-content: center; padding: .15cqw; border-color: hsl(var(--primary) / .5); container-type: size; }
+.draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; max-width: 100%; flex: 0 0 auto; font-size: 30cqmin; border-color: hsl(var(--primary) / .65); }
 .draw-show-center { position: absolute; z-index: 5; top: 39%; left: 29%; width: 42%; height: 10%; }
 .draw-show-team-card { display: flex; height: 100%; width: 100%; align-items: center; justify-content: center; padding: .7cqw 1.7cqw; }
 .draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; overflow: hidden; }
