@@ -282,7 +282,7 @@ const LiveDrawDialog = ({
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: picture as unknown as never }, { onConflict: "phase_id" });
       if (error) console.warn("Live loting niet gesynchroniseerd", error.message);
     });
-  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, showOptions.theme, selectedPotId, tournamentId, tournamentName, phaseId, categoryId]);
+  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, showOptions.theme, selectedPotId, tournamentId, tournamentName, tournamentLogo, phaseId, categoryId]);
 
   useEffect(() => {
     if (open && step === "draw") return;
