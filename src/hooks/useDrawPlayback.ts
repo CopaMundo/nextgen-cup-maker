@@ -26,9 +26,11 @@ export function useDrawPlayback(incoming: StagePicture) {
     if (!active.current && queue.current.length) {
       const picture = queue.current.shift();
       const nextKey = picture && eventKey(picture);
-      if (picture && nextKey) active.current = { key: nextKey, picture, elapsed: 0, speed: picture.presentation?.speed ?? 1 };
+      if (picture && nextKey) {
+        active.current = { key: nextKey, picture, elapsed: 0, speed: picture.presentation?.speed ?? 1 };
+        redraw((value) => value + 1);
+      }
     }
-    redraw((value) => value + 1);
   }, [incoming.session, incoming.presentation, incoming.spotlightId]);
 
   useLayoutEffect(() => {

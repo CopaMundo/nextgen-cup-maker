@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useDrawPlayback } from "@/hooks/useDrawPlayback";
 import type { DrawSessionState } from "@/lib/drawSession";
-import { calculateGroupLayout, calculateWingDensity, revealDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { calculateGroupLayout, calculateWingDensity, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
@@ -36,7 +36,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const rounds = presentation?.rounds;
   const selectedId = presentation?.selection?.targetId;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
-  const teamReady = !presentation?.revealAt || now >= presentation.revealAt + revealDuration(presentation.speed);
+  const teamReady = !revealing;
   const last = session?.history[session.history.length - 1];
   const eligible = selectedId ? pending?.options.filter((option) => option.id === selectedId) ?? [] : pending?.options ?? [];
   const layout = calculateGroupLayout(session?.containers ?? []);
