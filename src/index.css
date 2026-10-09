@@ -2667,8 +2667,9 @@ posities + statistieken groen */
 .draw-show-team-logo { width: 3cqw; height: 3cqw; object-fit: contain; flex-shrink: 0; }
 .draw-show-team-identity { display: grid; grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; width: 100%; min-width: 0; align-items: center; padding-inline: 1.4cqw; }
 .draw-show-team-identity strong { grid-column: 2; width: 100%; }
-.draw-show-flag-backdrop { position: absolute; z-index: 0; right: 0; top: 0; display: grid; place-items: center; width: 42%; height: 100%; pointer-events: none; opacity: .36; background: hsl(var(--stage-ball-light) / .16); box-shadow: inset 0 0 .35cqw hsl(var(--stage-ball-light) / .22); mask-image: linear-gradient(to right, transparent, hsl(var(--foreground)) 55%); }
-.draw-show-flag-backdrop .draw-show-flag { display: block; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; object-fit: cover; object-position: right center; filter: drop-shadow(0 0 .08cqw hsl(var(--stage-ball-light) / .8)); }
+.draw-show-flag-backdrop { position: absolute; z-index: 0; right: 0; top: 0; display: grid; place-items: center; width: 42%; height: 100%; overflow: hidden; pointer-events: none; opacity: .36; background: hsl(var(--stage-ball-light) / .16); box-shadow: inset 0 0 .35cqw hsl(var(--stage-ball-light) / .22); mask-image: linear-gradient(to right, transparent, hsl(var(--foreground)) 55%); }
+/* Twemoji flags have a 30 × 26 drawing inside a 36 × 36 viewBox: remove its transparent inset. */
+.draw-show-flag-backdrop .draw-show-flag { position: absolute; display: block; left: -10%; top: -19.23%; width: 120%; height: 138.46%; max-width: none; max-height: none; margin: 0; padding: 0; object-fit: fill; filter: drop-shadow(0 0 .08cqw hsl(var(--stage-ball-light) / .8)); }
 .draw-show-balls-canvas { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
 .draw-show-reveal-logo, .draw-show-team strong { filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; color: hsl(var(--foreground)); font-size: 1.6cqw; line-height: 1.2; text-align: center; text-shadow: 0 1px 3px hsl(var(--background)); }
