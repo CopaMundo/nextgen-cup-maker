@@ -5,9 +5,11 @@ import { calculateGroupLayout, calculateWingDensity, drawOverviewPage, stageSele
 import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
+import { countryToFlagUrl } from "@/lib/countryFlags";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import { studioFor } from "@/lib/drawStudio";
+import { DrawBalls } from "@/components/draw/DrawBalls";
 
 import { drawHeading } from "@/lib/drawHeading";
 
@@ -63,7 +65,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const pending = session?.pending;
   const rounds = presentation?.rounds;
   const selectedId = presentation?.selection?.targetId;
-  const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={country} className="draw-show-flag" /></span> : null;
+  const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><svg className="draw-show-flag" viewBox="3 5 30 26" preserveAspectRatio="none"><image href={countryToFlagUrl(country) ?? undefined} width="36" height="36" /></svg></span> : null;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
   const teamReady = !revealing;
   const last = session?.history[session.history.length - 1];
@@ -184,16 +186,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       </main>
       {selectionPhase === "transfer" && team && <div className="draw-show-transfer" key={`${team.id}-${selectedId}`}><div className="draw-transfer-reveal">{teamContent}</div><div className="draw-transfer-slot">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span>{layout.mode !== "C" && <span className="draw-show-slot-name">{team.name}</span>}</div></div>}
       <div className="draw-show-bowl-sheen" aria-hidden="true" />
-      <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}>
-        {remainingIds.map((id, index) => {
-          const columns = remainingIds.length > 49 ? 10 : 5;
-          const row = Math.floor(index / columns);
-          const column = index % columns;
-          const totalRows = Math.ceil(remainingIds.length / columns);
-          return <span key={id} className="draw-show-bowl-ball" style={{ left: `${24 + column * 52 / columns + (row % 2 ? 2 : 0)}%`, top: `${84 - row * Math.min(11, 40 / totalRows)}%`, "--drift-delay": `${-index * .37}s`, "--ball-size": remainingIds.length > 49 ? ".65cqw" : "1.15cqw", zIndex: index + 1 } as CSSProperties} />;
-        })}
-      </div>
-      {pending && revealing && <span key={`flight-${revealKey}`} className="draw-show-flying-ball" aria-hidden="true"><span className="draw-ball-half draw-ball-left" /><span className="draw-ball-half draw-ball-right" /></span>}
+      <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`} />
+      <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
       <svg className="draw-show-pot-label" viewBox="0 0 600 100" role="img" aria-label={footLabel}><defs><path id={`${ledArcId}-pot`} d="M 20 46 Q 300 90 580 46" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-pot`} startOffset="50%">{footLabel}</textPath></text></svg><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{visiblePotIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
     </>}
     {controls}
