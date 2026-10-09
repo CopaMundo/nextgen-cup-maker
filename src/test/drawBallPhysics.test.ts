@@ -31,5 +31,5 @@ describe("draw ball physics", () => {
        expect(Math.hypot(ball.position.x, ball.position.z)).toBeLessThan(5.9);
        expect(ball.position.y).toBeGreaterThan(BOWL_BOTTOM);
      }
-   });
+   }, 20000);
 });

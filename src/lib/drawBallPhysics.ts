@@ -1,4 +1,4 @@
-import { Body, Material, ContactMaterial, Sphere, Trimesh, Vec3, World } from "cannon-es";
+import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
 
 export const BOWL_BOTTOM = -14.05;
 export const BOWL_RADIUS = 5.9;
@@ -7,6 +7,7 @@ export const bowlHeight = (radius: number) => BOWL_BOTTOM + .025 * radius * radi
 /** A hidden concave bowl: real sphere contacts, gravity, rolling and settling. */
 export function createDrawBallWorld(ids: string[]) {
   const world = new World({ gravity: new Vec3(0, -25, 0), allowSleep: true });
+  world.broadphase = new SAPBroadphase(world);
   const material = new Material("draw-ball");
   world.addContactMaterial(new ContactMaterial(material, material, { friction: .32, restitution: .13 }));
   const vertices: number[] = [];
