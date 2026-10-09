@@ -30,7 +30,8 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); callba
 
 describe("Uninterrupted team reveal playback", () => {
   it.each([.5, 1, 3])("starts delayed pictures at the bowl and completes at speed %s", (speed) => {
-    const { result } = renderHook(() => useDrawPlayback(picture("a", Date.now() - 10000, speed)));
+    const input = picture("a", Date.now() - 10000, speed);
+    const { result } = renderHook(() => useDrawPlayback(input));
     expect(result.current.revealElapsed).toBe(0);
     expect(result.current.revealing).toBe(true);
     advance(1100 / speed);
