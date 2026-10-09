@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
 import { createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
 
@@ -73,9 +73,8 @@ export function DrawBalls(props: Props) {
   if (props.teamIds.length > generation.current.count) generation.current.key++;
   generation.current.count = props.teamIds.length;
   return <div ref={host} className="draw-show-balls-canvas" aria-hidden="true">
-    {palette && <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 1, near: .1, far: 200 }} dpr={[1, 1.5]} gl={{ alpha: true, antialias: true }} onCreated={({ camera, size }) => {
-      if ("left" in camera) { const ortho = camera as import("three").OrthographicCamera; ortho.left = -50; ortho.right = 50; ortho.top = 28.125; ortho.bottom = -28.125; ortho.updateProjectionMatrix(); }
-    }}>
+    {palette && <Canvas dpr={[1, 1.5]} gl={{ alpha: true, antialias: true }}>
+      <OrthographicCamera makeDefault manual position={[0, 0, 100]} left={-50} right={50} top={28.125} bottom={-28.125} near={.1} far={200} />
       <BallScene key={generation.current.key} {...props} palette={palette} />
     </Canvas>}
   </div>;
