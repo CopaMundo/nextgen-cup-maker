@@ -875,7 +875,7 @@ const LiveDrawDialog = ({
           </Popover>
         </aside>
       </>} />
-      <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope={activePotChoice ? "pot" : undefined} onCurrent={() => scopeAction === "reset" ? resetCurrentPot() : handleDrawAll(true)} onAll={() => scopeAction === "reset" ? handleReset() : handleDrawAll()} />
+      <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope={activePotChoice ? "pot" : session.containers.length === 1 ? "groep" : undefined} onCurrent={() => scopeAction === "reset" ? activePotChoice ? resetCurrentPot() : handleReset() : handleDrawAll(true)} onAll={() => scopeAction === "reset" ? handleReset() : handleDrawAll()} />
     </div>
   );
 
