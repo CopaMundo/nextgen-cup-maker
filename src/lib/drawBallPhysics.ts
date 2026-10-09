@@ -5,7 +5,7 @@ export const BOWL_RADIUS = 5.9;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .025 * radius * radius + .004 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
-export const drawBallRadius = (count: number) => Math.max(.62, Math.min(2.1, 7.5 / Math.sqrt(count + 8)));
+export const drawBallRadius = (count: number) => Math.max(.54, Math.min(1.8, 6.4 / Math.sqrt(count + 8)));
 
 /** A hidden concave bowl: real sphere contacts, gravity, rolling and settling. */
 export function createDrawBallWorld(ids: string[]) {

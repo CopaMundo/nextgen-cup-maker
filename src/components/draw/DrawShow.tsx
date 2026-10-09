@@ -180,7 +180,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         <div className="draw-show-wing draw-show-wing-right" data-wing-columns={layout.wingColumns} data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...rightContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{rightContainers.map(renderContainer)}</div>
       </>}
       <main className="draw-show-center">
-        <div className="draw-show-team-card">
+        <div className={`draw-show-team-card ${pending && selectionPhase !== "transfer" && selectionPhase !== "complete" ? "is-active" : ""}`}>
           {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={revealKey ?? pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
         </div>
         {!rounds && pending && selectionPhase !== "complete" && <div className={`draw-show-eligible draw-reveal-name ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": Math.max(1, Math.min(8, eligible.length)) } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}

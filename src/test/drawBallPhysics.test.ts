@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 import { BOWL_BOTTOM, bowlHeight, createDrawBallWorld, drawBallFlight, drawBallRadius } from "@/lib/drawBallPhysics";
 
 describe("draw ball physics", () => {
+  it("slightly reduces the physical and rendered bowl ball radius", () => {
+    expect(drawBallRadius(24)).toBeCloseTo(6.4 / Math.sqrt(32));
+    expect(drawBallRadius(1)).toBe(1.8);
+    expect(drawBallRadius(128)).toBeGreaterThanOrEqual(.54);
+  });
   it("settles spheres above the curved bowl", () => {
     const { balls } = createDrawBallWorld(Array.from({ length: 24 }, (_, i) => String(i)));
     expect(balls.size).toBe(24);

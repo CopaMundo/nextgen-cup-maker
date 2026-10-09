@@ -1,6 +1,6 @@
-import gold from "@/assets/studio-gold-clean-4k.webp.asset.json";
-import blue from "@/assets/studio-blue-clean-4k.webp.asset.json";
-import white from "@/assets/studio-white-clean-4k.webp.asset.json";
+import gold from "@/assets/studio-gold-restored.webp.asset.json";
+import blue from "@/assets/studio-blue-restored.webp.asset.json";
+import white from "@/assets/studio-white-restored.webp.asset.json";
 
 export type DrawStudioTheme = "copa-gold" | "champions-blue" | "platinum-white";
 export const drawStudios = [
