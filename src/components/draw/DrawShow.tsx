@@ -7,7 +7,7 @@ import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
-import liveDrawStage from "@/assets/live-draw-led-studio-4k.webp.asset.json";
+import liveDrawStage from "@/assets/live-draw-led-studio-final-4k.webp.asset.json";
 import copaLogo from "@/assets/copa-mundo-yellow.png.asset.json";
 
 export function DrawShow({ session: incomingSession, spotlightId: incomingSpotlight, presentation: incomingPresentation, controls }: {
