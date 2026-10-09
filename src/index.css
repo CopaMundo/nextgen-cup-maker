@@ -2609,7 +2609,7 @@ posities + statistieken groen */
 .draw-show-led-title text { font-size: 60px; fill: hsl(var(--primary)); }
 .draw-show-led-title .draw-led-measure { opacity: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-weight: 600; text-transform: uppercase; }
 .draw-show-brand { position: absolute; left: 30%; top: 16.9%; width: 40%; height: 3.2%; overflow: visible; pointer-events: none; }
-.draw-show-brand text { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 500; fill: hsl(var(--stage-brand-gold)); }
+.draw-show-brand text { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 32px; font-weight: 500; fill: hsl(var(--stage-brand-gold)); }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }

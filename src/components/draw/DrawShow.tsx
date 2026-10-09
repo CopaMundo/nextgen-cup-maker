@@ -134,7 +134,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
           : <text className="draw-led-lettering" textAnchor="middle"><textPath href={`#${ledArcId}`} startOffset="50%">{presentation?.tournamentName || "COPA MUNDO"}</textPath></text>}</g>
       </svg>
     </header>
-    <svg className="draw-show-brand" viewBox="0 0 1000 80" aria-label="Powered by Copa Mundo"><defs><path id={`${ledArcId}-brand`} d="M 30 25 Q 500 55 970 25" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-brand`} startOffset="50%">POWERED BY COPA MUNDO</textPath></text></svg>
+    <svg className="draw-show-brand" viewBox="0 0 1000 60" aria-label="Powered by Copa Mundo"><defs><path id={`${ledArcId}-brand`} d="M 30 25 Q 500 55 970 25" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-brand`} startOffset="50%">POWERED BY COPA MUNDO</textPath></text></svg>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
