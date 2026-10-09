@@ -2605,7 +2605,7 @@ posities + statistieken groen */
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-led-header { position: absolute; top: 0; left: 30%; width: 40%; height: 22.75%; pointer-events: none; }
+.draw-show-led-header { position: absolute; top: 0; left: 30%; width: 39%; height: 22.75%; pointer-events: none; }
 .draw-show-live-heading { position: absolute; top: 17%; left: 0; width: 100%; text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2cqw; font-weight: 500; line-height: 1.2; letter-spacing: 0; color: hsl(var(--foreground)); }
 .draw-show-led-title { position: absolute; top: 40%; left: 0; width: 100%; height: 34%; display: flex; align-items: center; justify-content: center; overflow: hidden; padding-inline: 1.8cqw; clip-path: polygon(3.8% 0, 96.2% 0, 100% 100%, 0 100%); border: .12cqw solid hsl(var(--border)); background: radial-gradient(circle, hsl(var(--stage-led-dot)) .035cqw, transparent .045cqw) 0 0 / .22cqw .22cqw, hsl(var(--stage-led-surface)); box-shadow: 0 .2cqw .5cqw hsl(var(--background)), inset 0 0 .4cqw hsl(var(--stage-glow) / .2); }
 .draw-led-lettering, .draw-led-measure { display: block; flex-shrink: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2.45cqw; line-height: 1; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: hsl(var(--primary)); }
@@ -2662,7 +2662,6 @@ posities + statistieken groen */
 .draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; max-width: 100%; flex: 0 0 auto; font-size: 30cqmin; border-color: hsl(var(--primary) / .65); }
 .draw-show-center { position: absolute; z-index: 5; top: 39%; left: 29%; width: 42%; height: 10%; }
 .draw-show-team-card { position: relative; isolation: isolate; display: flex; height: 96%; width: calc(100% - .5cqw); margin: 0 auto; align-items: center; justify-content: center; padding: 0; border-radius: var(--draw-identity-radius, .8cqw); overflow: hidden; border: .1cqw solid hsl(var(--primary) / .75); background: linear-gradient(180deg, hsl(var(--stage-ball-light) / .16), transparent 42%), linear-gradient(180deg, hsl(var(--stage-glass) / .92), hsl(var(--background) / .94)); box-shadow: 0 0 1.4cqw hsl(var(--stage-glow) / .35), inset 0 .08cqw 0 hsl(var(--stage-ball-light) / .45), inset 0 -.3cqw .8cqw hsl(var(--background) / .6); }
-.draw-show-team-card:not(.is-active) { visibility: hidden; }
 .draw-show-team-card::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; background: linear-gradient(105deg, transparent 30%, hsl(var(--stage-ball-light) / .12) 48%, transparent 60%); }
 .draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; border-radius: inherit; overflow: hidden; }
 .draw-show-reveal-logo { display: grid; place-items: center; width: 3cqw; height: 3cqw; flex: 0 0 3cqw; }
@@ -2766,14 +2765,23 @@ posities + statistieken groen */
 @keyframes draw-ball-drift { from { transform: translate(-50%, -50%) rotate(-3deg); } to { transform: translate(calc(-50% + .1cqw), calc(-50% - .08cqw)) rotate(3deg); } }
 .draw-transfer-reveal, .draw-transfer-slot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .draw-transfer-reveal { border-radius: inherit; overflow: hidden; animation: draw-transfer-out calc(1250ms / var(--draw-rate)) var(--transfer-offset) linear both; }
-.draw-transfer-slot { gap: .35cqw; padding: .25cqw .45cqw; border-radius: 4px; border: 1px solid hsl(var(--border) / .5); background: hsl(var(--stage-glass) / .65); justify-content: flex-start; overflow: hidden; animation: draw-transfer-in calc(1250ms / var(--draw-rate)) var(--transfer-offset) linear both; }
-.draw-transfer-slot .draw-show-slot-mark { width: var(--landing-logo-size, 1.5cqw); height: var(--landing-logo-size, 1.5cqw); flex-basis: var(--landing-logo-size, 1.5cqw); }
-.draw-transfer-slot .draw-show-slot-name { font-size: var(--landing-name-size, .82cqw); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.draw-transfer-slot { display: grid; grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; padding: 0 1.4cqw; border-radius: inherit; border: 1px solid hsl(var(--border) / .68); background: hsl(var(--stage-glass) / .82); overflow: hidden; animation: draw-transfer-morph calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
+.draw-transfer-slot .draw-show-slot-mark { width: 100%; height: auto; aspect-ratio: 1; max-height: 100%; min-height: 0; animation: draw-transfer-logo calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
+.draw-transfer-slot .draw-show-slot-mark img { animation: draw-transfer-logo-image calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
+.draw-transfer-slot .draw-show-slot-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; animation: draw-transfer-name calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
+.draw-show-transfer.is-logo-only .draw-transfer-slot { animation-name: draw-transfer-morph-logo; }
+.draw-show-transfer.is-logo-only .draw-show-slot-name { animation-name: draw-transfer-name-hide; }
 .draw-show-slot.is-arriving { animation: draw-slot-arrival 1100ms cubic-bezier(.25,.8,.3,1) both; }
 @keyframes draw-team-transfer {
   from { width: 41.5%; height: 9.6%; transform: translate(-50%, -50%); }
-  to { width: var(--transfer-width); height: var(--transfer-height); transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))); }
+  to { width: var(--transfer-width); height: var(--transfer-height); border-radius: 5px; transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))); }
 }
+@keyframes draw-transfer-morph { from { grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; padding: 0 1.4cqw; } to { grid-template-columns: var(--landing-logo-size) minmax(0, 1fr) 0cqw; gap: .3cqw; padding: .25cqw; } }
+@keyframes draw-transfer-morph-logo { from { grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; padding: 0 1.4cqw; } to { grid-template-columns: var(--landing-logo-size) minmax(0, 0fr) 0cqw; gap: 0; padding: .15cqw; justify-content: center; } }
+@keyframes draw-transfer-logo { from { border-color: transparent; background: transparent; border-radius: 0; } to { border-color: hsl(var(--border) / .5); background: hsl(var(--background) / .75); border-radius: 50%; } }
+@keyframes draw-transfer-logo-image { from { width: 100%; height: 100%; } to { width: 72%; height: 72%; } }
+@keyframes draw-transfer-name { from { font-size: 1.6cqw; font-weight: 700; transform: translateX(0); } to { font-size: var(--landing-name-size); font-weight: 600; transform: translateX(0); } }
+@keyframes draw-transfer-name-hide { from { font-size: 1.6cqw; opacity: 1; } to { font-size: var(--landing-name-size); opacity: 0; } }
 @keyframes draw-transfer-out { 0%,30% { opacity: 1; } 75%,100% { opacity: 0; } }
 @keyframes draw-transfer-in { 0%,30% { opacity: 0; } 75%,100% { opacity: 1; } }
 @keyframes draw-slot-arrival { 0% { box-shadow: 0 0 0 hsl(var(--stage-glow) / 0); } 25% { box-shadow: 0 0 .8cqw hsl(var(--stage-glow) / .65), inset 0 0 .5cqw hsl(var(--stage-glow) / .2); border-color: hsl(var(--primary)); } 100% { box-shadow: 0 0 0 hsl(var(--stage-glow) / 0); } }
