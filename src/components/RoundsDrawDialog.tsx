@@ -883,14 +883,14 @@ const RoundsDrawDialog = ({
     session.pending = currentTeamId ? { teamId: currentTeamId, options: [] } : null;
     session.finished = groupDone(activeDraw);
     return { session, spotlightId: null, presentation: {
-      tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, revealAt, speed: animationSpeed, activePotId: currentPot?.id ?? null, selection: null,
+      tournamentName, tournamentLogo, theme: showOptions.theme, flagBackdrops: showOptions.flagBackdrops, language: navigator.language, revealAt, speed: animationSpeed, activePotId: currentPot?.id ?? null, selection: null,
       rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
     } };
-  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, tournamentLogo, revealed, revealTimes, revealAt, showOptions.theme, animationSpeed]);
+  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, tournamentLogo, revealed, revealTimes, revealAt, showOptions.theme, showOptions.flagBackdrops, animationSpeed]);
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
-    const publishedPicture = step === "draw" ? picture : { session: null, presentation: { tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, revealAt: 0, activePotId: null, selection: null } };
+    const publishedPicture = step === "draw" ? picture : { session: null, presentation: { tournamentName, tournamentLogo, theme: showOptions.theme, flagBackdrops: showOptions.flagBackdrops, language: navigator.language, speed: animationSpeed, revealAt: 0, activePotId: null, selection: null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: publishedPicture as unknown as never }, { onConflict: "phase_id" });
@@ -900,7 +900,7 @@ const RoundsDrawDialog = ({
       }
       if (!error) syncFailed.current = false;
     });
-  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId, tournamentName, tournamentLogo, showOptions.theme, animationSpeed]);
+  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId, tournamentName, tournamentLogo, showOptions.theme, showOptions.flagBackdrops, animationSpeed]);
 
   useEffect(() => {
     if (open && (step === "draw" || step === "settings")) return;

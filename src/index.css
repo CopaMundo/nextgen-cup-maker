@@ -2581,7 +2581,8 @@ posities + statistieken groen */
   --stage-glow: 44 100% 58%; --stage-glass: 40 24% 8%;
   --stage-ball: 43 11% 86%; --stage-ball-shade: 38 10% 56%;
   --stage-ball-light: 48 25% 100%;
-  --stage-brand-gold: 45 86% 70%;
+  --stage-metal-light: 48 100% 92%; --stage-metal-main: 44 100% 56%; --stage-metal-dark: 38 92% 32%;
+  --stage-led-surface: 0 0% 3%; --stage-led-dot: 0 0% 13%;
   --stage-bowl-filter: sepia(.65) saturate(1.65) brightness(1.15);
 }
 .draw-show-stage {
@@ -2591,25 +2592,27 @@ posities + statistieken groen */
   color: hsl(var(--foreground)); container-type: size;
 }
 .draw-show-stage[data-studio-theme="champions-blue"] {
-  --stage-bowl-filter: grayscale(1) sepia(.5) hue-rotate(165deg) saturate(1.8) brightness(1.4);
+  --stage-bowl-filter: grayscale(1) sepia(1) hue-rotate(155deg) saturate(3.5) brightness(1.3);
+  --stage-metal-light: 190 100% 90%; --stage-metal-main: 202 100% 58%; --stage-metal-dark: 220 100% 38%;
   --background: 220 65% 5%; --foreground: 205 45% 95%; --card: 220 48% 8%; --border: 207 80% 54%;
   --primary: 202 100% 75%; --muted-foreground: 210 30% 74%; --accent: 212 55% 18%; --stage-glow: 207 100% 60%; --stage-glass: 220 45% 8%;
 }
 .draw-show-stage[data-studio-theme="platinum-white"] {
   --stage-bowl-filter: saturate(0) brightness(1.6) contrast(1.1);
+  --stage-metal-light: 0 0% 100%; --stage-metal-main: 0 0% 80%; --stage-metal-dark: 0 0% 45%;
   --background: 0 0% 5%; --foreground: 0 0% 96%; --card: 0 0% 8%; --border: 0 0% 68%;
   --primary: 0 0% 90%; --muted-foreground: 0 0% 73%; --accent: 0 0% 20%; --stage-glow: 0 0% 85%; --stage-glass: 0 0% 8%;
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-led-header { position: absolute; top: 0; left: 30%; width: 40%; height: 22.75%; pointer-events: none; }
+.draw-show-led-header { position: absolute; top: 0; left: 27%; width: 46%; height: 22.75%; pointer-events: none; }
 .draw-show-live-heading { position: absolute; top: 17%; left: 0; width: 100%; text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2cqw; font-weight: 500; line-height: 1.2; letter-spacing: 0; color: hsl(var(--foreground)); }
-.draw-show-led-title { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.draw-led-lettering { display: block; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-weight: 600; text-transform: uppercase; }
-.draw-show-led-title text { font-size: 60px; fill: hsl(var(--primary)); }
-.draw-show-led-title .draw-led-measure { opacity: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-weight: 600; text-transform: uppercase; }
-.draw-show-brand { position: absolute; left: 30%; top: 16.9%; width: 40%; height: 3.2%; overflow: visible; pointer-events: none; }
-.draw-show-brand text { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 32px; font-weight: 500; fill: hsl(var(--stage-brand-gold)); }
+.draw-show-led-title { position: absolute; top: 40%; left: 0; width: 100%; height: 34%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: .12cqw solid hsl(var(--border)); background: radial-gradient(circle, hsl(var(--stage-led-dot)) .035cqw, transparent .045cqw) 0 0 / .22cqw .22cqw, hsl(var(--stage-led-surface)); box-shadow: 0 .2cqw .5cqw hsl(var(--background)), inset 0 0 .4cqw hsl(var(--stage-glow) / .2); }
+.draw-led-lettering, .draw-led-measure { display: block; flex-shrink: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2.45cqw; line-height: 1; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: hsl(var(--primary)); }
+.draw-led-measure { position: absolute; visibility: hidden; }
+.draw-led-loop { position: absolute; left: 0; display: flex; align-items: center; gap: 4.8cqw; width: max-content; animation: draw-led-horizontal var(--led-duration) linear infinite; }
+@keyframes draw-led-horizontal { to { transform: translateX(calc(-1 * var(--led-period))); } }
+.draw-show-brand { position: absolute; left: 30%; top: 18.5%; width: 40%; height: 3.2%; text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 1.05cqw; font-weight: 700; line-height: 1.4; background: linear-gradient(to bottom, hsl(var(--stage-metal-light)) 10%, hsl(var(--stage-metal-main)) 40%, hsl(var(--stage-metal-dark)) 52%, hsl(var(--stage-metal-light)) 72%, hsl(var(--stage-metal-main)) 90%); background-clip: text; color: transparent; filter: drop-shadow(0 1px 1px hsl(var(--background))); pointer-events: none; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
@@ -2664,15 +2667,15 @@ posities + statistieken groen */
 .draw-show-team-logo { width: 3cqw; height: 3cqw; object-fit: contain; flex-shrink: 0; }
 .draw-show-team-identity { display: grid; grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; width: 100%; min-width: 0; align-items: center; padding-inline: 1.4cqw; }
 .draw-show-team-identity strong { grid-column: 2; width: 100%; }
-.draw-show-flag-backdrop { position: absolute; right: 0; top: 0; display: grid; place-items: center; width: 3.7cqw; height: 100%; pointer-events: none; opacity: .65; }
-.draw-show-flag-backdrop .draw-show-flag { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
+.draw-show-flag-backdrop { position: absolute; z-index: -1; right: 0; top: 0; display: grid; place-items: center; width: 42%; height: 100%; pointer-events: none; opacity: .22; mask-image: linear-gradient(to right, transparent, hsl(var(--foreground)) 55%); }
+.draw-show-flag-backdrop .draw-show-flag { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: cover; object-position: center; }
 .draw-show-reveal-logo, .draw-show-team strong { filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; color: hsl(var(--foreground)); font-size: 1.6cqw; line-height: 1.2; text-align: center; text-shadow: 0 1px 3px hsl(var(--background)); }
 /* The four-row eligibility budget ends above the bowl, regardless of label length. */
 .draw-show-eligible { position: absolute; top: 112%; width: 100%; height: 5.6cqw; overflow: hidden; }
 .draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, 1fr)); gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
 .draw-show-eligible-groups span { min-width: 0; height: 1.2cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.draw-show-bowl-sheen { position: absolute; inset: 0; background: inherit; pointer-events: none; filter: var(--stage-bowl-filter); clip-path: polygon(42.85% 62.05%, 44.9% 61.45%, 50% 61.3%, 55.1% 61.45%, 57.15% 62.05%, 56.85% 66.4%, 55.55% 70.9%, 53.2% 74.35%, 51.6% 76%, 48.4% 76%, 46.8% 74.35%, 44.45% 70.9%, 43.15% 66.4%); }
+.draw-show-bowl-sheen { position: absolute; inset: 0; background: inherit; pointer-events: none; filter: var(--stage-bowl-filter); clip-path: polygon(42.7% 61.9%, 44.9% 61.25%, 50% 61.1%, 55.1% 61.25%, 57.3% 61.9%, 57.05% 66.6%, 55.75% 71.15%, 53.4% 74.8%, 51.8% 76.4%, 48.2% 76.4%, 46.6% 74.8%, 44.25% 71.15%, 42.95% 66.6%); }
 .draw-show-eligible-groups .is-spotlight { background: hsl(var(--accent)); box-shadow: 0 0 1.2cqw hsl(var(--stage-glow) / .65); border-color: hsl(var(--primary)); }
 .draw-show-bowl { position: absolute; left: 44.8%; top: 62.5%; width: 10.4%; height: 12.5%; pointer-events: none; }
 .draw-show-bowl-ball { position: absolute; width: var(--ball-size, 1.7cqw); aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
@@ -2768,3 +2771,10 @@ posities + statistieken groen */
 @keyframes draw-transfer-in { 0%,40% { opacity: 0; } 85%,100% { opacity: 1; } }
 @keyframes draw-slot-arrival { 0%,35% { box-shadow: 0 0 .8cqw hsl(var(--stage-glow) / .65), inset 0 0 .5cqw hsl(var(--stage-glow) / .2); border-color: hsl(var(--primary)); } 100% { box-shadow: 0 0 0 hsl(var(--stage-glow) / 0); } }
 /* The live draw is a projected show: the ball flight, split and roster loop always animate, regardless of OS motion settings. */
+
+.draw-show-slot { position: relative; isolation: isolate; }
+.draw-transfer-reveal, .draw-transfer-slot { isolation: isolate; }
+.draw-show-team-identity, .draw-show-slot > :not(.draw-show-flag-backdrop), .draw-transfer-slot > :not(.draw-show-flag-backdrop) { position: relative; z-index: 1; }
+.draw-show-eligible.has-selection { display: flex; justify-content: center; }
+.draw-show-eligible.has-selection .draw-show-eligible-groups { display: block; width: auto; max-width: 12cqw; }
+.draw-show-eligible.has-selection .draw-show-eligible-groups span { display: block; height: auto; min-height: 1.35cqw; padding: .18cqw .8cqw; border-radius: 100px; font-size: .62cqw; line-height: 1.2; box-shadow: none; }

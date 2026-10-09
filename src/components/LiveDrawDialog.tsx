@@ -276,13 +276,13 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
-    const picture = { session: step === "draw" ? session : null, spotlightId, presentation: { ...presentation, tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: session?.pending ? session.activePotId : activePotChoice?.id ?? null } };
+    const picture = { session: step === "draw" ? session : null, spotlightId, presentation: { ...presentation, tournamentName, tournamentLogo, theme: showOptions.theme, flagBackdrops: showOptions.flagBackdrops, language: navigator.language, speed: animationSpeed, activePotId: session?.pending ? session.activePotId : activePotChoice?.id ?? null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: picture as unknown as never }, { onConflict: "phase_id" });
       if (error) console.warn("Live loting niet gesynchroniseerd", error.message);
     });
-  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, showOptions.theme, selectedPotId, tournamentId, tournamentName, tournamentLogo, phaseId, categoryId]);
+  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, showOptions.theme, showOptions.flagBackdrops, selectedPotId, tournamentId, tournamentName, tournamentLogo, phaseId, categoryId]);
 
   useEffect(() => {
     if (open && step === "draw") return;
@@ -852,7 +852,7 @@ const LiveDrawDialog = ({
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
     <div ref={directorRef} className="draw-control-stage">
-      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
+      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, tournamentLogo, theme: showOptions.theme, flagBackdrops: showOptions.flagBackdrops, language: navigator.language, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
         <div className="draw-control-primary">
           {session.finished ? <Button onClick={applyDraw} disabled={applying} className="draw-scene-button"><Check />Indeling toepassen</Button>
             : <Button className="draw-scene-button" disabled={sceneBusy || (Boolean(pending) && !pending?.options.length)} onClick={() => pending ? drawGroup() : handleDrawNext()}><Shuffle />{pending ? "Loot groep" : "Trek team"}</Button>}

@@ -5,6 +5,7 @@ export interface DrawPresentation {
   tournamentName?: string;
   tournamentLogo?: string;
   theme?: DrawStudioTheme;
+  flagBackdrops?: boolean;
   language?: string;
   revealAt: number;
   speed: number;

@@ -14,12 +14,13 @@ export function studioFor(theme?: string) {
 export interface DrawShowOptions {
   theme: DrawStudioTheme;
   speed: number;
+  flagBackdrops: boolean;
 }
-export const defaultShowOptions: DrawShowOptions = { theme: "copa-gold", speed: 1 };
+export const defaultShowOptions: DrawShowOptions = { theme: "copa-gold", speed: 1, flagBackdrops: true };
 
 export function readShowOptions(phaseId: string): DrawShowOptions {
   try {
     const saved = JSON.parse(localStorage.getItem(`copa-draw-show:${phaseId}`) ?? "null");
-    return { theme: studioFor(saved?.theme).id, speed: [.75, 1, 1.5].includes(saved?.speed) ? saved.speed : 1 };
+    return { theme: studioFor(saved?.theme).id, speed: [.75, 1, 1.5].includes(saved?.speed) ? saved.speed : 1, flagBackdrops: saved?.flagBackdrops !== false };
   } catch { return defaultShowOptions; }
 }
