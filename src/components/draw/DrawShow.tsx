@@ -116,7 +116,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     </section>
   );
    const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span>{team.country && <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={team.country} className="draw-show-flag" /></span>}</>;
-  const footLabel = rounds?.groupName ?? activePot?.name ?? session?.containers.find((container) => container.id === (selectedId ?? last?.targetId))?.name ?? session?.containers.find((container) => container.teamIds.length < container.capacity)?.name ?? session?.containers[0]?.name ?? session?.phaseName;
+   const footLabel = rounds ? `${rounds.groupName}${activePot ? ` · ${activePot.name}` : ""}` : activePot?.name ?? session?.phaseName;
+   const drawnCount = potTeamIds.filter((id) => rounds ? rounds.drawnTeamIds.includes(id) : !session?.remaining.includes(id)).length;
   const speed = presentation?.speed ?? 1;
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
@@ -125,16 +126,14 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     <header className="draw-show-led-header">
       <div className="draw-show-live-heading">{heading}</div>
       <svg className="draw-show-led-title" viewBox="0 0 1000 320" role="img" aria-label={presentation?.tournamentName || "COPA MUNDO"}>
-        <defs><path id={ledArcId} d="M 30 175 Q 500 235 970 175" /><path id={`${ledArcId}-brand`} d="M 30 195 Q 500 255 970 195" /><clipPath id={`${ledArcId}-clip`}><rect x={presentation?.tournamentLogo ? 160 : 20} y="115" width={presentation?.tournamentLogo ? 820 : 960} height="130" /></clipPath></defs>
+        <defs><path id={ledArcId} d="M 30 215 C 150 178 300 177 500 177 C 700 177 850 178 970 215" /><path id={`${ledArcId}-brand`} d="M 30 253 C 200 226 350 225 500 225 C 650 225 800 226 970 253" /><clipPath id={`${ledArcId}-clip`}><rect x="30" y="110" width="940" height="112" /></clipPath></defs>
         <text ref={ledTitleRef} className="draw-led-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</text>
-        <g clipPath={`url(#${ledArcId}-clip)`}>{ledLength > (presentation?.tournamentLogo ? 760 : 900) ? [0, 1].map((copy) => <text key={`${presentation?.tournamentName}-${copy}`} className="draw-led-lettering" data-led-scrolling="true"><textPath href={`#${ledArcId}`} startOffset={copy * (ledLength + 100)}>{presentation?.tournamentName || "COPA MUNDO"}<animate attributeName="startOffset" from={String(copy * (ledLength + 100))} to={String((copy - 1) * (ledLength + 100))} dur={`${(ledLength + 100) / 65}s`} repeatCount="indefinite" /></textPath></text>)
-          : <text className="draw-led-lettering" textAnchor="middle"><textPath href={`#${ledArcId}`} startOffset={presentation?.tournamentLogo ? "57%" : "50%"}>{presentation?.tournamentName || "COPA MUNDO"}</textPath></text>}</g>
+        <g clipPath={`url(#${ledArcId}-clip)`}>{ledLength > 900 ? <text key={presentation?.tournamentName} className="draw-led-lettering" data-led-scrolling="true"><textPath href={`#${ledArcId}`} startOffset="0">{`${presentation?.tournamentName || "COPA MUNDO"}\u00a0\u00a0\u00a0\u00a0${presentation?.tournamentName || "COPA MUNDO"}\u00a0\u00a0\u00a0\u00a0${presentation?.tournamentName || "COPA MUNDO"}`}<animate attributeName="startOffset" from="0" to={String(-(ledLength + 4 * 64 * .6))} dur={`${(ledLength + 4 * 64 * .6) / 65}s`} calcMode="linear" repeatCount="indefinite" /></textPath></text>
+          : <text className="draw-led-lettering" textAnchor="middle"><textPath href={`#${ledArcId}`} startOffset="50%">{presentation?.tournamentName || "COPA MUNDO"}</textPath></text>}</g>
         <text className="draw-led-powered" textAnchor="middle"><textPath href={`#${ledArcId}-brand`} startOffset="50%">POWERED BY COPA MUNDO</textPath></text>
       </svg>
-      {presentation?.tournamentLogo && <div className="draw-show-tournament-led-logo"><AutoTrimLogo src={presentation.tournamentLogo} /></div>}
     </header>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
-      <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
           <h2>{rounds.groupName}{session.mode === "pots" && <small> · {activePot?.name ?? session.pots[0]?.name}</small>}</h2>
@@ -177,7 +176,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         <div className="draw-show-team-card">
           {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={revealKey ?? pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
         </div>
-        {!rounds && pending && selectionPhase !== "complete" && <div className="draw-show-eligible draw-reveal-name"><div className="draw-show-eligible-groups">{eligible.map((option) => <span key={option.id} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
+        {!rounds && pending && selectionPhase !== "complete" && <div className="draw-show-eligible draw-reveal-name"><div className="draw-show-eligible-groups" style={{ "--eligible-columns": Math.max(1, Math.min(8, eligible.length)) } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
       </main>
       {selectionPhase === "transfer" && team && <div className="draw-show-transfer" key={`${team.id}-${selectedId}`}><div className="draw-transfer-reveal">{teamContent}</div><div className="draw-transfer-slot"><span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span>{layout.mode !== "C" && <span className="draw-show-slot-name">{team.name}</span>}</div></div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}>
