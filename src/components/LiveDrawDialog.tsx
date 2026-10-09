@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useDrawTournamentLogo } from "@/hooks/useDrawTournamentLogo";
+import { DrawScopeConfirm } from "@/components/draw/DrawScopeConfirm";
 import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
@@ -105,6 +107,8 @@ const LiveDrawDialog = ({
 }) => {
   const isRounds = phaseMatchType === "rounds";
   const tournamentName = useDrawTournamentName(tournamentId, open);
+  const tournamentLogo = useDrawTournamentLogo(tournamentId, open);
+  const [scopeAction, setScopeAction] = useState<"reset" | "complete" | null>(null);
   const { toast } = useToast();
   const [step, setStep] = useState<Step>("method");
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -272,7 +276,7 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
-    const picture = { session: step === "draw" ? session : null, spotlightId, presentation: { ...presentation, tournamentName, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: session?.pending ? session.activePotId : activePotChoice?.id ?? null } };
+    const picture = { session: step === "draw" ? session : null, spotlightId, presentation: { ...presentation, tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: session?.pending ? session.activePotId : activePotChoice?.id ?? null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: picture as unknown as never }, { onConflict: "phase_id" });
@@ -513,9 +517,36 @@ const LiveDrawDialog = ({
     setSession(drawNext(next, undefined, activePotChoice?.id));
   };
   const handleUndo = () => { if (session && !rolling && !revealing) { setPresentation((previous) => ({ ...previous, selection: null })); setSession(undoLast(session)); } };
-  const handleDrawAll = () => { if (session && !rolling && !revealing) setSession(drawAll(session)); };
+  const handleDrawAll = (currentPotOnly = false) => {
+    if (!session || rolling || revealing) return;
+    if (!currentPotOnly || !activePotChoice) setSession(drawAll(session));
+    else {
+      let next = session;
+      for (let i = 0; i <= activePotChoice.teamIds.length; i++) {
+        if (next.pending) next = confirmPending(next);
+        const id = activePotChoice.teamIds.find((teamId) => next.remaining.includes(teamId));
+        if (!id) break;
+        next = drawNext(next, id, activePotChoice.id);
+        if (!next.pending?.options.length) break;
+      }
+      if (next.pending) next = confirmPending(next);
+      setSession(next);
+    }
+    setPresentation((previous) => ({ ...previous, revealAt: 0, selection: null, sweep: null }));
+    setScopeAction(null);
+  };
+  const resetCurrentPot = () => {
+    if (!session || !activePotChoice) return;
+    const ids = new Set(activePotChoice.teamIds);
+    const removed = session.history.filter((entry) => ids.has(entry.teamId));
+    setSession({ ...session, containers: session.containers.map((c) => ({ ...c, teamIds: c.teamIds.filter((id) => !removed.some((entry) => entry.teamId === id)) })), history: session.history.filter((entry) => !ids.has(entry.teamId)), log: session.log.filter((_, i) => !ids.has(session.history[i]?.teamId)), remaining: [...new Set([...session.remaining, ...removed.map((entry) => entry.teamId)])], pending: null, finished: false, activePotId: activePotChoice.id });
+    setPresentation((previous) => ({ ...previous, revealAt: 0, selection: null, sweep: null }));
+    setScopeAction(null);
+  };
   const handleReset = () => {
     setShowResetConfirm(false);
+    setScopeAction(null);
+    setPresentation((previous) => ({ ...previous, revealAt: 0, selection: null, sweep: null }));
     startDraw();
   };
 
@@ -821,17 +852,17 @@ const LiveDrawDialog = ({
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
     <div ref={directorRef} className="draw-control-stage">
-      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
+      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
         <div className="draw-control-primary">
           {session.finished ? <Button onClick={applyDraw} disabled={applying} className="draw-scene-button"><Check />Indeling toepassen</Button>
             : <Button className="draw-scene-button" disabled={sceneBusy || (Boolean(pending) && !pending?.options.length)} onClick={() => pending ? drawGroup() : handleDrawNext()}><Shuffle />{pending ? "Loot groep" : "Trek team"}</Button>}
         </div>
         <aside className="draw-control-dock">
           <DrawFullscreenButton target={directorRef} />
-          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleUndo} disabled={sceneBusy || !session.history.length}><Undo2 />Ongedaan maken</Button>
-          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={handleDrawAll} disabled={sceneBusy || session.finished}><Sparkles />Alles loten</Button>
-          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setShowResetConfirm(true); }} disabled={sceneBusy}><RotateCcw />Opnieuw beginnen</Button>
-          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="sm" disabled={sceneBusy}><Settings2 />Instellingen</Button></PopoverTrigger>
+          <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Ongedaan maken" title="Ongedaan maken" onClick={handleUndo} disabled={sceneBusy || !session.history.length}><Undo2 /></Button>
+          <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Alles loten" title="Alles loten" onClick={() => setScopeAction("complete")} disabled={sceneBusy || session.finished}><Sparkles /></Button>
+          <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Opnieuw beginnen" title="Opnieuw beginnen" onClick={() => setScopeAction("reset")} disabled={sceneBusy}><RotateCcw /></Button>
+          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={sceneBusy}><Settings2 /></Button></PopoverTrigger>
             <PopoverContent portalContainer={directorRef.current} className="draw-scene-settings space-y-4" side="top">
               <h2 className="font-semibold">Regie-instellingen</h2>
               <DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} />
@@ -844,6 +875,7 @@ const LiveDrawDialog = ({
           </Popover>
         </aside>
       </>} />
+      <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope={activePotChoice ? "pot" : undefined} onCurrent={() => scopeAction === "reset" ? resetCurrentPot() : handleDrawAll(true)} onAll={() => scopeAction === "reset" ? handleReset() : handleDrawAll()} />
     </div>
   );
 
