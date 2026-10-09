@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Enkele poules duidelijk hoger optisch centreren; compacte clusters evenwichtig positioneren met vrije ruimte boven en onder en exacte transferdoelen controleren.
+- [x] Enkele poules duidelijk hoger optisch gecentreerd; compacte clusters met vrije ruimte boven en onder geplaatst. Optische verschuiving neemt af bij volle vleugels; tien voorbeeldformaten links/rechts zonder overflow en met exacte transferdoelen gecontroleerd, vijf tests geslaagd.
 - [x] Tussenruimte laten meeademen met werkelijke slotbezetting (begrensd .7–3cqw); één poule subtiel optisch hoger geplaatst. Tien voorbeeldformaten links/rechts gecontroleerd zonder overflow en met exacte transferdoelen; vijf presentatietests geslaagd.
 - [x] Vijf schaalniveaus voor groepsloting: royaal, comfortabel, standaard, compact met namen en logo-only; vijf tests en veertien voorbeeldformaten links/rechts gecontroleerd zonder overflow, met exacte transferdoelen en correcte hermeting bij schermvergroting.
 - [x] Poulekaders verfijnd: tekst maximaal .85cqw, bescheiden logo’s/slots en enkelkolomskaders 17cqw; negen voorbeeldformaten zonder slot-overflow en met exacte transferdoelen links/rechts gecontroleerd, vijf tests geslaagd.
