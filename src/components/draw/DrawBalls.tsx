@@ -49,8 +49,8 @@ function BallScene({ teamIds, elapsed, speed, revealing, palette }: Props & { pa
       <sphereGeometry args={[simulation.radius, 20, 14]} />
     </mesh>)}
     <group ref={flight} visible={false}>
-      <mesh ref={left} rotation-y={Math.PI} material={material}><sphereGeometry args={[1.9, 32, 24, 0, Math.PI]} /></mesh>
-      <mesh ref={right} material={material}><sphereGeometry args={[1.9, 32, 24, 0, Math.PI]} /></mesh>
+      <mesh ref={left} material={material}><sphereGeometry args={[1.9, 32, 24, -Math.PI / 2, Math.PI]} /></mesh>
+      <mesh ref={right} material={material}><sphereGeometry args={[1.9, 32, 24, Math.PI / 2, Math.PI]} /></mesh>
     </group>
   </>;
 }
