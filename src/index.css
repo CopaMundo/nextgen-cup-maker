@@ -2593,9 +2593,10 @@ posities + statistieken groen */
 .draw-show-led-title { width: 100%; height: 3cqw; display: flex; align-items: center; justify-content: center; min-width: 0; overflow: hidden; }
 .draw-led-lettering { font-family: ui-monospace, "Courier New", monospace; font-weight: 800; line-height: 1.2; text-transform: uppercase; color: transparent; background: radial-gradient(circle, hsl(var(--primary)) 0 37%, transparent 43%) 0 0 / .17cqw .17cqw; background-clip: text; -webkit-background-clip: text; filter: drop-shadow(0 0 .12cqw hsl(var(--stage-glow) / .4)); }
 .draw-show-led-title > span { font-size: var(--led-title-size, 2.1cqw); white-space: nowrap; flex: 0 0 auto; }
-.draw-show-led-brand { display: flex; align-items: center; justify-content: center; gap: .65cqw; height: 2.3cqw; font-size: .92cqw; }
-.draw-show-led-brand > span:first-child { font-size: .62cqw; }
-.draw-show-led-logo { width: 2.1cqw; height: 2.1cqw; object-fit: contain; mask-image: radial-gradient(circle, hsl(var(--foreground)) 0 40%, transparent 46%); mask-size: .13cqw .13cqw; filter: drop-shadow(0 0 .12cqw hsl(var(--stage-glow) / .4)); }
+.draw-show-led-brand { display: flex; align-items: center; justify-content: center; gap: .65cqw; height: 2.3cqw; font-size: 1.2cqw; }
+.draw-show-led-brand > span:first-child { font-size: .8cqw; }
+.draw-show-led-brand .draw-led-lettering { background-size: .1cqw .1cqw; }
+.draw-show-led-logo { width: 2.1cqw; height: 2.1cqw; object-fit: contain; mask-image: radial-gradient(circle, hsl(var(--foreground)) 0 48%, transparent 54%); mask-size: .09cqw .09cqw; filter: drop-shadow(0 0 .12cqw hsl(var(--stage-glow) / .4)); }
 .draw-show-phase { position: absolute; top: 28%; left: 29%; width: 42%; text-align: center; color: hsl(var(--muted-foreground)); font-size: .8cqw; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
@@ -2669,7 +2670,7 @@ posities + statistieken groen */
 .draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
 .draw-show-pot-label { position: absolute; z-index: 3; left: 46%; width: 8%; top: 71.8%; height: 2.1%; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; border: 0; border-radius: 3px; background: hsl(var(--stage-glass) / .9); color: hsl(var(--primary)); font-size: .85cqw; font-weight: 800; letter-spacing: 0; line-height: 1; text-transform: uppercase; text-shadow: 0 1px 2px hsl(var(--background)); white-space: nowrap; pointer-events: none; }
 .draw-show-pot { position: absolute; left: 29%; width: 42%; top: 81%; display: flex; justify-content: center; text-align: center; }
-.draw-show-pot-teams:has(> span:nth-child(17)) > span { height: 1.65cqw; }
+.draw-show-pot-teams:has(> span:nth-child(17)) > span { height: 1.4cqw; }
 .draw-show-pot-teams { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: .25cqw; width: calc(var(--pot-columns) * var(--pot-cell-width) + (var(--pot-columns) - 1) * .25cqw); max-width: 100%; padding: 0; }
 .draw-show-pot-teams > span { display: flex; flex: 0 0 var(--pot-cell-width); width: var(--pot-cell-width); height: 2.1cqw; min-width: 0; align-items: center; justify-content: flex-start; gap: var(--pot-cell-gap, .3cqw); padding: .15cqw .3cqw; overflow: hidden; border: 1px solid hsl(var(--border) / .42); border-radius: 4px; background: hsl(var(--stage-glass) / .88); color: hsl(var(--foreground)); transition: opacity 180ms, filter 180ms; }
 .draw-show-pot-name { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: var(--pot-name-lines, 2); -webkit-box-orient: vertical; overflow: hidden; text-align: center; font-size: var(--pot-name-size, .74cqw); font-weight: 600; line-height: 1.1; overflow-wrap: break-word; hyphens: auto; }
