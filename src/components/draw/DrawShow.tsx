@@ -6,7 +6,7 @@ import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
-import liveDrawStage from "@/assets/live-draw-raised-bowl-stage.png";
+import liveDrawStage from "@/assets/live-draw-studio-4k.webp";
 
 export function DrawShow({ session, spotlightId, presentation, controls }: {
   session?: DrawSessionState | null;
