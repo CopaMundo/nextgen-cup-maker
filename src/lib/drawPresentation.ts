@@ -1,7 +1,10 @@
 import type { DrawSessionState } from "./drawSession";
+import type { DrawStudioTheme } from "./drawStudio";
 
 export interface DrawPresentation {
   tournamentName?: string;
+  theme?: DrawStudioTheme;
+  language?: string;
   revealAt: number;
   speed: number;
   activePotId: string | null;
