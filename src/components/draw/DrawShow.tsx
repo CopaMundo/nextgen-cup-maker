@@ -7,7 +7,8 @@ import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
-import liveDrawStage from "@/assets/live-draw-studio-4k.webp";
+import liveDrawStage from "@/assets/live-draw-led-studio-4k.webp.asset.json";
+import copaLogo from "@/assets/copa-mundo-yellow.png.asset.json";
 
 export function DrawShow({ session: incomingSession, spotlightId: incomingSpotlight, presentation: incomingPresentation, controls }: {
   session?: DrawSessionState | null;
@@ -17,6 +18,22 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
 }) {
   const { session, spotlightId, presentation, now, revealKey, revealElapsed, revealing } = useDrawPlayback({ session: incomingSession ?? undefined, spotlightId: incomingSpotlight ?? null, presentation: incomingPresentation });
   const stageRef = useRef<HTMLDivElement>(null);
+  const ledTitleRef = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const title = ledTitleRef.current;
+    const board = title?.parentElement;
+    if (!title || !board) return;
+    const fit = () => {
+      title.style.removeProperty("--led-title-size");
+      const size = parseFloat(getComputedStyle(title).fontSize);
+      const scale = Math.min(1, board.clientWidth / Math.max(1, title.scrollWidth));
+      title.style.setProperty("--led-title-size", `${size * scale}px`);
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(board);
+    return () => observer.disconnect();
+  }, [presentation?.tournamentName]);
   const [destination, setDestination] = useState({ x: 0, y: 0 });
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -93,7 +110,11 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
-  return <div ref={stageRef} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${liveDrawStage})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
+  return <div ref={stageRef} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${liveDrawStage.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
+    <header className="draw-show-led-header">
+      <div className="draw-show-led-title" aria-label="Toernooinaam"><span ref={ledTitleRef} className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span></div>
+      <div className="draw-show-led-brand"><span className="draw-led-lettering">POWERED BY</span><AutoTrimLogo src={copaLogo.url} className="draw-show-led-logo" /><span className="draw-led-lettering">COPA MUNDO</span></div>
+    </header>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
       {rounds ? <>

@@ -1,6 +1,7 @@
 import type { DrawSessionState } from "./drawSession";
 
 export interface DrawPresentation {
+  tournamentName?: string;
   revealAt: number;
   speed: number;
   activePotId: string | null;
