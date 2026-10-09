@@ -1,8 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { calculateGroupLayout, calculateWingDensity, revealDuration, selectionDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { calculateGroupLayout, calculateWingDensity, drawOverviewPage, revealDuration, selectionDuration, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 
 const picture: DrawPresentation = { revealAt: 1000, speed: 1, activePotId: "p1", selection: { targetId: "g1", startedAt: 1000 } };
 describe("Shared draw presentation", () => {
+  it("balances overview teams over two synchronized pages from 24 teams", () => {
+    for (const count of [1, 23, 24, 28, 32, 48, 64, 128, 29]) {
+      const ids = Array.from({ length: count }, (_, i) => String(i));
+      const first = drawOverviewPage(ids, 0);
+      const second = drawOverviewPage(ids, 5000);
+      expect(first.pageCount).toBe(count >= 24 ? 2 : 1);
+      if (count >= 24) {
+        expect(Math.abs(first.teamIds.length - second.teamIds.length)).toBeLessThanOrEqual(1);
+        expect([...first.teamIds, ...second.teamIds]).toEqual(ids);
+        expect(drawOverviewPage(ids, 10000).teamIds).toEqual(first.teamIds);
+      } else expect(second.teamIds).toEqual(ids);
+    }
+  });
   it("selects all five studio profiles from actual wing groups and internal slot rows", () => {
     const groups = (count: number, capacity: number) => Array.from({ length: count }, (_, index) => ({ id: String(index), name: `Groep ${index}`, capacity, teamIds: [], slotIds: [] }));
     for (const [count, capacity, expected] of [

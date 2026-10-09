@@ -2581,6 +2581,8 @@ posities + statistieken groen */
   --stage-glow: 44 100% 58%; --stage-glass: 40 24% 8%;
   --stage-ball: 43 11% 86%; --stage-ball-shade: 38 10% 56%;
   --stage-ball-light: 48 25% 100%;
+  --stage-brand-gold: 45 86% 70%;
+  --stage-bowl-filter: saturate(1.25) brightness(1.18);
 }
 .draw-show-stage {
   position: relative; isolation: isolate; width: 100%; height: auto;
@@ -2589,10 +2591,12 @@ posities + statistieken groen */
   color: hsl(var(--foreground)); container-type: size;
 }
 .draw-show-stage[data-studio-theme="champions-blue"] {
+  --stage-bowl-filter: saturate(.3) brightness(1.45) sepia(.25) hue-rotate(170deg) saturate(1.6);
   --background: 220 65% 5%; --foreground: 205 45% 95%; --card: 220 48% 8%; --border: 207 80% 54%;
   --primary: 202 100% 75%; --muted-foreground: 210 30% 74%; --accent: 212 55% 18%; --stage-glow: 207 100% 60%; --stage-glass: 220 45% 8%;
 }
 .draw-show-stage[data-studio-theme="platinum-white"] {
+  --stage-bowl-filter: saturate(0) brightness(1.6) contrast(1.1);
   --background: 0 0% 5%; --foreground: 0 0% 96%; --card: 0 0% 8%; --border: 0 0% 68%;
   --primary: 0 0% 90%; --muted-foreground: 0 0% 73%; --accent: 0 0% 20%; --stage-glow: 0 0% 85%; --stage-glass: 0 0% 8%;
 }
@@ -2604,10 +2608,7 @@ posities + statistieken groen */
 .draw-led-lettering { display: block; font-family: ui-monospace, "Courier New", monospace; font-weight: 800; line-height: 1.2; text-transform: uppercase; color: hsl(var(--primary)); mask-image: radial-gradient(circle, hsl(var(--foreground)) 0 48%, transparent 55%); mask-size: .12cqw .12cqw; filter: drop-shadow(0 0 .12cqw hsl(var(--stage-glow) / .4)); }
 .draw-show-led-title text { font-size: 64px; fill: hsl(var(--primary)); mask-size: 2px 2px; }
 .draw-show-led-title .draw-led-measure { opacity: 0; font-family: ui-monospace, "Courier New", monospace; font-weight: 800; text-transform: uppercase; }
-.draw-show-led-title .draw-led-powered { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 24px; font-weight: 500; fill: hsl(var(--foreground)); }
-.draw-show-tournament-led-logo { position: absolute; left: 3%; top: 45%; width: 4cqw; height: 4cqw; display: grid; place-items: center; mask-image: radial-gradient(circle, hsl(var(--foreground)) 0 52%, transparent 62%); mask-size: .1cqw .1cqw; filter: drop-shadow(0 0 .18cqw hsl(var(--stage-glow) / .55)); }
-.draw-show-tournament-led-logo img { width: 100%; height: 100%; object-fit: contain; }
-.draw-show-phase { position: absolute; top: 28%; left: 29%; width: 42%; text-align: center; color: hsl(var(--muted-foreground)); font-size: .8cqw; }
+.draw-show-led-title .draw-led-powered { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 24px; font-weight: 500; fill: hsl(var(--stage-brand-gold)); }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
@@ -2666,9 +2667,11 @@ posities + statistieken groen */
 .draw-show-flag-backdrop .draw-show-flag { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
 .draw-show-reveal-logo, .draw-show-team strong { filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; color: hsl(var(--foreground)); font-size: 1.6cqw; line-height: 1.2; text-align: center; text-shadow: 0 1px 3px hsl(var(--background)); }
-.draw-show-eligible { position: absolute; top: 135%; width: 100%; }
-.draw-show-eligible-groups { display: flex; flex-wrap: wrap; justify-content: center; gap: .6cqw; }
-.draw-show-eligible-groups span { border: 1px solid hsl(var(--border)); border-radius: 5px; padding: .4cqw .7cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .92cqw; font-weight: 700; }
+/* The four-row eligibility budget ends above the bowl, regardless of label length. */
+.draw-show-eligible { position: absolute; top: 112%; width: 100%; height: 5.6cqw; overflow: hidden; }
+.draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, 1fr)); gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
+.draw-show-eligible-groups span { min-width: 0; height: 1.2cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.draw-show-bowl-sheen { position: absolute; left: 42.7%; top: 61.3%; width: 14.6%; height: 15%; pointer-events: none; backdrop-filter: var(--stage-bowl-filter); clip-path: polygon(1% 5%, 15% 1%, 50% 0, 85% 1%, 99% 5%, 97% 34%, 88% 64%, 72% 87%, 61% 98%, 39% 98%, 28% 87%, 12% 64%, 3% 34%); }
 .draw-show-eligible-groups .is-spotlight { background: hsl(var(--accent)); box-shadow: 0 0 1.2cqw hsl(var(--stage-glow) / .65); border-color: hsl(var(--primary)); }
 .draw-show-bowl { position: absolute; left: 44.8%; top: 62.5%; width: 10.4%; height: 12.5%; pointer-events: none; }
 .draw-show-bowl-ball { position: absolute; width: var(--ball-size, 1.7cqw); aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
@@ -2680,13 +2683,13 @@ posities + statistieken groen */
 .draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
 .draw-show-pot-label { position: absolute; z-index: 3; left: 38%; width: 24%; top: 79%; height: 7%; pointer-events: none; overflow: visible; }
 .draw-show-pot-label text { fill: hsl(var(--primary)); font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 48px; font-weight: 700; text-transform: uppercase; filter: drop-shadow(0 1px 2px hsl(var(--background))); }
-.draw-show-pot { position: absolute; left: 29%; width: 42%; top: 87.5%; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.draw-show-pot-counter { color: hsl(var(--primary)); font-size: .72cqw; line-height: 1.3; margin-top: .25cqw; }
+.draw-show-pot { position: absolute; left: 29%; width: 42%; top: 91.5%; height: 7.5%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.draw-show-pot-counter { position: absolute; top: 83.8%; left: 38%; width: 24%; text-align: center; color: hsl(var(--primary)); font-size: .65cqw; line-height: 1.2; pointer-events: none; }
 .draw-show-pot-teams { animation: draw-pot-page 500ms ease-out both; }
 @keyframes draw-pot-page { from { opacity: 0; } to { opacity: 1; } }
-.draw-show-pot-teams:has(> span:nth-child(17)) > span { height: 1.4cqw; }
+
 .draw-show-pot-teams { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: .25cqw; width: calc(var(--pot-columns) * var(--pot-cell-width) + (var(--pot-columns) - 1) * .25cqw); max-width: 100%; padding: 0; }
-.draw-show-pot-teams > span { display: flex; flex: 0 0 var(--pot-cell-width); width: var(--pot-cell-width); height: 2.1cqw; min-width: 0; align-items: center; justify-content: flex-start; gap: var(--pot-cell-gap, .3cqw); padding: .15cqw .3cqw; overflow: hidden; border: 1px solid hsl(var(--border) / .42); border-radius: 4px; background: hsl(var(--stage-glass) / .88); color: hsl(var(--foreground)); transition: opacity 180ms, filter 180ms; }
+.draw-show-pot-teams > span { display: flex; flex: 0 0 var(--pot-cell-width); width: var(--pot-cell-width); height: var(--pot-slot-height, 1.7cqw); min-width: 0; align-items: center; justify-content: flex-start; gap: var(--pot-cell-gap, .3cqw); padding: .15cqw .3cqw; overflow: hidden; border: 1px solid hsl(var(--border) / .42); border-radius: 4px; background: hsl(var(--stage-glass) / .88); color: hsl(var(--foreground)); transition: opacity 180ms, filter 180ms; }
 .draw-show-pot-name { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: var(--pot-name-lines, 2); -webkit-box-orient: vertical; overflow: hidden; text-align: center; font-size: var(--pot-name-size, .74cqw); font-weight: 600; line-height: 1.1; overflow-wrap: break-word; hyphens: auto; }
 .draw-show-pot-teams > .is-drawn { opacity: .3; filter: grayscale(1); color: hsl(var(--muted-foreground)); }
 .draw-show-pot-logo { display: flex; align-items: center; justify-content: center; width: var(--pot-logo-size, 1.45cqw); height: var(--pot-logo-size, 1.45cqw); flex: 0 0 var(--pot-logo-size, 1.45cqw); border: 0; border-radius: 0; background: none; }
@@ -2737,7 +2740,7 @@ posities + statistieken groen */
 .draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; container-type: size; }
 .draw-control-stage > .draw-show-stage { flex: 0 0 auto; width: min(100cqw, 177.7778cqh); }
 .draw-control-stage:fullscreen { width: 100vw; height: 100dvh; background: hsl(var(--background)); }
-.draw-control-primary { position: absolute; z-index: 11; left: 44%; width: 12%; top: 66.7%; display: flex; justify-content: center; }
+.draw-control-primary { position: absolute; z-index: 11; left: 38%; width: 24%; top: 86.7%; display: flex; justify-content: center; }
 .draw-control-dock { position: absolute; z-index: 11; bottom: 1.3%; right: 2%; width: auto; display: flex; justify-content: flex-end; gap: .3cqw; border-block: 1px solid hsl(var(--border) / .65); border-radius: 4px; background: hsl(var(--background) / .87); }
 .draw-control-dock .draw-scene-button { width: 2.6cqw; padding: 0; }
 .draw-show-stage .draw-scene-button, .draw-scene-settings .draw-scene-button { color: hsl(var(--primary)); background: hsl(var(--background) / .86); border: 1px solid hsl(var(--border) / .5); font-size: .82cqw; height: 2.6cqw; min-height: 0; padding: .3cqw .7cqw; gap: .35cqw; box-shadow: none; }

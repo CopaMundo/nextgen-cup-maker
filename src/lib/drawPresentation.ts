@@ -32,6 +32,14 @@ export const revealDuration = (speed: number) => 1900 / speed;
 export const selectionDuration = (speed: number) => 2100 / speed;
 export const sweepDuration = (count: number, speed: number) => Math.max(12, count * 3) * 100 / speed;
 
+/** Equal overview pages share wall-clock timing across director and projector. */
+export function drawOverviewPage(teamIds: string[], now: number) {
+  const pageCount = teamIds.length >= 24 ? 2 : 1;
+  const pageSize = Math.ceil(teamIds.length / pageCount);
+  const pageIndex = Math.floor(now / 5000) % pageCount;
+  return { pageCount, pageIndex, teamIds: teamIds.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize) };
+}
+
 export function sweepSpotlight(presentation: DrawPresentation | undefined, now: number) {
   const sweep = presentation?.sweep;
   if (!sweep?.optionIds.length) return null;
