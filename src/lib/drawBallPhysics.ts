@@ -11,15 +11,17 @@ export function createDrawBallWorld(ids: string[]) {
   world.addContactMaterial(new ContactMaterial(material, material, { friction: .32, restitution: .13 }));
   const vertices: number[] = [];
   const indices: number[] = [];
-  const rings = 12, segments = 32;
-  for (let ring = 0; ring <= rings; ring++) {
-    const radius = BOWL_RADIUS * ring / rings;
+   const rings = 12, segments = 32;
+   // Continue the concave contacts with a retaining rim so large spheres
+   // cannot roll over the mesh edge while the pile is settling.
+   for (let ring = 0; ring <= rings + 1; ring++) {
+     const radius = BOWL_RADIUS * Math.min(ring, rings) / rings;
     for (let segment = 0; segment < segments; segment++) {
       const angle = segment * Math.PI * 2 / segments;
-      vertices.push(Math.cos(angle) * radius, bowlHeight(radius), Math.sin(angle) * radius);
+       vertices.push(Math.cos(angle) * radius, ring > rings ? 40 : bowlHeight(radius), Math.sin(angle) * radius);
     }
   }
-  for (let ring = 0; ring < rings; ring++) for (let segment = 0; segment < segments; segment++) {
+   for (let ring = 0; ring <= rings; ring++) for (let segment = 0; segment < segments; segment++) {
     const a = ring * segments + segment, b = ring * segments + (segment + 1) % segments;
     const c = a + segments, d = b + segments;
     indices.push(a, b, c, b, d, c);
