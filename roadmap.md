@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Drie aangeleverde 4K-studiothema’s, gedeelde voorbereiding met snelheid/kijklink/QR en Start loting, regie-opties, dynamische titel en gebogen doorlopende LED-naam; bokaal en ballandingen controleren.
+- [x] Drie aangeleverde 4K-studiothema’s, gedeelde voorbereiding met snelheid/kijklink/QR en Start loting, regie-opties, dynamische titel en gebogen doorlopende LED-naam; 24 tests geslaagd, baldoel 0px afwijking en echte groepsregie/beamer samen gecontroleerd.
 - [x] Rustige aangeleverde 4K-studio verwerkt met bestaand teamvak (29–71%, 39–49%), gebogen LED-toernooinaam en browsertaalafhankelijke lotingstitel; podium met lokale testteams visueel gecontroleerd, transferafwijking 0px, veertien tests geslaagd. Echte gezamenlijke regie-beamercontrole blijft apart open.
 - [x] Studio met geïntegreerde komhouder, dynamische LED-toernooinaam en Copa Mundo-logo in 3840×2160; echte toernooinaam aangemeld opgehaald, gedeeld podium met 32 lokale testteams visueel gecontroleerd, vertraagde balvlucht zichtbaar en transferdoel exact (0px afwijking). 22 tests geslaagd; gezamenlijke echte regie-beamerloting blijft afzonderlijk open.
 - [x] Ononderbroken lokale balvlucht en opening bij elke teamtrekking, ook bij snel/traag tempo en vertraagde ontvangst; 22 tests geslaagd en gedeeld podium met lokale testteams bij drie snelheden, vroege plaatsing en tegenstanderonthulling zonder nieuwe bal gecontroleerd.
@@ -42,4 +42,4 @@
 - [x] Groepsvleugels naast de teamnaambalk houden, de vliegende bal in de balk laten openen en ronde logomarkers verwijderen.
 - [x] Compact podium met potlijst, gesynchroniseerde onthulling/plaatsing, leesbare grote groepen en geïntegreerde regiebediening; gecontroleerd met lokale testgegevens.
 - [x] Potnaam op de bokaalvoet, potteams met afstand onder de bokaal in evenwichtige gecentreerde rijen (5 = 3/2, 6 = 3/3), logo’s zonder rondje en grotere namen; logo’s vierkant bijgesneden en exact gecentreerd.
-- [ ] Echte regieloting en apart beamerscherm samen controleren; aangemelde sessie beschikbaar, maar deze controle met echte toernooigegevens is nog niet uitgevoerd.
+- [x] Echte groepsregieloting en apart beamerscherm samen gecontroleerd: publieke voorbereiding zonder bediening, Start loting, volledige balonthulling en gedeelde teamidentiteit; themawijziging in regie verschijnt ook publiek.
