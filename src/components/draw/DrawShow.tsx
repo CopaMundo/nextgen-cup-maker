@@ -128,13 +128,13 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     <header className="draw-show-led-header">
       <div className="draw-show-live-heading">{heading}</div>
       <svg className="draw-show-led-title" viewBox="0 0 1000 320" role="img" aria-label={presentation?.tournamentName || "COPA MUNDO"}>
-        <defs><path id={ledArcId} d="M 30 215 C 150 178 300 177 500 177 C 700 177 850 178 970 215" /><path id={`${ledArcId}-brand`} d="M 30 253 C 200 226 350 225 500 225 C 650 225 800 226 970 253" /><clipPath id={`${ledArcId}-clip`}><rect x="30" y="110" width="940" height="112" /></clipPath></defs>
+        <defs><path id={ledArcId} d="M 30 165 C 180 194 330 203 500 203 C 670 203 820 194 970 165" /><clipPath id={`${ledArcId}-clip`}><rect x="30" y="110" width="940" height="112" /></clipPath></defs>
         <text ref={ledTitleRef} className="draw-led-measure" aria-hidden="true">{`${presentation?.tournamentName || "COPA MUNDO"}\u00a0\u00a0\u00a0\u00a0`}</text>
         <g clipPath={`url(#${ledArcId}-clip)`}>{ledLength > 900 ? <text key={presentation?.tournamentName} className="draw-led-lettering" data-led-scrolling="true"><textPath href={`#${ledArcId}`} startOffset="0">{`${presentation?.tournamentName || "COPA MUNDO"}\u00a0\u00a0\u00a0\u00a0${presentation?.tournamentName || "COPA MUNDO"}\u00a0\u00a0\u00a0\u00a0${presentation?.tournamentName || "COPA MUNDO"}`}<animate attributeName="startOffset" from="0" to={String(-ledPeriod)} dur={`${ledPeriod / 65}s`} calcMode="linear" repeatCount="indefinite" /></textPath></text>
           : <text className="draw-led-lettering" textAnchor="middle"><textPath href={`#${ledArcId}`} startOffset="50%">{presentation?.tournamentName || "COPA MUNDO"}</textPath></text>}</g>
-        <text className="draw-led-powered" textAnchor="middle"><textPath href={`#${ledArcId}-brand`} startOffset="50%">POWERED BY COPA MUNDO</textPath></text>
       </svg>
     </header>
+    <svg className="draw-show-brand" viewBox="0 0 1000 80" aria-label="Powered by Copa Mundo"><defs><path id={`${ledArcId}-brand`} d="M 30 25 Q 500 55 970 25" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-brand`} startOffset="50%">POWERED BY COPA MUNDO</textPath></text></svg>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
