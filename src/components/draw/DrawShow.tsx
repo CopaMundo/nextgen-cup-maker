@@ -124,8 +124,8 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
           </div>
         </section>
       </> : <>
-        <div className="draw-show-wing draw-show-wing-left" data-wing-columns={layout.wingColumns} data-density={leftDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(leftContainers.length / layout.wingColumns)) } as CSSProperties}>{leftContainers.map(renderContainer)}</div>
-        <div className="draw-show-wing draw-show-wing-right" data-wing-columns={layout.wingColumns} data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)) } as CSSProperties}>{rightContainers.map(renderContainer)}</div>
+        <div className="draw-show-wing draw-show-wing-left" data-wing-columns={layout.wingColumns} data-density={leftDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(leftContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...leftContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{leftContainers.map(renderContainer)}</div>
+        <div className="draw-show-wing draw-show-wing-right" data-wing-columns={layout.wingColumns} data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...rightContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{rightContainers.map(renderContainer)}</div>
       </>}
       <main className="draw-show-center">
         <div className="draw-show-team-card">
