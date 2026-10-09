@@ -6,7 +6,7 @@ import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
-import liveDrawStageAsset from "@/assets/live-draw-studio-4k.webp.asset.json";
+import liveDrawStage from "@/assets/live-draw-studio-4k.webp";
 
 export function DrawShow({ session, spotlightId, presentation, controls }: {
   session?: DrawSessionState | null;
@@ -86,7 +86,7 @@ export function DrawShow({ session, spotlightId, presentation, controls }: {
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": `${-elapsed}ms`, "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
-  return <div ref={stageRef} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${liveDrawStageAsset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
+  return <div ref={stageRef} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${liveDrawStage})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       <div className="draw-show-phase">{session.phaseName} · {rounds ? `${rounds.groupName} · ${rounds.drawnTeamIds.length}/${session.teams.length}` : `${session.history.length}/${session.containers.reduce((sum, item) => sum + item.capacity, 0)}`}</div>
       {rounds ? <>
