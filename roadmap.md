@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Ononderbroken lokale balvlucht en opening bij elke teamtrekking, ook bij snel/traag tempo en vertraagde ontvangst; 22 tests geslaagd en gedeeld podium met lokale testteams bij drie snelheden, vroege plaatsing en tegenstanderonthulling zonder nieuwe bal gecontroleerd.
 - [x] Nieuwe aangeleverde studio met bijpassend teamvak op bestaande maat en opgeschaalde 3840×2160-weergave; podium visueel gecontroleerd, vijf tests geslaagd, twintig vleugellandingen exact en balopening binnen .02px van het vakcentrum gecontroleerd met lokale testteams.
 - [x] Enkele poules duidelijk hoger optisch gecentreerd; compacte clusters met vrije ruimte boven en onder geplaatst. Optische verschuiving neemt af bij volle vleugels; tien voorbeeldformaten links/rechts zonder overflow en met exacte transferdoelen gecontroleerd, vijf tests geslaagd.
 - [x] Tussenruimte laten meeademen met werkelijke slotbezetting (begrensd .7–3cqw); één poule subtiel optisch hoger geplaatst. Tien voorbeeldformaten links/rechts gecontroleerd zonder overflow en met exacte transferdoelen; vijf presentatietests geslaagd.
@@ -38,4 +39,4 @@
 - [x] Groepsvleugels naast de teamnaambalk houden, de vliegende bal in de balk laten openen en ronde logomarkers verwijderen.
 - [x] Compact podium met potlijst, gesynchroniseerde onthulling/plaatsing, leesbare grote groepen en geïntegreerde regiebediening; gecontroleerd met lokale testgegevens.
 - [x] Potnaam op de bokaalvoet, potteams met afstand onder de bokaal in evenwichtige gecentreerde rijen (5 = 3/2, 6 = 3/3), logo’s zonder rondje en grotere namen; logo’s vierkant bijgesneden en exact gecentreerd.
-- [ ] Echte regieloting en apart beamerscherm samen controleren; wacht op een ingelogde previewsessie (veilig automatisch aanmelden niet beschikbaar voor dit account).
+- [ ] Echte regieloting en apart beamerscherm samen controleren; aangemelde sessie beschikbaar, maar deze controle met echte toernooigegevens is nog niet uitgevoerd.
