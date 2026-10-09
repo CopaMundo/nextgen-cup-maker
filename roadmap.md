@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Betrouwbare volledige balvlucht en opening bij elke teamtrekking op regie en beamer, ook bij snel/traag tempo en vertraagde ontvangst; geen nieuwe bal bij tegenstanderonthullingen.
 - [x] Nieuwe aangeleverde studio met bijpassend teamvak op bestaande maat en opgeschaalde 3840×2160-weergave; podium visueel gecontroleerd, vijf tests geslaagd, twintig vleugellandingen exact en balopening binnen .02px van het vakcentrum gecontroleerd met lokale testteams.
 - [x] Enkele poules duidelijk hoger optisch gecentreerd; compacte clusters met vrije ruimte boven en onder geplaatst. Optische verschuiving neemt af bij volle vleugels; tien voorbeeldformaten links/rechts zonder overflow en met exacte transferdoelen gecontroleerd, vijf tests geslaagd.
 - [x] Tussenruimte laten meeademen met werkelijke slotbezetting (begrensd .7–3cqw); één poule subtiel optisch hoger geplaatst. Tien voorbeeldformaten links/rechts gecontroleerd zonder overflow en met exacte transferdoelen; vijf presentatietests geslaagd.
