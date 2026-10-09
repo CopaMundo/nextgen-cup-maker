@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useDrawTournamentLogo } from "@/hooks/useDrawTournamentLogo";
+import { DrawScopeConfirm } from "@/components/draw/DrawScopeConfirm";
 import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CountryFlag from "@/components/CountryFlag";
-import { AlertTriangle, ArrowLeft, Check, ChevronDown, Pause, Play, Plus, Trash2, FastForward, RotateCcw } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, ChevronDown, Pause, Play, Plus, Trash2, FastForward, RotateCcw, Undo2 } from "lucide-react";
 import {
   buildSchedule,
   defaultOpponentMatrix,
@@ -106,6 +108,8 @@ const RoundsDrawDialog = ({
 }) => {
   const { toast } = useToast();
   const tournamentName = useDrawTournamentName(tournamentId, open);
+  const tournamentLogo = useDrawTournamentLogo(tournamentId, open);
+  const [scopeAction, setScopeAction] = useState<"reset" | "complete" | null>(null);
   const [showOptions, setShowOptions] = useDrawShowOptions(phaseId);
   const animationSpeed = showOptions.speed;
   const [loading, setLoading] = useState(false);
@@ -514,10 +518,41 @@ const RoundsDrawDialog = ({
     return () => { if (timer.current) window.clearTimeout(timer.current); };
   }, [open, step, queue.join(","), paused, autoReveal, revealReady, revealsStarted, activeDraw?.groupId, animationSpeed]);
 
-  const revealAll = () => {
+  const stopPlayback = () => {
+    if (timer.current) window.clearTimeout(timer.current);
+    setPaused(true);
+    setRevealsStarted(false);
+    setRevealAt(0);
+    setRevealReady(true);
+    setScopeAction(null);
+  };
+  const revealAll = (entire = false) => {
     if (!activeDraw) return;
-    setRevealed((prev) => ({ ...prev, [activeDraw.groupId]: activeDraw.matches.map((_, i) => i) }));
-    setTeamIdx((prev) => ({ ...prev, [activeDraw.groupId]: activeDraw.order.length - 1 }));
+    stopPlayback();
+    const targets = entire ? draws : [activeDraw];
+    setRevealed((prev) => ({ ...prev, ...Object.fromEntries(targets.map((d) => [d.groupId, d.matches.map((_, i) => i)])) }));
+    setTeamIdx((prev) => ({ ...prev, ...Object.fromEntries(targets.map((d) => [d.groupId, d.order.length - 1])) }));
+    setRevealTimes((prev) => ({ ...prev, ...Object.fromEntries(targets.map((d) => [d.groupId, {}])) }));
+    if (entire) setActiveGroupIdx(draws.length - 1);
+  };
+  const resetShow = (entire = false) => {
+    if (!activeDraw) return;
+    stopPlayback();
+    const targets = entire ? draws : [activeDraw];
+    setRevealed((prev) => ({ ...prev, ...Object.fromEntries(targets.map((d) => [d.groupId, []])) }));
+    setRevealTimes((prev) => ({ ...prev, ...Object.fromEntries(targets.map((d) => [d.groupId, {}])) }));
+    setTeamIdx((prev) => ({ ...prev, ...Object.fromEntries(targets.map((d) => [d.groupId, -1])) }));
+    if (entire) setActiveGroupIdx(0);
+  };
+  const undoReveal = () => {
+    if (!activeDraw || !revealReady) return;
+    stopPlayback();
+    const groupId = activeDraw.groupId;
+    const last = (revealed[groupId] || []).at(-1);
+    if (last !== undefined) {
+      setRevealed((prev) => ({ ...prev, [groupId]: (prev[groupId] || []).slice(0, -1) }));
+      setRevealTimes((prev) => { const times = { ...prev[groupId] }; delete times[String(last)]; return { ...prev, [groupId]: times }; });
+    } else setTeamIdx((prev) => ({ ...prev, [groupId]: Math.max(-1, currentIdx - 1) }));
   };
 
   const groupDone = (d: GroupDraw) => (teamIdx[d.groupId] ?? -1) >= d.order.length - 1 && (revealed[d.groupId] || []).length >= d.matches.length;
@@ -848,14 +883,14 @@ const RoundsDrawDialog = ({
     session.pending = currentTeamId ? { teamId: currentTeamId, options: [] } : null;
     session.finished = groupDone(activeDraw);
     return { session, spotlightId: null, presentation: {
-      tournamentName, theme: showOptions.theme, language: navigator.language, revealAt, speed: animationSpeed, activePotId: currentPot?.id ?? null, selection: null,
+      tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, revealAt, speed: animationSpeed, activePotId: currentPot?.id ?? null, selection: null,
       rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
     } };
-  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, revealed, revealTimes, revealAt, showOptions.theme, animationSpeed]);
+  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, tournamentLogo, revealed, revealTimes, revealAt, showOptions.theme, animationSpeed]);
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
-    const publishedPicture = step === "draw" ? picture : { session: null, presentation: { tournamentName, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, revealAt: 0, activePotId: null, selection: null } };
+    const publishedPicture = step === "draw" ? picture : { session: null, presentation: { tournamentName, tournamentLogo, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, revealAt: 0, activePotId: null, selection: null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: publishedPicture as unknown as never }, { onConflict: "phase_id" });
@@ -865,7 +900,7 @@ const RoundsDrawDialog = ({
       }
       if (!error) syncFailed.current = false;
     });
-  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId, tournamentName, showOptions.theme, animationSpeed]);
+  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId, tournamentName, tournamentLogo, showOptions.theme, animationSpeed]);
 
   useEffect(() => {
     if (open && (step === "draw" || step === "settings")) return;
@@ -887,13 +922,14 @@ const RoundsDrawDialog = ({
         </div>
         <aside className="draw-control-dock">
           <DrawFullscreenButton target={directorRef} />
-          <Button className="draw-scene-button" variant="ghost" aria-pressed={autoReveal} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button>
-          <Button className="draw-scene-button" variant="ghost" aria-pressed={!autoReveal} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button>
-          <Button className="draw-scene-button" variant="ghost" disabled={!revealReady || groupDone(activeDraw)} onClick={revealAll}><FastForward />Alles tonen</Button>
-          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" disabled={!revealReady}><Settings2 />Instellingen</Button></PopoverTrigger><PopoverContent portalContainer={directorRef.current} className="draw-scene-settings max-h-[70dvh] overflow-y-auto space-y-4" side="top"><h2 className="font-semibold">Regie-instellingen</h2><DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} /><Button variant="outline" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}>Lotingsregels</Button></PopoverContent></Popover>
+          <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Ongedaan maken" title="Ongedaan maken" disabled={!revealReady || (currentIdx < 0 && !revealedSet.size)} onClick={undoReveal}><Undo2 /></Button>
+          <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Alles loten" title="Alles loten" disabled={!revealReady || allDone} onClick={() => setScopeAction("complete")}><FastForward /></Button>
+          <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Opnieuw beginnen" title="Opnieuw beginnen" disabled={!revealReady} onClick={() => setScopeAction("reset")}><RotateCcw /></Button>
+          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={!revealReady}><Settings2 /></Button></PopoverTrigger><PopoverContent portalContainer={directorRef.current} className="draw-scene-settings max-h-[70dvh] overflow-y-auto space-y-4" side="top"><h2 className="font-semibold">Regie-instellingen</h2><DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} /><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button></div><Button variant="outline" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}>Lotingsregels</Button></PopoverContent></Popover>
           <Button className="draw-scene-button" variant="ghost" aria-label="Beamerscherm" title="Beamerscherm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink /></Button>
         </aside>
       </>} />
+      <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope="groep" onCurrent={() => scopeAction === "reset" ? resetShow() : revealAll()} onAll={() => scopeAction === "reset" ? resetShow(true) : revealAll(true)} />
     </div>
   );
 
