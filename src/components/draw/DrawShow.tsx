@@ -1,7 +1,7 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useDrawPlayback } from "@/hooks/useDrawPlayback";
 import type { DrawSessionState } from "@/lib/drawSession";
-import { calculateGroupLayout, calculateWingDensity, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
+import { calculateGroupLayout, calculateWingDensity, drawOverviewPage, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
 import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
@@ -96,9 +96,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     .filter((id) => session?.remaining.includes(id) && id !== pending?.teamId);
   const potTeamIds = alphabeticalTeamIds(activePot?.teamIds ?? session?.teams.map((item) => item.id) ?? [], session?.teams ?? []);
   const rosterIds = alphabeticalTeamIds(session?.mode === "pots" ? activePot?.teamIds ?? session?.pots[0]?.teamIds ?? [] : session?.teams.map((item) => item.id) ?? [], session?.teams ?? []);
-  const pageCount = Math.max(1, Math.ceil(potTeamIds.length / 24));
-  const pageIndex = Math.floor(now / 5000) % pageCount;
-  const visiblePotIds = potTeamIds.slice(pageIndex * 24, (pageIndex + 1) * 24);
+   const { pageCount, pageIndex, teamIds: visiblePotIds } = drawOverviewPage(potTeamIds, now);
   const potMaxColumns = visiblePotIds.length > 16 ? 8 : 4;
   const potRows = Math.max(1, Math.ceil(visiblePotIds.length / potMaxColumns));
   const potColumns = Math.max(1, Math.ceil(visiblePotIds.length / potRows));
