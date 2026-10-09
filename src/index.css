@@ -2607,7 +2607,7 @@ posities + statistieken groen */
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
 .draw-show-led-header { position: absolute; top: 0; left: 30%; width: 40%; height: 22.75%; pointer-events: none; }
 .draw-show-live-heading { position: absolute; top: 17%; left: 0; width: 100%; text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2cqw; font-weight: 500; line-height: 1.2; letter-spacing: 0; color: hsl(var(--foreground)); }
-.draw-show-led-title { position: absolute; top: 40%; left: 0; width: 100%; height: 34%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: .12cqw solid hsl(var(--border)); background: radial-gradient(circle, hsl(var(--stage-led-dot)) .035cqw, transparent .045cqw) 0 0 / .22cqw .22cqw, hsl(var(--stage-led-surface)); box-shadow: 0 .2cqw .5cqw hsl(var(--background)), inset 0 0 .4cqw hsl(var(--stage-glow) / .2); }
+.draw-show-led-title { position: absolute; top: 40%; left: 0; width: 100%; height: 34%; display: flex; align-items: center; justify-content: center; overflow: hidden; padding-inline: 1.8cqw; clip-path: polygon(4.5% 0, 95.5% 0, 100% 100%, 0 100%); border: .12cqw solid hsl(var(--border)); background: radial-gradient(circle, hsl(var(--stage-led-dot)) .035cqw, transparent .045cqw) 0 0 / .22cqw .22cqw, hsl(var(--stage-led-surface)); box-shadow: 0 .2cqw .5cqw hsl(var(--background)), inset 0 0 .4cqw hsl(var(--stage-glow) / .2); }
 .draw-led-lettering, .draw-led-measure { display: block; flex-shrink: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2.45cqw; line-height: 1; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: hsl(var(--primary)); }
 .draw-led-measure { position: absolute; visibility: hidden; }
 .draw-led-loop { position: absolute; left: 0; display: flex; align-items: center; gap: 4.8cqw; width: max-content; animation: draw-led-horizontal var(--led-duration) linear infinite; }
@@ -2661,13 +2661,13 @@ posities + statistieken groen */
 .draw-show-layout-C .draw-show-wing .draw-show-slot { display: flex; justify-content: center; padding: .15cqw; border-color: hsl(var(--primary) / .5); container-type: size; }
 .draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; max-width: 100%; flex: 0 0 auto; font-size: 30cqmin; border-color: hsl(var(--primary) / .65); }
 .draw-show-center { position: absolute; z-index: 5; top: 39%; left: 29%; width: 42%; height: 10%; }
-.draw-show-team-card { display: flex; height: 100%; width: 100%; align-items: center; justify-content: center; padding: 0; }
-.draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; overflow: hidden; }
+.draw-show-team-card { display: flex; height: 96%; width: calc(100% - .5cqw); align-items: center; justify-content: center; padding: 0; border-radius: var(--draw-identity-radius, .8cqw); overflow: hidden; }
+.draw-show-team { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; gap: .8cqw; width: 100%; height: 100%; min-width: 0; border-radius: inherit; overflow: hidden; }
 .draw-show-reveal-logo { display: grid; place-items: center; width: 3cqw; height: 3cqw; flex: 0 0 3cqw; }
 .draw-show-team-logo { width: 3cqw; height: 3cqw; object-fit: contain; flex-shrink: 0; }
 .draw-show-team-identity { display: grid; grid-template-columns: 3cqw minmax(0, 1fr) 3cqw; gap: .7cqw; width: 100%; min-width: 0; align-items: center; padding-inline: 1.4cqw; }
 .draw-show-team-identity strong { grid-column: 2; width: 100%; }
-.draw-show-flag-backdrop { position: absolute; z-index: 0; right: 0; top: 0; display: grid; place-items: center; width: 42%; height: 100%; overflow: hidden; pointer-events: none; opacity: .36; background: transparent; box-shadow: inset 0 0 .35cqw hsl(var(--stage-ball-light) / .22); mask-image: linear-gradient(to right, transparent, hsl(var(--foreground)) 55%); }
+.draw-show-flag-backdrop { position: absolute; z-index: 0; right: 0; top: 0; display: grid; place-items: center; width: 42%; height: 100%; border-radius: inherit; overflow: hidden; pointer-events: none; opacity: .36; background: transparent; box-shadow: inset 0 0 .35cqw hsl(var(--stage-ball-light) / .22); mask-image: linear-gradient(to right, transparent, hsl(var(--foreground)) 55%); }
 /* Twemoji flags have a 30 × 26 drawing inside a 36 × 36 viewBox: remove its transparent inset. */
 .draw-show-flag-backdrop .draw-show-flag { position: absolute; display: block; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; filter: drop-shadow(0 0 .08cqw hsl(var(--stage-ball-light) / .8)); }
 .draw-show-balls-canvas { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
@@ -2675,7 +2675,7 @@ posities + statistieken groen */
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; color: hsl(var(--foreground)); font-size: 1.6cqw; line-height: 1.2; text-align: center; text-shadow: 0 1px 3px hsl(var(--background)); }
 /* The four-row eligibility budget ends above the bowl, regardless of label length. */
 .draw-show-eligible { position: absolute; top: 112%; width: 100%; height: 5.6cqw; overflow: hidden; }
-.draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, 1fr)); gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
+.draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, var(--draw-choice-width, 8cqw))); justify-content: center; gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
 .draw-show-eligible-groups span { min-width: 0; height: 1.2cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 .draw-show-bowl-sheen { position: absolute; inset: 0; background: inherit; pointer-events: none; filter: var(--stage-bowl-filter); clip-path: polygon(42.7% 61.9%, 44.9% 61.25%, 50% 61.1%, 55.1% 61.25%, 57.3% 61.9%, 57.05% 66.6%, 55.75% 71.15%, 53.4% 74.8%, 51.8% 76.4%, 48.2% 76.4%, 46.6% 74.8%, 44.25% 71.15%, 42.95% 66.6%); }
 .draw-show-eligible-groups .is-spotlight { background: hsl(var(--accent)); box-shadow: 0 0 1.2cqw hsl(var(--stage-glow) / .65); border-color: hsl(var(--primary)); }
@@ -2686,7 +2686,7 @@ posities + statistieken groen */
 .draw-ball-left { border-radius: 100px 0 0 100px; animation: draw-half-left calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(250ms / var(--draw-rate)) calc(1650ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
-.draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 37%; height: 7%; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
+.draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 41.5%; height: 9.6%; border-radius: var(--draw-identity-radius, .8cqw); overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-in-out both; }
 .draw-show-pot-label { position: absolute; z-index: 3; left: 38%; width: 24%; top: 79%; height: 7%; pointer-events: none; overflow: visible; }
 .draw-show-pot-label text { fill: hsl(var(--primary)); font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 48px; font-weight: 700; text-transform: uppercase; filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-pot { position: absolute; left: 29%; width: 42%; top: 89%; height: 10%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -2763,7 +2763,7 @@ posities + statistieken groen */
 @keyframes draw-name-reveal { from { opacity: 0; } to { opacity: 1; } }
 @keyframes draw-ball-drift { from { transform: translate(-50%, -50%) rotate(-3deg); } to { transform: translate(calc(-50% + .1cqw), calc(-50% - .08cqw)) rotate(3deg); } }
 .draw-transfer-reveal, .draw-transfer-slot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-.draw-transfer-reveal { animation: draw-transfer-out calc(1250ms / var(--draw-rate)) var(--transfer-offset) linear both; }
+.draw-transfer-reveal { border-radius: inherit; overflow: hidden; animation: draw-transfer-out calc(1250ms / var(--draw-rate)) var(--transfer-offset) linear both; }
 .draw-transfer-slot { gap: .35cqw; padding: .25cqw .45cqw; border-radius: 4px; border: 1px solid hsl(var(--border) / .5); background: hsl(var(--stage-glass) / .65); justify-content: flex-start; overflow: hidden; animation: draw-transfer-in calc(1250ms / var(--draw-rate)) var(--transfer-offset) linear both; }
 .draw-transfer-slot .draw-show-slot-mark { width: var(--landing-logo-size, 1.5cqw); height: var(--landing-logo-size, 1.5cqw); flex-basis: var(--landing-logo-size, 1.5cqw); }
 .draw-transfer-slot .draw-show-slot-name { font-size: var(--landing-name-size, .82cqw); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2778,5 +2778,4 @@ posities + statistieken groen */
 .draw-transfer-reveal, .draw-transfer-slot { isolation: isolate; }
 .draw-show-team-identity, .draw-show-slot > :not(.draw-show-flag-backdrop), .draw-transfer-slot > :not(.draw-show-flag-backdrop) { position: relative; z-index: 1; }
 .draw-show-eligible.has-selection { display: flex; justify-content: center; }
-.draw-show-eligible.has-selection .draw-show-eligible-groups { display: block; width: auto; max-width: 12cqw; }
-.draw-show-eligible.has-selection .draw-show-eligible-groups span { display: block; height: auto; min-height: 1.35cqw; padding: .18cqw .8cqw; border-radius: 100px; font-size: .62cqw; line-height: 1.2; box-shadow: none; }
+.draw-show-eligible.has-selection .draw-show-eligible-groups { width: var(--draw-choice-width, 8cqw); max-width: 100%; }

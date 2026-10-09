@@ -38,7 +38,9 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
       flight.current.visible = revealing && frame.visible;
       const progress = 1 - Math.pow(1 - Math.min(1, elapsed * speed / 1100), 3);
       flight.current.position.set(origin.current.x * (1 - progress), origin.current.y + (3.375 - origin.current.y) * progress, 8);
-      flight.current.scale.setScalar(frame.scale);
+       // Match the selected physical sphere at takeoff, retaining the same
+       // reveal size and shared landing coordinates at the end of the flight.
+       flight.current.scale.setScalar(simulation.radius / 1.9 + (1 - simulation.radius / 1.9) * progress);
     }
     for (const [mesh, direction] of [[left.current, -1], [right.current, 1]] as const) {
       if (mesh) { mesh.position.x = direction * frame.split * 5; mesh.rotation.z = direction * frame.split * .45; }

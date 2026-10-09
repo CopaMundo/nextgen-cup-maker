@@ -18,8 +18,18 @@ describe("draw ball physics", () => {
   it("uses larger balls and fills both sides of the bowl", () => {
     const { balls, radius } = createDrawBallWorld(Array.from({ length: 24 }, (_, i) => String(i)));
     const positions = [...balls.values()].map(ball => ball.position.x);
-    expect(radius).toBe(.68);
-    expect(Math.min(...positions)).toBeLessThan(-3);
-    expect(Math.max(...positions)).toBeGreaterThan(2.8);
+     expect(radius).toBe(1.53);
+     expect(Math.min(...positions)).toBeLessThan(-2.5);
+     expect(Math.max(...positions)).toBeGreaterThan(2.5);
   });
+   it.each([1, 6, 24, 49, 64, 128])("keeps %s enlarged balls contained with real contacts", count => {
+     const { balls, radius } = createDrawBallWorld(Array.from({ length: count }, (_, i) => String(i)));
+     expect(balls.size).toBe(count);
+     expect(radius).toBe(count > 49 ? .99 : 1.53);
+     for (const ball of balls.values()) {
+       expect(Number.isFinite(ball.position.y)).toBe(true);
+       expect(Math.hypot(ball.position.x, ball.position.z)).toBeLessThan(5.9);
+       expect(ball.position.y).toBeGreaterThan(BOWL_BOTTOM);
+     }
+   }, 20000);
 });
