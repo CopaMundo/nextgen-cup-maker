@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
 import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
@@ -101,6 +102,7 @@ const LiveDrawDialog = ({
   automaticRounds?: number;
 }) => {
   const isRounds = phaseMatchType === "rounds";
+  const tournamentName = useDrawTournamentName(tournamentId, open);
   const { toast } = useToast();
   const [step, setStep] = useState<Step>("method");
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -268,13 +270,13 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady || !session || step !== "draw") return;
-    const picture = { session, spotlightId, presentation: { ...presentation, speed: animationSpeed, activePotId: session.pending ? session.activePotId : activePotChoice?.id ?? null } };
+    const picture = { session, spotlightId, presentation: { ...presentation, tournamentName, speed: animationSpeed, activePotId: session.pending ? session.activePotId : activePotChoice?.id ?? null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
       const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: "running", state: picture as unknown as never }, { onConflict: "phase_id" });
       if (error) console.warn("Live loting niet gesynchroniseerd", error.message);
     });
-  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, selectedPotId, tournamentId, phaseId, categoryId]);
+  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, selectedPotId, tournamentId, tournamentName, phaseId, categoryId]);
 
   useEffect(() => {
     if (open && step === "draw") return;
@@ -817,7 +819,7 @@ const LiveDrawDialog = ({
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
     <div ref={directorRef} className="draw-control-stage">
-      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
+      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
         <div className="draw-control-primary">
           {session.finished ? <Button onClick={applyDraw} disabled={applying} className="draw-scene-button"><Check />Indeling toepassen</Button>
             : <Button className="draw-scene-button" disabled={sceneBusy || (Boolean(pending) && !pending?.options.length)} onClick={() => pending ? drawGroup() : handleDrawNext()}><Shuffle />{pending ? "Loot groep" : "Trek team"}</Button>}

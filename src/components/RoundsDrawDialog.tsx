@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,6 +102,7 @@ const RoundsDrawDialog = ({
   onStepChange?: (step: string) => void;
 }) => {
   const { toast } = useToast();
+  const tournamentName = useDrawTournamentName(tournamentId, open);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"method" | "pots" | "settings" | "draw">("method");
   const [method, setMethod] = useState<"free" | "pots">("free");
@@ -841,10 +843,10 @@ const RoundsDrawDialog = ({
     session.pending = currentTeamId ? { teamId: currentTeamId, options: [] } : null;
     session.finished = groupDone(activeDraw);
     return { session, spotlightId: null, presentation: {
-      revealAt, speed: 1, activePotId: currentPot?.id ?? null, selection: null,
+      tournamentName, revealAt, speed: 1, activePotId: currentPot?.id ?? null, selection: null,
       rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
     } };
-  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, revealed, revealTimes, revealAt]);
+  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, revealed, revealTimes, revealAt]);
 
   useEffect(() => {
     if (!open || !draftReady || step !== "draw" || !picture) return;
