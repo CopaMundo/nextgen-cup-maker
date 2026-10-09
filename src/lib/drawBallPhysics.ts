@@ -4,6 +4,9 @@ export const BOWL_BOTTOM = -14.05;
 export const BOWL_RADIUS = 5.9;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .025 * radius * radius + .004 * Math.pow(radius, 4);
 
+/** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
+export const drawBallRadius = (count: number) => Math.max(.62, Math.min(2.1, 7.5 / Math.sqrt(count + 8)));
+
 /** A hidden concave bowl: real sphere contacts, gravity, rolling and settling. */
 export function createDrawBallWorld(ids: string[]) {
   const world = new World({ gravity: new Vec3(0, -25, 0), allowSleep: true });
@@ -28,7 +31,7 @@ export function createDrawBallWorld(ids: string[]) {
     indices.push(a, b, c, b, d, c);
   }
   world.addBody(new Body({ mass: 0, material, shape: new Trimesh(vertices, indices) }));
-  const radius = ids.length > 49 ? .99 : 1.53;
+  const radius = drawBallRadius(ids.length);
   // Hexagonal layers avoid an overlapping spiral pile at the bowl's center.
   // Keep sphere edges within the rim while filling its full left/right span.
   const spacing = radius * 2 + .08;
