@@ -5,6 +5,7 @@ import { calculateGroupLayout, calculateWingDensity, drawOverviewPage, stageSele
 import { alphabeticalTeamIds, opponentRevealDuration, roundsTeamComplete } from "@/lib/roundsDrawPresentation";
 import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
+import { countryToFlagUrl } from "@/lib/countryFlags";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import { studioFor } from "@/lib/drawStudio";
@@ -64,7 +65,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const pending = session?.pending;
   const rounds = presentation?.rounds;
   const selectedId = presentation?.selection?.targetId;
-  const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><CountryFlag country={country} className="draw-show-flag" /></span> : null;
+  const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><svg className="draw-show-flag" viewBox="3 5 30 26" preserveAspectRatio="none"><image href={countryToFlagUrl(country) ?? undefined} width="36" height="36" /></svg></span> : null;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
   const teamReady = !revealing;
   const last = session?.history[session.history.length - 1];
