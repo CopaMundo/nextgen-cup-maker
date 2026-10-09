@@ -3,6 +3,7 @@ import type { DrawStudioTheme } from "./drawStudio";
 
 export interface DrawPresentation {
   tournamentName?: string;
+  tournamentLogo?: string;
   theme?: DrawStudioTheme;
   language?: string;
   revealAt: number;
