@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Studio met geïntegreerde komhouder, dynamische LED-toernooinaam en Copa Mundo-logo; bestaande balvlucht, teamvak en poulelandingen behouden en controleren.
 - [x] Ononderbroken lokale balvlucht en opening bij elke teamtrekking, ook bij snel/traag tempo en vertraagde ontvangst; 22 tests geslaagd en gedeeld podium met lokale testteams bij drie snelheden, vroege plaatsing en tegenstanderonthulling zonder nieuwe bal gecontroleerd.
 - [x] Nieuwe aangeleverde studio met bijpassend teamvak op bestaande maat en opgeschaalde 3840×2160-weergave; podium visueel gecontroleerd, vijf tests geslaagd, twintig vleugellandingen exact en balopening binnen .02px van het vakcentrum gecontroleerd met lokale testteams.
 - [x] Enkele poules duidelijk hoger optisch gecentreerd; compacte clusters met vrije ruimte boven en onder geplaatst. Optische verschuiving neemt af bij volle vleugels; tien voorbeeldformaten links/rechts zonder overflow en met exacte transferdoelen gecontroleerd, vijf tests geslaagd.
