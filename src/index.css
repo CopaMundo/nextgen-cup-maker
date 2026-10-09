@@ -2605,7 +2605,7 @@ posities + statistieken groen */
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-led-header { position: absolute; top: 0; left: 30%; width: 40%; height: 22.75%; pointer-events: none; }
+.draw-show-led-header { position: absolute; top: 0; left: 27%; width: 46%; height: 22.75%; pointer-events: none; }
 .draw-show-live-heading { position: absolute; top: 17%; left: 0; width: 100%; text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2cqw; font-weight: 500; line-height: 1.2; letter-spacing: 0; color: hsl(var(--foreground)); }
 .draw-show-led-title { position: absolute; top: 40%; left: 0; width: 100%; height: 34%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: .12cqw solid hsl(var(--border)); background: radial-gradient(circle, hsl(var(--stage-led-dot)) .035cqw, transparent .045cqw) 0 0 / .22cqw .22cqw, hsl(var(--stage-led-surface)); box-shadow: 0 .2cqw .5cqw hsl(var(--background)), inset 0 0 .4cqw hsl(var(--stage-glow) / .2); }
 .draw-led-lettering, .draw-led-measure { display: block; flex-shrink: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 2.45cqw; line-height: 1; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: hsl(var(--primary)); }

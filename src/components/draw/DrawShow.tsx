@@ -37,7 +37,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     if (!title || !board) return;
     const fit = () => {
       setLedLength(title.getBoundingClientRect().width);
-      setLedPeriod(title.getBoundingClientRect().width + board.getBoundingClientRect().width * .12);
+      setLedPeriod(title.getBoundingClientRect().width + (stageRef.current?.clientWidth ?? 0) * .048);
     };
     fit();
     void document.fonts.ready.then(fit);
@@ -131,7 +131,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       <div className="draw-show-live-heading">{heading}</div>
       <div className="draw-show-led-title" role="img" aria-label={presentation?.tournamentName || "COPA MUNDO"}>
         <span ref={ledTitleRef} className="draw-led-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
-        {ledLength > (stageRef.current?.clientWidth ?? 0) * .38 ? <div key={presentation?.tournamentName} className="draw-led-loop" data-led-scrolling="true" style={{ "--led-period": `${ledPeriod}px`, "--led-duration": `${Math.max(12, ledPeriod / 28)}s` } as CSSProperties} aria-hidden="true">{Array.from({ length: 3 }, (_, i) => <span key={i} className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>)}</div> : <span className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>}
+        {ledLength > (stageRef.current?.clientWidth ?? 0) * .44 ? <div key={presentation?.tournamentName} className="draw-led-loop" data-led-scrolling="true" style={{ "--led-period": `${ledPeriod}px`, "--led-duration": `${Math.max(12, ledPeriod / 28)}s` } as CSSProperties} aria-hidden="true">{Array.from({ length: 3 }, (_, i) => <span key={i} className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>)}</div> : <span className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>}
       </div>
     </header>
     <div className="draw-show-brand">POWERED BY COPA MUNDO</div>
