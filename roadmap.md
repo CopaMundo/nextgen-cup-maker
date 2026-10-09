@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Oude boogresten verwijderen en LED in decor integreren; vlaggen over volledige kaarthoogte met zichtbare donkere banen; gedeelde transparante 3D-ballen met komphysics, vlucht en split controleren.
 - [x] Recht LED-display, thematische metaalglans en glasranden, compacte gekozen-poulecapsule en gedeelde instelbare vlagachtergronden. 23 tests geslaagd; voorbeeldpodium met echte 4K-studio gecontroleerd, merkregel onder display, vlaggen uit verbergt alle achtergronden en LED-loop wijkt minder dan .01px af. Geen nieuwe gezamenlijke regie/beamerloting uitgevoerd.
 - [x] LED-typografie en aparte merkregel onder de boog gecorrigeerd, teller lager verduidelijkt, actie op gemarkeerde bovenrand gezet en teams omhoog geplaatst. Bokaal rechtstreeks thematisch gefilterd; echte regie/beamerflow en 13 tests geslaagd, exact baldoel 0px.
 - [x] Logo-vrije LED-contour met gemeten tekstloop, thematische bokaalglans, dynamisch randlabel met cijferteller, begrensde poulechips en centrale actie onder de voet. 23 tests geslaagd; echte regie/beamer, fullscreenbevestiging en themawisseling gecontroleerd; 32 teams wisselen 16/16 en transferdoel heeft 0px afwijking.
