@@ -15,4 +15,11 @@ describe("draw ball physics", () => {
     expect(drawBallFlight(1375 / speed, speed).split).toBeCloseTo(.5);
     expect(drawBallFlight(1650 / speed, speed).visible).toBe(false);
   });
+  it("uses larger balls and fills both sides of the bowl", () => {
+    const { balls, radius } = createDrawBallWorld(Array.from({ length: 24 }, (_, i) => String(i)));
+    const positions = [...balls.values()].map(ball => ball.position.x);
+    expect(radius).toBe(.68);
+    expect(Math.min(...positions)).toBeLessThan(-3);
+    expect(Math.max(...positions)).toBeGreaterThan(2.8);
+  });
 });

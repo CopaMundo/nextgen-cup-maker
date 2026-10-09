@@ -2,7 +2,7 @@ import { Body, Material, ContactMaterial, Sphere, Trimesh, Vec3, World } from "c
 
 export const BOWL_BOTTOM = -14.05;
 export const BOWL_RADIUS = 5.9;
-export const bowlHeight = (radius: number) => BOWL_BOTTOM + .195 * radius * radius;
+export const bowlHeight = (radius: number) => BOWL_BOTTOM + .025 * radius * radius + .004 * Math.pow(radius, 4);
 
 /** A hidden concave bowl: real sphere contacts, gravity, rolling and settling. */
 export function createDrawBallWorld(ids: string[]) {
@@ -25,11 +25,11 @@ export function createDrawBallWorld(ids: string[]) {
     indices.push(a, b, c, b, d, c);
   }
   world.addBody(new Body({ mass: 0, material, shape: new Trimesh(vertices, indices) }));
-  const radius = ids.length > 49 ? .36 : .56;
+  const radius = ids.length > 49 ? .44 : .68;
   const balls = new Map<string, Body>();
   ids.forEach((id, index) => {
     const angle = index * 2.399963;
-    const radial = Math.min(4.3, .7 * Math.sqrt(index));
+    const radial = Math.min(4.8, 1.05 * Math.sqrt(index));
     const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .24, angularDamping: .4, sleepSpeedLimit: .08, sleepTimeLimit: .7 });
     body.position.set(Math.cos(angle) * radial, bowlHeight(radial) + radius + .6 + Math.floor(index / 40) * 1.2, Math.sin(angle) * radial);
     body.velocity.set(Math.sin(angle) * .3, 0, Math.cos(angle) * .3);
