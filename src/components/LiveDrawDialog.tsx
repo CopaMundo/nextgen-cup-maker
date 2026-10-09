@@ -859,7 +859,7 @@ const LiveDrawDialog = ({
         </div>
         <aside className="draw-control-dock">
           <DrawFullscreenButton target={directorRef} />
-          <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Ongedaan maken" title="Ongedaan maken" onClick={handleUndo} disabled={sceneBusy || !session.history.length}><Undo2 /></Button>
+          <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Ongedaan maken" title="Ongedaan maken" onClick={handleUndo} disabled={sceneBusy || Boolean(pending) || !session.history.length}><Undo2 /></Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Alles loten" title="Alles loten" onClick={() => setScopeAction("complete")} disabled={sceneBusy || session.finished}><Sparkles /></Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Opnieuw beginnen" title="Opnieuw beginnen" onClick={() => setScopeAction("reset")} disabled={sceneBusy}><RotateCcw /></Button>
           <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={sceneBusy}><Settings2 /></Button></PopoverTrigger>
