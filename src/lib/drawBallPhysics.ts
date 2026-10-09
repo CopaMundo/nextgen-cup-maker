@@ -25,14 +25,31 @@ export function createDrawBallWorld(ids: string[]) {
     indices.push(a, b, c, b, d, c);
   }
   world.addBody(new Body({ mass: 0, material, shape: new Trimesh(vertices, indices) }));
-  const radius = ids.length > 49 ? .44 : .68;
+  const radius = ids.length > 49 ? .99 : 1.53;
+  // Hexagonal layers avoid an overlapping spiral pile at the bowl's center.
+  // Keep sphere edges within the rim while filling its full left/right span.
+  const spacing = radius * 2 + .08;
+  const rowSpacing = spacing * Math.sqrt(3) / 2;
+  const maxRadial = BOWL_RADIUS - radius - .12;
+  const layer: { x: number; z: number }[] = [];
+  const rows = Math.ceil(maxRadial / rowSpacing);
+  const columns = Math.ceil(maxRadial / spacing);
+  for (let row = -rows; row <= rows; row++) {
+    for (let column = -columns; column <= columns; column++) {
+      const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0);
+      const z = row * rowSpacing;
+      if (Math.hypot(x, z) <= maxRadial) layer.push({ x, z });
+    }
+  }
+  layer.sort((a, b) => Math.hypot(b.x, b.z) - Math.hypot(a.x, a.z) || a.x - b.x);
+  const layerBase = bowlHeight(maxRadial) + radius + .1;
   const balls = new Map<string, Body>();
   ids.forEach((id, index) => {
-    const angle = index * 2.399963;
-    const radial = Math.min(4.8, 1.05 * Math.sqrt(index));
+    const position = layer[index % layer.length];
+    if (!position) return;
     const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .24, angularDamping: .4, sleepSpeedLimit: .08, sleepTimeLimit: .7 });
-    body.position.set(Math.cos(angle) * radial, bowlHeight(radial) + radius + .6 + Math.floor(index / 40) * 1.2, Math.sin(angle) * radial);
-    body.velocity.set(Math.sin(angle) * .3, 0, Math.cos(angle) * .3);
+    body.position.set(position.x, layerBase + Math.floor(index / layer.length) * spacing, position.z);
+    body.velocity.set(-position.z * .025, 0, position.x * .025);
     world.addBody(body); balls.set(id, body);
   });
   // Start with a settled, deterministic arrangement instead of a falling pile.
