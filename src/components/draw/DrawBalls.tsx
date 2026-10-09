@@ -15,7 +15,8 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
   const right = useRef<Mesh>(null);
   const origin = useRef({ x: 0, y: -10.85625 });
   const material = useMemo(() => new MeshPhysicalMaterial({ color: palette.ball, roughness: .24, metalness: .22, clearcoat: .9, clearcoatRoughness: .15 }), [palette.ball]);
-  useEffect(() => () => material.dispose(), [material]);
+  const halves = useMemo(() => { const m = material.clone(); m.transparent = true; return m; }, [material]);
+  useEffect(() => () => { material.dispose(); halves.dispose(); }, [material, halves]);
   useEffect(() => {
     const selected = drawnId ? simulation.balls.get(drawnId) : undefined;
     origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: -10.85625 };
@@ -42,6 +43,7 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
        // reveal size and shared landing coordinates at the end of the flight.
        flight.current.scale.setScalar(simulation.radius / 1.9 + (1 - simulation.radius / 1.9) * progress);
     }
+    halves.opacity = 1 - Math.min(1, frame.split * 1.15);
     for (const [mesh, direction] of [[left.current, -1], [right.current, 1]] as const) {
       if (mesh) { mesh.position.x = direction * frame.split * 5; mesh.rotation.z = direction * frame.split * .45; }
     }
@@ -57,8 +59,8 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
       <sphereGeometry args={[simulation.radius, 20, 14]} />
     </mesh>)}
     <group ref={flight} visible={false}>
-      <mesh ref={left} material={material}><sphereGeometry args={[1.9, 32, 24, -Math.PI / 2, Math.PI]} /></mesh>
-      <mesh ref={right} material={material}><sphereGeometry args={[1.9, 32, 24, Math.PI / 2, Math.PI]} /></mesh>
+      <mesh ref={left} material={halves}><sphereGeometry args={[1.9, 32, 24, -Math.PI / 2, Math.PI]} /></mesh>
+      <mesh ref={right} material={halves}><sphereGeometry args={[1.9, 32, 24, Math.PI / 2, Math.PI]} /></mesh>
     </group>
   </>;
 }
