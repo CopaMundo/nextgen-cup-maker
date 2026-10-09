@@ -4,17 +4,22 @@ import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei"
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
 import { createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
 
-interface Props { teamIds: string[]; revealKey: string | null; elapsed: number; speed: number; revealing: boolean; theme: string; }
+interface Props { teamIds: string[]; drawnId?: string; revealKey: string | null; elapsed: number; speed: number; revealing: boolean; theme: string; }
 interface Palette { ball: string; light: string; edge: string; }
 
-function BallScene({ teamIds, elapsed, speed, revealing, palette }: Props & { palette: Palette }) {
+function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, palette }: Props & { palette: Palette }) {
   const simulation = useMemo(() => createDrawBallWorld(teamIds), []);
   const meshes = useRef(new Map<string, Mesh>());
   const flight = useRef<Group>(null);
   const left = useRef<Mesh>(null);
   const right = useRef<Mesh>(null);
+  const origin = useRef({ x: 0, y: -10.85625 });
   const material = useMemo(() => new MeshPhysicalMaterial({ color: palette.ball, roughness: .24, metalness: .22, clearcoat: .9, clearcoatRoughness: .15 }), [palette.ball]);
   useEffect(() => () => material.dispose(), [material]);
+  useEffect(() => {
+    const selected = drawnId ? simulation.balls.get(drawnId) : undefined;
+    origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: -10.85625 };
+  }, [drawnId, revealKey, simulation]);
   useEffect(() => {
     const retained = new Set(teamIds);
     for (const [id, body] of simulation.balls) if (!retained.has(id)) {
@@ -31,7 +36,8 @@ function BallScene({ teamIds, elapsed, speed, revealing, palette }: Props & { pa
     const frame = drawBallFlight(elapsed, speed);
     if (flight.current) {
       flight.current.visible = revealing && frame.visible;
-      flight.current.position.set(0, frame.y, 8);
+      const progress = 1 - Math.pow(1 - Math.min(1, elapsed * speed / 1100), 3);
+      flight.current.position.set(origin.current.x * (1 - progress), origin.current.y + (3.375 - origin.current.y) * progress, 8);
       flight.current.scale.setScalar(frame.scale);
     }
     for (const [mesh, direction] of [[left.current, -1], [right.current, 1]] as const) {
