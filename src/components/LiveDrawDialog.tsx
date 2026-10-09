@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
+import { DrawShowOptions } from "@/components/draw/DrawShowOptions";
+import { useDrawShowOptions } from "@/hooks/useDrawShowOptions";
 import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
 import { revealDuration, selectionDuration, sweepDuration, type DrawPresentation } from "@/lib/drawPresentation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -126,7 +128,8 @@ const LiveDrawDialog = ({
   const [placementMode, setPlacementMode] = useState<"manual" | "automatic">("manual");
   const [spotlightId, setSpotlightId] = useState<string | null>(null);
   const [rolling, setRolling] = useState(false);
-  const [animationSpeed, setAnimationSpeed] = useState(1);
+  const [showOptions, setShowOptions] = useDrawShowOptions(phaseId);
+  const animationSpeed = showOptions.speed;
   const [presentation, setPresentation] = useState<DrawPresentation>({ revealAt: 0, speed: 1, activePotId: null, selection: null });
   const [revealing, setRevealing] = useState(false);
   const timers = useRef<number[]>([]);
@@ -228,7 +231,6 @@ const LiveDrawDialog = ({
           setAdvancedOpen(draft.advancedOpen);
           setAdvancedSpreadOpen(draft.advancedSpreadOpen);
           setPlacementMode(draft.placementMode ?? "manual");
-          setAnimationSpeed(draft.animationSpeed ?? 1);
         } else {
           const counts = available.reduce<Record<string, number>>((result, team) => {
             if (team.country) result[team.country] = (result[team.country] || 0) + 1;
@@ -269,14 +271,14 @@ const LiveDrawDialog = ({
   }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation]);
 
   useEffect(() => {
-    if (!open || !draftReady || !session || step !== "draw") return;
-    const picture = { session, spotlightId, presentation: { ...presentation, tournamentName, speed: animationSpeed, activePotId: session.pending ? session.activePotId : activePotChoice?.id ?? null } };
+    if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
+    const picture = { session: step === "draw" ? session : null, spotlightId, presentation: { ...presentation, tournamentName, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: session?.pending ? session.activePotId : activePotChoice?.id ?? null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
-      const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: "running", state: picture as unknown as never }, { onConflict: "phase_id" });
+      const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: picture as unknown as never }, { onConflict: "phase_id" });
       if (error) console.warn("Live loting niet gesynchroniseerd", error.message);
     });
-  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, selectedPotId, tournamentId, tournamentName, phaseId, categoryId]);
+  }, [open, draftReady, session, step, spotlightId, presentation, animationSpeed, showOptions.theme, selectedPotId, tournamentId, tournamentName, phaseId, categoryId]);
 
   useEffect(() => {
     if (open && step === "draw") return;
@@ -285,7 +287,7 @@ const LiveDrawDialog = ({
     setRolling(false);
     setRevealing(false);
     setPresentation((previous) => ({ ...previous, selection: null }));
-    if (publishedHere.current && (!open || step !== "draw")) {
+    if (publishedHere.current && (!open || (step !== "draw" && step !== "settings"))) {
       publishedHere.current = false;
       syncQueue.current = syncQueue.current.then(() => supabase.from("draw_sessions").update({ status: "closed" }).eq("phase_id", phaseId));
     }
@@ -819,7 +821,7 @@ const LiveDrawDialog = ({
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
     <div ref={directorRef} className="draw-control-stage">
-      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
+      <DrawShow session={session} spotlightId={spotlightId} presentation={{ ...presentation, tournamentName, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, activePotId: pending ? session.activePotId : activePotChoice?.id ?? null }} controls={<>
         <div className="draw-control-primary">
           {session.finished ? <Button onClick={applyDraw} disabled={applying} className="draw-scene-button"><Check />Indeling toepassen</Button>
             : <Button className="draw-scene-button" disabled={sceneBusy || (Boolean(pending) && !pending?.options.length)} onClick={() => pending ? drawGroup() : handleDrawNext()}><Shuffle />{pending ? "Loot groep" : "Trek team"}</Button>}
@@ -832,7 +834,7 @@ const LiveDrawDialog = ({
           <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="sm" disabled={sceneBusy}><Settings2 />Instellingen</Button></PopoverTrigger>
             <PopoverContent portalContainer={directorRef.current} className="draw-scene-settings space-y-4" side="top">
               <h2 className="font-semibold">Regie-instellingen</h2>
-              <div><Label>Animatiesnelheid</Label><Select value={String(animationSpeed)} onValueChange={(value) => setAnimationSpeed(Number(value))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{[{ value: .75, label: "Rustig" }, { value: 1, label: "Normaal" }, { value: 1.5, label: "Snel" }].map((item) => <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>)}</SelectContent></Select></div>
+              <DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} />
               <div className="flex items-center justify-between gap-4"><Label htmlFor="automatic-placement">Automatisch toewijzen</Label><Switch id="automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>
               {session.mode === "pots" && <div><Label>Actieve pot</Label><Select value={activePotChoice?.id} onValueChange={setSelectedPotId} disabled={Boolean(pending)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{pots.map((pot) => <SelectItem key={pot.id} value={pot.id} disabled={!pot.teamIds.some((id) => session.remaining.includes(id))}>{pot.name}</SelectItem>)}</SelectContent></Select></div>}
               {!pending && !session.finished && <div><Label>Handmatig kiezen</Label><Select value={manualTeam} onValueChange={handleDrawNext}><SelectTrigger><SelectValue placeholder="Selecteer team" /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{remainingPool.map((id) => <SelectItem key={id} value={id}>{teamName(session, id)}</SelectItem>)}</SelectContent></Select></div>}
@@ -935,6 +937,9 @@ const LiveDrawDialog = ({
                 <p className="text-xs text-muted-foreground">Stel de landenlimiet en teams in die niet samen in één poule mogen komen.</p>
               </div>
               {renderRules()}
+              <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
+                <div className="flex items-center justify-between gap-4"><Label htmlFor="prepare-automatic-placement">Automatisch toewijzen</Label><Switch id="prepare-automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>
+              </DrawShowOptions>
                {usePots && potOptions.includes(pots.length) && (
                   <div className="space-y-5 border-t border-primary/30 pt-4">
                     <section className="space-y-2">
@@ -988,7 +993,7 @@ const LiveDrawDialog = ({
                 }
                 setStep("settings");
               }}>Volgende</Button>}
-              {step === "settings" && <Button onClick={openDraw}>Volgende</Button>}
+              {step === "settings" && <Button onClick={openDraw}>Start loting</Button>}
               </div>
             </footer>
           )}

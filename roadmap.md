@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Drie aangeleverde 4K-studiothema’s, gedeelde voorbereiding met snelheid/kijklink/QR en Start loting, regie-opties, dynamische titel en gebogen doorlopende LED-naam; bokaal en ballandingen controleren.
 - [x] Rustige aangeleverde 4K-studio verwerkt met bestaand teamvak (29–71%, 39–49%), gebogen LED-toernooinaam en browsertaalafhankelijke lotingstitel; podium met lokale testteams visueel gecontroleerd, transferafwijking 0px, veertien tests geslaagd. Echte gezamenlijke regie-beamercontrole blijft apart open.
 - [x] Studio met geïntegreerde komhouder, dynamische LED-toernooinaam en Copa Mundo-logo in 3840×2160; echte toernooinaam aangemeld opgehaald, gedeeld podium met 32 lokale testteams visueel gecontroleerd, vertraagde balvlucht zichtbaar en transferdoel exact (0px afwijking). 22 tests geslaagd; gezamenlijke echte regie-beamerloting blijft afzonderlijk open.
 - [x] Ononderbroken lokale balvlucht en opening bij elke teamtrekking, ook bij snel/traag tempo en vertraagde ontvangst; 22 tests geslaagd en gedeeld podium met lokale testteams bij drie snelheden, vroege plaatsing en tegenstanderonthulling zonder nieuwe bal gecontroleerd.

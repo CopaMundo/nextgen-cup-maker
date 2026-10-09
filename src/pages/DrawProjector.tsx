@@ -15,7 +15,8 @@ export default function DrawProjector() {
     let revision = 0;
     const show = (data: { status?: unknown; state?: unknown } | null) => {
       const state = data?.state as Picture | undefined;
-      setPicture(data?.status === "running" && (state?.session?.kind === "containers" || state?.session?.kind === "rounds") ? state : null);
+      setPicture(data?.status === "setup" && state?.presentation ? { ...state, session: undefined } as unknown as Picture
+        : data?.status === "running" && (state?.session?.kind === "containers" || state?.session?.kind === "rounds") ? state : null);
     };
     const refresh = async () => {
       const request = ++revision;

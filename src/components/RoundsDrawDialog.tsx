@@ -20,6 +20,9 @@ import {
 import { emptyRoundsRules, shuffle } from "@/lib/liveDraw";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawShow } from "@/components/draw/DrawShow";
+import { DrawShowOptions } from "@/components/draw/DrawShowOptions";
+import { useDrawShowOptions } from "@/hooks/useDrawShowOptions";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
 import { initRoundsState } from "@/lib/drawSession";
 import { orderedTeamFixtures, opponentRevealDuration, roundsStage } from "@/lib/roundsDrawPresentation";
@@ -103,6 +106,8 @@ const RoundsDrawDialog = ({
 }) => {
   const { toast } = useToast();
   const tournamentName = useDrawTournamentName(tournamentId, open);
+  const [showOptions, setShowOptions] = useDrawShowOptions(phaseId);
+  const animationSpeed = showOptions.speed;
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"method" | "pots" | "settings" | "draw">("method");
   const [method, setMethod] = useState<"free" | "pots">("free");
@@ -476,11 +481,11 @@ const RoundsDrawDialog = ({
     : [];
 
   useEffect(() => {
-    const wait = Math.max(0, revealAt + revealDuration(1) - Date.now());
+    const wait = Math.max(0, revealAt + revealDuration(animationSpeed) - Date.now());
     setRevealReady(wait === 0);
     const timeout = window.setTimeout(() => setRevealReady(true), wait);
     return () => window.clearTimeout(timeout);
-  }, [revealAt]);
+  }, [revealAt, animationSpeed]);
 
   const drawNextTeam = () => {
     if (!activeDraw || !activeGroup || queue.length || !revealReady) return;
@@ -500,14 +505,14 @@ const RoundsDrawDialog = ({
     setRevealed((prev) => ({ ...prev, [groupId]: [...new Set([...(prev[groupId] || []), head])] }));
     setRevealTimes((prev) => ({ ...prev, [groupId]: { ...prev[groupId], [String(head)]: Date.now() } }));
     setRevealReady(false);
-    window.setTimeout(() => setRevealReady(true), opponentRevealDuration);
+    window.setTimeout(() => setRevealReady(true), opponentRevealDuration / animationSpeed);
   };
 
   useEffect(() => {
     if (!open || step !== "draw" || !queue.length || paused || !autoReveal || !revealReady || !revealsStarted) return;
-    timer.current = window.setTimeout(revealNextOpponent, REVEAL_MS);
+    timer.current = window.setTimeout(revealNextOpponent, REVEAL_MS / animationSpeed);
     return () => { if (timer.current) window.clearTimeout(timer.current); };
-  }, [open, step, queue.join(","), paused, autoReveal, revealReady, revealsStarted, activeDraw?.groupId]);
+  }, [open, step, queue.join(","), paused, autoReveal, revealReady, revealsStarted, activeDraw?.groupId, animationSpeed]);
 
   const revealAll = () => {
     if (!activeDraw) return;
@@ -843,26 +848,27 @@ const RoundsDrawDialog = ({
     session.pending = currentTeamId ? { teamId: currentTeamId, options: [] } : null;
     session.finished = groupDone(activeDraw);
     return { session, spotlightId: null, presentation: {
-      tournamentName, revealAt, speed: 1, activePotId: currentPot?.id ?? null, selection: null,
+      tournamentName, theme: showOptions.theme, language: navigator.language, revealAt, speed: animationSpeed, activePotId: currentPot?.id ?? null, selection: null,
       rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
     } };
-  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, revealed, revealTimes, revealAt]);
+  }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, revealed, revealTimes, revealAt, showOptions.theme, animationSpeed]);
 
   useEffect(() => {
-    if (!open || !draftReady || step !== "draw" || !picture) return;
+    if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
+    const publishedPicture = step === "draw" ? picture : { session: null, presentation: { tournamentName, theme: showOptions.theme, language: navigator.language, speed: animationSpeed, revealAt: 0, activePotId: null, selection: null } };
     publishedHere.current = true;
     syncQueue.current = syncQueue.current.then(async () => {
-      const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: "running", state: picture as unknown as never }, { onConflict: "phase_id" });
+      const { error } = await supabase.from("draw_sessions").upsert({ tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, status: step === "draw" ? "running" : "setup", state: publishedPicture as unknown as never }, { onConflict: "phase_id" });
       if (error && !syncFailed.current) {
         syncFailed.current = true;
         toast({ title: "Beamerscherm niet bijgewerkt", description: "Controleer de verbinding en open de loting opnieuw.", variant: "destructive" });
       }
       if (!error) syncFailed.current = false;
     });
-  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId]);
+  }, [open, draftReady, step, picture, tournamentId, phaseId, categoryId, tournamentName, showOptions.theme, animationSpeed]);
 
   useEffect(() => {
-    if (open && step === "draw") return;
+    if (open && (step === "draw" || step === "settings")) return;
     if (!publishedHere.current) return;
     publishedHere.current = false;
     syncQueue.current = syncQueue.current.then(() => supabase.from("draw_sessions").update({ status: "closed" }).eq("phase_id", phaseId).eq("tournament_id", tournamentId));
@@ -884,7 +890,7 @@ const RoundsDrawDialog = ({
           <Button className="draw-scene-button" variant="ghost" aria-pressed={autoReveal} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button>
           <Button className="draw-scene-button" variant="ghost" aria-pressed={!autoReveal} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button>
           <Button className="draw-scene-button" variant="ghost" disabled={!revealReady || groupDone(activeDraw)} onClick={revealAll}><FastForward />Alles tonen</Button>
-          <Button className="draw-scene-button" variant="ghost" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}><Settings2 />Instellingen</Button>
+          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" disabled={!revealReady}><Settings2 />Instellingen</Button></PopoverTrigger><PopoverContent portalContainer={directorRef.current} className="draw-scene-settings max-h-[70dvh] overflow-y-auto space-y-4" side="top"><h2 className="font-semibold">Regie-instellingen</h2><DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} /><Button variant="outline" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}>Lotingsregels</Button></PopoverContent></Popover>
           <Button className="draw-scene-button" variant="ghost" aria-label="Beamerscherm" title="Beamerscherm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink /></Button>
         </aside>
       </>} />
@@ -901,7 +907,7 @@ const RoundsDrawDialog = ({
         </header>
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
-         ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? settings : drawScreen}
+         ) : step === "method" ? methodScreen : step === "pots" ? potScreen : step === "settings" ? <div className="min-h-0 overflow-y-auto space-y-5">{settings}<DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} aria-pressed={autoReveal} onClick={() => setAutoReveal(true)}><Play className="h-4 w-4" />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} aria-pressed={!autoReveal} onClick={() => setAutoReveal(false)}><Pause className="h-4 w-4" />Per wedstrijd</Button></div></DrawShowOptions></div> : drawScreen}
         <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:items-center">
           {onRestart && <Button variant="ghost" className="sm:mr-auto" onClick={onRestart} disabled={applying}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>}
           <div className="flex flex-col-reverse gap-2 sm:ml-auto sm:flex-row">
@@ -913,7 +919,7 @@ const RoundsDrawDialog = ({
             <>
                <Button variant="outline" onClick={() => setStep(method === "pots" ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
                <Button onClick={prepare} disabled={checking || groups.length === 0 || exceedsShowLimit}>
-                {checking ? "Speelrondes aanmaken..." : "Volgende"}
+                {checking ? "Speelrondes aanmaken..." : "Start loting"}
               </Button>
             </>
           ) : (

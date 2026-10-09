@@ -7,7 +7,7 @@ import { House, Plane } from "lucide-react";
 import CountryFlag from "@/components/CountryFlag";
 import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
-import liveDrawStage from "@/assets/live-draw-calm-aligned-4k.webp.asset.json";
+import { studioFor } from "@/lib/drawStudio";
 import copaLogo from "@/assets/copa-mundo-yellow.png.asset.json";
 import { drawHeading } from "@/lib/drawHeading";
 
@@ -20,18 +20,25 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const { session, spotlightId, presentation, now, revealKey, revealElapsed, revealing } = useDrawPlayback({ session: incomingSession ?? undefined, spotlightId: incomingSpotlight ?? null, presentation: incomingPresentation });
   const stageRef = useRef<HTMLDivElement>(null);
   const ledTitleRef = useRef<SVGTextElement>(null);
+  const [ledLength, setLedLength] = useState(0);
+  const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
-  const heading = drawHeading(navigator.language);
+  const heading = drawHeading(presentation?.language ?? browserLanguage);
+  const studio = studioFor(presentation?.theme);
+  useLayoutEffect(() => {
+    const update = () => setBrowserLanguage(navigator.language);
+    window.addEventListener("languagechange", update);
+    return () => window.removeEventListener("languagechange", update);
+  }, []);
   useLayoutEffect(() => {
     const title = ledTitleRef.current;
     const board = title?.parentElement;
     if (!title || !board) return;
     const fit = () => {
-      title.style.removeProperty("--led-title-size");
-      const scale = Math.min(1, 880 / Math.max(1, title.getComputedTextLength()));
-      title.style.setProperty("--led-title-size", `${36 * scale}px`);
+      setLedLength(title.getComputedTextLength());
     };
     fit();
+    void document.fonts.ready.then(fit);
     const observer = new ResizeObserver(fit);
     observer.observe(board);
     return () => observer.disconnect();
@@ -112,12 +119,14 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const motionStyle = { "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px` } as CSSProperties;
 
-  return <div ref={stageRef} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${liveDrawStage.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
+  return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     <header className="draw-show-led-header">
       <div className="draw-show-live-heading">{heading}</div>
       <svg className="draw-show-led-title" viewBox="0 0 1000 320" role="img" aria-label={presentation?.tournamentName || "COPA MUNDO"}>
         <defs><path id={ledArcId} d="M 30 155 Q 500 215 970 155" /></defs>
-        <text ref={ledTitleRef} className="draw-led-lettering" textAnchor="middle"><textPath href={`#${ledArcId}`} startOffset="50%">{presentation?.tournamentName || "COPA MUNDO"}</textPath></text>
+        <text ref={ledTitleRef} className="draw-led-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</text>
+        {ledLength > 880 ? [0, 1].map((copy) => <text key={`${presentation?.tournamentName}-${copy}`} className="draw-led-lettering" data-led-scrolling="true"><textPath href={`#${ledArcId}`} startOffset={copy * (ledLength + 100)}>{presentation?.tournamentName || "COPA MUNDO"}<animate attributeName="startOffset" from={String(copy * (ledLength + 100))} to={String((copy - 1) * (ledLength + 100))} dur={`${(ledLength + 100) / 65}s`} repeatCount="indefinite" /></textPath></text>)
+          : <text className="draw-led-lettering" textAnchor="middle"><textPath href={`#${ledArcId}`} startOffset="50%">{presentation?.tournamentName || "COPA MUNDO"}</textPath></text>}
       </svg>
       <div className="draw-show-led-brand"><span className="draw-led-lettering">POWERED BY</span><AutoTrimLogo src={copaLogo.url} className="draw-show-led-logo" /><span className="draw-led-lettering">COPA MUNDO</span></div>
     </header>
