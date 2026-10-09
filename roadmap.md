@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Recht LED-display, thematische metaalglans en glasranden, compacte gekozen-poulecapsule en gedeelde instelbare vlagachtergronden implementeren en controleren.
 - [x] LED-typografie en aparte merkregel onder de boog gecorrigeerd, teller lager verduidelijkt, actie op gemarkeerde bovenrand gezet en teams omhoog geplaatst. Bokaal rechtstreeks thematisch gefilterd; echte regie/beamerflow en 13 tests geslaagd, exact baldoel 0px.
 - [x] Logo-vrije LED-contour met gemeten tekstloop, thematische bokaalglans, dynamisch randlabel met cijferteller, begrensde poulechips en centrale actie onder de voet. 23 tests geslaagd; echte regie/beamer, fullscreenbevestiging en themawisseling gecontroleerd; 32 teams wisselen 16/16 en transferdoel heeft 0px afwijking.
 - [x] LED-boog en toernooilogo, vorige bokaal op bestaande voet in drie 4K-studio’s, actieve pot/groep met 24-team paginering, compacte fullscreen-regie met scoped bevestigingen en vloeiende slotlanding. 26 tests geslaagd; echte groepsregie/beamer, bevestiging binnen fullscreen en themawisseling gecontroleerd; paginering 24/8, teller 12/32, aankomstgloed en exact slotdoel (0px) gecontroleerd.

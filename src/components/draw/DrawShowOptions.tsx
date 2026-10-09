@@ -4,6 +4,7 @@ import { Check, Copy, ExternalLink, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { drawStudios, type DrawShowOptions as Options } from "@/lib/drawStudio";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +29,7 @@ export function DrawShowOptions({ phaseId, options, onChange, portalContainer, c
         : <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">{drawStudios.map((item) => <Button key={item.id} variant="outline" aria-pressed={options.theme === item.id} onClick={() => onChange({ ...options, theme: item.id })} className={`draw-choice h-auto flex-col overflow-hidden p-0 text-foreground ${options.theme === item.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : ""}`}><img src={item.asset.url} alt={item.name} className="aspect-video w-full object-cover" /><span className="flex w-full items-center justify-between gap-2 p-3 text-foreground">{item.name}{options.theme === item.id && <Check className="h-4 w-4 text-primary" />}</span></Button>)}</div>}
     </div>
     <div className="space-y-2"><Label htmlFor={`${id}-speed`}>Animatiesnelheid</Label><Select value={String(options.speed)} onValueChange={(speed) => onChange({ ...options, speed: Number(speed) })}><SelectTrigger id={`${id}-speed`}><SelectValue /></SelectTrigger><SelectContent portalContainer={portalContainer}>{[{ value: .75, label: "Rustig" }, { value: 1, label: "Normaal" }, { value: 1.5, label: "Snel" }].map((item) => <SelectItem key={item.value} value={String(item.value)}>{item.label}</SelectItem>)}</SelectContent></Select></div>
+    <div className="flex items-center justify-between gap-3"><Label htmlFor={`${id}-flags`}>Landsvlag als achtergrond</Label><Switch id={`${id}-flags`} checked={options.flagBackdrops} onCheckedChange={(flagBackdrops) => onChange({ ...options, flagBackdrops })} /></div>
     {children}
     <div className="space-y-3">
       <Button variant="outline" className="w-full" onClick={() => setShared((value) => !value)}><Link className="h-4 w-4" />{shared ? "Kijklink verbergen" : "Kijklink & QR-code"}</Button>
