@@ -180,12 +180,12 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         <div className="draw-show-wing draw-show-wing-right" data-wing-columns={layout.wingColumns} data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...rightContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{rightContainers.map(renderContainer)}</div>
       </>}
       <main className="draw-show-center">
-        <div className={`draw-show-team-card ${pending && selectionPhase !== "transfer" && selectionPhase !== "complete" ? "is-active" : ""}`}>
+        <div className="draw-show-team-card">
           {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={revealKey ?? pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
         </div>
         {!rounds && pending && selectionPhase !== "complete" && <div className={`draw-show-eligible draw-reveal-name ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": Math.max(1, Math.min(8, eligible.length)) } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
       </main>
-      {selectionPhase === "transfer" && team && <div className="draw-show-transfer" key={`${team.id}-${selectedId}`}><div className="draw-transfer-reveal">{teamContent}</div><div className="draw-transfer-slot">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span>{layout.mode !== "C" && <span className="draw-show-slot-name">{team.name}</span>}</div></div>}
+      {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span></div></div>}
       <div className="draw-show-bowl-sheen" aria-hidden="true" />
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`} />
       <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
