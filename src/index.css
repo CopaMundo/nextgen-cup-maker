@@ -2675,7 +2675,7 @@ posities + statistieken groen */
 .draw-show-eligible { position: absolute; top: 112%; width: 100%; height: 5.6cqw; overflow: hidden; }
 .draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, 1fr)); gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
 .draw-show-eligible-groups span { min-width: 0; height: 1.2cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.draw-show-bowl-sheen { position: absolute; inset: 0; background: inherit; pointer-events: none; filter: var(--stage-bowl-filter); clip-path: polygon(42.85% 62.05%, 44.9% 61.45%, 50% 61.3%, 55.1% 61.45%, 57.15% 62.05%, 56.85% 66.4%, 55.55% 70.9%, 53.2% 74.35%, 51.6% 76%, 48.4% 76%, 46.8% 74.35%, 44.45% 70.9%, 43.15% 66.4%); }
+.draw-show-bowl-sheen { position: absolute; inset: 0; background: inherit; pointer-events: none; filter: var(--stage-bowl-filter); clip-path: polygon(42.7% 61.9%, 44.9% 61.25%, 50% 61.1%, 55.1% 61.25%, 57.3% 61.9%, 57.05% 66.6%, 55.75% 71.15%, 53.4% 74.8%, 51.8% 76.4%, 48.2% 76.4%, 46.6% 74.8%, 44.25% 71.15%, 42.95% 66.6%); }
 .draw-show-eligible-groups .is-spotlight { background: hsl(var(--accent)); box-shadow: 0 0 1.2cqw hsl(var(--stage-glow) / .65); border-color: hsl(var(--primary)); }
 .draw-show-bowl { position: absolute; left: 44.8%; top: 62.5%; width: 10.4%; height: 12.5%; pointer-events: none; }
 .draw-show-bowl-ball { position: absolute; width: var(--ball-size, 1.7cqw); aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
@@ -2772,7 +2772,7 @@ posities + statistieken groen */
 @keyframes draw-slot-arrival { 0%,35% { box-shadow: 0 0 .8cqw hsl(var(--stage-glow) / .65), inset 0 0 .5cqw hsl(var(--stage-glow) / .2); border-color: hsl(var(--primary)); } 100% { box-shadow: 0 0 0 hsl(var(--stage-glow) / 0); } }
 /* The live draw is a projected show: the ball flight, split and roster loop always animate, regardless of OS motion settings. */
 
-.draw-show-slot { position: relative; isolation: isolate; }
+.draw-show-slot, .draw-transfer-reveal, .draw-transfer-slot { position: relative; isolation: isolate; }
 .draw-show-team-identity, .draw-show-slot > :not(.draw-show-flag-backdrop), .draw-transfer-slot > :not(.draw-show-flag-backdrop) { position: relative; z-index: 1; }
 .draw-show-eligible.has-selection { display: flex; justify-content: center; }
 .draw-show-eligible.has-selection .draw-show-eligible-groups { display: block; width: auto; max-width: 12cqw; }
