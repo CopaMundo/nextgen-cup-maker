@@ -6,11 +6,11 @@ import { ExtrudeGeometry, type Shape } from "three";
 const font = new FontLoader().parse(outlines);
 
 /** Real extruded outlines, optically centered and bounded to the rear-wall area. */
-export function wallLetterGeometry(text: string, height: number, width: number, tracking = 0) {
+export function wallLetterGeometry(text: string, height: number, width: number, tracking = 0, bevelSize = .012) {
   const normalized = text.trim().toUpperCase() || "COPA MUNDO";
   const geometry = new TextGeometry(normalized, {
     font, size: 1, depth: .065, curveSegments: 8,
-    bevelEnabled: true, bevelThickness: .018, bevelSize: .012, bevelSegments: 3,
+    bevelEnabled: true, bevelThickness: .018, bevelSize, bevelSegments: 3,
   });
   // Spread small captions by shifting each outline using its original pen advance.
   if (tracking > 0) {

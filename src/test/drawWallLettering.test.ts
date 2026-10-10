@@ -20,4 +20,15 @@ describe("mounted studio lettering", () => {
     expect((geometry.boundingBox?.max.x ?? 0) - (geometry.boundingBox?.min.x ?? 0)).toBeLessThanOrEqual(9.001);
     geometry.dispose();
   });
+  it("bounds the larger architectural title with a heavier milled edge", () => {
+    const geometry = wallLetterGeometry("SOCCERTEC MASTERS", 1.28, 12.8, 0, .026);
+    const box = geometry.boundingBox;
+    if (!box) throw new Error("Missing title bounds");
+    expect(box.max.x - box.min.x).toBeLessThanOrEqual(12.801);
+    expect(box.max.y - box.min.y).toBeLessThanOrEqual(1.281);
+    expect(box.max.y - box.min.y).toBeGreaterThan(1.02);
+    expect(box.min.x + box.max.x).toBeCloseTo(0, 4);
+    expect(Array.from(geometry.getAttribute("position").array).every(Number.isFinite)).toBe(true);
+    geometry.dispose();
+  });
 });
