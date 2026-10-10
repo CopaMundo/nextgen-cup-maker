@@ -32,6 +32,7 @@ function WallLetters({ title, heading, theme, palette }: Props & { palette: Meta
     <directionalLight position={[-4, 5, 7]} intensity={3.2} color={palette.light} />
     <directionalLight position={[6, 1, 4]} intensity={1.1} color={palette.reflection} />
     <Suspense fallback={null}><Environment resolution={64} frames={1}>
+      <Lightformer position={[0, 2, 6]} rotation-y={Math.PI} scale={[12, 5, 1]} intensity={3} color={palette.light} />
       <Lightformer position={[-2, 5, 5]} rotation-x={.3} scale={[10, 2, 1]} intensity={4} color={palette.light} />
       <Lightformer position={[5, 0, 3]} rotation-y={-.8} scale={[3, 6, 1]} intensity={2} color={palette.reflection} />
       <Lightformer position={[-5, -2, 2]} rotation-y={.8} scale={[4, 1, 1]} intensity={1.5} color={palette.light} />
@@ -39,7 +40,7 @@ function WallLetters({ title, heading, theme, palette }: Props & { palette: Meta
     {letters.map(({ geometry, y }, index) => <group key={index} position-y={y}>
       <mesh geometry={geometry} position={[.028, -.044, -.07]} scale={[1.012, 1.024, 1]}><meshBasicMaterial color={palette.shadow} transparent opacity={.8} /></mesh>
       <mesh geometry={geometry}>
-        <meshPhysicalMaterial color={palette.face} metalness={.94} roughness={theme === "copa-gold" ? .32 : .2} roughnessMap={grain} clearcoat={.35} clearcoatRoughness={.2} />
+        <meshPhysicalMaterial color={palette.face} emissive={palette.face} emissiveIntensity={index === 1 ? .24 : .4} metalness={.88} roughness={theme === "copa-gold" ? .32 : .2} roughnessMap={grain} clearcoat={.35} clearcoatRoughness={.2} />
       </mesh>
     </group>)}
   </>;

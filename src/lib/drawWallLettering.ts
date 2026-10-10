@@ -1,6 +1,7 @@
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import outlines from "@/assets/fonts/barlow-condensed-semibold.typeface.json";
+import { ExtrudeGeometry, type Shape } from "three";
 
 const font = new FontLoader().parse(outlines);
 
@@ -20,9 +21,13 @@ export function wallLetterGeometry(text: string, height: number, width: number, 
       const glyph = font.data.glyphs[character] ?? font.data.glyphs["?"];
       const letter = font.generateShapes(character, 1);
       for (const shape of letter) {
+        const moved = new Set<object>();
         for (const curve of [...shape.curves, ...shape.holes.flatMap(hole => hole.curves)]) {
           const points = curve as unknown as Record<string, { x: number } | undefined>;
-          for (const key of ["v1", "v2", "v0", "v3"]) if (points[key]) points[key].x += advance;
+          for (const key of ["v1", "v2", "v0", "v3"]) {
+            const point = points[key];
+            if (point && !moved.has(point)) { point.x += advance; moved.add(point); }
+          }
         }
       }
       shapes.push(...letter);
@@ -33,7 +38,6 @@ export function wallLetterGeometry(text: string, height: number, width: number, 
   return fitGeometry(geometry, height, width);
 }
 
-import { ExtrudeGeometry, type Shape } from "three";
 function fitGeometry(base: TextGeometry, height: number, width: number, shapes?: Shape[]) {
   const geometry = shapes ? new ExtrudeGeometry(shapes, { depth: .065, curveSegments: 8, bevelEnabled: true, bevelThickness: .018, bevelSize: .012, bevelSegments: 3 }) : base;
   if (shapes) base.dispose();
