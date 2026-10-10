@@ -2605,15 +2605,13 @@ posities + statistieken groen */
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-wall-header { --wall-heading-color: #C8CED6; --wall-title-color: #E8EBEF; --wall-brand-color: #AEB5BE; --wall-title-shadow: 0 2px 12px rgba(0, 0, 0, .6); position: absolute; top: 3.8675%; left: 34%; width: 32%; height: 16.15%; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .65cqw; overflow: hidden; }
-.draw-wall-metal { background: none; color: var(--wall-title-color); text-shadow: var(--wall-title-shadow); }
-.draw-wall-caption { text-align: center; font-family: "Montserrat", sans-serif; font-size: 1.05cqw; font-weight: 500; line-height: 1.4; white-space: nowrap; }
-.draw-show-live-heading { color: var(--wall-heading-color); letter-spacing: .38em; }
-.draw-show-brand { color: var(--wall-brand-color); letter-spacing: .30em; }
+.draw-show-wall-header { --wall-metal-finish: linear-gradient(180deg, hsl(var(--stage-metal-light)) 0%, hsl(var(--stage-metal-main)) 58%, hsl(var(--stage-metal-dark)) 100%); --wall-title-finish: linear-gradient(180deg, hsl(var(--stage-metal-light)) 0%, color-mix(in srgb, hsl(var(--stage-metal-light)) 50%, hsl(var(--stage-metal-main))) 58%, hsl(var(--stage-metal-main)) 100%); --wall-metal-shadow: 0 2px 8px hsl(var(--background) / .6); position: absolute; top: 3.8675%; left: 34%; width: 32%; height: 16.15%; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1cqw; overflow: hidden; }
+.draw-wall-metal { background: var(--wall-metal-finish); background-clip: text; -webkit-background-clip: text; color: transparent; filter: drop-shadow(var(--wall-metal-shadow)); }
+.draw-wall-caption { text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 1.05cqw; font-weight: 700; letter-spacing: 0; line-height: 1.4; white-space: nowrap; }
 .draw-show-live-heading, .draw-show-brand { width: 100%; flex: 0 0 auto; pointer-events: none; }
 .draw-show-wall-title { position: relative; width: 100%; min-height: 0; flex: 1 1 0; display: flex; align-items: center; justify-content: center; }
 .draw-wall-title-lettering, .draw-wall-title-measure { display: block; width: 100%; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: .95; font-weight: 600; letter-spacing: .035em; text-transform: uppercase; white-space: pre; text-align: center; overflow-wrap: normal; }
-.draw-wall-title-lettering { font-size: var(--wall-title-size, 4.8cqw); }
+.draw-wall-title-lettering { background-image: var(--wall-title-finish); font-size: var(--wall-title-size, 4.8cqw); }
 .draw-wall-title-measure { position: absolute; visibility: hidden; pointer-events: none; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
