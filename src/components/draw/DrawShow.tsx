@@ -65,7 +65,11 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       setWallTitleText(balanced);
       const range = document.createRange();
       range.selectNodeContents(title);
-      const fitted = fitWallTitle(board.clientWidth, board.clientHeight, maxSize, (size) => {
+      const header = board.parentElement;
+      if (!header) return;
+      const captions = Array.from(header.querySelectorAll<HTMLElement>(".draw-wall-caption"));
+      const availableHeight = header.clientHeight - captions.reduce((height, caption) => height + caption.getBoundingClientRect().height, 0) - 2 * parseFloat(getComputedStyle(header).rowGap);
+      const fitted = fitWallTitle(board.clientWidth, availableHeight, maxSize, (size) => {
         title.style.fontSize = `${size}px`;
         const rects = Array.from(range.getClientRects()).filter((rect) => rect.width > 0);
         const lines = new Set(rects.map((rect) => Math.round(rect.top * 10))).size;
@@ -168,7 +172,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       <div className="draw-show-live-heading draw-wall-metal draw-wall-caption">{heading}</div>
       <div className="draw-show-wall-title" style={{ "--wall-title-size": wallTitleSize ? `${wallTitleSize}px` : undefined } as CSSProperties}>
         <span ref={wallTitleRef} className="draw-wall-title-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
-        <span className="draw-wall-title-lettering draw-wall-metal">{wallTitleText}</span>
+        <span className="draw-wall-title-lettering">{wallTitleText.split("\n").map((line, index) => <span className="draw-wall-title-line draw-wall-metal" key={index}>{line}</span>)}</span>
       </div>
       <div className="draw-show-brand draw-wall-metal draw-wall-caption">POWERED BY COPA MUNDO</div>
     </header>

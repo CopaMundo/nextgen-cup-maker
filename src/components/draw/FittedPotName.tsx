@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
+import { balanceWallTitle } from "@/lib/drawHeading";
 
 /** Measure the actual name column after its logo and padding have taken space. */
 export function FittedPotName({ name }: { name: string }) {
@@ -12,14 +13,25 @@ export function FittedPotName({ name }: { name: string }) {
       element.style.removeProperty("font-size");
       const maximum = parseFloat(getComputedStyle(element).fontSize);
       const range = document.createRange();
+      const measure = (text: string) => {
+        element.textContent = text;
+        range.selectNodeContents(element);
+        return range.getBoundingClientRect().width;
+      };
+      // Keep the normal font size; only names that overflow gain a second line.
+      element.textContent = balanceWallTitle(name, element.clientWidth * .62, measure);
       range.selectNodeContents(element);
-      if (element.clientWidth > 0 && range.getBoundingClientRect().width > element.clientWidth) {
+      const parent = element.parentElement;
+      const parentStyle = parent ? getComputedStyle(parent) : undefined;
+      const availableHeight = parent ? parent.clientHeight - parseFloat(parentStyle?.paddingTop || "0") - parseFloat(parentStyle?.paddingBottom || "0") : Infinity;
+      const fits = () => range.getBoundingClientRect().width <= element.clientWidth - .5 && element.getBoundingClientRect().height <= availableHeight;
+      if (element.clientWidth > 0 && !fits()) {
         let low = 0;
         let high = maximum;
         for (let iteration = 0; iteration < 16; iteration++) {
           const size = (low + high) / 2;
           element.style.fontSize = `${size}px`;
-          if (range.getBoundingClientRect().width <= element.clientWidth - .5) low = size;
+          if (fits()) low = size;
           else high = size;
         }
         element.style.fontSize = `${low}px`;
