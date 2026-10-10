@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Wandteksten in één begrensde kolom, symmetrische tussenruimte en automatisch passende toernooinaam op maximaal twee regels; bestaande metallic stijl behouden.
 - [x] Toernooinaam op wanderta: veel groter, hoog/smal/condensed met strak spatiëring (Barlow Condensed 800, letter-spacing -0.015em, scaleY до 1.6); fitWallTitle запълва платото и капа высочината между LIVE LOTING и POWERED BY. Контролирани 3 теми × 3 дължини без припокриване; 5+4 теста минават.
 - [x] LED-paneel verwijderd; drie metallic wandteksten op bestaande hoogte, identieke heading/merkregel en grote vetgedrukte toernooinaam. Acht tests geslaagd; drie thema’s, identieke captionopmaak en lange naam gecontroleerd zonder runtimefouten.
 - [x] Permanente teambalk hersteld, rechter LED-rand teruggebracht zonder linkerzijde te verplaatsen en één identiteit vloeiend naar poulestijl gemorpht. 27 tests slagen; drie studio’s en directe landing binnen .01px gecontroleerd met voorbeeldteams zonder runtimefouten. Geen nieuwe gezamenlijke echte regie/beamer-trekking uitgevoerd.
