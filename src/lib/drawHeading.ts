@@ -20,7 +20,5 @@ export function fitWallTitle(boardWidth: number, naturalWidth: number, emHeight:
   const usable = stageHeight * 0.102;
   const capUnit = emHeight * 0.74;
   const widthFit = boardWidth / naturalWidth;
-  const stretchAtWidthFit = usable / (capUnit * widthFit);
-  if (stretchAtWidthFit >= 1) return { scale: widthFit, stretch: Math.min(1.6, stretchAtWidthFit) };
-  return { scale: usable / (capUnit * 1.6), stretch: 1.6 };
+  return { scale: Math.min(widthFit, usable / capUnit), stretch: 1 };
 }
