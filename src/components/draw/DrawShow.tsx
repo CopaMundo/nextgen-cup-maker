@@ -12,7 +12,6 @@ import { studioFor } from "@/lib/drawStudio";
 import { DrawBalls } from "@/components/draw/DrawBalls";
 import { FittedPotName } from "@/components/draw/FittedPotName";
 
-import { balanceWallTitle, drawHeading, fitWallTitle } from "@/lib/drawHeading";
 
 export function DrawShow({ session: incomingSession, spotlightId: incomingSpotlight, presentation: incomingPresentation, controls }: {
   session?: DrawSessionState | null;
@@ -22,69 +21,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
 }) {
   const { session, spotlightId, presentation, now, revealKey, revealElapsed, revealing } = useDrawPlayback({ session: incomingSession ?? undefined, spotlightId: incomingSpotlight ?? null, presentation: incomingPresentation });
   const stageRef = useRef<HTMLDivElement>(null);
-  const wallTitleRef = useRef<HTMLSpanElement>(null);
-  const [wallTitleSize, setWallTitleSize] = useState<number>();
-  const [wallTitleText, setWallTitleText] = useState(presentation?.tournamentName || "COPA MUNDO");
-  const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
-  const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
-  const heading = drawHeading(presentation?.language ?? browserLanguage);
+  const ledArcId = `draw-pot-${useId().replace(/:/g, "")}`;
   const studio = studioFor(presentation?.theme);
-  useLayoutEffect(() => {
-    if (document.querySelector("link[data-draw-wall-font]")) return;
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap";
-    link.dataset.drawWallFont = "true";
-    document.head.appendChild(link);
-  }, []);
-  useLayoutEffect(() => {
-    const update = () => setBrowserLanguage(navigator.language);
-    window.addEventListener("languagechange", update);
-    return () => window.removeEventListener("languagechange", update);
-  }, []);
-  useLayoutEffect(() => {
-    const title = wallTitleRef.current;
-    const board = title?.parentElement;
-    const stage = stageRef.current;
-    if (!title || !board || !stage) return;
-    const fit = () => {
-      title.style.removeProperty("font-size");
-      const maxSize = parseFloat(getComputedStyle(title).fontSize);
-      const text = presentation?.tournamentName || "COPA MUNDO";
-      const balanced = balanceWallTitle(text, board.clientWidth, (value) => {
-        title.textContent = value;
-        const naturalRange = document.createRange();
-        naturalRange.selectNodeContents(title);
-        // Temporarily prevent wrapping to measure the natural inscription width.
-        title.style.whiteSpace = "nowrap";
-        const width = naturalRange.getBoundingClientRect().width;
-        title.style.removeProperty("white-space");
-        return width;
-      });
-      title.textContent = balanced;
-      setWallTitleText(balanced);
-      const range = document.createRange();
-      range.selectNodeContents(title);
-      const header = board.parentElement;
-      if (!header) return;
-      const captions = Array.from(header.querySelectorAll<HTMLElement>(".draw-wall-caption"));
-      const availableHeight = header.clientHeight - captions.reduce((height, caption) => height + caption.getBoundingClientRect().height, 0) - 2 * parseFloat(getComputedStyle(header).rowGap);
-      const fitted = fitWallTitle(board.clientWidth, availableHeight, maxSize, (size) => {
-        title.style.fontSize = `${size}px`;
-        const rects = Array.from(range.getClientRects()).filter((rect) => rect.width > 0);
-        const lines = new Set(rects.map((rect) => Math.round(rect.top * 10))).size;
-        return { width: Math.max(title.scrollWidth, ...rects.map((rect) => rect.width)), height: title.getBoundingClientRect().height, lines };
-      });
-      if (fitted > 0) setWallTitleSize(fitted);
-    };
-    fit();
-    void document.fonts.ready.then(fit);
-    document.fonts.addEventListener("loadingdone", fit);
-    const observer = new ResizeObserver(fit);
-    observer.observe(board);
-    observer.observe(stage);
-    return () => { observer.disconnect(); document.fonts.removeEventListener("loadingdone", fit); };
-  }, [presentation?.tournamentName]);
   const [destination, setDestination] = useState({ x: 0, y: 0, width: 0, height: 0, logo: "1.5cqw", name: ".82cqw" });
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -122,7 +60,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       if (!slot) return;
       const rect = stage.getBoundingClientRect();
       const target = slot.getBoundingClientRect();
-      setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .44, width: target.width, height: target.height, logo: getComputedStyle(slot.querySelector(".draw-show-slot-mark") ?? slot).width, name: getComputedStyle(slot.querySelector(".draw-show-slot-name") ?? slot).fontSize });
+      setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .47, width: target.width, height: target.height, logo: getComputedStyle(slot.querySelector(".draw-show-slot-mark") ?? slot).width, name: getComputedStyle(slot.querySelector(".draw-show-slot-name") ?? slot).fontSize });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -159,7 +97,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       </div>
     </section>
   );
-   const teamContent = team && <>{flagBackdrop(team.country)}<span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl && <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" />}</span><strong>{team.name}</strong></span></>;
+   const teamContent = team && <><span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" /> : team.name.slice(0, 2).toUpperCase()}</span><strong>{team.name}</strong></span></>;
    const footLabel = rounds ? `${rounds.groupName}${activePot ? ` · ${activePot.name}` : ""}` : activePot?.name ?? session?.phaseName;
    const drawnCount = potTeamIds.filter((id) => rounds ? rounds.drawnTeamIds.includes(id) : !session?.remaining.includes(id)).length;
   const speed = presentation?.speed ?? 1;
@@ -168,14 +106,6 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
    const motionStyle = { "--draw-choice-width": `${Math.min(8, (42 - .16 * (choiceColumns - 1)) / choiceColumns)}cqw`, "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
 
   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
-    <header className="draw-show-wall-header">
-      <div className="draw-show-live-heading draw-wall-metal draw-wall-caption">{heading}</div>
-      <div className="draw-show-wall-title" style={{ "--wall-title-size": wallTitleSize ? `${wallTitleSize}px` : undefined } as CSSProperties}>
-        <span ref={wallTitleRef} className="draw-wall-title-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
-        <span className="draw-wall-title-lettering">{wallTitleText.split("\n").map((line, index) => <span className="draw-wall-title-line draw-wall-metal" key={index}>{line}</span>)}</span>
-      </div>
-      <div className="draw-show-brand draw-wall-metal draw-wall-caption">POWERED BY COPA MUNDO</div>
-    </header>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
@@ -218,9 +148,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         <div className="draw-show-wing draw-show-wing-right" data-wing-columns={layout.wingColumns} data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...rightContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{rightContainers.map(renderContainer)}</div>
       </>}
       <main className="draw-show-center">
-        <div className="draw-show-team-card">
-          {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={revealKey ?? pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
-        </div>
+        {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={revealKey ?? pending.teamId} className="draw-show-team draw-reveal-name">{teamContent}</div>}
         {!rounds && pending && selectionPhase !== "complete" && <div className={`draw-show-eligible draw-reveal-name ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": Math.max(1, Math.min(8, eligible.length)) } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
       </main>
       {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span></div></div>}
