@@ -1,8 +1,8 @@
 import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
 
-// Fysieke bowl comespondeert met de glazen schaal die in de achtergrond
-// getekend is: kom tot x 45.4-54.6%, binnenkant van rand (52.5%) tot bodem (~58%).
-export const BOWL_BOTTOM = -4.5;
+// Shared orthographic cavity: rounded glass sits on the uploaded podium,
+// with its inner floor at 74% and retaining rim at approximately 66.5%.
+export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
@@ -69,5 +69,5 @@ export function drawBallFlight(elapsed: number, speed: number) {
   const time = elapsed * speed;
   const progress = Math.max(0, Math.min(1, time / 1100));
   const eased = 1 - Math.pow(1 - progress, 3);
-  return { y: -3.8 + (3.375 + 3.8) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
+  return { y: BOWL_BOTTOM + .7 + (3.375 - BOWL_BOTTOM - .7) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
 }

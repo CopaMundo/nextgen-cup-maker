@@ -2,7 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
-import { createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
+import { BOWL_BOTTOM, createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
 
 interface Props { teamIds: string[]; drawnId?: string; revealKey: string | null; elapsed: number; speed: number; revealing: boolean; theme: string; }
 interface Palette { ball: string; light: string; edge: string; }
@@ -13,13 +13,13 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
   const flight = useRef<Group>(null);
   const left = useRef<Mesh>(null);
   const right = useRef<Mesh>(null);
-  const origin = useRef({ x: 0, y: -3.8 });
+  const origin = useRef({ x: 0, y: BOWL_BOTTOM + .7 });
   const material = useMemo(() => new MeshPhysicalMaterial({ color: palette.ball, roughness: .24, metalness: .22, clearcoat: .9, clearcoatRoughness: .15 }), [palette.ball]);
   const halves = useMemo(() => { const m = material.clone(); m.transparent = true; return m; }, [material]);
   useEffect(() => () => { material.dispose(); halves.dispose(); }, [material, halves]);
   useEffect(() => {
     const selected = drawnId ? simulation.balls.get(drawnId) : undefined;
-    origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: -3.8 };
+    origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: BOWL_BOTTOM + .7 };
   }, [drawnId, revealKey, simulation]);
   useEffect(() => {
     const retained = new Set(teamIds);
