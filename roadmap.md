@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Afgesneden/facetterende bokaalrand herstellen naar vloeiend rond glas, met behoud van voet en thema’s.
 - [x] Oorspronkelijk lettertype onder bokaal hersteld; exact één gedeelde lettergrootte voor alle teams en piramidevormige tweeregelige lange namen behouden. Achttien tests en negen gevulde voorbeeldweergaven in drie thema’s geslaagd; gelijke lettergroottes en geen tekstoverflow of runtimefouten bevestigd.
 - [x] Wandregels dichter bij titel met gelijke compacte afstanden; iedere titelregel heeft dezelfde glans. Potteamnamen delen Barlow Condensed en splitsen bij lange namen op woordgrenzen, gecentreerd met bij voorkeur een bredere onderregel. Achttien tests en negen gevulde voorbeeldweergaven in drie thema’s geslaagd, zonder overflow of runtimefouten.
 - [x] Vertrouwde Barlow-wandregels en ruime gelijke afstanden hersteld; vloeiende thematische metaalglans met helderdere toernooinaam. Twaalf tests en negen voorbeeldweergaven in drie thema’s gecontroleerd zonder overflow of runtimefouten.
