@@ -2609,9 +2609,9 @@ posities + statistieken groen */
 .draw-wall-metal { background: linear-gradient(to bottom, hsl(var(--stage-metal-light)) 10%, hsl(var(--stage-metal-main)) 40%, hsl(var(--stage-metal-dark)) 52%, hsl(var(--stage-metal-light)) 72%, hsl(var(--stage-metal-main)) 90%); background-clip: text; color: transparent; filter: drop-shadow(0 1px 1px hsl(var(--background))); }
 .draw-wall-caption { text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 1.05cqw; font-weight: 700; line-height: 1.4; letter-spacing: 0; }
 .draw-show-live-heading { position: absolute; top: 17%; left: 0; width: 100%; }
-.draw-show-wall-title { position: absolute; top: 40%; left: 0; width: 100%; height: 34%; display: flex; align-items: center; justify-content: center; }
-.draw-wall-title-lettering, .draw-wall-title-measure { display: block; flex-shrink: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: 1; font-weight: 800; letter-spacing: 0; text-transform: uppercase; white-space: nowrap; }
-.draw-wall-title-lettering { font-size: calc(4.8cqw * var(--wall-title-scale, 1)); }
+.draw-show-wall-title { position: absolute; top: 36%; left: 0; width: 100%; height: 40%; display: flex; align-items: center; justify-content: center; }
+.draw-wall-title-lettering, .draw-wall-title-measure { display: block; flex-shrink: 0; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: 1; font-weight: 800; letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap; }
+.draw-wall-title-lettering { font-size: calc(4.8cqw * var(--wall-title-scale, 1)); transform: scaleY(1.3); transform-origin: center; }
 .draw-wall-title-measure { position: absolute; visibility: hidden; pointer-events: none; }
 .draw-show-brand { position: absolute; left: 30%; top: 17.4%; width: 40%; height: 3.2%; pointer-events: none; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
