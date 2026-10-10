@@ -1,10 +1,10 @@
 import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
 
 // Fysieke bowl comespondeert met de glazen schaal die in de achtergrond
-// getekend is (x 45-55%, y 52-62.5% van het 16:9 podium).
-export const BOWL_BOTTOM = -6.9;
+// getekend is: kom tot x 45.4-54.6%, binnenkant van rand (52.5%) tot bodem (~58%).
+export const BOWL_BOTTOM = -4.5;
 export const BOWL_RADIUS = 4.6;
-export const bowlHeight = (radius: number) => BOWL_BOTTOM + .09 * radius * radius + .008 * Math.pow(radius, 4);
+export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
 export const drawBallRadius = (count: number) => Math.max(.5, Math.min(1.25, 3.8 / Math.sqrt(count + 6)));
@@ -69,5 +69,5 @@ export function drawBallFlight(elapsed: number, speed: number) {
   const time = elapsed * speed;
   const progress = Math.max(0, Math.min(1, time / 1100));
   const eased = 1 - Math.pow(1 - progress, 3);
-  return { y: -5.2 + (3.375 + 5.2) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
+  return { y: -3.8 + (3.375 + 3.8) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
 }

@@ -13,13 +13,13 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
   const flight = useRef<Group>(null);
   const left = useRef<Mesh>(null);
   const right = useRef<Mesh>(null);
-  const origin = useRef({ x: 0, y: -5.2 });
+  const origin = useRef({ x: 0, y: -3.8 });
   const material = useMemo(() => new MeshPhysicalMaterial({ color: palette.ball, roughness: .24, metalness: .22, clearcoat: .9, clearcoatRoughness: .15 }), [palette.ball]);
   const halves = useMemo(() => { const m = material.clone(); m.transparent = true; return m; }, [material]);
   useEffect(() => () => { material.dispose(); halves.dispose(); }, [material, halves]);
   useEffect(() => {
     const selected = drawnId ? simulation.balls.get(drawnId) : undefined;
-    origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: -5.2 };
+    origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: -3.8 };
   }, [drawnId, revealKey, simulation]);
   useEffect(() => {
     const retained = new Set(teamIds);
