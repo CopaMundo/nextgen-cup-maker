@@ -115,7 +115,6 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
 
   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     <DrawHalo title={presentation?.tournamentName || "COPA MUNDO"} heading={heading} theme={studio.id} />
-    <div className="draw-show-brand">POWERED BY COPA MUNDO</div>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
