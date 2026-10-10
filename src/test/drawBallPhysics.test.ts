@@ -3,9 +3,9 @@ import { BOWL_BOTTOM, bowlHeight, createDrawBallWorld, drawBallFlight, drawBallR
 
 describe("draw ball physics", () => {
   it("slightly reduces the physical and rendered bowl ball radius", () => {
-    expect(drawBallRadius(24)).toBeCloseTo(6.4 / Math.sqrt(32));
-    expect(drawBallRadius(1)).toBe(1.8);
-    expect(drawBallRadius(128)).toBeGreaterThanOrEqual(.54);
+    expect(drawBallRadius(24)).toBeCloseTo(3.8 / Math.sqrt(30));
+    expect(drawBallRadius(1)).toBe(1.25);
+    expect(drawBallRadius(128)).toBeGreaterThanOrEqual(.5);
   });
   it("settles spheres above the curved bowl", () => {
     const { balls } = createDrawBallWorld(Array.from({ length: 24 }, (_, i) => String(i)));
@@ -16,6 +16,7 @@ describe("draw ball physics", () => {
     }
   });
   it.each([.75, 1, 1.5])("lands at 50%/44% and splits at speed %s", speed => {
+    expect(drawBallFlight(0, speed).y).toBeCloseTo(BOWL_BOTTOM + .7);
     expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(3.375);
     expect(drawBallFlight(1375 / speed, speed).split).toBeCloseTo(.5);
     expect(drawBallFlight(1650 / speed, speed).visible).toBe(false);
