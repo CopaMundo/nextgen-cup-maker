@@ -9,12 +9,12 @@ interface Props { title: string; heading: string; theme: string; }
 
 function WallLetters({ title, heading, theme, palette }: Props & { palette: MetalPalette }) {
   const letters = useMemo(() => [
-    { geometry: wallLetterGeometry(heading, .24, 9, .16), y: 1.05 },
-    { geometry: wallLetterGeometry(title, 1.02, 12.1), y: .08 },
-    { geometry: wallLetterGeometry("POWERED BY COPA MUNDO", .20, 10, .12), y: -.89 },
+    { geometry: wallLetterGeometry(heading, .24, 9, .16), y: 1.19 },
+    { geometry: wallLetterGeometry(title, 1.28, 11.1, 0, .026), y: .12 },
+    { geometry: wallLetterGeometry("POWERED BY COPA MUNDO", .22, 10, .12), y: -.99 },
   ].map(item => {
-    // A calibrated reflected-light band runs through every inscription, not
-    // an emissive flat face. Its lower lip remains dark like a milled recess.
+    // Keep the polished face saturated and readable. A narrow studio reflection
+    // adds gloss without letting the recessed edge darken the whole inscription.
     const positions = item.geometry.getAttribute("position");
     const box = item.geometry.boundingBox;
     if (!box) return item;
@@ -24,8 +24,8 @@ function WallLetters({ title, heading, theme, palette }: Props & { palette: Meta
     const highlight = new Color(palette.highlight);
     for (let i = 0; i < positions.count; i++) {
       const y = (positions.getY(i) - box.min.y) / (box.max.y - box.min.y);
-      const shine = Math.exp(-Math.pow((y - .76) / .16, 2));
-      const color = reflection.clone().lerp(metal, .25 + .5 * y).lerp(highlight, shine * .78);
+      const shine = Math.exp(-Math.pow((y - .78) / .10, 2));
+      const color = metal.clone().lerp(reflection, .12 * (1 - y)).lerp(highlight, shine * .55);
       color.toArray(colors, i * 3);
     }
     item.geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
@@ -46,9 +46,9 @@ function WallLetters({ title, heading, theme, palette }: Props & { palette: Meta
   useEffect(() => () => grain.dispose(), [grain]);
   return <>
     <OrthographicCamera makeDefault manual position={[0, 0, 18]} left={-7} right={7} top={1.97} bottom={-1.97} near={.1} far={40} />
-    <ambientLight intensity={.8} color={palette.light} />
-    <directionalLight position={[-4, 7, 5]} intensity={2.1} color={palette.light} />
-    <directionalLight position={[6, 2, 4]} intensity={.8} color={palette.reflection} />
+    <ambientLight intensity={1.15} />
+    <directionalLight position={[-4, 7, 5]} intensity={1.8} />
+    <directionalLight position={[6, 2, 4]} intensity={.55} color={palette.light} />
     <Suspense fallback={null}><Environment resolution={64} frames={1}>
       <Lightformer position={[0, 2, 6]} rotation-y={Math.PI} scale={[12, 2, 1]} intensity={1.5} color={palette.light} />
       <Lightformer position={[-2, 5, 5]} rotation-x={.3} scale={[10, 1, 1]} intensity={3} color={palette.highlight} />
@@ -56,10 +56,10 @@ function WallLetters({ title, heading, theme, palette }: Props & { palette: Meta
       <Lightformer position={[-5, -2, 2]} rotation-y={.8} scale={[4, 1, 1]} intensity={1.5} color={palette.light} />
     </Environment></Suspense>
     {letters.map(({ geometry, y }, index) => <group key={index} position-y={y} scale-z={.28}>
-      <mesh geometry={geometry} position={[0, .012, -.04]} scale={[1.004, 1.012, 1]}><meshBasicMaterial color={palette.highlight} transparent opacity={.38} /></mesh>
-      <mesh geometry={geometry} position={[.006, -.018, -.02]} scale={[1.007, 1.018, 1]}><meshBasicMaterial color={palette.shadow} transparent opacity={.9} /></mesh>
+      <mesh geometry={geometry} position={[0, .009, -.04]} scale={[1.002, 1.006, 1]}><meshBasicMaterial color={palette.highlight} transparent opacity={.25} /></mesh>
+      <mesh geometry={geometry} position={[.004, -.012, -.02]} scale={[1.003, 1.008, 1]}><meshBasicMaterial color={palette.shadow} transparent opacity={.6} /></mesh>
       <mesh geometry={geometry}>
-        <meshPhysicalMaterial vertexColors metalness={.78} roughness={theme === "copa-gold" ? .22 : .16} roughnessMap={grain} clearcoat={.65} clearcoatRoughness={.12} />
+        <meshPhysicalMaterial vertexColors metalness={.62} roughness={theme === "copa-gold" ? .19 : .14} roughnessMap={grain} clearcoat={.8} clearcoatRoughness={.1} emissive={palette.face} emissiveIntensity={.12} />
       </mesh>
     </group>)}
   </>;
