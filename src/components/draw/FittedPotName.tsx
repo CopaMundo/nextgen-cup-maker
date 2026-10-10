@@ -13,16 +13,24 @@ export function FittedPotName({ name }: { name: string }) {
       const maximum = parseFloat(getComputedStyle(element).fontSize);
       const range = document.createRange();
       range.selectNodeContents(element);
-      const naturalWidth = range.getBoundingClientRect().width;
-      if (naturalWidth > element.clientWidth && element.clientWidth > 0) {
-        element.style.fontSize = `${maximum * element.clientWidth / naturalWidth * .98}px`;
+      if (element.clientWidth > 0 && range.getBoundingClientRect().width > element.clientWidth) {
+        let low = 0;
+        let high = maximum;
+        for (let iteration = 0; iteration < 16; iteration++) {
+          const size = (low + high) / 2;
+          element.style.fontSize = `${size}px`;
+          if (range.getBoundingClientRect().width <= element.clientWidth - .5) low = size;
+          else high = size;
+        }
+        element.style.fontSize = `${low}px`;
       }
     };
     fit();
     void document.fonts.ready.then(fit);
+    document.fonts.addEventListener("loadingdone", fit);
     const observer = new ResizeObserver(fit);
     observer.observe(element);
-    return () => { disposed = true; observer.disconnect(); };
+    return () => { disposed = true; observer.disconnect(); document.fonts.removeEventListener("loadingdone", fit); };
   }, [name]);
   return <span ref={ref} className="draw-show-pot-name">{name}</span>;
 }
