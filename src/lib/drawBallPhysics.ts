@@ -4,6 +4,8 @@ import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, 
 // with its inner floor at 74% and retaining rim at approximately 66.5%.
 export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
+/** Shared eye-level reveal point in the full-stage orthographic camera (47%). */
+export const DRAW_REVEAL_Y = 1.6875;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
@@ -68,6 +70,6 @@ export function createDrawBallWorld(ids: string[]) {
 export function drawBallFlight(elapsed: number, speed: number) {
   const time = elapsed * speed;
   const progress = Math.max(0, Math.min(1, time / 1100));
-  const eased = 1 - Math.pow(1 - progress, 3);
-  return { y: BOWL_BOTTOM + .7 + (3.375 - BOWL_BOTTOM - .7) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
+  const eased = progress * progress * (3 - 2 * progress);
+  return { progress: eased, y: BOWL_BOTTOM + .7 + (DRAW_REVEAL_Y - BOWL_BOTTOM - .7) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 700)), visible: time < 1800 };
 }

@@ -15,11 +15,12 @@ describe("draw ball physics", () => {
       expect(ball.position.y).toBeGreaterThan(bowlHeight(Math.hypot(ball.position.x, ball.position.z)) - .2);
     }
   });
-  it.each([.75, 1, 1.5])("lands at 50%/44% and splits at speed %s", speed => {
+  it.each([.75, 1, 1.5])("lands at 50%/47% and splits at speed %s", speed => {
     expect(drawBallFlight(0, speed).y).toBeCloseTo(BOWL_BOTTOM + .7);
-    expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(3.375);
-    expect(drawBallFlight(1375 / speed, speed).split).toBeCloseTo(.5);
-    expect(drawBallFlight(1650 / speed, speed).visible).toBe(false);
+    expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(1.6875);
+    expect(drawBallFlight(1450 / speed, speed).split).toBeCloseTo(.5);
+    expect(drawBallFlight(1800 / speed, speed).visible).toBe(false);
+    expect(drawBallFlight(550 / speed, speed).progress).toBeCloseTo(.5);
   });
   it("uses larger balls and fills both sides of the bowl", () => {
     const { balls, radius } = createDrawBallWorld(Array.from({ length: 24 }, (_, i) => String(i)));

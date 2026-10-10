@@ -2,7 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
-import { BOWL_BOTTOM, createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
+import { BOWL_BOTTOM, DRAW_REVEAL_Y, createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
 
 interface Props { teamIds: string[]; drawnId?: string; revealKey: string | null; elapsed: number; speed: number; revealing: boolean; theme: string; }
 interface Palette { ball: string; light: string; edge: string; }
@@ -37,15 +37,15 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
     const frame = drawBallFlight(elapsed, speed);
     if (flight.current) {
       flight.current.visible = revealing && frame.visible;
-      const progress = 1 - Math.pow(1 - Math.min(1, elapsed * speed / 1100), 3);
-      flight.current.position.set(origin.current.x * (1 - progress), origin.current.y + (3.375 - origin.current.y) * progress, 8);
+      const progress = frame.progress;
+      flight.current.position.set(origin.current.x * (1 - progress), origin.current.y + (DRAW_REVEAL_Y - origin.current.y) * progress, 8);
        // Match the selected physical sphere at takeoff, retaining the same
        // reveal size and shared landing coordinates at the end of the flight.
        flight.current.scale.setScalar(simulation.radius / 1.9 + (1 - simulation.radius / 1.9) * progress);
     }
-    halves.opacity = 1 - Math.min(1, frame.split * 1.15);
+    halves.opacity = Math.pow(1 - frame.split, 2);
     for (const [mesh, direction] of [[left.current, -1], [right.current, 1]] as const) {
-      if (mesh) { mesh.position.x = direction * frame.split * 5; mesh.rotation.z = direction * frame.split * .45; }
+      if (mesh) { mesh.position.x = direction * frame.split * 5; mesh.position.y = -frame.split * .6; mesh.rotation.z = direction * frame.split * .45; }
     }
   });
   return <>
@@ -65,7 +65,7 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
   </>;
 }
 
-/** Transparent full-stage coordinates retain the shared 50% / 44% reveal origin. */
+/** Transparent full-stage coordinates retain the shared 50% / 47% reveal origin. */
 export function DrawBalls(props: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [palette, setPalette] = useState<Palette | null>(null);
