@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Gebogen broadcastconsole rond de zuilen met forse zijvleugels, verlichte metallic lijsten, scherpe scrollende toernooinaam en geïntegreerde merkregel; drie thema’s visueel controleren.
 - [x] Zwevende 3D broadcast-halo met gebogen titel/live-tekst, rustige klokgesynchroniseerde rotatie voor lange namen, metaalranden en downlights; gedeeld door regie en beamer. Drie thema’s met origineel decor, poules/testteams, smalle stage en bestaande publieke voorbereiding gecontroleerd; geen runtimefouten, 20 tests geslaagd. Geen nieuwe live trekking uitgevoerd.
 - [x] Bewust zwevend Studio TV LED-scherm met vrije ruimte naast beide zuilen en thematische metallic rand; drie thema’s en lange doorlopende toernooinamen gecontroleerd, acht tests geslaagd.
 - [x] Permanente teambalk hersteld, rechter LED-rand teruggebracht zonder linkerzijde te verplaatsen en één identiteit vloeiend naar poulestijl gemorpht. 27 tests slagen; drie studio’s en directe landing binnen .01px gecontroleerd met voorbeeldteams zonder runtimefouten. Geen nieuwe gezamenlijke echte regie/beamer-trekking uitgevoerd.
