@@ -21,9 +21,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
 }) {
   const { session, spotlightId, presentation, now, revealKey, revealElapsed, revealing } = useDrawPlayback({ session: incomingSession ?? undefined, spotlightId: incomingSpotlight ?? null, presentation: incomingPresentation });
   const stageRef = useRef<HTMLDivElement>(null);
-  const ledTitleRef = useRef<HTMLSpanElement>(null);
-  const [ledLength, setLedLength] = useState(0);
-  const [ledPeriod, setLedPeriod] = useState(0);
+  const wallTitleRef = useRef<HTMLSpanElement>(null);
+  const [wallTitleScale, setWallTitleScale] = useState(1);
   const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
   const heading = drawHeading(presentation?.language ?? browserLanguage);
@@ -34,12 +33,11 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     return () => window.removeEventListener("languagechange", update);
   }, []);
   useLayoutEffect(() => {
-    const title = ledTitleRef.current;
+    const title = wallTitleRef.current;
     const board = title?.parentElement;
     if (!title || !board) return;
     const fit = () => {
-      setLedLength(title.getBoundingClientRect().width);
-      setLedPeriod(title.getBoundingClientRect().width + (stageRef.current?.clientWidth ?? 0) * .048);
+      setWallTitleScale(Math.min(1, board.clientWidth / Math.max(1, title.getBoundingClientRect().width)));
     };
     fit();
     void document.fonts.ready.then(fit);
@@ -130,14 +128,14 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
    const motionStyle = { "--draw-choice-width": `${Math.min(8, (42 - .16 * (choiceColumns - 1)) / choiceColumns)}cqw`, "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
 
   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
-    <header className="draw-show-led-header">
-      <div className="draw-show-live-heading">{heading}</div>
-      <div className="draw-show-led-title" role="img" aria-label={presentation?.tournamentName || "COPA MUNDO"}>
-        <span ref={ledTitleRef} className="draw-led-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
-        {ledLength > (stageRef.current?.clientWidth ?? 0) * .44 ? <div key={presentation?.tournamentName} className="draw-led-loop" data-led-scrolling="true" style={{ "--led-period": `${ledPeriod}px`, "--led-duration": `${Math.max(12, ledPeriod / 28)}s` } as CSSProperties} aria-hidden="true">{Array.from({ length: 3 }, (_, i) => <span key={i} className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>)}</div> : <span className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>}
+    <header className="draw-show-wall-header">
+      <div className="draw-show-live-heading draw-wall-metal draw-wall-caption">{heading}</div>
+      <div className="draw-show-wall-title" style={{ "--wall-title-scale": wallTitleScale } as CSSProperties}>
+        <span ref={wallTitleRef} className="draw-wall-title-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
+        <span className="draw-wall-title-lettering draw-wall-metal">{presentation?.tournamentName || "COPA MUNDO"}</span>
       </div>
     </header>
-    <div className="draw-show-brand">POWERED BY COPA MUNDO</div>
+    <div className="draw-show-brand draw-wall-metal draw-wall-caption">POWERED BY COPA MUNDO</div>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
