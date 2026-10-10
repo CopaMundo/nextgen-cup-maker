@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drawHeading } from "@/lib/drawHeading";
+import { drawHeading, fitWallTitle } from "@/lib/drawHeading";
 
 describe("draw heading", () => {
   it("uses the browser language independent of its region", () => {
