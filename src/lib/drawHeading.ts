@@ -21,5 +21,4 @@ export function fitWallTitle(boardWidth: number, naturalWidth: number, emHeight:
   const capUnit = emHeight * 0.74;
   const widthFit = boardWidth / naturalWidth;
   return { scale: Math.min(widthFit, usable / capUnit), stretch: 1 };
-};
 }
