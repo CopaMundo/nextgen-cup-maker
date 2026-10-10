@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Drie aangeleverde originele 4K UHD-achtergronden aansluiten, bestaande ronde bokaal apart behouden en uitlijning ongewijzigd controleren.
 - [x] Hoekige glaskleur-maskering vervangen door een vloeiende Bézier-contour, met behoud van oorspronkelijke bokaal, voet en glaskleur per thema. Achttien tests en negen voorbeeldweergaven geslaagd; ronde bokaal visueel gecontroleerd met echte studioafbeeldingen in Gold, Blue en White.
 - [x] Oorspronkelijk lettertype onder bokaal hersteld; exact één gedeelde lettergrootte voor alle teams en piramidevormige tweeregelige lange namen behouden. Achttien tests en negen gevulde voorbeeldweergaven in drie thema’s geslaagd; gelijke lettergroottes en geen tekstoverflow of runtimefouten bevestigd.
 - [x] Wandregels dichter bij titel met gelijke compacte afstanden; iedere titelregel heeft dezelfde glans. Potteamnamen delen Barlow Condensed en splitsen bij lange namen op woordgrenzen, gecentreerd met bij voorkeur een bredere onderregel. Achttien tests en negen gevulde voorbeeldweergaven in drie thema’s geslaagd, zonder overflow of runtimefouten.
