@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Architecturale wandletters hoger plaatsen, glanzend goud/blauw/chroom herstellen en de toernooinaam groter en vetter maken; drie thema’s en lange namen controleren.
+- [x] Architecturale wandletters hoger geplaatst, glanzend goud/blauw/chroom hersteld en de toernooinaam groter en vetter gemaakt. Drie thema’s, lange naam en verkleining visueel gecontroleerd zonder zuiloverlap of runtimefouten; acht tests geslaagd en build OK. Geen nieuwe live trekking gestart.
 - [x] Wandteksten flink hoger geplaatst; alle teksten delen rijke metaalglans, lichte bovenranden en donkere gegraveerde onderranden. Drie thema’s, lange naam en verkleind podium visueel gecontroleerd zonder runtimefouten; zeven tests geslaagd en build OK. Geen nieuwe live trekking gestart.
 - [x] Bovenste console vervangen door afgeschuinde metalen 3D-wandletters volgens de referentie; drie studioafwerkingen, lange namen en verkleining visueel gecontroleerd zonder runtimefouten; 13 tests geslaagd en build OK. Geen nieuwe live trekking gestart.
 - [x] Zware console vervangen door eenvoudige gebogen LED-balk tussen de zuilen volgens de referentie; dunne thematische randen, teksten en naamloop behouden. Drie thema’s en bestaande publieke wachtweergave gecontroleerd zonder runtimefouten; tien tests geslaagd en build OK.
