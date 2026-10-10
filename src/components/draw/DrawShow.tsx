@@ -23,6 +23,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const stageRef = useRef<HTMLDivElement>(null);
   const ledTitleRef = useRef<HTMLSpanElement>(null);
   const [ledLength, setLedLength] = useState(0);
+  const [ledAvailable, setLedAvailable] = useState(0);
   const [ledPeriod, setLedPeriod] = useState(0);
   const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
@@ -38,6 +39,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     const board = title?.parentElement;
     if (!title || !board) return;
     const fit = () => {
+      const style = getComputedStyle(board);
+      setLedAvailable(board.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight));
       setLedLength(title.getBoundingClientRect().width);
       setLedPeriod(title.getBoundingClientRect().width + (stageRef.current?.clientWidth ?? 0) * .048);
     };
@@ -134,7 +137,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       <div className="draw-show-live-heading">{heading}</div>
       <div className="draw-show-led-title" role="img" aria-label={presentation?.tournamentName || "COPA MUNDO"}>
         <span ref={ledTitleRef} className="draw-led-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
-        {ledLength > (stageRef.current?.clientWidth ?? 0) * .44 ? <div key={presentation?.tournamentName} className="draw-led-loop" data-led-scrolling="true" style={{ "--led-period": `${ledPeriod}px`, "--led-duration": `${Math.max(12, ledPeriod / 28)}s` } as CSSProperties} aria-hidden="true">{Array.from({ length: 3 }, (_, i) => <span key={i} className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>)}</div> : <span className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>}
+        {ledLength > ledAvailable ? <div key={presentation?.tournamentName} className="draw-led-loop" data-led-scrolling="true" style={{ "--led-period": `${ledPeriod}px`, "--led-duration": `${Math.max(12, ledPeriod / 28)}s` } as CSSProperties} aria-hidden="true">{Array.from({ length: 3 }, (_, i) => <span key={i} className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>)}</div> : <span className="draw-led-lettering">{presentation?.tournamentName || "COPA MUNDO"}</span>}
       </div>
     </header>
     <div className="draw-show-brand">POWERED BY COPA MUNDO</div>
