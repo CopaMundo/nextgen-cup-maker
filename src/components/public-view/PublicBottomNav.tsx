@@ -102,7 +102,7 @@ const PublicBottomNav = ({ activeTab, setActiveTab, tournament, favoriteTeam, te
                   onClick={() => setActiveTab(tab.id)}
                   className={`absolute left-1/2 ${isWc26 ? "bottom-2" : "top-1 -translate-y-3"} -translate-x-1/2 transform-gpu items-center justify-center shadow-lg transition-colors ${
                     isWc26
-                      ? `wc26-home-btn flex h-[72px] w-12 rounded-[6px] border-2 bg-card ${
+                      ? `wc26-home-btn flex h-[72px] w-12 rounded-md border-2 bg-card ${
                           isActive ? "border-primary" : "border-[hsl(var(--broadcast-gold))]"
                         }`
                       : `flex h-14 w-14 rounded-2xl border-2 ${
