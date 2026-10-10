@@ -19,6 +19,15 @@ describe("balanceWallTitle", () => {
   it("balances a long name at a word boundary", () => {
     expect(balanceWallTitle("INTERNATIONALE COPA MUNDO CHAMPIONS CUP", 20, (text) => text.length)).toBe("INTERNATIONALE COPA\nMUNDO CHAMPIONS CUP");
   });
+  it("shrinks medium names on one line before considering a split", () => {
+    expect(balanceWallTitle("SOCCERTEC MASTERS", 12, (text) => text.length)).toBe("SOCCERTEC MASTERS");
+  });
+  it("chooses a wider lower line even when the reverse split is more balanced", () => {
+    const title = balanceWallTitle("AAAAAA BBBB CCCCC DDDD", 10, (text) => text.length);
+    const [upper, lower] = title.split("\n");
+    expect(lower.length).toBeGreaterThanOrEqual(upper.length);
+    expect(title).toBe("AAAAAA BBBB\nCCCCC DDDD".replace("AAAAAA BBBB\nCCCCC DDDD", "AAAAAA\nBBBB CCCCC DDDD"));
+  });
   it("keeps an unbroken name intact for browser wrapping", () => {
     expect(balanceWallTitle("CHAMPIONSHIP", 5, (text) => text.length)).toBe("CHAMPIONSHIP");
   });

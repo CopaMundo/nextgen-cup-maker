@@ -16,11 +16,15 @@ type WallTitleMeasurement = { width: number; height: number; lines: number };
 
 export function balanceWallTitle(text: string, width: number, measure: (text: string) => number): string {
   const words = text.trim().split(/\s+/);
-  if (words.length < 2 || measure(words.join(" ")) <= width) return words.join(" ");
+  // Prefer a strong single line down to 62% of the studio's natural title size.
+  if (words.length < 2 || measure(words.join(" ")) * .62 <= width) return words.join(" ");
   let best = 1;
   let smallestWidth = Infinity;
   for (let split = 1; split < words.length; split++) {
-    const widest = Math.max(measure(words.slice(0, split).join(" ")), measure(words.slice(split).join(" ")));
+    const upper = measure(words.slice(0, split).join(" "));
+    const lower = measure(words.slice(split).join(" "));
+    if (lower < upper) continue;
+    const widest = lower;
     if (widest < smallestWidth) { best = split; smallestWidth = widest; }
   }
   return `${words.slice(0, best).join(" ")}\n${words.slice(best).join(" ")}`;
