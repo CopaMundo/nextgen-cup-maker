@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useDrawPlayback } from "@/hooks/useDrawPlayback";
 import type { DrawSessionState } from "@/lib/drawSession";
 import { calculateGroupLayout, calculateWingDensity, drawOverviewPage, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
