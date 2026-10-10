@@ -1,15 +1,12 @@
-import gold from "@/assets/copa-gold-uhd.webp.asset.json";
-import blue from "@/assets/champions-blue-uhd.webp.asset.json";
-import white from "@/assets/platinum-white-uhd.webp.asset.json";
-import goldBowl from "@/assets/studio-gold-restored.webp.asset.json";
-import blueBowl from "@/assets/studio-blue-restored.webp.asset.json";
-import whiteBowl from "@/assets/studio-white-restored.webp.asset.json";
+import gold from "@/assets/copa-gold-studio-4k.webp.asset.json";
+import blue from "@/assets/champions-blue-studio-4k.webp.asset.json";
+import white from "@/assets/platinum-white-studio-4k.webp.asset.json";
 
 export type DrawStudioTheme = "copa-gold" | "champions-blue" | "platinum-white";
 export const drawStudios = [
-  { id: "copa-gold", name: "COPA Gold", asset: gold, bowlAsset: goldBowl },
-  { id: "champions-blue", name: "Champions Blue", asset: blue, bowlAsset: blueBowl },
-  { id: "platinum-white", name: "Platinum White", asset: white, bowlAsset: whiteBowl },
+  { id: "copa-gold", name: "COPA Gold", asset: gold },
+  { id: "champions-blue", name: "Champions Blue", asset: blue },
+  { id: "platinum-white", name: "Platinum White", asset: white },
 ] as const;
 export function studioFor(theme?: string) {
   return drawStudios.find((studio) => studio.id === theme) ?? drawStudios[0];

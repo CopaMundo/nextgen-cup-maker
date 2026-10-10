@@ -1,11 +1,13 @@
 import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
 
-export const BOWL_BOTTOM = -14.05;
-export const BOWL_RADIUS = 5.9;
-export const bowlHeight = (radius: number) => BOWL_BOTTOM + .025 * radius * radius + .004 * Math.pow(radius, 4);
+// Fysieke bowl comespondeert met de glazen schaal die in de achtergrond
+// getekend is: kom tot x 45.4-54.6%, binnenkant van rand (52.5%) tot bodem (~58%).
+export const BOWL_BOTTOM = -4.5;
+export const BOWL_RADIUS = 4.6;
+export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
-export const drawBallRadius = (count: number) => Math.max(.54, Math.min(1.8, 6.4 / Math.sqrt(count + 8)));
+export const drawBallRadius = (count: number) => Math.max(.5, Math.min(1.25, 3.8 / Math.sqrt(count + 6)));
 
 /** A hidden concave bowl: real sphere contacts, gravity, rolling and settling. */
 export function createDrawBallWorld(ids: string[]) {
@@ -67,5 +69,5 @@ export function drawBallFlight(elapsed: number, speed: number) {
   const time = elapsed * speed;
   const progress = Math.max(0, Math.min(1, time / 1100));
   const eased = 1 - Math.pow(1 - progress, 3);
-  return { y: -10.85625 + (3.375 + 10.85625) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
+  return { y: -3.8 + (3.375 + 3.8) * eased, scale: .29 + .71 * eased, split: Math.max(0, Math.min(1, (time - 1100) / 550)), visible: time < 1650 };
 }

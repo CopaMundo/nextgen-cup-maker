@@ -2583,7 +2583,6 @@ posities + statistieken groen */
   --stage-ball-light: 48 25% 100%;
   --stage-metal-light: 48 100% 92%; --stage-metal-main: 44 100% 56%; --stage-metal-dark: 38 92% 32%;
   --stage-led-surface: 0 0% 3%; --stage-led-dot: 0 0% 13%;
-  --stage-bowl-filter: sepia(.65) saturate(1.65) brightness(1.15);
 }
 .draw-show-stage {
   position: relative; isolation: isolate; width: 100%; height: auto;
@@ -2592,13 +2591,11 @@ posities + statistieken groen */
   color: hsl(var(--foreground)); container-type: size;
 }
 .draw-show-stage[data-studio-theme="champions-blue"] {
-  --stage-bowl-filter: grayscale(1) sepia(1) hue-rotate(155deg) saturate(3.5) brightness(1.3);
   --stage-metal-light: 190 100% 90%; --stage-metal-main: 202 100% 58%; --stage-metal-dark: 220 100% 38%;
   --background: 220 65% 5%; --foreground: 205 45% 95%; --card: 220 48% 8%; --border: 207 80% 54%;
   --primary: 202 100% 75%; --muted-foreground: 210 30% 74%; --accent: 212 55% 18%; --stage-glow: 207 100% 60%; --stage-glass: 220 45% 8%;
 }
 .draw-show-stage[data-studio-theme="platinum-white"] {
-  --stage-bowl-filter: saturate(0) brightness(1.6) contrast(1.1);
   --stage-metal-light: 0 0% 100%; --stage-metal-main: 0 0% 80%; --stage-metal-dark: 0 0% 45%;
   --background: 0 0% 5%; --foreground: 0 0% 96%; --card: 0 0% 8%; --border: 0 0% 68%;
   --primary: 0 0% 90%; --muted-foreground: 0 0% 73%; --accent: 0 0% 20%; --stage-glow: 0 0% 85%; --stage-glass: 0 0% 8%;
@@ -2679,18 +2676,15 @@ posities + statistieken groen */
 .draw-show-eligible { position: absolute; top: 112%; width: 100%; height: 5.6cqw; overflow: hidden; }
 .draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, var(--draw-choice-width, 8cqw))); justify-content: center; gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
 .draw-show-eligible-groups span { min-width: 0; height: 1.2cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.draw-show-bowl-mask { position: absolute; pointer-events: none; }
-.draw-show-bowl-sheen { position: absolute; inset: 0; background: inherit; pointer-events: none; filter: var(--stage-bowl-filter); }
-.draw-show-eligible-groups .is-spotlight { background: hsl(var(--accent)); box-shadow: 0 0 1.2cqw hsl(var(--stage-glow) / .65); border-color: hsl(var(--primary)); }
-.draw-show-bowl { position: absolute; left: 44.8%; top: 62.5%; width: 10.4%; height: 12.5%; pointer-events: none; }
+.draw-show-bowl { position: absolute; left: 45.5%; top: 52%; width: 9%; height: 8.5%; pointer-events: none; }
 .draw-show-bowl-ball { position: absolute; width: var(--ball-size, 1.7cqw); aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
-.draw-show-flying-ball { position: absolute; z-index: 8; left: 50%; top: 69.3%; width: 3.8cqw; aspect-ratio: 1; display: flex; pointer-events: none; animation: draw-ball-rise calc(1100ms / var(--draw-rate)) var(--reveal-offset) cubic-bezier(.2,.7,.2,1) both; }
+.draw-show-flying-ball { position: absolute; z-index: 8; left: 50%; top: 58%; width: 3.8cqw; aspect-ratio: 1; display: flex; pointer-events: none; animation: draw-ball-rise calc(1100ms / var(--draw-rate)) var(--reveal-offset) cubic-bezier(.2,.7,.2,1) both; }
 .draw-ball-half { width: 50%; height: 100%; background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); border: 1px solid hsl(var(--primary)); }
 .draw-ball-left { border-radius: 100px 0 0 100px; animation: draw-half-left calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(800ms / var(--draw-rate)) calc(1150ms / var(--draw-rate) + var(--reveal-offset)) cubic-bezier(.22,.8,.3,1) both; }
 .draw-show-transfer { position: absolute; z-index: 9; top: 44%; left: 50%; width: 41.5%; height: 9.6%; border-radius: var(--draw-identity-radius, .8cqw); overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; will-change: transform, width, height; }
-.draw-show-pot-label { position: absolute; z-index: 3; left: 38%; width: 24%; top: 79%; height: 7%; pointer-events: none; overflow: visible; }
+.draw-show-pot-label { position: absolute; z-index: 3; left: 38%; width: 24%; top: 67.5%; height: 7%; pointer-events: none; overflow: visible; }
 .draw-show-pot-label text { fill: hsl(var(--primary)); font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 48px; font-weight: 700; text-transform: uppercase; filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-pot { position: absolute; left: 29%; width: 42%; top: 89%; height: 10%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .draw-show-pot-counter { position: absolute; top: 85.2%; left: 38%; width: 24%; text-align: center; color: hsl(var(--foreground)); font-size: .95cqw; font-weight: 600; line-height: 1.2; pointer-events: none; }
