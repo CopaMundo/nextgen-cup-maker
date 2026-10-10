@@ -2605,12 +2605,14 @@ posities + statistieken groen */
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-wall-header { position: absolute; top: 3.8675%; left: 34%; width: 32%; height: 16.15%; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .65cqw; overflow: hidden; }
-.draw-wall-metal { background: linear-gradient(to bottom, hsl(var(--stage-metal-light)) 10%, hsl(var(--stage-metal-main)) 40%, hsl(var(--stage-metal-dark)) 52%, hsl(var(--stage-metal-light)) 72%, hsl(var(--stage-metal-main)) 90%); background-clip: text; color: transparent; filter: drop-shadow(0 1px 1px hsl(var(--background))); }
-.draw-wall-caption { text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 1.05cqw; font-weight: 700; line-height: 1.4; letter-spacing: 0; }
+.draw-show-wall-header { --wall-heading-color: #C8CED6; --wall-title-color: #E8EBEF; --wall-brand-color: #AEB5BE; --wall-title-shadow: 0 2px 12px rgba(0, 0, 0, .6); position: absolute; top: 3.8675%; left: 34%; width: 32%; height: 16.15%; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .65cqw; overflow: hidden; }
+.draw-wall-metal { background: none; color: var(--wall-title-color); text-shadow: var(--wall-title-shadow); }
+.draw-wall-caption { text-align: center; font-family: "Montserrat", sans-serif; font-size: 1.05cqw; font-weight: 500; line-height: 1.4; white-space: nowrap; }
+.draw-show-live-heading { color: var(--wall-heading-color); letter-spacing: .38em; }
+.draw-show-brand { color: var(--wall-brand-color); letter-spacing: .30em; }
 .draw-show-live-heading, .draw-show-brand { width: 100%; flex: 0 0 auto; pointer-events: none; }
 .draw-show-wall-title { position: relative; width: 100%; min-height: 0; flex: 1 1 0; display: flex; align-items: center; justify-content: center; }
-.draw-wall-title-lettering, .draw-wall-title-measure { display: block; width: 100%; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: 1; font-weight: 500; letter-spacing: 0.005em; text-transform: uppercase; white-space: pre-line; text-align: center; text-wrap: balance; overflow-wrap: anywhere; }
+.draw-wall-title-lettering, .draw-wall-title-measure { display: block; width: 100%; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: .95; font-weight: 600; letter-spacing: .035em; text-transform: uppercase; white-space: pre; text-align: center; overflow-wrap: normal; }
 .draw-wall-title-lettering { font-size: var(--wall-title-size, 4.8cqw); }
 .draw-wall-title-measure { position: absolute; visibility: hidden; pointer-events: none; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
@@ -2697,7 +2699,7 @@ posities + statistieken groen */
 
 .draw-show-pot-teams { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: .25cqw; width: calc(var(--pot-columns) * var(--pot-cell-width) + (var(--pot-columns) - 1) * .25cqw); max-width: 100%; padding: 0; }
 .draw-show-pot-teams > span { display: flex; flex: 0 0 var(--pot-cell-width); width: var(--pot-cell-width); height: var(--pot-slot-height, 1.7cqw); min-width: 0; align-items: center; justify-content: flex-start; gap: var(--pot-cell-gap, .3cqw); padding: .15cqw .3cqw; overflow: hidden; border: 1px solid hsl(var(--border) / .42); border-radius: 4px; background: hsl(var(--stage-glass) / .88); color: hsl(var(--foreground)); transition: opacity 180ms, filter 180ms; }
-.draw-show-pot-name { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: var(--pot-name-lines, 2); -webkit-box-orient: vertical; overflow: hidden; text-align: center; font-size: var(--pot-name-size, .74cqw); font-weight: 600; line-height: 1.1; overflow-wrap: break-word; hyphens: auto; }
+.draw-show-pot-name { flex: 1; min-width: 0; display: block; overflow: hidden; text-align: center; font-size: var(--pot-name-size, .74cqw); font-weight: 600; line-height: 1.1; white-space: nowrap; overflow-wrap: normal; hyphens: none; }
 .draw-show-pot-teams > .is-drawn { opacity: .3; filter: grayscale(1); color: hsl(var(--muted-foreground)); }
 .draw-show-pot-logo { display: flex; align-items: center; justify-content: center; width: var(--pot-logo-size, 1.45cqw); height: var(--pot-logo-size, 1.45cqw); flex: 0 0 var(--pot-logo-size, 1.45cqw); border: 0; border-radius: 0; background: none; }
 .draw-show-pot-teams img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }

@@ -10,6 +10,7 @@ import { AutoTrimLogo } from "@/components/draw/AutoTrimLogo";
 import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import { studioFor } from "@/lib/drawStudio";
 import { DrawBalls } from "@/components/draw/DrawBalls";
+import { FittedPotName } from "@/components/draw/FittedPotName";
 
 import { balanceWallTitle, drawHeading, fitWallTitle } from "@/lib/drawHeading";
 
@@ -28,6 +29,14 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
   const heading = drawHeading(presentation?.language ?? browserLanguage);
   const studio = studioFor(presentation?.theme);
+  useLayoutEffect(() => {
+    if (document.querySelector("link[data-draw-wall-font]")) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap";
+    link.dataset.drawWallFont = "true";
+    document.head.appendChild(link);
+  }, []);
   useLayoutEffect(() => {
     const update = () => setBrowserLanguage(navigator.language);
     window.addEventListener("languagechange", update);
@@ -66,10 +75,11 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     };
     fit();
     void document.fonts.ready.then(fit);
+    document.fonts.addEventListener("loadingdone", fit);
     const observer = new ResizeObserver(fit);
     observer.observe(board);
     observer.observe(stage);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); document.fonts.removeEventListener("loadingdone", fit); };
   }, [presentation?.tournamentName]);
   const [destination, setDestination] = useState({ x: 0, y: 0, width: 0, height: 0, logo: "1.5cqw", name: ".82cqw" });
   useLayoutEffect(() => {
@@ -129,7 +139,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const potMaxColumns = visiblePotIds.length > 8 ? 8 : 4;
   const potRows = Math.max(1, Math.ceil(visiblePotIds.length / potMaxColumns));
   const potColumns = Math.max(1, Math.ceil(visiblePotIds.length / potRows));
-  const potGridStyle = { "--pot-columns": potColumns, "--pot-slot-height": `${Math.min(1.7, 4 / potRows - .15)}cqw`, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-name-lines": potColumns > 4 ? 3 : 2, "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
+   const potGridStyle = { "--pot-columns": potColumns, "--pot-slot-height": `${Math.min(1.7, 4 / potRows - .15)}cqw`, "--pot-cell-width": potColumns > 4 ? "5cqw" : potColumns === 4 ? "10cqw" : "12cqw", "--pot-name-size": potColumns > 4 ? ".5cqw" : ".74cqw", "--pot-logo-size": potColumns > 4 ? ".95cqw" : "1.45cqw", "--pot-cell-gap": potColumns > 4 ? ".18cqw" : ".3cqw" } as CSSProperties;
   const renderContainer = (container: DrawSessionState["containers"][number]) => (
     <section key={container.id} data-group-id={container.id} data-team-columns={layout.teamColumns} style={{ "--group-slot-rows": Math.max(1, Math.ceil(container.capacity / layout.teamColumns)) } as CSSProperties} className={`draw-show-group-card ${container.id === selectedId || container.id === activeSpotlight || (!pending && last?.targetId === container.id) ? "is-placed" : ""}`}>
       <h2>{container.name}</h2>
@@ -213,7 +223,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       <div className="draw-show-bowl-sheen" aria-hidden="true" />
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`} />
       <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
-      <svg className="draw-show-pot-label" viewBox="0 0 600 100" role="img" aria-label={footLabel}><defs><path id={`${ledArcId}-pot`} d="M 20 46 Q 300 90 580 46" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-pot`} startOffset="50%">{footLabel}</textPath></text></svg><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{visiblePotIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><span className="draw-show-pot-name">{item?.name}</span></span>; })}</div></div>
+      <svg className="draw-show-pot-label" viewBox="0 0 600 100" role="img" aria-label={footLabel}><defs><path id={`${ledArcId}-pot`} d="M 20 46 Q 300 90 580 46" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-pot`} startOffset="50%">{footLabel}</textPath></text></svg><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{visiblePotIds.map((id) => { const item = session.teams.find((candidate) => candidate.id === id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><FittedPotName name={item?.name ?? ""} /></span>; })}</div></div>
     </>}
     {controls}
   </div>;
