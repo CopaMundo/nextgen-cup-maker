@@ -2582,6 +2582,7 @@ posities + statistieken groen */
   --stage-ball: 43 11% 86%; --stage-ball-shade: 38 10% 56%;
   --stage-ball-light: 48 25% 100%;
   --stage-metal-light: 48 100% 92%; --stage-metal-main: 44 100% 56%; --stage-metal-dark: 38 92% 32%;
+  --stage-letter-metal: 43 68% 62%; --stage-letter-reflection: 38 72% 44%; --stage-letter-shadow: 0 0% 2%;
   --stage-led-surface: 0 0% 3%; --stage-led-dot: 0 0% 13%;
   --stage-bowl-filter: sepia(.65) saturate(1.65) brightness(1.15);
 }
@@ -2594,18 +2595,20 @@ posities + statistieken groen */
 .draw-show-stage[data-studio-theme="champions-blue"] {
   --stage-bowl-filter: grayscale(1) sepia(1) hue-rotate(155deg) saturate(3.5) brightness(1.3);
   --stage-metal-light: 190 100% 90%; --stage-metal-main: 202 100% 58%; --stage-metal-dark: 220 100% 38%;
+  --stage-letter-metal: 210 16% 82%; --stage-letter-reflection: 222 80% 42%;
   --background: 220 65% 5%; --foreground: 205 45% 95%; --card: 220 48% 8%; --border: 207 80% 54%;
   --primary: 202 100% 75%; --muted-foreground: 210 30% 74%; --accent: 212 55% 18%; --stage-glow: 207 100% 60%; --stage-glass: 220 45% 8%;
 }
 .draw-show-stage[data-studio-theme="platinum-white"] {
   --stage-bowl-filter: saturate(0) brightness(1.6) contrast(1.1);
   --stage-metal-light: 0 0% 100%; --stage-metal-main: 0 0% 80%; --stage-metal-dark: 0 0% 45%;
+  --stage-letter-metal: 210 4% 85%; --stage-letter-reflection: 210 7% 68%;
   --background: 0 0% 5%; --foreground: 0 0% 96%; --card: 0 0% 8%; --border: 0 0% 68%;
   --primary: 0 0% 90%; --muted-foreground: 0 0% 73%; --accent: 0 0% 20%; --stage-glow: 0 0% 85%; --stage-glass: 0 0% 8%;
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-halo { position: absolute; top: 5%; left: 29.5%; width: 41%; height: 16%; pointer-events: none; z-index: 3; }
+.draw-show-wall-lettering { position: absolute; top: 12%; left: 29%; width: 42%; height: 21%; pointer-events: none; z-index: 3; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }

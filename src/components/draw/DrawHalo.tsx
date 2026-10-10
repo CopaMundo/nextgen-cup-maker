@@ -1,76 +1,54 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
-import { CanvasTexture, Color, RepeatWrapping, SRGBColorSpace } from "three";
-import { consoleBand } from "@/lib/drawConsoleGeometry";
+import { Color, DataTexture, RepeatWrapping, SRGBColorSpace } from "three";
+import { wallLetterGeometry } from "@/lib/drawWallLettering";
 
-interface HaloPalette { surface: string; dot: string; text: string; metal: string; light: string; shade: string; }
+interface MetalPalette { face: string; light: string; reflection: string; shadow: string; }
 interface Props { title: string; heading: string; theme: string; }
 
-/** Separate text bands retain a fixed heading and brand while long titles scroll. */
-function createDisplay(text: string, size: number, palette: HaloPalette, led = true) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 4096; canvas.height = 512;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-  ctx.font = `600 ${size}px "Barlow Condensed", "Arial Narrow", sans-serif`;
-  const titleWidth = ctx.measureText(text.toUpperCase()).width;
-  const scrolling = led && titleWidth > 2850;
-  canvas.width = Math.max(4096, Math.min(16384, Math.ceil(titleWidth + 1100)));
-  if (led) { ctx.fillStyle = palette.surface; ctx.fillRect(0, 0, canvas.width, 512); }
-  ctx.fillStyle = palette.dot;
-  if (led) for (let y = 6; y < 512; y += 12) for (let x = 6; x < canvas.width; x += 12) {
-    ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = `600 ${size}px "Barlow Condensed", "Arial Narrow", sans-serif`;
-  ctx.fillStyle = led ? palette.text : palette.light;
-  ctx.fillText(text.toUpperCase(), canvas.width / 2, 256);
-  const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace; texture.anisotropy = 8;
-  texture.wrapS = RepeatWrapping;
-  texture.repeat.x = scrolling ? 4096 / canvas.width : 1;
-  return { texture, scrolling, period: Math.max(35000, canvas.width / 90 * 1000) };
-}
-
-function HaloScene({ title, heading, palette }: Omit<Props, "theme"> & { palette: HaloPalette }) {
-  const display = useMemo(() => createDisplay(title, 330, palette), [title, palette]);
-  const caption = useMemo(() => createDisplay(heading, 310, palette), [heading, palette]);
-  const brand = useMemo(() => createDisplay("POWERED BY COPA MUNDO", 185, palette), [palette]);
-  const geometry = useMemo(() => ({ body: consoleBand(1, -1, .12), top: consoleBand(1, .91, .12), bottom: consoleBand(-.91, -1, .12), screen: consoleBand(.9, -.9, 0), title: consoleBand(.35, -.48, 0), heading: consoleBand(.86, .36, 0), brand: consoleBand(-.5, -.89, 0) }), []);
-  useEffect(() => () => { display?.texture.dispose(); caption?.texture.dispose(); brand?.texture.dispose(); }, [display, caption, brand]);
-  useEffect(() => () => Object.values(geometry).forEach(item => item.dispose()), [geometry]);
-  useFrame(() => {
-    // The shared wall clock keeps director and projector lettering aligned.
-    if (display?.scrolling) display.texture.offset.x = (Date.now() % display.period) / display.period;
-  });
+function WallLetters({ title, heading, theme, palette }: Props & { palette: MetalPalette }) {
+  const letters = useMemo(() => [
+    { geometry: wallLetterGeometry(heading, .24, 9, .16), y: 1.05 },
+    { geometry: wallLetterGeometry(title, 1.02, 12.1), y: .08 },
+    { geometry: wallLetterGeometry("POWERED BY COPA MUNDO", .20, 10, .12), y: -.89 },
+  ], [title, heading]);
+  const grain = useMemo(() => {
+    const data = new Uint8Array(64 * 64 * 4);
+    for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
+      const i = (y * 64 + x) * 4;
+      const value = 170 + Math.round(24 * Math.sin(y * 17.3) + 6 * Math.sin(x * 2.1));
+      data[i] = data[i + 1] = data[i + 2] = value; data[i + 3] = 255;
+    }
+    const texture = new DataTexture(data, 64, 64);
+    texture.wrapS = texture.wrapT = RepeatWrapping; texture.repeat.set(3, 8); texture.needsUpdate = true;
+    return texture;
+  }, []);
+  useEffect(() => () => letters.forEach(item => item.geometry.dispose()), [letters]);
+  useEffect(() => () => grain.dispose(), [grain]);
   return <>
-    <OrthographicCamera makeDefault manual position={[0, 0, 18]} left={-6.65} right={6.65} top={1.5} bottom={-1.2} near={.1} far={60} onUpdate={camera => { camera.lookAt(0, 0, 0); camera.updateProjectionMatrix(); }} />
-    <ambientLight intensity={1.1} />
-    <directionalLight position={[-6, 7, 10]} intensity={3} color={palette.light} />
+    <OrthographicCamera makeDefault manual position={[0, 0, 18]} left={-7} right={7} top={1.97} bottom={-1.97} near={.1} far={40} />
+    <ambientLight intensity={.65} color={palette.light} />
+    <directionalLight position={[-4, 5, 7]} intensity={3.2} color={palette.light} />
+    <directionalLight position={[6, 1, 4]} intensity={1.1} color={palette.reflection} />
     <Suspense fallback={null}><Environment resolution={64} frames={1}>
-      <Lightformer position={[0, 8, 6]} scale={[12, 3, 1]} intensity={3} color={palette.light} />
-      <Lightformer position={[-6, 0, 4]} rotation-y={Math.PI / 3} scale={[3, 6, 1]} intensity={2} color={palette.metal} />
+      <Lightformer position={[-2, 5, 5]} rotation-x={.3} scale={[10, 2, 1]} intensity={4} color={palette.light} />
+      <Lightformer position={[5, 0, 3]} rotation-y={-.8} scale={[3, 6, 1]} intensity={2} color={palette.reflection} />
+      <Lightformer position={[-5, -2, 2]} rotation-y={.8} scale={[4, 1, 1]} intensity={1.5} color={palette.light} />
     </Environment></Suspense>
-    <mesh geometry={geometry.body}><meshStandardMaterial color={palette.shade} metalness={.85} roughness={.3} /></mesh>
-    {[geometry.top, geometry.bottom].map((band, index) => <mesh key={index} geometry={band} position-z={.015}><meshStandardMaterial color={palette.metal} metalness={.92} roughness={.23} /></mesh>)}
-    <mesh geometry={geometry.screen} position-z={.03}><meshStandardMaterial color={palette.surface} metalness={.35} roughness={.2} /></mesh>
-    <mesh geometry={geometry.title} position-z={.18}><meshBasicMaterial map={display?.texture} toneMapped={false} /></mesh>
-    <mesh geometry={geometry.heading} position-z={.18}><meshBasicMaterial map={caption?.texture} toneMapped={false} /></mesh>
-    <mesh geometry={geometry.brand} position-z={.18}><meshBasicMaterial map={brand?.texture} transparent toneMapped={false} /></mesh>
-    <mesh geometry={geometry.screen} position-z={.2}><meshStandardMaterial color={palette.light} metalness={.65} roughness={.22} transparent opacity={.065} depthWrite={false} /></mesh>
+    {letters.map(({ geometry, y }, index) => <group key={index} position-y={y}>
+      <mesh geometry={geometry} position={[.028, -.044, -.07]} scale={[1.012, 1.024, 1]}><meshBasicMaterial color={palette.shadow} transparent opacity={.8} /></mesh>
+      <mesh geometry={geometry}>
+        <meshPhysicalMaterial color={palette.face} metalness={.94} roughness={theme === "copa-gold" ? .32 : .2} roughnessMap={grain} clearcoat={.35} clearcoatRoughness={.2} />
+      </mesh>
+    </group>)}
   </>;
 }
 
+/** Historical export retained; this is unframed, fixed metal lettering, not a halo. */
 export function DrawHalo({ title, heading, theme }: Props) {
   const host = useRef<HTMLElement>(null);
-  const [palette, setPalette] = useState<HaloPalette | null>(null);
-  const [fontsReady, setFontsReady] = useState(false);
-  useEffect(() => {
-    let mounted = true;
-    void document.fonts.load('600 330px "Barlow Condensed"').then(() => { if (mounted) setFontsReady(true); });
-    return () => { mounted = false; };
-  }, []);
+  const [palette, setPalette] = useState<MetalPalette | null>(null);
   useEffect(() => {
     if (!host.current) return;
     const css = getComputedStyle(host.current);
@@ -78,9 +56,9 @@ export function DrawHalo({ title, heading, theme }: Props) {
       const [h, s, l] = css.getPropertyValue(token).trim().split(/\s+/).map(parseFloat);
       return new Color().setHSL(h / 360, s / 100, l / 100, SRGBColorSpace).getStyle();
     };
-    setPalette({ surface: color("--stage-led-surface"), dot: color("--stage-led-dot"), text: color("--primary"), metal: color("--stage-metal-main"), light: color("--stage-metal-light"), shade: color("--stage-metal-dark") });
+    setPalette({ face: color("--stage-letter-metal"), light: color("--stage-metal-light"), reflection: color("--stage-letter-reflection"), shadow: color("--stage-letter-shadow") });
   }, [theme]);
-  return <header ref={host} className="draw-show-halo" role="img" aria-label={`${heading} · ${title} · POWERED BY COPA MUNDO`} data-halo-title={title} data-broadcast-console>
-    {palette && fontsReady && <Canvas dpr={[1, 1.5]} gl={{ alpha: true, antialias: true }}><HaloScene title={title} heading={heading} palette={palette} /></Canvas>}
+  return <header ref={host} className="draw-show-wall-lettering" role="img" aria-label={`${heading} · ${title} · POWERED BY COPA MUNDO`} data-wall-lettering={title}>
+    {palette && <Canvas frameloop="demand" dpr={[1, 2]} gl={{ alpha: true, antialias: true }}><WallLetters title={title} heading={heading} theme={theme} palette={palette} /></Canvas>}
   </header>;
 }
