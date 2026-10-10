@@ -58,8 +58,9 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       range.selectNodeContents(title);
       const fitted = fitWallTitle(board.clientWidth, board.clientHeight, maxSize, (size) => {
         title.style.fontSize = `${size}px`;
-        const rects = Array.from(range.getClientRects());
-        return { width: Math.max(title.scrollWidth, ...rects.map((rect) => rect.width)), height: title.getBoundingClientRect().height, lines: rects.length };
+        const rects = Array.from(range.getClientRects()).filter((rect) => rect.width > 0);
+        const lines = new Set(rects.map((rect) => Math.round(rect.top * 10))).size;
+        return { width: Math.max(title.scrollWidth, ...rects.map((rect) => rect.width)), height: title.getBoundingClientRect().height, lines };
       });
       if (fitted > 0) setWallTitleSize(fitted);
     };

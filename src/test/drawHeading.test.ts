@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drawHeading, fitWallTitle } from "@/lib/drawHeading";
+import { balanceWallTitle, drawHeading, fitWallTitle } from "@/lib/drawHeading";
 
 describe("draw heading", () => {
   it("uses the browser language independent of its region", () => {
@@ -9,6 +9,18 @@ describe("draw heading", () => {
   });
   it("falls back to English for unsupported languages", () => {
     expect(drawHeading("ja-JP")).toBe("LIVE DRAW");
+  });
+});
+
+describe("balanceWallTitle", () => {
+  it("leaves short names on one line", () => {
+    expect(balanceWallTitle("COPA MUNDO", 20, (text) => text.length)).toBe("COPA MUNDO");
+  });
+  it("balances a long name at a word boundary", () => {
+    expect(balanceWallTitle("INTERNATIONALE COPA MUNDO CHAMPIONS CUP", 20, (text) => text.length)).toBe("INTERNATIONALE COPA\nMUNDO CHAMPIONS CUP");
+  });
+  it("keeps an unbroken name intact for browser wrapping", () => {
+    expect(balanceWallTitle("CHAMPIONSHIP", 5, (text) => text.length)).toBe("CHAMPIONSHIP");
   });
 });
 
