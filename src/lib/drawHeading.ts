@@ -14,6 +14,18 @@ export function drawHeading(language: string): string {
 
 type WallTitleMeasurement = { width: number; height: number; lines: number };
 
+export function balanceWallTitle(text: string, width: number, measure: (text: string) => number): string {
+  const words = text.trim().split(/\s+/);
+  if (words.length < 2 || measure(words.join(" ")) <= width) return words.join(" ");
+  let best = 1;
+  let smallestWidth = Infinity;
+  for (let split = 1; split < words.length; split++) {
+    const widest = Math.max(measure(words.slice(0, split).join(" ")), measure(words.slice(split).join(" ")));
+    if (widest < smallestWidth) { best = split; smallestWidth = widest; }
+  }
+  return `${words.slice(0, best).join(" ")}\n${words.slice(best).join(" ")}`;
+}
+
 // Measure real balanced browser wrapping; size the font, never distort glyphs.
 export function fitWallTitle(width: number, height: number, maxFontSize: number, measure: (fontSize: number) => WallTitleMeasurement): number {
   if (!(width > 0) || !(height > 0) || !(maxFontSize > 0)) return 0;

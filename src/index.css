@@ -2610,7 +2610,7 @@ posities + statistieken groen */
 .draw-wall-caption { text-align: center; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 1.05cqw; font-weight: 700; line-height: 1.4; letter-spacing: 0; }
 .draw-show-live-heading, .draw-show-brand { width: 100%; flex: 0 0 auto; pointer-events: none; }
 .draw-show-wall-title { position: relative; width: 100%; min-height: 0; flex: 1 1 0; display: flex; align-items: center; justify-content: center; }
-.draw-wall-title-lettering, .draw-wall-title-measure { display: block; width: 100%; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: 1; font-weight: 500; letter-spacing: 0.005em; text-transform: uppercase; white-space: normal; text-align: center; text-wrap: balance; overflow-wrap: anywhere; }
+.draw-wall-title-lettering, .draw-wall-title-measure { display: block; width: 100%; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 4.8cqw; line-height: 1; font-weight: 500; letter-spacing: 0.005em; text-transform: uppercase; white-space: pre-line; text-align: center; text-wrap: balance; overflow-wrap: anywhere; }
 .draw-wall-title-lettering { font-size: var(--wall-title-size, 4.8cqw); }
 .draw-wall-title-measure { position: absolute; visibility: hidden; pointer-events: none; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }

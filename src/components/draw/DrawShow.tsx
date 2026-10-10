@@ -11,7 +11,7 @@ import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import { studioFor } from "@/lib/drawStudio";
 import { DrawBalls } from "@/components/draw/DrawBalls";
 
-import { drawHeading, fitWallTitle } from "@/lib/drawHeading";
+import { balanceWallTitle, drawHeading, fitWallTitle } from "@/lib/drawHeading";
 
 export function DrawShow({ session: incomingSession, spotlightId: incomingSpotlight, presentation: incomingPresentation, controls }: {
   session?: DrawSessionState | null;
@@ -23,6 +23,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const stageRef = useRef<HTMLDivElement>(null);
   const wallTitleRef = useRef<HTMLSpanElement>(null);
   const [wallTitleSize, setWallTitleSize] = useState<number>();
+  const [wallTitleText, setWallTitleText] = useState(presentation?.tournamentName || "COPA MUNDO");
   const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
   const heading = drawHeading(presentation?.language ?? browserLanguage);
@@ -40,6 +41,19 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     const fit = () => {
       title.style.removeProperty("font-size");
       const maxSize = parseFloat(getComputedStyle(title).fontSize);
+      const text = presentation?.tournamentName || "COPA MUNDO";
+      const balanced = balanceWallTitle(text, board.clientWidth, (value) => {
+        title.textContent = value;
+        const naturalRange = document.createRange();
+        naturalRange.selectNodeContents(title);
+        // Temporarily prevent wrapping to measure the natural inscription width.
+        title.style.whiteSpace = "nowrap";
+        const width = naturalRange.getBoundingClientRect().width;
+        title.style.removeProperty("white-space");
+        return width;
+      });
+      title.textContent = balanced;
+      setWallTitleText(balanced);
       const range = document.createRange();
       range.selectNodeContents(title);
       const fitted = fitWallTitle(board.clientWidth, board.clientHeight, maxSize, (size) => {
@@ -143,7 +157,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       <div className="draw-show-live-heading draw-wall-metal draw-wall-caption">{heading}</div>
       <div className="draw-show-wall-title" style={{ "--wall-title-size": wallTitleSize ? `${wallTitleSize}px` : undefined } as CSSProperties}>
         <span ref={wallTitleRef} className="draw-wall-title-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
-        <span className="draw-wall-title-lettering draw-wall-metal">{presentation?.tournamentName || "COPA MUNDO"}</span>
+        <span className="draw-wall-title-lettering draw-wall-metal">{wallTitleText}</span>
       </div>
       <div className="draw-show-brand draw-wall-metal draw-wall-caption">POWERED BY COPA MUNDO</div>
     </header>
