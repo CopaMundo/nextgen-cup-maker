@@ -11,7 +11,7 @@ import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import { studioFor } from "@/lib/drawStudio";
 import { DrawBalls } from "@/components/draw/DrawBalls";
 
-import { drawHeading } from "@/lib/drawHeading";
+import { drawHeading, fitWallTitle } from "@/lib/drawHeading";
 
 export function DrawShow({ session: incomingSession, spotlightId: incomingSpotlight, presentation: incomingPresentation, controls }: {
   session?: DrawSessionState | null;
@@ -23,6 +23,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const stageRef = useRef<HTMLDivElement>(null);
   const wallTitleRef = useRef<HTMLSpanElement>(null);
   const [wallTitleScale, setWallTitleScale] = useState(1);
+  const [wallTitleStretch, setWallTitleStretch] = useState(1.6);
   const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
   const heading = drawHeading(presentation?.language ?? browserLanguage);
@@ -35,14 +36,19 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   useLayoutEffect(() => {
     const title = wallTitleRef.current;
     const board = title?.parentElement;
-    if (!title || !board) return;
+    const stage = stageRef.current;
+    if (!title || !board || !stage) return;
     const fit = () => {
-      setWallTitleScale(Math.min(1, board.clientWidth / Math.max(1, title.getBoundingClientRect().width)));
+      const natural = title.getBoundingClientRect();
+      const fitted = fitWallTitle(board.clientWidth, Math.max(1, natural.width), natural.height, stage.getBoundingClientRect().height);
+      setWallTitleScale(fitted.scale);
+      setWallTitleStretch(fitted.stretch);
     };
     fit();
     void document.fonts.ready.then(fit);
     const observer = new ResizeObserver(fit);
     observer.observe(board);
+    observer.observe(stage);
     return () => observer.disconnect();
   }, [presentation?.tournamentName]);
   const [destination, setDestination] = useState({ x: 0, y: 0, width: 0, height: 0, logo: "1.5cqw", name: ".82cqw" });
@@ -130,7 +136,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     <header className="draw-show-wall-header">
       <div className="draw-show-live-heading draw-wall-metal draw-wall-caption">{heading}</div>
-      <div className="draw-show-wall-title" style={{ "--wall-title-scale": wallTitleScale } as CSSProperties}>
+      <div className="draw-show-wall-title" style={{ "--wall-title-scale": wallTitleScale, "--wall-title-stretch": wallTitleStretch } as CSSProperties}>
         <span ref={wallTitleRef} className="draw-wall-title-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
         <span className="draw-wall-title-lettering draw-wall-metal">{presentation?.tournamentName || "COPA MUNDO"}</span>
       </div>
