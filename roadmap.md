@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Nieuwe aangeleverde 4K-studio’s aansluiten, ronde thematische bokaal op podium plaatsen en balvlucht/centraal vak controleren.
+- [x] Nieuwe originele 4K-studio’s aangesloten met ronde thematische bokaal op het podium, afgestemde balcontacten en vlucht naar het permanente centrale teamvak. Drie thema’s en onthulling met voorbeeldteams visueel gecontroleerd; 25 tests geslaagd. Geen nieuwe echte gezamenlijke regie/beamer-trekking uitgevoerd.
 - [x] Drie originele 3840×2160 UHD-achtergronden aangesloten zonder kwaliteitsverlies; bestaande bokaal apart behouden op dezelfde positie. Drie thema’s visueel gecontroleerd, negen voorbeeldweergaven en achttien tests geslaagd.
 - [x] Hoekige glaskleur-maskering vervangen door een vloeiende Bézier-contour, met behoud van oorspronkelijke bokaal, voet en glaskleur per thema. Achttien tests en negen voorbeeldweergaven geslaagd; ronde bokaal visueel gecontroleerd met echte studioafbeeldingen in Gold, Blue en White.
 - [x] Oorspronkelijk lettertype onder bokaal hersteld; exact één gedeelde lettergrootte voor alle teams en piramidevormige tweeregelige lange namen behouden. Achttien tests en negen gevulde voorbeeldweergaven in drie thema’s geslaagd; gelijke lettergroottes en geen tekstoverflow of runtimefouten bevestigd.
