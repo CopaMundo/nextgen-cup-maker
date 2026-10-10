@@ -24,7 +24,7 @@ function createDisplay(text: string, size: number, palette: HaloPalette, led = t
   }
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.font = `600 ${size}px "Barlow Condensed", "Arial Narrow", sans-serif`;
-  ctx.fillStyle = led ? palette.text : palette.shade;
+  ctx.fillStyle = led ? palette.text : palette.light;
   ctx.fillText(text.toUpperCase(), canvas.width / 2, 256);
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace; texture.anisotropy = 8;
@@ -35,9 +35,9 @@ function createDisplay(text: string, size: number, palette: HaloPalette, led = t
 
 function HaloScene({ title, heading, palette }: Omit<Props, "theme"> & { palette: HaloPalette }) {
   const display = useMemo(() => createDisplay(title, 330, palette), [title, palette]);
-  const caption = useMemo(() => createDisplay(heading, 225, palette), [heading, palette]);
-  const brand = useMemo(() => createDisplay("POWERED BY COPA MUNDO", 205, palette, false), [palette]);
-  const geometry = useMemo(() => ({ body: consoleBand(1.13, -1.02, .45), top: consoleBand(1.13, .77, .45), bottom: consoleBand(-.64, -1.02, .35), screen: consoleBand(.76, -.63, .04), title: consoleBand(.32, -.54, .02), heading: consoleBand(.74, .34, .02), brand: consoleBand(-.69, -.98, .02), upperLight: consoleBand(.81, .79, .03), lowerLight: consoleBand(-1.02, -1.04, .03) }), []);
+  const caption = useMemo(() => createDisplay(heading, 310, palette), [heading, palette]);
+  const brand = useMemo(() => createDisplay("POWERED BY COPA MUNDO", 270, palette, false), [palette]);
+  const geometry = useMemo(() => ({ body: consoleBand(1.13, -1.02, .45), top: consoleBand(1.13, .77, .45), bottom: consoleBand(-.64, -1.02, .35), screen: consoleBand(.76, -.63, 0), title: consoleBand(.26, -.54, 0), heading: consoleBand(.65, .27, 0), brand: consoleBand(-.69, -.98, 0), upperLight: consoleBand(.81, .79, .03), lowerLight: consoleBand(-1.02, -1.04, .03) }), []);
   useEffect(() => () => { display?.texture.dispose(); caption?.texture.dispose(); brand?.texture.dispose(); }, [display, caption, brand]);
   useEffect(() => () => Object.values(geometry).forEach(item => item.dispose()), [geometry]);
   useFrame(() => {
@@ -55,14 +55,14 @@ function HaloScene({ title, heading, palette }: Omit<Props, "theme"> & { palette
     <mesh geometry={geometry.body}><meshStandardMaterial color={palette.shade} metalness={.85} roughness={.3} /></mesh>
     {[geometry.top, geometry.bottom].map((band, index) => <mesh key={index} geometry={band} position-z={.015}><meshStandardMaterial color={palette.metal} metalness={.92} roughness={.23} /></mesh>)}
     <mesh geometry={geometry.screen} position-z={.03}><meshStandardMaterial color={palette.surface} metalness={.35} roughness={.2} /></mesh>
-    <mesh geometry={geometry.title} position-z={.07}><meshBasicMaterial map={display?.texture} toneMapped={false} /></mesh>
-    <mesh geometry={geometry.heading} position-z={.07}><meshBasicMaterial map={caption?.texture} toneMapped={false} /></mesh>
-    <mesh geometry={geometry.brand} position-z={.07}><meshBasicMaterial map={brand?.texture} transparent toneMapped={false} /></mesh>
+    <mesh geometry={geometry.title} position-z={.18}><meshBasicMaterial map={display?.texture} toneMapped={false} /></mesh>
+    <mesh geometry={geometry.heading} position-z={.18}><meshBasicMaterial map={caption?.texture} toneMapped={false} /></mesh>
+    <mesh geometry={geometry.brand} position-z={.18}><meshBasicMaterial map={brand?.texture} transparent toneMapped={false} /></mesh>
+    <mesh geometry={geometry.screen} position-z={.2}><meshStandardMaterial color={palette.light} metalness={.65} roughness={.22} transparent opacity={.065} depthWrite={false} /></mesh>
     {[geometry.upperLight, geometry.lowerLight].map((band, index) => <mesh key={index} geometry={band} position-z={.06}><meshBasicMaterial color={palette.light} toneMapped={false} /></mesh>)}
     {[-5.5, -3.3, 0, 3.3, 5.5].map(x => <group key={x} position={[x, -1.08, consoleContour(x).z - .12]}>
       <mesh><cylinderGeometry args={[.12, .16, .22, 12]} /><meshStandardMaterial color={palette.shade} metalness={.8} roughness={.3} /></mesh>
       <mesh position-y={-.12} rotation-x={Math.PI / 2}><circleGeometry args={[.1, 16]} /><meshBasicMaterial color={palette.light} side={DoubleSide} toneMapped={false} /></mesh>
-      <mesh position-y={-.34}><coneGeometry args={[.4, .6, 20, 1, true]} /><meshBasicMaterial color={palette.light} transparent opacity={.045} depthWrite={false} side={DoubleSide} /></mesh>
     </group>)}
   </>;
 }
