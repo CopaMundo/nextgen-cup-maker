@@ -10,7 +10,7 @@ interface Props { title: string; heading: string; theme: string; }
 function WallLetters({ title, heading, theme, palette }: Props & { palette: MetalPalette }) {
   const letters = useMemo(() => [
     { geometry: wallLetterGeometry(heading, .24, 9, .16), y: 1.19 },
-    { geometry: wallLetterGeometry(title, 1.28, 12.8, 0, .026), y: .12 },
+    { geometry: wallLetterGeometry(title, 1.28, 11.1, 0, .026), y: .12 },
     { geometry: wallLetterGeometry("POWERED BY COPA MUNDO", .22, 10, .12), y: -.99 },
   ].map(item => {
     // Keep the polished face saturated and readable. A narrow studio reflection
