@@ -1,8 +1,8 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
-import { CanvasTexture, Color, DoubleSide, RepeatWrapping, SRGBColorSpace } from "three";
-import { consoleBand, consoleContour } from "@/lib/drawConsoleGeometry";
+import { CanvasTexture, Color, RepeatWrapping, SRGBColorSpace } from "three";
+import { consoleBand } from "@/lib/drawConsoleGeometry";
 
 interface HaloPalette { surface: string; dot: string; text: string; metal: string; light: string; shade: string; }
 interface Props { title: string; heading: string; theme: string; }
@@ -36,8 +36,8 @@ function createDisplay(text: string, size: number, palette: HaloPalette, led = t
 function HaloScene({ title, heading, palette }: Omit<Props, "theme"> & { palette: HaloPalette }) {
   const display = useMemo(() => createDisplay(title, 330, palette), [title, palette]);
   const caption = useMemo(() => createDisplay(heading, 310, palette), [heading, palette]);
-  const brand = useMemo(() => createDisplay("POWERED BY COPA MUNDO", 270, palette, false), [palette]);
-  const geometry = useMemo(() => ({ body: consoleBand(1.13, -1.02, .45), top: consoleBand(1.13, .77, .45), bottom: consoleBand(-.64, -1.02, .35), screen: consoleBand(.76, -.63, 0), title: consoleBand(.26, -.54, 0), heading: consoleBand(.65, .27, 0), brand: consoleBand(-.69, -.98, 0), upperLight: consoleBand(.81, .79, .03), lowerLight: consoleBand(-1.02, -1.04, .03) }), []);
+  const brand = useMemo(() => createDisplay("POWERED BY COPA MUNDO", 185, palette), [palette]);
+  const geometry = useMemo(() => ({ body: consoleBand(1, -1, .12), top: consoleBand(1, .91, .12), bottom: consoleBand(-.91, -1, .12), screen: consoleBand(.9, -.9, 0), title: consoleBand(.35, -.48, 0), heading: consoleBand(.86, .36, 0), brand: consoleBand(-.5, -.89, 0) }), []);
   useEffect(() => () => { display?.texture.dispose(); caption?.texture.dispose(); brand?.texture.dispose(); }, [display, caption, brand]);
   useEffect(() => () => Object.values(geometry).forEach(item => item.dispose()), [geometry]);
   useFrame(() => {
@@ -45,7 +45,7 @@ function HaloScene({ title, heading, palette }: Omit<Props, "theme"> & { palette
     if (display?.scrolling) display.texture.offset.x = (Date.now() % display.period) / display.period;
   });
   return <>
-    <OrthographicCamera makeDefault manual position={[0, 2.8, 18]} left={-7} right={7} top={1.75} bottom={-1.75} near={.1} far={60} onUpdate={camera => { camera.lookAt(0, 0, 0); camera.updateProjectionMatrix(); }} />
+    <OrthographicCamera makeDefault manual position={[0, 0, 18]} left={-6.65} right={6.65} top={1.5} bottom={-1.2} near={.1} far={60} onUpdate={camera => { camera.lookAt(0, 0, 0); camera.updateProjectionMatrix(); }} />
     <ambientLight intensity={1.1} />
     <directionalLight position={[-6, 7, 10]} intensity={3} color={palette.light} />
     <Suspense fallback={null}><Environment resolution={64} frames={1}>
@@ -59,11 +59,6 @@ function HaloScene({ title, heading, palette }: Omit<Props, "theme"> & { palette
     <mesh geometry={geometry.heading} position-z={.18}><meshBasicMaterial map={caption?.texture} toneMapped={false} /></mesh>
     <mesh geometry={geometry.brand} position-z={.18}><meshBasicMaterial map={brand?.texture} transparent toneMapped={false} /></mesh>
     <mesh geometry={geometry.screen} position-z={.2}><meshStandardMaterial color={palette.light} metalness={.65} roughness={.22} transparent opacity={.065} depthWrite={false} /></mesh>
-    {[geometry.upperLight, geometry.lowerLight].map((band, index) => <mesh key={index} geometry={band} position-z={.06}><meshBasicMaterial color={palette.light} toneMapped={false} /></mesh>)}
-    {[-5.5, -3.3, 0, 3.3, 5.5].map(x => <group key={x} position={[x, -1.08, consoleContour(x).z - .12]}>
-      <mesh><cylinderGeometry args={[.12, .16, .22, 12]} /><meshStandardMaterial color={palette.shade} metalness={.8} roughness={.3} /></mesh>
-      <mesh position-y={-.12} rotation-x={Math.PI / 2}><circleGeometry args={[.1, 16]} /><meshBasicMaterial color={palette.light} side={DoubleSide} toneMapped={false} /></mesh>
-    </group>)}
   </>;
 }
 

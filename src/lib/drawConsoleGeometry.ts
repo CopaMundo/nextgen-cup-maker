@@ -1,9 +1,8 @@
 import { BufferGeometry, Float32BufferAttribute } from "three";
 
-/** A central bow with swept-back, chamfered wings around the pillars. */
+/** Restrained bow and slight tapered ends follow the studio's inner pillars. */
 export function consoleContour(x: number) {
-  const wing = Math.max(0, Math.abs(x) - 5.2);
-  return { z: .75 - .038 * x * x - wing * .65, inset: wing * .16 };
+  return { z: .4 - .012 * x * x, inset: 0, rise: .4 * (x / 6.5) ** 2 };
 }
 
 export function consoleBand(top: number, bottom: number, depth = .12) {
@@ -12,9 +11,10 @@ export function consoleBand(top: number, bottom: number, depth = .12) {
   const segments = 160;
   for (let i = 0; i <= segments; i++) {
     const x = -6.5 + 13 * i / segments;
-    const { z, inset } = consoleContour(x);
-    const bevel = Math.min(inset, (top - bottom) * .2);
-    vertices.push(x, top - bevel, z, x, bottom + bevel, z, x, top - bevel, z - depth, x, bottom + bevel, z - depth);
+    const { z, rise } = consoleContour(x);
+    const upperX = x * (1 - .025 * (top + 1));
+    const lowerX = x * (1 - .025 * (bottom + 1));
+    vertices.push(upperX, top + rise, z, lowerX, bottom + rise, z, upperX, top + rise, z - depth, lowerX, bottom + rise, z - depth);
     uv.push(i / segments, 1, i / segments, 0, i / segments, 1, i / segments, 0);
     if (i < segments) {
       const a = i * 4, b = a + 4;

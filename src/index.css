@@ -2605,7 +2605,7 @@ posities + statistieken groen */
 }
 .draw-watch-qr { --qr-paper: 0 0% 100%; background: hsl(var(--qr-paper)); border-radius: 4px; }
 .draw-projector-stage .draw-show-stage { width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); flex: 0 0 auto; }
-.draw-show-halo { position: absolute; top: 0; left: 22%; width: 56%; height: 25%; pointer-events: none; z-index: 3; filter: drop-shadow(0 .3cqw .65cqw hsl(var(--stage-glow) / .22)); }
+.draw-show-halo { position: absolute; top: 5%; left: 29.5%; width: 41%; height: 16%; pointer-events: none; z-index: 3; }
 .draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
