@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Wandregels dichter bij titel, gelijke glans per titelregel en uniforme potteamnamen met nette gecentreerde tweeregelige namen controleren.
 - [x] Vertrouwde Barlow-wandregels en ruime gelijke afstanden hersteld; vloeiende thematische metaalglans met helderdere toernooinaam. Twaalf tests en negen voorbeeldweergaven in drie thema’s gecontroleerd zonder overflow of runtimefouten.
 - [x] Wandtypografie volgens nieuwe specificaties; normale titels op één regel, uitzonderlijk lange op twee regels met bredere onderregel; potteamnamen automatisch passend op één regel. Achttien tests en negen gevulde voorbeeldweergaven in drie thema’s gecontroleerd, met gelijke afstanden en zonder tekstoverflow of runtimefouten.
 - [x] Wandteksten in één kolom binnen de zuilen, gelijke tussenruimte en gebalanceerde toernooinaam op maximaal twee passende regels; metallic stijl behouden. Zestien tests en dertig schermcontroles in drie thema’s geslaagd, zonder overlap of runtimefouten.
