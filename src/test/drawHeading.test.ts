@@ -13,23 +13,20 @@ describe("draw heading", () => {
 });
 
 describe("fitWallTitle", () => {
-  const stage = 720;
-  const board = 512;
-  const em = 61.44; // 4.8cqw at a 1280px stage
-  it("never distorts letters while fitting the board width", () => {
-    const fitted = fitWallTitle(board, 1010, em, stage);
-    expect(fitted.scale).toBeCloseTo(0.507, 2);
-    expect(fitted.stretch).toBe(1);
-    expect(fitted.scale * 1010).toBeCloseTo(board, 0);
+  it("keeps natural font size for a fitting one-line name", () => {
+    expect(fitWallTitle(512, 80, 60, (size) => ({ width: size * 7, height: size, lines: 1 }))).toBeCloseTo(60);
   });
-  it("caps the scale so the ink stays inside the vertical band for short names", () => {
-    const fitted = fitWallTitle(board, 300, em, stage);
-    const capHeight = em * 0.74 * fitted.scale * fitted.stretch;
-    expect(capHeight).toBeLessThanOrEqual(stage * 0.102 + 0.01);
-    expect(fitted.stretch).toBe(1);
+  it("fits two lines inside the available height", () => {
+    expect(fitWallTitle(512, 80, 60, (size) => ({ width: size * 10, height: size * 2, lines: 2 }))).toBeCloseTo(40);
   });
-  it("returns neutral values for unmeasured geometry", () => {
-    expect(fitWallTitle(0, 300, em, stage)).toEqual({ scale: 1, stretch: 1 });
-    expect(fitWallTitle(board, 300, 0, stage)).toEqual({ scale: 1, stretch: 1 });
+  it("shrinks until a long name wraps to at most two lines", () => {
+    expect(fitWallTitle(512, 100, 60, (size) => ({ width: 512, height: size * (size > 35 ? 3 : 2), lines: size > 35 ? 3 : 2 }))).toBeCloseTo(35);
+  });
+  it("bounds the width of an unbroken name too", () => {
+    expect(fitWallTitle(512, 80, 60, (size) => ({ width: size * 20, height: size, lines: 1 }))).toBeCloseTo(25.6);
+  });
+  it("returns zero for unmeasured geometry", () => {
+    expect(fitWallTitle(0, 80, 60, () => ({ width: 0, height: 0, lines: 0 }))).toBe(0);
+    expect(fitWallTitle(512, 0, 60, () => ({ width: 0, height: 0, lines: 0 }))).toBe(0);
   });
 });

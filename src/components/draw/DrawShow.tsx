@@ -22,8 +22,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const { session, spotlightId, presentation, now, revealKey, revealElapsed, revealing } = useDrawPlayback({ session: incomingSession ?? undefined, spotlightId: incomingSpotlight ?? null, presentation: incomingPresentation });
   const stageRef = useRef<HTMLDivElement>(null);
   const wallTitleRef = useRef<HTMLSpanElement>(null);
-  const [wallTitleScale, setWallTitleScale] = useState(1);
-  const [wallTitleStretch, setWallTitleStretch] = useState(1.6);
+  const [wallTitleSize, setWallTitleSize] = useState<number>();
   const [browserLanguage, setBrowserLanguage] = useState(navigator.language);
   const ledArcId = `draw-led-${useId().replace(/:/g, "")}`;
   const heading = drawHeading(presentation?.language ?? browserLanguage);
@@ -39,10 +38,16 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     const stage = stageRef.current;
     if (!title || !board || !stage) return;
     const fit = () => {
-      const natural = title.getBoundingClientRect();
-      const fitted = fitWallTitle(board.clientWidth, Math.max(1, natural.width), natural.height, stage.getBoundingClientRect().height);
-      setWallTitleScale(fitted.scale);
-      setWallTitleStretch(fitted.stretch);
+      title.style.removeProperty("font-size");
+      const maxSize = parseFloat(getComputedStyle(title).fontSize);
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      const fitted = fitWallTitle(board.clientWidth, board.clientHeight, maxSize, (size) => {
+        title.style.fontSize = `${size}px`;
+        const rects = Array.from(range.getClientRects());
+        return { width: Math.max(title.scrollWidth, ...rects.map((rect) => rect.width)), height: title.getBoundingClientRect().height, lines: rects.length };
+      });
+      if (fitted > 0) setWallTitleSize(fitted);
     };
     fit();
     void document.fonts.ready.then(fit);
@@ -136,12 +141,12 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     <header className="draw-show-wall-header">
       <div className="draw-show-live-heading draw-wall-metal draw-wall-caption">{heading}</div>
-      <div className="draw-show-wall-title" style={{ "--wall-title-scale": wallTitleScale, "--wall-title-stretch": wallTitleStretch } as CSSProperties}>
+      <div className="draw-show-wall-title" style={{ "--wall-title-size": wallTitleSize ? `${wallTitleSize}px` : undefined } as CSSProperties}>
         <span ref={wallTitleRef} className="draw-wall-title-measure" aria-hidden="true">{presentation?.tournamentName || "COPA MUNDO"}</span>
         <span className="draw-wall-title-lettering draw-wall-metal">{presentation?.tournamentName || "COPA MUNDO"}</span>
       </div>
+      <div className="draw-show-brand draw-wall-metal draw-wall-caption">POWERED BY COPA MUNDO</div>
     </header>
-    <div className="draw-show-brand draw-wall-metal draw-wall-caption">POWERED BY COPA MUNDO</div>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
