@@ -20,6 +20,7 @@ import PublicView from "./pages/PublicView";
 import SearchTournaments from "./pages/SearchTournaments";
 import TournamentSlideshow from "./pages/TournamentSlideshow";
 import DrawProjector from "./pages/DrawProjector";
+import DrawStudioPreview from "./pages/DrawStudioPreview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/search" element={<SearchTournaments />} />
                 <Route path="/slideshow/:id" element={<TournamentSlideshow />} />
                 <Route path="/draw/:phaseId" element={<DrawProjector />} />
+                <Route path="/draw-studio-preview" element={<DrawStudioPreview />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/create" element={<ProtectedRoute><CreateTournament /></ProtectedRoute>} />
