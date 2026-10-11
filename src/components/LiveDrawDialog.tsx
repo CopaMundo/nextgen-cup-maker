@@ -245,7 +245,7 @@ const LiveDrawDialog = ({
             draft.session.remaining.every((id) => validTeamIds.has(id)) &&
             draft.session.containers.every((container) => validContainerIds.has(container.id) && container.teamIds.every((id) => validTeamIds.has(id) || nextContainers.some(c => c.teamIds.includes(id))))
           );
-          setStep(sessionValid ? draft.step : "method");
+          setStep(sessionValid ? (isMatchDraw && draft.step === "pots" ? "teams" : draft.step) : "method");
           setUsePots(draft.usePots);
           setPotCount(draft.potCount);
           setRules({ ...draft.rules, separateSameCountry: isMatchDraw ? Boolean(draft.rules.separateSameCountry) : false, requiredPairs: [] });
@@ -1166,6 +1166,8 @@ const requestPotCount = (count: number) => {
               {step === "method" && <Button variant="outline" onClick={() => (onBack ? onBack() : onOpenChange(false))}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
               {step === "pots" && <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
               {step === "settings" && <Button variant="outline" onClick={() => setStep(isMatchDraw ? "rules" : usePots ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
+              {isMatchDraw && step === "teams" && <><Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button><Button disabled={savingSlot || loading} onClick={() => { const error = validationError(); if (error && error.step !== "rules" && error.step !== "settings") { toast({ title: "Indeling nog niet compleet", description: error.message, variant: "destructive" }); return; } setStep("rules"); }}>Volgende</Button></>}
+              {isMatchDraw && step === "rules" && <><Button variant="outline" onClick={() => setStep("teams")}><ArrowLeft className="h-4 w-4" /> Vorige</Button><Button onClick={() => { const error = validationError(); if (error) { toast({ title: "Loting niet mogelijk", description: error.message, variant: "destructive" }); return; } setStep("settings"); }}>Volgende</Button></>}
               {step === "method" && <Button disabled={loading} onClick={() => void nextFromMethod()}>Volgende</Button>}
               {step === "pots" && <Button onClick={() => {
                 const error = validationError();
