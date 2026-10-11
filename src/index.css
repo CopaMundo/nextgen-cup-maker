@@ -2718,6 +2718,9 @@ posities + statistieken groen */
 .draw-show-rounds-roster { border: 0; border-radius: 0; background: none; box-shadow: none; }
 .draw-show-rounds-roster h2 { border: 1px solid hsl(var(--primary) / .65); border-radius: 5px; background: hsl(var(--card) / .45); margin-bottom: .35cqw; }
 .draw-show-rounds-schedule { top: 53%; bottom: auto; transform: translateY(-50%); }
+.draw-show-rounds-roster.draw-show-wing-left, .draw-show-rounds-schedule.draw-show-wing-left { left: 17%; }
+.draw-show-rounds-roster.draw-show-wing-right, .draw-show-rounds-schedule.draw-show-wing-right { right: 17%; }
+.draw-show-rounds-roster, .draw-show-rounds-schedule { width: 22%; }
 .draw-show-rounds-roster-list { flex: 1; min-height: 0; overflow: hidden; }
 .draw-show-rounds-roster-track { will-change: transform; }
 .draw-show-rounds-roster-list.is-looping .draw-show-rounds-roster-track { animation: draw-roster-loop var(--roster-duration) linear infinite; }
