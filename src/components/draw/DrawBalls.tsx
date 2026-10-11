@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, memo, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
@@ -77,7 +77,7 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
 }
 
 /** Transparent full-stage coordinates retain the shared 50% / 47% reveal origin. */
-export function DrawBalls(props: Props) {
+function DrawBallsCanvas(props: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [palette, setPalette] = useState<Palette | null>(null);
   useEffect(() => {
@@ -100,3 +100,8 @@ export function DrawBalls(props: Props) {
     </Canvas>}
   </div>;
 }
+/** Idle stage refreshes must not re-render (and re-draw) the 3D pile. */
+export const DrawBalls = memo(DrawBallsCanvas, (previous, next) =>
+  previous.teamIds.join("|") === next.teamIds.join("|") && previous.drawnId === next.drawnId && previous.revealKey === next.revealKey
+  && previous.revealing === next.revealing && previous.speed === next.speed && previous.theme === next.theme
+  && (!next.revealing || previous.elapsed === next.elapsed));
