@@ -235,7 +235,7 @@ const LiveDrawDialog = ({
         const raw = localStorage.getItem(draftKey);
         const draft = raw ? JSON.parse(raw) as LiveDrawDraft : null;
         if (draft?.version === 1) {
-          const validTeamIds = new Set(available.map((team) => team.id));
+          const validTeamIds = new Set(isMatchDraw ? matchTeamIds : available.map((team) => team.id));
           const validContainerIds = new Set(nextContainers.map((container) => container.id));
           const validPotIds = new Set(nextPots.map((pot) => pot.id));
           const sessionValid = !draft.session || (
@@ -778,7 +778,7 @@ const LiveDrawDialog = ({
         description: drawnMatches > 0 ? `${drawnMatches} wedstrijden geloot over de speelrondes.` : undefined,
       });
       localStorage.removeItem(draftKey);
-      onApplied?.();
+      await onApplied?.();
       onOpenChange(false);
     } catch (error: any) {
       toast({ title: "Toewijzen mislukt", description: error?.message, variant: "destructive" });
@@ -1029,7 +1029,7 @@ const LiveDrawDialog = ({
                   );
                 })}
               </div>
-              {isMatchDraw && <section className="space-y-2"><h3 className="font-semibold">Deelnemers · {selectedMatchTeams.length}/{containers.length * 2}</h3><PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} onChange={(index, id) => { if (fixedIds.has(selectedMatchTeams[index])) return; setSelectedMatchTeams(previous => { const next = [...previous]; if (id) next[index] = id; else next.splice(index, 1); return next; }); }} /></section>}
+              {isMatchDraw && <section className="space-y-2"><h3 className="font-semibold">Deelnemers · {selectedMatchTeams.length}/{containers.length * 2}</h3><PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} lockedIds={fixedIds} capacity={containers.length * 2} onChange={(index, id) => { if (fixedIds.has(selectedMatchTeams[index])) return; setSelectedMatchTeams(previous => { const next = [...previous]; if (id) next[index] = id; else next.splice(index, 1); return next; }); }} /></section>}
               {fixtureKind === "knockout" && <div className="flex items-center justify-between gap-4"><Label htmlFor="seeded-draw" className="font-semibold">Loting met reekshoofden</Label><Switch id="seeded-draw" checked={useSeeds} onCheckedChange={(checked) => { setUseSeeds(checked); if (!checked) setContainers(originalMatchContainers.current.map(item => ({ ...item, seedRanks: [null, null] }))); }} /></div>}
               {fixtureKind === "knockout" && useSeeds && <section className="space-y-3"><h3 className="font-semibold">Vaste reekshoofdposities</h3>{containers.map(c => <div key={c.id} className="draw-panel space-y-2 p-3"><h4 className="text-sm font-semibold">{c.name}</h4>{[0, 1].map(side => <div key={side} className="flex items-center gap-2"><span className="w-10 shrink-0 text-xs text-muted-foreground">{side === 0 ? "Thuis" : "Uit"}</span><Select value={c.matchSlots?.[side] ?? "empty"} disabled={Boolean(originalMatchContainers.current.find(item => item.id === c.id)?.matchSlots?.[side])} onValueChange={value => changeSeed(c.id, side, value === "empty" ? null : value)}><SelectTrigger aria-label={`${c.name} ${side === 0 ? "thuis" : "uit"} reekshoofd`} className="min-w-0 flex-1"><SelectValue placeholder="Geen reekshoofd" /></SelectTrigger><SelectContent><SelectItem value="empty">Geen reekshoofd</SelectItem>{teams.filter(t => selectedMatchTeams.includes(t.id) && (!fixedIds.has(t.id) || c.matchSlots?.[side] === t.id)).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select><Input type="number" min={1} max={128} disabled={!c.matchSlots?.[side]} aria-label={`${c.name} ${side === 0 ? "thuis" : "uit"} seednummer`} className="w-16" value={c.seedRanks?.[side] ?? ""} onChange={event => setContainers(previous => previous.map(item => item.id === c.id ? { ...item, seedRanks: (item.seedRanks ?? [null, null]).map((rank, index) => index === side ? (event.target.value ? Number(event.target.value) : null) : rank) } : item))} /></div>)}</div>)}</section>}
             </div>
