@@ -33,6 +33,7 @@ export function roundsRosterWindow(order: string[], activeId: string | undefined
 /** Never publish hidden opponent identities to the fan picture. */
 export function roundsStage(input: {
   groupName: string;
+  totalRounds?: number;
   order: string[];
   currentIndex: number;
   matches: ScheduledMatch[];
@@ -48,6 +49,7 @@ export function roundsStage(input: {
   const drawnTeamIds = input.order.slice(0, input.currentIndex + 1);
   return {
     groupName: input.groupName,
+    totalRounds: input.totalRounds ?? Math.max(0, ...input.matches.map(match => match.round)),
     drawnTeamIds,
     teamOrder: input.order,
     roster: drawnTeamIds.map((teamId) => {

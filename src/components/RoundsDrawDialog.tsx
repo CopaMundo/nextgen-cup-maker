@@ -884,7 +884,7 @@ const RoundsDrawDialog = ({
     session.finished = groupDone(activeDraw);
     return { session, spotlightId: null, presentation: {
       tournamentName, tournamentLogo, theme: showOptions.theme, flagBackdrops: showOptions.flagBackdrops, language: navigator.language, revealAt, speed: animationSpeed, activePotId: currentPot?.id ?? null, selection: null,
-      rounds: roundsStage({ groupName: activeGroup.name, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
+      rounds: roundsStage({ groupName: activeGroup.name, totalRounds: activeGroup.rounds, order: activeDraw.order, currentIndex: currentIdx, matches: activeDraw.matches, pots, revealed: revealed[activeGroup.id] || [], revealTimes: revealTimes[activeGroup.id] || {}, usePots: method === "pots" }),
     } };
   }, [activeDraw, activeGroup, currentTeamId, currentIdx, teams, method, phaseName, tournamentName, tournamentLogo, revealed, revealTimes, revealAt, showOptions.theme, showOptions.flagBackdrops, animationSpeed]);
 

@@ -38,6 +38,9 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const activeSpotlight = sweepSpotlight(presentation, now) ?? spotlightId;
   const pending = session?.pending;
   const rounds = presentation?.rounds;
+  const fixtureCount = Math.max(rounds?.totalRounds ?? 0, rounds?.fixtures.length ?? 0);
+  const fixtureRows = Math.max(1, Math.ceil(fixtureCount / (fixtureCount > 10 ? 2 : 1)));
+  const visibleFixtures = rounds?.fixtures.length ? rounds.fixtures : Array.from({ length: fixtureCount }, (_, index) => ({ id: `waiting-${index}`, round: index + 1, potName: "", home: false, opponentId: null, revealAt: null }));
   const selectedId = presentation?.selection?.targetId;
   const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><svg className="draw-show-flag" viewBox="3 5 30 26" preserveAspectRatio="none"><image href={countryToFlagUrl(country) ?? undefined} width="36" height="36" /></svg></span> : null;
   const teamById = useMemo(() => new Map(session?.teams.map(item => [item.id, item])), [session?.teams]);
@@ -150,10 +153,10 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         </section>
         <section className="draw-show-rounds-schedule draw-show-wing-right draw-show-group-card" aria-label="Speelschema getrokken team">
           <div className="draw-show-rounds-team-header">
-            {team && teamReady && <><span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><div><strong>{team.name}</strong>{session.mode === "pots" && <small>{activePot?.name}</small>}</div><CountryFlag country={team.country} className="draw-show-rounds-header-flag" /></>}
+            {team && teamReady ? <><span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><div><strong>{team.name}</strong>{session.mode === "pots" && <small>{activePot?.name}</small>}</div><CountryFlag country={team.country} className="draw-show-rounds-header-flag" /></> : <strong className="draw-show-rounds-waiting">Wachten op trekking</strong>}
           </div>
-          <div className={`draw-show-rounds-fixtures ${rounds.fixtures.length > 10 ? "is-two-columns" : ""}`} style={{ "--fixture-rows": Math.max(1, Math.ceil(rounds.fixtures.length / (rounds.fixtures.length > 10 ? 2 : 1))) } as CSSProperties}>
-            {rounds.fixtures.map((fixture) => { const finished = teamReady && (!fixture.revealAt || now >= fixture.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)); const opponent = finished ? teamById.get(fixture.opponentId ?? "") : undefined; return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture draw-show-slot ${opponent ? "is-known" : ""}`}>
+          <div className={`draw-show-rounds-fixtures ${fixtureCount > 10 ? "is-two-columns" : ""}`} style={{ "--fixture-rows": fixtureRows } as CSSProperties}>
+            {visibleFixtures?.map((fixture) => { const finished = teamReady && (!fixture.revealAt || now >= fixture.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)); const opponent = finished ? teamById.get(fixture.opponentId ?? "") : undefined; return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture draw-show-slot ${opponent ? "is-known" : ""}`}>
                {flagBackdrop(opponent?.country)}
               {session.mode === "pots" && <span className="draw-show-rounds-pot-tag">{fixture.potName}</span>}
               <span className="draw-show-slot-mark">{opponent?.logoUrl ? <AutoTrimLogo src={opponent.logoUrl} /> : opponent?.name.slice(0, 2).toUpperCase()}</span>

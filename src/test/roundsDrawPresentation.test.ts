@@ -21,6 +21,11 @@ describe("Rounds fan picture", () => {
   it("publishes no fixtures or drawn teams before the first ball", () => {
     expect(roundsStage({ ...input, currentIndex: -1 })).toMatchObject({ drawnTeamIds: [], fixtures: [] });
   });
+  it("publishes round-count geometry before drawing without exposing opponents", () => {
+    expect(roundsStage({ ...input, totalRounds: 12, currentIndex: -1 })).toMatchObject({ totalRounds: 12, drawnTeamIds: [], fixtures: [] });
+    expect(roundsStage({ ...input, currentIndex: -1 }).totalRounds).toBe(2);
+    expect(roundsStage({ ...input, totalRounds: 12 }).totalRounds).toBe(12);
+  });
   it("puts already known opponents first in free draws, regardless of round", () => {
     const matches = [{ round: 1, homeId: "b", awayId: "d" }, { round: 4, homeId: "a", awayId: "b" }];
     const picture = roundsStage({ ...input, matches, pots: [{ name: "Alle teams", teamIds: input.order }], usePots: false });
