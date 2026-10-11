@@ -98,6 +98,7 @@ const RoundsDrawDialog = ({
   onStepChange,
   initialMethod,
   initialStep = "method",
+  assignGroups = false,
   hideHeader = false,
 }: {
   open: boolean;
@@ -114,6 +115,8 @@ const RoundsDrawDialog = ({
   onStepChange?: (step: string) => void;
   initialMethod?: "random" | "pots";
   initialStep?: "method" | "teams";
+  /** Rounds-only: organizer assigns groups manually in the teams step before the rounds draw. */
+  assignGroups?: boolean;
   hideHeader?: boolean;
 }) => {
   const { toast } = useToast();
@@ -162,6 +165,11 @@ const RoundsDrawDialog = ({
   const timer = useRef<number | null>(null);
   const [draftReady, setDraftReady] = useState(false);
   const draftKey = `copa-live-draw:rounds:v1:${phaseId}`;
+  const [slotRowsByGroup, setSlotRowsByGroup] = useState<Record<string, string[]>>({});
+  const [assignDraft, setAssignDraft] = useState<Record<string, string[]>>({});
+  const [groupsConfirmed, setGroupsConfirmed] = useState(false);
+  const [assignError, setAssignError] = useState("");
+  const [savingAssign, setSavingAssign] = useState(false);
 
   useEffect(() => { if (open) onStepChange?.(step); }, [open, step]);
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
@@ -172,7 +180,7 @@ const RoundsDrawDialog = ({
       const [{ data: groupRows }, { data: slotRows }, { data: teamRows }, { data: potRows }, { data: potTeamRows }, { data: matchRows }] =
         await Promise.all([
           supabase.from("groups").select("id, name, sort_order").eq("phase_id", phaseId).order("created_at").order("name"),
-          supabase.from("slots").select("group_id, team_id, slot_code, sort_order").eq("phase_id", phaseId).order("sort_order"),
+          supabase.from("slots").select("id, group_id, team_id, slot_code, sort_order").eq("phase_id", phaseId).order("sort_order"),
           supabase.from("teams").select("id, name, country, logo_url").eq("tournament_id", tournamentId),
           supabase.from("draw_pots").select("id, name, sort_order").eq("phase_id", phaseId).order("sort_order"),
           supabase.from("draw_pot_teams").select("pot_id, team_id, sort_order").eq("tournament_id", tournamentId).order("sort_order"),
@@ -211,6 +219,8 @@ const RoundsDrawDialog = ({
         };
       });
       setGroups(infos);
+      setSlotRowsByGroup(Object.fromEntries(infos.map((g) => [g.id, (slotRows || []).filter((s) => s.group_id === g.id).map((s) => s.id as string)])));
+      setAssignDraft(Object.fromEntries(infos.map((g) => [g.id, [...g.teamIds]])));
       setPotGroups(Object.fromEntries(infos.map((g) => {
         if (g.pots.length > 1 && g.pots.every(p => p.teamIds.length === g.teamIds.length / g.pots.length)) return [g.id, g.pots];
         const count = defaultDrawPotCount(g.teamIds.length);
@@ -675,6 +685,37 @@ const RoundsDrawDialog = ({
   const editGroup = drawGroups.find((g) => g.id === editGroupId) || drawGroups[0];
   const matrixGroup = sameForAll && canShare ? drawGroups[0] : editGroup;
 
+  const assignedGroupTeams = new Set(Object.values(assignDraft).flat());
+  const assignScreen = <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>
+    <p className="text-sm text-muted-foreground">Deel de teams handmatig in over de poules. Daarna kies je het type loting voor de speelrondes.</p>
+    {assignError && <p role="alert" className="flex items-start gap-2 text-sm text-destructive"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />{assignError}</p>}
+    <div className="grid gap-4 md:grid-cols-2">{groups.map(group => { const list = assignDraft[group.id] || []; const cap = slotRowsByGroup[group.id]?.length || 0; return <section key={group.id} className="draw-panel space-y-2 p-3">
+      <h3 className="font-semibold">{group.name} · {list.length}/{cap}</h3>
+      <PotTeamSlots teams={teams} teamIds={list} assignedIds={assignedGroupTeams} capacity={cap} onChange={(index, teamId) => { setAssignError(""); setAssignDraft(prev => { const next = [...(prev[group.id] || [])]; if (teamId) next[index] = teamId; else next.splice(index, 1); return { ...prev, [group.id]: next }; }); }} />
+    </section>; })}</div>
+  </div>;
+  const saveAssignment = async () => {
+    if (groups.some(g => (assignDraft[g.id]?.length || 0) !== (slotRowsByGroup[g.id]?.length || 0))) { setAssignError("Vul alle plaatsen in elke poule in voordat je verdergaat."); return; }
+    setSavingAssign(true);
+    try {
+      for (const g of groups) {
+        const ids = slotRowsByGroup[g.id] || [];
+        for (let i = 0; i < ids.length; i++) {
+          const { error } = await supabase.from("slots").update({ team_id: assignDraft[g.id]?.[i] ?? null }).eq("id", ids[i]);
+          if (error) throw error;
+        }
+      }
+      await load();
+      setGroupsConfirmed(true);
+      onApplied?.();
+      if (initialStep === "teams") setStep("method");
+      else if (method !== "pots") setStep("rules");
+    } catch {
+      toast({ title: "Indeling niet opgeslagen", description: "Probeer het opnieuw.", variant: "destructive" });
+    } finally { setSavingAssign(false); }
+  };
+  const editingGroups = assignGroups && !groupsConfirmed;
+
   const methodScreen = (
     <div className="space-y-5 overflow-y-auto pr-1">
       <h3 className="text-lg font-bold">Type loting</h3>
@@ -946,16 +987,20 @@ const RoundsDrawDialog = ({
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
                    ) : step === "method" ? methodScreen
-            : step === "teams" || step === "pots" ? <div className="min-h-0 flex-1 overflow-y-auto">{method === "pots" ? potScreen : <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{groups.map(group => <section key={group.id} className="space-y-2"><h3 className="font-semibold">{group.name} · {group.teamIds.length} teams</h3><PotTeamSlots teams={teams} teamIds={group.teamIds} assignedIds={new Set(group.teamIds)} capacity={group.teamIds.length} disabled onChange={() => {}} /></section>)}</div>}</div>
+            : step === "teams" || step === "pots" ? <div className="min-h-0 flex-1 overflow-y-auto">{editingGroups ? assignScreen : method === "pots" ? potScreen : <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{groups.map(group => <section key={group.id} className="space-y-2"><h3 className="font-semibold">{group.name} · {group.teamIds.length} teams</h3><PotTeamSlots teams={teams} teamIds={group.teamIds} assignedIds={new Set(group.teamIds)} capacity={group.teamIds.length} disabled onChange={() => {}} /></section>)}</div>}</div>
             : step === "rules" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{settings}</div>
             : step === "settings" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Loting show instellingen</h2><DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} aria-pressed={autoReveal} onClick={() => setAutoReveal(true)}><Play className="h-4 w-4" />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} aria-pressed={!autoReveal} onClick={() => setAutoReveal(false)}><Pause className="h-4 w-4" />Per wedstrijd</Button></div></DrawShowOptions></div> : drawScreen}
         {step !== "draw" && <footer className="flex shrink-0 justify-end gap-2 border-t border-primary/30 pt-4">
-          <Button variant="outline" disabled={loading || checking || step === "method"} onClick={() => {
+          <Button variant="outline" disabled={loading || checking || savingAssign || (step === "method" && !(assignGroups && initialStep === "teams"))} onClick={() => {
+            if (step === "method") { setGroupsConfirmed(false); setStep("teams"); return; }
+            if ((step === "teams" || step === "pots") && assignGroups && !editingGroups) { setStep("method"); return; }
+            if ((step === "teams" || step === "pots") && editingGroups && initialStep === "method") { setStep("method"); return; }
             if (step === "teams" || step === "pots") { if (onBack) onBack(); else setStep("method"); }
             else setStep(step === "settings" ? "rules" : "teams");
           }}><ArrowLeft className="h-4 w-4" />Vorige</Button>
           <Button disabled={loading || checking || groups.length === 0 || exceedsShowLimit || (method === "pots" && !potDrawAvailable)} onClick={() => {
-            if (step === "method") setStep("teams");
+            if (step === "method") { if (assignGroups && groupsConfirmed && method !== "pots") nextToRules(); else setStep("teams"); }
+            else if ((step === "teams" || step === "pots") && editingGroups) void saveAssignment();
             else if (step === "teams" || step === "pots") { if (method === "pots") proceedFromPots(); else nextToRules(); }
             else if (step === "rules") {
               for (const group of drawGroups) {
