@@ -388,10 +388,6 @@ const LiveDrawDialog = ({
        setStep("teams");
        return;
      }
-     if (isMatchDraw && (selectedMatchTeams.length !== containers.length * 2 || new Set(selectedMatchTeams).size !== selectedMatchTeams.length)) {
-       toast({ title: "Deelnemers nog niet compleet", description: `Kies precies ${containers.length * 2} verschillende teams.`, variant: "destructive" });
-       return;
-     }
      if (usePots) {
        if (!potOptions.includes(pots.length)) {
          const count = isMatchDraw ? 2 : defaultDrawPotCount(drawSize, maxGroupCapacity);
@@ -838,7 +834,7 @@ const requestPotCount = (count: number) => {
 
   const validationError = (): { step: Step; message: string } | null => {
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
-    if (isMatchDraw && selectedMatchTeams.length !== containers.length * 2) return { step: "teams", message: `Kies precies ${containers.length * 2} teams.` };
+    if (isMatchDraw && (selectedMatchTeams.length !== containers.length * 2 || new Set(selectedMatchTeams).size !== selectedMatchTeams.length)) return { step: "teams", message: `Kies precies ${containers.length * 2} verschillende teams.` };
     const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
     if (fixtureKind === "knockout" && useSeeds && !fixedIds.size) return { step: "teams", message: "Kies minstens één reekshoofd op een vaste wedstrijdplaats." };
     if (usePots && pots.some(p => p.teamIds.some(id => !eligibleTeams.some(t => t.id === id)))) return { step: "pots", message: "Een pot bevat een vast reekshoofd of een niet-geselecteerd team. Pas de potindeling aan." };
@@ -888,7 +884,7 @@ const requestPotCount = (count: number) => {
   const openDraw = () => {
     const error = validationError();
     if (error) {
-      setStep(error.step);
+      setStep(isMatchDraw && error.step === "pots" ? "teams" : error.step);
       toast({ title: "Loting kan nog niet starten", description: error.message, variant: "destructive" });
       return;
     }
