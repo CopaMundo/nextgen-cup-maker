@@ -115,7 +115,6 @@ export function buildSchedule(
   const byId = new Map(teams.map((t) => [t.id, t]));
   const deadline = Date.now() + timeBudgetMs;
   const maxMeet = Math.max(1, rules.maxMeetings);
-  let homeAwayFailed = false;
 
   for (let attempt = 0; Date.now() < deadline; attempt++) {
     // need[team][pot]
@@ -205,74 +204,118 @@ export function buildSchedule(
     });
     if (Math.max(...tops) - Math.min(...tops) > 1 && Date.now() < deadline - timeBudgetMs / 3) continue;
     const oriented = assignHomeAway(matches, byId);
-    if (!oriented) { homeAwayFailed = true; continue; }
     return { ok: true, matches: oriented, sameCountryCount };
   }
-  if (homeAwayFailed)
-    return fail("Er is geen schema gevonden met een evenwichtige thuis/uit-verdeling (max. 2x op rij thuis of uit). Pas het aantal speelrondes of de verdeling per pot aan.");
   return fail(
     "Met deze instellingen kunnen de speelrondes niet volledig worden aangemaakt. Pas de verdeling per pot of de regels aan."
   );
 }
 
 /**
- * Vaste kwaliteitsregels voor thuis/uit:
+ * Thuis/uit-toewijzing via gescoorde lokale zoektocht (nooit blokkerend):
+ * - totale balans per team: even aantal wedstrijden exact gelijk, oneven max. 1 verschil;
  * - twee ontmoetingen tussen dezelfde teams: 1x thuis, 1x uit;
- * - per team en per tegenstanderspot een evenwichtige thuis/uit-balans (verschil max. 1);
- * - nooit meer dan 2 opeenvolgende thuis- of uitwedstrijden.
+ * - per team en per tegenstanderspot evenwichtig (bij 2 duels: 1 thuis, 1 uit);
+ * - reeksen van 3+ opeenvolgende thuis- of uitwedstrijden zijn een sterke strafscore.
+ * Geeft altijd het best gevonden schema terug.
  */
 export function assignHomeAway(
   matches: ScheduledMatch[],
   byId: Map<string, ScheduleTeam>,
-  attempts = 400
-): ScheduledMatch[] | null {
-  const sorted = [...matches].sort((a, b) => a.round - b.round);
-  for (let t = 0; t < attempts; t++) {
-    const out: ScheduledMatch[] = [];
-    const last = new Map<string, { side: "H" | "A"; streak: number; round: number }>();
-    const bal = new Map<string, number>(); // team|pot -> thuis - uit
-    const pairHome = new Map<string, string[]>();
-    let ok = true;
-    for (const m of shuffleWithinRounds(sorted)) {
-      const key = pairKey(m.homeId, m.awayId);
-      const prev = pairHome.get(key) || [];
-      const score = (h: string, a: string) => {
-        let s = 0;
-        const lh = last.get(h);
-        const la = last.get(a);
-        if (lh && lh.side === "H" && lh.round === m.round - 1 && lh.streak >= 2) return Infinity;
-        if (la && la.side === "A" && la.round === m.round - 1 && la.streak >= 2) return Infinity;
-        const homes = prev.filter((x) => x === h).length;
-        if (prev.length % 2 === 1 && homes > prev.length - homes) return Infinity;
-        const bh = bal.get(`${h}|${byId.get(a)!.potIndex}`) || 0;
-        const ba = bal.get(`${a}|${byId.get(h)!.potIndex}`) || 0;
-        if (bh >= 1 || ba <= -1) s += 10;
-        if (lh?.side === "H" && lh.round === m.round - 1) s += 1;
-        if (la?.side === "A" && la.round === m.round - 1) s += 1;
-        return s + Math.random();
-      };
-      const s1 = score(m.homeId, m.awayId);
-      const s2 = score(m.awayId, m.homeId);
-      if (s1 === Infinity && s2 === Infinity) { ok = false; break; }
-      const [h, a] = s1 <= s2 ? [m.homeId, m.awayId] : [m.awayId, m.homeId];
-      const push = (id: string, side: "H" | "A") => {
-        const l = last.get(id);
-        const streak = l && l.side === side && l.round === m.round - 1 ? l.streak + 1 : 1;
-        last.set(id, { side, streak, round: m.round });
-      };
-      push(h, "H");
-      push(a, "A");
-      bal.set(`${h}|${byId.get(a)!.potIndex}`, (bal.get(`${h}|${byId.get(a)!.potIndex}`) || 0) + 1);
-      bal.set(`${a}|${byId.get(h)!.potIndex}`, (bal.get(`${a}|${byId.get(h)!.potIndex}`) || 0) - 1);
-      pairHome.set(key, [...prev, h]);
-      out.push({ round: m.round, homeId: h, awayId: a });
+  timeBudgetMs = 600
+): ScheduledMatch[] {
+  const ms = [...matches].sort((a, b) => a.round - b.round);
+  const n = ms.length;
+  if (n === 0) return [];
+  const teamMatches = new Map<string, number[]>();
+  const pairMatches = new Map<string, number[]>();
+  ms.forEach((m, i) => {
+    for (const id of [m.homeId, m.awayId]) teamMatches.set(id, [...(teamMatches.get(id) || []), i]);
+    const k = pairKey(m.homeId, m.awayId);
+    pairMatches.set(k, [...(pairMatches.get(k) || []), i]);
+  });
+  const base = ms.map((m) => [m.homeId, m.awayId] as const);
+  // flip[i] = true -> tweede team speelt thuis
+  const flip = new Array<boolean>(n).fill(false);
+  const homeOf = (i: number) => (flip[i] ? base[i][1] : base[i][0]);
+  const pot = (id: string) => byId.get(id)?.potIndex ?? 0;
+
+  const teamCost = (id: string) => {
+    const list = teamMatches.get(id) || [];
+    let h = 0;
+    const perPot = new Map<number, number>();
+    let cost = 0;
+    let run = 0, prevSide = 0, prevRound = -99;
+    for (const i of list) {
+      const isHome = homeOf(i) === id;
+      h += isHome ? 1 : 0;
+      const opp = base[i][0] === id ? base[i][1] : base[i][0];
+      perPot.set(pot(opp), (perPot.get(pot(opp)) || 0) + (isHome ? 1 : -1));
+      const side = isHome ? 1 : -1;
+      run = side === prevSide && ms[i].round === prevRound + 1 ? run + 1 : 1;
+      if (run >= 3) cost += 40 * (run - 2);
+      else if (run === 2) cost += 0.5;
+      prevSide = side; prevRound = ms[i].round;
     }
-    if (!ok) continue;
-    // Controle: balans per pot max. 1 verschil.
-    if ([...bal.values()].some((v) => Math.abs(v) > 1)) continue;
-    return out;
+    const diff = Math.abs(2 * h - list.length);
+    cost += 1000 * Math.max(0, diff - (list.length % 2));
+    for (const v of perPot.values()) cost += 300 * Math.max(0, Math.abs(v) - 1);
+    return cost;
+  };
+  const pairCost = (k: string) => {
+    const list = pairMatches.get(k) || [];
+    if (list.length < 2) return 0;
+    const first = base[list[0]][0];
+    const homes = list.filter((i) => homeOf(i) === first).length;
+    return 500 * Math.max(0, Math.abs(2 * homes - list.length) - (list.length % 2));
+  };
+  const localCost = (i: number) =>
+    teamCost(base[i][0]) + teamCost(base[i][1]) + pairCost(pairKey(base[i][0], base[i][1]));
+  const totalCost = () => {
+    let c = 0;
+    for (const id of teamMatches.keys()) c += teamCost(id);
+    for (const k of pairMatches.keys()) c += pairCost(k);
+    return c;
+  };
+
+  let best: boolean[] = [...flip];
+  let bestCost = Infinity;
+  const deadline = Date.now() + timeBudgetMs;
+  for (let restart = 0; restart === 0 || Date.now() < deadline; restart++) {
+    // Startpunt: herhaalde ontmoetingen alterneren, rest willekeurig.
+    for (let i = 0; i < n; i++) flip[i] = Math.random() < 0.5;
+    for (const list of pairMatches.values()) list.forEach((i, j) => (flip[i] = base[i][0] === base[list[0]][0] ? j % 2 === 1 : j % 2 === 0));
+    let cost = totalCost();
+    let temp = 20;
+    for (let step = 0; step < n * 200; step++) {
+      const i = Math.floor(Math.random() * n);
+      const before = localCost(i);
+      flip[i] = !flip[i];
+      // gekoppelde wissel binnen een herhaald paar houdt 1x thuis / 1x uit intact
+      const pair = pairMatches.get(pairKey(base[i][0], base[i][1]))!;
+      let partner = -1;
+      if (pair.length >= 2 && Math.random() < 0.5) {
+        partner = pair[(pair.indexOf(i) + 1) % pair.length];
+      }
+      const beforeP = partner >= 0 ? localCost(partner) : 0;
+      if (partner >= 0) flip[partner] = !flip[partner];
+      const after = localCost(i) + (partner >= 0 ? localCost(partner) : 0);
+      const prior = before + beforeP;
+      // localCost overlapt bij gedeelde teams; herbereken bij twijfel volledig
+      const delta = partner >= 0 ? totalCost() - cost : after - prior;
+      if (delta <= 0 || Math.random() < Math.exp(-delta / temp)) {
+        cost += delta;
+      } else {
+        flip[i] = !flip[i];
+        if (partner >= 0) flip[partner] = !flip[partner];
+      }
+      temp = Math.max(0.05, temp * 0.999);
+      if (cost < bestCost) { bestCost = cost; best = [...flip]; }
+      if (bestCost < 1) break;
+    }
+    if (bestCost < 1 || Date.now() >= deadline) break;
   }
-  return null;
+  return ms.map((m, i) => (best[i] ? { round: m.round, homeId: m.awayId, awayId: m.homeId } : { ...m }));
 }
 
 function shuffleWithinRounds(ms: ScheduledMatch[]): ScheduledMatch[] {
