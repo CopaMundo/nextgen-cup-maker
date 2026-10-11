@@ -4,8 +4,8 @@ import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, 
 // with its inner floor at 74% and retaining rim at approximately 66.5%.
 export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
-/** Center of the compact acrylic bar between the studio light strips. */
-export const DRAW_REVEAL_FRACTION = .415;
+/** Center of the dark band between the two middle studio LED rings (39.3% / 49.4%). */
+export const DRAW_REVEAL_FRACTION = .443;
 export const DRAW_REVEAL_Y = (0.5 - DRAW_REVEAL_FRACTION) * 56.25;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
