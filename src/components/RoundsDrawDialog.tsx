@@ -21,6 +21,7 @@ import {
 } from "@/lib/roundsSchedule";
 import { emptyRoundsRules, shuffle } from "@/lib/liveDraw";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
+import { defaultDrawPotCount } from "@/lib/drawWizard";
 import { DrawShow } from "@/components/draw/DrawShow";
 import { DrawShowOptions } from "@/components/draw/DrawShowOptions";
 import { useDrawShowOptions } from "@/hooks/useDrawShowOptions";
@@ -200,7 +201,11 @@ const RoundsDrawDialog = ({
         };
       });
       setGroups(infos);
-      setPotGroups(Object.fromEntries(infos.map((g) => [g.id, g.pots.length > 1 && g.pots.every((p) => p.teamIds.length === g.teamIds.length / g.pots.length) ? g.pots : []])));
+      setPotGroups(Object.fromEntries(infos.map((g) => {
+        if (g.pots.length > 1 && g.pots.every(p => p.teamIds.length === g.teamIds.length / g.pots.length)) return [g.id, g.pots];
+        const count = defaultDrawPotCount(g.teamIds.length);
+        return [g.id, count ? Array.from({ length: count }, (_, i) => ({ id: crypto.randomUUID(), name: `Pot ${i + 1}`, teamIds: [] as string[] })) : []];
+      })));
       setPotGroupId(infos[0]?.id || "");
       setEditGroupId(infos[0]?.id || "");
       const initial: Record<string, number[][]> = {};

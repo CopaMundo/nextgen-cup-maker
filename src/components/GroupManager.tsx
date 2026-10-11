@@ -1346,7 +1346,7 @@ const GroupManager = ({
             onRestart={() => setShowRestartConfirm(true)}
             onStepChange={setDrawSubStep}
             open={drawView === "groups"}
-            onOpenChange={(next) => setDrawView(next ? "groups" : null)}
+            onOpenChange={(next) => setDrawView(current => next ? "groups" : current === "groups" ? null : current)}
             tournamentId={tournamentId}
             phaseId={phaseId}
             categoryId={categoryId}

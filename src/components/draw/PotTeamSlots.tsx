@@ -5,21 +5,23 @@ import { X } from "lucide-react";
 
 type Team = { id: string; name: string; country?: string | null; logoUrl?: string | null };
 
-export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, disabled = false }: {
+export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, disabled = false, lockedIds }: {
   teams: Team[];
   teamIds: string[];
   assignedIds: Set<string>;
   capacity: number;
   onChange: (index: number, teamId: string | null) => void;
   disabled?: boolean;
+  lockedIds?: Set<string>;
 }) {
   const byId = new Map(teams.map((team) => [team.id, team]));
   return <div className="grid gap-2">
     {Array.from({ length: capacity }, (_, index) => {
       const current = teamIds[index];
       const selected = current ? byId.get(current) : undefined;
+      const locked = Boolean(current && lockedIds?.has(current));
       return <div key={index} className="flex min-w-0 items-center gap-1.5">
-        <Select value={current || "empty"} disabled={disabled || index > teamIds.length} onValueChange={(value) => onChange(index, value === "empty" ? null : value)}>
+        <Select value={current || "empty"} disabled={disabled || locked || index > teamIds.length} onValueChange={(value) => onChange(index, value === "empty" ? null : value)}>
           <SelectTrigger aria-label={`Teamvak ${index + 1}`} className="h-11 min-w-0 flex-1 border-border bg-background text-left">
             <SelectValue>
               {selected ? <span className="flex min-w-0 items-center gap-2">
@@ -36,7 +38,7 @@ export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, 
             )}
           </SelectContent>
         </Select>
-        <Button type="button" variant="ghost" size="icon" className="h-9 w-9 shrink-0" disabled={disabled || !current} aria-label={`Team uit plaats ${index + 1} verwijderen`} onClick={() => onChange(index, null)}>
+        <Button type="button" variant="ghost" size="icon" className="h-9 w-9 shrink-0" disabled={disabled || locked || !current} aria-label={`Team uit plaats ${index + 1} verwijderen`} onClick={() => onChange(index, null)}>
           <X className="h-4 w-4" />
         </Button>
       </div>;
