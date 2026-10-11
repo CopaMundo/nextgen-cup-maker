@@ -31,6 +31,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import CountryFlag from "@/components/CountryFlag";
 import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2 } from "lucide-react";
 import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/matchDraw";
+import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { defaultDrawPotCount, placeDrawSeed } from "@/lib/drawWizard";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import { generateRoundRobin } from "@/lib/matchGenerator";
@@ -60,7 +61,7 @@ interface Pot {
   teamIds: string[];
 }
 
-type Step = "method" | "pots" | "settings" | "draw";
+type Step = "method" | "teams" | "pots" | "rules" | "settings" | "draw";
 
 interface LiveDrawDraft {
   version: 1;
@@ -79,6 +80,7 @@ interface LiveDrawDraft {
   matchContainers?: DrawContainer[];
   selectedMatchTeams?: string[];
   useSeeds?: boolean;
+  seedCount?: number;
 }
 
 const LiveDrawDialog = ({
@@ -131,6 +133,7 @@ const LiveDrawDialog = ({
   const originalMatchContainers = useRef<DrawContainer[]>([]);
   const [usePots, setUsePots] = useState(true);
   const [useSeeds, setUseSeeds] = useState(false);
+  const [seedCount, setSeedCount] = useState(2);
   const [potCount, setPotCount] = useState(4);
   const [rules, setRules] = useState<ContainerRules>(emptyContainerRules());
   const [potMatrix, setPotMatrix] = useState<Record<string, number>>({});
@@ -247,6 +250,7 @@ const LiveDrawDialog = ({
           setPotCount(draft.potCount);
           setRules({ ...draft.rules, separateSameCountry: isMatchDraw ? Boolean(draft.rules.separateSameCountry) : false, requiredPairs: [] });
           setUseSeeds(Boolean(draft.useSeeds));
+          setSeedCount(draft.seedCount ?? 2);
           setPotMatrix(draft.potMatrix);
           const restoredSelection = draft.selectedMatchTeams?.filter(id => matchTeamIds.includes(id)) ?? [];
           if (isMatchDraw && restoredSelection.length) setSelectedMatchTeams([...new Set([...originalFixed, ...restoredSelection])]);
@@ -299,9 +303,9 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, matchContainers: isMatchDraw ? containers : undefined, selectedMatchTeams, useSeeds };
+    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, matchContainers: isMatchDraw ? containers : undefined, selectedMatchTeams, useSeeds, seedCount };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, containers, selectedMatchTeams, useSeeds]);
+  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, containers, selectedMatchTeams, useSeeds, seedCount]);
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
@@ -378,6 +382,11 @@ const LiveDrawDialog = ({
    const potOptions = isMatchDraw ? [2] : Array.from({ length: drawSize }, (_, i) => i + 1)
      .filter((count) => count >= 2 && (count < drawSize || drawSize === 2) && drawSize % count === 0);
    const nextFromMethod = async () => {
+     if (isMatchDraw) {
+       if (usePots && pots.length !== 2) await createEmptyPots(2);
+       setStep("teams");
+       return;
+     }
      if (isMatchDraw && (selectedMatchTeams.length !== containers.length * 2 || new Set(selectedMatchTeams).size !== selectedMatchTeams.length)) {
        toast({ title: "Deelnemers nog niet compleet", description: `Kies precies ${containers.length * 2} verschillende teams.`, variant: "destructive" });
        return;
@@ -391,10 +400,32 @@ const LiveDrawDialog = ({
        setStep("pots");
      } else setStep("settings");
    };
-   const changeSeed = (fixtureId: string, side: number, id: string | null) => {
-     setContainers(previous => placeDrawSeed(previous, fixtureId, side, id));
+   const changeRankedSeed = (rank: number, teamId: string | null, fixtureId?: string, side?: number) => {
+     setContainers(previous => {
+       const existing = previous.find(c => c.seedRanks?.includes(rank));
+       const existingSide = existing?.seedRanks?.indexOf(rank) ?? -1;
+       let next = existing && existingSide >= 0 ? placeDrawSeed(previous, existing.id, existingSide, null) : previous;
+       if (!teamId) return next;
+       const preferred = rank === 2 ? next[next.length - 1] : next[Math.min(next.length - 1, rank - 1)];
+       const target = fixtureId ? next.find(c => c.id === fixtureId) : existing ?? preferred;
+       const targetSide = side ?? (existingSide >= 0 ? existingSide : target?.matchSlots?.findIndex(id => !id) ?? -1);
+       if (!target || targetSide < 0 || target.matchSlots?.[targetSide]) return previous;
+       next = placeDrawSeed(next, target.id, targetSide, teamId);
+       return next.map(c => c.id === target.id ? { ...c, seedRanks: (c.seedRanks ?? [null, null]).map((value, index) => index === targetSide ? rank : value) } : c);
+     });
    };
-  const requestPotCount = (count: number) => {
+   const selectMatchMethod = (method: "random" | "pots" | "seeds") => {
+     setUsePots(method === "pots"); setUseSeeds(method === "seeds");
+     if (method !== "seeds") setContainers(originalMatchContainers.current.map(c => ({ ...c, seedRanks: [null, null] })));
+   };
+   const changeSeedCount = (count: number) => {
+     setSeedCount(count);
+     setContainers(previous => previous.map(c => {
+       const matchSlots = (c.matchSlots ?? []).map((id, side) => (c.seedRanks?.[side] ?? 0) > count && !originalMatchContainers.current.some(item => item.teamIds.includes(id ?? "")) ? null : id);
+       return { ...c, matchSlots, teamIds: matchSlots.filter((id): id is string => Boolean(id)), seedRanks: (c.seedRanks ?? []).map(rank => rank && rank > count ? null : rank) };
+     }));
+   };
+const requestPotCount = (count: number) => {
     if (count === pots.length) return;
     if (pots.some((pot) => pot.teamIds.length)) setPendingPotCount(count);
     else void createEmptyPots(count);
@@ -802,9 +833,11 @@ const LiveDrawDialog = ({
 
   const validationError = (): { step: Step; message: string } | null => {
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
+    if (isMatchDraw && selectedMatchTeams.length !== containers.length * 2) return { step: "teams", message: `Kies precies ${containers.length * 2} teams.` };
     const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
-    if (fixtureKind === "knockout" && useSeeds && !fixedIds.size) return { step: "method", message: "Kies minstens één reekshoofd op een vaste wedstrijdplaats." };
+    if (fixtureKind === "knockout" && useSeeds && !fixedIds.size) return { step: "teams", message: "Kies minstens één reekshoofd op een vaste wedstrijdplaats." };
     if (usePots && pots.some(p => p.teamIds.some(id => !eligibleTeams.some(t => t.id === id)))) return { step: "pots", message: "Een pot bevat een vast reekshoofd of een niet-geselecteerd team. Pas de potindeling aan." };
+    if (useSeeds && seedRanks.length !== seedCount) return { step: "teams", message: `Wijs alle ${seedCount} reekshoofden toe.` };
     if (fixtureKind === "knockout" && useSeeds && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
     if (!usePots && drawTeamIds.length !== totalCapacity) {
       return {
@@ -844,7 +877,7 @@ const LiveDrawDialog = ({
     }
     const ctx = buildContainerCtx(teams, pots, effectiveRules);
     const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
-    return check.ok ? null : { step: "settings", message: check.message || "De gekozen regels zijn niet haalbaar." };
+    return check.ok ? null : { step: isMatchDraw ? "rules" : "settings", message: check.message || "De gekozen regels zijn niet haalbaar." };
   };
 
   const openDraw = () => {
@@ -996,10 +1029,13 @@ const LiveDrawDialog = ({
         <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4">
           <header className="shrink-0 border-b border-primary/30 pb-3">
             <h1 className="text-lg font-semibold">Live loting{phaseName ? ` · ${phaseName}` : ""}</h1>
+            {isMatchDraw && <ol aria-label="Lotingsstappen" className="mt-3 grid grid-cols-5 gap-2 text-xs">{["Type loting", "Indeling en teams", "Regels en beperkingen", "Instellingen loting", "Live loting show"].map((label, index) => { const current = ["method", "teams", "rules", "settings", "draw"].indexOf(step); return <li key={label} aria-current={current === index ? "step" : undefined} className={`border-t-2 pt-2 ${current === index ? "border-primary text-primary font-semibold" : "border-border text-muted-foreground"}`}>{index + 1}. {label}</li>; })}</ol>}
           </header>
 
           {loading && step !== "draw" ? (
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
+          ) : step === "method" && isMatchDraw ? (
+            <div className="min-h-0 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Type loting</h2><div className="grid gap-3 sm:grid-cols-3">{([{ id: "random" as const, label: "Willekeurige loting" }, { id: "pots" as const, label: "Loting met potten" }, ...(fixtureKind === "knockout" ? [{ id: "seeds" as const, label: "Loting met reekshoofden" }] : [])]).map(option => { const selected = option.id === (useSeeds ? "seeds" : usePots ? "pots" : "random"); return <Button key={option.id} variant="outline" aria-pressed={selected} onClick={() => selectMatchMethod(option.id)} className={`draw-choice h-auto min-h-24 whitespace-normal p-4 ${selected ? "border-primary text-primary" : "border-border"}`}>{option.label}{selected && <Check className="h-4 w-4" />}</Button>; })}</div></div>
           ) : step === "method" ? (
             <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
               <div>
@@ -1029,18 +1065,18 @@ const LiveDrawDialog = ({
                   );
                 })}
               </div>
-              {isMatchDraw && <section className="space-y-2"><h3 className="font-semibold">Deelnemers · {selectedMatchTeams.length}/{containers.length * 2}</h3><PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} lockedIds={fixedIds} capacity={containers.length * 2} onChange={(index, id) => { if (fixedIds.has(selectedMatchTeams[index])) return; setSelectedMatchTeams(previous => { const next = [...previous]; if (id) next[index] = id; else next.splice(index, 1); return next; }); }} /></section>}
-              {fixtureKind === "knockout" && <div className="flex items-center justify-between gap-4"><Label htmlFor="seeded-draw" className="font-semibold">Loting met reekshoofden</Label><Switch id="seeded-draw" checked={useSeeds} onCheckedChange={(checked) => { setUseSeeds(checked); if (!checked) setContainers(originalMatchContainers.current.map(item => ({ ...item, seedRanks: [null, null] }))); }} /></div>}
-              {fixtureKind === "knockout" && useSeeds && <section className="space-y-3"><h3 className="font-semibold">Vaste reekshoofdposities</h3>{containers.map(c => <div key={c.id} className="draw-panel space-y-2 p-3"><h4 className="text-sm font-semibold">{c.name}</h4>{[0, 1].map(side => <div key={side} className="flex items-center gap-2"><span className="w-10 shrink-0 text-xs text-muted-foreground">{side === 0 ? "Thuis" : "Uit"}</span><Select value={c.matchSlots?.[side] ?? "empty"} disabled={Boolean(originalMatchContainers.current.find(item => item.id === c.id)?.matchSlots?.[side])} onValueChange={value => changeSeed(c.id, side, value === "empty" ? null : value)}><SelectTrigger aria-label={`${c.name} ${side === 0 ? "thuis" : "uit"} reekshoofd`} className="min-w-0 flex-1"><SelectValue placeholder="Geen reekshoofd" /></SelectTrigger><SelectContent><SelectItem value="empty">Geen reekshoofd</SelectItem>{teams.filter(t => selectedMatchTeams.includes(t.id) && (!fixedIds.has(t.id) || c.matchSlots?.[side] === t.id)).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select><Input type="number" min={1} max={128} disabled={!c.matchSlots?.[side]} aria-label={`${c.name} ${side === 0 ? "thuis" : "uit"} seednummer`} className="w-16" value={c.seedRanks?.[side] ?? ""} onChange={event => setContainers(previous => previous.map(item => item.id === c.id ? { ...item, seedRanks: (item.seedRanks ?? [null, null]).map((rank, index) => index === side ? (event.target.value ? Number(event.target.value) : null) : rank) } : item))} /></div>)}</div>)}</section>}
             </div>
-          ) : step === "pots" ? (
+          ) : step === "teams" && isMatchDraw && !usePots ? (
+            <div className="min-h-0 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling en teams</h2><MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /></div>
+          ) : step === "pots" || (step === "teams" && isMatchDraw && usePots) ? (
             <div className="max-h-[70vh] space-y-5 overflow-y-auto pr-1">
               <div>
-                <h2 className="text-lg font-bold">Potindeling</h2>
+                <h2 className="text-lg font-bold">{isMatchDraw ? "Indeling en teams" : "Potindeling"}</h2>
                 <p className="text-xs text-muted-foreground">Maak je potten aan, verdeel de teams en stel indien nodig geavanceerde lotingsregels in.</p>
               </div>
 
-               <div className="flex flex-wrap items-end gap-2">
+               {isMatchDraw && <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} />}
+                <div className="flex flex-wrap items-end gap-2">
                  <div className="min-w-[220px] flex-1 sm:max-w-sm">
                    <Label htmlFor="group-pot-distribution">Potverdeling · {drawSize} plaatsen in dit format</Label>
                    <Select value={potOptions.includes(pots.length) ? String(pots.length) : undefined} onValueChange={(value) => requestPotCount(Number(value))}>
@@ -1074,15 +1110,15 @@ const LiveDrawDialog = ({
               )}
 
             </div>
+          ) : step === "rules" && isMatchDraw ? (
+            <div className="min-h-0 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels en beperkingen</h2>{renderMatchRules()}</div>
           ) : step === "settings" ? (
             <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
               <div>
-                <h2 className="text-lg font-bold">{isMatchDraw ? "Instellingen wedstrijdloting" : "Instellingen pouleloting"}</h2>
+                <h2 className="text-lg font-bold">{isMatchDraw ? "Instellingen loting" : "Instellingen pouleloting"}</h2>
                 {!isMatchDraw && <p className="text-xs text-muted-foreground">Stel de landenlimiet en teams in die niet samen in één poule mogen komen.</p>}
               </div>
               {!isMatchDraw && renderRules()}
-              {isMatchDraw && renderMatchRules()}
-              {fixtureKind === "knockout" && useSeeds && fixedIds.size > 0 && <div className="draw-panel p-3 space-y-2"><h3 className="font-semibold">Vaste seeds</h3>{containers.flatMap((c) => (c.matchSlots ?? []).map((id, index) => id ? <div key={id} className="flex items-center gap-3"><span className="flex-1">{teamById.get(id)?.name} · {c.name}</span><Input type="number" min={1} max={128} aria-label={`Seed ${teamById.get(id)?.name}`} className="w-20" value={c.seedRanks?.[index] ?? ""} onChange={event => setContainers(previous => previous.map(item => item.id === c.id ? { ...item, seedRanks: (item.seedRanks ?? [null, null]).map((rank, side) => side === index ? (event.target.value ? Number(event.target.value) : null) : rank) } : item))} /></div> : null))}</div>}
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
                 {!isMatchDraw && <div className="flex items-center justify-between gap-4"><Label htmlFor="prepare-automatic-placement">Automatisch toewijzen</Label><Switch id="prepare-automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>}
               </DrawShowOptions>
@@ -1129,7 +1165,7 @@ const LiveDrawDialog = ({
               <div className="flex flex-col-reverse gap-2 sm:ml-auto sm:flex-row">
               {step === "method" && <Button variant="outline" onClick={() => (onBack ? onBack() : onOpenChange(false))}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
               {step === "pots" && <Button variant="outline" onClick={() => setStep("method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
-              {step === "settings" && <Button variant="outline" onClick={() => setStep(usePots ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
+              {step === "settings" && <Button variant="outline" onClick={() => setStep(isMatchDraw ? "rules" : usePots ? "pots" : "method")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>}
               {step === "method" && <Button disabled={loading} onClick={() => void nextFromMethod()}>Volgende</Button>}
               {step === "pots" && <Button onClick={() => {
                 const error = validationError();
