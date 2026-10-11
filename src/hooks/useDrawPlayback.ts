@@ -1,7 +1,18 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { revealDuration, type DrawPicture } from "@/lib/drawPresentation";
+import { revealDuration, selectionDuration, type DrawPicture } from "@/lib/drawPresentation";
 
 type StagePicture = Partial<DrawPicture>;
+/** Frame-accurate redraws are only needed while something time-based moves on stage. */
+function needsFrames(picture: StagePicture, now: number) {
+  const presentation = picture.presentation;
+  if (!presentation) return false;
+  const speed = presentation.speed || 1;
+  if (presentation.sweep?.optionIds.length) return true;
+  if (presentation.selection && now - presentation.selection.startedAt < selectionDuration(speed) + 300) return true;
+  return Boolean(presentation.rounds?.fixtures.some((fixture) => fixture.revealAt && now - fixture.revealAt > -300 && now - fixture.revealAt < 2500 / speed));
+}
+const IDLE_REDRAW_MS = 200;
+
 const eventKey = (picture: StagePicture) => picture.session?.pending && picture.presentation?.revealAt
   ? `${picture.session.pending.teamId}:${picture.presentation.revealAt}` : null;
 
@@ -35,6 +46,7 @@ export function useDrawPlayback(incoming: StagePicture) {
 
   useLayoutEffect(() => {
     let previous = performance.now();
+    let lastRedraw = previous;
     let frame = 0;
     const tick = (timestamp: number) => {
       const current = active.current;
@@ -50,7 +62,12 @@ export function useDrawPlayback(incoming: StagePicture) {
         const key = picture && eventKey(picture);
         if (picture && key) active.current = { key, picture, elapsed: 0, speed: picture.presentation?.speed ?? 1 };
       }
-      redraw((value) => value + 1);
+      // Idle stages refresh a few times per second instead of re-rendering the
+      // entire studio (wings, pot grid, 3D balls) on every animation frame.
+      if (active.current || needsFrames(latest.current, Date.now()) || timestamp - lastRedraw >= IDLE_REDRAW_MS) {
+        lastRedraw = timestamp;
+        redraw((value) => value + 1);
+      }
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);

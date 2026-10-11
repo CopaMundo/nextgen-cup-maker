@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
 import { balanceWallTitle } from "@/lib/drawHeading";
 
+const scheduledGrids = new WeakMap<Element, number>();
+
 /** Balance names in their actual columns, using one shared size for the entire grid. */
 export function FittedPotName({ name }: { name: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -9,8 +11,9 @@ export function FittedPotName({ name }: { name: string }) {
     const grid = element?.closest(".draw-show-pot-teams");
     if (!element || !grid) return;
     let disposed = false;
-    const fit = () => {
-      if (disposed) return;
+    const fitNow = () => {
+      scheduledGrids.delete(grid);
+      if (disposed || !grid.isConnected) return;
       const names = Array.from(grid.querySelectorAll<HTMLElement>(".draw-show-pot-name"));
       names.forEach((item) => item.style.removeProperty("font-size"));
       let sharedSize = Infinity;
@@ -43,6 +46,11 @@ export function FittedPotName({ name }: { name: string }) {
         sharedSize = Math.min(sharedSize, fittedSize);
       }
       if (Number.isFinite(sharedSize)) names.forEach((item) => { item.style.fontSize = `${sharedSize}px`; });
+    };
+    // Every name in the grid shares one measurement pass per frame.
+    const fit = () => {
+      if (disposed || scheduledGrids.has(grid)) return;
+      scheduledGrids.set(grid, requestAnimationFrame(fitNow));
     };
     fit();
     void document.fonts.ready.then(fit);
