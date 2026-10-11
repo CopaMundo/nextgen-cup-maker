@@ -34,7 +34,6 @@ import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/match
 import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
 import { TeamSelectList } from "@/components/draw/TeamSelectList";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { completeLastDrawPot, defaultDrawPotCount, defaultDrawSeedCount, placeDrawSeed } from "@/lib/drawWizard";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import { generateRoundRobin } from "@/lib/matchGenerator";
