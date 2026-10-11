@@ -1,4 +1,4 @@
-import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
+import { Body, Material, ContactMaterial, GSSolver, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
 
 // Shared orthographic cavity: rounded glass sits on the uploaded podium,
 // with its inner floor at 74% and retaining rim at approximately 66.5%.
@@ -16,10 +16,14 @@ export const drawBallRadius = (count: number) => Math.max(.8, Math.min(1.25, 3.8
 export function createDrawBallWorld(ids: string[]) {
   const world = new World({ gravity: new Vec3(0, -25, 0), allowSleep: true });
   world.broadphase = new SAPBroadphase(world);
+  const solver = new GSSolver();
+  solver.iterations = 16;
+  solver.tolerance = .001;
+  world.solver = solver;
   const material = new Material("draw-ball");
   // Orthographic depth holds large pots without increasing the visible bowl silhouette.
   const depth = Math.max(1, ids.length / 40);
-  world.addContactMaterial(new ContactMaterial(material, material, { friction: .22, restitution: 0, contactEquationRelaxation: 6 }));
+  world.addContactMaterial(new ContactMaterial(material, material, { friction: .35, restitution: 0, contactEquationRelaxation: 4, contactEquationStiffness: 1e6 }));
   const vertices: number[] = [];
   const indices: number[] = [];
    const rings = 8, segments = 20;
@@ -84,7 +88,7 @@ export function createDrawBallWorld(ids: string[]) {
       const reach = 4 * radius * radius - d2;
       if (reach > 0) heights[index] = Math.max(heights[index], y + Math.sqrt(reach) + .004);
     });
-    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .8, angularDamping: .9, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
+    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .95, angularDamping: .98, sleepSpeedLimit: .16, sleepTimeLimit: .3 });
     body.position.set(x, y, z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
@@ -99,11 +103,18 @@ export function createDrawBallWorld(ids: string[]) {
   world.addEventListener("postStep", () => {
     for (const ball of balls.values()) {
       const ceiling = previousHeights.get(ball);
-      if (ceiling !== undefined && ball.position.y > ceiling) {
-        ball.position.y = ceiling;
+      // Permit subpixel contact correction rather than locking penetrating
+      // bodies together (which made the solver eject their neighbours sideways).
+      if (ceiling !== undefined && ball.position.y > ceiling + .002) {
+        ball.position.y = ceiling + .002;
         ball.aabbNeedsUpdate = true;
       }
       if (ball.velocity.y > 0) ball.velocity.y = 0;
+      const horizontalSpeed = Math.hypot(ball.velocity.x, ball.velocity.z);
+      if (horizontalSpeed > .65) {
+        ball.velocity.x *= .65 / horizontalSpeed;
+        ball.velocity.z *= .65 / horizontalSpeed;
+      }
     }
   });
   return { world, balls, radius, depth };
