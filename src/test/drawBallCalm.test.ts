@@ -14,8 +14,8 @@ describe("calm draw pile", () => {
     }
     expect(new Set([...a.balls.values()].map(ball => ball.position.z.toFixed(4))).size).toBeGreaterThan(32);
   });
-  it("settles a local gap without jumping above the original pile", () => {
-    const { world, balls, radius } = createDrawBallWorld(Array.from({ length: 32 }, (_, i) => String(i)));
+  it.each([32, 64, 128])("settles a local gap at %s teams without jumping above the original pile", count => {
+    const { world, balls, radius } = createDrawBallWorld(Array.from({ length: count }, (_, i) => String(i)));
     const removed = balls.get("0");
     if (!removed) throw new Error("Missing drawn ball");
     world.removeBody(removed); balls.delete("0");

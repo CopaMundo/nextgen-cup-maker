@@ -10,13 +10,15 @@ export const DRAW_REVEAL_Y = (0.5 - DRAW_REVEAL_FRACTION) * 56.25;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
-export const drawBallRadius = (count: number) => Math.max(.5, Math.min(1.25, 3.8 / Math.sqrt(count + 6)));
+export const drawBallRadius = (count: number) => Math.max(.8, Math.min(1.25, 3.8 / Math.sqrt(count + 6)));
 
 /** A hidden concave bowl: real sphere contacts, gravity, rolling and settling. */
 export function createDrawBallWorld(ids: string[]) {
   const world = new World({ gravity: new Vec3(0, -25, 0), allowSleep: true });
   world.broadphase = new SAPBroadphase(world);
   const material = new Material("draw-ball");
+  // Orthographic depth holds large pots without increasing the visible bowl silhouette.
+  const depth = Math.max(1, ids.length / 40);
   world.addContactMaterial(new ContactMaterial(material, material, { friction: .22, restitution: 0, contactEquationRelaxation: 6 }));
   const vertices: number[] = [];
   const indices: number[] = [];
@@ -27,7 +29,7 @@ export function createDrawBallWorld(ids: string[]) {
      const radius = BOWL_RADIUS * Math.min(ring, rings) / rings;
     for (let segment = 0; segment < segments; segment++) {
       const angle = segment * Math.PI * 2 / segments;
-       vertices.push(Math.cos(angle) * radius, ring > rings ? 40 : bowlHeight(radius), Math.sin(angle) * radius);
+       vertices.push(Math.cos(angle) * radius, ring > rings ? 40 : bowlHeight(radius), Math.sin(angle) * radius * depth);
     }
   }
    for (let ring = 0; ring <= rings; ring++) for (let segment = 0; segment < segments; segment++) {
@@ -45,15 +47,16 @@ export function createDrawBallWorld(ids: string[]) {
   const step = radius * .42;
   const candidates: { x: number; z: number }[] = [];
   const steps = Math.ceil(maxRadial / step);
-  for (let row = -steps; row <= steps; row++) for (let column = -steps; column <= steps; column++) {
+  const depthSteps = Math.ceil(maxRadial * depth / step);
+  for (let row = -depthSteps; row <= depthSteps; row++) for (let column = -steps; column <= steps; column++) {
     // Deterministic micro-offsets avoid a visible lattice while refreshes stay reproducible.
     const seed = Math.sin(row * 127.1 + column * 311.7) * 43758.5453;
     const jitter = (seed - Math.floor(seed) - .5) * step * .5;
     const x = column * step + jitter, z = row * step - jitter * .7;
-    if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z });
+    if (Math.hypot(x, z / depth) <= maxRadial) candidates.push({ x, z });
   }
   const surface = (x: number, z: number) => {
-    const d = Math.hypot(x, z);
+    const d = Math.hypot(x, z / depth);
     const slope = .2 * d + .0088 * d * d * d;
     return bowlHeight(d) + radius * Math.sqrt(1 + slope * slope);
   };
@@ -81,12 +84,12 @@ export function createDrawBallWorld(ids: string[]) {
       const reach = 4 * radius * radius - d2;
       if (reach > 0) heights[index] = Math.max(heights[index], y + Math.sqrt(reach) + .004);
     });
-    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .65, angularDamping: .8, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
+    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .8, angularDamping: .9, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
     body.position.set(x, y, z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
   });
-  return { world, balls, radius };
+  return { world, balls, radius, depth };
 }
 
 export function drawBallFlight(elapsed: number, speed: number) {

@@ -3,9 +3,10 @@ import { BOWL_BOTTOM, DRAW_REVEAL_FRACTION, DRAW_REVEAL_Y, bowlHeight, createDra
 
 describe("draw ball physics", () => {
   it("slightly reduces the physical and rendered bowl ball radius", () => {
-    expect(drawBallRadius(24)).toBeCloseTo(3.8 / Math.sqrt(30));
+    expect(drawBallRadius(24)).toBe(.8);
     expect(drawBallRadius(1)).toBe(1.25);
-    expect(drawBallRadius(128)).toBeGreaterThanOrEqual(.5);
+    expect(drawBallRadius(64)).toBe(.8);
+    expect(drawBallRadius(128)).toBe(.8);
   });
   it("settles spheres above the curved bowl", () => {
     const { balls } = createDrawBallWorld(Array.from({ length: 24 }, (_, i) => String(i)));
@@ -31,12 +32,12 @@ describe("draw ball physics", () => {
      expect(Math.max(...positions)).toBeGreaterThan(2.5);
   });
    it.each([1, 6, 24, 49, 64, 128])("keeps %s enlarged balls contained with real contacts", count => {
-     const { balls, radius } = createDrawBallWorld(Array.from({ length: count }, (_, i) => String(i)));
+     const { balls, radius, depth } = createDrawBallWorld(Array.from({ length: count }, (_, i) => String(i)));
      expect(balls.size).toBe(count);
      expect(radius).toBeCloseTo(drawBallRadius(count));
      for (const ball of balls.values()) {
        expect(Number.isFinite(ball.position.y)).toBe(true);
-       expect(Math.hypot(ball.position.x, ball.position.z)).toBeLessThan(5.9);
+       expect(Math.hypot(ball.position.x, ball.position.z / depth)).toBeLessThan(4.6);
        expect(ball.position.y).toBeGreaterThan(BOWL_BOTTOM);
      }
    }, 20000);
