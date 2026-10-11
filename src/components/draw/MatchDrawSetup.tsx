@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PotTeamSlots } from "./PotTeamSlots";
+import { TeamSelectList } from "./TeamSelectList";
 import type { DrawContainer, DrawTeam } from "@/lib/liveDraw";
 
 export function MatchDrawSetup({ teams, selectedIds, onTeamsChange, containers, originals, useSeeds, seedCount, onSeedCount, onSeed }: {
@@ -14,7 +14,7 @@ export function MatchDrawSetup({ teams, selectedIds, onTeamsChange, containers, 
   const originalIds = new Set(originals.flatMap(c => c.teamIds));
   const capacity = containers.length * 2;
   return <div className="space-y-5">
-    {teams.length > capacity && <section className="space-y-2"><h3 className="font-semibold">Deelnemers · {selectedIds.length}/{capacity}</h3><PotTeamSlots teams={teams} teamIds={selectedIds} assignedIds={new Set(selectedIds)} lockedIds={fixedIds} capacity={capacity} onChange={(index, id) => { const next = [...selectedIds]; if (id) next[index] = id; else next.splice(index, 1); onTeamsChange(next); }} /></section>}
+    {teams.length > capacity && <TeamSelectList teams={teams} selectedIds={selectedIds} capacity={capacity} lockedIds={fixedIds} onChange={onTeamsChange} />}
     {useSeeds && <section className="space-y-3">
       <Label htmlFor="seed-count">Aantal reekshoofden</Label>
       <Select value={String(seedCount)} onValueChange={value => onSeedCount(Number(value))}><SelectTrigger id="seed-count" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{Array.from({ length: Math.max(0, containers.length - 1) }, (_, i) => i + 2).map(count => <SelectItem key={count} value={String(count)}>{count}</SelectItem>)}</SelectContent></Select>

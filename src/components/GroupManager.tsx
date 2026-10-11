@@ -1023,6 +1023,14 @@ const GroupManager = ({
     fetchGroups();
   };
 
+  const clearPhaseMatches = async () => {
+    const { data: phaseMatchIds } = await supabase.from("matches").select("id").eq("phase_id", phaseId).eq("tournament_id", tournamentId);
+    const matchIds = (phaseMatchIds ?? []).map(m => m.id);
+    if (matchIds.length > 0) await supabase.from("match_stats").delete().in("match_id", matchIds);
+    await supabase.from("matches").delete().eq("phase_id", phaseId).eq("tournament_id", tournamentId);
+    notifySlotChange();
+  };
+
   const addLabel = phaseType === "knockout" ? "Ronde" : phaseType === "round_robin" ? "League" : "Groep";
 
   const renderGroupCard = (group: Group) => (
@@ -1373,7 +1381,7 @@ const GroupManager = ({
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { const m = pendingDrawMode; setPendingDrawMode(null); if (m) startDraw(m, true); }}
+              onClick={async () => { const m = pendingDrawMode; setPendingDrawMode(null); if (!m) return; if (m === "rounds") await clearPhaseMatches(); else await clearAllSlots(); startDraw(m, true); }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Ja, overschrijven
