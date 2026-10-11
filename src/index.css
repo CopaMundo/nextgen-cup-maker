@@ -2550,6 +2550,8 @@ posities + statistieken groen */
 
 .draw-dialog-theme .draw-choice[aria-pressed="true"],
 .draw-choice[aria-pressed="true"] {
+  border-top-color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
   background: hsl(var(--primary) / 0.06);
 }
 

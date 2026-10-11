@@ -33,6 +33,7 @@ import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, Chev
 import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/matchDraw";
 import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
+import { DrawTypeChoices } from "@/components/draw/DrawTypeChoices";
 import { TeamSelectList } from "@/components/draw/TeamSelectList";
 import { completeLastDrawPot, defaultDrawPotCount, defaultDrawSeedCount, placeDrawSeed } from "@/lib/drawWizard";
 import { generatePotMatchups } from "@/lib/drawEngine";
@@ -141,7 +142,7 @@ const LiveDrawDialog = ({
   const [selectedMatchTeams, setSelectedMatchTeams] = useState<string[]>([]);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const originalMatchContainers = useRef<DrawContainer[]>([]);
-  const [usePots, setUsePots] = useState(true);
+  const [usePots, setUsePots] = useState(false);
   const [useSeeds, setUseSeeds] = useState(false);
   const [seedCount, setSeedCount] = useState(2);
   const [potCount, setPotCount] = useState(4);
@@ -227,7 +228,7 @@ const LiveDrawDialog = ({
       const originalFixed = nextContainers.flatMap(c => c.teamIds);
       const availableCapacity = nextContainers.reduce((sum, c) => sum + c.capacity, 0);
       setSeedCount(defaultDrawSeedCount(nextContainers.length * 2));
-      setUsePots(initialMethod ? initialMethod === "pots" : isMatchDraw ? false : true);
+      setUsePots(initialMethod === "pots");
 
       const occupied = new Set(overwrite && !isMatchDraw ? [] : (slotRows || []).filter((s) => s.team_id).map((s) => s.team_id as string));
       const available = (teamRows || [])
@@ -1006,37 +1007,12 @@ const requestPotCount = (count: number) => {
 
           {loading && step !== "draw" ? (
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
-          ) : step === "method" && isMatchDraw ? (
-            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Type loting</h2><div className="grid gap-3 sm:grid-cols-3">{([{ id: "random" as const, label: "Vrije loting" }, { id: "pots" as const, label: "Potten" }, ...(fixtureKind === "knockout" ? [{ id: "seeds" as const, label: "Reekshoofden" }] : [])]).map(option => { const selected = option.id === (useSeeds ? "seeds" : usePots ? "pots" : "random"); return <Button key={option.id} variant="outline" aria-pressed={selected} disabled={option.id === "seeds" && containers.length < 2} onClick={() => selectMatchMethod(option.id)} className={`draw-choice h-auto min-h-24 whitespace-normal p-4 ${selected ? "border-primary text-primary" : "border-border"}`}>{option.label}{selected && <Check className="h-4 w-4" />}</Button>; })}</div></div>
           ) : step === "method" ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
-              <div>
-                <h2 className="text-lg font-bold">Type loting</h2>
-                <p className="text-xs text-muted-foreground">{drawSize} plaatsen · {containers.length} {isMatchDraw ? "wedstrijden" : "groepen"}{eligibleTeams.length !== drawSize ? ` · ${eligibleTeams.length} beschikbare teams` : ""}</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {[
-                  { value: false, label: "Willekeurig", title: isMatchDraw ? "Vrije wedstrijdloting" : "Verdeel alle teams volledig willekeurig", text: isMatchDraw ? "Het eerste team speelt tegen het tweede, het derde tegen het vierde." : "De teams worden zonder voorafgaande indeling willekeurig over de beschikbare groepen verdeeld." },
-                  { value: true, label: "Potten", title: isMatchDraw ? "Pot 1 tegen Pot 2" : "Trek teams pot per pot", text: isMatchDraw ? "Per wedstrijd eerst Pot 1, daarna Pot 2. Vaste plaatsen blijven behouden." : "Verdeel de teams vooraf over verschillende potten, bijvoorbeeld op basis van niveau, ranking of je eigen voorkeur. Tijdens de loting trek je vervolgens team per team uit de gekozen pot." },
-                ].map((opt) => {
-                  const selected = usePots === opt.value;
-                  return (
-                    <Button
-                      key={opt.label}
-                      type="button"
-                      variant="outline"
-                      aria-pressed={selected}
-                      onClick={() => setUsePots(opt.value)}
-                      className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-0 whitespace-normal p-5 text-left transition-all ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}
-                    >
-                      {selected && <Check className="absolute right-3 top-3 h-4 w-4 text-primary" />}
-                      <p className="text-xs font-bold uppercase tracking-wide text-foreground">{opt.label}</p>
-                      <p className="mt-2 text-sm font-semibold">{opt.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{opt.text}</p>
-                    </Button>
-                  );
-                })}
-              </div>
+              <h2 className="text-lg font-bold">Type loting</h2>
+              <DrawTypeChoices format={fixtureKind ?? "group"} value={useSeeds ? "seeds" : usePots ? "pots" : "random"}
+                seedsDisabled={containers.length < 2}
+                onChange={method => { if (isMatchDraw) selectMatchMethod(method); else setUsePots(method === "pots"); }} />
             </div>
           ) : step === "teams" && !usePots ? (
             <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <p className="draw-panel p-3 text-sm text-muted-foreground">Alle {teams.length} teams doen mee aan de loting.</p>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>

@@ -28,6 +28,7 @@ import { generateRoundRobin } from "@/lib/matchGenerator";
 import LiveDrawDialog from "./LiveDrawDialog";
 import RoundsDrawDialog from "./RoundsDrawDialog";
 import { DrawWizardHeader } from "./draw/DrawWizardHeader";
+import { DrawScopeChoices, DrawTypeChoices, DrawTypeProgress } from "./draw/DrawTypeChoices";
 import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { canChooseLiveDraw, liveRoundsAvailable, liveRoundsLimitMessage } from "@/lib/liveDrawLimits";
 
@@ -316,6 +317,7 @@ const GroupManager = ({
   type DrawMode = "full" | "groups" | "rounds";
   const [drawMode, setDrawMode] = useState<DrawMode>("full");
   const [drawMethod, setDrawMethod] = useState<"random" | "pots">("random");
+  const [drawChoicePart, setDrawChoicePart] = useState<"scope" | "method">("scope");
   const drawTournamentName = useDrawTournamentName(tournamentId, drawView !== null);
   const [pendingDrawMode, setPendingDrawMode] = useState<DrawMode | null>(null);
   const drawViewStorageKey = `copa-live-draw-view:${phaseId}`;
@@ -326,6 +328,7 @@ const GroupManager = ({
     const saved = localStorage.getItem(drawViewStorageKey);
     const savedMode = localStorage.getItem(drawModeStorageKey);
     setDrawMethod(localStorage.getItem(`copa-live-draw-method:${phaseId}`) === "pots" ? "pots" : "random");
+    setDrawChoicePart(localStorage.getItem(`copa-live-draw-choice-part:${phaseId}`) === "method" ? "method" : "scope");
     if (saved === "choice" || saved === "groups" || saved === "rounds") setDrawView(saved);
     if (savedMode === "full" || savedMode === "groups" || savedMode === "rounds") setDrawMode(savedMode);
   }, [drawViewStorageKey, drawModeStorageKey]);
@@ -344,6 +347,7 @@ const GroupManager = ({
     if (drawView) localStorage.setItem(drawModeStorageKey, drawMode);
   }, [drawMode, drawView, drawModeStorageKey]);
   useEffect(() => { if (drawView) localStorage.setItem(`copa-live-draw-method:${phaseId}`, drawMethod); }, [drawMethod, drawView, phaseId]);
+  useEffect(() => { if (drawView === "choice") localStorage.setItem(`copa-live-draw-choice-part:${phaseId}`, drawChoicePart); }, [drawChoicePart, drawView, phaseId]);
   const drawOverwriteKey = `copa-live-draw-overwrite:${phaseId}`;
   const [drawOverwrite, setDrawOverwrite] = useState(false);
   const [drawSubStep, setDrawSubStep] = useState("method");
@@ -368,7 +372,7 @@ const GroupManager = ({
         if (raw) localStorage.setItem(key, JSON.stringify({ ...JSON.parse(raw), step: "method" }));
       } catch { localStorage.removeItem(key); }
     }
-    if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable || drawMode === "full")) setDrawView("choice");
+    if (phaseMatchType === "rounds") { setDrawChoicePart("method"); setDrawView("choice"); }
     else closeDrawView();
   };
   const restartDraw = () => {
@@ -1297,34 +1301,17 @@ const GroupManager = ({
           {drawView && <div className="shrink-0 px-4 pt-3 sm:px-6"><DrawWizardHeader tournamentName={drawTournamentName} formatName={phaseMatchType === "rounds" ? "Groepsfase met Speelrondes" : "Groepsfase"} step={drawView === "choice" ? "method" : drawSubStep} onClose={closeDrawView} /></div>}
           {drawView === "choice" && (
             <section className="draw-surface flex min-h-0 flex-1 flex-col bg-background p-4 text-foreground sm:p-6">
-              <DialogHeader className="shrink-0 border-b border-primary/30 pb-4">
-                <h2 className="text-lg font-bold">Type loting</h2>
-                <h3 className="text-sm font-semibold">Wat wil je loten?</h3>
-              </DialogHeader>
-              {!roundsShowAvailable && <p role="status" className="mt-4 shrink-0 text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
-              <div className="min-h-0 flex-1 space-y-5 overflow-y-auto py-5"><div className="grid gap-3 md:grid-cols-3">
-            {([
-              ["full", "Volledige loting (Groepen + Speelrondes)", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
-               ["groups", "Alleen Groepsfase", roundsShowAvailable ? "Teams over de poules verdelen. De speelrondes blijven ongewijzigd." : "Teams over de poules verdelen. De speelrondes worden automatisch gegenereerd."],
-              ["rounds", "Alleen Speelrondes", "De huidige poule-indeling behouden en enkel de tegenstanders loten."],
-            ] as const).map(([mode, title, text]) => (
-              <Button
-                key={mode}
-                type="button"
-                variant="outline"
-                 aria-pressed={drawMode === mode}
-                 disabled={!roundsShowAvailable && mode !== "groups"}
-                 onClick={() => setDrawMode(mode)}
-                 className={`draw-choice h-auto min-h-40 w-full flex-col items-start justify-start whitespace-normal p-5 text-left ${drawMode === mode ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`}
-              >
-                <div className="text-sm font-semibold text-foreground">{title}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{text}</div>
-              </Button>
-            ))}
-               </div><div className="space-y-3"><h3 className="font-semibold">Methode</h3><div className="grid gap-3 sm:grid-cols-2">{(["random", "pots"] as const).map(method => <Button key={method} variant="outline" aria-pressed={drawMethod === method} className="draw-choice h-20" onClick={() => setDrawMethod(method)}>{method === "random" ? "Willekeurig" : "Potten"}</Button>)}</div></div></div>
+              <h2 className="shrink-0 text-lg font-bold">Type loting</h2>
+              <div className="min-h-0 flex-1 space-y-5 overflow-y-auto py-5">
+                <DrawTypeProgress part={drawChoicePart} />
+                {!roundsShowAvailable && <p role="status" className="text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
+                {drawChoicePart === "scope"
+                  ? <DrawScopeChoices value={drawMode} onChange={setDrawMode} roundsAvailable={roundsShowAvailable} />
+                  : <DrawTypeChoices value={drawMethod} onChange={method => setDrawMethod(method === "pots" ? "pots" : "random")} />}
+              </div>
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
-                <Button variant="outline" disabled><ArrowLeft className="h-4 w-4" /> Vorige</Button>
-                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(drawMode)}>Volgende</Button>
+                <Button variant="outline" disabled={drawChoicePart === "scope"} onClick={() => setDrawChoicePart("scope")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
+                <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => { if (drawChoicePart === "scope") setDrawChoicePart("method"); else void requestDraw(drawMode); }}>Volgende</Button>
               </DialogFooter>
             </section>
           )}
@@ -1360,7 +1347,7 @@ const GroupManager = ({
             phaseId={phaseId}
             categoryId={categoryId}
             phaseMatchType={phaseMatchType}
-            automaticRounds={!roundsShowAvailable ? phaseRounds : undefined}
+            automaticRounds={drawMode === "groups" || !roundsShowAvailable ? phaseRounds : undefined}
             phaseName={phases.find((phase) => phase.id === phaseId)?.name}
             onApplied={async () => {
               notifySlotChange();
