@@ -314,7 +314,10 @@ const RoundsDrawDialog = ({
     const sig = (g: GroupInfo) => `${g.pots.length}|${g.pots.map((p) => p.teamIds.length).join(",")}|${matchesPerTeam(g.teamIds.length, g.rounds)}`;
     return drawGroups.every((g) => sig(g) === sig(drawGroups[0]));
   }, [drawGroups]);
-  const potDrawAvailable = groups.length > 0 && groups.every((g) => g.teamIds.length >= 4 && g.teamIds.length % 2 === 0 && g.freeSlots === 0);
+  const potDrawAvailable = groups.length > 0 && groups.every((g) => {
+    const size = assignGroups && !groupsConfirmed ? slotRowsByGroup[g.id]?.length ?? 0 : g.teamIds.length;
+    return size >= 4 && size % 2 === 0 && (assignGroups && !groupsConfirmed ? true : g.freeSlots === 0);
+  });
   const exceedsShowLimit = groups.some((g) => !liveRoundsAvailable(Number(roundInputs[g.id] ?? g.rounds)));
 
   const selectPotCount = (group: GroupInfo, count: number) => {
@@ -720,7 +723,7 @@ const RoundsDrawDialog = ({
     <div className="space-y-5 overflow-y-auto pr-1">
       <h3 className="text-lg font-bold">Type loting</h3>
       <DrawTypeChoices value={method === "pots" ? "pots" : "random"} potsDisabled={!potDrawAvailable} onChange={value => setMethod(value === "pots" ? "pots" : "free")} />
-      {!potDrawAvailable && <p className="flex items-start gap-2 text-sm text-warning"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Loting met niveau-potten vereist minimaal 4 teams en een even aantal teams per poule. Vul ook alle plaatsen in.</p>}
+      {!potDrawAvailable && <p className="flex items-start gap-2 text-sm text-warning"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Loting met niveau-potten vereist minimaal 4 plaatsen en een even aantal plaatsen per poule.</p>}
     </div>
   );
 
