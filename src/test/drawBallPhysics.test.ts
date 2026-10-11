@@ -15,9 +15,9 @@ describe("draw ball physics", () => {
       expect(ball.position.y).toBeGreaterThan(bowlHeight(Math.hypot(ball.position.x, ball.position.z)) - .2);
     }
   });
-  it.each([.75, 1, 1.5])("lands at 50%/48.5% and splits at speed %s", speed => {
+  it.each([.75, 1, 1.5])("lands at 50%/37.5% and splits at speed %s", speed => {
     expect(drawBallFlight(0, speed).y).toBeCloseTo(BOWL_BOTTOM + .7);
-    expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(.84375);
+    expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(7.03125);
     expect(drawBallFlight(1450 / speed, speed).split).toBeCloseTo(.5);
     expect(drawBallFlight(1800 / speed, speed).visible).toBe(false);
     expect(drawBallFlight(550 / speed, speed).progress).toBeCloseTo(.5);
