@@ -172,7 +172,7 @@ const LiveDrawDialog = ({
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
   const assignedTeamIds = useMemo(() => new Set(pots.flatMap((p) => p.teamIds)), [pots]);
   const fixedIds = useMemo(() => new Set(containers.flatMap(c => c.teamIds)), [containers]);
-  const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || (!isMatchDraw && teams.length <= drawSize) || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams, isMatchDraw, drawSize]);
+  const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || (!isMatchDraw && teams.length <= containers.reduce((sum, c) => sum + c.capacity - c.teamIds.length, 0)) || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams, isMatchDraw, containers]);
   const unassignedTeams = useMemo(() => eligibleTeams.filter((t) => !assignedTeamIds.has(t.id)), [eligibleTeams, assignedTeamIds]);
   const countries = useMemo(
     () => Array.from(new Set(teams.map((t) => t.country).filter(Boolean) as string[])).sort(),
