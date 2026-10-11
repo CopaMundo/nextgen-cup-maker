@@ -55,7 +55,7 @@ describe("Uniform draw preparation", () => {
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
     fireEvent.click(screen.getByRole("button", { name: "Vorige" }));
-    expect(screen.getByText("Deelnemers · 4/4")).toBeInTheDocument();
+    expect(screen.getByText("Alle 4 teams doen mee aan de loting.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Loting show instellingen" });
