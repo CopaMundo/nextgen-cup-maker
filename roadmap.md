@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Poulevleugels vanaf 12% binnen de zuilen en boven de onderste teams begrenzen; vrije balonthulling en exacte booglanding behouden en controleren.
 - [x] Prototype: vrije wand zonder statisch teamvak, rustige balopening op 47% hoogte, uitvouwend clubembleem en gebogen exacte poulelanding. Drie thema’s met voorbeeldteams visueel gecontroleerd zonder runtimefouten; landing wijkt minder dan .01px af en 25 tests slagen. Geen nieuwe gezamenlijke echte regie/beamer-trekking uitgevoerd.
 - [x] Nieuwe originele 4K-studio’s aangesloten met ronde thematische bokaal op het podium, afgestemde balcontacten en vlucht naar het permanente centrale teamvak. Drie thema’s en onthulling met voorbeeldteams visueel gecontroleerd; 25 tests geslaagd. Geen nieuwe echte gezamenlijke regie/beamer-trekking uitgevoerd.
 - [x] Drie originele 3840×2160 UHD-achtergronden aangesloten zonder kwaliteitsverlies; bestaande bokaal apart behouden op dezelfde positie. Drie thema’s visueel gecontroleerd, negen voorbeeldweergaven en achttien tests geslaagd.
