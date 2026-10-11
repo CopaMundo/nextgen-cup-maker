@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
 import { BOWL_BOTTOM, DRAW_REVEAL_Y, createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
@@ -10,6 +10,7 @@ interface Palette { ball: string; light: string; edge: string; }
 function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, palette }: Props & { palette: Palette }) {
   const simulation = useMemo(() => createDrawBallWorld(teamIds), []);
   const meshes = useRef(new Map<string, Mesh>());
+  const invalidate = useThree((state) => state.invalidate);
   const flight = useRef<Group>(null);
   const left = useRef<Mesh>(null);
   const right = useRef<Mesh>(null);
@@ -31,7 +32,8 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
   }, [teamKey, simulation]);
   useFrame((_, delta) => {
     // Sleeping piles need no solver work; a single substep keeps large pots smooth.
-    if (simulation.balls.size && [...simulation.balls.values()].some(body => body.sleepState !== 2)) simulation.world.step(1 / 60, Math.min(delta, .05), 1);
+    const awake = [...simulation.balls.values()].some(body => body.sleepState !== 2);
+    if (awake) simulation.world.step(1 / 60, Math.min(delta, .05), 1);
     for (const [id, body] of simulation.balls) {
       const mesh = meshes.current.get(id);
       if (mesh) { mesh.position.copy(body.position); mesh.quaternion.copy(body.quaternion); }
@@ -49,7 +51,10 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
     for (const [mesh, direction] of [[left.current, -1], [right.current, 1]] as const) {
       if (mesh) { mesh.position.x = direction * frame.split * 5; mesh.position.y = -frame.split * .6; mesh.rotation.z = direction * frame.split * .45; }
     }
+    // On-demand rendering: keep drawing only while balls roll or a ball is in flight.
+    if (awake || (revealing && frame.visible)) invalidate();
   });
+  useEffect(() => { invalidate(); }, [invalidate, revealing, elapsed, teamKey, drawnId, revealKey, material]);
   // Ball meshes only change when a team leaves the pot, not on every playback tick.
   const ballMeshes = useMemo(() => teamKey ? teamKey.split("|").map(id => <mesh key={id} ref={mesh => { if (mesh) meshes.current.set(id, mesh); else meshes.current.delete(id); }} material={material}>
     <sphereGeometry args={[simulation.radius, 20, 14]} />
@@ -87,7 +92,7 @@ export function DrawBalls(props: Props) {
   if (props.teamIds.length > generation.current.count) generation.current.key++;
   generation.current.count = props.teamIds.length;
   return <div ref={host} className="draw-show-balls-canvas" aria-hidden="true">
-    {palette && <Canvas dpr={[1, 1.5]} gl={{ alpha: true, antialias: true }}>
+    {palette && <Canvas frameloop="demand" dpr={[1, 1.25]} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
       <OrthographicCamera makeDefault manual position={[0, 0, 100]} left={-50} right={50} top={28.125} bottom={-28.125} near={.1} far={200} />
       <BallScene key={generation.current.key} {...props} palette={palette} />
     </Canvas>}
