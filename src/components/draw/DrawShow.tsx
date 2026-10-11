@@ -1,4 +1,5 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { DRAW_REVEAL_FRACTION } from "@/lib/drawBallPhysics";
 import { useDrawPlayback } from "@/hooks/useDrawPlayback";
 import type { DrawSessionState } from "@/lib/drawSession";
 import { calculateGroupLayout, calculateWingDensity, drawChoiceGrid, drawOverviewPage, stageSelection, sweepSpotlight, type DrawPresentation } from "@/lib/drawPresentation";
@@ -24,7 +25,6 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   ballClock.current = revealElapsed;
   const revealAnimations = useRef<Animation[]>([]);
   const stageRef = useRef<HTMLDivElement>(null);
-  const ledArcId = `draw-pot-${useId().replace(/:/g, "")}`;
   const studio = studioFor(presentation?.theme);
   const [destination, setDestination] = useState({ x: 0, y: 0, width: 0, height: 0, logo: "1.5cqw", name: ".82cqw" });
   useLayoutEffect(() => {
@@ -67,7 +67,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       if (!slot) return;
       const rect = stage.getBoundingClientRect();
       const target = slot.getBoundingClientRect();
-      const next = { x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .42, width: target.width, height: target.height, logo: getComputedStyle(slot.querySelector(".draw-show-slot-mark") ?? slot).width, name: getComputedStyle(slot.querySelector(".draw-show-slot-name") ?? slot).fontSize };
+      const next = { x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * DRAW_REVEAL_FRACTION, width: target.width, height: target.height, logo: getComputedStyle(slot.querySelector(".draw-show-slot-mark") ?? slot).width, name: getComputedStyle(slot.querySelector(".draw-show-slot-name") ?? slot).fontSize };
       setDestination(previous => Object.keys(next).every(key => previous[key as keyof typeof previous] === next[key as keyof typeof next]) ? previous : next);
     };
     measure();
@@ -120,7 +120,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const speed = presentation?.speed ?? 1;
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const { columns: choiceColumns } = drawChoiceGrid(pending?.options.length ?? 1);
-   const motionStyle = { "--draw-choice-width": `${Math.min(8, (20 - .16 * (choiceColumns - 1)) / choiceColumns)}cqw`, "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
+   const motionStyle = { "--draw-reveal-top": `${DRAW_REVEAL_FRACTION * 100}%`, "--draw-choice-width": `${Math.min(8, (20 - .16 * (choiceColumns - 1)) / choiceColumns)}cqw`, "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
 
   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
@@ -168,12 +168,12 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         {pending && team && selectionPhase !== "transfer" && selectionPhase !== "complete" && <div key={revealKey ?? pending.teamId} className="draw-show-team-card draw-reveal-name">
           <div className="draw-show-team">{teamContent}</div>
         </div>}
-        {!rounds && pending && choicesReady && teamReady && selectionPhase !== "complete" && <div key={pending.teamId} className={`draw-show-eligible ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": drawChoiceGrid(eligible.length).columns } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} aria-label={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{eligible.length > 18 ? option.label.replace(/^(groep|group|poule)\s+/i, "") : option.label}</span>)}</div></div>}
       </main>
+      {!rounds && pending && choicesReady && teamReady && selectionPhase !== "complete" && <div key={pending.teamId} className={`draw-show-eligible ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": drawChoiceGrid(eligible.length).columns } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} aria-label={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{eligible.length > 18 ? option.label.replace(/^(groep|group|poule)\s+/i, "") : option.label}</span>)}</div></div>}
       {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot draw-show-team">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>
       <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} clock={ballClock} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
-      <svg className="draw-show-pot-label" viewBox="0 0 600 100" role="img" aria-label={footLabel}><defs><path id={`${ledArcId}-pot`} d="M 20 46 Q 300 90 580 46" /></defs><text textAnchor="middle"><textPath href={`#${ledArcId}-pot`} startOffset="50%">{footLabel}</textPath></text></svg><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potCards}</div></div>
+      <div className="draw-show-pedestal-label"><div className="draw-show-pot-label" title={footLabel}>{footLabel}</div><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div></div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potCards}</div></div>
     </>}
     {controls}
   </div>;

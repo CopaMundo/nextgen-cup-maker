@@ -2660,7 +2660,7 @@ posities + statistieken groen */
 .draw-show-layout-C .draw-show-slots { grid-auto-flow: row; gap: .22cqw; }
 .draw-show-layout-C .draw-show-wing .draw-show-slot { display: flex; justify-content: center; padding: .15cqw; border-color: hsl(var(--primary) / .5); container-type: size; }
 .draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; max-width: 100%; flex: 0 0 auto; font-size: 30cqmin; border-color: hsl(var(--primary) / .65); }
-.draw-show-center { position: absolute; z-index: 9; top: 39%; left: 40%; width: 20%; height: 6%; }
+.draw-show-center { position: absolute; z-index: 9; top: var(--draw-reveal-top); left: 50%; width: 20%; height: 6%; transform: translate(-50%, -50%); }
 .draw-show-team-card { position: relative; isolation: isolate; display: flex; height: 100%; width: 100%; margin: 0 auto; align-items: center; justify-content: center; padding: 0; border-radius: var(--draw-identity-radius, .6cqw); overflow: hidden; border: .1cqw solid hsl(var(--stage-metal-main) / .85); background: linear-gradient(160deg, hsl(var(--stage-ball-light) / .22), hsl(var(--stage-glass) / .48) 55%, hsl(var(--stage-ball-light) / .09)); backdrop-filter: blur(8px); box-shadow: 0 0 1.4cqw hsl(var(--stage-glow) / .22), inset 0 .08cqw 0 hsl(var(--stage-metal-light) / .65), inset 0 -.15cqw .5cqw hsl(var(--background) / .3); }
 .draw-show-team-card.is-departing { animation: draw-bar-dissolve calc(650ms / var(--draw-rate)) ease-out both; pointer-events: none; }
 @keyframes draw-bar-dissolve { from { opacity: 1; } to { opacity: 0; } }
@@ -2678,7 +2678,7 @@ posities + statistieken groen */
 .draw-show-reveal-logo, .draw-show-team strong { filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; background: linear-gradient(180deg, hsl(var(--stage-metal-light)), hsl(var(--stage-metal-main))); background-clip: text; -webkit-background-clip: text; color: transparent; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-weight: 600; font-size: 1.2cqw; line-height: 1.2; text-align: center; }
 /* The four-row eligibility budget ends above the bowl, regardless of label length. */
-.draw-show-eligible { position: absolute; top: calc(100% + .7cqw); left: 0; width: 100%; height: 9cqw; overflow: hidden; animation: draw-choices-appear calc(450ms / var(--draw-rate)) ease-out both; }
+.draw-show-eligible { position: absolute; z-index: 9; top: calc(var(--draw-reveal-top) + 3% + .35cqw); left: 40%; width: 20%; height: 9cqw; overflow: hidden; animation: draw-choices-appear calc(450ms / var(--draw-rate)) ease-out both; }
 @keyframes draw-choices-appear { from { opacity: 0; transform: translateY(.3cqw); } to { opacity: 1; transform: translateY(0); } }
 .draw-show-eligible-groups { display: flex; flex-wrap: wrap; justify-content: center; gap: .16cqw; max-height: 9cqw; overflow: hidden; align-content: start; }
 .draw-show-eligible-groups span { flex: 0 0 calc((100% - (var(--eligible-columns) - 1) * .16cqw) / var(--eligible-columns)); min-width: 0; height: 1.25cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
@@ -2690,11 +2690,12 @@ posities + statistieken groen */
 .draw-ball-left { border-radius: 100px 0 0 100px; animation: draw-half-left calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(800ms / var(--draw-rate)) calc(1150ms / var(--draw-rate) + var(--reveal-offset)) cubic-bezier(.22,.8,.3,1) both; }
-.draw-show-transfer { position: absolute; z-index: 9; top: 42%; left: 50%; width: 20%; height: 6%; border-radius: var(--draw-identity-radius, .6cqw); overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; will-change: transform, width, height; }
-.draw-show-pot-label { position: absolute; z-index: 3; left: 38%; width: 24%; top: 79%; height: 5%; pointer-events: none; overflow: visible; }
-.draw-show-pot-label text { fill: hsl(var(--primary)); font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 48px; font-weight: 700; text-transform: uppercase; filter: drop-shadow(0 1px 2px hsl(var(--background))); }
+.draw-show-transfer { position: absolute; z-index: 9; top: var(--draw-reveal-top); left: 50%; width: 20%; height: 6%; border-radius: var(--draw-identity-radius, .6cqw); overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; will-change: transform, width, height; }
+.draw-show-pedestal-label { position: absolute; z-index: 9; top: 81%; left: 50%; width: 17%; height: 6%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3cqw; text-align: center; pointer-events: none; }
+.draw-show-pot-label, .draw-show-pot-counter { width: 100%; background: linear-gradient(165deg, hsl(var(--stage-metal-light)) 5%, hsl(var(--stage-metal-main)) 48%, hsl(var(--stage-metal-light)) 70%, hsl(var(--stage-metal-main)) 100%); background-clip: text; -webkit-background-clip: text; color: transparent; filter: drop-shadow(0 1px 1px hsl(var(--background) / .9)) drop-shadow(0 0 .3cqw hsl(var(--stage-glow) / .65)); }
+.draw-show-pot-label { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 1.3cqw; font-weight: 700; line-height: 1.15; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .draw-show-pot { position: absolute; left: 29%; width: 42%; top: 88%; height: 12%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.draw-show-pot-counter { position: absolute; top: 85.2%; left: 38%; width: 24%; text-align: center; color: hsl(var(--foreground)); font-size: .95cqw; font-weight: 600; line-height: 1.2; pointer-events: none; }
+.draw-show-pot-counter { font-size: .95cqw; font-weight: 700; line-height: 1.2; }
 .draw-show-pot-teams { animation: draw-pot-page 500ms ease-out both; }
 @keyframes draw-pot-page { from { opacity: 0; } to { opacity: 1; } }
 
