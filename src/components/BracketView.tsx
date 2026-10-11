@@ -2931,7 +2931,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     <div className="space-y-6">
       {editable && rounds.length > 0 && (
         <div className="flex items-center gap-2">
-          {showRandomAssign && <Button variant="outline" size="sm" onClick={() => setLiveDrawOpen(true)}><Shuffle className="h-3 w-3" />Live loting</Button>}
+          {(isKnockout || isSingleMatch) && <Button variant="outline" size="sm" onClick={() => setLiveDrawOpen(true)}><Shuffle className="h-3 w-3" />Live loting</Button>}
           {showRandomAssign && !isSingleMatch && filteredTeams.length > 0 && (
             <Button variant="outline" size="sm" onClick={() => {
               const hasTeams = r1Matches.some(m => m.home_team_id || m.away_team_id);

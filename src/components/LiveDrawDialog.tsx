@@ -763,7 +763,7 @@ const LiveDrawDialog = ({
     }
     if (usePots) {
       if (pots.length === 0) return { step: "pots", message: "Kies eerst het aantal potten." };
-      if ((isMatchDraw && pots.length !== 2) || (!isMatchDraw && drawSize % pots.length !== 0) || pots.some((pot, index) => pot.teamIds.length !== (isMatchDraw ? matchPotCapacity(containers, index) : drawSize / pots.length))) return { step: "pots", message: `Vul elke pot met precies ${drawSize / pots.length} teams.` };
+      if ((isMatchDraw && pots.length !== 2) || (!isMatchDraw && drawSize % pots.length !== 0) || pots.some((pot, index) => pot.teamIds.length !== (isMatchDraw ? matchPotCapacity(containers, index) : drawSize / pots.length))) return { step: "pots", message: isMatchDraw ? `Vul Pot 1 met ${matchPotCapacity(containers, 0)} teams en Pot 2 met ${matchPotCapacity(containers, 1)} teams.` : `Vul elke pot met precies ${drawSize / pots.length} teams.` };
       const allAssigned = pots.flatMap((pot) => pot.teamIds);
       const uniqueAssigned = new Set(allAssigned);
       if (allAssigned.length !== drawSize || uniqueAssigned.size !== drawSize)
@@ -792,6 +792,8 @@ const LiveDrawDialog = ({
         }
       }
     }
+    const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
+    if (fixtureKind === "knockout" && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
     const ctx = buildContainerCtx(teams, pots, effectiveRules);
     const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
     return check.ok ? null : { step: "settings", message: check.message || "De gekozen regels zijn niet haalbaar." };
@@ -906,7 +908,7 @@ const LiveDrawDialog = ({
             <PopoverContent portalContainer={directorRef.current} className="draw-scene-settings space-y-4" side="top">
               <h2 className="font-semibold">Regie-instellingen</h2>
               <DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} />
-              <div className="flex items-center justify-between gap-4"><Label htmlFor="automatic-placement">Automatisch toewijzen</Label><Switch id="automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>
+              {!isMatchDraw && <div className="flex items-center justify-between gap-4"><Label htmlFor="automatic-placement">Automatisch toewijzen</Label><Switch id="automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>}
               {session.mode === "pots" && !isMatchDraw && <div><Label>Actieve pot</Label><Select value={activePotChoice?.id} onValueChange={setSelectedPotId} disabled={Boolean(pending)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{pots.map((pot) => <SelectItem key={pot.id} value={pot.id} disabled={!pot.teamIds.some((id) => session.remaining.includes(id))}>{pot.name}</SelectItem>)}</SelectContent></Select></div>}
               {!pending && !session.finished && <div><Label>Handmatig kiezen</Label><Select value={manualTeam} onValueChange={handleDrawNext}><SelectTrigger><SelectValue placeholder="Selecteer team" /></SelectTrigger><SelectContent portalContainer={directorRef.current}>{remainingPool.map((id) => <SelectItem key={id} value={id}>{teamName(session, id)}</SelectItem>)}</SelectContent></Select></div>}
               {pending && <Button className="draw-scene-button w-full" variant="outline" onClick={handleRedraw}><RotateCcw />Opnieuw trekken</Button>}
@@ -915,7 +917,7 @@ const LiveDrawDialog = ({
           </Popover>
         </aside>
       </>} />
-      <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope={!isMatchDraw && activePotChoice ? "pot" : session.containers.length === 1 ? "groep" : undefined} onCurrent={() => scopeAction === "reset" ? activePotChoice ? resetCurrentPot() : handleReset() : handleDrawAll(true)} onAll={() => scopeAction === "reset" ? handleReset() : handleDrawAll()} />
+      <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope={isMatchDraw ? undefined : activePotChoice ? "pot" : session.containers.length === 1 ? "groep" : undefined} onCurrent={() => scopeAction === "reset" ? activePotChoice ? resetCurrentPot() : handleReset() : handleDrawAll(true)} onAll={() => scopeAction === "reset" ? handleReset() : handleDrawAll()} />
     </div>
   );
 
@@ -939,8 +941,8 @@ const LiveDrawDialog = ({
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  { value: false, label: "Volledig willekeurige loting", title: "Verdeel alle teams volledig willekeurig", text: "De teams worden zonder voorafgaande indeling willekeurig over de beschikbare groepen verdeeld." },
-                  { value: true, label: "Loting met potten", title: "Trek teams pot per pot", text: "Verdeel de teams vooraf over verschillende potten, bijvoorbeeld op basis van niveau, ranking of je eigen voorkeur. Tijdens de loting trek je vervolgens team per team uit de gekozen pot." },
+                  { value: false, label: "Volledig willekeurige loting", title: isMatchDraw ? "Vrije wedstrijdloting" : "Verdeel alle teams volledig willekeurig", text: isMatchDraw ? "Het eerste team speelt tegen het tweede, het derde tegen het vierde." : "De teams worden zonder voorafgaande indeling willekeurig over de beschikbare groepen verdeeld." },
+                  { value: true, label: "Loting met potten", title: isMatchDraw ? "Pot 1 tegen Pot 2" : "Trek teams pot per pot", text: isMatchDraw ? "Per wedstrijd eerst Pot 1, daarna Pot 2. Vaste plaatsen blijven behouden." : "Verdeel de teams vooraf over verschillende potten, bijvoorbeeld op basis van niveau, ranking of je eigen voorkeur. Tijdens de loting trek je vervolgens team per team uit de gekozen pot." },
                 ].map((opt) => {
                   const selected = usePots === opt.value;
                   return (
@@ -974,7 +976,7 @@ const LiveDrawDialog = ({
                    <Label htmlFor="group-pot-distribution">Potverdeling · {drawSize} plaatsen in dit format</Label>
                    <Select value={potOptions.includes(pots.length) ? String(pots.length) : undefined} onValueChange={(value) => requestPotCount(Number(value))}>
                      <SelectTrigger id="group-pot-distribution" className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
-                     <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {drawSize / count} teams</SelectItem>)}</SelectContent>
+                     <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{isMatchDraw ? `Pot 1: ${matchPotCapacity(containers, 0)} · Pot 2: ${matchPotCapacity(containers, 1)}` : `${count} potten van ${drawSize / count} teams`}</SelectItem>)}</SelectContent>
                    </Select>
                  </div>
                </div>
@@ -1007,12 +1009,12 @@ const LiveDrawDialog = ({
             <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
               <div>
                 <h2 className="text-lg font-bold">{isMatchDraw ? "Instellingen wedstrijdloting" : "Instellingen pouleloting"}</h2>
-                <p className="text-xs text-muted-foreground">Stel de landenlimiet en teams in die niet samen in één poule mogen komen.</p>
+                {!isMatchDraw && <p className="text-xs text-muted-foreground">Stel de landenlimiet en teams in die niet samen in één poule mogen komen.</p>}
               </div>
               {!isMatchDraw && renderRules()}
               {fixtureKind === "knockout" && fixedIds.size > 0 && <div className="draw-panel p-3 space-y-2"><h3 className="font-semibold">Vaste seeds</h3>{containers.flatMap((c) => (c.matchSlots ?? []).map((id, index) => id ? <div key={id} className="flex items-center gap-3"><span className="flex-1">{teamById.get(id)?.name} · {c.name}</span><Input type="number" min={1} max={128} aria-label={`Seed ${teamById.get(id)?.name}`} className="w-20" value={c.seedRanks?.[index] ?? ""} onChange={event => setContainers(previous => previous.map(item => item.id === c.id ? { ...item, seedRanks: (item.seedRanks ?? [null, null]).map((rank, side) => side === index ? (event.target.value ? Number(event.target.value) : null) : rank) } : item))} /></div> : null))}</div>}
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
-                <div className="flex items-center justify-between gap-4"><Label htmlFor="prepare-automatic-placement">Automatisch toewijzen</Label><Switch id="prepare-automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>
+                {!isMatchDraw && <div className="flex items-center justify-between gap-4"><Label htmlFor="prepare-automatic-placement">Automatisch toewijzen</Label><Switch id="prepare-automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>}
               </DrawShowOptions>
                {!isMatchDraw && usePots && potOptions.includes(pots.length) && (
                   <div className="space-y-5 border-t border-primary/30 pt-4">
