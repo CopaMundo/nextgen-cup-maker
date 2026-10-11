@@ -88,7 +88,7 @@ export function createDrawBallWorld(ids: string[]) {
       const reach = 4 * radius * radius - d2;
       if (reach > 0) heights[index] = Math.max(heights[index], y + Math.sqrt(reach) + .004);
     });
-    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .95, angularDamping: .98, sleepSpeedLimit: .5, sleepTimeLimit: .45 });
+    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .95, angularDamping: .98, allowSleep: false });
     body.position.set(x, y, z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
@@ -119,7 +119,7 @@ export function createDrawBallWorld(ids: string[]) {
       if (contact.ni.y > .2) supported.add(contact.bj);
     }
     for (const ball of balls.values()) {
-      if (ball.sleepState === Body.SLEEPING) { quietTime.delete(ball); continue; }
+      if (ball.sleepState === Body.SLEEPING) continue;
       // Do not roll positions back after contact integration: that reintroduces
       // overlap and makes stacked balls fight the same constraint every frame.
       if (ball.velocity.y > 0) ball.velocity.y = 0;
