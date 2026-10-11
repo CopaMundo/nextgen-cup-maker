@@ -2611,23 +2611,25 @@ posities + statistieken groen */
 .draw-wall-title-lettering { font-size: var(--wall-title-size, 4.8cqw); }
 .draw-wall-title-line { display: block; background-image: var(--wall-title-finish); }
 .draw-wall-title-measure { position: absolute; visibility: hidden; pointer-events: none; }
-.draw-show-wing { position: absolute; top: 13%; bottom: 7%; width: 25%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
+.draw-show-wing { --wing-height: 38.25cqw; --group-slot-height: min(var(--group-slot-preferred, 1.6cqw), calc((var(--wing-height) / var(--wing-rows, 1) - var(--wing-gap, .7cqw) - var(--group-title-size, .85cqw) * 1.3 - 1.1cqw - 2px) / var(--wing-slot-rows, 1) - .15cqw)); position: absolute; top: 13%; bottom: 19%; width: 22%; display: grid; grid-template-columns: repeat(var(--wing-columns, 2), minmax(0, 1fr)); grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, 1fr)); gap: .7cqw; }
 .draw-show-wing-left { left: 2%; }
 .draw-show-wing-right { right: 2%; }
+.draw-show-wing.draw-show-wing-left { left: 12%; }
+.draw-show-wing.draw-show-wing-right { right: 12%; }
 .draw-show-layout-A .draw-show-wing,
 .draw-show-layout-B .draw-show-wing {
-  --wing-gap: clamp(.7cqw, calc(4.5cqw - var(--wing-slot-rows, 6) * var(--group-slot-height, 2cqw) / 3), 3cqw);
+  --wing-gap: clamp(.7cqw, calc(4.5cqw - var(--wing-slot-rows, 6) * var(--group-slot-preferred, 2cqw) / 3), 1.5cqw);
   --wing-row-height: calc(var(--wing-slot-rows, 1) * var(--group-slot-height, 2cqw) + (var(--wing-slot-rows, 1) - 1) * .15cqw + var(--group-title-size, .95cqw) * 1.3 + 1.1cqw + 2px);
-  --wing-free-height: calc(45cqw - var(--wing-rows, 1) * var(--wing-row-height) - (var(--wing-rows, 1) - 1) * var(--wing-gap));
+  --wing-free-height: calc(var(--wing-height) - var(--wing-rows, 1) * var(--wing-row-height) - (var(--wing-rows, 1) - 1) * var(--wing-gap));
   grid-template-rows: repeat(var(--wing-rows, 2), minmax(0, max-content));
   align-content: safe center;
   row-gap: var(--wing-gap);
   padding-bottom: clamp(0px, calc(var(--wing-free-height) * .35), 8cqw);
 }
-.draw-show-wing[data-density="royal"] { --group-card-width: 21cqw; --group-slot-height: 3.2cqw; --group-logo-size: 2.2cqw; --group-name-size: 1.15cqw; --group-title-size: 1.3cqw; }
-.draw-show-wing[data-density="comfortable"] { --group-card-width: 18.5cqw; --group-slot-height: 2.4cqw; --group-logo-size: 1.8cqw; --group-name-size: .95cqw; --group-title-size: 1.1cqw; }
-.draw-show-wing[data-density="standard"] { --group-card-width: 16.5cqw; --group-slot-height: 2cqw; --group-logo-size: 1.5cqw; --group-name-size: .82cqw; --group-title-size: .95cqw; }
-.draw-show-wing[data-density="compact"] { --group-slot-height: 1.6cqw; --group-logo-size: 1.2cqw; --group-name-size: .7cqw; --group-title-size: .85cqw; }
+.draw-show-wing[data-density="royal"] { --group-card-width: 21cqw; --group-slot-preferred: 3.2cqw; --group-logo-size: 2.2cqw; --group-name-size: 1.15cqw; --group-title-size: 1.3cqw; }
+.draw-show-wing[data-density="comfortable"] { --group-card-width: 18.5cqw; --group-slot-preferred: 2.4cqw; --group-logo-size: 1.8cqw; --group-name-size: .95cqw; --group-title-size: 1.1cqw; }
+.draw-show-wing[data-density="standard"] { --group-card-width: 16.5cqw; --group-slot-preferred: 2cqw; --group-logo-size: 1.5cqw; --group-name-size: .82cqw; --group-title-size: .95cqw; }
+.draw-show-wing[data-density="compact"] { --group-slot-preferred: 1.6cqw; --group-logo-size: 1.2cqw; --group-name-size: .7cqw; --group-title-size: .85cqw; }
 .draw-show-group-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .85); border-radius: 8px; background: hsl(var(--card) / .78); box-shadow: inset 0 0 .5cqw hsl(var(--stage-glow) / .12); transition: box-shadow 140ms; }
 .draw-show-group-card h2 { flex-shrink: 0; text-align: center; padding: .75cqw .4cqw; color: hsl(var(--primary)); font-size: 1.1cqw; text-transform: uppercase; font-weight: 700; line-height: 1.3; }
 .draw-show-group-card h2 small { color: hsl(var(--muted-foreground)); font-size: .7cqw; }
