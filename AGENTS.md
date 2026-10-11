@@ -1,10 +1,11 @@
 # Architecture rules
 
 - Draw-stage rendering rules (bowl, balls, wings, overview, logos) live in src/components/draw/AGENTS.md.
+- Represent live knockout and single-match entry encounters as fixed home/away slot containers in the shared draw session; source their geometry from existing matches and never infer seed rank from slot codes, so bracket positions and return legs stay intact.
 - Keep rounds-draw pot assignments per group in a phase-scoped browser draft and include them in the final draw report; phase-wide pot tables cannot replace group-specific assignments, and applying clears the draft.
 - Style both live-draw dialogs with the shared draw-dialog-theme, draw-choice, draw-panel, and draw-table roles; shared tokens prevent the group and rounds workflows from drifting visually.
 - Render both live draws inside one secured modal wizard that blocks outside-click and Escape dismissal; phase drafts preserve refresh recovery.
-- Use equal-size pot choices and the shared fixed PotTeamSlots selector in both draw views; a bounded slot cannot overfill a pot and keeps assignment behavior consistent.
+- Use equal-size pot choices for group/round draws and side-specific open-slot capacities for fixture pots with the shared fixed PotTeamSlots selector; bounded slots prevent overfill while preserving seeded positions.
 - Share one timestamp-driven 16:9 draw stage between admin and projector; inject organizer-only controls and publish phase timing. Complete each received team reveal with a bounded monotonic playback clock and queue newer team events before returning to published timing; latency or suspended rendering must not skip flight/split, and opponent-only updates never restart it. Consume projector change payloads directly and discard older reads to avoid losing intermediate draws.
 - Publish shared title, language, theme, speed and flags; fit titles one-line-first in a bounded, equal-gap wall column, using a wider lower line for exceptional names so both stages match.
 - Share phase-scoped show options across both draw preparation and director settings; publish only presentation metadata during setup and revealed identities during the show so a public QR/watch URL never receives organizer controls or hidden fixtures.
