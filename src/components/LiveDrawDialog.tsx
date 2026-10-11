@@ -241,10 +241,11 @@ const LiveDrawDialog = ({
           const validTeamIds = new Set(isMatchDraw ? matchTeamIds : available.map((team) => team.id));
           const validContainerIds = new Set(nextContainers.map((container) => container.id));
           const validPotIds = new Set(nextPots.map((pot) => pot.id));
-          const sessionValid = !draft.session || (
+          const geometryValid = !isMatchDraw || !draft.matchContainers || (draft.matchContainers.length === nextContainers.length && draft.matchContainers.every(c => nextContainers.some(next => next.id === c.id && next.slotIds.every((id, side) => id === c.slotIds[side]))));
+          const sessionValid = geometryValid && (!draft.session || (
             draft.session.remaining.every((id) => validTeamIds.has(id)) &&
             draft.session.containers.every((container) => validContainerIds.has(container.id) && container.teamIds.every((id) => validTeamIds.has(id) || nextContainers.some(c => c.teamIds.includes(id))))
-          );
+          ));
           setStep(sessionValid ? (isMatchDraw && draft.step === "pots" ? "teams" : draft.step) : "method");
           setUsePots(draft.usePots);
           setPotCount(draft.potCount);
@@ -254,7 +255,7 @@ const LiveDrawDialog = ({
           setPotMatrix(draft.potMatrix);
           const restoredSelection = draft.selectedMatchTeams?.filter(id => matchTeamIds.includes(id)) ?? [];
           if (isMatchDraw && restoredSelection.length) setSelectedMatchTeams([...new Set([...originalFixed, ...restoredSelection])]);
-          if (isMatchDraw && draft.matchContainers?.every(c => validContainerIds.has(c.id))) setContainers(nextContainers.map(c => {
+          if (isMatchDraw && geometryValid && draft.matchContainers?.every(c => validContainerIds.has(c.id))) setContainers(nextContainers.map(c => {
             const saved = draft.matchContainers?.find(item => item.id === c.id);
             const matchSlots = (c.matchSlots ?? []).map((id, side) => id ?? (saved?.matchSlots?.[side] && matchTeamIds.includes(saved.matchSlots[side] as string) ? saved.matchSlots[side] : null));
             return { ...c, matchSlots, teamIds: matchSlots.filter((id): id is string => Boolean(id)), seedRanks: saved?.seedRanks ?? c.seedRanks };
@@ -407,7 +408,7 @@ const LiveDrawDialog = ({
        let next = existing && existingSide >= 0 ? placeDrawSeed(previous, existing.id, existingSide, null) : previous;
        if (!teamId) return next;
        const preferred = rank === 2 ? next[next.length - 1] : next[Math.min(next.length - 1, rank - 1)];
-       const target = fixtureId ? next.find(c => c.id === fixtureId) : existing ?? preferred;
+       const target = fixtureId ? next.find(c => c.id === fixtureId) : (existing ? next.find(c => c.id === existing.id) : preferred);
        const targetSide = side ?? (existingSide >= 0 ? existingSide : target?.matchSlots?.findIndex(id => !id) ?? -1);
        if (!target || targetSide < 0 || target.matchSlots?.[targetSide]) return previous;
        next = placeDrawSeed(next, target.id, targetSide, teamId);
@@ -417,6 +418,10 @@ const LiveDrawDialog = ({
    const selectMatchMethod = (method: "random" | "pots" | "seeds") => {
      setUsePots(method === "pots"); setUseSeeds(method === "seeds");
      if (method !== "seeds") setContainers(originalMatchContainers.current.map(c => ({ ...c, seedRanks: [null, null] })));
+     else setContainers(previous => {
+       let rank = 1;
+       return previous.map(c => ({ ...c, seedRanks: (c.matchSlots ?? []).map(id => id ? rank++ : null) }));
+     });
    };
    const changeSeedCount = (count: number) => {
      setSeedCount(count);
@@ -838,7 +843,7 @@ const requestPotCount = (count: number) => {
     if (fixtureKind === "knockout" && useSeeds && !fixedIds.size) return { step: "teams", message: "Kies minstens één reekshoofd op een vaste wedstrijdplaats." };
     if (usePots && pots.some(p => p.teamIds.some(id => !eligibleTeams.some(t => t.id === id)))) return { step: "pots", message: "Een pot bevat een vast reekshoofd of een niet-geselecteerd team. Pas de potindeling aan." };
     if (useSeeds && seedRanks.length !== seedCount) return { step: "teams", message: `Wijs alle ${seedCount} reekshoofden toe.` };
-    if (fixtureKind === "knockout" && useSeeds && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
+     if (fixtureKind === "knockout" && useSeeds && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > seedCount) || new Set(seedRanks).size !== seedRanks.length)) return { step: "teams", message: "Wijs ieder genummerd reekshoofd precies één keer toe." };
     if (!usePots && drawTeamIds.length !== totalCapacity) {
       return {
         step: "method",
