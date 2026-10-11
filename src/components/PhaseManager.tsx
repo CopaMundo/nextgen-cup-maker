@@ -1281,7 +1281,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
             <NumberSelect
               value={singleMatchConfig.matchCount}
               onChange={(n) => setSingleMatchConfig({ ...singleMatchConfig, matchCount: n })}
-              options={Array.from({ length: 32 }, (_, i) => i + 1)}
+              options={Array.from({ length: 64 }, (_, i) => i + 1)}
               className="w-full max-w-[200px]"
             />
           </div>
