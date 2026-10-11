@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import { balanceWallTitle } from "@/lib/drawHeading";
 
 const scheduledGrids = new WeakMap<Element, number>();
+const gridObservers = new WeakMap<Element, { count: number; fit: () => void; dispose: () => void }>();
 
 /** Balance names in their actual columns, using one shared size for the entire grid. */
 export function FittedPotName({ name }: { name: string }) {
@@ -10,6 +11,12 @@ export function FittedPotName({ name }: { name: string }) {
     const element = ref.current;
     const grid = element?.closest(".draw-show-pot-teams");
     if (!element || !grid) return;
+    const existing = gridObservers.get(grid);
+    if (existing) {
+      existing.count++;
+      existing.fit();
+      return () => { if (--existing.count === 0) { existing.dispose(); gridObservers.delete(grid); } };
+    }
     let disposed = false;
     const fitNow = () => {
       scheduledGrids.delete(grid);
@@ -57,7 +64,16 @@ export function FittedPotName({ name }: { name: string }) {
     document.fonts.addEventListener("loadingdone", fit);
     const observer = new ResizeObserver(fit);
     observer.observe(grid);
-    return () => { disposed = true; observer.disconnect(); document.fonts.removeEventListener("loadingdone", fit); };
+    const registration = { count: 1, fit, dispose: () => {
+      disposed = true;
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", fit);
+      const frame = scheduledGrids.get(grid);
+      if (frame !== undefined) cancelAnimationFrame(frame);
+      scheduledGrids.delete(grid);
+    } };
+    gridObservers.set(grid, registration);
+    return () => { if (--registration.count === 0) { registration.dispose(); gridObservers.delete(grid); } };
   }, [name]);
   return <span ref={ref} className="draw-show-pot-name" data-name={name}>{name}</span>;
 }

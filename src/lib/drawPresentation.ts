@@ -35,10 +35,18 @@ export const sweepDuration = (count: number, speed: number) => Math.max(12, coun
 
 /** Equal overview pages share wall-clock timing across director and projector. */
 export function drawOverviewPage(teamIds: string[], now: number) {
-  const pageCount = teamIds.length >= 24 ? 2 : 1;
-  const pageSize = Math.ceil(teamIds.length / pageCount);
+  const pageCount = Math.max(1, Math.ceil(teamIds.length / 24));
   const pageIndex = Math.floor(now / 5000) % pageCount;
-  return { pageCount, pageIndex, teamIds: teamIds.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize) };
+  const start = Math.floor(pageIndex * teamIds.length / pageCount);
+  const end = Math.floor((pageIndex + 1) * teamIds.length / pageCount);
+  return { pageCount, pageIndex, teamIds: teamIds.slice(start, end) };
+}
+
+/** Center incomplete rows while keeping choices balanced and bounded. */
+export function drawChoiceGrid(count: number) {
+  const rows = count === 5 ? 2 : Math.max(1, Math.ceil(count / (count > 24 ? 8 : 6)));
+  const columns = Math.max(1, Math.ceil(count / rows));
+  return { rows, columns };
 }
 
 export function sweepSpotlight(presentation: DrawPresentation | undefined, now: number) {
