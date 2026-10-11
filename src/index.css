@@ -2750,6 +2750,7 @@ posities + statistieken groen */
 .draw-control-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; width: 100%; container-type: size; }
 .draw-control-stage > .draw-show-stage { flex: 0 0 auto; width: min(100cqw, 177.7778cqh); }
 .draw-control-stage:fullscreen { width: 100vw; height: 100dvh; background: hsl(var(--background)); }
+.draw-control-stage.is-pseudo-fullscreen { position: fixed; inset: 0; z-index: 2147483000; width: 100vw; height: 100dvh; background: hsl(var(--background)); }
 .draw-control-primary { position: absolute; z-index: 11; left: 38%; width: 24%; top: 76.1%; display: flex; justify-content: center; }
 .draw-control-dock { position: absolute; z-index: 11; bottom: 1.3%; right: 2%; width: auto; display: flex; justify-content: flex-end; gap: .3cqw; border-block: 1px solid hsl(var(--border) / .65); border-radius: 4px; background: hsl(var(--background) / .87); }
 .draw-control-dock .draw-scene-button { width: 2.6cqw; padding: 0; }
