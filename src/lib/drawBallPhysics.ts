@@ -96,12 +96,25 @@ export function createDrawBallWorld(ids: string[]) {
   // The pre-seeded pile is already supported. Solver penetration corrections
   // must not inject upward energy when that support is removed during a draw.
   const previousHeights = new Map<Body, number>();
+  const previousPositions = new Map<Body, Vec3>();
+  const quietTime = new Map<Body, number>();
   world.addEventListener("preStep", () => {
     previousHeights.clear();
-    for (const ball of balls.values()) previousHeights.set(ball, ball.position.y);
+    for (const ball of balls.values()) {
+      previousHeights.set(ball, ball.position.y);
+      const previous = previousPositions.get(ball) ?? new Vec3();
+      previous.copy(ball.position);
+      previousPositions.set(ball, previous);
+    }
   });
   world.addEventListener("postStep", () => {
+    const supported = new Set<Body>();
+    for (const contact of world.contacts) {
+      if (contact.ni.y < -.2) supported.add(contact.bi);
+      if (contact.ni.y > .2) supported.add(contact.bj);
+    }
     for (const ball of balls.values()) {
+      if (ball.sleepState === Body.SLEEPING) { quietTime.delete(ball); continue; }
       const ceiling = previousHeights.get(ball);
       // Permit subpixel contact correction rather than locking penetrating
       // bodies together (which made the solver eject their neighbours sideways).
@@ -110,11 +123,19 @@ export function createDrawBallWorld(ids: string[]) {
         ball.aabbNeedsUpdate = true;
       }
       if (ball.velocity.y > 0) ball.velocity.y = 0;
+      ball.velocity.y = Math.max(-1.2, ball.velocity.y);
       const horizontalSpeed = Math.hypot(ball.velocity.x, ball.velocity.z);
       if (horizontalSpeed > .65) {
         ball.velocity.x *= .65 / horizontalSpeed;
         ball.velocity.z *= .65 / horizontalSpeed;
       }
+      // Judge rest from actual displacement and real supporting contacts,
+      // not the solver's residual velocity. Unsupported balls must keep falling.
+      const previous = previousPositions.get(ball);
+      const quiet = supported.has(ball) && previous && ball.position.distanceTo(previous) < .004;
+      const duration = quiet ? (quietTime.get(ball) ?? 0) + world.dt : 0;
+      quietTime.set(ball, duration);
+      if (duration >= .3) ball.sleep();
     }
   });
   return { world, balls, radius, depth };
