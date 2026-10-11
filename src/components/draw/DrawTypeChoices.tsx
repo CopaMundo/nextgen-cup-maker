@@ -1,4 +1,3 @@
-import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export type DrawMethod = "random" | "pots" | "seeds";
@@ -8,9 +7,9 @@ export function DrawChoice({ label, description, selected, disabled, onClick }: 
   label: string; description: string; selected: boolean; disabled?: boolean; onClick: () => void;
 }) {
   return <Button type="button" variant="outline" aria-label={label} aria-pressed={selected} disabled={disabled} onClick={onClick}
-    className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal p-5 text-left ${selected ? "border-y-primary" : "border-y-border hover:border-y-primary/30"}`}>
-    <span className="flex w-full items-start justify-between gap-3 text-sm font-semibold text-foreground">{label}{selected && <Check className="h-4 w-4 shrink-0 text-primary" />}</span>
-    <span className="text-xs font-normal leading-relaxed text-muted-foreground">{description}</span>
+    className="draw-choice draw-type-choice h-auto min-h-28 w-full flex-col items-start justify-start gap-1 whitespace-normal p-3 text-left">
+    <span className="text-sm font-bold uppercase text-foreground">{label}</span>
+    <span className="text-sm font-normal leading-snug text-muted-foreground">{description}</span>
   </Button>;
 }
 
