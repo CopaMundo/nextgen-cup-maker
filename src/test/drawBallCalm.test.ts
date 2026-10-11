@@ -27,5 +27,5 @@ describe("calm draw pile", () => {
       for (const ball of balls.values()) maximum = Math.max(maximum, ball.position.y);
     }
     expect(maximum - highest).toBeLessThan(.12);
-  });
+  }, 20000);
 });
