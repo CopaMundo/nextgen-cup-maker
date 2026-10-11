@@ -27,14 +27,14 @@ describe("Uniform draw preparation", () => {
   it.each(["knockout", "single_match"] as const)("uses four steps for %s with suitable methods", async kind => {
     fixtures.matches = true;
     render(<LiveDrawDialog {...props} fixtureKind={kind} />);
-    await screen.findByRole("button", { name: "Vrije loting" });
+    await screen.findByRole("button", { name: "Willekeurige loting" });
     if (kind === "knockout") {
-      fireEvent.click(screen.getByRole("button", { name: "Reekshoofden" }));
+      fireEvent.click(screen.getByRole("button", { name: "Loting met reekshoofden" }));
       fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
       await screen.findByRole("combobox", { name: "Reekshoofd 2" });
       expect(screen.getByRole("combobox", { name: "Aantal reekshoofden" })).toHaveTextContent("2");
     } else {
-      expect(screen.queryByRole("button", { name: "Reekshoofden" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Loting met reekshoofden" })).not.toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
       await screen.findByRole("heading", { name: "Indeling & teams" });
       fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
@@ -47,6 +47,9 @@ describe("Uniform draw preparation", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Volgende" })).toBeEnabled());
     expect(within(screen.getByRole("list", { name: "Lotingsstappen" })).getAllByRole("listitem")).toHaveLength(4);
     expect(screen.getByRole("heading", { name: "Live loting Copa Mundo · Groepsfase" })).toBeInTheDocument();
+    expect(screen.queryByText(/Stap \d van 4/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Willekeurige loting" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("De teams worden volledig willekeurig over de beschikbare groepen verdeeld.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Opnieuw beginnen" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Willekeurig/ }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));

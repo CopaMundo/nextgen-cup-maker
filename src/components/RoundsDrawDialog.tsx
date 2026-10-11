@@ -22,6 +22,7 @@ import {
 import { emptyRoundsRules, shuffle } from "@/lib/liveDraw";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
+import { DrawTypeChoices } from "@/components/draw/DrawTypeChoices";
 import { completeLastDrawPot, defaultDrawPotCount } from "@/lib/drawWizard";
 import { DrawShow } from "@/components/draw/DrawShow";
 import { DrawShowOptions } from "@/components/draw/DrawShowOptions";
@@ -676,27 +677,8 @@ const RoundsDrawDialog = ({
 
   const methodScreen = (
     <div className="space-y-5 overflow-y-auto pr-1">
-      <div>
-        <h3 className="text-lg font-bold">Type loting</h3>
-        <p className="text-sm text-muted-foreground">{phaseName || "Speelrondes"} · {groups.length} poules</p>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {([
-          { id: "free" as const, label: "Willekeurig", description: "Elk team speelt het opgegeven aantal rondes tegen willekeurige tegenstanders." },
-          { id: "pots" as const, label: "Potten", description: "Teams worden via potten ingedeeld en het schema volgt een potmatrix." },
-        ]).map((option) => {
-          const disabled = option.id === "pots" && !potDrawAvailable;
-          const selected = method === option.id;
-          return <Button key={option.id} type="button" variant="outline" aria-pressed={selected} disabled={disabled}
-            onClick={() => setMethod(option.id)}
-            className={`draw-choice relative h-auto min-h-36 w-full flex-col items-start justify-start gap-2 whitespace-normal p-5 text-left ${selected ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border hover:border-y-primary/30"}`}>
-            <span className="flex w-full items-start justify-between gap-2 text-sm font-bold text-foreground">
-              {option.label}{selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
-            </span>
-            <span className="text-xs font-normal leading-relaxed text-muted-foreground">{option.description}</span>
-          </Button>;
-        })}
-      </div>
+      <h3 className="text-lg font-bold">Type loting</h3>
+      <DrawTypeChoices value={method === "pots" ? "pots" : "random"} potsDisabled={!potDrawAvailable} onChange={value => setMethod(value === "pots" ? "pots" : "free")} />
       {!potDrawAvailable && <p className="flex items-start gap-2 text-sm text-warning"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Loting met niveau-potten vereist minimaal 4 teams en een even aantal teams per poule. Vul ook alle plaatsen in.</p>}
     </div>
   );
