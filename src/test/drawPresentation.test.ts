@@ -51,8 +51,8 @@ describe("Shared draw presentation", () => {
   });
   it("holds the selected group before transferring and clearing the team", () => {
     expect(stageSelection(picture, 1500)).toBe("hold");
-    expect(stageSelection(picture, 1900)).toBe("transfer");
-    expect(stageSelection(picture, 3100)).toBe("complete");
+    expect(stageSelection(picture, 3100)).toBe("transfer");
+    expect(stageSelection(picture, 4400)).toBe("complete");
   });
   it("keeps projector and organizer on the same timestamp-driven sweep", () => {
     const sweep = { ...picture, sweep: { startedAt: 1000, optionIds: ["a", "c", "f"] } };
@@ -63,7 +63,7 @@ describe("Shared draw presentation", () => {
   });
   it("scales both reveal and placement timing together", () => {
     expect(revealDuration(1.5)).toBeCloseTo(1900 / 1.5);
-    expect(selectionDuration(1.5)).toBe(1400);
+    expect(selectionDuration(1.5)).toBe(2200);
   });
   it("selects the requested named and compact layouts at their physical limits", () => {
     const groups = (count: number, capacity: number) => Array.from({ length: count }, (_, index) => ({ id: String(index), name: `Groep ${index}`, capacity, teamIds: [], slotIds: [] }));
