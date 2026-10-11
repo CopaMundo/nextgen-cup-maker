@@ -25,20 +25,20 @@ const props = { open: true, onOpenChange: vi.fn(), tournamentId: "tournament", p
 describe("Uniform draw preparation", () => {
   it("keeps all four group steps visible and preserves selection when going back", async () => {
     render(<LiveDrawDialog {...props} />);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Volgende", exact: true })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Volgende" })).toBeEnabled());
     expect(within(screen.getByRole("list", { name: "Lotingsstappen" })).getAllByRole("listitem")).toHaveLength(4);
     expect(screen.getByRole("heading", { name: "Live loting Copa Mundo · Groepsfase" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Opnieuw beginnen" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Willekeurig/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Volgende", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Indeling & teams" });
     expect(screen.getAllByRole("combobox")).toHaveLength(4);
-    fireEvent.click(screen.getByRole("button", { name: "Volgende", exact: true }));
-    await screen.findByRole("heading", { name: "Regels", exact: true });
-    fireEvent.click(screen.getByRole("button", { name: "Vorige", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    await screen.findByRole("heading", { name: "Regels" });
+    fireEvent.click(screen.getByRole("button", { name: "Vorige" }));
     expect(screen.getByText("Deelnemers · 4/4")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Volgende", exact: true }));
-    fireEvent.click(screen.getByRole("button", { name: "Volgende", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Loting show instellingen" });
     expect(screen.queryByText("Landenlimiet per poule")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Start loting show" })).toBeInTheDocument();
@@ -51,15 +51,15 @@ describe("Uniform draw preparation", () => {
     render(<LiveDrawDialog {...props} initialMethod="random" initialStep="teams" />);
     await screen.findByText("Deelnemers · 0/4");
     expect(screen.getByRole("combobox", { name: "Teamvak 1" })).toBeEnabled();
-    fireEvent.click(screen.getByRole("button", { name: "Volgende", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     expect(screen.getByRole("heading", { name: "Indeling & teams" })).toBeInTheDocument();
   });
   it("uses the same header and separate team step for rounds", async () => {
     render(<RoundsDrawDialog {...props} defaultRounds={2} />);
-    await screen.findByRole("button", { name: "Willekeurig" });
+    await screen.findByRole("button", { name: /^Willekeurig/ });
     expect(within(screen.getByRole("list", { name: "Lotingsstappen" })).getAllByRole("listitem")).toHaveLength(4);
     expect(screen.queryByRole("button", { name: "Opnieuw beginnen" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Volgende", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Indeling & teams" });
   });
 });
