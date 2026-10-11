@@ -404,9 +404,14 @@ const LiveDrawDialog = ({
          if (!count) { toast({ title: "Geen gelijke potverdeling mogelijk", description: "Kies een vrije loting voor dit aantal plaatsen.", variant: "destructive" }); return; }
          await createEmptyPots(count);
        }
-       setStep("pots");
-     } else setStep("settings");
+      }
+      setStep("teams");
    };
+    useEffect(() => {
+      if (!open || !draftReady || loading || step !== "teams" || !usePots || pots.length || !drawSize) return;
+      const count = isMatchDraw ? 2 : defaultDrawPotCount(drawSize, maxGroupCapacity);
+      if (count) void createEmptyPots(count);
+    }, [open, draftReady, loading, step, usePots, pots.length, drawSize]);
    const changeRankedSeed = (rank: number, teamId: string | null, fixtureId?: string, side?: number) => {
      setContainers(previous => {
        const existing = previous.find(c => c.seedRanks?.includes(rank));
@@ -1126,7 +1131,6 @@ const requestPotCount = (count: number) => {
               <div>
                 <h2 className="text-lg font-bold">Loting show instellingen</h2>
               </div>
-              {!isMatchDraw && renderRules()}
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
                 {!isMatchDraw && <div className="space-y-2"><Label htmlFor="prepare-placement">Groepstoewijzing</Label><Select value={placementMode} onValueChange={value => setPlacementMode(value as "manual" | "automatic")}><SelectTrigger id="prepare-placement"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="automatic">Automatisch toewijzen</SelectItem><SelectItem value="manual">Groep loten</SelectItem></SelectContent></Select></div>}
               </DrawShowOptions>

@@ -1287,9 +1287,8 @@ const GroupManager = ({
                 <div className="mt-1 text-xs text-muted-foreground">{text}</div>
               </Button>
             ))}
-              </div>
+               </div><div className="space-y-3"><h3 className="font-semibold">Methode</h3><div className="grid gap-3 sm:grid-cols-2">{(["random", "pots"] as const).map(method => <Button key={method} variant="outline" aria-pressed={drawMethod === method} className="draw-choice h-20" onClick={() => setDrawMethod(method)}>{method === "random" ? "Willekeurig" : "Potten"}</Button>)}</div></div></div>
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
-                <Button variant="ghost" className="sm:mr-auto" onClick={() => setShowRestartConfirm(true)}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>
                 <Button variant="outline" disabled><ArrowLeft className="h-4 w-4" /> Vorige</Button>
                 <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(drawMode)}>Volgende</Button>
               </DialogFooter>
@@ -1421,8 +1420,14 @@ const GroupManager = ({
                   {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
                     <SelectItem key={n} value={String(n)}>{n} teams</SelectItem>
                   ))}
-               </div><div className="space-y-3"><h3 className="font-semibold">Methode</h3><div className="grid gap-3 sm:grid-cols-2">{(["random", "pots"] as const).map(method => <Button key={method} variant="outline" aria-pressed={drawMethod === method} className="draw-choice h-20" onClick={() => setDrawMethod(method)}>{method === "random" ? "Willekeurig" : "Potten"}</Button>)}</div></div></div>
-<DialogFooter>
+                </SelectContent>
+              </Select>
+            </div>
+            {renderCompetitionTypeSelector(false)}
+            <ScoringSystemSelector systems={scoringSystems} value={dialogScoringSystemId} onChange={setDialogScoringSystemId} />
+            {renderLogoUpload()}
+          </div>
+          <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>Annuleren</Button>
             <Button onClick={addGroup} disabled={uploading}>
               {uploading ? "Bezig..." : "Toevoegen"}

@@ -1,9 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { defaultDrawPotCount, placeDrawSeed } from "@/lib/drawWizard";
+import { completeLastDrawPot, defaultDrawPotCount, defaultDrawSeedCount, placeDrawSeed } from "@/lib/drawWizard";
 import { initContainersState, drawAll } from "@/lib/drawSession";
 import { emptyContainerRules } from "@/lib/liveDraw";
 
 describe("Draw wizard defaults and fixed positions", () => {
+  it("defaults to half the participants as seeds", () => {
+    expect(defaultDrawSeedCount(8)).toBe(4);
+    expect(defaultDrawSeedCount(32)).toBe(16);
+  });
+  it("fills only the last pot once every earlier pot is complete", () => {
+    const pots = [{ teamIds: ["a", "b"] }, { teamIds: ["c", "d"] }, { teamIds: [] as string[] }];
+    expect(completeLastDrawPot(pots, ["a", "b", "c", "d", "e", "f"], [2, 2, 2])[2].teamIds).toEqual(["e", "f"]);
+    expect(completeLastDrawPot(pots, ["a", "b", "c", "d", "e", "f", "g"], [2, 2, 2])).toBe(pots);
+    const incomplete = [{ teamIds: ["a"] }, { teamIds: [] as string[] }];
+    expect(completeLastDrawPot(incomplete, ["a", "b", "c", "d"], [2, 2])).toBe(incomplete);
+    expect(completeLastDrawPot([{ teamIds: ["a", "b"] }, { teamIds: [] as string[] }], ["a", "b", "c", "d"], [2, 2])[1].teamIds).toEqual(["c", "d"]);
+  });
   it("chooses only equal, usable pots closest to the phase structure", () => {
     expect(defaultDrawPotCount(32, 8)).toBe(8);
     expect(defaultDrawPotCount(32)).toBe(4);
