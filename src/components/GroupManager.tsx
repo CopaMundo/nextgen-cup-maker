@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLiveDrawGuard } from "@/hooks/useLiveDrawGuard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -411,6 +412,26 @@ const GroupManager = ({
     }
     if (needsConfirm) setPendingDrawMode(mode);
     else startDraw(mode);
+  };
+
+  const { guard: guardLiveDraw, dialog: liveDrawGuardDialog } = useLiveDrawGuard(phaseId, () => { setDrawOverwrite(false); setDrawResetKey(k => k + 1); });
+  const [showLiveOverwrite, setShowLiveOverwrite] = useState(false);
+  const openLiveDraw = async () => {
+    const [{ data: filled }, { data: played }] = await Promise.all([
+      supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1),
+      supabase.from("matches").select("id").eq("phase_id", phaseId).or("home_team_id.not.is.null,away_team_id.not.is.null,is_played.eq.true").limit(1),
+    ]);
+    if (filled?.length || played?.length) { setShowLiveOverwrite(true); return; }
+    if (phaseMatchType === "rounds") setDrawView("choice"); else requestDraw("groups");
+  };
+  const confirmLiveOverwrite = async () => {
+    setShowLiveOverwrite(false);
+    await clearAllSlots();
+    if (phaseMatchType === "rounds") await clearPhaseMatches();
+    notifySlotChange();
+    fetchGroups();
+    updateOverwrite(true);
+    if (phaseMatchType === "rounds") setDrawView("choice"); else startDraw("groups", true);
   };
 
   const notifySlotChange = () => {
@@ -1097,6 +1118,7 @@ const GroupManager = ({
         categoryId={categoryId}
         refreshKey={slotRefreshKey + (refreshKey ?? 0)}
         onSlotChange={notifySlotChange}
+        guardChange={(action) => { void guardLiveDraw(action); }}
       />
     </div>
   );
@@ -1249,16 +1271,13 @@ const GroupManager = ({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         {showRandomAssign && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
-            if (hasAssignedTeams) { setShowRandomConfirm(true); } else { randomAssignTeams(); }
+            void guardLiveDraw(() => { if (hasAssignedTeams) { setShowRandomConfirm(true); } else { randomAssignTeams(); } });
           }}>
             <Shuffle className="h-3 w-3" /> Willekeurige indeling
           </Button>
         )}
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
-          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
-            if (phaseMatchType === "rounds") setDrawView("choice");
-            else requestDraw("groups");
-          }}>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => { void openLiveDraw(); }}>
             <Trophy className="h-3 w-3" /> Live loting
           </Button>
         )}
@@ -1612,6 +1631,19 @@ const GroupManager = ({
             <AlertDialogAction onClick={() => { setShowClearConfirm(false); clearAllSlots(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Leeg maken
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {liveDrawGuardDialog}
+      <AlertDialog open={showLiveOverwrite} onOpenChange={setShowLiveOverwrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bestaande indeling overschrijven?</AlertDialogTitle>
+            <AlertDialogDescription>De huidige groepen en wedstrijden worden volledig gewist zodat je met een schone lei start.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { void confirmLiveOverwrite(); }}>Ja, overschrijven</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

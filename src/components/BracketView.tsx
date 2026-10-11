@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLiveDrawGuard } from "@/hooks/useLiveDrawGuard";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
@@ -145,6 +146,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [liveDrawOpen, setLiveDrawOpen] = useState(false);
+  const [showLiveOverwrite, setShowLiveOverwrite] = useState(false);
+  const { guard: guardLiveDraw, dialog: liveDrawGuardDialog } = useLiveDrawGuard(phaseId);
   const [showDeleteSingleConfirm, setShowDeleteSingleConfirm] = useState<string | null>(null);
   const [showDeleteBracketConfirm, setShowDeleteBracketConfirm] = useState<string | null>(null);
   const [showDeletePlacementConfirm, setShowDeletePlacementConfirm] = useState<string | null>(null);
@@ -2424,7 +2427,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         )}
         <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border-t border-border">Teams</div>
         {pickerTeams.map(t => (
-          <button key={t.id} onClick={(e) => { e.stopPropagation(); assignTeamToMatch(matchId, side, t.id); }}
+          <button key={t.id} onClick={(e) => { e.stopPropagation(); void guardLiveDraw(() => assignTeamToMatch(matchId, side, t.id)); }}
             className="w-full px-3 py-1.5 text-left text-xs text-foreground hover:bg-foreground/5 transition-colors flex items-center gap-2">
             {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain flex-shrink-0" alt="" />}
             <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />{t.name}
@@ -2931,11 +2934,11 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     <div className="space-y-6">
       {editable && rounds.length > 0 && (
         <div className="flex items-center gap-2">
-          {(isKnockout || isSingleMatch) && <Button variant="outline" size="sm" onClick={() => setLiveDrawOpen(true)}><Shuffle className="h-3 w-3" />Live loting</Button>}
+          {(isKnockout || isSingleMatch) && <Button variant="outline" size="sm" onClick={() => { if (matches.some(m => m.home_team_id || m.away_team_id || m.is_played)) setShowLiveOverwrite(true); else setLiveDrawOpen(true); }}><Shuffle className="h-3 w-3" />Live loting</Button>}
           {showRandomAssign && !isSingleMatch && filteredTeams.length > 0 && (
             <Button variant="outline" size="sm" onClick={() => {
               const hasTeams = r1Matches.some(m => m.home_team_id || m.away_team_id);
-              if (hasTeams) { setShowRandomConfirm(true); } else { randomAssignRound1(); }
+              void guardLiveDraw(() => { if (hasTeams) { setShowRandomConfirm(true); } else { randomAssignRound1(); } });
             }}>
               <Shuffle className="h-3 w-3" /> Willekeurige indeling
             </Button>
@@ -2946,6 +2949,19 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         </div>
       )}
 
+      {liveDrawGuardDialog}
+      <AlertDialog open={showLiveOverwrite} onOpenChange={setShowLiveOverwrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bestaande indeling overschrijven?</AlertDialogTitle>
+            <AlertDialogDescription>De huidige groepen en wedstrijden worden volledig gewist zodat je met een schone lei start.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={async () => { setShowLiveOverwrite(false); await clearAllR1Slots(); await fetchData(); onSlotChange?.(); localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`); setLiveDrawOpen(true); }}>Ja, overschrijven</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Dialog open={liveDrawOpen} onOpenChange={setLiveDrawOpen}>
         <DialogContent scrollable={false} onPointerDownOutside={event => event.preventDefault()} onEscapeKeyDown={event => event.preventDefault()} className="draw-dialog-theme flex flex-col h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl">
           <DialogTitle className="sr-only">Live wedstrijdloting</DialogTitle>
