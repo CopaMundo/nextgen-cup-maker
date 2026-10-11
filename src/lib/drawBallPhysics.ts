@@ -95,19 +95,16 @@ export function createDrawBallWorld(ids: string[]) {
   });
   // The pre-seeded pile is already supported. Solver penetration corrections
   // must not inject upward energy when that support is removed during a draw.
-  const previousHeights = new Map<Body, number>();
   const previousPositions = new Map<Body, Vec3>();
   const quietTime = new Map<Body, number>();
   world.addEventListener("preStep", () => {
-    previousHeights.clear();
     for (const ball of balls.values()) {
-      previousHeights.set(ball, ball.position.y);
       const previous = previousPositions.get(ball) ?? new Vec3();
       previous.copy(ball.position);
       previousPositions.set(ball, previous);
       // Cannon emits preStep after contact solving, before integration. Limit
       // sideways correction energy but preserve vertical contact resolution.
-      ball.velocity.y = Math.max(-1.2, ball.velocity.y);
+      ball.velocity.y = Math.max(-1.2, Math.min(.8, ball.velocity.y));
       const lateral = Math.hypot(ball.velocity.x, ball.velocity.z);
       if (lateral > .4) {
         ball.velocity.x *= .4 / lateral;
