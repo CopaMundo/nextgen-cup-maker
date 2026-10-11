@@ -41,6 +41,13 @@ describe("Live encounter draw", () => {
     expect(matchDrawContainers(slots, matches, true)[0].matchSlots).toEqual([null, "t0"]);
     expect(matchDrawContainers(slots, matches, true)[0].seedRanks).toEqual([null, null]);
   });
+  it("fills only open seeded slots from their matching pots", () => {
+    const containers = fixtures(2).map((c, i) => ({ ...c, teamIds: [`t${i}`], matchSlots: [i === 0 ? "t0" : null, i === 1 ? "t1" : null] }));
+    const pots = [{ id: "p1", name: "Pot 1", teamIds: ["t2"] }, { id: "p2", name: "Pot 2", teamIds: ["t3"] }];
+    const rules = { ...emptyContainerRules(), potQuota: { "p1|m0": 0, "p2|m0": 1, "p1|m1": 1, "p2|m1": 0 } };
+    const state = drawAll(initContainersState({ fixtureKind: "knockout", phaseName: "KO", mode: "pots", teams: teams.slice(0, 4), pots, containers, rules }));
+    expect(state.containers.map(c => c.matchSlots)).toEqual([["t0", "t3"], ["t2", "t1"]]);
+  });
   it("draws all 128 teams without duplicates", () => {
     const state = drawAll(initContainersState({ fixtureKind: "knockout", phaseName: "KO", mode: "random", teams, pots: [], containers: fixtures(64), rules: emptyContainerRules() }));
     expect(state.finished).toBe(true);

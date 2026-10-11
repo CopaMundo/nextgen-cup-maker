@@ -755,6 +755,8 @@ const LiveDrawDialog = ({
 
   const validationError = (): { step: Step; message: string } | null => {
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
+    const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
+    if (fixtureKind === "knockout" && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
     if (!usePots && drawTeamIds.length !== totalCapacity) {
       return {
         step: "method",
@@ -792,8 +794,6 @@ const LiveDrawDialog = ({
         }
       }
     }
-    const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
-    if (fixtureKind === "knockout" && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
     const ctx = buildContainerCtx(teams, pots, effectiveRules);
     const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
     return check.ok ? null : { step: "settings", message: check.message || "De gekozen regels zijn niet haalbaar." };
