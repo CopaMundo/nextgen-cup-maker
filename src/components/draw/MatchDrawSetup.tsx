@@ -17,7 +17,7 @@ export function MatchDrawSetup({ teams, selectedIds, onTeamsChange, containers, 
     {teams.length > capacity && <section className="space-y-2"><h3 className="font-semibold">Deelnemers · {selectedIds.length}/{capacity}</h3><PotTeamSlots teams={teams} teamIds={selectedIds} assignedIds={new Set(selectedIds)} lockedIds={fixedIds} capacity={capacity} onChange={(index, id) => { const next = [...selectedIds]; if (id) next[index] = id; else next.splice(index, 1); onTeamsChange(next); }} /></section>}
     {useSeeds && <section className="space-y-3">
       <Label htmlFor="seed-count">Aantal reekshoofden</Label>
-      <Select value={String(seedCount)} onValueChange={value => onSeedCount(Number(value))}><SelectTrigger id="seed-count" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{Array.from({ length: containers.length }, (_, i) => i + 1).map(count => <SelectItem key={count} value={String(count)}>{count}</SelectItem>)}</SelectContent></Select>
+      <Select value={String(seedCount)} onValueChange={value => onSeedCount(Number(value))}><SelectTrigger id="seed-count" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{Array.from({ length: Math.max(0, containers.length - 1) }, (_, i) => i + 2).map(count => <SelectItem key={count} value={String(count)}>{count}</SelectItem>)}</SelectContent></Select>
       {Array.from({ length: seedCount }, (_, i) => i + 1).map(rank => {
         const fixture = containers.find(c => c.seedRanks?.includes(rank));
         const side = fixture?.seedRanks?.indexOf(rank) ?? -1;
