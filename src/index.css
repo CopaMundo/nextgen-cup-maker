@@ -2555,6 +2555,28 @@ posities + statistieken groen */
   background: hsl(var(--primary) / 0.06);
 }
 
+/* Type/scope cards match the Copa Mundo competition-format frames. */
+.draw-dialog-theme .draw-type-choice {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.25rem;
+  background: hsl(var(--background));
+  box-shadow: none;
+}
+
+.draw-dialog-theme .draw-type-choice:hover:not(:disabled) {
+  background: hsl(var(--background));
+  border-color: hsl(var(--primary) / 0.2);
+}
+
+.draw-dialog-theme .draw-type-choice[aria-pressed="true"],
+.draw-dialog-theme .draw-type-choice[aria-pressed="true"]:hover:not(:disabled) {
+  border-color: hsl(var(--border));
+  border-top-color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
+  background: hsl(var(--primary) / 0.06);
+  box-shadow: inset 0 1px 0 hsl(var(--primary)), inset 0 -1px 0 hsl(var(--primary));
+}
+
 .draw-dialog-theme .draw-table,
 .draw-table {
   width: 100%;
