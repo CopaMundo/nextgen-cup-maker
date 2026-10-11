@@ -140,7 +140,7 @@ export function createDrawBallWorld(ids: string[]) {
       // Judge rest from actual displacement and real supporting contacts,
       // not the solver's residual velocity. Unsupported balls must keep falling.
       const previous = previousPositions.get(ball);
-      const quiet = supported.has(ball) && previous && ball.position.distanceTo(previous) < .008;
+      const quiet = supported.has(ball) && previous && ball.position.distanceTo(previous) < .022;
       const duration = quiet ? (quietTime.get(ball) ?? 0) + world.dt : 0;
       quietTime.set(ball, duration);
       if (duration >= .45) ball.sleep();
