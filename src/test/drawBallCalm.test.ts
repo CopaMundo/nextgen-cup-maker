@@ -20,12 +20,19 @@ describe("calm draw pile", () => {
     if (!removed) throw new Error("Missing drawn ball");
     world.removeBody(removed); balls.delete("0");
     const highest = Math.max(...[...balls.values()].map(ball => ball.position.y));
+    const previous = new Map([...balls].map(([id, ball]) => [id, ball.position.y]));
+    let upwardStep = 0;
     for (const ball of balls.values()) if (ball.position.distanceTo(removed.position) < radius * 4.2) ball.wakeUp();
     let maximum = highest;
     for (let i = 0; i < 180; i++) {
       world.step(1 / 60);
-      for (const ball of balls.values()) maximum = Math.max(maximum, ball.position.y);
+      for (const [id, ball] of balls) {
+        maximum = Math.max(maximum, ball.position.y);
+        upwardStep = Math.max(upwardStep, ball.position.y - (previous.get(id) ?? ball.position.y));
+        previous.set(id, ball.position.y);
+      }
     }
     expect(maximum - highest).toBeLessThan(.12);
+    expect(upwardStep).toBeLessThan(.04);
   }, 20000);
 });
