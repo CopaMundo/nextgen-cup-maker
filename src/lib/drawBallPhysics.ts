@@ -123,13 +123,8 @@ export function createDrawBallWorld(ids: string[]) {
     }
     for (const ball of balls.values()) {
       if (ball.sleepState === Body.SLEEPING) { quietTime.delete(ball); continue; }
-      const ceiling = previousHeights.get(ball);
-      // Permit subpixel contact correction rather than locking penetrating
-      // bodies together (which made the solver eject their neighbours sideways).
-      if (ceiling !== undefined && ball.position.y > ceiling + .02) {
-        ball.position.y = ceiling + .02;
-        ball.aabbNeedsUpdate = true;
-      }
+      // Do not roll positions back after contact integration: that reintroduces
+      // overlap and makes stacked balls fight the same constraint every frame.
       if (ball.velocity.y > 0) ball.velocity.y = 0;
       ball.velocity.y = Math.max(-1.2, ball.velocity.y);
       const horizontalSpeed = Math.hypot(ball.velocity.x, ball.velocity.z);
