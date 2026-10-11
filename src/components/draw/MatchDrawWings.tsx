@@ -8,7 +8,7 @@ export const MatchDrawWings = memo(function MatchDrawWings({ left, right, teams,
   return <>{([left, right] as const).map((fixtures, wing) => {
     const columns = fixtures.length > 8 ? 2 : 1;
     const rows = Math.max(1, Math.ceil(fixtures.length / columns));
-    return <section key={wing} className={`draw-show-match-wing ${wing === 0 ? "is-left" : "is-right"}`} aria-label={wing === 0 ? "Linker brackethelft" : "Rechter brackethelft"} style={{ "--match-columns": columns, "--match-rows": rows } as CSSProperties}>
+    return <section key={wing} className={`draw-show-match-wing ${wing === 0 ? "is-left" : "is-right"}`} data-columns={columns} aria-label={wing === 0 ? "Linker brackethelft" : "Rechter brackethelft"} style={{ "--match-columns": columns, "--match-rows": rows } as CSSProperties}>
       {fixtures.map(fixture => <article key={fixture.id} className={`draw-show-match-card ${fixture.id === targetId ? "is-active" : ""}`} data-match-number={fixture.matchNumber}>
         <span className="draw-show-match-number" aria-label={`Wedstrijd ${fixture.matchNumber}`}>{fixture.matchNumber}</span>
         {(fixture.matchSlots ?? [null, null]).map((id, side) => {
