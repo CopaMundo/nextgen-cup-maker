@@ -51,7 +51,7 @@ describe("Uniform draw preparation", () => {
     fireEvent.click(screen.getByRole("button", { name: /Willekeurig/ }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Indeling & teams" });
-    expect(screen.getAllByRole("combobox")).toHaveLength(4);
+    expect(screen.getByText("Alle 4 teams doen mee aan de loting.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
     fireEvent.click(screen.getByRole("button", { name: "Vorige" }));
@@ -69,7 +69,7 @@ describe("Uniform draw preparation", () => {
     fixtures.excess = true;
     render(<LiveDrawDialog {...props} initialMethod="random" initialStep="teams" />);
     await screen.findByText("Deelnemers · 0/4");
-    expect(screen.getByRole("combobox", { name: "Teamvak 1" })).toBeEnabled();
+    expect(screen.getByRole("checkbox", { name: "Team 0" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     expect(screen.getByRole("heading", { name: "Indeling & teams" })).toBeInTheDocument();
   });
