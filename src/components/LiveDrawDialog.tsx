@@ -82,6 +82,7 @@ interface LiveDrawDraft {
   selectedMatchTeams?: string[];
   useSeeds?: boolean;
   seedCount?: number;
+  pots?: Pot[];
 }
 
 const LiveDrawDialog = ({
@@ -250,7 +251,9 @@ const LiveDrawDialog = ({
         if (draft?.version === 1) {
           const validTeamIds = new Set(isMatchDraw ? matchTeamIds : available.map((team) => team.id));
           const validContainerIds = new Set(nextContainers.map((container) => container.id));
-          const validPotIds = new Set(nextPots.map((pot) => pot.id));
+          const restoredPots = draft.pots?.map(p => ({ ...p, teamIds: p.teamIds.filter(id => validTeamIds.has(id)) })) ?? nextPots;
+          setPots(restoredPots);
+          const validPotIds = new Set(restoredPots.map(p => p.id));
           const geometryValid = !isMatchDraw || !draft.matchContainers || (draft.matchContainers.length === nextContainers.length && draft.matchContainers.every(c => nextContainers.some(next => next.id === c.id && next.slotIds.every((id, side) => id === c.slotIds[side]))));
           const sessionValid = geometryValid && (!draft.session || (
             draft.session.remaining.every((id) => validTeamIds.has(id)) &&
@@ -264,7 +267,7 @@ const LiveDrawDialog = ({
           setSeedCount(Math.max(2, Math.min(nextContainers.length, draft.seedCount ?? defaultDrawSeedCount(nextContainers.length * 2))));
           setPotMatrix(draft.potMatrix);
           const restoredSelection = draft.selectedMatchTeams?.filter(id => matchTeamIds.includes(id)) ?? [];
-          if (draft.selectedMatchTeams) setSelectedMatchTeams([...new Set([...originalFixed, ...restoredSelection])]);
+          if (draft.selectedMatchTeams) setSelectedMatchTeams([...new Set([...originalFixed, ...restoredSelection.filter(id => validTeamIds.has(id))])]);
           if (isMatchDraw && geometryValid && draft.matchContainers?.every(c => validContainerIds.has(c.id))) setContainers(nextContainers.map(c => {
             const saved = draft.matchContainers?.find(item => item.id === c.id);
             const matchSlots = (c.matchSlots ?? []).map((id, side) => id ?? (saved?.matchSlots?.[side] && matchTeamIds.includes(saved.matchSlots[side] as string) ? saved.matchSlots[side] : null));
@@ -314,9 +317,9 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, matchContainers: isMatchDraw ? containers : undefined, selectedMatchTeams, useSeeds, seedCount };
+    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, matchContainers: isMatchDraw ? containers : undefined, selectedMatchTeams, useSeeds, seedCount, pots };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, containers, selectedMatchTeams, useSeeds, seedCount]);
+  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, containers, selectedMatchTeams, useSeeds, seedCount, pots]);
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
@@ -343,51 +346,15 @@ const LiveDrawDialog = ({
 
   /* -------------------------------- potten ------------------------------ */
 
-  const renamePot = async (potId: string, name: string) => {
-    setPots((prev) => prev.map((p) => (p.id === potId ? { ...p, name } : p)));
-    await supabase.from("draw_pots").update({ name }).eq("id", potId);
+  const renamePot = (potId: string, name: string) => {
+    setPots(previous => previous.map(pot => pot.id === potId ? { ...pot, name } : pot));
   };
 
-  /** Maakt `count` lege potten aan (Pot 1, Pot 2, ...) en vervangt de bestaande. */
   const createEmptyPots = async (count: number) => {
-    if ((!isMatchDraw && drawSize % count !== 0) || count < 2 || (!isMatchDraw && count > drawSize)) return;
-    setLoading(true);
-    try {
-      if (pots.length) {
-        const { error: assignmentsError } = await supabase.from("draw_pot_teams").delete().in("pot_id", pots.map((p) => p.id));
-        if (assignmentsError) throw assignmentsError;
-        const { error: potsError } = await supabase.from("draw_pots").delete().in("id", pots.map((p) => p.id));
-        if (potsError) throw potsError;
-      }
-      const { data, error } = await supabase
-        .from("draw_pots")
-        .insert(
-          Array.from({ length: count }, (_, i) => ({
-            tournament_id: tournamentId,
-            phase_id: phaseId,
-            category_id: categoryId ?? null,
-            name: `Pot ${i + 1}`,
-            sort_order: i,
-          }))
-        )
-        .select("id, name, sort_order");
-      if (error) {
-        toast({ title: "Potten aanmaken mislukt", description: error.message, variant: "destructive" });
-        return;
-      }
-      setPots(
-        (data || [])
-          .sort((a, b) => a.sort_order - b.sort_order)
-          .map((p) => ({ id: p.id, name: p.name, sort_order: p.sort_order, teamIds: [] }))
-      );
-      setPotCount(count);
-      setRules((prev) => ({ ...prev, potQuota: {} }));
-    } catch (error: any) {
-      toast({ title: "Potverdeling wijzigen mislukt", description: error?.message, variant: "destructive" });
-      await loadAll();
-    } finally {
-      setLoading(false);
-    }
+    if (count < 2 || (!isMatchDraw && (drawSize % count !== 0 || count > drawSize))) return;
+    setPots(Array.from({ length: count }, (_, index) => ({ id: crypto.randomUUID(), name: `Pot ${index + 1}`, sort_order: index, teamIds: [] })));
+    setPotCount(count);
+    setRules(previous => ({ ...previous, potQuota: {} }));
   };
 
    const potOptions = isMatchDraw ? [2] : Array.from({ length: drawSize }, (_, i) => i + 1)
@@ -468,54 +435,19 @@ const requestPotCount = (count: number) => {
     setRules((prev) => ({ ...prev, potQuota: { ...prev.potQuota, [`${potId}|${containerId}`]: Math.max(0, value) } }));
   const resetQuota = () => setRules((prev) => ({ ...prev, potQuota: {} }));
 
-  const setPotSlot = async (potId: string, index: number, teamId: string | null) => {
-    if (savingSlot) return;
-    const pot = pots.find((p) => p.id === potId);
-    if (!pot || index >= (isMatchDraw ? matchPotCapacity(containers, pots.indexOf(pot)) : drawSize / pots.length)) return;
-    const previous = pot.teamIds[index];
-    if (previous === teamId || (teamId && assignedTeamIds.has(teamId))) return;
-    setSavingSlot(true);
-    try {
-      if (previous) {
-        const { error } = await supabase.from("draw_pot_teams").delete().eq("pot_id", potId).eq("team_id", previous);
-        if (error) throw error;
-      }
-      if (teamId) {
-        const { error } = await supabase.from("draw_pot_teams").insert({ pot_id: potId, tournament_id: tournamentId, team_id: teamId, sort_order: index });
-        if (error) {
-          if (previous) await supabase.from("draw_pot_teams").insert({ pot_id: potId, tournament_id: tournamentId, team_id: previous, sort_order: index });
-          throw error;
-        }
-      }
-      setPots((prev) => prev.map((p) => {
-        if (p.id !== potId) return p;
-        const teamIds = [...p.teamIds];
-        if (teamId) teamIds[index] = teamId;
-        else teamIds.splice(index, 1);
-        return { ...p, teamIds };
-      }));
-      const updated = pots.map(p => {
+  const setPotSlot = (potId: string, index: number, teamId: string | null) => {
+    const pot = pots.find(p => p.id === potId);
+    if (!pot || index < 0 || index >= (isMatchDraw ? matchPotCapacity(containers, pots.indexOf(pot)) : drawSize / pots.length)) return;
+    if (teamId && (assignedTeamIds.has(teamId) || !eligibleTeams.some(team => team.id === teamId))) return;
+    setPots(previous => {
+      const updated = previous.map(p => {
         if (p.id !== potId) return p;
         const teamIds = [...p.teamIds];
         if (teamId) teamIds[index] = teamId; else teamIds.splice(index, 1);
         return { ...p, teamIds };
       });
-      const capacities = updated.map((_, i) => isMatchDraw ? matchPotCapacity(containers, i) : drawSize / updated.length);
-      const completed = completeLastDrawPot(updated, eligibleTeams.map(t => t.id), capacities);
-      const last = completed[completed.length - 1];
-      const priorLast = updated[updated.length - 1];
-      const added = last?.teamIds.filter(id => !priorLast?.teamIds.includes(id)) ?? [];
-      if (last && added.length) {
-        const { error } = await supabase.from("draw_pot_teams").insert(added.map((id, offset) => ({ pot_id: last.id, tournament_id: tournamentId, team_id: id, sort_order: (priorLast?.teamIds.length ?? 0) + offset })));
-        if (error) throw error;
-        setPots(completed);
-      }
-    } catch (error: any) {
-      toast({ title: "Toewijzen mislukt", description: error?.message, variant: "destructive" });
-      await loadAll();
-    } finally {
-      setSavingSlot(false);
-    }
+      return completeLastDrawPot(updated, eligibleTeams.map(team => team.id), updated.map((_, side) => isMatchDraw ? matchPotCapacity(containers, side) : drawSize / updated.length));
+    });
   };
 
   /** Volledige regels met de standaardverdeling expliciet ingevuld. */
