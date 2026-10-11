@@ -2954,7 +2954,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Bestaande indeling overschrijven?</AlertDialogTitle>
-            <AlertDialogDescription>De huidige groepen en wedstrijden worden volledig gewist zodat je met een schone lei start.</AlertDialogDescription>
+            <AlertDialogDescription>De huidige groepen en wedstrijden worden gewist om een nieuwe live loting te starten.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
