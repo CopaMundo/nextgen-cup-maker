@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BOWL_BOTTOM, bowlHeight, createDrawBallWorld, drawBallFlight, drawBallRadius } from "@/lib/drawBallPhysics";
+import { BOWL_BOTTOM, DRAW_REVEAL_FRACTION, DRAW_REVEAL_Y, bowlHeight, createDrawBallWorld, drawBallFlight, drawBallRadius } from "@/lib/drawBallPhysics";
 
 describe("draw ball physics", () => {
   it("slightly reduces the physical and rendered bowl ball radius", () => {
@@ -15,9 +15,10 @@ describe("draw ball physics", () => {
       expect(ball.position.y).toBeGreaterThan(bowlHeight(Math.hypot(ball.position.x, ball.position.z)) - .2);
     }
   });
-  it.each([.75, 1, 1.5])("lands at 50%/42% and splits at speed %s", speed => {
+  it.each([.75, 1, 1.5])("lands at 50%/41.5% and splits at speed %s", speed => {
     expect(drawBallFlight(0, speed).y).toBeCloseTo(BOWL_BOTTOM + .7);
-    expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(4.5);
+    expect(drawBallFlight(1100 / speed, speed).y).toBeCloseTo(DRAW_REVEAL_Y);
+    expect(.5 - DRAW_REVEAL_Y / 56.25).toBeCloseTo(DRAW_REVEAL_FRACTION);
     expect(drawBallFlight(1450 / speed, speed).split).toBeCloseTo(.5);
     expect(drawBallFlight(1800 / speed, speed).visible).toBe(false);
     expect(drawBallFlight(550 / speed, speed).progress).toBeCloseTo(.5);

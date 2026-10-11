@@ -5,7 +5,8 @@ import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, 
 export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
 /** Center of the compact acrylic bar between the studio light strips. */
-export const DRAW_REVEAL_Y = 4.5;
+export const DRAW_REVEAL_FRACTION = .415;
+export const DRAW_REVEAL_Y = (0.5 - DRAW_REVEAL_FRACTION) * 56.25;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
@@ -16,7 +17,7 @@ export function createDrawBallWorld(ids: string[]) {
   const world = new World({ gravity: new Vec3(0, -25, 0), allowSleep: true });
   world.broadphase = new SAPBroadphase(world);
   const material = new Material("draw-ball");
-  world.addContactMaterial(new ContactMaterial(material, material, { friction: .32, restitution: .13 }));
+  world.addContactMaterial(new ContactMaterial(material, material, { friction: .22, restitution: 0, contactEquationRelaxation: 6 }));
   const vertices: number[] = [];
   const indices: number[] = [];
    const rings = 8, segments = 20;
@@ -48,8 +49,11 @@ export function createDrawBallWorld(ids: string[]) {
   for (let level = 0; level < 3; level++) {
     const offsetX = level * spacing / 2, offsetZ = level * rowSpacing / 3;
     for (let row = -rows; row <= rows; row++) for (let column = -columns; column <= columns; column++) {
-      const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0) + offsetX;
-      const z = row * rowSpacing + offsetZ;
+      // Deterministic micro-offsets keep refresh recovery stable without a visible lattice.
+      const seed = Math.sin(row * 127.1 + column * 311.7 + level * 74.7) * 43758.5453;
+      const jitter = (seed - Math.floor(seed) - .5) * radius * .35;
+      const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0) + offsetX + jitter;
+      const z = row * rowSpacing + offsetZ + jitter * .61;
       if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z, level });
     }
   }
@@ -79,7 +83,7 @@ export function createDrawBallWorld(ids: string[]) {
       candidates.splice(candidates.indexOf(spread), 1);
       const y = restingY(spread.x, spread.z);
       placed.push({ x: spread.x, y, z: spread.z });
-      const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .24, angularDamping: .4, sleepSpeedLimit: .08, sleepTimeLimit: .7 });
+      const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .65, angularDamping: .8, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
       body.position.set(spread.x, y, spread.z);
       world.addBody(body); balls.set(id, body); body.sleep();
       return;
@@ -92,7 +96,7 @@ export function createDrawBallWorld(ids: string[]) {
     const position = best >= 0 ? candidates.splice(best, 1)[0] : { x: 0, z: 0 };
     const y = best >= 0 ? bestY : restingY(0, 0);
     placed.push({ x: position.x, y, z: position.z });
-    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .24, angularDamping: .4, sleepSpeedLimit: .08, sleepTimeLimit: .7 });
+    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .65, angularDamping: .8, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
     body.position.set(position.x, y, position.z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
