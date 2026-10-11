@@ -26,6 +26,8 @@ import { compressImage } from "@/lib/compressImage";
 import { generateRoundRobin } from "@/lib/matchGenerator";
 import LiveDrawDialog from "./LiveDrawDialog";
 import RoundsDrawDialog from "./RoundsDrawDialog";
+import { DrawWizardHeader } from "./draw/DrawWizardHeader";
+import { useDrawTournamentName } from "@/hooks/useDrawTournamentName";
 import { canChooseLiveDraw, liveRoundsAvailable, liveRoundsLimitMessage } from "@/lib/liveDrawLimits";
 
 interface Group {
@@ -312,6 +314,8 @@ const GroupManager = ({
   const [drawView, setDrawView] = useState<DrawView>(null);
   type DrawMode = "full" | "groups" | "rounds";
   const [drawMode, setDrawMode] = useState<DrawMode>("full");
+  const [drawMethod, setDrawMethod] = useState<"random" | "pots">("random");
+  const drawTournamentName = useDrawTournamentName(tournamentId, drawView !== null);
   const [pendingDrawMode, setPendingDrawMode] = useState<DrawMode | null>(null);
   const drawViewStorageKey = `copa-live-draw-view:${phaseId}`;
   const drawModeStorageKey = `copa-live-draw-mode:${phaseId}`;
@@ -320,6 +324,7 @@ const GroupManager = ({
     drawViewHydrated.current = false;
     const saved = localStorage.getItem(drawViewStorageKey);
     const savedMode = localStorage.getItem(drawModeStorageKey);
+    setDrawMethod(localStorage.getItem(`copa-live-draw-method:${phaseId}`) === "pots" ? "pots" : "random");
     if (saved === "choice" || saved === "groups" || saved === "rounds") setDrawView(saved);
     if (savedMode === "full" || savedMode === "groups" || savedMode === "rounds") setDrawMode(savedMode);
   }, [drawViewStorageKey, drawModeStorageKey]);
@@ -337,6 +342,7 @@ const GroupManager = ({
   useEffect(() => {
     if (drawView) localStorage.setItem(drawModeStorageKey, drawMode);
   }, [drawMode, drawView, drawModeStorageKey]);
+  useEffect(() => { if (drawView) localStorage.setItem(`copa-live-draw-method:${phaseId}`, drawMethod); }, [drawMethod, drawView, phaseId]);
   const drawOverwriteKey = `copa-live-draw-overwrite:${phaseId}`;
   const [drawOverwrite, setDrawOverwrite] = useState(false);
   const [drawSubStep, setDrawSubStep] = useState("method");
@@ -372,14 +378,17 @@ const GroupManager = ({
   const startDraw = (mode: DrawMode, overwrite = false) => {
     if (phaseMatchType === "rounds" && !canChooseLiveDraw(mode, phaseRounds)) return;
     updateOverwrite(overwrite);
-    localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`);
-    localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
-    setDrawResetKey((k) => k + 1);
+    if (overwrite) {
+      localStorage.removeItem(`copa-live-draw:groups:v1:${phaseId}`);
+      localStorage.removeItem(`copa-live-draw:rounds:v1:${phaseId}`);
+      setDrawResetKey(k => k + 1);
+    }
     setDrawMode(mode);
     setDrawView(mode === "rounds" ? "rounds" : "groups");
   };
   const requestDraw = async (mode: DrawMode) => {
     if (phaseMatchType === "rounds" && !canChooseLiveDraw(mode, phaseRounds)) return;
+    if (drawOverwrite || localStorage.getItem(`copa-live-draw:groups:v1:${phaseId}`) || localStorage.getItem(`copa-live-draw:rounds:v1:${phaseId}`)) { setDrawMode(mode); setDrawView(mode === "rounds" ? "rounds" : "groups"); return; }
     let needsConfirm = false;
     if (mode === "rounds") {
       const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
@@ -1232,16 +1241,7 @@ const GroupManager = ({
         )}
         {showRandomAssign && (phaseType === "group" || phaseType === "round_robin") && (
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
-            if (phaseMatchType === "rounds") {
-              if (groups.length === 1 && roundsShowAvailable) {
-                void (async () => {
-                  const { data: filled } = await supabase.from("slots").select("id").eq("phase_id", phaseId).not("team_id", "is", null).limit(1);
-                  if (filled?.length) void requestDraw("rounds");
-                  else setDrawView("choice");
-                })();
-              }
-              else setDrawView("choice");
-            }
+            if (phaseMatchType === "rounds") setDrawView("choice");
             else requestDraw("groups");
           }}>
             <Trophy className="h-3 w-3" /> Live loting
@@ -1259,48 +1259,20 @@ const GroupManager = ({
           onEscapeKeyDown={(event) => event.preventDefault()}
           className="draw-dialog-theme flex flex-col h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl"
         >
-          {drawView && (() => {
-            const steps = drawMode === "groups" || phaseMatchType !== "rounds"
-              ? ["Type loting", "Poules & Potten", "Regels", "Loting show"]
-              : drawMode === "rounds"
-                ? ["Type loting", "Speelrondes", "Loting show"]
-                : ["Type loting", "Poules & Potten", "Regels", "Speelrondes", "Loting show"];
-            const label = drawView === "choice" ? "Type loting"
-              : drawSubStep === "draw" ? (drawView === "rounds" || drawMode !== "full" || phaseMatchType !== "rounds" ? "Loting show" : "Loting show")
-              : drawView === "rounds" ? "Speelrondes"
-              : drawSubStep === "settings" ? "Regels"
-              : drawSubStep === "pots" ? "Poules & Potten"
-              : (phaseMatchType === "rounds" && drawMode === "full") ? "Poules & Potten" : "Type loting";
-            const current = Math.max(0, steps.indexOf(label));
-            return (
-              <div className="shrink-0 border-b border-primary/30 bg-background px-4 pt-3 pb-3 sm:px-6">
-                <div className="flex items-center justify-between gap-3">
-                  <Button variant="ghost" size="sm" className="px-0" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Terug naar toernooi</Button>
-                  <span className="text-xs text-muted-foreground">Stap {current + 1} van {steps.length}</span>
-                </div>
-                <ol className="mt-2 flex gap-1.5" aria-label="Voortgang loting">
-                  {steps.map((name, i) => (
-                    <li key={name} className="min-w-0 flex-1" aria-current={i === current ? "step" : undefined}>
-                      <div className={`h-1 rounded-full ${i <= current ? "bg-primary" : "bg-border"}`} />
-                      <span className={`mt-1 hidden truncate text-[11px] sm:block ${i === current ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{name}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            );
-          })()}
+          <DialogTitle className="sr-only">Live loting</DialogTitle>
+          {drawView && <div className="shrink-0 px-4 pt-3 sm:px-6"><DrawWizardHeader tournamentName={drawTournamentName} formatName={phaseMatchType === "rounds" ? "Groepsfase met Speelrondes" : "Groepsfase"} step={drawView === "choice" ? "method" : drawSubStep} onClose={closeDrawView} /></div>}
           {drawView === "choice" && (
             <section className="draw-surface flex min-h-0 flex-1 flex-col bg-background p-4 text-foreground sm:p-6">
               <DialogHeader className="shrink-0 border-b border-primary/30 pb-4">
-                <DialogTitle>Wat wil je loten?</DialogTitle>
-                <DialogDescription>Kies welk deel van deze fase je live wilt loten.</DialogDescription>
+                <h2 className="text-lg font-bold">Type loting</h2>
+                <h3 className="text-sm font-semibold">Wat wil je loten?</h3>
               </DialogHeader>
               {!roundsShowAvailable && <p role="status" className="mt-4 shrink-0 text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
-              <div className="grid min-h-0 flex-1 content-start gap-3 overflow-y-auto py-5 md:grid-cols-3">
+              <div className="min-h-0 flex-1 space-y-5 overflow-y-auto py-5"><div className="grid gap-3 md:grid-cols-3">
             {([
-              ["full", "Volledige loting", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
-               ["groups", "Groepen loten", roundsShowAvailable ? "Teams over de poules verdelen. De speelrondes blijven ongewijzigd." : "Teams over de poules verdelen. De speelrondes worden automatisch gegenereerd."],
-              ["rounds", "Alleen speelrondes loten", "De huidige poule-indeling behouden en enkel de tegenstanders loten."],
+              ["full", "Volledige loting (Groepen + Speelrondes)", "Eerst de teams over de poules loten, daarna de tegenstanders per speelronde."],
+               ["groups", "Alleen Groepsfase", roundsShowAvailable ? "Teams over de poules verdelen. De speelrondes blijven ongewijzigd." : "Teams over de poules verdelen. De speelrondes worden automatisch gegenereerd."],
+              ["rounds", "Alleen Speelrondes", "De huidige poule-indeling behouden en enkel de tegenstanders loten."],
             ] as const).map(([mode, title, text]) => (
               <Button
                 key={mode}
@@ -1318,7 +1290,7 @@ const GroupManager = ({
               </div>
               <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
                 <Button variant="ghost" className="sm:mr-auto" onClick={() => setShowRestartConfirm(true)}><RotateCcw className="h-4 w-4" /> Opnieuw beginnen</Button>
-                <Button variant="outline" onClick={closeDrawView}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
+                <Button variant="outline" disabled><ArrowLeft className="h-4 w-4" /> Vorige</Button>
                 <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => void requestDraw(drawMode)}>Volgende</Button>
               </DialogFooter>
             </section>
@@ -1327,8 +1299,10 @@ const GroupManager = ({
           <RoundsDrawDialog
             key={`rounds-${drawResetKey}`}
             overwrite={drawOverwrite}
-            onBack={() => (drawMode === "full" && groups.length > 1 ? setDrawView("groups") : backToChoice())}
-            onRestart={() => setShowRestartConfirm(true)}
+            onBack={() => setDrawView("choice")}
+            hideHeader
+            initialMethod={phaseMatchType === "rounds" ? drawMethod : undefined}
+            initialStep={phaseMatchType === "rounds" ? "teams" : "method"}
             onStepChange={setDrawSubStep}
             open={drawView === "rounds"}
             onOpenChange={(next) => setDrawView(next ? "rounds" : null)}
@@ -1343,7 +1317,9 @@ const GroupManager = ({
             key={`groups-${drawResetKey}`}
             overwrite={drawOverwrite}
             onBack={backToChoice}
-            onRestart={() => setShowRestartConfirm(true)}
+            hideHeader
+            initialMethod={phaseMatchType === "rounds" ? drawMethod : undefined}
+            initialStep={phaseMatchType === "rounds" ? "teams" : "method"}
             onStepChange={setDrawSubStep}
             open={drawView === "groups"}
             onOpenChange={(next) => setDrawView(current => next ? "groups" : current === "groups" ? null : current)}
@@ -1445,18 +1421,8 @@ const GroupManager = ({
                   {Array.from({ length: 63 }, (_, i) => i + 2).map((n) => (
                     <SelectItem key={n} value={String(n)}>{n} teams</SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {renderCompetitionTypeSelector(false)}
-            <ScoringSystemSelector
-              systems={scoringSystems}
-              value={dialogScoringSystemId}
-              onChange={setDialogScoringSystemId}
-            />
-            {renderLogoUpload()}
-          </div>
-          <DialogFooter>
+               </div><div className="space-y-3"><h3 className="font-semibold">Methode</h3><div className="grid gap-3 sm:grid-cols-2">{(["random", "pots"] as const).map(method => <Button key={method} variant="outline" aria-pressed={drawMethod === method} className="draw-choice h-20" onClick={() => setDrawMethod(method)}>{method === "random" ? "Willekeurig" : "Potten"}</Button>)}</div></div></div>
+<DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>Annuleren</Button>
             <Button onClick={addGroup} disabled={uploading}>
               {uploading ? "Bezig..." : "Toevoegen"}

@@ -2948,7 +2948,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
       <Dialog open={liveDrawOpen} onOpenChange={setLiveDrawOpen}>
         <DialogContent scrollable={false} onPointerDownOutside={event => event.preventDefault()} onEscapeKeyDown={event => event.preventDefault()} className="draw-dialog-theme flex flex-col h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl">
-          <DialogHeader className="shrink-0 border-b border-primary/30 px-4 py-3"><DialogTitle className="sr-only">Live wedstrijdloting</DialogTitle><Button variant="ghost" size="sm" className="w-fit" onClick={() => setLiveDrawOpen(false)}><ArrowRight className="h-4 w-4 rotate-180" />Terug naar toernooi</Button></DialogHeader>
+          <DialogTitle className="sr-only">Live wedstrijdloting</DialogTitle>
           <LiveDrawDialog open={liveDrawOpen} onOpenChange={setLiveDrawOpen} tournamentId={tournamentId} phaseId={phaseId} categoryId={currentPhase?.category_id} fixtureKind={isSingleMatch ? "single_match" : "knockout"} phaseName={currentPhase?.name} onApplied={() => { void fetchData(); onSlotChange?.(); }} />
         </DialogContent>
       </Dialog>
