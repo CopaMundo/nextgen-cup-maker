@@ -19,6 +19,7 @@ import {
   validContainersFor,
   validOpponents,
 } from "./liveDraw";
+import { nextMatchContainer, nextMatchPot } from "./matchDraw";
 
 export interface RoundsGroup {
   groupId: string;
@@ -42,6 +43,7 @@ export interface PendingDraw {
 
 export interface DrawSessionState {
   kind: DrawKind;
+  fixtureKind?: "knockout" | "single_match";
   mode: DrawMode;
   phaseName: string;
   teams: DrawTeam[];
@@ -75,25 +77,28 @@ export const teamName = (state: DrawSessionState, id: string) =>
 export function initContainersState(input: {
   phaseName: string;
   mode: DrawMode;
+  fixtureKind?: "knockout" | "single_match";
   teams: DrawTeam[];
   pots: DrawPot[];
   containers: DrawContainer[];
   rules: ContainerRules;
 }): DrawSessionState {
   const inPots = new Set(input.pots.flatMap((p) => p.teamIds));
+  const fixed = new Set(input.containers.flatMap(container => container.teamIds));
   const remaining =
     input.mode === "pots"
       ? input.pots.flatMap((p) => shuffle(p.teamIds))
       : shuffle(input.teams.map((t) => t.id));
   return {
     kind: "containers",
+    fixtureKind: input.fixtureKind,
     mode: input.mode,
     phaseName: input.phaseName,
     teams: input.teams,
     pots: input.mode === "pots" ? input.pots : [],
     containers: input.containers.map((c) => ({ ...c, teamIds: [...c.teamIds] })),
     containerRules: { ...input.rules, onePerPot: input.mode === "pots" ? input.rules.onePerPot : false },
-    remaining: input.mode === "pots" ? remaining.filter((id) => inPots.has(id)) : remaining,
+    remaining: remaining.filter(id => !fixed.has(id) && (input.mode !== "pots" || inPots.has(id))),
     activePotId: null,
     roundsGroups: [],
     roundsRules: null,
@@ -104,7 +109,7 @@ export function initContainersState(input: {
     pending: null,
     history: [],
     log: [],
-    finished: false,
+    finished: remaining.filter(id => !fixed.has(id)).length === 0,
   };
 }
 
@@ -157,6 +162,19 @@ export function drawNext(state: DrawSessionState, forcedTeamId?: string, potId?:
   if (state.finished || state.pending) return state;
 
   if (state.kind === "containers") {
+    if (state.fixtureKind) {
+      const container = nextMatchContainer(state.containers);
+      if (!container) return { ...state, finished: true };
+      const pot = state.mode === "pots" ? nextMatchPot(state.containers, state.pots) : null;
+      const ctx = containerCtxFor(state);
+      const candidates = shuffle(state.remaining.filter(id => !pot || pot.teamIds.includes(id)));
+      if (forcedTeamId && candidates.includes(forcedTeamId)) candidates.sort((a, b) => Number(b === forcedTeamId) - Number(a === forcedTeamId));
+      for (const teamId of candidates) {
+        const options = validContainersFor(teamId, state.remaining.filter(id => id !== teamId), state.containers, ctx);
+        if (options.includes(container.id)) return { ...state, pending: { teamId, options: [{ id: container.id, label: container.name }] }, activePotId: pot?.id ?? null };
+      }
+      return state;
+    }
     let pool = state.remaining;
     if (state.mode === "pots") {
       // Gekozen actieve pot, anders de eerste pot met resterende teams.
@@ -232,7 +250,7 @@ export function confirmPending(state: DrawSessionState, targetId?: string): Draw
 
   if (state.kind === "containers") {
     const containers = state.containers.map((c) =>
-      c.id === choice ? { ...c, teamIds: [...c.teamIds, teamId] } : c
+      c.id === choice ? { ...c, teamIds: [...c.teamIds, teamId], ...(c.matchSlots ? { matchSlots: c.matchSlots.map((id, index) => index === c.matchSlots?.findIndex(slot => !slot) ? teamId : id) } : {}) } : c
     );
     const label = state.containers.find((c) => c.id === choice)?.name || choice;
     const remaining = state.remaining.filter((id) => id !== teamId);
@@ -279,7 +297,7 @@ export function undoLast(state: DrawSessionState): DrawSessionState {
     return {
       ...state,
       containers: state.containers.map((c) =>
-        c.id === last.targetId ? { ...c, teamIds: c.teamIds.filter((id) => id !== last.teamId) } : c
+        c.id === last.targetId ? { ...c, teamIds: c.teamIds.filter((id) => id !== last.teamId), ...(c.matchSlots ? { matchSlots: c.matchSlots.map(id => id === last.teamId ? null : id) } : {}) } : c
       ),
       remaining: [last.teamId, ...state.remaining],
       pending: null,

@@ -32,6 +32,11 @@ export interface DrawContainer {
   /** Vrije slot-ids in volgorde (leeg bij een testloting op nieuwe groepen). */
   slotIds: string[];
   teamIds: string[];
+  /** Fixed home/away entry slots for knockout and single-match encounters. */
+  matchSlots?: (string | null)[];
+  seedRanks?: (number | null)[];
+  groupId?: string | null;
+  matchNumber?: number;
 }
 
 export interface ContainerRules {

@@ -31,8 +31,8 @@ export function matchDrawContainers(slots: MatchDrawSlot[], matches: MatchDrawFi
       seen.add(key);
       const matchSlots = [home.team_id, away.team_id];
       return [{ id: match.id, name: `Wedstrijd ${seen.size}`, capacity: 2, slotIds: [home.id, away.id], teamIds: matchSlots.filter((id): id is string => Boolean(id)), matchSlots, groupId: match.group_id, matchNumber: seen.size,
-        // Assigned entry positions are fixed. Explicit ranks can be edited before starting.
-        seedRanks: seeded ? matchSlots.map((id, index) => id ? Number((index === 0 ? home : away).slot_code.replace(/^S/i, "")) || null : null) : [null, null] }];
+        // Slot codes describe geometry, never a team's ranking.
+        seedRanks: [null, null] }];
     }).sort((a, b) => {
       const aSlot = slots.find(slot => slot.id === a.slotIds[0]);
       const bSlot = slots.find(slot => slot.id === b.slotIds[0]);
