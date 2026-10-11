@@ -1,4 +1,5 @@
 # Draw stage rules
+- Render live entry encounters through shared memoized match wings with fixed halves and attached numbering; measure open home/away targets and derive large-show segments from the pending target or shared clock so director/projector landings agree.
 
 - Size rounds panels from published round-count metadata before any team reveal; retain fixed headers and bounded equal grid tracks above the pedestal, splitting above ten rounds. Keep right-side logos unframed and left roster badges unchanged so identity updates cannot shift stage geometry.
 

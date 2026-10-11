@@ -12,6 +12,8 @@ import { RoundsRosterLoop } from "@/components/draw/RoundsRosterLoop";
 import { studioFor } from "@/lib/drawStudio";
 import { DrawBalls } from "@/components/draw/DrawBalls";
 import { FittedPotName } from "@/components/draw/FittedPotName";
+import { matchDrawPage, nextMatchContainer } from "@/lib/matchDraw";
+import { MatchDrawWings } from "./MatchDrawWings";
 
 
 export function DrawShow({ session: incomingSession, spotlightId: incomingSpotlight, presentation: incomingPresentation, controls }: {
@@ -42,6 +44,9 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const fixtureRows = Math.max(1, Math.ceil(fixtureCount / (fixtureCount > 10 ? 2 : 1)));
   const visibleFixtures = rounds?.fixtures.length ? rounds.fixtures : Array.from({ length: fixtureCount }, (_, index) => ({ id: `waiting-${index}`, round: index + 1, potName: "", home: false, opponentId: null, revealAt: null }));
   const selectedId = presentation?.selection?.targetId;
+  const matchTargetId = selectedId ?? pending?.options[0]?.id ?? (session ? nextMatchContainer(session.containers)?.id : null);
+  const matchTick = Math.floor(now / 6500);
+  const matchPage = useMemo(() => matchDrawPage(session?.containers ?? [], matchTargetId, session?.finished ?? false, matchTick * 6500), [session?.containers, matchTargetId, session?.finished, matchTick]);
   const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><svg className="draw-show-flag" viewBox="3 5 30 26" preserveAspectRatio="none"><image href={countryToFlagUrl(country) ?? undefined} width="36" height="36" /></svg></span> : null;
   const teamById = useMemo(() => new Map(session?.teams.map(item => [item.id, item])), [session?.teams]);
   const team = pending ? teamById.get(pending.teamId) : undefined;
@@ -79,7 +84,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
     const target = stage.querySelector<HTMLElement>("[data-transfer-target='true']");
     if (target) observer.observe(target);
     return () => observer.disconnect();
-  }, [selectedId, pending?.teamId, session?.containers, layout.mode, layout.teamColumns, layout.wingRows, leftDensity, rightDensity]);
+  }, [selectedId, pending?.teamId, session?.containers, layout.mode, layout.teamColumns, layout.wingRows, leftDensity, rightDensity, matchPage.segment]);
 
   const { activePot, remainingIds, potTeamIds, rosterIds } = useMemo(() => {
     const remaining = new Set(session?.remaining ?? []);
@@ -127,7 +132,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const { columns: choiceColumns } = drawChoiceGrid(pending?.options.length ?? 1);
    const motionStyle = { "--draw-reveal-top": `${DRAW_REVEAL_FRACTION * 100}%`, "--draw-choice-width": `${Math.min(8, (20 - .16 * (choiceColumns - 1)) / choiceColumns)}cqw`, "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
 
-  return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
+   return <div ref={stageRef} data-studio-theme={studio.id} data-group-layout={rounds || session?.fixtureKind ? undefined : layout.mode} className={`draw-show draw-show-stage ${rounds || session?.fixtureKind ? "" : `draw-show-layout-${layout.mode}`}`} style={{ backgroundImage: `url(${studio.asset.url})`, "--wing-columns": layout.wingColumns, "--wing-rows": layout.wingRows, ...motionStyle } as CSSProperties}>
     {!session ? <div className="draw-show-waiting"><strong>Wachten op de live loting</strong></div> : <>
       {rounds ? <>
         <section className="draw-show-rounds-roster draw-show-wing-left draw-show-group-card" aria-label={`Teams ${rounds.groupName}`}>
@@ -165,7 +170,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
             </div>; })}
           </div>
         </section>
-      </> : <>
+      </> : session.fixtureKind ? <MatchDrawWings left={matchPage.left} right={matchPage.right} teams={teamById} targetId={matchTargetId} lastTeamId={!pending ? last?.teamId : undefined} /> : <>
         <div className="draw-show-wing draw-show-wing-left" data-wing-columns={layout.wingColumns} data-density={leftDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(leftContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...leftContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{leftCards}</div>
         <div className="draw-show-wing draw-show-wing-right" data-wing-columns={layout.wingColumns} data-density={rightDensity} style={{ "--wing-rows": Math.max(1, Math.ceil(rightContainers.length / layout.wingColumns)), "--wing-slot-rows": Math.max(1, ...rightContainers.map((container) => Math.ceil(container.capacity / layout.teamColumns))) } as CSSProperties}>{rightCards}</div>
       </>}
@@ -175,7 +180,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         </div>}
       </main>
       {!rounds && pending && choicesReady && teamReady && selectionPhase !== "complete" && <div key={pending.teamId} className={`draw-show-eligible ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": drawChoiceGrid(eligible.length).columns } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} aria-label={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{eligible.length > 18 ? option.label.replace(/^(groep|group|poule)\s+/i, "") : option.label}</span>)}</div></div>}
-      {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot draw-show-team">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
+      {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${!session.fixtureKind && layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot draw-show-team">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>
       <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} clock={ballClock} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
       <div className="draw-show-bowl is-front" aria-hidden="true"><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>

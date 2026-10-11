@@ -21,6 +21,7 @@ import CountryFlag from "@/components/CountryFlag";
 import { getSlotReferenceLabel as resolveSlotReferenceLabel } from "@/lib/slotLabels";
 import { firstRefereeName } from "@/lib/refereeConfig";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
+import LiveDrawDialog from "./LiveDrawDialog";
 
 interface BracketMatch {
   id: string;
@@ -143,6 +144,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const [selectedHAMatchId, setSelectedHAMatchId] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
+  const [liveDrawOpen, setLiveDrawOpen] = useState(false);
   const [showDeleteSingleConfirm, setShowDeleteSingleConfirm] = useState<string | null>(null);
   const [showDeleteBracketConfirm, setShowDeleteBracketConfirm] = useState<string | null>(null);
   const [showDeletePlacementConfirm, setShowDeletePlacementConfirm] = useState<string | null>(null);
@@ -2929,6 +2931,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     <div className="space-y-6">
       {editable && rounds.length > 0 && (
         <div className="flex items-center gap-2">
+          {showRandomAssign && <Button variant="outline" size="sm" onClick={() => setLiveDrawOpen(true)}><Shuffle className="h-3 w-3" />Live loting</Button>}
           {showRandomAssign && !isSingleMatch && filteredTeams.length > 0 && (
             <Button variant="outline" size="sm" onClick={() => {
               const hasTeams = r1Matches.some(m => m.home_team_id || m.away_team_id);
@@ -2942,6 +2945,13 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           </Button>
         </div>
       )}
+
+      <Dialog open={liveDrawOpen} onOpenChange={setLiveDrawOpen}>
+        <DialogContent scrollable={false} onPointerDownOutside={event => event.preventDefault()} onEscapeKeyDown={event => event.preventDefault()} className="draw-dialog-theme flex flex-col h-[92dvh] max-h-[92dvh] w-[calc(100%-1rem)] max-w-7xl overflow-hidden p-0 sm:h-[90dvh] sm:max-h-[90dvh] sm:w-[calc(100%-2rem)] sm:max-w-7xl">
+          <DialogHeader className="shrink-0 border-b border-primary/30 px-4 py-3"><DialogTitle className="sr-only">Live wedstrijdloting</DialogTitle><Button variant="ghost" size="sm" className="w-fit" onClick={() => setLiveDrawOpen(false)}><ArrowRight className="h-4 w-4 rotate-180" />Terug naar toernooi</Button></DialogHeader>
+          <LiveDrawDialog open={liveDrawOpen} onOpenChange={setLiveDrawOpen} tournamentId={tournamentId} phaseId={phaseId} categoryId={currentPhase?.category_id} fixtureKind={isSingleMatch ? "single_match" : "knockout"} phaseName={currentPhase?.name} onApplied={() => { void fetchData(); onSlotChange?.(); }} />
+        </DialogContent>
+      </Dialog>
 
       {!loaded && (
         <div className="flex justify-center py-8">
