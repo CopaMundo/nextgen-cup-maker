@@ -2630,7 +2630,7 @@ posities + statistieken groen */
 .draw-show-wing[data-density="comfortable"] { --group-card-width: 18.5cqw; --group-slot-preferred: 2.4cqw; --group-logo-size: 1.8cqw; --group-name-size: .95cqw; --group-title-size: 1.1cqw; }
 .draw-show-wing[data-density="standard"] { --group-card-width: 16.5cqw; --group-slot-preferred: 2cqw; --group-logo-size: 1.5cqw; --group-name-size: .82cqw; --group-title-size: .95cqw; }
 .draw-show-wing[data-density="compact"] { --group-slot-preferred: 1.6cqw; --group-logo-size: 1.2cqw; --group-name-size: .7cqw; --group-title-size: .85cqw; }
-.draw-show-group-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .85); border-radius: 8px; background: hsl(var(--card) / .78); box-shadow: inset 0 0 .5cqw hsl(var(--stage-glow) / .12); transition: box-shadow 140ms; }
+.draw-show-group-card { contain: layout paint style; display: flex; flex-direction: column; min-height: 0; overflow: hidden; border: 1px solid hsl(var(--primary) / .85); border-radius: 8px; background: hsl(var(--card) / .78); box-shadow: inset 0 0 .5cqw hsl(var(--stage-glow) / .12); transition: box-shadow 140ms; }
 .draw-show-group-card h2 { flex-shrink: 0; text-align: center; padding: .75cqw .4cqw; color: hsl(var(--primary)); font-size: 1.1cqw; text-transform: uppercase; font-weight: 700; line-height: 1.3; }
 .draw-show-group-card h2 small { color: hsl(var(--muted-foreground)); font-size: .7cqw; }
 .draw-show-slots { display: grid; flex: 1; min-height: 0; grid-template-columns: repeat(var(--slot-columns, 1), minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(var(--slot-rows, 1), minmax(0, 1fr)); gap: .2cqw; padding: .35cqw; overflow: hidden; }
@@ -2660,7 +2660,7 @@ posities + statistieken groen */
 .draw-show-layout-C .draw-show-slots { grid-auto-flow: row; gap: .22cqw; }
 .draw-show-layout-C .draw-show-wing .draw-show-slot { display: flex; justify-content: center; padding: .15cqw; border-color: hsl(var(--primary) / .5); container-type: size; }
 .draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; max-width: 100%; flex: 0 0 auto; font-size: 30cqmin; border-color: hsl(var(--primary) / .65); }
-.draw-show-center { position: absolute; z-index: 9; top: 35%; left: 40%; width: 20%; height: 5%; }
+.draw-show-center { position: absolute; z-index: 9; top: 39%; left: 40%; width: 20%; height: 6%; }
 .draw-show-team-card { position: relative; isolation: isolate; display: flex; height: 100%; width: 100%; margin: 0 auto; align-items: center; justify-content: center; padding: 0; border-radius: var(--draw-identity-radius, .6cqw); overflow: hidden; border: .1cqw solid hsl(var(--stage-metal-main) / .85); background: linear-gradient(160deg, hsl(var(--stage-ball-light) / .22), hsl(var(--stage-glass) / .48) 55%, hsl(var(--stage-ball-light) / .09)); backdrop-filter: blur(8px); box-shadow: 0 0 1.4cqw hsl(var(--stage-glow) / .22), inset 0 .08cqw 0 hsl(var(--stage-metal-light) / .65), inset 0 -.15cqw .5cqw hsl(var(--background) / .3); }
 .draw-show-team-card.is-departing { animation: draw-bar-dissolve calc(650ms / var(--draw-rate)) ease-out both; pointer-events: none; }
 @keyframes draw-bar-dissolve { from { opacity: 1; } to { opacity: 0; } }
@@ -2678,10 +2678,10 @@ posities + statistieken groen */
 .draw-show-reveal-logo, .draw-show-team strong { filter: drop-shadow(0 1px 2px hsl(var(--background))); }
 .draw-show-team strong { min-width: 0; max-height: 4.2cqw; overflow: hidden; overflow-wrap: anywhere; background: linear-gradient(180deg, hsl(var(--stage-metal-light)), hsl(var(--stage-metal-main))); background-clip: text; -webkit-background-clip: text; color: transparent; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-weight: 600; font-size: 1.2cqw; line-height: 1.2; text-align: center; }
 /* The four-row eligibility budget ends above the bowl, regardless of label length. */
-.draw-show-eligible { position: absolute; top: calc(100% + .7cqw); left: -10%; width: 120%; height: 5.6cqw; overflow: hidden; animation: draw-choices-appear calc(450ms / var(--draw-rate)) ease-out both; }
+.draw-show-eligible { position: absolute; top: calc(100% + .7cqw); left: 0; width: 100%; height: 9cqw; overflow: hidden; animation: draw-choices-appear calc(450ms / var(--draw-rate)) ease-out both; }
 @keyframes draw-choices-appear { from { opacity: 0; transform: translateY(.3cqw); } to { opacity: 1; transform: translateY(0); } }
-.draw-show-eligible-groups { display: grid; grid-template-columns: repeat(var(--eligible-columns, 8), minmax(0, var(--draw-choice-width, 8cqw))); justify-content: center; gap: .16cqw; max-height: 5.6cqw; overflow: hidden; align-content: start; }
-.draw-show-eligible-groups span { min-width: 0; height: 1.2cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.draw-show-eligible-groups { display: flex; flex-wrap: wrap; justify-content: center; gap: .16cqw; max-height: 9cqw; overflow: hidden; align-content: start; }
+.draw-show-eligible-groups span { flex: 0 0 calc((100% - (var(--eligible-columns) - 1) * .16cqw) / var(--eligible-columns)); min-width: 0; height: 1.25cqw; line-height: 1cqw; border: 1px solid hsl(var(--border)); border-radius: 4px; padding: .08cqw .22cqw; background: hsl(var(--background) / .88); color: hsl(var(--primary)); font-size: .65cqw; font-weight: 700; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 .draw-show-bowl { position: absolute; z-index: 7; left: 44.8%; top: 64%; width: 10.4%; height: 13%; pointer-events: none; }
 .draw-show-bowl-art { display: block; width: 100%; height: 100%; object-fit: fill; }
 .draw-show-bowl-ball { position: absolute; width: var(--ball-size, 1.7cqw); aspect-ratio: 1; border-radius: 50%; border: 1px solid hsl(var(--stage-ball-shade)); background: radial-gradient(circle at 34% 28%, hsl(var(--stage-ball-light)), hsl(var(--stage-ball)) 47%, hsl(var(--stage-ball-shade))); box-shadow: inset -.15cqw -.2cqw .4cqw hsl(var(--background) / .3), 0 .15cqw .25cqw hsl(var(--background) / .5); animation: draw-ball-drift 3.5s var(--drift-delay) ease-in-out infinite alternate; }
@@ -2690,10 +2690,10 @@ posities + statistieken groen */
 .draw-ball-left { border-radius: 100px 0 0 100px; animation: draw-half-left calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-ball-right { border-radius: 0 100px 100px 0; animation: draw-half-right calc(550ms / var(--draw-rate)) calc(1100ms / var(--draw-rate) + var(--reveal-offset)) ease-out both; }
 .draw-reveal-name { animation: draw-name-reveal calc(800ms / var(--draw-rate)) calc(1150ms / var(--draw-rate) + var(--reveal-offset)) cubic-bezier(.22,.8,.3,1) both; }
-.draw-show-transfer { position: absolute; z-index: 9; top: 37.5%; left: 50%; width: 20%; height: 5%; border-radius: var(--draw-identity-radius, .6cqw); overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; will-change: transform, width, height; }
+.draw-show-transfer { position: absolute; z-index: 9; top: 42%; left: 50%; width: 20%; height: 6%; border-radius: var(--draw-identity-radius, .6cqw); overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .7cqw; color: hsl(var(--foreground)); font-size: 1.5cqw; transform: translate(-50%, -50%); animation: draw-team-transfer calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; will-change: transform, width, height; }
 .draw-show-pot-label { position: absolute; z-index: 3; left: 38%; width: 24%; top: 79%; height: 5%; pointer-events: none; overflow: visible; }
 .draw-show-pot-label text { fill: hsl(var(--primary)); font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 48px; font-weight: 700; text-transform: uppercase; filter: drop-shadow(0 1px 2px hsl(var(--background))); }
-.draw-show-pot { position: absolute; left: 29%; width: 42%; top: 89%; height: 10%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.draw-show-pot { position: absolute; left: 29%; width: 42%; top: 88%; height: 12%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .draw-show-pot-counter { position: absolute; top: 85.2%; left: 38%; width: 24%; text-align: center; color: hsl(var(--foreground)); font-size: .95cqw; font-weight: 600; line-height: 1.2; pointer-events: none; }
 .draw-show-pot-teams { animation: draw-pot-page 500ms ease-out both; }
 @keyframes draw-pot-page { from { opacity: 0; } to { opacity: 1; } }
@@ -2769,7 +2769,7 @@ posities + statistieken groen */
 @keyframes draw-ball-drift { from { transform: translate(-50%, -50%) rotate(-3deg); } to { transform: translate(calc(-50% + .1cqw), calc(-50% - .08cqw)) rotate(3deg); } }
 .draw-transfer-reveal, .draw-transfer-slot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .draw-transfer-reveal { border-radius: inherit; overflow: hidden; animation: draw-transfer-out calc(1250ms / var(--draw-rate)) var(--transfer-offset) linear both; }
-.draw-transfer-slot { display: grid; grid-template-columns: 2.3cqw minmax(0, 1fr) 1.6cqw; gap: .25cqw; padding: 0 .45cqw; border-radius: inherit; border: 1px solid transparent; background: transparent; overflow: hidden; animation: draw-transfer-morph calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
+.draw-transfer-slot { display: grid; grid-template-columns: 2.3cqw minmax(0, 1fr) 1.6cqw; gap: .25cqw; padding: 0 .45cqw; border-radius: inherit; border: .1cqw solid hsl(var(--stage-metal-main) / .85); background: linear-gradient(160deg, hsl(var(--stage-ball-light) / .22), hsl(var(--stage-glass) / .48) 55%, hsl(var(--stage-ball-light) / .09)); overflow: hidden; animation: draw-transfer-morph calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
 .draw-transfer-slot > .draw-show-identity-flag { animation: draw-transfer-flag calc(1250ms / var(--draw-rate)) var(--transfer-offset) ease-out both; }
 @keyframes draw-transfer-flag { 0% { opacity: 1; } 35%, 100% { opacity: 0; width: 0; } }
 .draw-transfer-slot .draw-show-slot-mark { width: 100%; height: auto; aspect-ratio: 1; max-height: 100%; min-height: 0; animation: draw-transfer-logo calc(1250ms / var(--draw-rate)) var(--transfer-offset) cubic-bezier(.4,0,.2,1) both; }
@@ -2779,14 +2779,13 @@ posities + statistieken groen */
 .draw-show-transfer.is-logo-only .draw-show-slot-name { animation-name: draw-transfer-name-hide; }
 .draw-show-slot.is-arriving { animation: draw-slot-arrival 1100ms cubic-bezier(.25,.8,.3,1) both; }
 @keyframes draw-team-transfer {
-   from { width: 20%; height: 5%; transform: translate(-50%, -50%); }
-   50% { width: calc((20cqw + var(--transfer-width)) / 2); height: calc((2.8125cqw + var(--transfer-height)) / 2); transform: translate(calc(-50% + var(--transfer-x) * .5), calc(-50% + var(--transfer-y) * .5 - 4cqw)); }
+   from { width: 20%; height: 6%; transform: translate(-50%, -50%); }
   to { width: var(--transfer-width); height: var(--transfer-height); border-radius: 5px; transform: translate(calc(-50% + var(--transfer-x)), calc(-50% + var(--transfer-y))); }
 }
-@keyframes draw-transfer-morph { from { grid-template-columns: 2.3cqw minmax(0, 1fr) 1.6cqw; gap: .25cqw; padding: 0 .45cqw; border-color: transparent; background: transparent; } to { border-color: hsl(var(--border) / .68); background: hsl(var(--stage-glass) / .82); grid-template-columns: var(--landing-logo-size) minmax(0, 1fr) 0cqw; gap: .3cqw; padding: .25cqw; } }
-@keyframes draw-transfer-morph-logo { from { grid-template-columns: 2.3cqw minmax(0, 1fr) 1.6cqw; gap: .25cqw; padding: 0 .45cqw; border-color: transparent; background: transparent; } to { border-color: hsl(var(--border) / .68); background: hsl(var(--stage-glass) / .82); grid-template-columns: var(--landing-logo-size) minmax(0, 0fr) 0cqw; gap: 0; padding: .15cqw; justify-content: center; } }
-@keyframes draw-transfer-logo { from { border-color: transparent; background: transparent; border-radius: 0; } to { border-color: hsl(var(--border) / .5); background: hsl(var(--background) / .75); border-radius: 50%; } }
-@keyframes draw-transfer-logo-image { from { width: 100%; height: 100%; } to { width: 72%; height: 72%; } }
+@keyframes draw-transfer-morph { from { grid-template-columns: 2.3cqw minmax(0, 1fr) 1.6cqw; gap: .25cqw; padding: 0 .45cqw; border-color: hsl(var(--stage-metal-main) / .85); background: hsl(var(--stage-glass) / .48); } to { border-color: hsl(var(--border) / .68); background: hsl(var(--stage-glass) / .82); grid-template-columns: var(--landing-logo-size) minmax(0, 1fr) 0cqw; gap: .3cqw; padding: .12cqw .25cqw; } }
+@keyframes draw-transfer-morph-logo { from { grid-template-columns: 2.3cqw minmax(0, 1fr) 1.6cqw; gap: .25cqw; padding: 0 .45cqw; border-color: hsl(var(--stage-metal-main) / .85); background: hsl(var(--stage-glass) / .48); } to { border-color: hsl(var(--border) / .68); background: hsl(var(--stage-glass) / .82); grid-template-columns: var(--landing-logo-size) minmax(0, 0fr) 0cqw; gap: 0; padding: .15cqw; justify-content: center; } }
+@keyframes draw-transfer-logo { from { border-radius: 0; } to { border-radius: 0; } }
+@keyframes draw-transfer-logo-image { from { width: 100%; height: 100%; } to { width: 100%; height: 100%; } }
 @keyframes draw-transfer-name { from { font-size: 1.2cqw; font-weight: 600; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; text-align: center; } to { font-size: var(--landing-name-size); font-weight: 600; font-family: inherit; text-align: left; } }
 @keyframes draw-transfer-name-hide { from { font-size: 1.2cqw; opacity: 1; } to { font-size: var(--landing-name-size); opacity: 0; } }
 @keyframes draw-transfer-out { 0%,30% { opacity: 1; } 75%,100% { opacity: 0; } }
@@ -2799,3 +2798,11 @@ posities + statistieken groen */
 .draw-show-team-identity, .draw-show-slot > :not(.draw-show-flag-backdrop), .draw-transfer-slot > :not(.draw-show-flag-backdrop) { position: relative; z-index: 1; }
 .draw-show-eligible.has-selection { display: flex; justify-content: center; }
 .draw-show-eligible.has-selection .draw-show-eligible-groups { width: var(--draw-choice-width, 8cqw); max-width: 100%; }
+
+/* Unframed row-height logos, without changing the five wing profiles. */
+.draw-show-wing .draw-show-slot-mark, .draw-transfer-slot .draw-show-slot-mark { border: 0; border-radius: 0; background: none; }
+.draw-show-wing .draw-show-slot { padding-block: .12cqw; grid-template-columns: minmax(0, calc(var(--group-slot-height) - .24cqw - 2px)) minmax(0, 1fr); }
+.draw-show-wing .draw-show-slot-mark { width: 100%; height: 100%; aspect-ratio: auto; }
+.draw-show-wing .draw-show-slot-mark img { width: 100%; height: 100%; }
+.draw-show-layout-C .draw-show-wing .draw-show-slot-mark { width: 90cqmin; height: 90cqmin; }
+.draw-show-transfer .draw-show-slot-name { color: hsl(var(--foreground)); }

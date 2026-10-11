@@ -1,13 +1,13 @@
-import { Suspense, memo, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, memo, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, OrthographicCamera } from "@react-three/drei";
 import { Color, Group, Mesh, MeshPhysicalMaterial } from "three";
 import { BOWL_BOTTOM, DRAW_REVEAL_Y, createDrawBallWorld, drawBallFlight } from "@/lib/drawBallPhysics";
 
-interface Props { teamIds: string[]; drawnId?: string; revealKey: string | null; elapsed: number; speed: number; revealing: boolean; theme: string; }
+interface Props { clock?: MutableRefObject<number>; teamIds: string[]; drawnId?: string; revealKey: string | null; elapsed: number; speed: number; revealing: boolean; theme: string; }
 interface Palette { ball: string; light: string; edge: string; }
 
-function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, palette }: Props & { palette: Palette }) {
+function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, palette, clock }: Props & { palette: Palette }) {
   const simulation = useMemo(() => createDrawBallWorld(teamIds), []);
   const meshes = useRef(new Map<string, Mesh>());
   const invalidate = useThree((state) => state.invalidate);
@@ -34,13 +34,14 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
   }, [teamKey, simulation]);
   useFrame((_, delta) => {
     // Sleeping piles need no solver work; a single substep keeps large pots smooth.
-    const awake = [...simulation.balls.values()].some(body => body.sleepState !== 2);
+    let awake = false;
+    for (const body of simulation.balls.values()) if (body.sleepState !== 2) { awake = true; break; }
     if (awake) simulation.world.step(1 / 60, Math.min(delta, .05), 2);
     for (const [id, body] of simulation.balls) {
       const mesh = meshes.current.get(id);
       if (mesh) { mesh.position.copy(body.position); mesh.quaternion.copy(body.quaternion); }
     }
-    const frame = drawBallFlight(elapsed, speed);
+    const frame = drawBallFlight(clock?.current ?? elapsed, speed);
     if (flight.current) {
       flight.current.visible = revealing && frame.visible;
       const progress = frame.progress;
@@ -104,4 +105,4 @@ function DrawBallsCanvas(props: Props) {
 export const DrawBalls = memo(DrawBallsCanvas, (previous, next) =>
   previous.teamIds.join("|") === next.teamIds.join("|") && previous.drawnId === next.drawnId && previous.revealKey === next.revealKey
   && previous.revealing === next.revealing && previous.speed === next.speed && previous.theme === next.theme
-  && (!next.revealing || previous.elapsed === next.elapsed));
+  && (next.clock ? previous.clock === next.clock : !next.revealing || previous.elapsed === next.elapsed));
