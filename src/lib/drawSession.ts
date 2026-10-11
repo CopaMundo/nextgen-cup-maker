@@ -168,9 +168,10 @@ export function drawNext(state: DrawSessionState, forcedTeamId?: string, potId?:
       const pot = state.mode === "pots" ? nextMatchPot(state.containers, state.pots) : null;
       const ctx = containerCtxFor(state);
       const candidates = shuffle(state.remaining.filter(id => !pot || pot.teamIds.includes(id)));
+      const unrestricted = ctx.rules.countryMaxDefault == null && !ctx.rules.separateSameCountry && !ctx.rules.separateSamePrevGroup && !Object.keys(ctx.rules.countryMax).length && !ctx.forbidden.size && !ctx.required.size;
       if (forcedTeamId && candidates.includes(forcedTeamId)) candidates.sort((a, b) => Number(b === forcedTeamId) - Number(a === forcedTeamId));
       for (const teamId of candidates) {
-        const options = validContainersFor(teamId, state.remaining.filter(id => id !== teamId), state.containers, ctx);
+        const options = unrestricted ? [container.id] : validContainersFor(teamId, state.remaining.filter(id => id !== teamId), state.containers, ctx);
         if (options.includes(container.id)) return { ...state, pending: { teamId, options: [{ id: container.id, label: container.name }] }, activePotId: pot?.id ?? null };
       }
       return state;
