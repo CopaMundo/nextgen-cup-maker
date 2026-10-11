@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Poulevleugels op de tribunes bij 19%/81%; tijdelijke acrylglazen teambalk op 44–53% met logo, metallic naam en vlag, aansluitende balopening en vloeiende booglanding controleren.
 - [x] Poulevleugels op 12% naar binnen, begrensd boven de onderste teams met aangepaste rijhoogtes; acht formaten zonder overflow gecontroleerd. Vrije balonthulling en booglanding behouden, landing binnen .01px en 25 tests geslaagd. Geen nieuwe gezamenlijke echte regie/beamer-trekking uitgevoerd.
 - [x] Prototype: vrije wand zonder statisch teamvak, rustige balopening op 47% hoogte, uitvouwend clubembleem en gebogen exacte poulelanding. Drie thema’s met voorbeeldteams visueel gecontroleerd zonder runtimefouten; landing wijkt minder dan .01px af en 25 tests slagen. Geen nieuwe gezamenlijke echte regie/beamer-trekking uitgevoerd.
 - [x] Nieuwe originele 4K-studio’s aangesloten met ronde thematische bokaal op het podium, afgestemde balcontacten en vlucht naar het permanente centrale teamvak. Drie thema’s en onthulling met voorbeeldteams visueel gecontroleerd; 25 tests geslaagd. Geen nieuwe echte gezamenlijke regie/beamer-trekking uitgevoerd.

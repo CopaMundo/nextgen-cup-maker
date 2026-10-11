@@ -4,8 +4,8 @@ import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, 
 // with its inner floor at 74% and retaining rim at approximately 66.5%.
 export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
-/** Shared eye-level reveal point in the full-stage orthographic camera (47%). */
-export const DRAW_REVEAL_Y = 1.6875;
+/** Center of the shared temporary acrylic bar (44–53% stage height). */
+export const DRAW_REVEAL_Y = .84375;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */
