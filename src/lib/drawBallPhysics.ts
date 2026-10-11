@@ -42,7 +42,7 @@ export function createDrawBallWorld(ids: string[]) {
   const spacing = radius * 2 + .02;
   const rowSpacing = spacing * Math.sqrt(3) / 2;
   const maxRadial = BOWL_RADIUS - radius - .12;
-  const candidates: { x: number; z: number }[] = [];
+  const candidates: { x: number; z: number; level: number }[] = [];
   const rows = Math.ceil(maxRadial / rowSpacing) + 1;
   const columns = Math.ceil(maxRadial / spacing) + 1;
   for (let level = 0; level < 3; level++) {
@@ -50,9 +50,13 @@ export function createDrawBallWorld(ids: string[]) {
     for (let row = -rows; row <= rows; row++) for (let column = -columns; column <= columns; column++) {
       const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0) + offsetX;
       const z = row * rowSpacing + offsetZ;
-      if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z });
+      if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z, level });
     }
   }
+  // The first layer spreads across the full bowl width (outer ring first);
+  // further balls drop onto the lowest free resting spot.
+  const floor = candidates.filter((candidate) => candidate.level === 0)
+    .sort((a, b) => Math.hypot(b.x, b.z) - Math.hypot(a.x, a.z) || a.x - b.x);
   const surface = (x: number, z: number) => {
     const d = Math.hypot(x, z);
     const slope = .2 * d + .0088 * d * d * d;
@@ -69,7 +73,17 @@ export function createDrawBallWorld(ids: string[]) {
     return y;
   };
   const balls = new Map<string, Body>();
-  ids.forEach((id) => {
+  ids.forEach((id, order) => {
+    const spread = order < floor.length ? floor[order] : null;
+    if (spread) {
+      candidates.splice(candidates.indexOf(spread), 1);
+      const y = restingY(spread.x, spread.z);
+      placed.push({ x: spread.x, y, z: spread.z });
+      const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .24, angularDamping: .4, sleepSpeedLimit: .08, sleepTimeLimit: .7 });
+      body.position.set(spread.x, y, spread.z);
+      world.addBody(body); balls.set(id, body); body.sleep();
+      return;
+    }
     let best = -1, bestY = Infinity;
     candidates.forEach((candidate, index) => {
       const y = restingY(candidate.x, candidate.z);
