@@ -360,6 +360,13 @@ const GroupManager = ({
   };
   const closeDrawView = () => setDrawView(null);
   const backToChoice = () => {
+    for (const kind of ["groups", "rounds"]) {
+      const key = `copa-live-draw:${kind}:v1:${phaseId}`;
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) localStorage.setItem(key, JSON.stringify({ ...JSON.parse(raw), step: "method" }));
+      } catch { localStorage.removeItem(key); }
+    }
     if (phaseMatchType === "rounds" && (groups.length > 1 || !roundsShowAvailable || drawMode === "full")) setDrawView("choice");
     else closeDrawView();
   };
@@ -1298,7 +1305,7 @@ const GroupManager = ({
           <RoundsDrawDialog
             key={`rounds-${drawResetKey}`}
             overwrite={drawOverwrite}
-            onBack={() => setDrawView("choice")}
+            onBack={backToChoice}
             hideHeader
             initialMethod={phaseMatchType === "rounds" ? drawMethod : undefined}
             initialStep={phaseMatchType === "rounds" ? "teams" : "method"}

@@ -707,7 +707,6 @@ const RoundsDrawDialog = ({
   const settings = (
     <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
       <div>
-        <h3 className="text-lg font-semibold">Speelrondes loten</h3>
         <p className="text-sm text-muted-foreground">Bepaal hoeveel tegenstanders elk team uit iedere pot loot. De speelrondes worden vóór de loting volledig aangemaakt en gecontroleerd.</p>
       </div>
 

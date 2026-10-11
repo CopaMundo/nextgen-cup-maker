@@ -604,6 +604,21 @@ const requestPotCount = (count: number) => {
     if (!session) return;
     setApplying(true);
     try {
+      if (usePots) {
+        const { data: existing, error: readError } = await supabase.from("draw_pots").select("id").eq("tournament_id", tournamentId).eq("phase_id", phaseId);
+        if (readError) throw readError;
+        const existingIds = (existing ?? []).map(p => p.id);
+        if (existingIds.length) {
+          const { error } = await supabase.from("draw_pot_teams").delete().eq("tournament_id", tournamentId).in("pot_id", existingIds);
+          if (error) throw error;
+        }
+        const { error: clearError } = await supabase.from("draw_pots").delete().eq("tournament_id", tournamentId).eq("phase_id", phaseId);
+        if (clearError) throw clearError;
+        const { error: potsError } = await supabase.from("draw_pots").insert(pots.map(p => ({ id: p.id, tournament_id: tournamentId, phase_id: phaseId, category_id: categoryId ?? null, name: p.name, sort_order: p.sort_order })));
+        if (potsError) throw potsError;
+        const { error: teamsError } = await supabase.from("draw_pot_teams").insert(pots.flatMap(p => p.teamIds.map((teamId, index) => ({ pot_id: p.id, tournament_id: tournamentId, team_id: teamId, sort_order: index }))));
+        if (teamsError) throw teamsError;
+      }
       if (isMatchDraw) {
         for (const container of session.containers) {
           for (const [index, teamId] of (container.matchSlots ?? []).entries()) {
