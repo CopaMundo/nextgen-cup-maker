@@ -89,6 +89,23 @@ export function createDrawBallWorld(ids: string[]) {
     world.addBody(body); balls.set(id, body);
     body.sleep();
   });
+  // The pre-seeded pile is already supported. Solver penetration corrections
+  // must not inject upward energy when that support is removed during a draw.
+  const previousHeights = new Map<Body, number>();
+  world.addEventListener("preStep", () => {
+    previousHeights.clear();
+    for (const ball of balls.values()) previousHeights.set(ball, ball.position.y);
+  });
+  world.addEventListener("postStep", () => {
+    for (const ball of balls.values()) {
+      const ceiling = previousHeights.get(ball);
+      if (ceiling !== undefined && ball.position.y > ceiling) {
+        ball.position.y = ceiling;
+        ball.aabbNeedsUpdate = true;
+      }
+      if (ball.velocity.y > 0) ball.velocity.y = 0;
+    }
+  });
   return { world, balls, radius, depth };
 }
 
