@@ -77,6 +77,7 @@ interface LiveDrawDraft {
   presentation?: DrawPresentation;
   matchContainers?: DrawContainer[];
   selectedMatchTeams?: string[];
+  useSeeds?: boolean;
 }
 
 const LiveDrawDialog = ({
@@ -127,6 +128,7 @@ const LiveDrawDialog = ({
   const [teams, setTeams] = useState<DrawTeam[]>([]);
   const [selectedMatchTeams, setSelectedMatchTeams] = useState<string[]>([]);
   const [usePots, setUsePots] = useState(true);
+  const [useSeeds, setUseSeeds] = useState(false);
   const [potCount, setPotCount] = useState(4);
   const [rules, setRules] = useState<ContainerRules>(emptyContainerRules());
   const [potMatrix, setPotMatrix] = useState<Record<string, number>>({});
@@ -237,7 +239,8 @@ const LiveDrawDialog = ({
           setStep(sessionValid ? draft.step : "method");
           setUsePots(draft.usePots);
           setPotCount(draft.potCount);
-          setRules({ ...draft.rules, separateSameCountry: false, requiredPairs: [] });
+          setRules({ ...draft.rules, separateSameCountry: isMatchDraw ? Boolean(draft.rules.separateSameCountry) : false, requiredPairs: [] });
+          setUseSeeds(Boolean(draft.useSeeds));
           setPotMatrix(draft.potMatrix);
           setSelectedMatchTeams((draft.selectedMatchTeams ?? []).filter(id => validTeamIds.has(id)));
           if (isMatchDraw && draft.matchContainers?.every(c => validContainerIds.has(c.id))) setContainers(nextContainers.map(c => ({ ...c, seedRanks: draft.matchContainers?.find(item => item.id === c.id)?.seedRanks ?? c.seedRanks })));
@@ -285,9 +288,9 @@ const LiveDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, matchContainers: isMatchDraw ? containers : undefined, selectedMatchTeams };
+    const draft: LiveDrawDraft = { version: 1, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, matchContainers: isMatchDraw ? containers : undefined, selectedMatchTeams, useSeeds };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, containers, selectedMatchTeams]);
+  }, [open, draftReady, draftKey, step, usePots, potCount, rules, potMatrix, session, selectedPotId, advancedOpen, advancedSpreadOpen, placementMode, animationSpeed, presentation, containers, selectedMatchTeams, useSeeds]);
 
   useEffect(() => {
     if (!open || !draftReady || (step !== "draw" && step !== "settings")) return;
@@ -416,6 +419,20 @@ const LiveDrawDialog = ({
         else teamIds.splice(index, 1);
         return { ...p, teamIds };
       }));
+      const firstIndex = pots.indexOf(pot);
+      const second = pots[1];
+      if (isMatchDraw && pots.length === 2 && firstIndex === 0 && teamId && second) {
+        const firstIds = [...pot.teamIds]; firstIds[index] = teamId;
+        const firstFull = firstIds.filter(Boolean).length === matchPotCapacity(containers, 0);
+        const secondCapacity = matchPotCapacity(containers, 1);
+        const taken = new Set([...firstIds, ...second.teamIds]);
+        const fill = eligibleTeams.map(t => t.id).filter(id => !taken.has(id)).slice(0, secondCapacity - second.teamIds.length);
+        if (firstFull && fill.length) {
+          const { error } = await supabase.from("draw_pot_teams").insert(fill.map((id, offset) => ({ pot_id: second.id, tournament_id: tournamentId, team_id: id, sort_order: second.teamIds.length + offset })));
+          if (error) throw error;
+          setPots(prev => prev.map(p => p.id === second.id ? { ...p, teamIds: [...p.teamIds, ...fill] } : p));
+        }
+      }
     } catch (error: any) {
       toast({ title: "Toewijzen mislukt", description: error?.message, variant: "destructive" });
       await loadAll();
@@ -758,7 +775,7 @@ const LiveDrawDialog = ({
   const validationError = (): { step: Step; message: string } | null => {
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
     const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
-    if (fixtureKind === "knockout" && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
+    if (fixtureKind === "knockout" && useSeeds && (seedRanks.some(rank => !Number.isInteger(rank) || rank < 1 || rank > 128) || new Set(seedRanks).size !== seedRanks.length)) return { step: "settings", message: "Gebruik unieke seednummers tussen 1 en 128." };
     if (!usePots && drawTeamIds.length !== totalCapacity) {
       return {
         step: "method",
@@ -774,8 +791,7 @@ const LiveDrawDialog = ({
         return { step: "pots", message: "Wijs ieder team precies één keer aan een pot toe." };
       const emptyPot = pots.find((pot, index) => pot.teamIds.length === 0 && (!isMatchDraw || matchPotCapacity(containers, index) > 0));
       if (emptyPot) return { step: "pots", message: `${emptyPot.name} is nog leeg. Voeg teams toe of kies minder potten.` };
-      if (isMatchDraw) return null;
-      for (const pot of pots) {
+      if (!isMatchDraw) for (const pot of pots) {
         const quotaTotal = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
         if (quotaTotal !== pot.teamIds.length) {
           setAdvancedSpreadOpen(true);
@@ -785,7 +801,7 @@ const LiveDrawDialog = ({
           };
         }
       }
-      for (const container of containers) {
+      if (!isMatchDraw) for (const container of containers) {
         const groupTotal = pots.reduce((sum, pot) => sum + quotaFor(pot.id, container.id), 0);
         if (groupTotal !== container.capacity) {
           setAdvancedSpreadOpen(true);
@@ -893,6 +909,25 @@ const LiveDrawDialog = ({
     </div>
   );
 
+  const renderMatchRules = () => (
+    <div className="space-y-3">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Lotingsregels</h3>
+      <div className="draw-panel flex items-start justify-between gap-4 p-3">
+        <div><Label htmlFor="country-protection" className="font-medium">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
+        <Switch id="country-protection" checked={rules.separateSameCountry} onCheckedChange={(checked) => setRules((previous) => ({ ...previous, separateSameCountry: checked }))} />
+      </div>
+      <div className="draw-panel space-y-3 p-3">
+        <p className="text-sm font-medium">Verboden combinaties: kies twee teams die niet tegen elkaar mogen loten.</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Select value={pairA} onValueChange={setPairA}><SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger><SelectContent>{teams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
+          <Select value={pairB} onValueChange={setPairB}><SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger><SelectContent>{teams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
+        </div>
+        <Button variant="outline" size="sm" disabled={!pairA || !pairB} onClick={() => { setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] })); setPairA(""); setPairB(""); }}>Niet tegen elkaar</Button>
+        <div className="space-y-1">{rules.forbiddenPairs.map(([first, second], index) => <div key={`match-forbidden-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs"><span>Niet tegen elkaar: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button></div>)}</div>
+      </div>
+    </div>
+  );
+
   const sceneBusy = rolling || revealing;
   const drawContent = session && (
     <div ref={directorRef} className="draw-control-stage">
@@ -964,6 +999,7 @@ const LiveDrawDialog = ({
                   );
                 })}
               </div>
+              {fixtureKind === "knockout" && <div className="draw-panel flex items-start justify-between gap-4 p-4"><div><Label htmlFor="seeded-draw" className="font-semibold">Loting met reekshoofden</Label><p className="mt-1 text-xs text-muted-foreground">{fixedIds.size ? `${fixedIds.size} reekshoofden staan vast op hun bracketplaats. Geef ze bij de instellingen een seednummer; het nummer verschijnt achter de teamnaam, bijvoorbeeld Teamnaam (1).` : "Plaats eerst de reekshoofden op hun vaste plek in de bracket; zij worden dan niet meegeloot."}</p></div><Switch id="seeded-draw" checked={useSeeds} onCheckedChange={(checked) => { setUseSeeds(checked); if (!checked) setContainers(previous => previous.map(item => ({ ...item, seedRanks: [null, null] }))); }} /></div>}
               {isMatchDraw && !usePots && eligibleTeams.length !== drawSize && <div className="draw-panel p-3 space-y-2"><h3 className="font-semibold">Deelnemers · {selectedMatchTeams.length}/{drawSize}</h3><PotTeamSlots teams={eligibleTeams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={drawSize} onChange={(index, id) => setSelectedMatchTeams(previous => { const next = [...previous]; if (id) next[index] = id; else next.splice(index, 1); return next; })} /></div>}
             </div>
           ) : step === "pots" ? (
@@ -1014,7 +1050,8 @@ const LiveDrawDialog = ({
                 {!isMatchDraw && <p className="text-xs text-muted-foreground">Stel de landenlimiet en teams in die niet samen in één poule mogen komen.</p>}
               </div>
               {!isMatchDraw && renderRules()}
-              {fixtureKind === "knockout" && fixedIds.size > 0 && <div className="draw-panel p-3 space-y-2"><h3 className="font-semibold">Vaste seeds</h3>{containers.flatMap((c) => (c.matchSlots ?? []).map((id, index) => id ? <div key={id} className="flex items-center gap-3"><span className="flex-1">{teamById.get(id)?.name} · {c.name}</span><Input type="number" min={1} max={128} aria-label={`Seed ${teamById.get(id)?.name}`} className="w-20" value={c.seedRanks?.[index] ?? ""} onChange={event => setContainers(previous => previous.map(item => item.id === c.id ? { ...item, seedRanks: (item.seedRanks ?? [null, null]).map((rank, side) => side === index ? (event.target.value ? Number(event.target.value) : null) : rank) } : item))} /></div> : null))}</div>}
+              {isMatchDraw && renderMatchRules()}
+              {fixtureKind === "knockout" && useSeeds && fixedIds.size > 0 && <div className="draw-panel p-3 space-y-2"><h3 className="font-semibold">Vaste seeds</h3>{containers.flatMap((c) => (c.matchSlots ?? []).map((id, index) => id ? <div key={id} className="flex items-center gap-3"><span className="flex-1">{teamById.get(id)?.name} · {c.name}</span><Input type="number" min={1} max={128} aria-label={`Seed ${teamById.get(id)?.name}`} className="w-20" value={c.seedRanks?.[index] ?? ""} onChange={event => setContainers(previous => previous.map(item => item.id === c.id ? { ...item, seedRanks: (item.seedRanks ?? [null, null]).map((rank, side) => side === index ? (event.target.value ? Number(event.target.value) : null) : rank) } : item))} /></div> : null))}</div>}
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
                 {!isMatchDraw && <div className="flex items-center justify-between gap-4"><Label htmlFor="prepare-automatic-placement">Automatisch toewijzen</Label><Switch id="prepare-automatic-placement" checked={placementMode === "automatic"} onCheckedChange={(checked) => setPlacementMode(checked ? "automatic" : "manual")} /></div>}
               </DrawShowOptions>

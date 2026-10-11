@@ -31,7 +31,7 @@ export interface DrawPicture {
 }
 
 export const revealDuration = (speed: number) => 1900 / speed;
-export const selectionDuration = (speed: number) => 2100 / speed;
+export const selectionDuration = (speed: number) => 3300 / speed;
 export const sweepDuration = (count: number, speed: number) => Math.max(12, count * 3) * 100 / speed;
 
 /** Equal overview pages share wall-clock timing across director and projector. */
@@ -60,7 +60,7 @@ export function sweepSpotlight(presentation: DrawPresentation | undefined, now: 
 export function stageSelection(presentation: DrawPresentation | undefined, now: number) {
   if (!presentation?.selection) return "idle";
   const elapsed = (now - presentation.selection.startedAt) * presentation.speed;
-  return elapsed < 850 ? "hold" : elapsed < 2100 ? "transfer" : "complete";
+  return elapsed < 2050 ? "hold" : elapsed < 3300 ? "transfer" : "complete";
 }
 
 export interface GroupDrawLayout {

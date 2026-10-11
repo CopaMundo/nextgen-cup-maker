@@ -128,7 +128,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const potNames = useMemo(() => potTeamIds.map((id) => teamById.get(id)?.name ?? "").join("\n"), [potTeamIds, teamById]);
   const potCards = useMemo(() => visiblePotIds.map((id) => { const item = teamById.get(id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><FittedPotName name={item?.name ?? ""} /></span>; }), [visiblePotIds, teamById, remainingIds, pending?.teamId, teamReady]);
   const speed = presentation?.speed ?? 1;
-  const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
+  const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 2050 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const { columns: choiceColumns } = drawChoiceGrid(pending?.options.length ?? 1);
    const motionStyle = { "--draw-reveal-top": `${DRAW_REVEAL_FRACTION * 100}%`, "--draw-choice-width": `${Math.min(8, (20 - .16 * (choiceColumns - 1)) / choiceColumns)}cqw`, "--draw-rate": speed, "--reveal-offset": "0ms", "--transfer-offset": `${-transferElapsed}ms`, "--transfer-x": `${destination.x}px`, "--transfer-y": `${destination.y}px`, "--transfer-width": `${destination.width}px`, "--transfer-height": `${destination.height}px`, "--landing-logo-size": destination.logo, "--landing-name-size": destination.name } as CSSProperties;
 
@@ -165,7 +165,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
                {flagBackdrop(opponent?.country)}
               {session.mode === "pots" && <span className="draw-show-rounds-pot-tag">{fixture.potName}</span>}
               <span className="draw-show-slot-mark">{opponent?.logoUrl ? <AutoTrimLogo src={opponent.logoUrl} /> : opponent?.name.slice(0, 2).toUpperCase()}</span>
-              <span className="draw-show-rounds-opponent-identity"><span className="draw-show-slot-name">{opponent?.name ?? "—"}</span>{opponent && <CountryFlag country={opponent.country} className="draw-show-rounds-flag" />}</span>
+              <span className="draw-show-rounds-opponent-identity"><span className="draw-show-slot-name">{opponent?.name ?? ""}</span>{opponent && <CountryFlag country={opponent.country} className="draw-show-rounds-flag" />}</span>
               {opponent && <span className="draw-show-rounds-venue" aria-label={fixture.home ? "Thuis" : "Uit"} title={fixture.home ? "Thuis" : "Uit"}>{fixture.home ? <House /> : <Plane />}</span>}
             </div>; })}
           </div>
