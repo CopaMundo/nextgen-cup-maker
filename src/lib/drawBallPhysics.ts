@@ -107,7 +107,7 @@ export function createDrawBallWorld(ids: string[]) {
       previousPositions.set(ball, previous);
       // Cannon emits preStep after contact solving, before integration. Limit
       // correction energy here, before it can displace an entire pile.
-      ball.velocity.y = Math.max(-1.2, Math.min(.08, ball.velocity.y));
+      ball.velocity.y = Math.max(-1.2, ball.velocity.y);
       const lateral = Math.hypot(ball.velocity.x, ball.velocity.z);
       if (lateral > .4) {
         ball.velocity.x *= .4 / lateral;
