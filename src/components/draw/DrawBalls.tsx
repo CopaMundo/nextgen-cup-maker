@@ -30,6 +30,16 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
       // Only neighbours resting on or beside the drawn ball need to roll in.
       const reach = simulation.radius * 4.2;
       for (const remaining of simulation.balls.values()) if (remaining.position.distanceTo(body.position) < reach) remaining.wakeUp();
+      // Wake stacked dependants too, but never kick a sleeping pile sideways.
+      const moving = [...simulation.balls.values()].filter(ball => ball.sleepState !== 2);
+      for (let index = 0; index < moving.length; index++) {
+        const support = moving[index];
+        for (const remaining of simulation.balls.values()) {
+          if (remaining.sleepState === 2 && remaining.position.y > support.position.y && remaining.position.distanceTo(support.position) < simulation.radius * 2.1) {
+            remaining.wakeUp(); moving.push(remaining);
+          }
+        }
+      }
     }
   }, [teamKey, simulation]);
   useFrame((_, delta) => {
