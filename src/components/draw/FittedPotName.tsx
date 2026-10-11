@@ -24,16 +24,16 @@ export function FittedPotName({ name }: { name: string }) {
       if (!probe) return;
       names.forEach((item) => item.style.removeProperty("font-size"));
       const maximum = parseFloat(getComputedStyle(probe).fontSize);
+      const css = getComputedStyle(probe);
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      context.font = `${css.fontWeight} ${maximum}px ${css.fontFamily}`;
       const width = probe.clientWidth;
       const parent = probe.parentElement;
       const parentStyle = parent ? getComputedStyle(parent) : undefined;
       const availableHeight = parent ? parent.clientHeight - parseFloat(parentStyle?.paddingTop || "0") - parseFloat(parentStyle?.paddingBottom || "0") : Infinity;
-      const range = document.createRange();
-      const measure = (text: string) => {
-        probe.textContent = text;
-        range.selectNodeContents(probe);
-        return range.getBoundingClientRect().width;
-      };
+      const measure = (text: string) => context.measureText(text).width;
       const balanced = (name: string) => {
         if (measure(name) <= width) return name;
         const words = name.trim().split(/\s+/);
@@ -47,12 +47,10 @@ export function FittedPotName({ name }: { name: string }) {
         return best;
       };
       const fitted = names.map((item) => {
-        probe.style.removeProperty("font-size");
         const text = balanced(item.dataset.name || "");
-        probe.textContent = text;
-        range.selectNodeContents(probe);
-        const bounds = range.getBoundingClientRect();
-        const ratio = Math.min(1, (width - .5) / Math.max(1, bounds.width), availableHeight / Math.max(1, bounds.height));
+        const lines = text.split("\n");
+        const measuredWidth = Math.max(...lines.map(measure));
+        const ratio = Math.min(1, (item.clientWidth - 1) / Math.max(1, measuredWidth), availableHeight / (lines.length * maximum * 1.1));
         return { item, text, size: maximum * ratio };
       });
       fitted.forEach(({ item, text, size }) => { item.textContent = text; item.style.fontSize = `${size}px`; });
