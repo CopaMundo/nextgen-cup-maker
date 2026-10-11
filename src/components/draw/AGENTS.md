@@ -1,5 +1,7 @@
 # Draw stage rules
 
+- Size rounds panels from published round-count metadata before any team reveal; retain fixed headers and bounded equal grid tracks above the pedestal, splitting above ten rounds. Keep right-side logos unframed and left roster badges unchanged so identity updates cannot shift stage geometry.
+
 - Layer theme-specific bowl cutouts over clean studios; reveal one identity in a compact acrylic bar between the light strips, then directly morph the entire bar into measured slots. Delay choices from completed local playback so latency never skips their entrance.
 - Auto-trim transparent logo margins in the shared draw stage at render time and cache the result; source uploads stay unchanged while projector and director receive identical optical alignment.
 - Calculate wing profiles and per-card row proportions from group capacity and slot-row occupancy, not revealed identity count, so draws never resize tables. Bound gaps and slot heights within the pillar-free wall budget. Center unpaired cards at normal width and observe stage/target resize so director and projector share exact landings.

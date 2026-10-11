@@ -2714,10 +2714,10 @@ posities + statistieken groen */
 .draw-show-pot-teams > .is-drawn { opacity: .3; filter: grayscale(1); color: hsl(var(--muted-foreground)); }
 .draw-show-pot-logo { display: flex; align-items: center; justify-content: center; width: var(--pot-logo-size, 1.45cqw); height: var(--pot-logo-size, 1.45cqw); flex: 0 0 var(--pot-logo-size, 1.45cqw); border: 0; border-radius: 0; background: none; }
 .draw-show-pot-teams img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; object-fit: contain; object-position: center; }
-.draw-show-rounds-roster, .draw-show-rounds-schedule { position: absolute; top: 13%; bottom: 7%; width: 25%; display: flex; flex-direction: column; }
+.draw-show-rounds-roster, .draw-show-rounds-schedule { position: absolute; top: 13%; bottom: 29%; width: 22%; display: flex; flex-direction: column; }
 .draw-show-rounds-roster { border: 0; border-radius: 0; background: none; box-shadow: none; }
 .draw-show-rounds-roster h2 { border: 1px solid hsl(var(--primary) / .65); border-radius: 5px; background: hsl(var(--card) / .45); margin-bottom: .35cqw; }
-.draw-show-rounds-schedule { top: 53%; bottom: auto; transform: translateY(-50%); }
+.draw-show-rounds-schedule { transform: none; }
 .draw-show-rounds-roster.draw-show-wing-left, .draw-show-rounds-schedule.draw-show-wing-left { left: 17%; }
 .draw-show-rounds-roster.draw-show-wing-right, .draw-show-rounds-schedule.draw-show-wing-right { right: 17%; }
 .draw-show-rounds-roster, .draw-show-rounds-schedule { width: 22%; }
@@ -2736,9 +2736,12 @@ posities + statistieken groen */
 .draw-show-rounds-roster-team.is-inactive .draw-show-rounds-roster-identity,
 .draw-show-rounds-roster-team.is-inactive .draw-show-rounds-club-logo { opacity: .35; filter: grayscale(1); }
 .draw-show-rounds-roster-team.is-complete { border-color: hsl(var(--primary)); background: hsl(var(--accent)); color: hsl(var(--primary)); }
-.draw-show-rounds-fixtures { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(var(--fixture-rows), 3.6cqw); flex: 0 0 auto; gap: .3cqw; overflow: hidden; padding: .5cqw; }
+.draw-show-rounds-fixtures { --fixture-height: calc((32.625cqw - 4.5cqw - 1cqw - 2px - (var(--fixture-rows) - 1) * .3cqw) / var(--fixture-rows)); --fixture-logo-size: min(3.3cqw, calc(var(--fixture-height) - .4cqw - 2px)); --fixture-name-size: clamp(.72cqw, calc(var(--fixture-height) * .3), 1cqw); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(var(--fixture-rows), minmax(0, 1fr)); flex: 1; min-height: 0; gap: .3cqw; overflow: hidden; padding: .5cqw; }
 .draw-show-rounds-fixtures.is-two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; gap: .3cqw; }
-.draw-show-rounds-team-header { position: relative; isolation: isolate; display: flex; align-items: center; gap: .65cqw; min-height: 4.5cqw; flex-shrink: 0; padding: .7cqw; border-bottom: 1px solid hsl(var(--border) / .35); }
+.draw-show-rounds-team-header { position: relative; isolation: isolate; display: flex; align-items: center; gap: .65cqw; height: 4.5cqw; min-height: 4.5cqw; flex-shrink: 0; overflow: hidden; padding: .5cqw; border-bottom: 1px solid hsl(var(--border) / .35); }
+.draw-show-rounds-waiting { width: 100%; text-align: center; color: hsl(var(--muted-foreground)); }
+.draw-show-rounds-schedule .draw-show-slot-mark { border: 0; border-radius: 0; background: none; }
+.draw-show-rounds-schedule .draw-show-slot-mark img { width: 100%; height: 100%; }
 .draw-show-rounds-team-header > .draw-show-slot-mark { width: 3.3cqw; height: 3.3cqw; flex-basis: 3.3cqw; font-size: 1cqw; }
 .draw-show-rounds-team-header > div { position: relative; z-index: 1; min-width: 0; flex: 1; padding-right: 2.4cqw; }
 .draw-show-rounds-team-header strong { font-size: 1.15cqw; line-height: 1.25; overflow-wrap: anywhere; }
@@ -2746,13 +2749,12 @@ posities + statistieken groen */
 .draw-show-rounds-team-header small { display: block; width: fit-content; margin-top: .3cqw; color: hsl(var(--primary)); font-size: .65cqw; text-transform: uppercase; }
 .draw-show-rounds-fixture { min-height: 0; gap: .4cqw; }
 .draw-show-rounds-opponent-identity { display: flex; align-items: center; gap: .35cqw; flex: 1; min-width: 0; }
-.draw-show-rounds-fixture .draw-show-slot-name { flex: 0 1 auto; font-size: 1cqw; white-space: normal; overflow-wrap: anywhere; }
+.draw-show-rounds-fixture .draw-show-slot-name { flex: 0 1 auto; font-size: var(--fixture-name-size); white-space: normal; overflow-wrap: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .draw-show-rounds-pot-tag { flex: 0 0 2cqw; color: hsl(var(--primary)); font-size: .65cqw; text-align: center; text-transform: uppercase; }
-.draw-show-rounds-fixture .draw-show-slot-mark { width: 2.7cqw; height: 2.7cqw; flex-basis: 2.7cqw; font-size: .8cqw; }
-.draw-show-rounds-fixtures.is-two-columns .draw-show-rounds-fixture { flex-wrap: wrap; align-content: center; }
-.draw-show-rounds-fixtures.is-two-columns .draw-show-rounds-pot-tag { flex-basis: 100%; text-align: left; }
-.draw-show-rounds-fixtures.is-two-columns .draw-show-slot-mark { width: 1.6cqw; height: 1.6cqw; flex-basis: 1.6cqw; }
-.draw-show-rounds-fixtures.is-two-columns .draw-show-slot-name { font-size: .8cqw; }
+.draw-show-rounds-fixture .draw-show-slot-mark { width: var(--fixture-logo-size); height: var(--fixture-logo-size); flex-basis: var(--fixture-logo-size); font-size: .8cqw; }
+.draw-show-rounds-fixtures.is-two-columns { --fixture-logo-size: min(2.2cqw, calc(var(--fixture-height) - .4cqw - 2px)); --fixture-name-size: clamp(.65cqw, calc(var(--fixture-height) * .28), .8cqw); }
+.draw-show-rounds-fixtures.is-two-columns .draw-show-rounds-fixture { gap: .2cqw; padding-inline: .2cqw; }
+.draw-show-rounds-fixtures.is-two-columns .draw-show-rounds-pot-tag { flex-basis: 1cqw; font-size: .5cqw; overflow: hidden; }
 .draw-show-rounds-fixtures.is-two-columns .draw-show-rounds-venue { flex-basis: 1cqw; }
 .draw-show-rounds-fixture .draw-show-rounds-flag { width: 1.4cqw; height: 1.1cqw; object-fit: contain; flex-shrink: 0; }
 .draw-show-rounds-venue { display: grid; place-items: center; flex: 0 0 1.3cqw; color: hsl(var(--muted-foreground)); }

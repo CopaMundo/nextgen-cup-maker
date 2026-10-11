@@ -17,6 +17,7 @@ export interface DrawPresentation {
 
 export interface RoundsStage {
   groupName: string;
+  totalRounds?: number;
   drawnTeamIds: string[];
   teamOrder?: string[];
   roster?: { teamId: string; completedAt?: number | null; opponents: { id: string; opponentId: string; revealAt: number | null }[] }[];
