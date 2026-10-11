@@ -997,7 +997,7 @@ const requestPotCount = (count: number) => {
           {loading && step !== "draw" ? (
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
           ) : step === "method" && isMatchDraw ? (
-            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Type loting</h2><div className="grid gap-3 sm:grid-cols-3">{([{ id: "random" as const, label: "Vrije loting" }, { id: "pots" as const, label: "Potten" }, ...(fixtureKind === "knockout" ? [{ id: "seeds" as const, label: "Reekshoofden" }] : [])]).map(option => { const selected = option.id === (useSeeds ? "seeds" : usePots ? "pots" : "random"); return <Button key={option.id} variant="outline" aria-pressed={selected} onClick={() => selectMatchMethod(option.id)} className={`draw-choice h-auto min-h-24 whitespace-normal p-4 ${selected ? "border-primary text-primary" : "border-border"}`}>{option.label}{selected && <Check className="h-4 w-4" />}</Button>; })}</div></div>
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Type loting</h2><div className="grid gap-3 sm:grid-cols-3">{([{ id: "random" as const, label: "Vrije loting" }, { id: "pots" as const, label: "Potten" }, ...(fixtureKind === "knockout" ? [{ id: "seeds" as const, label: "Reekshoofden" }] : [])]).map(option => { const selected = option.id === (useSeeds ? "seeds" : usePots ? "pots" : "random"); return <Button key={option.id} variant="outline" aria-pressed={selected} disabled={option.id === "seeds" && containers.length < 2} onClick={() => selectMatchMethod(option.id)} className={`draw-choice h-auto min-h-24 whitespace-normal p-4 ${selected ? "border-primary text-primary" : "border-border"}`}>{option.label}{selected && <Check className="h-4 w-4" />}</Button>; })}</div></div>
           ) : step === "method" ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>
@@ -1072,16 +1072,7 @@ const requestPotCount = (count: number) => {
 
             </div>
           ) : step === "rules" ? (
-            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{isMatchDraw ? renderMatchRules() : renderRules()}</div>
-          ) : step === "settings" ? (
-            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
-              <div>
-                <h2 className="text-lg font-bold">Loting show instellingen</h2>
-              </div>
-              <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
-                {!isMatchDraw && <div className="space-y-2"><Label htmlFor="prepare-placement">Groepstoewijzing</Label><Select value={placementMode} onValueChange={value => setPlacementMode(value as "manual" | "automatic")}><SelectTrigger id="prepare-placement"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="automatic">Automatisch toewijzen</SelectItem><SelectItem value="manual">Groep loten</SelectItem></SelectContent></Select></div>}
-              </DrawShowOptions>
-               {!isMatchDraw && usePots && potOptions.includes(pots.length) && (
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{isMatchDraw ? renderMatchRules() : renderRules()}{!isMatchDraw && usePots && potOptions.includes(pots.length) && (
                   <div className="space-y-5 border-t border-primary/30 pt-4">
                     <section className="space-y-2">
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verdeling van potten over groepen</h3>
@@ -1114,7 +1105,16 @@ const requestPotCount = (count: number) => {
 
 
                  </div>
-              )}
+              )}</div>
+          ) : step === "settings" ? (
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
+              <div>
+                <h2 className="text-lg font-bold">Loting show instellingen</h2>
+              </div>
+              <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
+                {!isMatchDraw && <div className="space-y-2"><Label htmlFor="prepare-placement">Groepstoewijzing</Label><Select value={placementMode} onValueChange={value => setPlacementMode(value as "manual" | "automatic")}><SelectTrigger id="prepare-placement"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="automatic">Automatisch toewijzen</SelectItem><SelectItem value="manual">Groep loten</SelectItem></SelectContent></Select></div>}
+              </DrawShowOptions>
+               
             </div>
           ) : drawContent}
 
