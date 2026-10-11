@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Type loting: exacte teksten en standaardkeuzes voor alle formaten, geen stapteller/subtitel, gedeelde keuzekaarten en tweedelige voortgang bij speelrondes.
 - [x] Alle formats: uniforme vierstappen-opstartwizard, vaste kop/navigatie, teamselectie en voorwaardelijke potaanvulling, reekshoofden en gedeelde showinstellingen. 22 gerichte tests geslaagd, inclusief vier formats, terugnavigatie, selectietelling en showstart; actuele build OK.
 - [ ] Aangemelde controle van de wizard en poule-naar-speelrondedoorstroom in een echt toernooi. Blokker: geen actieve previewsessie; automatisch aanmelden kon geen bijbehorend account bepalen.
 - [x] Wedstrijdkaarten: links uitgelijnde namen, rustige begrensde typografie, compactere éénkolomskaarten op vaste vleugelposities en duidelijke teamscheiding bij twee kolommen. 21 tests geslaagd; aangemelde seedtrekking/plaatsing en fullscreen gecontroleerd; 2/8/16 kaarten per flank visueel gecontroleerd zonder overflow. Eén kolom 16cqw breed, twee kolommen vullen vaste tracks; decor/beamer niet geverifieerd.
