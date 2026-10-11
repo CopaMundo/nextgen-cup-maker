@@ -118,8 +118,8 @@ export function createDrawBallWorld(ids: string[]) {
       const ceiling = previousHeights.get(ball);
       // Permit subpixel contact correction rather than locking penetrating
       // bodies together (which made the solver eject their neighbours sideways).
-      if (ceiling !== undefined && ball.position.y > ceiling + .002) {
-        ball.position.y = ceiling + .002;
+      if (ceiling !== undefined && ball.position.y > ceiling + .02) {
+        ball.position.y = ceiling + .02;
         ball.aabbNeedsUpdate = true;
       }
       if (ball.velocity.y > 0) ball.velocity.y = 0;
