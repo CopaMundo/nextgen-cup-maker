@@ -1,11 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
-import { balanceWallTitle } from "@/lib/drawHeading";
-
-const sharedSizes = new Map<string, number>();
 const scheduledGrids = new WeakMap<Element, number>();
 const gridObservers = new WeakMap<Element, { count: number; fit: () => void; dispose: () => void }>();
 
-/** Balance names in their actual columns, using one shared size for the entire grid. */
+/** Keep normal names large; only an exceptional name fits its own two-line column. */
 export function FittedPotName({ name }: { name: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
@@ -37,37 +34,28 @@ export function FittedPotName({ name }: { name: string }) {
         range.selectNodeContents(probe);
         return range.getBoundingClientRect().width;
       };
-      const balanced = (name: string) => balanceWallTitle(name, width * .62, measure);
-      // All pot names (every overview page) decide one shared size, cached per column width.
-      const allNames = Array.from(new Set((grid.getAttribute("data-all-names") || names.map((item) => item.dataset.name || "").join("\n")).split("\n").filter(Boolean)));
-      const cacheKey = `${Math.round(width)}|${Math.round(availableHeight)}|${maximum}|${allNames.join("\n")}`;
-      let sharedSize = sharedSizes.get(cacheKey) ?? Infinity;
-      if (!sharedSizes.has(cacheKey) && width > 0) {
-        for (const name of allNames) {
-          probe.style.removeProperty("font-size");
-          probe.textContent = balanced(name);
-          range.selectNodeContents(probe);
-          const fits = () => range.getBoundingClientRect().width <= width - .5 && probe.getBoundingClientRect().height <= availableHeight;
-          let fittedSize = maximum;
-          if (!fits()) {
-            let low = 0;
-            let high = Math.min(maximum, sharedSize);
-            for (let iteration = 0; iteration < 14; iteration++) {
-              const size = (low + high) / 2;
-              probe.style.fontSize = `${size}px`;
-              if (fits()) low = size;
-              else high = size;
-            }
-            fittedSize = low;
-          }
-          sharedSize = Math.min(sharedSize, fittedSize);
+      const balanced = (name: string) => {
+        if (measure(name) <= width) return name;
+        const words = name.trim().split(/\s+/);
+        let best = name, score = Infinity;
+        for (let split = 1; split < words.length; split++) {
+          const upper = words.slice(0, split).join(" "), lower = words.slice(split).join(" ");
+          const a = measure(upper), b = measure(lower);
+          const next = Math.max(a, b) + (b < a ? width * .15 : 0);
+          if (next < score) { score = next; best = `${upper}\n${lower}`; }
         }
-        if (Number.isFinite(sharedSize)) sharedSizes.set(cacheKey, sharedSize);
-      }
-      probe.style.removeProperty("font-size");
-      names.forEach((item) => { item.textContent = balanced(item.dataset.name || ""); });
-      probe.textContent = balanced(probe.dataset.name || "");
-      if (Number.isFinite(sharedSize)) names.forEach((item) => { item.style.fontSize = `${sharedSize}px`; });
+        return best;
+      };
+      const fitted = names.map((item) => {
+        probe.style.removeProperty("font-size");
+        const text = balanced(item.dataset.name || "");
+        probe.textContent = text;
+        range.selectNodeContents(probe);
+        const bounds = range.getBoundingClientRect();
+        const ratio = Math.min(1, (width - .5) / Math.max(1, bounds.width), availableHeight / Math.max(1, bounds.height));
+        return { item, text, size: maximum * ratio };
+      });
+      fitted.forEach(({ item, text, size }) => { item.textContent = text; item.style.fontSize = `${size}px`; });
     };
     // Every name in the grid shares one measurement pass per frame.
     const fit = () => {
