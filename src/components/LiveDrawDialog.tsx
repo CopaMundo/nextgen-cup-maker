@@ -588,7 +588,9 @@ const LiveDrawDialog = ({
             const { error } = await supabase.from("slots").update({ team_id: teamId }).eq("tournament_id", tournamentId).eq("phase_id", phaseId).eq("id", slotId);
             if (error) throw error;
             for (const side of ["home", "away"] as const) {
-              const { error: matchError } = await supabase.from("matches").update(side === "home" ? { home_team_id: teamId } : { away_team_id: teamId }).eq("tournament_id", tournamentId).eq("phase_id", phaseId).eq("group_id", slot.group_id ?? "").eq(side === "home" ? "home_slot_label" : "away_slot_label", slot.slot_code);
+              let update = supabase.from("matches").update(side === "home" ? { home_team_id: teamId } : { away_team_id: teamId }).eq("tournament_id", tournamentId).eq("phase_id", phaseId).eq(side === "home" ? "home_slot_label" : "away_slot_label", slot.slot_code);
+              update = slot.group_id ? update.eq("group_id", slot.group_id) : update.is("group_id", null);
+              const { error: matchError } = await update;
               if (matchError) throw matchError;
             }
           }
