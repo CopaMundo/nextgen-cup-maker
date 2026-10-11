@@ -34,5 +34,10 @@ describe("calm draw pile", () => {
     }
     expect(maximum - highest).toBeLessThan(.12);
     expect(upwardStep).toBeLessThan(.04);
+    for (let i = 0; i < 120; i++) world.step(1 / 60);
+    for (const ball of balls.values()) {
+      expect(ball.sleepState).toBe(2);
+      expect(ball.velocity.length()).toBe(0);
+    }
   }, 20000);
 });

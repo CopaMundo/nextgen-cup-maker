@@ -50,7 +50,9 @@ export function FittedPotName({ name }: { name: string }) {
         const text = balanced(item.dataset.name || "");
         const lines = text.split("\n");
         const measuredWidth = Math.max(...lines.map(measure));
-        const ratio = Math.min(1, (item.clientWidth - 1) / Math.max(1, measuredWidth), availableHeight / (lines.length * maximum * 1.1));
+        // Ordinary one-line and balanced two-line names keep the exact same
+        // base size. Only an unbreakable exceptional word needs optical fitting.
+        const ratio = Math.min(1, item.clientWidth / Math.max(1, measuredWidth), availableHeight / (lines.length * maximum * 1.1));
         return { item, text, size: maximum * ratio };
       });
       fitted.forEach(({ item, text, size }) => { item.textContent = text; item.style.fontSize = `${size}px`; });

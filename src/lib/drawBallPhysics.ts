@@ -1,4 +1,4 @@
-import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
+import { Body, Material, ContactMaterial, GSSolver, SAPBroadphase, Sphere, Trimesh, Vec3, World } from "cannon-es";
 
 // Shared orthographic cavity: rounded glass sits on the uploaded podium,
 // with its inner floor at 74% and retaining rim at approximately 66.5%.
@@ -16,10 +16,14 @@ export const drawBallRadius = (count: number) => Math.max(.8, Math.min(1.25, 3.8
 export function createDrawBallWorld(ids: string[]) {
   const world = new World({ gravity: new Vec3(0, -25, 0), allowSleep: true });
   world.broadphase = new SAPBroadphase(world);
+  const solver = new GSSolver();
+  solver.iterations = 16;
+  solver.tolerance = .001;
+  world.solver = solver;
   const material = new Material("draw-ball");
   // Orthographic depth holds large pots without increasing the visible bowl silhouette.
   const depth = Math.max(1, ids.length / 40);
-  world.addContactMaterial(new ContactMaterial(material, material, { friction: .22, restitution: 0, contactEquationRelaxation: 6 }));
+  world.addContactMaterial(new ContactMaterial(material, material, { friction: .35, restitution: 0, contactEquationRelaxation: 4, contactEquationStiffness: 1e6 }));
   const vertices: number[] = [];
   const indices: number[] = [];
    const rings = 8, segments = 20;
@@ -84,26 +88,54 @@ export function createDrawBallWorld(ids: string[]) {
       const reach = 4 * radius * radius - d2;
       if (reach > 0) heights[index] = Math.max(heights[index], y + Math.sqrt(reach) + .004);
     });
-    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .8, angularDamping: .9, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
+    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .95, angularDamping: .98, allowSleep: false });
     body.position.set(x, y, z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
   });
   // The pre-seeded pile is already supported. Solver penetration corrections
   // must not inject upward energy when that support is removed during a draw.
-  const previousHeights = new Map<Body, number>();
+  const previousPositions = new Map<Body, Vec3>();
+  const quietTime = new Map<Body, number>();
   world.addEventListener("preStep", () => {
-    previousHeights.clear();
-    for (const ball of balls.values()) previousHeights.set(ball, ball.position.y);
+    for (const ball of balls.values()) {
+      const previous = previousPositions.get(ball) ?? new Vec3();
+      previous.copy(ball.position);
+      previousPositions.set(ball, previous);
+      // Cannon emits preStep after contact solving, before integration. Limit
+      // sideways correction energy but preserve vertical contact resolution.
+      ball.velocity.y = Math.max(-1.2, Math.min(.8, ball.velocity.y));
+      const lateral = Math.hypot(ball.velocity.x, ball.velocity.z);
+      if (lateral > .4) {
+        ball.velocity.x *= .4 / lateral;
+        ball.velocity.z *= .4 / lateral;
+      }
+    }
   });
   world.addEventListener("postStep", () => {
+    const supported = new Set<Body>();
+    for (const contact of world.contacts) {
+      if (contact.ni.y < -.2) supported.add(contact.bi);
+      if (contact.ni.y > .2) supported.add(contact.bj);
+    }
     for (const ball of balls.values()) {
-      const ceiling = previousHeights.get(ball);
-      if (ceiling !== undefined && ball.position.y > ceiling) {
-        ball.position.y = ceiling;
-        ball.aabbNeedsUpdate = true;
-      }
+      if (ball.sleepState === Body.SLEEPING) continue;
+      // Do not roll positions back after contact integration: that reintroduces
+      // overlap and makes stacked balls fight the same constraint every frame.
       if (ball.velocity.y > 0) ball.velocity.y = 0;
+      ball.velocity.y = Math.max(-1.2, ball.velocity.y);
+      const horizontalSpeed = Math.hypot(ball.velocity.x, ball.velocity.z);
+      if (horizontalSpeed > .65) {
+        ball.velocity.x *= .65 / horizontalSpeed;
+        ball.velocity.z *= .65 / horizontalSpeed;
+      }
+      // Judge rest from actual displacement and real supporting contacts,
+      // not the solver's residual velocity. Unsupported balls must keep falling.
+      const previous = previousPositions.get(ball);
+      const quiet = supported.has(ball) && previous && Math.abs(ball.position.y - previous.y) < .025;
+      const duration = quiet ? (quietTime.get(ball) ?? 0) + world.dt : Math.max(0, (quietTime.get(ball) ?? 0) - world.dt);
+      quietTime.set(ball, duration);
+      if (duration >= .45) ball.sleep();
     }
   });
   return { world, balls, radius, depth };
