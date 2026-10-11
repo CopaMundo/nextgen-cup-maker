@@ -27,7 +27,9 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
     const retained = new Set(teamKey.split("|"));
     for (const [id, body] of simulation.balls) if (!retained.has(id)) {
       simulation.world.removeBody(body); simulation.balls.delete(id);
-      for (const remaining of simulation.balls.values()) remaining.wakeUp();
+      // Only neighbours resting on or beside the drawn ball need to roll in.
+      const reach = simulation.radius * 4.2;
+      for (const remaining of simulation.balls.values()) if (remaining.position.distanceTo(body.position) < reach) remaining.wakeUp();
     }
   }, [teamKey, simulation]);
   useFrame((_, delta) => {

@@ -36,38 +36,53 @@ export function createDrawBallWorld(ids: string[]) {
   }
   world.addBody(new Body({ mass: 0, material, shape: new Trimesh(vertices, indices) }));
   const radius = drawBallRadius(ids.length);
-  // Hexagonal layers avoid an overlapping spiral pile at the bowl's center.
-  // Keep sphere edges within the rim while filling its full left/right span.
-  const spacing = radius * 2 + .08;
+  // Place every ball where it would come to rest (lowest free spot on the bowl
+  // or on the balls beneath it) and start asleep. A synchronous settling
+  // simulation blocked the live stage for seconds with larger pots.
+  const spacing = radius * 2 + .02;
   const rowSpacing = spacing * Math.sqrt(3) / 2;
   const maxRadial = BOWL_RADIUS - radius - .12;
-  const layer: { x: number; z: number }[] = [];
-  const rows = Math.ceil(maxRadial / rowSpacing);
-  const columns = Math.ceil(maxRadial / spacing);
-  for (let row = -rows; row <= rows; row++) {
-    for (let column = -columns; column <= columns; column++) {
-      const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0);
-      const z = row * rowSpacing;
-      if (Math.hypot(x, z) <= maxRadial) layer.push({ x, z });
+  const candidates: { x: number; z: number }[] = [];
+  const rows = Math.ceil(maxRadial / rowSpacing) + 1;
+  const columns = Math.ceil(maxRadial / spacing) + 1;
+  for (let level = 0; level < 3; level++) {
+    const offsetX = level * spacing / 2, offsetZ = level * rowSpacing / 3;
+    for (let row = -rows; row <= rows; row++) for (let column = -columns; column <= columns; column++) {
+      const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0) + offsetX;
+      const z = row * rowSpacing + offsetZ;
+      if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z });
     }
   }
-  layer.sort((a, b) => Math.hypot(b.x, b.z) - Math.hypot(a.x, a.z) || a.x - b.x);
-  const layerBase = bowlHeight(maxRadial) + radius + .1;
+  const surface = (x: number, z: number) => {
+    const d = Math.hypot(x, z);
+    const slope = .2 * d + .0088 * d * d * d;
+    return bowlHeight(d) + radius * Math.sqrt(1 + slope * slope);
+  };
+  const placed: { x: number; y: number; z: number }[] = [];
+  const restingY = (x: number, z: number) => {
+    let y = surface(x, z);
+    for (const other of placed) {
+      const d2 = (other.x - x) ** 2 + (other.z - z) ** 2;
+      const reach = 4 * radius * radius - d2;
+      if (reach > 0) y = Math.max(y, other.y + Math.sqrt(reach) + .005);
+    }
+    return y;
+  };
   const balls = new Map<string, Body>();
-  ids.forEach((id, index) => {
-    const position = layer[index % layer.length];
-    if (!position) return;
+  ids.forEach((id) => {
+    let best = -1, bestY = Infinity;
+    candidates.forEach((candidate, index) => {
+      const y = restingY(candidate.x, candidate.z);
+      if (y < bestY - 1e-6) { best = index; bestY = y; }
+    });
+    const position = best >= 0 ? candidates.splice(best, 1)[0] : { x: 0, z: 0 };
+    const y = best >= 0 ? bestY : restingY(0, 0);
+    placed.push({ x: position.x, y, z: position.z });
     const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .24, angularDamping: .4, sleepSpeedLimit: .08, sleepTimeLimit: .7 });
-    body.position.set(position.x, layerBase + Math.floor(index / layer.length) * spacing, position.z);
-    body.velocity.set(-position.z * .025, 0, position.x * .025);
+    body.position.set(position.x, y, position.z);
     world.addBody(body); balls.set(id, body);
+    body.sleep();
   });
-  // Start with a settled, deterministic arrangement instead of a falling pile.
-  // Stop as soon as the pile sleeps, so the live stage opens without a busy physics loop.
-  for (let i = 0; i < 360; i++) {
-    world.step(1 / 30);
-    if (i > 20 && [...balls.values()].every((body) => body.sleepState === Body.SLEEPING)) break;
-  }
   return { world, balls, radius };
 }
 
