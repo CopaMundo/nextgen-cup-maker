@@ -21,13 +21,14 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
     const selected = drawnId ? simulation.balls.get(drawnId) : undefined;
     origin.current = selected ? { x: selected.position.x, y: selected.position.y } : { x: 0, y: BOWL_BOTTOM + .7 };
   }, [drawnId, revealKey, simulation]);
+  const teamKey = teamIds.join("|");
   useEffect(() => {
-    const retained = new Set(teamIds);
+    const retained = new Set(teamKey.split("|"));
     for (const [id, body] of simulation.balls) if (!retained.has(id)) {
       simulation.world.removeBody(body); simulation.balls.delete(id);
       for (const remaining of simulation.balls.values()) remaining.wakeUp();
     }
-  }, [teamIds, simulation]);
+  }, [teamKey, simulation]);
   useFrame((_, delta) => {
     // Sleeping piles need no solver work; a single substep keeps large pots smooth.
     if (simulation.balls.size && [...simulation.balls.values()].some(body => body.sleepState !== 2)) simulation.world.step(1 / 60, Math.min(delta, .05), 1);
@@ -49,6 +50,10 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
       if (mesh) { mesh.position.x = direction * frame.split * 5; mesh.position.y = -frame.split * .6; mesh.rotation.z = direction * frame.split * .45; }
     }
   });
+  // Ball meshes only change when a team leaves the pot, not on every playback tick.
+  const ballMeshes = useMemo(() => teamKey ? teamKey.split("|").map(id => <mesh key={id} ref={mesh => { if (mesh) meshes.current.set(id, mesh); else meshes.current.delete(id); }} material={material}>
+    <sphereGeometry args={[simulation.radius, 20, 14]} />
+  </mesh>) : null, [teamKey, material, simulation.radius]);
   return <>
     <ambientLight intensity={1.2} />
     <directionalLight position={[-12, 25, 30]} intensity={3} color={palette.light} />
@@ -56,9 +61,7 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
       <Lightformer position={[0, 20, 10]} scale={[30, 10, 1]} intensity={3} color={palette.light} />
       <Lightformer position={[-12, 0, 10]} scale={[4, 30, 1]} intensity={2} color={palette.edge} />
     </Environment></Suspense>
-    {teamIds.map(id => <mesh key={id} ref={mesh => { if (mesh) meshes.current.set(id, mesh); else meshes.current.delete(id); }} material={material}>
-      <sphereGeometry args={[simulation.radius, 20, 14]} />
-    </mesh>)}
+    {ballMeshes}
     <group ref={flight} visible={false}>
       <mesh ref={left} material={halves}><sphereGeometry args={[1.9, 32, 24, -Math.PI / 2, Math.PI]} /></mesh>
       <mesh ref={right} material={halves}><sphereGeometry args={[1.9, 32, 24, Math.PI / 2, Math.PI]} /></mesh>

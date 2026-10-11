@@ -13,7 +13,7 @@ export function FittedPotName({ name }: { name: string }) {
     let disposed = false;
     const fitNow = () => {
       scheduledGrids.delete(grid);
-      if (disposed || !grid.isConnected) return;
+      if (!grid.isConnected) return;
       const names = Array.from(grid.querySelectorAll<HTMLElement>(".draw-show-pot-name"));
       names.forEach((item) => item.style.removeProperty("font-size"));
       let sharedSize = Infinity;
