@@ -4,8 +4,8 @@ import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, 
 // with its inner floor at 74% and retaining rim at approximately 66.5%.
 export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
-/** Center of the compact acrylic bar between the studio light strips. */
-export const DRAW_REVEAL_FRACTION = .415;
+/** Center of the dark band between the two middle studio LED rings (39.3% / 49.4%). */
+export const DRAW_REVEAL_FRACTION = .443;
 export const DRAW_REVEAL_Y = (0.5 - DRAW_REVEAL_FRACTION) * 56.25;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
@@ -37,30 +37,21 @@ export function createDrawBallWorld(ids: string[]) {
   }
   world.addBody(new Body({ mass: 0, material, shape: new Trimesh(vertices, indices) }));
   const radius = drawBallRadius(ids.length);
-  // Place every ball where it would come to rest (lowest free spot on the bowl
-  // or on the balls beneath it) and start asleep. A synchronous settling
-  // simulation blocked the live stage for seconds with larger pots.
-  const spacing = radius * 2 + .02;
-  const rowSpacing = spacing * Math.sqrt(3) / 2;
+  // Place every ball where it would come to rest and start asleep (a synchronous
+  // settling simulation blocked the stage for seconds). Each ball drops into the
+  // lowest free spot of the bowl or the pile, so the pile fills from the centre
+  // upwards with a calm, level surface instead of a ring or loose lumps.
   const maxRadial = BOWL_RADIUS - radius - .12;
-  const candidates: { x: number; z: number; level: number }[] = [];
-  const rows = Math.ceil(maxRadial / rowSpacing) + 1;
-  const columns = Math.ceil(maxRadial / spacing) + 1;
-  for (let level = 0; level < 3; level++) {
-    const offsetX = level * spacing / 2, offsetZ = level * rowSpacing / 3;
-    for (let row = -rows; row <= rows; row++) for (let column = -columns; column <= columns; column++) {
-      // Deterministic micro-offsets keep refresh recovery stable without a visible lattice.
-      const seed = Math.sin(row * 127.1 + column * 311.7 + level * 74.7) * 43758.5453;
-      const jitter = (seed - Math.floor(seed) - .5) * radius * .35;
-      const x = column * spacing + (Math.abs(row) % 2 ? spacing / 2 : 0) + offsetX + jitter;
-      const z = row * rowSpacing + offsetZ + jitter * .61;
-      if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z, level });
-    }
+  const step = radius * .42;
+  const candidates: { x: number; z: number }[] = [];
+  const steps = Math.ceil(maxRadial / step);
+  for (let row = -steps; row <= steps; row++) for (let column = -steps; column <= steps; column++) {
+    // Deterministic micro-offsets avoid a visible lattice while refreshes stay reproducible.
+    const seed = Math.sin(row * 127.1 + column * 311.7) * 43758.5453;
+    const jitter = (seed - Math.floor(seed) - .5) * step * .5;
+    const x = column * step + jitter, z = row * step - jitter * .7;
+    if (Math.hypot(x, z) <= maxRadial) candidates.push({ x, z });
   }
-  // The first layer spreads across the full bowl width (outer ring first);
-  // further balls drop onto the lowest free resting spot.
-  const floor = candidates.filter((candidate) => candidate.level === 0)
-    .sort((a, b) => Math.hypot(b.x, b.z) - Math.hypot(a.x, a.z) || a.x - b.x);
   const surface = (x: number, z: number) => {
     const d = Math.hypot(x, z);
     const slope = .2 * d + .0088 * d * d * d;
@@ -72,32 +63,26 @@ export function createDrawBallWorld(ids: string[]) {
     for (const other of placed) {
       const d2 = (other.x - x) ** 2 + (other.z - z) ** 2;
       const reach = 4 * radius * radius - d2;
-      if (reach > 0) y = Math.max(y, other.y + Math.sqrt(reach) + .005);
+      if (reach > 0) y = Math.max(y, other.y + Math.sqrt(reach) + .004);
     }
     return y;
   };
+  const heights = candidates.map((candidate) => surface(candidate.x, candidate.z));
   const balls = new Map<string, Body>();
-  ids.forEach((id, order) => {
-    const spread = order < floor.length ? floor[order] : null;
-    if (spread) {
-      candidates.splice(candidates.indexOf(spread), 1);
-      const y = restingY(spread.x, spread.z);
-      placed.push({ x: spread.x, y, z: spread.z });
-      const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .65, angularDamping: .8, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
-      body.position.set(spread.x, y, spread.z);
-      world.addBody(body); balls.set(id, body); body.sleep();
-      return;
-    }
-    let best = -1, bestY = Infinity;
+  ids.forEach((id) => {
+    let best = 0;
+    for (let index = 1; index < candidates.length; index++) if (heights[index] < heights[best] - 1e-6) best = index;
+    const { x, z } = candidates[best] ?? { x: 0, z: 0 };
+    const y = heights[best] ?? restingY(0, 0);
+    placed.push({ x, y, z });
+    // Only heights near the new ball change.
     candidates.forEach((candidate, index) => {
-      const y = restingY(candidate.x, candidate.z);
-      if (y < bestY - 1e-6) { best = index; bestY = y; }
+      const d2 = (candidate.x - x) ** 2 + (candidate.z - z) ** 2;
+      const reach = 4 * radius * radius - d2;
+      if (reach > 0) heights[index] = Math.max(heights[index], y + Math.sqrt(reach) + .004);
     });
-    const position = best >= 0 ? candidates.splice(best, 1)[0] : { x: 0, z: 0 };
-    const y = best >= 0 ? bestY : restingY(0, 0);
-    placed.push({ x: position.x, y, z: position.z });
     const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .65, angularDamping: .8, sleepSpeedLimit: .12, sleepTimeLimit: .45 });
-    body.position.set(position.x, y, position.z);
+    body.position.set(x, y, z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
   });

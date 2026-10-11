@@ -116,6 +116,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
    const teamContent = team && <span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" /> : team.name.slice(0, 2).toUpperCase()}</span><strong>{team.name}</strong><CountryFlag country={team.country} className="draw-show-identity-flag" /></span>;
    const footLabel = rounds ? `${rounds.groupName}${activePot ? ` · ${activePot.name}` : ""}` : activePot?.name ?? session?.phaseName;
    const drawnCount = potTeamIds.filter((id) => rounds ? rounds.drawnTeamIds.includes(id) : !session?.remaining.includes(id)).length;
+  // Every overview page fits names against the whole pot, so the size never changes between pages.
+  const potNames = useMemo(() => potTeamIds.map((id) => teamById.get(id)?.name ?? "").join("\n"), [potTeamIds, teamById]);
   const potCards = useMemo(() => visiblePotIds.map((id) => { const item = teamById.get(id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><FittedPotName name={item?.name ?? ""} /></span>; }), [visiblePotIds, teamById, remainingIds, pending?.teamId, teamReady]);
   const speed = presentation?.speed ?? 1;
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
@@ -173,7 +175,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot draw-show-team">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>
       <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} clock={ballClock} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
-      <div className="draw-show-pedestal-label"><div className="draw-show-pot-label" title={footLabel}>{footLabel}</div><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div></div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} aria-label="Clubs in actieve pot">{potCards}</div></div>
+      <div className="draw-show-bowl is-front" aria-hidden="true"><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>
+      <div className="draw-show-pedestal-label"><div className="draw-show-pot-label" title={footLabel}>{footLabel}</div><div className="draw-show-pot-counter">{drawnCount}/{potTeamIds.length}</div></div><div className="draw-show-pot"><div key={`${rounds?.groupName}-${activePot?.id}-${pageIndex}`} className="draw-show-pot-teams" style={potGridStyle} data-all-names={potNames} aria-label="Clubs in actieve pot">{potCards}</div></div>
     </>}
     {controls}
   </div>;
