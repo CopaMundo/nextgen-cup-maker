@@ -1,9 +1,9 @@
 import gold from "@/assets/copa-gold-studio-v11-4k.webp.asset.json";
 import blue from "@/assets/champions-blue-aligned-4k.webp.asset.json";
 import white from "@/assets/platinum-white-studio-v11-4k.webp.asset.json";
-import goldBowl from "@/assets/draw-bowl-gold-glass.webp.asset.json";
-import blueBowl from "@/assets/draw-bowl-blue-glass.webp.asset.json";
-import whiteBowl from "@/assets/draw-bowl-platinum-glass.webp.asset.json";
+import goldBowl from "@/assets/draw-bowl-gold-rimless.webp.asset.json";
+import blueBowl from "@/assets/draw-bowl-blue-rimless.webp.asset.json";
+import whiteBowl from "@/assets/draw-bowl-platinum-rimless.webp.asset.json";
 
 export type DrawStudioTheme = "copa-gold" | "champions-blue" | "platinum-white";
 export const drawStudios = [
