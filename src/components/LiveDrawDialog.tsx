@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2 } from "lucide-react";
+import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2, SlidersHorizontal } from "lucide-react";
 import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/matchDraw";
 import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
