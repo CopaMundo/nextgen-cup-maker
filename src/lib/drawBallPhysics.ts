@@ -63,7 +63,11 @@ export function createDrawBallWorld(ids: string[]) {
     world.addBody(body); balls.set(id, body);
   });
   // Start with a settled, deterministic arrangement instead of a falling pile.
-  for (let i = 0; i < 90; i++) world.step(1 / 30);
+  // Stop as soon as the pile sleeps, so the live stage opens without a busy physics loop.
+  for (let i = 0; i < 360; i++) {
+    world.step(1 / 30);
+    if (i > 20 && [...balls.values()].every((body) => body.sleepState === Body.SLEEPING)) break;
+  }
   return { world, balls, radius };
 }
 
