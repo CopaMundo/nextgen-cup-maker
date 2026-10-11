@@ -5,7 +5,7 @@ import { Body, Material, ContactMaterial, SAPBroadphase, Sphere, Trimesh, Vec3, 
 export const BOWL_BOTTOM = -13.5;
 export const BOWL_RADIUS = 4.6;
 /** Center of the compact acrylic bar between the studio light strips. */
-export const DRAW_REVEAL_Y = 1.96875;
+export const DRAW_REVEAL_Y = 7.03125;
 export const bowlHeight = (radius: number) => BOWL_BOTTOM + .1 * radius * radius + .0022 * Math.pow(radius, 4);
 
 /** Few teams get large tactile balls; larger pots shrink gradually to fill the bowl. */

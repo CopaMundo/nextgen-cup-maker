@@ -44,6 +44,13 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   const flagBackdrop = (country?: string | null) => presentation?.flagBackdrops !== false && country ? <span className="draw-show-flag-backdrop" aria-hidden="true"><svg className="draw-show-flag" viewBox="3 5 30 26" preserveAspectRatio="none"><image href={countryToFlagUrl(country) ?? undefined} width="36" height="36" /></svg></span> : null;
   const team = session?.teams.find((item) => item.id === pending?.teamId);
   const teamReady = !revealing;
+  const [choicesReady, setChoicesReady] = useState(false);
+  useLayoutEffect(() => {
+    setChoicesReady(false);
+    if (revealing || !revealKey) return;
+    const timer = window.setTimeout(() => setChoicesReady(true), 550 / (presentation?.speed ?? 1));
+    return () => window.clearTimeout(timer);
+  }, [revealing, revealKey, presentation?.speed]);
   const last = session?.history[session.history.length - 1];
   const eligible = selectedId ? pending?.options.filter((option) => option.id === selectedId) ?? [] : pending?.options ?? [];
   const layout = calculateGroupLayout(session?.containers ?? []);
@@ -60,7 +67,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
       if (!slot) return;
       const rect = stage.getBoundingClientRect();
       const target = slot.getBoundingClientRect();
-      setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .465, width: target.width, height: target.height, logo: getComputedStyle(slot.querySelector(".draw-show-slot-mark") ?? slot).width, name: getComputedStyle(slot.querySelector(".draw-show-slot-name") ?? slot).fontSize });
+      setDestination({ x: target.left + target.width / 2 - rect.left - rect.width / 2, y: target.top + target.height / 2 - rect.top - rect.height * .375, width: target.width, height: target.height, logo: getComputedStyle(slot.querySelector(".draw-show-slot-mark") ?? slot).width, name: getComputedStyle(slot.querySelector(".draw-show-slot-name") ?? slot).fontSize });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -151,7 +158,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         {pending && team && <div key={revealKey ?? pending.teamId} className={`draw-show-team-card ${selectionPhase === "transfer" || selectionPhase === "complete" ? "is-departing" : "draw-reveal-name"}`}>
           {selectionPhase !== "transfer" && selectionPhase !== "complete" && <div className="draw-show-team">{teamContent}</div>}
         </div>}
-        {!rounds && pending && teamReady && now >= (presentation?.revealAt ?? 0) + 2450 / speed && selectionPhase !== "complete" && <div key={pending.teamId} className={`draw-show-eligible ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": Math.max(1, Math.min(8, eligible.length)) } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
+        {!rounds && pending && choicesReady && teamReady && selectionPhase !== "complete" && <div key={pending.teamId} className={`draw-show-eligible ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": Math.max(1, Math.min(8, eligible.length)) } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{option.label}</span>)}</div></div>}
       </main>
       {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>
