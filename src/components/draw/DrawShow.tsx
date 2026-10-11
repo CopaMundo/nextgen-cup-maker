@@ -116,6 +116,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
    const teamContent = team && <span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" /> : team.name.slice(0, 2).toUpperCase()}</span><strong>{team.name}</strong><CountryFlag country={team.country} className="draw-show-identity-flag" /></span>;
    const footLabel = rounds ? `${rounds.groupName}${activePot ? ` · ${activePot.name}` : ""}` : activePot?.name ?? session?.phaseName;
    const drawnCount = potTeamIds.filter((id) => rounds ? rounds.drawnTeamIds.includes(id) : !session?.remaining.includes(id)).length;
+  // Every overview page fits names against the whole pot, so the size never changes between pages.
+  const potNames = useMemo(() => potTeamIds.map((id) => teamById.get(id)?.name ?? "").join("\n"), [potTeamIds, teamById]);
   const potCards = useMemo(() => visiblePotIds.map((id) => { const item = teamById.get(id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><FittedPotName name={item?.name ?? ""} /></span>; }), [visiblePotIds, teamById, remainingIds, pending?.teamId, teamReady]);
   const speed = presentation?.speed ?? 1;
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 850 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
