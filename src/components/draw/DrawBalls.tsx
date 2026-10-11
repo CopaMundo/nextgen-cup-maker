@@ -29,7 +29,8 @@ function BallScene({ teamIds, drawnId, revealKey, elapsed, speed, revealing, pal
     }
   }, [teamIds, simulation]);
   useFrame((_, delta) => {
-    simulation.world.step(1 / 60, Math.min(delta, .05), 3);
+    // Sleeping piles need no solver work; a single substep keeps large pots smooth.
+    if (simulation.balls.size && [...simulation.balls.values()].some(body => body.sleepState !== 2)) simulation.world.step(1 / 60, Math.min(delta, .05), 1);
     for (const [id, body] of simulation.balls) {
       const mesh = meshes.current.get(id);
       if (mesh) { mesh.position.copy(body.position); mesh.quaternion.copy(body.quaternion); }

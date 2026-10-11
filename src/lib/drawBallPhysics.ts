@@ -19,7 +19,7 @@ export function createDrawBallWorld(ids: string[]) {
   world.addContactMaterial(new ContactMaterial(material, material, { friction: .32, restitution: .13 }));
   const vertices: number[] = [];
   const indices: number[] = [];
-   const rings = 12, segments = 32;
+   const rings = 8, segments = 20;
    // Continue the concave contacts with a retaining rim so large spheres
    // cannot roll over the mesh edge while the pile is settling.
    for (let ring = 0; ring <= rings + 1; ring++) {
@@ -63,7 +63,7 @@ export function createDrawBallWorld(ids: string[]) {
     world.addBody(body); balls.set(id, body);
   });
   // Start with a settled, deterministic arrangement instead of a falling pile.
-  for (let i = 0; i < 180; i++) world.step(1 / 60);
+  for (let i = 0; i < 90; i++) world.step(1 / 30);
   return { world, balls, radius };
 }
 
