@@ -88,7 +88,7 @@ export function createDrawBallWorld(ids: string[]) {
       const reach = 4 * radius * radius - d2;
       if (reach > 0) heights[index] = Math.max(heights[index], y + Math.sqrt(reach) + .004);
     });
-    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .95, angularDamping: .98, sleepSpeedLimit: .16, sleepTimeLimit: .3 });
+    const body = new Body({ mass: 1, material, shape: new Sphere(radius), linearDamping: .95, angularDamping: .98, sleepSpeedLimit: .5, sleepTimeLimit: .45 });
     body.position.set(x, y, z);
     world.addBody(body); balls.set(id, body);
     body.sleep();
@@ -106,7 +106,7 @@ export function createDrawBallWorld(ids: string[]) {
       previous.copy(ball.position);
       previousPositions.set(ball, previous);
       // Cannon emits preStep after contact solving, before integration. Limit
-      // correction energy here, before it can displace an entire pile.
+      // sideways correction energy but preserve vertical contact resolution.
       ball.velocity.y = Math.max(-1.2, ball.velocity.y);
       const lateral = Math.hypot(ball.velocity.x, ball.velocity.z);
       if (lateral > .4) {
