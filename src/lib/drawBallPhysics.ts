@@ -105,6 +105,14 @@ export function createDrawBallWorld(ids: string[]) {
       const previous = previousPositions.get(ball) ?? new Vec3();
       previous.copy(ball.position);
       previousPositions.set(ball, previous);
+      // Cannon emits preStep after contact solving, before integration. Limit
+      // correction energy here, before it can displace an entire pile.
+      ball.velocity.y = Math.max(-1.2, Math.min(.08, ball.velocity.y));
+      const lateral = Math.hypot(ball.velocity.x, ball.velocity.z);
+      if (lateral > .4) {
+        ball.velocity.x *= .4 / lateral;
+        ball.velocity.z *= .4 / lateral;
+      }
     }
   });
   world.addEventListener("postStep", () => {
@@ -132,7 +140,7 @@ export function createDrawBallWorld(ids: string[]) {
       // Judge rest from actual displacement and real supporting contacts,
       // not the solver's residual velocity. Unsupported balls must keep falling.
       const previous = previousPositions.get(ball);
-      const quiet = supported.has(ball) && previous && ball.position.distanceTo(previous) < .014;
+      const quiet = supported.has(ball) && previous && ball.position.distanceTo(previous) < .008;
       const duration = quiet ? (quietTime.get(ball) ?? 0) + world.dt : 0;
       quietTime.set(ball, duration);
       if (duration >= .45) ball.sleep();
