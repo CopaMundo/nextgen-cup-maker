@@ -51,9 +51,10 @@ interface SlotManagerProps {
   categoryId?: string | null;
   refreshKey?: number;
   onSlotChange?: () => void;
+  guardChange?: (action: () => unknown) => void;
 }
 
-const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, phases, categoryId, refreshKey, onSlotChange }: SlotManagerProps) => {
+const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, phases, categoryId, refreshKey, onSlotChange, guardChange }: SlotManagerProps) => {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [allSlots, setAllSlots] = useState<Slot[]>([]);
@@ -552,7 +553,7 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
               <div className={`absolute z-50 w-full rounded-lg border border-border bg-card shadow-lg max-h-64 overflow-y-auto ${isLastSlot ? "bottom-full mb-1" : "top-full mt-1"}`}>
                 {/* 1. Geen (empty slot) */}
                 <button
-                  onClick={() => clearSlot(slot.id)}
+                  onClick={() => (guardChange ?? ((a) => a()))(() => clearSlot(slot.id))}
                   className="w-full px-3 py-1.5 text-left text-xs hover:bg-accent/50 transition-colors flex items-center gap-2"
                 >
                   <span className="font-mono font-bold text-destructive text-xs">GEEN</span>
@@ -716,7 +717,7 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
                     {availableTeams.map(t => (
                       <button
                         key={t.id}
-                        onClick={() => assignTeam(slot.id, t.id)}
+                        onClick={() => (guardChange ?? ((a) => a()))(() => assignTeam(slot.id, t.id))}
                         className="w-full px-3 py-1.5 text-left text-xs text-foreground hover:bg-foreground/5 transition-colors flex items-center gap-2"
                       >
                         {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain" />}
