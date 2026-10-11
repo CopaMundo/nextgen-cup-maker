@@ -2823,7 +2823,8 @@ posities + statistieken groen */
 .draw-show-transfer .draw-show-slot-name { color: hsl(var(--foreground)); }
 
 /* Entry-round encounters retain fixed halves, paired identities and attached numbering. */
-.draw-show-match-wing { position: absolute; top: 13%; bottom: 29%; width: 22%; display: grid; grid-template-columns: repeat(var(--match-columns), minmax(0, 1fr)); grid-template-rows: repeat(var(--match-rows), minmax(0, 1fr)); grid-auto-flow: column; gap: .5cqw; align-content: center; }
+.draw-show-match-wing { position: absolute; top: 13%; bottom: 29%; width: 22%; display: grid; grid-template-columns: repeat(var(--match-columns), minmax(0, 1fr)); grid-template-rows: repeat(var(--match-rows), minmax(0, 1fr)); grid-auto-flow: column; gap: var(--match-gap, .5cqw); align-content: center; }
+.draw-show-match-wing[data-columns="2"] { --match-gap: .3cqw; }
 .draw-show-match-wing.is-left { left: 17%; }
 .draw-show-match-wing.is-right { right: 17%; }
 .draw-show-match-card { --match-height: min(7cqw, calc((32.625cqw - (var(--match-rows) - 1) * .5cqw) / var(--match-rows))); --match-logo: min(2.6cqw, calc(var(--match-height) / 2 - .3cqw)); --match-font: clamp(.82cqw, calc(var(--match-height) * .2), 1.02cqw); contain: layout paint style; position: relative; display: grid; grid-template-columns: 1.1cqw minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); width: min(100%, 16cqw); height: var(--match-height); min-width: 0; align-self: center; justify-self: center; border: 1px solid hsl(var(--primary) / .85); border-radius: 6px; background: hsl(var(--card) / .78); overflow: hidden; }
