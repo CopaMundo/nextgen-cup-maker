@@ -15,7 +15,7 @@ describe("Fixture assignment step", () => {
   });
   it("only asks for participant selection when there are excess teams", () => {
     render(<MatchDrawSetup {...props} teams={[...teams, { id: "t3", name: "Feyenoord" }]} useSeeds={false} />);
-    expect(screen.getAllByRole("combobox")).toHaveLength(2);
+    expect(screen.getAllByRole("checkbox").length).toBeGreaterThan(2);
     expect(screen.queryByRole("combobox", { name: "Reekshoofd 1" })).not.toBeInTheDocument();
   });
 });

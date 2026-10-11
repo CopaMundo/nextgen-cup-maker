@@ -29,10 +29,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CountryFlag from "@/components/CountryFlag";
-import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2 } from "lucide-react";
+import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2, SlidersHorizontal } from "lucide-react";
 import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/matchDraw";
 import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
+import { TeamSelectList } from "@/components/draw/TeamSelectList";
 import { completeLastDrawPot, defaultDrawPotCount, defaultDrawSeedCount, placeDrawSeed } from "@/lib/drawWizard";
 import { generatePotMatchups } from "@/lib/drawEngine";
 import { generateRoundRobin } from "@/lib/matchGenerator";
@@ -138,6 +139,7 @@ const LiveDrawDialog = ({
   const [containers, setContainers] = useState<DrawContainer[]>([]);
   const [teams, setTeams] = useState<DrawTeam[]>([]);
   const [selectedMatchTeams, setSelectedMatchTeams] = useState<string[]>([]);
+  const [adjustOpen, setAdjustOpen] = useState(false);
   const originalMatchContainers = useRef<DrawContainer[]>([]);
   const [usePots, setUsePots] = useState(true);
   const [useSeeds, setUseSeeds] = useState(false);
@@ -170,7 +172,7 @@ const LiveDrawDialog = ({
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
   const assignedTeamIds = useMemo(() => new Set(pots.flatMap((p) => p.teamIds)), [pots]);
   const fixedIds = useMemo(() => new Set(containers.flatMap(c => c.teamIds)), [containers]);
-  const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams]);
+  const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || (!isMatchDraw && teams.length <= containers.reduce((sum, c) => sum + c.capacity - c.teamIds.length, 0)) || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams, isMatchDraw, containers]);
   const unassignedTeams = useMemo(() => eligibleTeams.filter((t) => !assignedTeamIds.has(t.id)), [eligibleTeams, assignedTeamIds]);
   const countries = useMemo(
     () => Array.from(new Set(teams.map((t) => t.country).filter(Boolean) as string[])).sort(),
@@ -798,6 +800,7 @@ const requestPotCount = (count: number) => {
 
   const validationError = (): { step: Step; message: string } | null => {
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
+    if (!isMatchDraw && !usePots && teams.length > drawSize && new Set(selectedMatchTeams).size !== drawSize) return { step: "teams", message: `Selecteer precies ${drawSize} teams.` };
     if (isMatchDraw && !usePots && (selectedMatchTeams.length !== containers.length * 2 || new Set(selectedMatchTeams).size !== selectedMatchTeams.length)) return { step: "teams", message: `Kies precies ${containers.length * 2} verschillende teams.` };
     const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
     if (fixtureKind === "knockout" && useSeeds && !fixedIds.size) return { step: "teams", message: "Kies minstens één reekshoofd op een vaste wedstrijdplaats." };
@@ -969,6 +972,7 @@ const requestPotCount = (count: number) => {
           <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Ongedaan maken" title="Ongedaan maken" onClick={handleUndo} disabled={sceneBusy || Boolean(pending) || !session.history.length}><Undo2 /></Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Alles loten" title="Alles loten" onClick={() => setScopeAction("complete")} disabled={sceneBusy || session.finished}><Sparkles /></Button>
           <Button className="draw-scene-button" variant="ghost" size="sm" aria-label="Opnieuw beginnen" title="Opnieuw beginnen" onClick={() => setScopeAction("reset")} disabled={sceneBusy}><RotateCcw /></Button>
+          <Button className="draw-scene-button" variant="ghost" size="sm" onClick={() => setAdjustOpen(true)} disabled={sceneBusy || applying}><SlidersHorizontal />Loting aanpassen</Button>
           <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={sceneBusy}><Settings2 /></Button></PopoverTrigger>
             <PopoverContent portalContainer={directorRef.current} className="draw-scene-settings space-y-4" side="top">
               <h2 className="font-semibold">Regie-instellingen</h2>
@@ -982,6 +986,12 @@ const requestPotCount = (count: number) => {
           </Popover>
         </aside>
       </>} />
+      <AlertDialog open={adjustOpen} onOpenChange={setAdjustOpen}>
+        <AlertDialogContent portalContainer={directorRef.current} className="draw-dialog-theme">
+          <AlertDialogHeader><AlertDialogTitle>Loting aanpassen?</AlertDialogTitle><AlertDialogDescription>De huidige show wordt gewist en gereset. Je keert terug naar de wizard; je gekozen instellingen blijven behouden.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Annuleren</AlertDialogCancel><AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { setAdjustOpen(false); setScopeAction(null); setSession(null); setPresentation((previous) => ({ ...previous, revealAt: 0, selection: null, sweep: null })); setStep("method"); }}>Show wissen en aanpassen</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope={isMatchDraw ? undefined : activePotChoice ? "pot" : session.containers.length === 1 ? "groep" : undefined} onCurrent={() => scopeAction === "reset" ? activePotChoice ? resetCurrentPot() : handleReset() : handleDrawAll(true)} onAll={() => scopeAction === "reset" ? handleReset() : handleDrawAll()} />
     </div>
   );
@@ -1029,7 +1039,7 @@ const requestPotCount = (count: number) => {
               </div>
             </div>
           ) : step === "teams" && !usePots ? (
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : <><h3 className="font-semibold">Deelnemers · {selectedMatchTeams.length}/{drawSize}</h3><PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={drawSize} disabled={teams.length === drawSize} onChange={(index, id) => setSelectedMatchTeams(previous => { const next = [...previous]; if (id) next[index] = id; else next.splice(index, 1); return next; })} /></>}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <p className="draw-panel p-3 text-sm text-muted-foreground">Alle {teams.length} teams doen mee aan de loting.</p>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
           ) : step === "pots" || (step === "teams" && usePots) ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>

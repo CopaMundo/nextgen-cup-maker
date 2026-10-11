@@ -31,7 +31,8 @@ import { DrawFullscreenButton } from "@/components/draw/DrawFullscreenButton";
 import { initRoundsState } from "@/lib/drawSession";
 import { orderedTeamFixtures, opponentRevealDuration, roundsStage } from "@/lib/roundsDrawPresentation";
 import { revealDuration, type DrawPicture } from "@/lib/drawPresentation";
-import { ExternalLink, Settings2, Shuffle } from "lucide-react";
+import { ExternalLink, Settings2, Shuffle, SlidersHorizontal } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { MAX_LIVE_DRAW_ROUNDS, liveRoundsAvailable, liveRoundsLimitMessage } from "@/lib/liveDrawLimits";
 
 interface Team {
@@ -122,6 +123,7 @@ const RoundsDrawDialog = ({
   const animationSpeed = showOptions.speed;
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"method" | "teams" | "pots" | "rules" | "settings" | "draw">("method");
+  const [adjustOpen, setAdjustOpen] = useState(false);
   const [method, setMethod] = useState<"free" | "pots">("free");
   const [teams, setTeams] = useState<Team[]>([]);
   const [groups, setGroups] = useState<GroupInfo[]>([]);
@@ -938,10 +940,17 @@ const RoundsDrawDialog = ({
           <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Ongedaan maken" title="Ongedaan maken" disabled={!revealReady || (currentIdx < 0 && !revealedSet.size)} onClick={undoReveal}><Undo2 /></Button>
           <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Alles loten" title="Alles loten" disabled={!revealReady || allDone} onClick={() => setScopeAction("complete")}><FastForward /></Button>
           <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Opnieuw beginnen" title="Opnieuw beginnen" disabled={!revealReady} onClick={() => setScopeAction("reset")}><RotateCcw /></Button>
+          <Button className="draw-scene-button" variant="ghost" onClick={() => setAdjustOpen(true)}><SlidersHorizontal />Loting aanpassen</Button>
           <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={!revealReady}><Settings2 /></Button></PopoverTrigger><PopoverContent portalContainer={directorRef.current} className="draw-scene-settings max-h-[70dvh] overflow-y-auto space-y-4" side="top"><h2 className="font-semibold">Regie-instellingen</h2><DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} /><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button></div><Button variant="outline" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}>Lotingsregels</Button></PopoverContent></Popover>
           <Button className="draw-scene-button" variant="ghost" aria-label="Beamerscherm" title="Beamerscherm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink /></Button>
         </aside>
       </>} />
+      <AlertDialog open={adjustOpen} onOpenChange={setAdjustOpen}>
+        <AlertDialogContent portalContainer={directorRef.current} className="draw-dialog-theme">
+          <AlertDialogHeader><AlertDialogTitle>Loting aanpassen?</AlertDialogTitle><AlertDialogDescription>De huidige show wordt gewist en gereset. Je keert terug naar de wizard; je gekozen instellingen blijven behouden.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Annuleren</AlertDialogCancel><AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={async () => { setAdjustOpen(false); setScopeAction(null); if (document.fullscreenElement) await document.exitFullscreen().catch(() => undefined); setDraws([]); setRevealsStarted(false); setTeamIdx({}); setRevealed({}); setRevealAt(0); setRevealTimes({}); setActiveGroupIdx(0); setStep("method"); }}>Show wissen en aanpassen</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <DrawScopeConfirm action={scopeAction} onClose={() => setScopeAction(null)} container={directorRef.current} scope="groep" onCurrent={() => scopeAction === "reset" ? resetShow() : revealAll()} onAll={() => scopeAction === "reset" ? resetShow(true) : revealAll(true)} />
     </div>
   );

@@ -21,7 +21,7 @@ export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, 
       const selected = current ? byId.get(current) : undefined;
       const locked = Boolean(current && lockedIds?.has(current));
       return <div key={index} className="flex min-w-0 items-center gap-1.5">
-        <Select value={current || "empty"} disabled={disabled || locked || index > teamIds.length} onValueChange={(value) => onChange(index, value === "empty" ? null : value)}>
+        <Select value={current || "empty"} disabled={disabled || locked} onValueChange={(value) => onChange(Math.min(index, teamIds.length), value === "empty" ? null : value)}>
           <SelectTrigger aria-label={`Teamvak ${index + 1}`} className="h-11 min-w-0 flex-1 border-border bg-background text-left">
             <SelectValue>
               {selected ? <span className="flex min-w-0 items-center gap-2">
