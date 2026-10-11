@@ -98,6 +98,7 @@ const RoundsDrawDialog = ({
   onStepChange,
   initialMethod,
   initialStep = "method",
+  assignGroups = false,
   hideHeader = false,
 }: {
   open: boolean;
@@ -114,6 +115,8 @@ const RoundsDrawDialog = ({
   onStepChange?: (step: string) => void;
   initialMethod?: "random" | "pots";
   initialStep?: "method" | "teams";
+  /** Rounds-only: organizer assigns groups manually in the teams step before the rounds draw. */
+  assignGroups?: boolean;
   hideHeader?: boolean;
 }) => {
   const { toast } = useToast();
@@ -162,6 +165,11 @@ const RoundsDrawDialog = ({
   const timer = useRef<number | null>(null);
   const [draftReady, setDraftReady] = useState(false);
   const draftKey = `copa-live-draw:rounds:v1:${phaseId}`;
+  const [slotRowsByGroup, setSlotRowsByGroup] = useState<Record<string, string[]>>({});
+  const [assignDraft, setAssignDraft] = useState<Record<string, string[]>>({});
+  const [groupsConfirmed, setGroupsConfirmed] = useState(false);
+  const [assignError, setAssignError] = useState("");
+  const [savingAssign, setSavingAssign] = useState(false);
 
   useEffect(() => { if (open) onStepChange?.(step); }, [open, step]);
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
@@ -172,7 +180,7 @@ const RoundsDrawDialog = ({
       const [{ data: groupRows }, { data: slotRows }, { data: teamRows }, { data: potRows }, { data: potTeamRows }, { data: matchRows }] =
         await Promise.all([
           supabase.from("groups").select("id, name, sort_order").eq("phase_id", phaseId).order("created_at").order("name"),
-          supabase.from("slots").select("group_id, team_id, slot_code, sort_order").eq("phase_id", phaseId).order("sort_order"),
+          supabase.from("slots").select("id, group_id, team_id, slot_code, sort_order").eq("phase_id", phaseId).order("sort_order"),
           supabase.from("teams").select("id, name, country, logo_url").eq("tournament_id", tournamentId),
           supabase.from("draw_pots").select("id, name, sort_order").eq("phase_id", phaseId).order("sort_order"),
           supabase.from("draw_pot_teams").select("pot_id, team_id, sort_order").eq("tournament_id", tournamentId).order("sort_order"),
@@ -211,6 +219,8 @@ const RoundsDrawDialog = ({
         };
       });
       setGroups(infos);
+      setSlotRowsByGroup(Object.fromEntries(infos.map((g) => [g.id, (slotRows || []).filter((s) => s.group_id === g.id).map((s) => s.id as string)])));
+      setAssignDraft(Object.fromEntries(infos.map((g) => [g.id, [...g.teamIds]])));
       setPotGroups(Object.fromEntries(infos.map((g) => {
         if (g.pots.length > 1 && g.pots.every(p => p.teamIds.length === g.teamIds.length / g.pots.length)) return [g.id, g.pots];
         const count = defaultDrawPotCount(g.teamIds.length);
