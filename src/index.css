@@ -3069,3 +3069,22 @@ posities + statistieken groen */
 @media (prefers-reduced-motion: reduce) {
   .admin-ui :is(input, textarea, select, [role="combobox"]):not(.draw-show-stage *) { transition: none; }
 }
+
+/* Professional management layout: three neutral depth layers (page, card, field), brand colour as accent only. */
+.admin-ui { --admin-shadow: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 2px hsl(0 0% 0% / 0.35); }
+[data-mode="light"] .admin-ui { --admin-shadow: 0 1px 2px hsl(0 0% 0% / 0.06), 0 1px 1px hsl(0 0% 0% / 0.04); }
+.admin-ui .admin-nav-active { background-color: hsl(var(--secondary)); }
+.admin-ui :is(.border.bg-card, .border.bg-secondary, .section-card, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  box-shadow: var(--admin-shadow);
+}
+.admin-ui .admin-bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+.admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button):not([role="switch"]):not(.bg-primary) {
+  background-color: hsl(var(--secondary));
+}
+.admin-ui [class*="border-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button) {
+  border-color: hsl(var(--border));
+}
+.admin-ui [class*="text-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) { color: hsl(var(--muted-foreground)); }
+@media (max-width: 767px) {
+  .tournament-admin .fixed[class*="bottom-"]:not([role="dialog"]):not([role="alertdialog"]) { margin-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
