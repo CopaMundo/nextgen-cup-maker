@@ -3085,6 +3085,3 @@ posities + statistieken groen */
   border-color: hsl(var(--border));
 }
 .admin-ui [class*="text-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) { color: hsl(var(--muted-foreground)); }
-.admin-ui :is([class*="bg-green-"], [class*="bg-emerald-"], [class*="bg-blue-"], [class*="bg-sky-"], [class*="bg-yellow-"]):not(.draw-show-stage *):not(.draw-scene-settings *):not([style]) {
-  background-color: hsl(var(--secondary));
-}
