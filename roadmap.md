@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Vernieuw desktop/tablet-beheershell met geïntegreerde kop, acties en selectors; behoud mobiel, publieke pagina en live-show; controleer alle zes tabs en schermbreedtes.
 - [x] Beheertabbladen en pop-ups daadwerkelijk zwart/grijs of wit/grijs gemaakt, inclusief hovervlakken en subtiele randen; blauw/geel alleen als accent. Aangemeld Algemeen in beide thema’s visueel gecontroleerd; 17 gerichte tests geslaagd, build OK.
 - [x] Alle beheertabbladen en pop-ups: gedeelde donkere panelen, subtiele randen, thema-accenten, titels en velden; publieke stijlen en live-show behouden. 191 tests geslaagd, build OK; gedeelde pop-upinvoer, selecties en sluiten visueel gecontroleerd. Echte toernooicontrole blijft geblokkeerd door ontbrekend gekoppeld account zoals hieronder vermeld.
 - [x] Potdropdowns neutraal donker/licht met thema-accent, toegewezen teams verborgen in andere keuzes, Landenregels boven het kader en duidelijke omschrijving voor verboden poulecombinaties. 18 gerichte tests geslaagd, build OK; echte toernooicontrole blijft geblokkeerd door ontbrekend gekoppeld account.
