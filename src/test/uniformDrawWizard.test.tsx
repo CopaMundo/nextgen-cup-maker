@@ -25,6 +25,7 @@ const props = { open: true, onOpenChange: vi.fn(), tournamentId: "tournament", p
 
 describe("Uniform draw preparation", () => {
   it("keeps the per-group pot table behind the advanced allocation choice", async () => {
+    vi.spyOn(Element.prototype, "scrollIntoView", "get").mockReturnValue(vi.fn());
     render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
     await screen.findByText("0 / 4");
     for (let index = 0; index < 3; index++) {
