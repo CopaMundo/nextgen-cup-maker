@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Potdropdowns neutraal donker/licht met thema-accent, toegewezen teams verborgen in andere keuzes, Landenregels boven het kader en duidelijke omschrijving voor verboden poulecombinaties.
 - [x] Wizardverfijningen: formatkeuzekleuren voor type/groepstoewijzing, deelnemers als bijtitel, teamrijen als formatplaatsen en één helder landenlimietveld met uitzonderingen eronder. 22 tests geslaagd, build OK; schermen met voorbeeldteams visueel gecontroleerd. Echte aangemelde controle blijft geblokkeerd door ontbrekend gekoppeld account.
 - [x] Volledige lotingspop-up gelijk aan beheertabs: hoofdvlak, titelbalk, tussenruimte, labels, panelen, teamvakken en tabelbediening. 22 gerichte tests geslaagd, build OK; voorbeeldteams visueel gecontroleerd. Aangemelde toernooicontrole blijft geblokkeerd.
 - [x] Wizardverfijning: deelnemerskop met verticale balk, secundaire invoer-/tabelvakken en waarschuwing bij onvolledige selectie tijdens doorgaan én showstart. 16 gerichte tests geslaagd, build OK; selectie en instellingen visueel gecontroleerd met voorbeeldteams. Aangemelde controle blijft geblokkeerd zoals hieronder vermeld.

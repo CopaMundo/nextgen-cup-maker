@@ -99,6 +99,10 @@ describe("Uniform draw preparation", () => {
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
     expect(screen.getByText("Geen beperking")).toBeInTheDocument();
+    const countryHeading = screen.getByRole("heading", { name: "Landenregels" });
+    expect(countryHeading.closest(".draw-panel")).toBeNull();
+    expect(screen.getByText("Aantal teams uit hetzelfde land per poule").closest(".draw-panel")).not.toBeNull();
+    expect(screen.getByText("Teams die niet samen in één poule mogen worden geloot").closest(".draw-panel")).not.toBeNull();
     expect(screen.queryByText("Uitzonderingen op de landenlimiet")).not.toBeInTheDocument();
   });
   it("starts excess participants checked and requires the exact number", async () => {
