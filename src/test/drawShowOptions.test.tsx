@@ -9,6 +9,9 @@ describe("Shared draw show settings", () => {
     const onChange = vi.fn();
     render(<DrawShowOptions phaseId="phase" options={defaultShowOptions} onChange={onChange} />);
     expect(screen.getByRole("button", { name: "Normaal" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Animatiesnelheid")).toHaveClass("form-label");
+    expect(screen.getByText("LIVE LOTING LINK")).toHaveClass("form-label");
+    expect(screen.getByRole("button", { name: "Normaal" })).toHaveClass("h-full");
     fireEvent.click(screen.getByRole("button", { name: "Langzaam" }));
     expect(onChange).toHaveBeenCalledWith({ ...defaultShowOptions, speed: .75 });
     fireEvent.click(screen.getByRole("button", { name: "Uit" }));

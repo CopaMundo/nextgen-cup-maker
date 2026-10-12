@@ -16,15 +16,15 @@ export function MatchDrawSetup({ teams, selectedIds, onTeamsChange, containers, 
   return <div className="space-y-5">
     {(!useSeeds || teams.length > capacity) && <TeamSelectList teams={teams} selectedIds={selectedIds} capacity={capacity} lockedIds={fixedIds} onChange={onTeamsChange} />}
     {useSeeds && <section className="space-y-3">
-      <Label className="draw-section-title" htmlFor="seed-count">Aantal reekshoofden</Label>
+      <Label className="form-label" htmlFor="seed-count">Aantal reekshoofden</Label>
       <Select value={String(seedCount)} onValueChange={value => onSeedCount(Number(value))}><SelectTrigger id="seed-count" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{Array.from({ length: Math.max(0, containers.length - 1) }, (_, i) => i + 2).map(count => <SelectItem key={count} value={String(count)}>{count}</SelectItem>)}</SelectContent></Select>
       {Array.from({ length: seedCount }, (_, i) => i + 1).map(rank => {
         const fixture = containers.find(c => c.seedRanks?.includes(rank));
         const side = fixture?.seedRanks?.indexOf(rank) ?? -1;
         const id = side >= 0 ? fixture?.matchSlots?.[side] : null;
         const locked = Boolean(id && originalIds.has(id));
-        return <div key={rank} className="draw-panel space-y-2 p-3">
-          <Label className="draw-section-title" htmlFor={`seed-team-${rank}`}>Reekshoofd {rank}</Label>
+        return <div key={rank} className="draw-panel space-y-3 p-4">
+          <Label className="form-label" htmlFor={`seed-team-${rank}`}>Reekshoofd {rank}</Label>
           <div className="grid gap-2 sm:grid-cols-2">
             <Select value={id ?? "empty"} disabled={locked} onValueChange={value => onSeed(rank, value === "empty" ? null : value)}><SelectTrigger id={`seed-team-${rank}`} aria-label={`Reekshoofd ${rank}`}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="empty">Kies team</SelectItem>{teams.filter(t => selectedIds.includes(t.id) && (!fixedIds.has(t.id) || t.id === id)).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select>
             <Select value={fixture && side >= 0 ? `${fixture.id}|${side}` : "empty"} disabled={!id || locked} onValueChange={value => { const [fixtureId, nextSide] = value.split("|"); onSeed(rank, id ?? null, fixtureId, Number(nextSide)); }}><SelectTrigger aria-label={`Bracketpositie reekshoofd ${rank}`}><SelectValue placeholder="Vaste bracketpositie" /></SelectTrigger><SelectContent>{!fixture && <SelectItem value="empty">Vaste bracketpositie</SelectItem>}{containers.flatMap(c => [0, 1].filter(s => !c.matchSlots?.[s] || c.matchSlots[s] === id).map(s => <SelectItem key={`${c.id}|${s}`} value={`${c.id}|${s}`}>{c.name} · {s === 0 ? "Thuis" : "Uit"}</SelectItem>))}</SelectContent></Select>
