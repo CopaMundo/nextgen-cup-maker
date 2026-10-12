@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminPageActions } from "@/components/admin/AdminPageActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -509,9 +510,9 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
       <div className="flex items-center justify-between">
         <h2 className="section-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
         {categoryId && importByCategory.length > 0 && (
-          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
-            <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
-          </Button>
+          <AdminPageActions><Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
+            <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
+          </Button></AdminPageActions>
         )}
       </div>
 
