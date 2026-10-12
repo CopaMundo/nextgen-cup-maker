@@ -10,9 +10,10 @@ export function TeamSelectList({ teams, selectedIds, capacity, onChange, lockedI
   const selected = new Set(selectedIds);
   const full = selectedIds.length >= capacity;
   return <section className="space-y-2">
-    <div className="flex flex-wrap items-baseline justify-between gap-2">
-      <h3 className="font-semibold">Deelnemers · {selectedIds.length}/{capacity}</h3>
-      <p className={`text-xs ${selectedIds.length === capacity ? "text-muted-foreground" : "text-destructive"}`}>Selecteer precies {capacity} van de {teams.length} teams.</p>
+    <h3 className="draw-section-title">DEELNEMERS</h3>
+    <div className="flex flex-wrap items-center gap-3 text-sm">
+      <p>Selecteer {capacity} teams voor de loting</p>
+      <span aria-label="Geselecteerde deelnemers" className="shrink-0 font-semibold tabular-nums">{selectedIds.length} / {capacity}</span>
     </div>
     <ul aria-label="Deelnemers selecteren" className="draw-panel grid max-h-[50vh] gap-1 overflow-y-auto p-2 sm:grid-cols-2 lg:grid-cols-3">
       {teams.map(team => {

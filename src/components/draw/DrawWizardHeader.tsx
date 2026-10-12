@@ -1,5 +1,5 @@
 
-export const drawPreparationSteps = ["Type loting", "Indeling & teams", "Regels", "Loting show instellingen"];
+export const drawPreparationSteps = ["Type loting", "Indeling & teams", "Regels", "Instellingen Live loting"];
 
 export function DrawWizardHeader({ tournamentName, formatName, step, onClose, typePart }: {
   tournamentName: string; formatName: string; step: string; onClose: () => void; typePart?: "scope" | "method";

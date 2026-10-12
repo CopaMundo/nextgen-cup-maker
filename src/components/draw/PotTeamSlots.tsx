@@ -33,7 +33,7 @@ export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="empty">Lege plaats</SelectItem>
-            {teams.filter((team) => team.id === current || !assignedIds.has(team.id)).map((team) =>
+            {teams.map((team) =>
               <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
             )}
           </SelectContent>
