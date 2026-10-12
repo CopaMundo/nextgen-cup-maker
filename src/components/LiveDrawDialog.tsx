@@ -33,7 +33,7 @@ import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, Chev
 import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/matchDraw";
 import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
-import { DrawTypeChoices } from "@/components/draw/DrawTypeChoices";
+import { DrawChoice, DrawTypeChoices } from "@/components/draw/DrawTypeChoices";
 import { TeamSelectList } from "@/components/draw/TeamSelectList";
 import { completeLastDrawPot, defaultDrawPotCount, defaultDrawSeedCount, placeDrawSeed } from "@/lib/drawWizard";
 import { generatePotMatchups } from "@/lib/drawEngine";
@@ -41,7 +41,6 @@ import { generateRoundRobin } from "@/lib/matchGenerator";
 import {
   checkContainerFeasibility,
   buildContainerCtx,
-  defaultPotQuotas,
   emptyContainerRules,
   type ContainerRules,
   type DrawContainer,
@@ -154,7 +153,7 @@ const LiveDrawDialog = ({
   const [pairA, setPairA] = useState("");
   const [pairB, setPairB] = useState("");
   const [manualTeam, setManualTeam] = useState("");
-  const [placementMode, setPlacementMode] = useState<"manual" | "automatic">("manual");
+  const [placementMode, setPlacementMode] = useState<"manual" | "automatic">("automatic");
   const [spotlightId, setSpotlightId] = useState<string | null>(null);
   const [rolling, setRolling] = useState(false);
   const [showOptions, setShowOptions] = useDrawShowOptions(phaseId);
@@ -175,18 +174,17 @@ const LiveDrawDialog = ({
   const fixedIds = useMemo(() => new Set(containers.flatMap(c => c.teamIds)), [containers]);
   const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || (!isMatchDraw && teams.length <= containers.reduce((sum, c) => sum + c.capacity - c.teamIds.length, 0)) || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams, isMatchDraw, containers]);
   const unassignedTeams = useMemo(() => eligibleTeams.filter((t) => !assignedTeamIds.has(t.id)), [eligibleTeams, assignedTeamIds]);
-  const countries = useMemo(
-    () => Array.from(new Set(teams.map((t) => t.country).filter(Boolean) as string[])).sort(),
-    [teams]
-  );
-  const countryCounts = useMemo(() => teams.reduce<Record<string, number>>((counts, team) => {
+  const participatingTeams = useMemo(() => {
+    const ids = new Set(usePots ? pots.flatMap(p => p.teamIds) : [...fixedIds, ...eligibleTeams.map(t => t.id)]);
+    return teams.filter(t => ids.has(t.id));
+  }, [teams, pots, usePots, fixedIds, eligibleTeams]);
+  const countryCounts = useMemo(() => participatingTeams.reduce<Record<string, number>>((counts, team) => {
     if (team.country) counts[team.country] = (counts[team.country] || 0) + 1;
     return counts;
-  }, {}), [teams]);
-  const exceptionalCountries = useMemo(
-    () => countries.filter((country) => countryCounts[country] > containers.length),
-    [countries, countryCounts, containers.length]
-  );
+  }, {}), [participatingTeams]);
+  const exceptionalCountries = useMemo(() => Object.keys(countryCounts).sort().filter(country =>
+    rules.countryMaxDefault != null && countryCounts[country] > rules.countryMaxDefault * containers.length
+  ), [countryCounts, rules.countryMaxDefault, containers.length]);
   const maxGroupCapacity = Math.max(1, ...containers.map((container) => container.capacity));
   const totalCapacity = containers.reduce((sum, c) => sum + c.capacity - c.teamIds.length, 0);
   const potTeamTotal = pots.reduce((sum, p) => sum + p.teamIds.length, 0);
@@ -282,16 +280,9 @@ const LiveDrawDialog = ({
           setSelectedPotId(draft.selectedPotId && validPotIds.has(draft.selectedPotId) ? draft.selectedPotId : null);
           setAdvancedOpen(draft.advancedOpen);
           setAdvancedSpreadOpen(draft.advancedSpreadOpen);
-          setPlacementMode(draft.placementMode ?? "manual");
+          setPlacementMode(draft.placementMode ?? "automatic");
         } else {
-          const counts = available.reduce<Record<string, number>>((result, team) => {
-            if (team.country) result[team.country] = (result[team.country] || 0) + 1;
-            return result;
-          }, {});
-          const automaticLimit = nextContainers.length
-            ? Math.max(1, ...Object.values(counts).map((count) => Math.ceil(count / nextContainers.length)))
-            : null;
-          setRules((previous) => ({ ...previous, countryMaxDefault: isMatchDraw ? null : automaticLimit, separateSameCountry: false, requiredPairs: [] }));
+          setRules(previous => ({ ...previous, countryMaxDefault: null, separateSameCountry: false, requiredPairs: [] }));
         }
       } catch {
         localStorage.removeItem(draftKey);
@@ -312,7 +303,7 @@ const LiveDrawDialog = ({
     setAdvancedSpreadOpen(false);
     setSelectedPotId(null);
     setSession(null);
-    setPlacementMode("manual");
+    setPlacementMode("automatic");
     setSpotlightId(null);
     setRules(emptyContainerRules());
     loadAll();
@@ -419,24 +410,21 @@ const requestPotCount = (count: number) => {
 
   /* ------------------------------ verdeling ----------------------------- */
 
-  const containerIds = containers.map((c) => c.id);
-  /** Gezamenlijke standaardverdeling die de capaciteit van elke groep respecteert. */
-  const jointDefaults = useMemo(
-    () =>
-      defaultPotQuotas(
-        pots.map((p) => ({ id: p.id, size: p.teamIds.length })),
-        containers.map((c) => ({ id: c.id, capacity: c.capacity }))
-      ),
-    [pots, containers]
-  );
-  const quotaFor = (potId: string, containerId: string) => {
+  const quotaBounds = (potId: string, containerId: string) => {
     const explicit = rules.potQuota[`${potId}|${containerId}`];
-    if (explicit != null) return explicit;
-    return jointDefaults[potId]?.[containerIds.indexOf(containerId)] ?? 0;
+    if (explicit != null) return { min: explicit, max: explicit };
+    const size = pots.find(p => p.id === potId)?.teamIds.length ?? 0;
+    const count = Math.max(1, containers.length);
+    return { min: Math.floor(size / count), max: Math.ceil(size / count) };
   };
-  const setQuota = (potId: string, containerId: string, value: number) =>
-    setRules((prev) => ({ ...prev, potQuota: { ...prev.potQuota, [`${potId}|${containerId}`]: Math.max(0, value) } }));
-  const resetQuota = () => setRules((prev) => ({ ...prev, potQuota: {} }));
+  const setQuota = (potId: string, containerId: string, value: string) =>
+    setRules(prev => {
+      const potQuota = { ...prev.potQuota };
+      if (value === "") delete potQuota[`${potId}|${containerId}`];
+      else potQuota[`${potId}|${containerId}`] = Math.max(0, Number(value));
+      return { ...prev, potQuota };
+    });
+  const resetQuota = () => setRules(prev => ({ ...prev, potQuota: {} }));
 
   const setPotSlot = (potId: string, index: number, teamId: string | null) => {
     const pot = pots.find(p => p.id === potId);
@@ -456,13 +444,17 @@ const requestPotCount = (count: number) => {
   /** Volledige regels met de standaardverdeling expliciet ingevuld. */
   const effectiveRules = useMemo<ContainerRules>(() => {
     const potQuota: Record<string, number> = {};
-    for (const pot of pots) {
-      containers.forEach((c, i) => {
-        potQuota[`${pot.id}|${c.id}`] = isMatchDraw ? (c.matchSlots?.[pots.indexOf(pot)] ? 0 : 1) : rules.potQuota[`${pot.id}|${c.id}`] ?? jointDefaults[pot.id]?.[i] ?? 0;
-      });
+    const potQuotaMin: Record<string, number> = {};
+    for (const pot of pots) for (const c of containers) {
+      const key = `${pot.id}|${c.id}`;
+      const bounds = quotaBounds(pot.id, c.id);
+      potQuota[key] = isMatchDraw ? (c.matchSlots?.[pots.indexOf(pot)] ? 0 : 1) : bounds.max;
+      potQuotaMin[key] = isMatchDraw ? potQuota[key] : bounds.min;
     }
-    return { ...rules, potQuota, onePerPot: usePots };
-  }, [rules, pots, containers, usePots, jointDefaults, isMatchDraw]);
+    const countryMax = Object.fromEntries(exceptionalCountries.map(country => [country,
+      rules.countryMax[country] ?? Math.ceil(countryCounts[country] / Math.max(1, containers.length))]));
+    return { ...rules, countryMax, potQuota, potQuotaMin, onePerPot: usePots };
+  }, [rules, pots, containers, usePots, isMatchDraw, exceptionalCountries, countryCounts]);
 
   /* ------------------------------ ontmoetingen -------------------------- */
 
@@ -823,27 +815,8 @@ const requestPotCount = (count: number) => {
         return { step: "pots", message: "Wijs ieder team precies één keer aan een pot toe." };
       const emptyPot = pots.find((pot, index) => pot.teamIds.length === 0 && (!isMatchDraw || matchPotCapacity(containers, index) > 0));
       if (emptyPot) return { step: "pots", message: `${emptyPot.name} is nog leeg. Voeg teams toe of kies minder potten.` };
-      if (!isMatchDraw) for (const pot of pots) {
-        const quotaTotal = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
-        if (quotaTotal !== pot.teamIds.length) {
-          setAdvancedSpreadOpen(true);
-          return {
-            step: "settings",
-            message: `Verdeling: ${pot.name} bevat ${pot.teamIds.length} teams, maar de verdeling over de groepen voorziet ${quotaTotal} plaatsen.`,
-          };
-        }
-      }
-      if (!isMatchDraw) for (const container of containers) {
-        const groupTotal = pots.reduce((sum, pot) => sum + quotaFor(pot.id, container.id), 0);
-        if (groupTotal !== container.capacity) {
-          setAdvancedSpreadOpen(true);
-          return {
-            step: "settings",
-            message: `Verdeling: ${container.name} krijgt ${groupTotal} teams, maar heeft exact ${container.capacity} plaatsen.`,
-          };
-        }
-      }
     }
+
     const ctx = buildContainerCtx(teams, pots, effectiveRules);
     const check = checkContainerFeasibility(drawTeamIds, containers, ctx);
     return check.ok ? null : { step: "rules", message: check.message || "De gekozen regels zijn niet haalbaar." };
@@ -883,7 +856,7 @@ const requestPotCount = (count: number) => {
         </div>
 
         {rules.countryMaxDefault != null && exceptionalCountries.length > 0 && <div className="space-y-2">
-          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Alleen landen met meer teams dan poules. Ze worden optimaal gespreid: elke poule krijgt eerst één team van dat land en het verschil tussen poules is maximaal één.</p></div>
+          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Deze landen passen niet binnen de algemene limiet. Het verschil tussen poules blijft maximaal één team.</p></div>
           {exceptionalCountries.map((country) => (
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
@@ -893,7 +866,7 @@ const requestPotCount = (count: number) => {
                 const options = Array.from({ length: Math.max(0, maxGroupCapacity - minNeeded + 1) }, (_, index) => minNeeded + index);
                 return (
                   <Select
-                    value={rules.countryMax[country] != null ? String(rules.countryMax[country]) : undefined}
+                    value={String(rules.countryMax[country] ?? minNeeded)}
                     onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}
                   >
                     <SelectTrigger className="h-8 w-28"><SelectValue placeholder="Kies max" /></SelectTrigger>
@@ -909,17 +882,16 @@ const requestPotCount = (count: number) => {
       <h3 className="pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Teamregels</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
         <p className="text-sm font-medium">Kies twee teams die niet samen in één poule mogen komen.</p>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
           <Select value={pairA} onValueChange={setPairA}>
             <SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger>
-            <SelectContent>{teams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{participatingTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={pairB} onValueChange={setPairB}>
             <SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger>
-            <SelectContent>{teams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{participatingTeams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
           </Select>
-        </div>
-        <div className="flex flex-wrap gap-2"><Button
+        <Button
             variant="outline"
             size="sm"
             disabled={!pairA || !pairB}
@@ -927,11 +899,11 @@ const requestPotCount = (count: number) => {
               setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] }));
               setPairA(""); setPairB("");
             }}
-          >Niet samen in één poule</Button>
+          >Toevoegen</Button>
         </div>
-        <div className="space-y-1">
+        <div className="flex flex-wrap gap-2">
           {rules.forbiddenPairs.map(([first, second], index) => (
-            <div key={`forbidden-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs">
+            <div key={`forbidden-${index}`} className="inline-flex max-w-full items-center gap-2 rounded-md border border-border px-2 py-1 text-xs">
               <span>Niet samen: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span>
               <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button>
             </div>
@@ -951,11 +923,11 @@ const requestPotCount = (count: number) => {
       <div className="draw-panel space-y-3 p-3">
         <p className="text-sm font-medium">Verboden combinaties: kies twee teams die niet tegen elkaar mogen loten.</p>
         <div className="grid gap-2 sm:grid-cols-2">
-          <Select value={pairA} onValueChange={setPairA}><SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger><SelectContent>{teams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
-          <Select value={pairB} onValueChange={setPairB}><SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger><SelectContent>{teams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
+          <Select value={pairA} onValueChange={setPairA}><SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger><SelectContent>{participatingTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
+          <Select value={pairB} onValueChange={setPairB}><SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger><SelectContent>{participatingTeams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
         </div>
         <Button variant="outline" size="sm" disabled={!pairA || !pairB} onClick={() => { setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] })); setPairA(""); setPairB(""); }}>Niet tegen elkaar</Button>
-        <div className="space-y-1">{rules.forbiddenPairs.map(([first, second], index) => <div key={`match-forbidden-${index}`} className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1 text-xs"><span>Niet tegen elkaar: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button></div>)}</div>
+        <div className="space-y-1">{rules.forbiddenPairs.map(([first, second], index) => <div key={`match-forbidden-${index}`} className="inline-flex max-w-full items-center gap-2 rounded-md border border-border px-2 py-1 text-xs"><span>Niet tegen elkaar: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button></div>)}</div>
       </div>
     </div>
   );
@@ -1015,7 +987,7 @@ const requestPotCount = (count: number) => {
                 onChange={method => { if (isMatchDraw) selectMatchMethod(method); else setUsePots(method === "pots"); }} />
             </div>
           ) : step === "teams" && !usePots ? (
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <p className="draw-panel p-3 text-sm text-muted-foreground">Alle {teams.length} teams doen mee aan de loting.</p>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <section className="space-y-2"><h3 className="font-semibold">Deelnemende teams</h3><ul className="draw-panel grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">{teams.map(team => <li key={team.id}><TeamChip id={team.id} /></li>)}</ul></section>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
           ) : step === "pots" || (step === "teams" && usePots) ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>
@@ -1035,10 +1007,7 @@ const requestPotCount = (count: number) => {
 
                {potOptions.includes(pots.length) && (
                  <>
-                  <div className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${potTeamTotal < drawSize ? "border-destructive/50 text-destructive" : "border-border text-muted-foreground"}`}>
-                    {potTeamTotal < drawSize && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-                     <span>{potTeamTotal} van {drawSize} plaatsen gevuld.</span>
-                  </div>
+                  <p className="text-xs text-muted-foreground">{potTeamTotal} van {drawSize} plaatsen gevuld.</p>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                      {pots.map((pot) => {
                        const expected = isMatchDraw ? matchPotCapacity(containers, pots.indexOf(pot)) : drawSize / pots.length;
@@ -1064,7 +1033,7 @@ const requestPotCount = (count: number) => {
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verdeling van potten over groepen</h3>
                       <div className="draw-panel p-3">
                         <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
-                        <p className="text-xs text-muted-foreground">Copa Mundo verdeelt de teams uit elke pot zo gelijk mogelijk over de groepen. Het verschil tussen groepen is maximaal één team; welke groepen een extra team krijgen, wordt willekeurig bepaald.</p>
+                        <p className="text-xs text-muted-foreground">Teams uit elke pot worden gelijkmatig over de groepen verdeeld. Waar nodig wijst de loting het resterende team toe.</p>
                         <div className="mt-3 space-y-3">
                             <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
                             <div className="overflow-x-auto">
@@ -1072,16 +1041,12 @@ const requestPotCount = (count: number) => {
                                 <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
                                 <tbody>
                                   {pots.map((pot) => {
-                                    const total = containers.reduce((sum, container) => sum + quotaFor(pot.id, container.id), 0);
-                                    return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium">{pot.name} <span className={total === pot.teamIds.length ? "text-muted-foreground" : "text-destructive"}>{total}/{pot.teamIds.length}</span></td>{containers.map((container) => <td key={container.id} className="p-1"><Input type="number" min={0} value={quotaFor(pot.id, container.id)} onChange={(event) => setQuota(pot.id, container.id, Number(event.target.value))} className="mx-auto h-8 w-16 text-center" /></td>)}</tr>;
+                                    return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium">{pot.name} <span className="text-muted-foreground">· {pot.teamIds.length} teams</span></td>{containers.map(container => {
+                                      const bounds = quotaBounds(pot.id, container.id);
+                                      return <td key={container.id} className="p-1"><Input aria-label={`${pot.name} · ${container.name}`} type="number" min={0} placeholder={bounds.min === bounds.max ? String(bounds.min) : `${bounds.min} - ${bounds.max}`} value={rules.potQuota[`${pot.id}|${container.id}`] ?? ""} onChange={event => setQuota(pot.id, container.id, event.target.value)} className="mx-auto h-8 w-20 text-center" /></td>;
+                                    })}</tr>;
                                   })}
-                                  <tr className="border-t border-border">
-                                    <td className="p-2 font-semibold">Totaal</td>
-                                    {containers.map((container) => {
-                                      const total = pots.reduce((sum, pot) => sum + quotaFor(pot.id, container.id), 0);
-                                      return <td key={container.id} className={`p-2 text-center font-semibold ${total === container.capacity ? "text-muted-foreground" : "text-destructive"}`}>{total}/{container.capacity}</td>;
-                                    })}
-                                  </tr>
+                                  <tr className="border-t border-border"><td className="p-2 font-semibold">Plaatsen</td>{containers.map(container => <td key={container.id} className="p-2 text-center font-semibold">{container.capacity}</td>)}</tr>
                                 </tbody>
                               </table>
                             </div>
@@ -1098,7 +1063,7 @@ const requestPotCount = (count: number) => {
                 <h2 className="text-lg font-bold">Loting show instellingen</h2>
               </div>
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
-                {!isMatchDraw && <div className="space-y-2"><Label htmlFor="prepare-placement">Groepstoewijzing</Label><Select value={placementMode} onValueChange={value => setPlacementMode(value as "manual" | "automatic")}><SelectTrigger id="prepare-placement"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="automatic">Automatisch toewijzen</SelectItem><SelectItem value="manual">Groep loten</SelectItem></SelectContent></Select></div>}
+                {!isMatchDraw && <div className="space-y-2"><Label>Groepstoewijzing</Label><div className="grid gap-3 sm:grid-cols-2"><DrawChoice label="Automatisch toewijzen" description="" selected={placementMode === "automatic"} onClick={() => setPlacementMode("automatic")} /><DrawChoice label="Groep loten" description="" selected={placementMode === "manual"} onClick={() => setPlacementMode("manual")} /></div></div>}
               </DrawShowOptions>
                
             </div>
