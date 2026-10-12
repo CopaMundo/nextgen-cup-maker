@@ -24,6 +24,16 @@ afterEach(cleanup);
 const props = { open: true, onOpenChange: vi.fn(), tournamentId: "tournament", phaseId: "phase" };
 
 describe("Uniform draw preparation", () => {
+  it("keeps the per-group pot table behind the advanced allocation choice", async () => {
+    render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="rules" />);
+    const toggle = await screen.findByRole("button", { name: "Geavanceerde groepsverdeling aanpassen" });
+    expect(screen.getAllByText(/Maximaal/).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  });
   it.each(["knockout", "single_match"] as const)("uses four steps for %s with suitable methods", async kind => {
     fixtures.matches = true;
     render(<LiveDrawDialog {...props} fixtureKind={kind} />);
