@@ -3167,53 +3167,100 @@ posities + statistieken groen */
 [data-mode="light"] .admin-ui.admin-dialog { --admin-raised: 0 0% 100%; --admin-field: 0 0% 98.5%; --admin-line: 0 0% 0% / 0.08; --admin-line-strong: 0 0% 0% / 0.14; }
 .admin-select-menu { border-radius: 10px; box-shadow: 0 20px 50px -20px hsl(0 0% 0% / 0.6); }
 
-/* Desktop/tablet workspace: preserve phone rules and the public/live-stage boundary. */
+/* Structural desktop workspace; phone and stage keep their existing presentation. */
+.admin-desktop-section-title { display: none; }
 @media (min-width: 768px) {
-  .tournament-admin {
-    --admin-canvas: 0 0% 6%; --admin-raised: 0 0% 10%; --admin-field: 0 0% 8%;
-    --admin-radius: 8px; --admin-workspace-head: 0 0% 8%;
-    --admin-workspace-shadow: 0 1px 0 hsl(0 0% 100% / 0.03) inset;
-    background: hsl(var(--admin-canvas));
-  }
-  [data-mode="light"] .tournament-admin {
-    --admin-canvas: 0 0% 96%; --admin-raised: 0 0% 100%; --admin-field: 0 0% 98%;
-    --admin-workspace-head: 0 0% 100%; --admin-workspace-shadow: 0 1px 2px hsl(0 0% 0% / 0.04);
-  }
-  .admin-ui .admin-workspace-sidebar { background: hsl(var(--admin-workspace-head)); }
-  .admin-workspace-brand { display: flex; align-items: center; gap: 10px; height: 88px; padding: 0 18px; flex-shrink: 0; }
-  .admin-workspace-tournament { display: flex; align-items: center; gap: 10px; margin: 0 12px 20px; padding: 12px 6px; border-top: 1px solid hsl(var(--admin-line)); border-bottom: 1px solid hsl(var(--admin-line)); }
-  .admin-workspace-header { position: sticky; top: 0; z-index: 25; flex-shrink: 0; padding: 26px 32px 0; background: hsl(var(--admin-workspace-head)); border-bottom: 1px solid hsl(var(--admin-line)); }
-  .admin-workspace-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 22px; }
-  .admin-workspace-breadcrumb { display: flex; align-items: center; gap: 8px; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.5; margin-bottom: 9px; }
-  .admin-workspace-breadcrumb a { flex-shrink: 0; }
-  .admin-workspace-breadcrumb a:hover { color: hsl(var(--foreground)); }
-  .admin-workspace-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: 0; color: hsl(var(--foreground)); }
-  .admin-workspace-utilities { display: flex; align-items: center; gap: 3px; color: hsl(var(--muted-foreground)); flex-shrink: 0; }
-  .admin-workspace-utilities button, .admin-workspace-utilities a { width: 34px; height: 34px; }
-  .admin-workspace-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; min-height: 50px; }
-  .admin-workspace-navigation { min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: thin; }
-  .admin-workspace-tabs { display: flex; align-items: stretch; gap: 20px; width: max-content; }
-  .admin-ui .admin-workspace-tab { position: relative; height: 50px; padding: 0 0 12px; border-radius: 0; background: transparent; color: hsl(var(--muted-foreground)); font-size: 12px; font-weight: 500; letter-spacing: 0; }
-  .admin-ui .admin-workspace-tab:hover { background: transparent; color: hsl(var(--foreground)); }
-  .admin-ui .admin-workspace-tab-active { color: hsl(var(--foreground)); }
-  .admin-workspace-tab-active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: hsl(var(--primary)); }
-  .admin-workspace-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; padding-bottom: 10px; }
-  .admin-workspace-controls [role="combobox"] { height: 32px; min-width: 105px; max-width: 200px; padding: 0 10px; font-size: 12px; }
-  .admin-workspace-controls button { min-height: 32px; }
-  .admin-ui .admin-workspace-content { max-width: 1800px; padding: 28px 32px; }
-  .admin-workspace-content :is(.section-title, .dialog-heading) { letter-spacing: 0; font-size: 15px; font-weight: 600; }
-  .admin-workspace-content :is(.border.bg-card, .border.bg-secondary, .section-card):not(.draw-show-stage *):not(.draw-scene-settings *) { box-shadow: var(--admin-workspace-shadow); }
-  .admin-workspace-content .form-label { letter-spacing: 0; }
+ .tournament-admin { --admin-canvas: 0 0% 5%; --admin-raised: 0 0% 9%; --admin-field: 0 0% 12%; --admin-line: 0 0% 100% / .09; --admin-radius: 8px; --admin-workspace-head: 0 0% 7%; background: hsl(var(--admin-canvas)); }
+ [data-mode="light"] .tournament-admin { --admin-canvas: 0 0% 96%; --admin-raised: 0 0% 100%; --admin-field: 0 0% 98%; --admin-line: 0 0% 0% / .09; --admin-workspace-head: 0 0% 100%; }
+ .admin-workspace-header { position: sticky; top: 0; z-index: 25; flex-shrink: 0; background: hsl(var(--admin-canvas)); }
+ .admin-command-bar { display:flex; justify-content:space-between; align-items:center; gap:24px; height:76px; padding:0 40px; background:hsl(var(--admin-workspace-head)); }
+ .admin-command-identity { display:flex; align-items:center; gap:14px; min-width:0; }
+ .admin-command-identity span { display:flex; flex-direction:column; gap:3px; min-width:0; }
+ .admin-command-identity small { font-size:9px; font-weight:700; color:hsl(var(--primary)); letter-spacing:0; }
+ .admin-command-identity strong { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+ .admin-primary-navigation { display:flex; align-items:stretch; gap:8px; height:57px; padding:0 40px; background:hsl(var(--admin-workspace-head)); border-bottom:1px solid hsl(var(--admin-line)); overflow-x:auto; }
+ .admin-ui .admin-primary-tab { height:57px; padding:0 20px; gap:10px; position:relative; border-radius:0; font-size:13px; font-weight:500; color:hsl(var(--muted-foreground)); background:transparent; flex-shrink:0; }
+ .admin-ui .admin-primary-tab:hover { color:hsl(var(--foreground)); background:hsl(var(--secondary)); }
+ .admin-ui .admin-primary-tab.is-active { color:hsl(var(--foreground)); }
+ .admin-primary-tab.is-active svg { color:hsl(var(--primary)); }
+ .admin-primary-tab.is-active::after { content:''; position:absolute; inset:auto 18px 0; height:3px; background:hsl(var(--primary)); }
+ .admin-workspace-heading { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:30px 40px 22px; }
+ .admin-workspace-breadcrumb { display:flex; align-items:center; gap:8px; color:hsl(var(--muted-foreground)); font-size:11px; margin-bottom:8px; }
+ .admin-workspace-title { font-family:'Space Grotesk',sans-serif; font-size:32px; line-height:1.2; font-weight:600; letter-spacing:0; }
+ .admin-workspace-utilities { display:flex; gap:3px; color:hsl(var(--muted-foreground)); flex-shrink:0; }
+ .admin-workspace-utilities button,.admin-workspace-utilities a { width:34px; height:34px; }
+ .admin-workspace-toolbar { display:flex; padding:0 40px; }
+ .admin-workspace-toolbar:has(.admin-workspace-navigation:empty) { display:none; }
+ .admin-workspace-navigation { min-width:0; max-width:100%; overflow-x:auto; }
+ .admin-workspace-controls { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:8px; max-width:65%; }
+ .admin-workspace-controls [role="combobox"] { height:36px; min-width:105px; max-width:200px; padding:0 12px; font-size:12px; }
+ .admin-workspace-controls button { min-height:36px; }
+ .admin-ui .admin-workspace-content { max-width:1800px; padding:8px 40px 40px; }
+ .admin-ui .admin-editor-layout { display:flex; flex-direction:row; gap:32px; align-items:flex-start; }
+ .admin-section-rail { width:208px; flex:0 0 208px; padding:18px 0; position:sticky; top:0; }
+ .admin-section-rail > .form-label { display:block; padding:0 14px 18px; }
+ .admin-section-rail [role="tablist"] { display:flex; flex-direction:column; gap:5px; }
+ .admin-ui .admin-section-choice { display:flex; justify-content:flex-start; height:auto; min-height:46px; padding:12px; gap:10px; width:100%; white-space:normal; text-align:left; border:1px solid transparent; color:hsl(var(--muted-foreground)); font-size:12px; font-weight:500; }
+ .admin-section-choice > span:nth-child(2) { flex:1; }
+ .admin-section-number { font-size:10px; color:hsl(var(--muted-foreground)); font-variant-numeric:tabular-nums; }
+ .admin-ui .admin-section-choice.is-active { background:hsl(var(--admin-raised)); border-color:hsl(var(--admin-line)); color:hsl(var(--foreground)); }
+ .admin-section-choice.is-active .admin-section-number { color:hsl(var(--primary)); }
+ .admin-editor-body { min-width:0; width:100%; }
+ .admin-workspace-content :is(.section-title,.dialog-heading) { letter-spacing:0; font-size:17px; font-weight:600; }
+ .admin-ui .admin-workspace-content .section-card { border:0; background:transparent; border-radius:0; box-shadow:none; padding:24px 0; }
+ .admin-workspace-content .form-label { letter-spacing:0; font-size:10px; font-weight:600; }
+ .admin-ui .admin-information-sheet { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,.65fr); gap:24px 32px; padding-top:18px; }
+ .admin-information-sheet > .section-title { grid-column:1 / -1; padding-bottom:16px; border-bottom:1px solid hsl(var(--admin-line)); }
+ .admin-information-sheet > * { margin-top:0; }
+ .admin-identity-fields { grid-column:1; display:grid; gap:22px; align-content:start; }
+ .admin-competition-fields { grid-column:1; grid-row:3; border-top:1px solid hsl(var(--admin-line)); padding-top:24px; }
+ .admin-competition-fields > .grid { grid-template-columns:1fr; gap:20px; }
+ .admin-brand-fields { grid-column:2; grid-row:2 / 4; padding:24px; background:hsl(var(--admin-raised)); border-left:1px solid hsl(var(--admin-line)); }
+ .admin-brand-fields > .grid { grid-template-columns:1fr; gap:32px; }
+ .admin-brand-fields img { border:0; border-radius:0; background:transparent; }
+ .admin-brand-fields img[alt="Cover"] { width:100%; height:auto; aspect-ratio:16 / 9; object-fit:cover; }
+ .admin-brand-fields img[alt="Logo"] { width:96px; height:96px; }
+ .admin-attachment-fields { grid-column:1 / -1; padding-top:24px; }
+ .admin-desktop-section-title { display:block; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin-bottom:22px; }
+ .admin-participants-register { padding-top:18px; }
+ .admin-register-toolbar { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:22px 0; }
+ .admin-register-toolbar input { max-width:320px; }
+ .admin-register-columns { display:grid; grid-template-columns:minmax(0,1fr) 130px 136px; gap:16px; padding:14px 18px; background:hsl(var(--admin-raised)); border-block:1px solid hsl(var(--admin-line)); color:hsl(var(--muted-foreground)); font-size:10px; font-weight:600; text-transform:uppercase; }
+ .admin-team-register { display:flex; flex-direction:column; }
+ .admin-team-row { display:grid; grid-template-columns:40px minmax(0,1fr) 130px 136px; align-items:center; gap:16px; padding:14px 18px; border-bottom:1px solid hsl(var(--admin-line)); min-height:70px; transition:background 150ms; }
+ .admin-team-row:hover { background:hsl(var(--admin-raised)); }
+ .admin-team-mark { width:40px; height:40px; }
+ .admin-team-country { display:flex; gap:8px; align-items:center; font-size:11px; color:hsl(var(--muted-foreground)); }
+ .admin-team-actions { justify-content:flex-end; }
+ .admin-team-actions button { width:32px; height:32px; color:hsl(var(--muted-foreground)); }
+ .admin-ui .admin-register-add { display:flex; align-items:center; justify-content:flex-start; gap:14px; padding:18px; height:64px; border-bottom:1px dashed hsl(var(--admin-line)); border-radius:0; }
+ .admin-register-add svg { width:20px; height:20px; }
+ .admin-presentation-layout.admin-presentation-website { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr); gap:32px; }
+ .admin-presentation-website > .section-card:nth-child(2) { margin-top:0; border-left:1px solid hsl(var(--admin-line)); padding-left:28px; }
+ .admin-ui.admin-dialog:not(.draw-dialog-theme) { border-radius:8px; padding:0; overflow:hidden; }
+ .admin-dialog:not(.draw-dialog-theme) .admin-dialog-layout { padding:28px; gap:24px; }
+ .admin-dialog:not(.draw-dialog-theme) .dialog-header { padding:0 32px 22px 0; border-bottom:1px solid hsl(var(--admin-line)); }
+ .admin-dialog:not(.draw-dialog-theme) .dialog-footer { margin:0 -28px -28px; padding:18px 28px; background:hsl(var(--admin-field)); border-top:1px solid hsl(var(--admin-line)); }
+ .admin-dialog:not(.draw-dialog-theme) > button[aria-label="Sluiten"] { border-radius:6px; box-shadow:none; background:transparent; }
 }
-@media (min-width: 768px) and (max-width: 1100px) {
-  .admin-workspace-sidebar { width: 72px; }
-  .admin-workspace-sidebar .admin-workspace-brand span,
-  .admin-workspace-sidebar .admin-workspace-tournament > div,
-  .admin-workspace-sidebar button > span { display: none; }
-  .admin-workspace-sidebar button { justify-content: center; padding-left: 0; padding-right: 0; }
-  .admin-workspace-sidebar .admin-workspace-tournament { margin-left: 12px; margin-right: 12px; }
-  .admin-workspace-sidebar .admin-workspace-brand { padding: 0 18px; }
-  .admin-workspace-header { padding: 22px 22px 0; }
-  .admin-ui .admin-workspace-content { padding: 22px; }
-  .admin-workspace-tabs { gap: 16px; }
+@media (min-width:768px) and (max-width:1050px) {
+ .admin-command-bar,.admin-primary-navigation { padding-left:24px; padding-right:24px; }
+ .admin-ui .admin-primary-tab { padding:0 12px; gap:8px; font-size:12px; }
+ .admin-workspace-heading { padding:24px; align-items:flex-start; }
+ .admin-workspace-toolbar { padding:0 24px; }
+ .admin-ui .admin-workspace-content { padding:8px 24px 24px; gap:24px; }
+ .admin-section-rail { width:165px; flex-basis:165px; }
+ .admin-ui .admin-section-choice { padding:10px 8px; font-size:11px; }
+ .admin-ui .admin-information-sheet { grid-template-columns:1fr; }
+ .admin-brand-fields { grid-column:1; grid-row:auto; border-left:0; }
+ .admin-brand-fields > .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .admin-register-columns { grid-template-columns:minmax(0,1fr) 72px 110px; }
+ .admin-team-row { grid-template-columns:36px minmax(0,1fr) 72px 110px; gap:10px; padding:12px; }
+ .admin-team-country span { display:none; }
+ .admin-presentation-layout.admin-presentation-website { grid-template-columns:1fr; }
+ .admin-presentation-website > .section-card:nth-child(2) { border-left:0; border-top:1px solid hsl(var(--admin-line)); padding-left:0; }
+}
+@media (max-width:767px) {
+ .admin-information-sheet > :is(.admin-identity-fields,.admin-competition-fields,.admin-brand-fields) { display:contents; }
+ .admin-information-sheet .admin-identity-fields > *, .admin-information-sheet .admin-competition-fields > .grid, .admin-information-sheet .admin-brand-fields > .grid { margin-top:24px; }
 }
