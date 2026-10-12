@@ -3088,3 +3088,81 @@ posities + statistieken groen */
 @media (max-width: 767px) {
   .tournament-admin .fixed[class*="bottom-"]:not([role="dialog"]):not([role="alertdialog"]) { margin-bottom: calc(60px + env(safe-area-inset-bottom)); }
 }
+/* Uniform admin hierarchy: dialog titles, card headings and footers share one rhythm. */
+.admin-ui.admin-dialog :is([role="heading"], h2):first-of-type:not(.draw-show-stage *) { font-family: 'Space Grotesk', sans-serif; letter-spacing: 0; }
+
+/* ===== Copa Mundo management design system =====
+   One premium, neutral design line for every admin tab and dialog.
+   Public view (.broadcast) and live draw show (.draw-show-stage) are excluded. */
+.tournament-admin {
+  --admin-canvas: 0 0% 5%;
+  --admin-raised: 0 0% 9%;
+  --admin-field: 0 0% 6.5%;
+  --admin-line: 0 0% 100% / 0.07;
+  --admin-line-strong: 0 0% 100% / 0.12;
+  --admin-radius: 10px;
+  background:
+    radial-gradient(1200px 400px at 60% -200px, hsl(var(--primary) / 0.035), transparent 70%),
+    hsl(var(--admin-canvas));
+}
+[data-mode="light"] .tournament-admin {
+  --admin-canvas: 0 0% 97%;
+  --admin-raised: 0 0% 100%;
+  --admin-field: 0 0% 98.5%;
+  --admin-line: 0 0% 0% / 0.08;
+  --admin-line-strong: 0 0% 0% / 0.14;
+}
+.admin-ui { --admin-panel: var(--admin-raised, 0 0% 9%); }
+.tournament-admin > .flex > .flex-1 { background: transparent; }
+
+/* Navigation */
+.admin-ui .admin-sidenav { background: hsl(var(--admin-raised, var(--card))); border-color: hsl(var(--admin-line)); }
+.admin-ui .admin-sidenav button { letter-spacing: 0.005em; }
+.admin-ui .admin-subbar { background: hsl(var(--admin-canvas, var(--background)) / 0.85); border-color: hsl(var(--admin-line)); }
+.admin-ui .admin-bottom-nav { background: hsl(var(--admin-raised, var(--card))); border-color: hsl(var(--admin-line)); }
+
+/* Page heading */
+.admin-ui .admin-page-head { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.5rem 0 1.5rem; }
+.admin-ui .admin-page-eyebrow { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: hsl(var(--primary)); }
+.admin-ui .admin-page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; color: hsl(var(--foreground)); }
+
+/* Panels */
+.admin-ui :is(.border.bg-card, .border.bg-secondary, .section-card, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  background: hsl(var(--admin-raised, var(--secondary)));
+  border-color: hsl(var(--admin-line));
+  border-radius: var(--admin-radius, 0.5rem);
+  box-shadow: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 8px 24px -16px hsl(0 0% 0% / 0.6);
+}
+[data-mode="light"] .admin-ui :is(.border.bg-card, .border.bg-secondary, .section-card, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.05), 0 8px 24px -18px hsl(0 0% 0% / 0.25);
+}
+.admin-ui .border-border:not(.draw-show-stage *):not(.draw-scene-settings *) { border-color: hsl(var(--admin-line, var(--border))); }
+
+/* Typography hierarchy */
+.admin-ui :is(.section-title, .dialog-heading) { font-size: 1.0625rem; letter-spacing: -0.01em; }
+.admin-ui :is(.section-title, .dialog-heading)::before { width: 3px; flex-basis: 3px; height: 1.125rem; border-radius: 2px; }
+.admin-ui :is(.form-label, [data-ui="form-label"]):not(.draw-rules *):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  font-size: 0.6875rem; letter-spacing: 0.08em; color: hsl(var(--muted-foreground));
+}
+
+/* Fields */
+.admin-ui :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea, select, [role="combobox"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  background-color: hsl(var(--admin-field, var(--background)));
+  border-color: hsl(var(--admin-line-strong, var(--input)));
+  border-radius: 8px;
+}
+.admin-ui :is(input, textarea, [role="combobox"]):hover:not(:focus-visible):not(.draw-show-stage *):not(.draw-scene-settings *) { border-color: hsl(var(--muted-foreground) / 0.45); }
+.admin-ui :is(input, textarea, select, [role="combobox"]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *) {
+  outline: none; border-color: hsl(var(--primary)); box-shadow: 0 0 0 3px hsl(var(--primary) / 0.14);
+}
+
+/* Dialogs */
+.admin-ui.admin-dialog:not(.draw-dialog-theme) {
+  background: hsl(var(--admin-raised, 0 0% 9%));
+  border: 1px solid hsl(var(--admin-line-strong, var(--border)));
+  border-radius: 14px;
+  box-shadow: 0 30px 80px -20px hsl(0 0% 0% / 0.7), 0 1px 0 hsl(0 0% 100% / 0.04) inset;
+}
+.admin-ui.admin-dialog { --admin-raised: 0 0% 9%; --admin-field: 0 0% 6.5%; --admin-line: 0 0% 100% / 0.07; --admin-line-strong: 0 0% 100% / 0.12; }
+[data-mode="light"] .admin-ui.admin-dialog { --admin-raised: 0 0% 100%; --admin-field: 0 0% 98.5%; --admin-line: 0 0% 0% / 0.08; --admin-line-strong: 0 0% 0% / 0.14; }
+.admin-select-menu { border-radius: 10px; box-shadow: 0 20px 50px -20px hsl(0 0% 0% / 0.6); }
