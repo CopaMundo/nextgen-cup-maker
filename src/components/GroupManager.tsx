@@ -1306,8 +1306,8 @@ const GroupManager = ({
           {drawView && <div className="shrink-0 px-4 pt-3 sm:px-6"><DrawWizardHeader tournamentName={drawTournamentName} formatName={phaseMatchType === "rounds" ? "Groepsfase met Speelrondes" : "Groepsfase"} step={drawView === "choice" ? "method" : drawSubStep} typePart={drawView === "choice" ? drawChoicePart : drawView === "rounds" && drawMode === "rounds" && groups.length > 1 && drawSubStep === "method" ? "method" : undefined} onClose={closeDrawView} /></div>}
           {drawView === "choice" && (
             <section className="draw-surface flex min-h-0 flex-1 flex-col bg-background p-4 text-foreground sm:p-6">
-              <h2 className="section-title shrink-0">Type loting</h2>
-              <div className="min-h-0 flex-1 space-y-5 overflow-y-auto py-5">
+              <div className="draw-wizard-page min-h-0 flex-1 space-y-6 overflow-y-auto mb-4">
+                <h2 className="section-title shrink-0">Type loting</h2>
                 {!roundsShowAvailable && <p role="status" className="text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
                 {drawChoicePart === "scope"
                   ? <DrawScopeChoices value={drawMode} onChange={setDrawMode} roundsAvailable={roundsShowAvailable} />
