@@ -9,7 +9,7 @@ export function TeamSelectList({ teams, selectedIds, capacity, onChange, lockedI
 }) {
   const selected = new Set(selectedIds);
   return <section className="space-y-2">
-    <h3 className="section-title">DEELNEMERS</h3>
+    <h3 className="form-label">DEELNEMERS</h3>
     <div className="flex flex-wrap items-center gap-3 text-sm">
       <p>Selecteer {capacity} teams voor de loting</p>
       <span aria-label="Geselecteerde deelnemers" className="shrink-0 font-semibold tabular-nums">{selectedIds.length} / {capacity}</span>
@@ -19,7 +19,7 @@ export function TeamSelectList({ teams, selectedIds, capacity, onChange, lockedI
         const checked = selected.has(team.id);
         const locked = Boolean(lockedIds?.has(team.id));
         return <li key={team.id}>
-          <label className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-primary/[0.06] ${checked ? "bg-primary/[0.08]" : ""}`}>
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-2 py-1.5 text-sm transition-colors hover:border-primary/50">
             <Checkbox checked={checked} disabled={locked} aria-label={team.name}
               onCheckedChange={value => onChange(value ? [...selectedIds, team.id] : selectedIds.filter(id => id !== team.id))} />
             {team.logoUrl && <img src={team.logoUrl} alt="" className="h-6 w-6 shrink-0 object-contain" />}
