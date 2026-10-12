@@ -9,7 +9,7 @@ export function TeamSelectList({ teams, selectedIds, capacity, onChange, lockedI
 }) {
   const selected = new Set(selectedIds);
   return <section className="space-y-2">
-    <h3 className="draw-section-title">DEELNEMERS</h3>
+    <h3 className="section-title">DEELNEMERS</h3>
     <div className="flex flex-wrap items-center gap-3 text-sm">
       <p>Selecteer {capacity} teams voor de loting</p>
       <span aria-label="Geselecteerde deelnemers" className="shrink-0 font-semibold tabular-nums">{selectedIds.length} / {capacity}</span>

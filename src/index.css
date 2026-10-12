@@ -2530,6 +2530,13 @@ posities + statistieken groen */
   letter-spacing: 0;
 }
 
+.draw-dialog-theme input:not([type="checkbox"]):not([type="radio"]),
+.draw-dialog-theme [role="combobox"],
+.draw-dialog-theme .draw-table {
+  background: hsl(var(--secondary));
+  border-color: hsl(var(--border));
+}
+
 
 .draw-dialog-theme .draw-panel,
 .draw-panel {

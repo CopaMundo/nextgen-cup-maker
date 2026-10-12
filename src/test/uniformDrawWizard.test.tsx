@@ -118,6 +118,7 @@ describe("Uniform draw preparation", () => {
     await screen.findByText("4 / 4");
     expect(screen.getAllByRole("checkbox")).toHaveLength(4);
     expect(screen.getByRole("heading", { name: "Indeling & teams" })).toHaveClass("section-title");
+    expect(screen.getByRole("heading", { name: "DEELNEMERS" })).toHaveClass("section-title");
     for (const checkbox of screen.getAllByRole("checkbox")) expect(checkbox).toBeChecked();
     fireEvent.click(screen.getByRole("checkbox", { name: "Team 0" }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
