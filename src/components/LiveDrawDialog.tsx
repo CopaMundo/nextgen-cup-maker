@@ -429,12 +429,20 @@ const requestPotCount = (count: number) => {
   const setPotSlot = (potId: string, index: number, teamId: string | null) => {
     const pot = pots.find(p => p.id === potId);
     if (!pot || index < 0 || index >= (isMatchDraw ? matchPotCapacity(containers, pots.indexOf(pot)) : drawSize / pots.length)) return;
-    if (teamId && (assignedTeamIds.has(teamId) || !eligibleTeams.some(team => team.id === teamId))) return;
+    if (teamId && !eligibleTeams.some(team => team.id === teamId)) return;
     setPots(previous => {
       const updated = previous.map(p => {
-        if (p.id !== potId) return p;
         const teamIds = [...p.teamIds];
-        if (teamId) teamIds[index] = teamId; else teamIds.splice(index, 1);
+        const sourceIndex = teamId ? teamIds.indexOf(teamId) : -1;
+        const replaced = pot.teamIds[index];
+        if (p.id === potId) {
+          if (sourceIndex >= 0 && sourceIndex !== index) {
+            if (replaced) teamIds[sourceIndex] = replaced; else teamIds.splice(sourceIndex, 1);
+          }
+          if (teamId) teamIds[Math.min(index, teamIds.length)] = teamId; else teamIds.splice(index, 1);
+        } else if (sourceIndex >= 0) {
+          if (replaced) teamIds[sourceIndex] = replaced; else teamIds.splice(sourceIndex, 1);
+        }
         return { ...p, teamIds };
       });
       return completeLastDrawPot(updated, eligibleTeams.map(team => team.id), updated.map((_, side) => isMatchDraw ? matchPotCapacity(containers, side) : drawSize / updated.length));
@@ -834,7 +842,7 @@ const requestPotCount = (count: number) => {
 
   const renderRules = () => (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Landenlimiet per poule</h3>
+      <h3 className="draw-section-title">Landenlimiet per poule</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
         <div>
           <Label className="text-xs">Maximum aantal teams uit hetzelfde land</Label>
@@ -879,7 +887,7 @@ const requestPotCount = (count: number) => {
         </div>}
       </div>
 
-      <h3 className="pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Teamregels</h3>
+      <h3 className="pt-2 draw-section-title">Teamregels</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
         <p className="text-sm font-medium">Kies twee teams die niet samen in één poule mogen komen.</p>
         <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
@@ -915,7 +923,7 @@ const requestPotCount = (count: number) => {
 
   const renderMatchRules = () => (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Lotingsregels</h3>
+      <h3 className="draw-section-title">Lotingsregels</h3>
       <div className="draw-panel flex items-start justify-between gap-4 p-3">
         <div><Label htmlFor="country-protection" className="font-medium">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
         <Switch id="country-protection" checked={rules.separateSameCountry} onCheckedChange={(checked) => setRules((previous) => ({ ...previous, separateSameCountry: checked }))} />
@@ -987,22 +995,22 @@ const requestPotCount = (count: number) => {
                 onChange={method => { if (isMatchDraw) selectMatchMethod(method); else setUsePots(method === "pots"); }} />
             </div>
           ) : step === "teams" && !usePots ? (
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <section className="space-y-2"><h3 className="font-semibold">Deelnemende teams</h3><ul className="draw-panel grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">{teams.map(team => <li key={team.id}><TeamChip id={team.id} /></li>)}</ul></section>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <section className="space-y-2"><h3 className="draw-section-title">DEELNEMERS</h3><div className="flex flex-wrap items-center gap-3 text-sm"><p>Selecteer {drawSize} teams voor de loting</p><span className="font-semibold tabular-nums">{teams.length} / {drawSize}</span></div><ul className="draw-panel grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">{teams.map(team => <li key={team.id}><TeamChip id={team.id} /></li>)}</ul></section>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
           ) : step === "pots" || (step === "teams" && usePots) ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>
                 <h2 className="text-lg font-bold">Indeling &amp; teams</h2>
-                <p className="text-xs text-muted-foreground">Maak je potten aan, verdeel de teams en stel indien nodig geavanceerde lotingsregels in.</p>
               </div>
 
                 <div className="flex flex-wrap items-end gap-2">
                  <div className="min-w-[220px] flex-1 sm:max-w-sm">
-                   <Label htmlFor="group-pot-distribution">Potverdeling · {drawSize} plaatsen in dit format</Label>
+                   <Label className="draw-section-title" htmlFor="group-pot-distribution">POTVERDELING</Label>
                    <Select value={potOptions.includes(pots.length) ? String(pots.length) : ""} onValueChange={(value) => requestPotCount(Number(value))}>
                      <SelectTrigger id="group-pot-distribution" className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
                      <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{isMatchDraw ? `Pot 1: ${matchPotCapacity(containers, 0)} · Pot 2: ${matchPotCapacity(containers, 1)}` : `${count} potten van ${drawSize / count} teams`}</SelectItem>)}</SelectContent>
                    </Select>
                  </div>
+                 <span className="mb-3 shrink-0 text-sm font-semibold tabular-nums" aria-label="Teams in potten">{potTeamTotal} / {drawSize}</span>
                </div>
 
                {potOptions.includes(pots.length) && (
@@ -1028,9 +1036,9 @@ const requestPotCount = (count: number) => {
             </div>
           ) : step === "rules" ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{isMatchDraw ? renderMatchRules() : renderRules()}{!isMatchDraw && usePots && potOptions.includes(pots.length) && (
-                  <div className="space-y-5 border-t border-primary/30 pt-4">
+                  <div className="space-y-5 pt-4">
                     <section className="space-y-2">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Verdeling van potten over groepen</h3>
+                      <h3 className="draw-section-title">Verdeling van potten over groepen</h3>
                       <div className="draw-panel p-3">
                         <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
                         <p className="text-xs text-muted-foreground">Teams uit elke pot worden gelijkmatig over de groepen verdeeld. Waar nodig wijst de loting het resterende team toe.</p>
@@ -1060,10 +1068,10 @@ const requestPotCount = (count: number) => {
           ) : step === "settings" ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>
-                <h2 className="text-lg font-bold">Loting show instellingen</h2>
+                <h2 className="text-lg font-bold">Instellingen Live loting</h2>
               </div>
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
-                {!isMatchDraw && <div className="space-y-2"><Label>Groepstoewijzing</Label><div className="grid gap-3 sm:grid-cols-2"><DrawChoice label="Automatisch toewijzen" description="" selected={placementMode === "automatic"} onClick={() => setPlacementMode("automatic")} /><DrawChoice label="Groep loten" description="" selected={placementMode === "manual"} onClick={() => setPlacementMode("manual")} /></div></div>}
+                {!isMatchDraw && <div className="space-y-2"><Label className="draw-section-title">Groepstoewijzing</Label><div className="grid gap-3 sm:grid-cols-2"><DrawChoice label="Automatisch toewijzen" description="Na de loting van het team wordt deze direct toegewezen aan de eerstvolgende beschikbare poule." selected={placementMode === "automatic"} onClick={() => setPlacementMode("automatic")} /><DrawChoice label="Groep loten" description="Na het loten van het team volgt een aparte loting om de poule te bepalen." selected={placementMode === "manual"} onClick={() => setPlacementMode("manual")} /></div></div>}
               </DrawShowOptions>
                
             </div>
