@@ -24,7 +24,7 @@ afterEach(cleanup);
 const props = { open: true, onOpenChange: vi.fn(), tournamentId: "tournament", phaseId: "phase" };
 
 describe("Uniform draw preparation", () => {
-  it("keeps the per-group pot table behind the advanced allocation choice", async () => {
+  it("shows the pot distribution table directly with the helper text", async () => {
     Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
     render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
     await screen.findByText("0 / 4");
@@ -34,13 +34,11 @@ describe("Uniform draw preparation", () => {
       fireEvent.click(await screen.findByRole("option", { name: `Team ${index}` }));
     }
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
-    const toggle = await screen.findByRole("button", { name: "Geavanceerde groepsverdeling aanpassen" });
-    expect(screen.getAllByText(/Maximaal/).length).toBeGreaterThan(0);
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    fireEvent.click(toggle);
+    await screen.findByRole("heading", { name: "Regels" });
+    expect(screen.queryByText("Geavanceerde groepsverdeling aanpassen")).not.toBeInTheDocument();
+    expect(screen.getByText(/Pas hieronder eventueel jouw voorkeuren aan/)).toBeInTheDocument();
     expect(screen.getByRole("table")).toBeInTheDocument();
-    fireEvent.click(toggle);
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Automatische verdeling herstellen" })).toBeInTheDocument();
   });
   it.each(["knockout", "single_match"] as const)("uses four steps for %s with suitable methods", async kind => {
     fixtures.matches = true;
