@@ -675,12 +675,13 @@ const TournamentGeneral = ({
                 placeholder="Naam van het toernooi"
               />
             ) : (
-              <div
+              <Button variant="outline"
                 onClick={() => { setEditName(form.name); setShowEditName(true); }}
-                className="cursor-pointer rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors"
+                className="w-full h-auto justify-start rounded-md border border-border bg-secondary px-4 py-2.5 text-sm font-normal text-foreground whitespace-normal text-left"
+                aria-label="Toernooinaam bewerken"
               >
                 {form.name || <span className="text-muted-foreground">Klik om naam in te vullen</span>}
-              </div>
+              </Button>
             )}
           </div>
           <div className="space-y-2">
@@ -695,12 +696,13 @@ const TournamentGeneral = ({
                 placeholder="Beschrijving van het toernooi"
               />
             ) : (
-              <div
+              <Button variant="outline"
                 onClick={() => { setEditDesc(form.description); setShowEditDesc(true); }}
-                className="cursor-pointer rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors min-h-[72px] overflow-hidden line-clamp-2 whitespace-pre-wrap"
+                className="w-full h-auto items-start justify-start rounded-md border border-border bg-secondary px-4 py-2.5 text-sm font-normal text-foreground min-h-[72px] overflow-hidden whitespace-pre-wrap text-left"
+                aria-label="Toernooibeschrijving bewerken"
               >
                 {form.description || <span className="text-muted-foreground">Klik om beschrijving toe te voegen</span>}
-              </div>
+              </Button>
             )}
           </div>
 

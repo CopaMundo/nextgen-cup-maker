@@ -537,6 +537,13 @@ const TournamentDetail = () => {
         </div>
       )}
       <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
+        {!isMobile && <aside className="admin-platform-sidebar print:hidden">
+          <Link to="/dashboard" className="admin-platform-brand"><img src={logo} alt="Copa Mundo" /><span>COPA MUNDO</span></Link>
+          <nav aria-label="Toernooibeheer" className="admin-primary-navigation">
+            {sidebarItems.map(item => <Button key={item.id} variant="ghost" aria-label={item.label} aria-current={activeTab === item.id ? "page" : undefined} onClick={() => setActiveTab(item.id)} className={cn("admin-primary-tab", activeTab === item.id && "is-active")}><item.icon className="h-[18px] w-[18px] shrink-0" /><span>{item.label}</span></Button>)}
+          </nav>
+          <Link to="/dashboard" className="admin-platform-return"><ArrowLeft className="h-4 w-4" />Mijn toernooien</Link>
+        </aside>}
         {/* Mobile: bottom navigation bar */}
         {isMobile && (
           <nav
@@ -574,16 +581,15 @@ const TournamentDetail = () => {
               title={sidebarItems.find((item) => item.id === activeTab)?.label || "Toernooibeheer"}
               tournamentName={tournament.name}
               tournamentLogo={tournament.logo_url || logo}
-              primaryNavigation={<nav aria-label="Toernooibeheer" className="admin-primary-navigation">
-                {sidebarItems.map(item => <Button key={item.id} variant="ghost" aria-label={item.label} aria-current={activeTab === item.id ? "page" : undefined} onClick={() => setActiveTab(item.id)} className={cn("admin-primary-tab", activeTab === item.id && "is-active")}><item.icon className="h-[18px] w-[18px] shrink-0" /><span>{item.label}</span></Button>)}
-              </nav>}
               actionsRef={setPageActionsTarget}
               selectors={<>
                 {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
                 {activeTab === "schedule" && id && <LocationSelector tournamentId={id} selectedLocation={selectedLocation} onSelect={setSelectedLocation} showLabel={false} />}
               </>}
               actions={activeTab === "phases" && phaseHeader ? <Button size="sm" onClick={phaseHeader.onAdd} className="gap-1.5"><Plus className="h-4 w-4" /> Fase toevoegen</Button> : null}
-              navigation={
+              navigation={desktopSegments ? <div role="tablist" aria-label="Onderdelen" className="admin-platform-sections">
+                {desktopSegments.items.map(seg => <Button key={seg.id} variant="ghost" role="tab" aria-selected={desktopSegments.active === seg.id} onClick={() => desktopSegments.onSelect(seg.id)} className={cn("admin-section-choice", desktopSegments.active === seg.id && "is-active")}>{seg.label}</Button>)}
+              </div> :
                 activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
                   <PhaseStripNav phases={phaseHeader.phases} activePhaseNumber={phaseHeader.activePhaseNumber} onSelect={phaseHeader.onSelect} onEdit={phaseHeader.onEdit} onDelete={phaseHeader.onDelete} />
                 ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
@@ -593,12 +599,6 @@ const TournamentDetail = () => {
             />
           )}
           <div className={cn(!isMobile && "admin-workspace-content admin-editor-layout", "w-full px-3 sm:mx-auto sm:max-w-[1600px] sm:px-6 lg:px-10", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
-            {!isMobile && desktopSegments && <aside className="admin-section-rail">
-              <span className="form-label">{sidebarItems.find(item => item.id === activeTab)?.label}</span>
-              <div role="tablist" aria-label="Onderdelen" aria-orientation="vertical">
-                {desktopSegments.items.map((seg, index) => <Button key={seg.id} variant="ghost" role="tab" aria-selected={desktopSegments.active === seg.id} onClick={() => desktopSegments.onSelect(seg.id)} className={cn("admin-section-choice", desktopSegments.active === seg.id && "is-active")}><span className="admin-section-number">{String(index + 1).padStart(2, "0")}</span><span>{seg.label}</span><ChevronRight className="h-3.5 w-3.5 shrink-0" /></Button>)}
-              </div>
-            </aside>}
             <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && "admin-editor-body")} data-admin-tab={activeTab}>{renderContent()}</div>
           </div>
         </div>

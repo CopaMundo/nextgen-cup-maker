@@ -509,7 +509,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   return (
     <div className="space-y-4 admin-participants-register">
       <div className="flex items-center justify-between">
-        <h2 className="section-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
+        <h2 className="section-title admin-register-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
         <AdminPageActions><Button size="sm" onClick={() => setShowAdd(true)} disabled={teams.length >= 128}><Plus className="h-4 w-4" />{singularLabel} toevoegen</Button></AdminPageActions>
         {categoryId && importByCategory.length > 0 && (
           <AdminPageActions><Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
@@ -518,7 +518,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
         )}
       </div>
 
-      <div className="admin-register-toolbar"><Input aria-label="Zoek deelnemers" placeholder="Zoek deelnemers..." value={teamSearch} onChange={e => setTeamSearch(e.target.value)} /><span className="form-label">{teams.length} / 128</span></div>
+      <div className="admin-register-toolbar"><Input aria-label="Zoek deelnemers" placeholder="Zoek deelnemers..." value={teamSearch} onChange={e => setTeamSearch(e.target.value)} /><span className="text-xs text-muted-foreground">{teams.filter(team => team.name.toLowerCase().includes(teamSearch.toLowerCase())).length} / {teams.length} {pluralLabel.toLowerCase()}</span></div>
       <div className="admin-register-columns"><span>{singularLabel}</span><span>Land</span><span>Beheer</span></div>
       <div className="admin-team-register">
         {teams.filter(team => team.name.toLowerCase().includes(teamSearch.toLowerCase())).map(team => (
@@ -548,6 +548,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
           </div>
 
         ))}
+        {teamSearch && !teams.some(team => team.name.toLowerCase().includes(teamSearch.toLowerCase())) && <p className="py-8 text-center text-sm text-muted-foreground">Geen deelnemers gevonden.</p>}
         {teams.length < 128 && (
           <Button variant="ghost"
             onClick={() => setShowAdd(true)}

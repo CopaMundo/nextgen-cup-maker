@@ -29,6 +29,8 @@ describe("Desktop management workspace", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Schema" })).toBeInTheDocument();
     expect(screen.getByText("U12")).toBeInTheDocument();
     expect(screen.getByText("12/10/2026")).toBeInTheDocument();
+    expect(screen.getAllByText("Copa Test")).toHaveLength(1);
+    expect(screen.getByTitle("Mijn toernooien")).toHaveAttribute("href", "/dashboard");
     fireEvent.click(screen.getByRole("button", { name: "Lichte weergave" }));
     expect(toggleMode).toHaveBeenCalledOnce();
   });
