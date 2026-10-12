@@ -32,4 +32,9 @@ describe("Desktop management workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lichte weergave" }));
     expect(toggleMode).toHaveBeenCalledOnce();
   });
+  it("renders primary navigation separately from page tools", () => {
+    render(<MemoryRouter><DesktopAdminHeader title="Algemeen" tournamentName="Copa Test" primaryNavigation={<nav aria-label="Toernooibeheer"><button>Deelnemers</button></nav>} navigation={null} selectors={null} actions={<button>Toevoegen</button>} actionsRef={() => {}} /></MemoryRouter>);
+    expect(screen.getByRole("navigation", { name: "Toernooibeheer" })).toContainElement(screen.getByText("Deelnemers"));
+    expect(screen.getByText("Toevoegen").closest(".admin-workspace-heading")).not.toBeNull();
+  });
 });
