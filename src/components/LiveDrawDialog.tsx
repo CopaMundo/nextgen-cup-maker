@@ -843,7 +843,7 @@ const requestPotCount = (count: number) => {
   };
 
   const renderRules = () => (
-    <div className="space-y-5">
+    <div className="draw-rules space-y-5">
       <div className="space-y-4">
         <div>
           <Label htmlFor="draw-country-limit" className="form-label">Aantal teams uit hetzelfde land per poule</Label>
@@ -923,7 +923,7 @@ const requestPotCount = (count: number) => {
   );
 
   const renderMatchRules = () => (
-    <div className="space-y-5">
+    <div className="draw-rules space-y-5">
       <h3 className="form-label">Lotingsregels</h3>
       <div className="draw-panel flex items-start justify-between gap-4 p-3">
         <div><Label htmlFor="country-protection" className="form-label">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>

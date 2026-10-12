@@ -2565,6 +2565,14 @@ posities + statistieken groen */
   letter-spacing: 0;
 }
 
+.draw-rules .form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: hsl(var(--foreground));
+}
+
 .draw-dialog-theme input:not([type="checkbox"]):not([type="radio"]),
 .draw-dialog-theme [role="combobox"],
 .draw-dialog-theme .draw-table {
