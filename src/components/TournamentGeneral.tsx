@@ -832,7 +832,7 @@ const TournamentGeneral = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
               <Label className="form-label">Logo</Label>
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4 md:flex-wrap">
                 {tournament.logo_url && (
                   <img src={tournament.logo_url} alt="Logo" className="h-20 w-20 rounded-lg object-contain bg-secondary border border-border" />
                  )}
@@ -844,7 +844,7 @@ const TournamentGeneral = ({
             </div>
             <div className="space-y-2">
               <Label className="form-label">Omslagfoto</Label>
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4 md:flex-wrap">
                 {tournament.cover_url && (
                   <img src={tournament.cover_url} alt="Cover" className="h-20 w-36 rounded-lg object-cover bg-secondary border border-border" />
                 )}
