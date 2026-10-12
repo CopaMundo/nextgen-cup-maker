@@ -152,7 +152,7 @@ const RoundsDrawDialog = ({
   const [activeGroupIdx, setActiveGroupIdx] = useState(0);
   const [teamIdx, setTeamIdx] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<Record<string, number[]>>({});
-  const [autoReveal, setAutoReveal] = useState(true);
+  const [autoReveal, setAutoReveal] = useState(false);
   const [revealsStarted, setRevealsStarted] = useState(false);
   const [revealAt, setRevealAt] = useState(0);
   const [revealReady, setRevealReady] = useState(true);
@@ -264,7 +264,7 @@ const RoundsDrawDialog = ({
           setActiveGroupIdx(drawsValid ? Math.min(draft.activeGroupIdx, Math.max(0, draft.draws.length - 1)) : 0);
           setTeamIdx(drawsValid ? draft.teamIdx : {});
           setRevealed(drawsValid ? draft.revealed : {});
-          setAutoReveal(draft.autoReveal ?? true);
+          setAutoReveal(draft.autoReveal ?? false);
           setRevealsStarted(draft.revealsStarted ?? false);
           setRevealAt(draft.revealAt ?? 0);
           setRevealTimes(draft.revealTimes ?? {});

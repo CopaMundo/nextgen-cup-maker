@@ -111,8 +111,8 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
           const placed = teamById.get(container.teamIds[index]);
           return <div key={index} className={`draw-show-slot ${!pending && last?.teamId === placed?.id && last?.targetId === container.id ? "is-arriving" : ""}`} title={placed?.name} aria-label={placed?.name} data-transfer-target={container.id === selectedId && index === container.teamIds.length}>
             {flagBackdrop(placed?.country)}
-            <span className="draw-show-slot-mark">{placed?.logoUrl ? <AutoTrimLogo src={placed.logoUrl} /> : placed?.name.slice(0, 2).toUpperCase()}</span>
-            {layout.mode !== "C" && <span className="draw-show-slot-name">{placed?.name ?? ""}</span>}
+            {placed?.logoUrl && <span className="draw-show-slot-mark"><AutoTrimLogo src={placed.logoUrl} /></span>}
+            {(layout.mode !== "C" || !placed?.logoUrl) && <span className="draw-show-slot-name">{placed?.name ?? ""}</span>}
           </div>;
         })}
       </div>
@@ -121,12 +121,12 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
   // Static wings never reconcile on playback ticks; only identity/selection changes do.
   const leftCards = useMemo(() => leftContainers.map(renderContainer), [leftContainers, teamById, layout, selectedId, activeSpotlight, pending?.teamId, last, presentation?.flagBackdrops]);
   const rightCards = useMemo(() => rightContainers.map(renderContainer), [rightContainers, teamById, layout, selectedId, activeSpotlight, pending?.teamId, last, presentation?.flagBackdrops]);
-   const teamContent = team && <span className="draw-show-team-identity"><span className="draw-show-reveal-logo">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" /> : team.name.slice(0, 2).toUpperCase()}</span><strong>{team.name}</strong><CountryFlag country={team.country} className="draw-show-identity-flag" /></span>;
+   const teamContent = team && <span className="draw-show-team-identity">{team.logoUrl && <span className="draw-show-reveal-logo"><AutoTrimLogo src={team.logoUrl} className="draw-show-team-logo" /></span>}<strong>{team.name}</strong><CountryFlag country={team.country} className="draw-show-identity-flag" /></span>;
    const footLabel = rounds ? `${rounds.groupName}${activePot ? ` · ${activePot.name}` : ""}` : activePot?.name ?? session?.phaseName;
    const drawnCount = potTeamIds.filter((id) => rounds ? rounds.drawnTeamIds.includes(id) : !session?.remaining.includes(id)).length;
   // Every overview page fits names against the whole pot, so the size never changes between pages.
   const potNames = useMemo(() => potTeamIds.map((id) => teamById.get(id)?.name ?? "").join("\n"), [potTeamIds, teamById]);
-  const potCards = useMemo(() => visiblePotIds.map((id) => { const item = teamById.get(id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}><span className="draw-show-pot-logo">{item?.logoUrl && <AutoTrimLogo src={item.logoUrl} />}</span><FittedPotName name={item?.name ?? ""} /></span>; }), [visiblePotIds, teamById, remainingIds, pending?.teamId, teamReady]);
+  const potCards = useMemo(() => visiblePotIds.map((id) => { const item = teamById.get(id); const drawn = !remainingIds.includes(id) && (id !== pending?.teamId || teamReady); return <span key={id} className={drawn ? "is-drawn" : ""} title={`${item?.name ?? ""}${drawn ? " · Getrokken" : ""}`}>{item?.logoUrl && <span className="draw-show-pot-logo"><AutoTrimLogo src={item.logoUrl} /></span>}<FittedPotName name={item?.name ?? ""} /></span>; }), [visiblePotIds, teamById, remainingIds, pending?.teamId, teamReady]);
   const speed = presentation?.speed ?? 1;
   const transferElapsed = useMemo(() => selectionPhase === "transfer" && presentation?.selection ? Math.max(0, Date.now() - presentation.selection.startedAt - 2050 / speed) : 0, [selectionPhase, presentation?.selection?.startedAt, speed]);
   const { columns: choiceColumns } = drawChoiceGrid(pending?.options.length ?? 1);
@@ -145,11 +145,11 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
                 const complete = roundsTeamComplete(entry, now, presentation?.speed ?? 1) && (id !== pending?.teamId || teamReady);
                 return <div key={id} data-team-id={id} data-complete={complete} className={`draw-show-slot draw-show-rounds-roster-team ${complete ? "is-complete" : "is-inactive"}`}>
                   {flagBackdrop(item?.country)}
-                  <span className="draw-show-slot-mark draw-show-rounds-club-logo">{item?.logoUrl ? <AutoTrimLogo src={item.logoUrl} /> : item?.name.slice(0, 2).toUpperCase()}</span>
+                  {item?.logoUrl && <span className="draw-show-slot-mark draw-show-rounds-club-logo"><AutoTrimLogo src={item.logoUrl} /></span>}
                   <div className="draw-show-rounds-roster-identity"><span className="draw-show-slot-name">{item?.name}</span></div>
                   <div className="draw-show-rounds-opponent-badges">{complete && entry?.opponents.map((opponent) => {
                     const opponentTeam = teamById.get(opponent.opponentId);
-                    return <span key={opponent.id} className="draw-show-slot-mark" title={opponentTeam?.name} aria-label={opponentTeam?.name}>{opponentTeam?.logoUrl ? <AutoTrimLogo src={opponentTeam.logoUrl} /> : opponentTeam?.name.slice(0, 2).toUpperCase()}</span>;
+                    return <span key={opponent.id} className="draw-show-slot-mark" title={opponentTeam?.name} aria-label={opponentTeam?.name}>{opponentTeam?.logoUrl ? <AutoTrimLogo src={opponentTeam.logoUrl} /> : opponentTeam?.name}</span>;
                   })}</div>
                 </div>;
               })}
@@ -158,13 +158,13 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         </section>
         <section className="draw-show-rounds-schedule draw-show-wing-right draw-show-group-card" aria-label="Speelschema getrokken team">
           <div className="draw-show-rounds-team-header">
-            {team && teamReady ? <><span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><div><strong>{team.name}</strong>{session.mode === "pots" && <small>{activePot?.name}</small>}</div><CountryFlag country={team.country} className="draw-show-rounds-header-flag" /></> : <strong className="draw-show-rounds-waiting">Wachten op trekking</strong>}
+            {team && teamReady ? <>{team.logoUrl && <span className="draw-show-slot-mark"><AutoTrimLogo src={team.logoUrl} /></span>}<div><strong>{team.name}</strong>{session.mode === "pots" && <small>{activePot?.name}</small>}</div><CountryFlag country={team.country} className="draw-show-rounds-header-flag" /></> : <strong className="draw-show-rounds-waiting">Wachten op trekking</strong>}
           </div>
           <div className={`draw-show-rounds-fixtures ${fixtureCount > 10 ? "is-two-columns" : ""}`} style={{ "--fixture-rows": fixtureRows } as CSSProperties}>
             {visibleFixtures?.map((fixture) => { const finished = teamReady && (!fixture.revealAt || now >= fixture.revealAt + opponentRevealDuration / (presentation?.speed ?? 1)); const opponent = finished ? teamById.get(fixture.opponentId ?? "") : undefined; return <div key={`${pending?.teamId}-${fixture.id}`} className={`draw-show-rounds-fixture draw-show-slot ${opponent ? "is-known" : ""}`}>
                {flagBackdrop(opponent?.country)}
               {session.mode === "pots" && <span className="draw-show-rounds-pot-tag">{fixture.potName}</span>}
-              <span className="draw-show-slot-mark">{opponent?.logoUrl ? <AutoTrimLogo src={opponent.logoUrl} /> : opponent?.name.slice(0, 2).toUpperCase()}</span>
+              {opponent?.logoUrl && <span className="draw-show-slot-mark"><AutoTrimLogo src={opponent.logoUrl} /></span>}
               <span className="draw-show-rounds-opponent-identity"><span className="draw-show-slot-name">{opponent?.name ?? ""}</span>{opponent && <CountryFlag country={opponent.country} className="draw-show-rounds-flag" />}</span>
               {opponent && <span className="draw-show-rounds-venue" aria-label={fixture.home ? "Thuis" : "Uit"} title={fixture.home ? "Thuis" : "Uit"}>{fixture.home ? <House /> : <Plane />}</span>}
             </div>; })}
@@ -180,7 +180,7 @@ export function DrawShow({ session: incomingSession, spotlightId: incomingSpotli
         </div>}
       </main>
       {!rounds && pending && choicesReady && teamReady && selectionPhase !== "complete" && <div key={pending.teamId} className={`draw-show-eligible ${selectedId ? "has-selection" : ""}`}><div className="draw-show-eligible-groups" style={{ "--eligible-columns": drawChoiceGrid(eligible.length).columns } as CSSProperties}>{eligible.map((option) => <span key={option.id} title={option.label} aria-label={option.label} className={activeSpotlight === option.id || selectedId === option.id ? "is-spotlight" : ""}>{eligible.length > 18 ? option.label.replace(/^(groep|group|poule)\s+/i, "") : option.label}</span>)}</div></div>}
-      {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${!session.fixtureKind && layout.mode === "C" ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot draw-show-team">{flagBackdrop(team.country)}<span className="draw-show-slot-mark">{team.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team.name.slice(0, 2).toUpperCase()}</span><span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
+      {selectionPhase === "transfer" && team && <div className={`draw-show-transfer ${!session.fixtureKind && layout.mode === "C" && team.logoUrl ? "is-logo-only" : ""}`} key={`${team.id}-${selectedId}`}><div className="draw-transfer-slot draw-show-team">{flagBackdrop(team.country)}{team.logoUrl && <span className="draw-show-slot-mark"><AutoTrimLogo src={team.logoUrl} /></span>}<span className="draw-show-slot-name">{team.name}</span><CountryFlag country={team.country} className="draw-show-identity-flag" /></div></div>}
       <div className="draw-show-bowl" aria-label={`${remainingIds.length} ballen resterend`}><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>
       <DrawBalls key={activePot?.id ?? rounds?.groupName ?? "all"} clock={ballClock} teamIds={remainingIds} drawnId={pending?.teamId} revealKey={revealKey} elapsed={revealElapsed} speed={speed} revealing={revealing} theme={studio.id} />
       <div className="draw-show-bowl is-front" aria-hidden="true"><img src={studio.bowl} alt="" className="draw-show-bowl-art" /></div>

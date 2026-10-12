@@ -16,7 +16,7 @@ export const MatchDrawWings = memo(function MatchDrawWings({ left, right, teams,
           const rank = fixture.seedRanks?.[side];
           const name = team ? `${team.name}${rank ? ` (${rank})` : ""}` : "";
           return <div key={side} className={`draw-show-slot ${id && id === lastTeamId ? "is-arriving" : ""}`} data-transfer-target={fixture.id === targetId && side === fixture.matchSlots?.findIndex(slot => !slot)} title={name}>
-            <span className="draw-show-slot-mark">{team?.logoUrl ? <AutoTrimLogo src={team.logoUrl} /> : team?.name.slice(0, 2).toUpperCase()}</span>
+            {team?.logoUrl && <span className="draw-show-slot-mark"><AutoTrimLogo src={team.logoUrl} /></span>}
             <span className="draw-show-slot-name">{name}</span>
           </div>;
         })}

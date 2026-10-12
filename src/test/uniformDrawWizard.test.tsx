@@ -10,7 +10,7 @@ vi.mock("@/hooks/useDrawShowOptions", () => ({ useDrawShowOptions: () => [{ them
 vi.mock("@/components/draw/DrawShow", () => ({ DrawShow: () => <div>Studio</div> }));
 vi.mock("@/integrations/supabase/client", () => ({ supabase: { from: (table: string) => {
   const data = table === "groups" ? [{ id: "g1", name: "Groep A" }]
-    : table === "teams" ? Array.from({ length: fixtures.excess ? 5 : 4 }, (_, i) => ({ id: `t${i}`, name: `Team ${i}`, country: null }))
+    : table === "teams" ? Array.from({ length: fixtures.excess ? 5 : 4 }, (_, i) => ({ id: `t${i}`, name: `Team ${i}`, country: i < 3 ? "Belgium" : "Netherlands" }))
     : table === "matches" && fixtures.matches ? [{ id: "m1", group_id: "g1", home_slot_label: "S0", away_slot_label: "S1", round_number: 1, match_name: "Wedstrijd 1" }, { id: "m2", group_id: "g1", home_slot_label: "S2", away_slot_label: "S3", round_number: 1, match_name: "Wedstrijd 2" }]
     : table === "slots" ? Array.from({ length: 4 }, (_, i) => ({ id: `s${i}`, group_id: "g1", team_id: null, slot_code: `S${i}`, sort_order: i })) : [];
   const query: Record<string, unknown> = {};
@@ -54,19 +54,36 @@ describe("Uniform draw preparation", () => {
     fireEvent.click(screen.getByRole("button", { name: /Willekeurig/ }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Indeling & teams" });
-    expect(screen.getByText("Alle 4 teams doen mee aan de loting.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Deelnemende teams" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
     fireEvent.click(screen.getByRole("button", { name: "Vorige" }));
-    expect(screen.getByText("Alle 4 teams doen mee aan de loting.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Deelnemende teams" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Loting show instellingen" });
     expect(screen.queryByText("Landenlimiet per poule")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Start loting show" })).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: "Landenvlag" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Landenvlag tonen achter teamnaam" })).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: "Start loting show" }));
     await screen.findByText("Studio");
+  });
+  it("shows pot errors only after trying to continue", async () => {
+    render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
+    await screen.findByText("0 van 4 plaatsen gevuld.");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    expect(screen.getByRole("heading", { name: "Indeling & teams" })).toBeInTheDocument();
+  });
+  it("defaults country limits to unrestricted and counts selected participants", async () => {
+    fixtures.excess = true;
+    render(<LiveDrawDialog {...props} initialStep="teams" />);
+    await screen.findByText("Deelnemers · 0/4");
+    for (const name of ["Team 0", "Team 1", "Team 3", "Team 4"]) fireEvent.click(screen.getByRole("checkbox", { name }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    await screen.findByRole("heading", { name: "Regels" });
+    expect(screen.getByText("Geen beperking")).toBeInTheDocument();
+    expect(screen.queryByText("Uitzonderingen op de landenlimiet")).not.toBeInTheDocument();
   });
   it("requires manual participant selection with excess teams", async () => {
     fixtures.excess = true;
