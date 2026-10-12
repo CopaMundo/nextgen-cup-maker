@@ -2943,148 +2943,162 @@ posities + statistieken groen */
 .draw-show-rounds-roster-team:not(:has(.draw-show-rounds-club-logo)) .draw-show-rounds-opponent-badges { grid-column: 1; }
 .draw-show-rounds-opponent-badges .draw-show-slot-mark:not(:has(img)) { max-width: none; aspect-ratio: auto; border: 0; border-radius: 0; background: none; }
 
-/* Shared management surfaces; portal scopes arrive through AdminAppearanceContext.
-   Broadcast pages and the projected stage deliberately retain their own palette. */
+/* Management theme is scoped through AdminAppearanceContext, including portals.
+   The public site and timestamp-driven draw stage keep their independent design. */
 .admin-ui {
-  /* Management surfaces are achromatic; brand colors belong to accents only. */
-  --background: 0 0% 6%;
-  --foreground: 0 0% 95%;
-  --card: 0 0% 10%;
-  --card-foreground: 0 0% 95%;
-  --popover: 0 0% 10%;
-  --popover-foreground: 0 0% 95%;
-  --secondary: 0 0% 14%;
-  --secondary-foreground: 0 0% 85%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 62%;
-  --accent: 0 0% 19%;
-  --accent-foreground: 0 0% 95%;
-  --primary-foreground: 0 0% 6%;
-  --border: 0 0% 22%;
-  --input: 0 0% 22%;
-  --sidebar-background: 0 0% 6%;
-  --sidebar-foreground: 0 0% 85%;
-  --sidebar-accent: 0 0% 14%;
-  --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-border: 0 0% 22%;
-  --admin-panel: var(--secondary);
+  --background: 0 0% 14%;
+  --foreground: 0 0% 92%;
+  --card: 0 0% 17%;
+  --card-foreground: 0 0% 92%;
+  --popover: 0 0% 19%;
+  --popover-foreground: 0 0% 92%;
+  --secondary: 0 0% 21%;
+  --secondary-foreground: 0 0% 89%;
+  --muted: 0 0% 21%;
+  --muted-foreground: 0 0% 72%;
+  --accent: 0 0% 25%;
+  --accent-foreground: 0 0% 94%;
+  --primary-foreground: 0 0% 12%;
+  --border: 0 0% 29%;
+  --input: 0 0% 34%;
+  --sidebar-background: var(--card);
+  --sidebar-foreground: var(--muted-foreground);
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --admin-panel: var(--card);
+  --admin-field: 0 0% 16%;
   --admin-panel-border: var(--border);
   --admin-title-accent: var(--primary);
+  --admin-shadow: 0 1px 3px hsl(0 0% 0% / .1);
+  --admin-dialog-shadow: 0 16px 64px hsl(0 0% 0% / .24);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
+  line-height: 1.6;
 }
-
 [data-mode="light"] .admin-ui {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 12%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 12%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 12%;
-  --secondary: 0 0% 92%;
+  --background: 0 0% 92%;
+  --foreground: 0 0% 19%;
+  --card: 0 0% 95%;
+  --card-foreground: 0 0% 19%;
+  --popover: 0 0% 95%;
+  --popover-foreground: 0 0% 19%;
+  --secondary: 0 0% 89%;
   --secondary-foreground: 0 0% 25%;
-  --muted: 0 0% 93%;
-  --muted-foreground: 0 0% 40%;
-  --accent: 0 0% 88%;
-  --accent-foreground: 0 0% 12%;
-  --primary-foreground: 0 0% 100%;
-  --border: 0 0% 82%;
-  --input: 0 0% 82%;
-  --sidebar-background: 0 0% 96%;
-  --sidebar-foreground: 0 0% 25%;
-  --sidebar-accent: 0 0% 92%;
-  --sidebar-accent-foreground: 0 0% 25%;
-  --sidebar-border: 0 0% 82%;
+  --muted: 0 0% 89%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 0 0% 86%;
+  --accent-foreground: 0 0% 19%;
+  --primary-foreground: 0 0% 98%;
+  --border: 0 0% 80%;
+  --input: 0 0% 74%;
+  --admin-field: 0 0% 97%;
+  --admin-shadow: 0 1px 3px hsl(0 0% 0% / .05);
+  --admin-dialog-shadow: 0 16px 64px hsl(0 0% 0% / .16);
 }
-
-.admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) {
-  background-color: hsl(var(--secondary));
+.admin-ui :is(h1, h2, h3, h4, .font-display):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
 }
-
-.admin-ui.admin-dialog:not(.draw-dialog-theme) {
-  background: hsl(var(--background));
-  border-color: hsl(var(--admin-panel-border));
-  border-radius: 0.5rem;
-}
-
-.admin-ui :is(.border.bg-card, .border.bg-secondary, .section-card, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
+.admin-ui :is(.border.bg-card, .border.bg-secondary, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
   background-color: hsl(var(--admin-panel));
   border-color: hsl(var(--admin-panel-border));
-  border-radius: 0.375rem;
-  box-shadow: none;
+  border-radius: .5rem;
+  box-shadow: var(--admin-shadow);
 }
-
+/* Settings sections are unframed bands, not nested floating cards. */
+.admin-ui .section-card:not(.draw-show-stage *):not(.draw-scene-settings *) {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid hsl(var(--border));
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0 0 1.75rem;
+}
+.admin-ui .section-card + .section-card { padding-top: .5rem; }
 .admin-ui :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea, select, [role="combobox"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
-  background-color: hsl(var(--background));
+  background-color: hsl(var(--admin-field));
   color: hsl(var(--foreground));
   border-color: hsl(var(--input));
-  border-radius: 0.375rem;
+  border-radius: .375rem;
+  font-size: .875rem;
+  line-height: 1.5;
   transition: border-color 150ms ease, background-color 150ms ease;
 }
-
-.admin-ui :is(input, textarea, select, [role="combobox"]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *),
+.admin-ui :is(input, textarea)::placeholder { color: hsl(var(--muted-foreground)); opacity: 1; }
+.admin-ui :is(input, textarea, select, [role="combobox"]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *) {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
 .admin-ui [role="combobox"][data-state="open"]:not(.draw-show-stage *):not(.draw-scene-settings *) {
   border-top-color: hsl(var(--primary));
   border-bottom-color: hsl(var(--primary));
 }
-
-.admin-ui :is(.form-label, [data-ui="form-label"]):not(.draw-rules *):not(.draw-show-stage *):not(.draw-scene-settings *) {
+.admin-ui :is(.form-label, [data-ui="form-label"], .draw-section-title):not(.draw-rules *):not(.draw-show-stage *):not(.draw-scene-settings *) {
   color: hsl(var(--muted-foreground));
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1.5;
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1.6;
   text-transform: uppercase;
   letter-spacing: 0;
 }
-
-.admin-ui :is(.section-title, .dialog-heading) {
+.admin-ui :is(.section-title, .dialog-heading):not(.draw-show-stage *):not(.draw-scene-settings *) {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: .75rem;
   color: hsl(var(--foreground));
-  font-family: 'Space Grotesk', sans-serif;
   font-size: 1.125rem;
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: 0;
+  font-weight: 600;
+  line-height: 1.5;
   text-align: left;
+  overflow-wrap: anywhere;
 }
-
 .admin-ui :is(.section-title, .dialog-heading)::before {
   content: "";
-  flex: 0 0 0.25rem;
-  width: 0.25rem;
-  height: 1.5rem;
-  border-radius: 0.125rem;
+  flex: 0 0 3px;
+  width: 3px;
+  height: 1.25rem;
+  border-radius: 2px;
   background: hsl(var(--admin-title-accent));
 }
-
+.admin-ui.admin-dialog {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+  border-radius: .5rem;
+  box-shadow: var(--admin-dialog-shadow);
+}
+.admin-ui.admin-dialog .dialog-heading { padding-right: 2rem; }
+.admin-ui .draw-wizard-page {
+  padding: 1.25rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.admin-ui .draw-type-choice { background: hsl(var(--admin-field)); }
+.admin-ui .admin-nav-active { background-color: hsl(var(--secondary)); }
+.admin-ui .admin-tabs button { letter-spacing: 0; }
+.admin-ui .admin-tabs button[aria-current="page"] { font-weight: 600; }
+.admin-ui .admin-page-heading h1 { letter-spacing: 0; }
+.admin-ui .admin-bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+.admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button):not([role="switch"]) {
+  background-color: hsl(var(--secondary));
+}
+.admin-ui [class*="border-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button) { border-color: hsl(var(--border)); }
+.admin-ui [class*="text-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) { color: hsl(var(--muted-foreground)); }
 .admin-select-menu {
-  background: hsl(var(--background));
+  background: hsl(var(--popover));
   color: hsl(var(--foreground));
   border-color: hsl(var(--border));
+  box-shadow: var(--admin-dialog-shadow);
 }
 .admin-select-menu [role="option"][data-highlighted] {
   background: hsl(var(--accent));
   color: hsl(var(--foreground));
 }
+@media (max-width: 767px) {
+  .admin-ui .admin-content .section-card { padding-bottom: 1.25rem; }
+  .admin-ui .section-title { font-size: 1.0625rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   .admin-ui :is(input, textarea, select, [role="combobox"]):not(.draw-show-stage *) { transition: none; }
-}
-
-/* Professional management layout: three neutral depth layers (page, card, field), brand colour as accent only. */
-.admin-ui { --admin-shadow: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 2px hsl(0 0% 0% / 0.35); }
-[data-mode="light"] .admin-ui { --admin-shadow: 0 1px 2px hsl(0 0% 0% / 0.06), 0 1px 1px hsl(0 0% 0% / 0.04); }
-.admin-ui .admin-nav-active { background-color: hsl(var(--secondary)); }
-.admin-ui :is(.border.bg-card, .border.bg-secondary, .section-card, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
-  box-shadow: var(--admin-shadow);
-}
-.admin-ui .admin-bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
-.admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button):not([role="switch"]):not(.bg-primary) {
-  background-color: hsl(var(--secondary));
-}
-.admin-ui [class*="border-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button) {
-  border-color: hsl(var(--border));
-}
-.admin-ui [class*="text-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) { color: hsl(var(--muted-foreground)); }
-@media (max-width: 767px) {
-  .tournament-admin .fixed[class*="bottom-"]:not([role="dialog"]):not([role="alertdialog"]) { margin-bottom: calc(60px + env(safe-area-inset-bottom)); }
 }

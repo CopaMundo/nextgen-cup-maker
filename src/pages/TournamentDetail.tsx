@@ -530,10 +530,9 @@ const TournamentDetail = () => {
 
 
       <Navbar />
-      <ThemeSwitcher />
       {isMobile && (
-        <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-card px-4 print:hidden">
-          <span className="min-w-0 flex-1 truncate text-xs font-bold uppercase tracking-wider text-foreground">
+        <div className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card px-4 print:hidden">
+          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
             {sidebarItems.find((item) => item.id === activeTab)?.label}
           </span>
           <div className="flex items-center justify-end gap-1.5 min-w-0 max-w-[55%]">
@@ -544,6 +543,7 @@ const TournamentDetail = () => {
               <img src={tournament.logo_url} alt="" className="h-4 w-4 shrink-0 object-contain" />
             )}
           </div>
+          <ThemeSwitcher embedded />
         </div>
       )}
       <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
@@ -566,7 +566,7 @@ const TournamentDetail = () => {
                   </div>
                 )}
                 {!desktopNavCollapsed && (
-                  <span className="min-w-0 flex-1 truncate font-display text-sm font-bold uppercase tracking-wide text-foreground" title={tournament.name}>
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
                     {tournament.name}
                   </span>
                 )}
@@ -578,12 +578,13 @@ const TournamentDetail = () => {
                   return (
                     <Tooltip key={item.id}>
                       <TooltipTrigger asChild>
-                        <button
+                        <Button
+                          variant="ghost"
                           type="button"
                           onClick={() => setActiveTab(item.id)}
                           aria-current={active ? "page" : undefined}
                           className={cn(
-                            "group relative flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-semibold transition-colors",
+                            "group relative flex h-11 w-full justify-start items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
                             desktopNavCollapsed && "justify-center px-0",
                             active
                               ? "admin-nav-active text-foreground"
@@ -595,7 +596,7 @@ const TournamentDetail = () => {
                           )}
                           <item.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-primary")} />
                           {!desktopNavCollapsed && <span className="truncate">{item.label}</span>}
-                        </button>
+                        </Button>
                       </TooltipTrigger>
                       {desktopNavCollapsed && (
                         <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
@@ -605,13 +606,13 @@ const TournamentDetail = () => {
                 })}
               </div>
 
-              <div className="shrink-0 border-t border-border p-2">
+              <div className="flex shrink-0 items-center gap-1 border-t border-border p-2">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={toggleDesktopNav}
                   className={cn(
-                    "w-full justify-start gap-3 px-2.5 text-xs font-semibold text-muted-foreground",
+                    "min-w-0 flex-1 justify-start gap-3 px-2.5 text-xs font-semibold text-muted-foreground",
                     desktopNavCollapsed && "justify-center px-0"
                   )}
                   aria-label={desktopNavCollapsed ? "Menu openen" : "Menu inklappen"}
@@ -619,6 +620,7 @@ const TournamentDetail = () => {
                   {desktopNavCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
                   {!desktopNavCollapsed && <span>Inklappen</span>}
                 </Button>
+                <ThemeSwitcher embedded />
               </div>
             </nav>
           </TooltipProvider>
@@ -657,9 +659,9 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
-            <header className="sticky top-0 z-20 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur print:hidden">
-              <div className="mx-auto grid h-full w-full max-w-[1920px] grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] items-center gap-6 px-3 sm:px-6 lg:px-8">
-                <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
+            <header className="admin-workbar sticky top-0 z-20 shrink-0 border-b border-border bg-card print:hidden">
+              <div className="mx-auto flex min-h-14 w-full max-w-[1920px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 sm:px-6 lg:px-8">
+                <div className="flex shrink-0 flex-wrap items-center gap-2 empty:hidden [&>*]:mb-0">
                   {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
                   {activeTab === "schedule" && (
                     <LocationSelector
@@ -670,7 +672,7 @@ const TournamentDetail = () => {
                   )}
                 </div>
 
-                <div className="flex min-w-0 justify-center justify-self-center">
+                <div className="min-w-0 flex-1 overflow-x-auto scrollbar-none">
                   {activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
                     <PhaseStripNav
                       phases={phaseHeader.phases}
@@ -696,16 +698,18 @@ const TournamentDetail = () => {
                     />
                   ) : (
                     desktopSegments && (
-                      <div className="flex shrink-0 items-center gap-1">
+                      <div className="admin-tabs flex w-max min-w-full items-center gap-1">
                         {desktopSegments.items.map((seg) => {
                           const active = desktopSegments.active === seg.id;
                           return (
-                            <button
+                            <Button
+                              variant="ghost"
                               key={seg.id}
                               type="button"
                               onClick={() => desktopSegments.onSelect(seg.id)}
+                              aria-current={active ? "page" : undefined}
                               className={cn(
-                                "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
+                                "relative flex h-10 shrink-0 items-center gap-2 rounded-none px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
                                 active
                                   ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
                                   : ""
@@ -713,7 +717,7 @@ const TournamentDetail = () => {
                             >
                               {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
                               <span className="truncate">{seg.label}</span>
-                            </button>
+                            </Button>
                           );
                         })}
                       </div>
@@ -721,7 +725,7 @@ const TournamentDetail = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-end gap-3">
+                <div className="flex shrink-0 items-center justify-end gap-3 empty:hidden">
                   {activeTab === "phases" && phaseHeader && (
                     <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
                       <Plus className="h-4 w-4" /> Fase
@@ -731,7 +735,10 @@ const TournamentDetail = () => {
               </div>
             </header>
           )}
-          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
+          <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
+            {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
+              <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.title}</h1>
+            </div>}
             <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>
           </div>
         </div>
