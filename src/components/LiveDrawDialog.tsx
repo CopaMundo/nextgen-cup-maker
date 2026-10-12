@@ -835,6 +835,7 @@ const requestPotCount = (count: number) => {
     const error = validationError();
     if (error) {
       setStep(isMatchDraw && error.step === "pots" ? "teams" : error.step);
+      if (error.step === "teams" && !usePots) setParticipantError(error.message);
       toast({ title: "Loting kan nog niet starten", description: error.message, variant: "destructive" });
       return;
     }

@@ -378,11 +378,22 @@ const RoundsDrawDialog = ({
     nextToRules();
   };
 
-  const nextToRules = () => {
+  const validateParticipants = () => {
     if (method === "free") {
       const incomplete = groups.find(g => (selectedTeamsByGroup[g.id] ?? []).length !== g.teamIds.length);
-      if (incomplete) { setParticipantError(`Selecteer precies ${incomplete.teamIds.length} teams voor de loting in ${incomplete.name}. Er zijn nu ${selectedTeamsByGroup[incomplete.id]?.length ?? 0} teams geselecteerd.`); setStep("teams"); return; }
+      if (incomplete) {
+        const message = `Selecteer precies ${incomplete.teamIds.length} teams voor de loting in ${incomplete.name}. Er zijn nu ${selectedTeamsByGroup[incomplete.id]?.length ?? 0} teams geselecteerd.`;
+        setParticipantError(message);
+        toast({ title: "Loting nog niet compleet", description: message, variant: "destructive" });
+        setStep("teams");
+        return false;
+      }
     }
+    return true;
+  };
+
+  const nextToRules = () => {
+    if (!validateParticipants()) return;
     if (method === "pots" && !potDrawAvailable) return;
     const next: Record<string, number[][]> = {};
     drawGroups.forEach((g) => {
@@ -436,6 +447,7 @@ const RoundsDrawDialog = ({
   };
 
   const prepare = async () => {
+    if (!validateParticipants()) return;
     if (exceedsShowLimit) {
       toast({ title: "Maximaal 20 speelrondes in de live show", description: liveRoundsLimitMessage, variant: "destructive" });
       return;
