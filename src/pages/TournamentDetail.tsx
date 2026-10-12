@@ -557,7 +557,7 @@ const TournamentDetail = () => {
           </div>
         </div>
       )}
-      <div className="relative flex flex-1 overflow-hidden min-h-0">
+      <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
         {/* Desktop: left navigation column */}
         {!isMobile && (
           <TooltipProvider delayDuration={300}>
@@ -597,14 +597,14 @@ const TournamentDetail = () => {
                             "group relative flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-semibold transition-colors",
                             desktopNavCollapsed && "justify-center px-0",
                             active
-                              ? "bg-primary/10 text-primary"
-                              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                              ? "admin-nav-active text-foreground"
+                              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                           )}
                         >
                           {active && !desktopNavCollapsed && (
                             <span className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-primary" />
                           )}
-                          <item.icon className="h-[18px] w-[18px] shrink-0" />
+                          <item.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-primary")} />
                           {!desktopNavCollapsed && <span className="truncate">{item.label}</span>}
                         </button>
                       </TooltipTrigger>
@@ -635,49 +635,34 @@ const TournamentDetail = () => {
           </TooltipProvider>
         )}
 
-        {/* Mobile: left icon sidebar */}
+        {/* Mobile: bottom navigation bar */}
         {isMobile && (
-          <TooltipProvider delayDuration={200}>
-            <nav
-              aria-label="Toernooibeheer"
-              className={cn(
-                "shrink-0 self-stretch bg-card flex flex-col py-2 gap-1 print:hidden min-h-0 overflow-hidden transition-[width,border-color] duration-200",
-                mobileSidebarCollapsed
-                  ? "relative w-0 border-r-0"
-                  : "relative w-14 items-center border-r border-border"
-              )}
-            >
-              <div className="min-h-0 w-full flex-1 overflow-y-auto scrollbar-none">
-                {sidebarItems.map(item => (
-                  <Tooltip key={item.id}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          setActiveTab(item.id);
-                        }}
-                        aria-label={item.label}
-                        aria-current={activeTab === item.id ? "page" : undefined}
-                        className={cn(
-                          "shrink-0 rounded-md flex items-center transition-colors duration-150 overflow-hidden",
-                          "mx-auto mb-1 h-11 w-11 justify-center p-0",
-                          activeTab === item.id
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                        )}
-                      >
-                        <item.icon className="h-[18px] w-[18px] shrink-0" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="text-xs">
-                      {item.label}
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </div>
-            </nav>
-          </TooltipProvider>
+          <nav
+            aria-label="Toernooibeheer"
+            className="admin-bottom-nav shrink-0 grid border-t border-border bg-card print:hidden"
+            style={{ gridTemplateColumns: `repeat(${sidebarItems.length}, minmax(0, 1fr))` }}
+          >
+            {sidebarItems.map(item => {
+              const active = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveTab(item.id)}
+                  aria-label={item.label}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex min-w-0 flex-col items-center justify-center gap-1 py-2 text-[10px] font-semibold transition-colors",
+                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {active && <span className="absolute left-1/2 top-0 h-[2px] w-8 -translate-x-1/2 rounded-full bg-primary" />}
+                  <item.icon className={cn("h-5 w-5 shrink-0", active && "text-primary")} />
+                  <span className="max-w-full truncate px-0.5">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         )}
 
         {/* Main content */}
