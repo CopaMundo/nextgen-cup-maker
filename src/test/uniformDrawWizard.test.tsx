@@ -28,8 +28,9 @@ describe("Uniform draw preparation", () => {
     Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
     render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
     await screen.findByText("0 / 4");
-    for (let index = 0; index < 3; index++) {
-      fireEvent.click(screen.getAllByRole("combobox", { name: "Teamvak 1" })[index]);
+    const slots = screen.getAllByRole("combobox", { name: /Teamvak/ });
+    for (let index = 0; index < slots.length - 1; index++) {
+      fireEvent.click(slots[index]);
       fireEvent.click(await screen.findByRole("option", { name: `Team ${index}` }));
     }
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
