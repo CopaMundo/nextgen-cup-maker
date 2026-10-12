@@ -27,9 +27,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import CountryFlag from "@/components/CountryFlag";
-import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, ChevronDown, ArrowLeft, ExternalLink, Settings2, SlidersHorizontal } from "lucide-react";
+import { Trash2, Shuffle, Undo2, RotateCcw, Check, AlertTriangle, Sparkles, Info, ArrowLeft, ExternalLink, Settings2, SlidersHorizontal } from "lucide-react";
 import { matchDrawContainers, matchPotCapacity, nextMatchPot } from "@/lib/matchDraw";
 import { MatchDrawSetup } from "@/components/draw/MatchDrawSetup";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
@@ -1015,7 +1015,6 @@ const requestPotCount = (count: number) => {
 
                {potOptions.includes(pots.length) && (
                  <>
-                  <p className="text-xs text-muted-foreground">{potTeamTotal} van {drawSize} plaatsen gevuld.</p>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                      {pots.map((pot) => {
                        const expected = isMatchDraw ? matchPotCapacity(containers, pots.indexOf(pot)) : drawSize / pots.length;
@@ -1039,29 +1038,24 @@ const requestPotCount = (count: number) => {
                   <div className="space-y-5 pt-4">
                     <section className="space-y-2">
                       <h3 className="draw-section-title">Verdeling van potten over groepen</h3>
-                      <div className="draw-panel p-3">
-                        <p className="text-xs text-muted-foreground">Teams uit elke pot worden gelijkmatig over de groepen verdeeld. Waar nodig wijst de loting het resterende team toe.</p>
-                         <div className="mt-3 space-y-2">{pots.map(pot => <div key={pot.id} className="flex flex-wrap items-center justify-between gap-2 text-sm"><span className="font-semibold">{pot.name}</span><span>Maximaal <strong>{Math.ceil(pot.teamIds.length / Math.max(1, containers.length))}</strong> team(s) per poule</span></div>)}</div>
-                         <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
-                           <CollapsibleTrigger asChild><Button variant="outline" size="sm" className="h-auto whitespace-normal text-left"><ChevronDown className={`h-4 w-4 shrink-0 ${advancedSpreadOpen ? "rotate-180" : ""}`} />Geavanceerde groepsverdeling aanpassen</Button></CollapsibleTrigger>
-                           <CollapsibleContent className="mt-3 space-y-3">
-                            <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
-                            <div className="overflow-x-auto">
-                              <table className="draw-table min-w-[520px] text-xs">
-                                <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
-                                <tbody>
-                                  {pots.map((pot) => {
-                                    return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium">{pot.name} <span className="text-muted-foreground">· {pot.teamIds.length} teams</span></td>{containers.map(container => {
-                                      const bounds = quotaBounds(pot.id, container.id);
-                                      return <td key={container.id} className="p-1"><Input aria-label={`${pot.name} · ${container.name}`} type="number" min={0} placeholder={bounds.min === bounds.max ? String(bounds.min) : `${bounds.min} - ${bounds.max}`} value={rules.potQuota[`${pot.id}|${container.id}`] ?? ""} onChange={event => setQuota(pot.id, container.id, event.target.value)} className="mx-auto h-8 w-20 text-center" /></td>;
-                                    })}</tr>;
-                                  })}
-                                  <tr className="border-t border-border"><td className="p-2 font-semibold">Plaatsen</td>{containers.map(container => <td key={container.id} className="p-2 text-center font-semibold">{container.capacity}</td>)}</tr>
-                                </tbody>
-                              </table>
-                             </div>
-                           </CollapsibleContent>
-                         </Collapsible>
+                      <div className="draw-panel space-y-3 p-3">
+                        <p className="text-xs text-muted-foreground">Teams uit elke pot worden gelijkmatig over de groepen verdeeld. Pas hieronder eventueel jouw voorkeuren aan.</p>
+                        <div className="overflow-x-auto">
+                          <table className="draw-table min-w-[520px] text-xs">
+                            <thead><tr><th className="p-2 text-left">Pot</th>{containers.map((container) => <th key={container.id} className="p-2 text-center">{container.name}</th>)}</tr></thead>
+                            <tbody>
+                              {pots.map((pot) => {
+                                const uneven = pot.teamIds.length % Math.max(1, containers.length) !== 0;
+                                return <tr key={pot.id} className="border-t border-border"><td className="p-2 font-medium"><span className="inline-flex items-center gap-1.5">{pot.name}<span className="text-muted-foreground">· {pot.teamIds.length} teams</span>{uneven && <TooltipProvider delayDuration={200}><Tooltip><TooltipTrigger asChild><span tabIndex={0} className="inline-flex" aria-label={`${pot.name}: oneven verdeling`}><Info className="h-3.5 w-3.5 text-primary" /></span></TooltipTrigger><TooltipContent className="max-w-xs text-xs">Teams uit deze pot kunnen niet exact gelijk verdeeld worden. De loting bepaalt live welke poule het resterende team ontvangt.</TooltipContent></Tooltip></TooltipProvider>}</span></td>{containers.map(container => {
+                                  const bounds = quotaBounds(pot.id, container.id);
+                                  return <td key={container.id} className="p-1"><Input aria-label={`${pot.name} · ${container.name}`} type="number" min={0} placeholder={bounds.min === bounds.max ? String(bounds.min) : `${bounds.min} - ${bounds.max}`} value={rules.potQuota[`${pot.id}|${container.id}`] ?? ""} onChange={event => setQuota(pot.id, container.id, event.target.value)} className="mx-auto h-8 w-20 text-center" /></td>;
+                                })}</tr>;
+                              })}
+                              <tr className="border-t border-border"><td className="p-2 font-semibold">Plaatsen</td>{containers.map(container => <td key={container.id} className="p-2 text-center font-semibold">{container.capacity}</td>)}</tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
                       </div>
                     </section>
 
