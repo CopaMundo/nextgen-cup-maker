@@ -141,11 +141,11 @@ Blue #002776
 @layer components {
   /* Eén keuzestijl voor native selectors binnen het toernooibeheer. */
   .tournament-admin select {
-    @apply rounded-md border border-input bg-background text-foreground transition-colors hover:bg-secondary/50 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary focus:bg-primary/[0.06] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply rounded-md border border-input bg-background text-foreground transition-colors hover:bg-secondary/50 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary  disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .tournament-admin [role="combobox"] {
-    @apply transition-colors hover:bg-secondary/50 data-[state=open]:border-y-2 data-[state=open]:border-y-primary data-[state=open]:bg-primary/[0.06];
+    @apply transition-colors hover:bg-secondary/50 data-[state=open]:border-y-2 data-[state=open]:border-y-primary ;
   }
 
   .tournament-admin [role="combobox"] svg:last-child {
@@ -2648,7 +2648,7 @@ posities + statistieken groen */
   border-color: hsl(var(--border));
   border-top-color: hsl(var(--primary));
   border-bottom-color: hsl(var(--primary));
-  background: hsl(var(--primary) / 0.06);
+  
   box-shadow: inset 0 1px 0 hsl(var(--primary)), inset 0 -1px 0 hsl(var(--primary));
 }
 

@@ -245,7 +245,7 @@ const PresentationManager = ({
                           key={key}
                           className={cn(
                             "flex min-h-14 items-center gap-3 rounded-lg border p-3 transition-colors",
-                            isActive ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
+                            isActive ? "border-y-2 border-y-primary" : "border-border hover:border-foreground/30"
                           )}
                         >
                           <button
@@ -313,7 +313,7 @@ const PresentationManager = ({
                   onClick={() => updateFormatDisplayMode("stacked")}
                   className={cn(
                     "flex flex-col rounded-lg border p-3 text-left transition-colors",
-                    formatDisplayMode === "stacked" ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
+                    formatDisplayMode === "stacked" ? "border-y-2 border-y-primary" : "border-border hover:border-foreground/30"
                   )}
                 >
                   <span className="text-sm font-semibold text-foreground">Onder elkaar</span>
@@ -324,7 +324,7 @@ const PresentationManager = ({
                   onClick={() => updateFormatDisplayMode("tabs")}
                   className={cn(
                     "flex flex-col rounded-lg border p-3 text-left transition-colors",
-                    formatDisplayMode === "tabs" ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-foreground/30"
+                    formatDisplayMode === "tabs" ? "border-y-2 border-y-primary" : "border-border hover:border-foreground/30"
                   )}
                 >
                   <span className="text-sm font-semibold text-foreground">Tabs</span>
