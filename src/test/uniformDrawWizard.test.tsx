@@ -94,20 +94,42 @@ describe("Uniform draw preparation", () => {
   it("defaults country limits to unrestricted and counts selected participants", async () => {
     fixtures.excess = true;
     render(<LiveDrawDialog {...props} initialStep="teams" />);
-    await screen.findByText("0 / 4");
-    for (const name of ["Team 0", "Team 1", "Team 3", "Team 4"]) fireEvent.click(screen.getByRole("checkbox", { name }));
+    await screen.findByText("5 / 4");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Team 2" }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
     expect(screen.getByText("Geen beperking")).toBeInTheDocument();
     expect(screen.queryByText("Uitzonderingen op de landenlimiet")).not.toBeInTheDocument();
   });
-  it("requires manual participant selection with excess teams", async () => {
+  it("starts excess participants checked and requires the exact number", async () => {
     fixtures.excess = true;
     render(<LiveDrawDialog {...props} initialMethod="random" initialStep="teams" />);
-    await screen.findByText("0 / 4");
-    expect(screen.getByRole("checkbox", { name: "Team 0" })).toBeEnabled();
+    await screen.findByText("5 / 4");
+    expect(screen.getByRole("checkbox", { name: "Team 0" })).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
-    expect(screen.getByRole("heading", { name: "Indeling & teams" })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("Selecteer precies 4 teams");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Team 4" }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    await screen.findByRole("heading", { name: "Regels" });
+  });
+  it.each([undefined, "knockout", "single_match"] as const)("allows unchecking exact participants and preserves choices for %s", async fixtureKind => {
+    fixtures.matches = Boolean(fixtureKind);
+    const { unmount } = render(<LiveDrawDialog {...props} fixtureKind={fixtureKind} initialStep="teams" />);
+    await screen.findByText("4 / 4");
+    expect(screen.getAllByRole("checkbox")).toHaveLength(4);
+    expect(screen.getByRole("heading", { name: "Indeling & teams" })).toHaveClass("section-title");
+    for (const checkbox of screen.getAllByRole("checkbox")) expect(checkbox).toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Team 0" }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Selecteer precies 4");
+    expect(screen.getByRole("alert")).toHaveTextContent("3 teams geselecteerd");
+    unmount();
+    render(<LiveDrawDialog {...props} fixtureKind={fixtureKind} initialStep="teams" />);
+    await screen.findByText("3 / 4");
+    expect(screen.getByRole("checkbox", { name: "Team 0" })).not.toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Team 0" }));
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    await screen.findByRole("heading", { name: "Regels" });
   });
   it("uses the same header and separate team step for rounds", async () => {
     render(<RoundsDrawDialog {...props} defaultRounds={2} />);

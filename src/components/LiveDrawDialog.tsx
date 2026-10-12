@@ -846,7 +846,7 @@ const requestPotCount = (count: number) => {
       <h3 className="draw-section-title">Landenlimiet per poule</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
         <div>
-          <Label className="text-xs">Maximum aantal teams uit hetzelfde land</Label>
+          <Label className="draw-section-title">Maximum aantal teams uit hetzelfde land</Label>
           <Select
             value={rules.countryMaxDefault == null ? "none" : String(rules.countryMaxDefault)}
             onValueChange={(value) => setRules((previous) => ({
@@ -865,7 +865,7 @@ const requestPotCount = (count: number) => {
         </div>
 
         {rules.countryMaxDefault != null && exceptionalCountries.length > 0 && <div className="space-y-2">
-          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Deze landen passen niet binnen de algemene limiet. Het verschil tussen poules blijft maximaal één team.</p></div>
+          <div><Label className="draw-section-title">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Deze landen passen niet binnen de algemene limiet. Het verschil tussen poules blijft maximaal één team.</p></div>
           {exceptionalCountries.map((country) => (
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
@@ -926,7 +926,7 @@ const requestPotCount = (count: number) => {
     <div className="space-y-3">
       <h3 className="draw-section-title">Lotingsregels</h3>
       <div className="draw-panel flex items-start justify-between gap-4 p-3">
-        <div><Label htmlFor="country-protection" className="font-medium">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
+        <div><Label htmlFor="country-protection" className="draw-section-title">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
         <Switch id="country-protection" checked={rules.separateSameCountry} onCheckedChange={(checked) => setRules((previous) => ({ ...previous, separateSameCountry: checked }))} />
       </div>
       <div className="draw-panel space-y-3 p-3">

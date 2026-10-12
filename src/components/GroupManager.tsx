@@ -1306,14 +1306,14 @@ const GroupManager = ({
           {drawView && <div className="shrink-0 px-4 pt-3 sm:px-6"><DrawWizardHeader tournamentName={drawTournamentName} formatName={phaseMatchType === "rounds" ? "Groepsfase met Speelrondes" : "Groepsfase"} step={drawView === "choice" ? "method" : drawSubStep} typePart={drawView === "choice" ? drawChoicePart : drawView === "rounds" && drawMode === "rounds" && groups.length > 1 && drawSubStep === "method" ? "method" : undefined} onClose={closeDrawView} /></div>}
           {drawView === "choice" && (
             <section className="draw-surface flex min-h-0 flex-1 flex-col bg-background p-4 text-foreground sm:p-6">
-              <h2 className="shrink-0 text-lg font-bold">Type loting</h2>
+              <h2 className="section-title shrink-0">Type loting</h2>
               <div className="min-h-0 flex-1 space-y-5 overflow-y-auto py-5">
                 {!roundsShowAvailable && <p role="status" className="text-sm text-muted-foreground">{liveRoundsLimitMessage}</p>}
                 {drawChoicePart === "scope"
                   ? <DrawScopeChoices value={drawMode} onChange={setDrawMode} roundsAvailable={roundsShowAvailable} />
                   : <DrawTypeChoices value={drawMethod} onChange={method => setDrawMethod(method === "pots" ? "pots" : "random")} />}
               </div>
-              <DialogFooter className="shrink-0 border-t border-primary/30 pt-4">
+              <DialogFooter className="shrink-0 border-t border-border pt-4">
                 <Button variant="outline" disabled={drawChoicePart === "scope"} onClick={() => setDrawChoicePart("scope")}><ArrowLeft className="h-4 w-4" /> Vorige</Button>
                 <Button disabled={!roundsShowAvailable && drawMode !== "groups"} onClick={() => { if (drawChoicePart === "scope" && drawMode === "rounds") void requestDraw("rounds"); else if (drawChoicePart === "scope") setDrawChoicePart("method"); else void requestDraw(drawMode); }}>Volgende</Button>
               </DialogFooter>
