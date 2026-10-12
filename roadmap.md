@@ -89,4 +89,4 @@
 - [x] Echte groepsregieloting en apart beamerscherm samen gecontroleerd: publieke voorbereiding zonder bediening, Start loting, volledige balonthulling en gedeelde teamidentiteit; themawijziging in regie verschijnt ook publiek.
 - [x] Teamvak midden tussen de twee middelste LED-ringen (44,3%), schone glazen bokaal zonder donker vierkant met glas vóór de ballen, ballen vullen de kom van onder naar boven, GROEPSFASE gecentreerd op de podiumvoorkant en één vaste naamgrootte over alle teampagina's; 146 tests en schermcontrole in drie thema's geslaagd.
 
-- [ ] Complete premium herontwerp beheeromgeving (alle tabs en pop-ups), publieke pagina en lotingshow onaangeroerd
+- [x] Complete premium herontwerp beheeromgeving (alle tabs en pop-ups), publieke pagina en lotingshow onaangeroerd
