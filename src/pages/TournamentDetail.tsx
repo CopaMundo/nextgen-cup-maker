@@ -585,6 +585,8 @@ const TournamentDetail = () => {
                           variant="ghost"
                           type="button"
                           onClick={() => setActiveTab(item.id)}
+                          aria-label={item.label}
+                          title={item.label}
                           aria-current={active ? "page" : undefined}
                           className={cn(
                             "group relative flex h-11 w-full justify-start items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
