@@ -998,7 +998,7 @@ const requestPotCount = (count: number) => {
                 <div className="flex flex-wrap items-end gap-2">
                  <div className="min-w-[220px] flex-1 sm:max-w-sm">
                    <Label htmlFor="group-pot-distribution">Potverdeling · {drawSize} plaatsen in dit format</Label>
-                   <Select value={potOptions.includes(pots.length) ? String(pots.length) : undefined} onValueChange={(value) => requestPotCount(Number(value))}>
+                   <Select value={potOptions.includes(pots.length) ? String(pots.length) : ""} onValueChange={(value) => requestPotCount(Number(value))}>
                      <SelectTrigger id="group-pot-distribution" className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
                      <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{isMatchDraw ? `Pot 1: ${matchPotCapacity(containers, 0)} · Pot 2: ${matchPotCapacity(containers, 1)}` : `${count} potten van ${drawSize / count} teams`}</SelectItem>)}</SelectContent>
                    </Select>

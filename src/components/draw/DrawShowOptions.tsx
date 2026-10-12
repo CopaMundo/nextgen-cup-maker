@@ -41,7 +41,7 @@ export function DrawShowOptions({ phaseId, options, onChange, portalContainer, c
     </div>
     <div className="space-y-2"><Label>Thema kiezen</Label>
       {compact ? <Select value={options.theme} onValueChange={(theme) => onChange({ ...options, theme: drawStudios.find((item) => item.id === theme)?.id ?? "copa-gold" })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent portalContainer={portalContainer}>{drawStudios.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent></Select>
-        : <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">{drawStudios.map((item) => <Button key={item.id} variant="outline" aria-pressed={options.theme === item.id} onClick={() => onChange({ ...options, theme: item.id })} className="draw-choice draw-type-choice h-auto flex-col overflow-hidden p-0 text-foreground"><img src={item.asset.url} alt={item.name} className="aspect-video w-full object-cover" /><span className="flex w-full items-center justify-between gap-2 p-3 text-foreground">{item.name}{options.theme === item.id && <Check className="h-4 w-4 text-primary" />}</span></Button>)}</div>}
+        : <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">{drawStudios.map((item) => <Button key={item.id} variant="outline" aria-pressed={options.theme === item.id} onClick={() => onChange({ ...options, theme: item.id })} className="draw-choice draw-type-choice h-auto flex-col overflow-hidden p-0 text-foreground"><img src={item.asset.url} alt="" className="aspect-video w-full object-cover" /><span className="flex w-full items-center justify-between gap-2 p-3 text-foreground">{item.name}{options.theme === item.id && <Check className="h-4 w-4 text-primary" />}</span></Button>)}</div>}
     </div>
   </section>;
 }
