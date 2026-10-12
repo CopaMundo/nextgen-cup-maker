@@ -844,7 +844,8 @@ const requestPotCount = (count: number) => {
 
   const renderRules = () => (
     <div className="draw-rules space-y-5">
-      <div className="space-y-4">
+      <h3 className="form-label">Landenregels</h3>
+      <div className="draw-panel space-y-4 p-4">
         <div>
           <Label htmlFor="draw-country-limit" className="form-label">Aantal teams uit hetzelfde land per poule</Label>
           <Select
@@ -890,7 +891,7 @@ const requestPotCount = (count: number) => {
 
       <h3 className="form-label">Teamregels</h3>
       <div className="draw-panel space-y-4 p-4">
-        <p className="text-sm text-muted-foreground">Kies twee teams die niet samen in één poule mogen komen.</p>
+        <p className="text-sm text-foreground">Teams die niet samen in één poule mogen worden geloot</p>
         <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
           <Select value={pairA} onValueChange={setPairA}>
             <SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger>
