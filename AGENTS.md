@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Draw-stage rendering rules (bowl, balls, wings, overview, logos) live in src/components/draw/AGENTS.md.
+- Draw-stage rules (bowl, balls, wings, overview, logos): src/components/draw/AGENTS.md.
 - Represent live knockout and single-match entry encounters as fixed home/away slot containers in the shared draw session; source their geometry from existing matches and never infer seed rank from slot codes, so bracket positions and return legs stay intact.
 - Keep rounds-draw pot assignments per group in a phase-scoped browser draft and include them in the final draw report; phase-wide pot tables cannot replace group-specific assignments, and applying clears the draft.
 - Both live-draw dialogs use draw-dialog-theme, draw-choice, draw-panel and draw-table roles with general-settings surface/label tokens and section-title headings; shared roles prevent styling drift.
