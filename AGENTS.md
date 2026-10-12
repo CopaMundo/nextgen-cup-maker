@@ -3,7 +3,7 @@
 - Draw-stage rules (bowl, balls, wings, overview, logos): src/components/draw/AGENTS.md.
 - Represent live knockout and single-match entry encounters as fixed home/away slot containers in the shared draw session; source their geometry from existing matches and never infer seed rank from slot codes, so bracket positions and return legs stay intact.
 - Keep rounds-draw pot assignments per group in a phase-scoped browser draft and include them in the final draw report; phase-wide pot tables cannot replace group-specific assignments, and applying clears the draft.
-- Scope admin styles with .tournament-admin/.admin-ui and AdminAppearanceContext; separate desktop at 768px and portal feature actions via AdminPageActionsContext, preserving phone/public/live layouts without duplicating state.
+- Scope admin via .tournament-admin/.admin-ui and AdminAppearanceContext: horizontal main navigation and vertical section rail above 768px; portal actions via AdminPageActionsContext to preserve state and phone/public/live layouts.
 - Render both live draws inside one secured modal wizard that blocks outside-click and Escape dismissal; phase drafts preserve refresh recovery.
 - Use equal-size pot choices for group/round draws and side-specific open-slot capacities for fixture pots with shared fixed PotTeamSlots; bounded slots preserve seeds and prevent overfill. Filter assigned teams from other selectors, retaining the current selection, to prevent duplicate choices.
 - Keep editable participant checklists and explicit entry-slot seed assignments in the phase wizard draft, validating exact slot capacity before advancing; use shared drawWizard helpers for equal-pot defaults and seed placement so rankings never derive from bracket labels or reorder matches.

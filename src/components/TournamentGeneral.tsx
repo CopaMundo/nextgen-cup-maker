@@ -661,9 +661,10 @@ const TournamentGeneral = ({
         ) : null}
 
         {generalSubTab === "info" && (
-        <div className="section-card space-y-6">
+        <div className="section-card space-y-6 admin-information-sheet">
           <h2 className="section-title">Toernooi informatie</h2>
 
+          <div className="admin-identity-fields">
           <div className="space-y-2">
             <Label className="form-label">Toernooinaam</Label>
             {isMobile ? (
@@ -703,7 +704,10 @@ const TournamentGeneral = ({
             )}
           </div>
 
+          </div>
 
+          <div className="admin-competition-fields">
+          <h3 className="admin-desktop-section-title">Deelnemers & sport</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 h-5"><Label className="form-label">Sport</Label></div>
@@ -828,7 +832,10 @@ const TournamentGeneral = ({
               </div>
             </div>
           </div>
+          </div>
 
+          <div className="admin-brand-fields">
+          <h3 className="admin-desktop-section-title">Toernooi-identiteit</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
               <Label className="form-label">Logo</Label>
@@ -855,8 +862,9 @@ const TournamentGeneral = ({
               </div>
             </div>
           </div>
+          </div>
 
-          <div className="space-y-3 pt-4 border-t border-border">
+          <div className="admin-attachment-fields space-y-3 pt-4 border-t border-border">
             <div className="space-y-1">
               <Label className="form-label">Bijlagen</Label>
               <p className="text-xs sm:text-sm text-muted-foreground">Upload hier documenten die bezoekers kunnen downloaden op je toernooipagina.</p>
