@@ -532,19 +532,8 @@ const TournamentDetail = () => {
       <Navbar />
       <ThemeSwitcher />
       {isMobile && (
-        <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border bg-card px-2 print:hidden">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={toggleMobileSidebar}
-            className="h-7 w-7 shrink-0"
-            aria-label={mobileSidebarCollapsed ? "Navigatie openen" : "Navigatie sluiten"}
-            title={mobileSidebarCollapsed ? "Navigatie openen" : "Navigatie sluiten"}
-          >
-            {mobileSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-          </Button>
-          <span className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground">
+        <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-card px-4 print:hidden">
+          <span className="min-w-0 flex-1 truncate text-xs font-bold uppercase tracking-wider text-foreground">
             {sidebarItems.find((item) => item.id === activeTab)?.label}
           </span>
           <div className="flex items-center justify-end gap-1.5 min-w-0 max-w-[55%]">
