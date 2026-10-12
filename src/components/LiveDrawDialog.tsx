@@ -1059,9 +1059,9 @@ const requestPotCount = (count: number) => {
                                   <tr className="border-t border-border"><td className="p-2 font-semibold">Plaatsen</td>{containers.map(container => <td key={container.id} className="p-2 text-center font-semibold">{container.capacity}</td>)}</tr>
                                 </tbody>
                               </table>
+                             </div>
                            </CollapsibleContent>
                          </Collapsible>
-                        </div>
                       </div>
                     </section>
 
