@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus, Globe, Palette, Handshake, BarChart3, MonitorPlay, ListChecks } from "lucide-react";
+import { Settings, Tv2, ArrowLeft, ChevronRight, Users, Plus, Globe, Palette, Handshake, BarChart3, MonitorPlay, ListChecks } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
@@ -31,7 +31,6 @@ import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
@@ -183,20 +182,6 @@ const TournamentDetail = () => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem(mobileSidebarStorageKey) === "true";
   });
-  const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return sessionStorage.getItem("admin-desktop-nav-collapsed") === "true";
-  });
-
-  const toggleDesktopNav = () => {
-    setDesktopNavCollapsed((collapsed) => {
-      const next = !collapsed;
-      sessionStorage.setItem("admin-desktop-nav-collapsed", String(next));
-      return next;
-    });
-  };
-
-
   const toggleMobileSidebar = () => {
     setMobileSidebarCollapsed((collapsed) => {
       const next = !collapsed;
@@ -552,84 +537,6 @@ const TournamentDetail = () => {
         </div>
       )}
       <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
-        {/* Desktop: left navigation column */}
-        {false && !isMobile && (
-          <TooltipProvider delayDuration={300}>
-            <nav
-              aria-label="Toernooibeheer"
-              className={cn(
-                "admin-workspace-sidebar admin-sidenav shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
-                desktopNavCollapsed ? "w-[72px]" : "w-[216px]"
-              )}
-            >
-              <Link to="/dashboard" className="admin-workspace-brand" title="Mijn toernooien">
-                <img src={logo} alt="Copa Mundo" className="h-9 w-9 shrink-0 object-contain" />
-                {!desktopNavCollapsed && <span className="font-display text-sm font-bold uppercase text-foreground">Copa Mundo</span>}
-              </Link>
-              <div className="admin-workspace-tournament">
-                {tournament.logo_url ? (
-                  <img src={tournament.logo_url} alt="" className="h-9 w-9 shrink-0 object-contain" />
-                ) : (
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-secondary font-display font-bold text-primary">{tournament.name?.charAt(0)?.toUpperCase()}</span>
-                )}
-                {!desktopNavCollapsed && <div className="min-w-0"><span className="block text-[10px] font-semibold uppercase text-muted-foreground">Toernooibeheer</span><span className="mt-1 block truncate text-xs font-semibold text-foreground" title={tournament.name}>{tournament.name}</span></div>}
-              </div>
-
-              <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
-                {sidebarItems.map((item) => {
-                  const active = activeTab === item.id;
-                  return (
-                    <Tooltip key={item.id}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          type="button"
-                          onClick={() => setActiveTab(item.id)}
-                          aria-label={item.label}
-                          title={item.label}
-                          aria-current={active ? "page" : undefined}
-                          className={cn(
-                            "group relative flex h-11 w-full justify-start items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
-                            desktopNavCollapsed && "justify-center px-0",
-                            active
-                              ? "admin-nav-active text-foreground"
-                              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                          )}
-                        >
-                          {active && !desktopNavCollapsed && (
-                            <span className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-primary" />
-                          )}
-                          <item.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-primary")} />
-                          {!desktopNavCollapsed && <span className="truncate">{item.label}</span>}
-                        </Button>
-                      </TooltipTrigger>
-                      {desktopNavCollapsed && (
-                        <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
-                      )}
-                    </Tooltip>
-                  );
-                })}
-              </div>
-
-              <div className="shrink-0 border-t border-border p-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={toggleDesktopNav}
-                  className={cn(
-                    "w-full justify-start gap-3 px-2.5 text-xs font-semibold text-muted-foreground",
-                    desktopNavCollapsed && "justify-center px-0"
-                  )}
-                  aria-label={desktopNavCollapsed ? "Menu openen" : "Menu inklappen"}
-                >
-                  {desktopNavCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-                  {!desktopNavCollapsed && <span>Inklappen</span>}
-                </Button>
-              </div>
-            </nav>
-          </TooltipProvider>
-        )}
-
         {/* Mobile: bottom navigation bar */}
         {isMobile && (
           <nav
