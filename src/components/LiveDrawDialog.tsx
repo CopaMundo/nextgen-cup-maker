@@ -843,11 +843,10 @@ const requestPotCount = (count: number) => {
   };
 
   const renderRules = () => (
-    <div className="space-y-5">
-      <h3 className="form-label">Landenlimiet per poule</h3>
-      <div className="draw-panel space-y-4 p-4">
+    <div className="draw-rules space-y-5">
+      <div className="space-y-4">
         <div>
-          <Label className="form-label">Maximum aantal teams uit hetzelfde land</Label>
+          <Label htmlFor="draw-country-limit" className="form-label">Aantal teams uit hetzelfde land per poule</Label>
           <Select
             value={rules.countryMaxDefault == null ? "none" : String(rules.countryMaxDefault)}
             onValueChange={(value) => setRules((previous) => ({
@@ -857,7 +856,7 @@ const requestPotCount = (count: number) => {
               countryMax: value === "none" ? {} : previous.countryMax,
             }))}
           >
-            <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+            <SelectTrigger id="draw-country-limit" className="mt-2"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Geen beperking</SelectItem>
               {Array.from({ length: maxGroupCapacity }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}
@@ -889,7 +888,7 @@ const requestPotCount = (count: number) => {
         </div>}
       </div>
 
-      <h3 className="pt-2 form-label">Teamregels</h3>
+      <h3 className="form-label">Teamregels</h3>
       <div className="draw-panel space-y-4 p-4">
         <p className="text-sm text-muted-foreground">Kies twee teams die niet samen in één poule mogen komen.</p>
         <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
@@ -924,7 +923,7 @@ const requestPotCount = (count: number) => {
   );
 
   const renderMatchRules = () => (
-    <div className="space-y-5">
+    <div className="draw-rules space-y-5">
       <h3 className="form-label">Lotingsregels</h3>
       <div className="draw-panel flex items-start justify-between gap-4 p-3">
         <div><Label htmlFor="country-protection" className="form-label">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
