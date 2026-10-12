@@ -519,7 +519,7 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
                 display.type === "empty"
                   ? "border-dashed border-border text-muted-foreground hover:border-foreground/20"
                   : display.type === "ref"
-                  ? "border-primary/20 bg-primary/5 text-foreground hover:border-primary/40"
+                  ? "border-primary/20 text-foreground hover:border-primary/40"
                   : "border-border bg-foreground/[0.02] text-foreground hover:bg-foreground/[0.04]"
               }`}
             >

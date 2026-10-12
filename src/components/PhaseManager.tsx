@@ -1034,7 +1034,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
               onClick={() => setNewFormatType(opt.value)}
               className={`rounded-lg border-2 p-3 text-center transition-all ${
                 newFormatType === opt.value
-                  ? "border-y-2 border-y-primary bg-primary/[0.06]"
+                  ? "border-y-2 border-y-primary"
                   : "border-border hover:border-primary/20"
               }`}
             >
@@ -1093,7 +1093,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
                      opt.value === "rounds" && (groupConfig.teamsPerGroup < 4 || groupConfig.teamsPerGroup % 2 !== 0) ? "border-border opacity-40 cursor-not-allowed" :
                     groupConfig.matchType === opt.value
-                      ? "border-y-2 border-y-primary bg-primary/[0.06]"
+                      ? "border-y-2 border-y-primary"
                       : "border-border hover:border-primary/20"
                   }`}
                 >
@@ -1154,7 +1154,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                     onClick={() => setMatchGenMode(opt.value)}
                     className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
                       matchGenMode === opt.value
-                        ? "border-y-2 border-y-primary bg-primary/[0.06]"
+                        ? "border-y-2 border-y-primary"
                         : "border-border hover:border-primary/20"
                     }`}
                   >
@@ -1190,7 +1190,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   onClick={() => setBracketConfig({ ...bracketConfig, matchType: opt.value })}
                   className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
                     bracketConfig.matchType === opt.value
-                      ? "border-y-2 border-y-primary bg-primary/[0.06]"
+                      ? "border-y-2 border-y-primary"
                       : "border-border hover:border-primary/20"
                   }`}
                 >
@@ -1296,7 +1296,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   key={opt.value}
                   type="button"
                   onClick={() => setSingleMatchConfig({ ...singleMatchConfig, matchType: opt.value as any })}
-                  className={`flex-1 text-left border rounded-lg px-3 py-2 text-xs transition-all ${singleMatchConfig.matchType === opt.value ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-border hover:border-primary/50"}`}
+                  className={`flex-1 text-left border rounded-lg px-3 py-2 text-xs transition-all ${singleMatchConfig.matchType === opt.value ? "border-y-2 border-y-primary" : "border-border hover:border-primary/50"}`}
                 >
                   <span className="font-bold block">{opt.label}</span>
                   <p className="text-muted-foreground mt-0.5">{opt.desc}</p>
