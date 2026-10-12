@@ -56,6 +56,8 @@ export interface ContainerRules {
   onePerPot: boolean;
   /** Maximaal aantal deelnemers uit een pot in een bakje, sleutel `potId|containerId`. */
   potQuota: Record<string, number>;
+  /** Minimum pot occupancy; upper/lower ranges leave remainders to the live draw. */
+  potQuotaMin?: Record<string, number>;
 }
 
 export const emptyContainerRules = (): ContainerRules => ({
@@ -252,6 +254,33 @@ export function containerAllows(container: DrawContainer, teamId: string, ctx: C
 function spreadOk(containers: DrawContainer[], remaining: string[], ctx: ContainerCtx): boolean {
   const n = containers.length;
   if (n === 0) return true;
+  if (ctx.rules.onePerPot) {
+    const potIds = new Set(ctx.potByTeam.values());
+    for (const potId of potIds) {
+      const left = remaining.filter(id => ctx.potByTeam.get(id) === potId).length;
+      let deficit = 0;
+      let room = 0;
+      for (const container of containers) {
+        const count = container.teamIds.filter(id => ctx.potByTeam.get(id) === potId).length;
+        const key = `${potId}|${container.id}`;
+        const min = ctx.rules.potQuotaMin?.[key] ?? 0;
+        const max = ctx.rules.potQuota[key] ?? 1;
+        if (count > max || min > max) return false;
+        const free = container.capacity - container.teamIds.length;
+        if (min - count > free) return false;
+        deficit += Math.max(0, min - count);
+        room += Math.min(free, Math.max(0, max - count));
+      }
+      if (deficit > left || room < left) return false;
+    }
+    for (const container of containers) {
+      const minimumFree = [...potIds].reduce((sum, potId) => {
+        const count = container.teamIds.filter(id => ctx.potByTeam.get(id) === potId).length;
+        return sum + Math.max(0, (ctx.rules.potQuotaMin?.[`${potId}|${container.id}`] ?? 0) - count);
+      }, 0);
+      if (minimumFree > container.capacity - container.teamIds.length) return false;
+    }
+  }
   const totals = new Map<string, number>();
   const left = new Map<string, number>();
   const add = (map: Map<string, number>, id: string) => {
@@ -295,7 +324,7 @@ export function solveContainers(
   const order = [...teamIds].sort((a, b) => (ctx.required.get(b)?.length || 0) - (ctx.required.get(a)?.length || 0));
 
   const solve = (index: number): boolean => {
-    if (index >= order.length) return true;
+    if (index >= order.length) return spreadOk(working, [], ctx);
     if (Date.now() > deadline) return false;
     const teamId = order[index];
 
