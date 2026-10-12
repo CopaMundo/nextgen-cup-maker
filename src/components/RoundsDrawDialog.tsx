@@ -332,14 +332,20 @@ const RoundsDrawDialog = ({
   const setPotSlot = (groupId: string, potId: string, index: number, teamId: string | null) => {
     const group = groups.find((g) => g.id === groupId);
     const pots = potGroups[groupId] || [];
-    const assigned = new Set(pots.flatMap((pot) => pot.teamIds));
     const previous = pots.find((pot) => pot.id === potId)?.teamIds[index];
-    if (!group || !pots.length || (teamId && (!group.teamIds.includes(teamId) || (assigned.has(teamId) && teamId !== previous)))) return;
+    if (!group || !pots.length || (teamId && !group.teamIds.includes(teamId))) return;
     setPotGroups(prev => {
       const updated = (prev[groupId] || []).map(pot => {
-        if (pot.id !== potId) return pot;
         const teamIds = [...pot.teamIds];
-        if (teamId) teamIds[index] = teamId; else teamIds.splice(index, 1);
+        const sourceIndex = teamId ? teamIds.indexOf(teamId) : -1;
+        if (pot.id === potId) {
+          if (sourceIndex >= 0 && sourceIndex !== index) {
+            if (previous) teamIds[sourceIndex] = previous; else teamIds.splice(sourceIndex, 1);
+          }
+          if (teamId) teamIds[Math.min(index, teamIds.length)] = teamId; else teamIds.splice(index, 1);
+        } else if (sourceIndex >= 0) {
+          if (previous) teamIds[sourceIndex] = previous; else teamIds.splice(sourceIndex, 1);
+        }
         return { ...pot, teamIds };
       });
       return { ...prev, [groupId]: completeLastDrawPot(updated, group.teamIds, updated.map(() => group.teamIds.length / updated.length)) };
@@ -693,7 +699,7 @@ const RoundsDrawDialog = ({
     <p className="text-sm text-muted-foreground">Deel de teams handmatig in over de poules. Daarna kies je het type loting voor de speelrondes.</p>
     {assignError && <p role="alert" className="flex items-start gap-2 text-sm text-destructive"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />{assignError}</p>}
     <div className="grid gap-4 md:grid-cols-2">{groups.map(group => { const list = assignDraft[group.id] || []; const cap = slotRowsByGroup[group.id]?.length || 0; return <section key={group.id} className="draw-panel space-y-2 p-3">
-      <h3 className="font-semibold">{group.name} · {list.length}/{cap}</h3>
+      <h3 className="draw-section-title">{group.name} · {list.length}/{cap}</h3>
       <PotTeamSlots teams={teams} teamIds={list} assignedIds={assignedGroupTeams} capacity={cap} onChange={(index, teamId) => { setAssignError(""); setAssignDraft(prev => { const next = [...(prev[group.id] || [])]; if (teamId) next[index] = teamId; else next.splice(index, 1); return { ...prev, [group.id]: next }; }); }} />
     </section>; })}</div>
   </div>;
@@ -741,7 +747,7 @@ const RoundsDrawDialog = ({
       <div className="grid gap-2 sm:grid-cols-2">
         {drawGroups.map((g) => (
           <div key={g.id} className="draw-panel p-3 text-sm">
-            <div className="font-semibold">{g.name}</div>
+            <div className="draw-section-title">{g.name}</div>
             <div className="text-muted-foreground">
               {g.teamIds.length} teams · {g.rounds} speelrondes · {matchesPerTeam(g.teamIds.length, g.rounds)} wedstrijden per team
             </div>
@@ -771,7 +777,7 @@ const RoundsDrawDialog = ({
         <div className="draw-panel p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <div className="font-semibold">Verdeling van tegenstanders per pot</div>
+              <div className="draw-section-title">Verdeling van tegenstanders per pot</div>
               <p className="text-xs text-muted-foreground">Bepaal hoeveel keer een team uit elke pot tegen teams uit de andere potten speelt.</p>
             </div>
             <div className="flex items-center gap-2">
@@ -832,7 +838,7 @@ const RoundsDrawDialog = ({
       )}
 
       <div className="draw-panel p-4 text-sm">
-        <div className="font-semibold">Vaste kwaliteitsregels</div>
+        <div className="draw-section-title">Vaste kwaliteitsregels</div>
         <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
           <li>Evenwichtige thuis/uit-balans per pot: bij 2 ontmoetingen speelt elk team 1x thuis en 1x uit.</li>
           <li>Nooit meer dan 2 opeenvolgende thuis- of uitwedstrijden.</li>
@@ -841,7 +847,7 @@ const RoundsDrawDialog = ({
 
       <div className="draw-panel space-y-4 p-4">
           <div>
-            <Label className="font-semibold">Teams uit hetzelfde land</Label>
+            <Label className="draw-section-title">Teams uit hetzelfde land</Label>
             <RadioGroup value={sameCountry} onValueChange={(v) => setSameCountry(v as SameCountryMode)} className="mt-2 space-y-1">
               <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="allow" /> Altijd toestaan</label>
               <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="avoid" /> Zo lang mogelijk vermijden (voorkeur)</label>
@@ -853,7 +859,7 @@ const RoundsDrawDialog = ({
             <Input type="number" min={1} className="h-8 w-16" value={maxMeetings} onChange={(e) => setMaxMeetings(Math.max(1, Number(e.target.value) || 1))} />
           </div>
           <div>
-            <Label className="font-semibold">Geblokkeerde ontmoetingen</Label>
+            <Label className="draw-section-title">Geblokkeerde ontmoetingen</Label>
             <p className="text-xs text-muted-foreground">Deze teams worden nooit tegen elkaar geloot.</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <Select value={pairA} onValueChange={setPairA}>
@@ -883,19 +889,19 @@ const RoundsDrawDialog = ({
 
   const potScreen = (
     <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
-      <div><h3 className="text-lg font-bold">Indeling &amp; teams</h3><p className="text-sm text-muted-foreground">Verdeel de teams per poule gelijkmatig over de niveau-potten.</p></div>
+      <div><h3 className="text-lg font-bold">Indeling &amp; teams</h3></div>
       {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
       {potGroup && <>
         <div className="flex flex-wrap items-end gap-2">
-          <div className="min-w-[220px] flex-1 sm:max-w-sm"><Label>Potverdeling · {potGroup.teamIds.length} teams</Label>
+          <div className="min-w-[220px] flex-1 sm:max-w-sm"><Label className="draw-section-title">POTVERDELING</Label>
             <Select value={groupPots.length ? String(groupPots.length) : undefined} onValueChange={(value) => selectPotCount(potGroup, Number(value))}>
               <SelectTrigger className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
               <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {potGroup.teamIds.length / count} teams</SelectItem>)}</SelectContent>
             </Select>
           </div>
+          <span className="mb-3 shrink-0 text-sm font-semibold tabular-nums" aria-label="Teams in potten">{assigned.size} / {potGroup.teamIds.length}</span>
         </div>
         {groupPots.length > 0 && <>
-          <p className="text-xs text-muted-foreground">{assigned.size}/{potGroup.teamIds.length} teams ingedeeld</p>
           <div className="grid gap-3 md:grid-cols-2">
             {groupPots.map((pot) => <div key={pot.id} className="draw-panel p-3">
               <div className="mb-3 flex items-center gap-2"><Input aria-label="Potnaam" value={pot.name} onChange={(e) => setPotGroups((prev) => ({ ...prev, [potGroup.id]: (prev[potGroup.id] || []).map((p) => p.id === pot.id ? { ...p, name: e.target.value } : p) }))} className="h-8 min-w-0 flex-1 font-semibold" /><span className={`shrink-0 text-sm font-bold ${pot.teamIds.length === potGroup.teamIds.length / groupPots.length ? "text-primary" : "text-muted-foreground"}`}>{pot.teamIds.length}/{potGroup.teamIds.length / groupPots.length}</span></div>
@@ -967,7 +973,7 @@ const RoundsDrawDialog = ({
           <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Alles loten" title="Alles loten" disabled={!revealReady || allDone} onClick={() => setScopeAction("complete")}><FastForward /></Button>
           <Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Opnieuw beginnen" title="Opnieuw beginnen" disabled={!revealReady} onClick={() => setScopeAction("reset")}><RotateCcw /></Button>
           <Button className="draw-scene-button" variant="ghost" onClick={() => setAdjustOpen(true)}><SlidersHorizontal />Loting aanpassen</Button>
-          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={!revealReady}><Settings2 /></Button></PopoverTrigger><PopoverContent portalContainer={directorRef.current} className="draw-scene-settings max-h-[70dvh] overflow-y-auto space-y-4" side="top"><h2 className="font-semibold">Regie-instellingen</h2><DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} /><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button></div><Button variant="outline" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}>Lotingsregels</Button></PopoverContent></Popover>
+          <Popover><PopoverTrigger asChild><Button className="draw-scene-button" variant="ghost" size="icon" aria-label="Instellingen" title="Instellingen" disabled={!revealReady}><Settings2 /></Button></PopoverTrigger><PopoverContent portalContainer={directorRef.current} className="draw-scene-settings max-h-[70dvh] overflow-y-auto space-y-4" side="top"><h2 className="draw-section-title">Regie-instellingen</h2><DrawShowOptions compact phaseId={phaseId} options={showOptions} onChange={setShowOptions} portalContainer={directorRef.current} /><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(true); setPaused(false); }}><Play />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} onClick={() => { setAutoReveal(false); setPaused(false); }}><Pause />Per wedstrijd</Button></div><Button variant="outline" onClick={async () => { if (document.fullscreenElement === directorRef.current) await document.exitFullscreen(); setStep("settings"); }}>Lotingsregels</Button></PopoverContent></Popover>
           <Button className="draw-scene-button" variant="ghost" aria-label="Beamerscherm" title="Beamerscherm" onClick={() => window.open(`/draw/${phaseId}`, "_blank", "noopener,noreferrer")}><ExternalLink /></Button>
         </aside>
       </>} />
@@ -990,9 +996,9 @@ const RoundsDrawDialog = ({
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
                    ) : step === "method" ? methodScreen
-            : step === "teams" || step === "pots" ? <div className="min-h-0 flex-1 overflow-y-auto">{editingGroups ? assignScreen : method === "pots" ? potScreen : <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{groups.map(group => <section key={group.id} className="space-y-2"><h3 className="font-semibold">{group.name} · {group.teamIds.length} teams</h3><PotTeamSlots teams={teams} teamIds={group.teamIds} assignedIds={new Set(group.teamIds)} capacity={group.teamIds.length} disabled onChange={() => {}} /></section>)}</div>}</div>
+            : step === "teams" || step === "pots" ? <div className="min-h-0 flex-1 overflow-y-auto">{editingGroups ? assignScreen : method === "pots" ? potScreen : <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{groups.map(group => <section key={group.id} className="space-y-2"><h3 className="draw-section-title">{group.name} · {group.teamIds.length} teams</h3><PotTeamSlots teams={teams} teamIds={group.teamIds} assignedIds={new Set(group.teamIds)} capacity={group.teamIds.length} disabled onChange={() => {}} /></section>)}</div>}</div>
             : step === "rules" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{settings}</div>
-            : step === "settings" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Loting show instellingen</h2><DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} aria-pressed={autoReveal} onClick={() => setAutoReveal(true)}><Play className="h-4 w-4" />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} aria-pressed={!autoReveal} onClick={() => setAutoReveal(false)}><Pause className="h-4 w-4" />Per wedstrijd</Button></div></DrawShowOptions></div> : drawScreen}
+            : step === "settings" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Instellingen Live loting</h2><DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} aria-pressed={autoReveal} onClick={() => setAutoReveal(true)}><Play className="h-4 w-4" />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} aria-pressed={!autoReveal} onClick={() => setAutoReveal(false)}><Pause className="h-4 w-4" />Per wedstrijd</Button></div></DrawShowOptions></div> : drawScreen}
         {step !== "draw" && <footer className="flex shrink-0 justify-end gap-2 border-t border-primary/30 pt-4">
           <Button variant="outline" disabled={loading || checking || savingAssign || (step === "method" && !(assignGroups && initialStep === "teams"))} onClick={() => {
             if (step === "method") { setGroupsConfirmed(false); setStep("teams"); return; }

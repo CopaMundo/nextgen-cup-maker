@@ -24,6 +24,24 @@ afterEach(cleanup);
 const props = { open: true, onOpenChange: vi.fn(), tournamentId: "tournament", phaseId: "phase" };
 
 describe("Uniform draw preparation", () => {
+  it("keeps the per-group pot table behind the advanced allocation choice", async () => {
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
+    render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
+    await screen.findByText("0 / 4");
+    const slots = screen.getAllByRole("combobox", { name: /Teamvak/ });
+    for (let index = 0; index < slots.length - 1; index++) {
+      fireEvent.click(slots[index]);
+      fireEvent.click(await screen.findByRole("option", { name: `Team ${index}` }));
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    const toggle = await screen.findByRole("button", { name: "Geavanceerde groepsverdeling aanpassen" });
+    expect(screen.getAllByText(/Maximaal/).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  });
   it.each(["knockout", "single_match"] as const)("uses four steps for %s with suitable methods", async kind => {
     fixtures.matches = true;
     render(<LiveDrawDialog {...props} fixtureKind={kind} />);
@@ -54,23 +72,23 @@ describe("Uniform draw preparation", () => {
     fireEvent.click(screen.getByRole("button", { name: /Willekeurig/ }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Indeling & teams" });
-    expect(screen.getByRole("heading", { name: "Deelnemende teams" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "DEELNEMERS" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
     fireEvent.click(screen.getByRole("button", { name: "Vorige" }));
-    expect(screen.getByRole("heading", { name: "Deelnemende teams" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "DEELNEMERS" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
-    await screen.findByRole("heading", { name: "Loting show instellingen" });
+    await screen.findByRole("heading", { name: "Instellingen Live loting" });
     expect(screen.queryByText("Landenlimiet per poule")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Start loting show" })).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: "Landenvlag tonen achter teamnaam" })).toBeChecked();
+    expect(within(screen.getByRole("group", { name: "Landenvlag tonen achter teamnaam" })).getByRole("button", { name: "Aan" })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("button", { name: "Start loting show" }));
     await screen.findByText("Studio");
   });
   it("shows pot errors only after trying to continue", async () => {
     render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
-    await screen.findByText("0 van 4 plaatsen gevuld.");
+    await screen.findByText("0 / 4");
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     expect(screen.getByRole("heading", { name: "Indeling & teams" })).toBeInTheDocument();
@@ -78,7 +96,7 @@ describe("Uniform draw preparation", () => {
   it("defaults country limits to unrestricted and counts selected participants", async () => {
     fixtures.excess = true;
     render(<LiveDrawDialog {...props} initialStep="teams" />);
-    await screen.findByText("Deelnemers · 0/4");
+    await screen.findByText("0 / 4");
     for (const name of ["Team 0", "Team 1", "Team 3", "Team 4"]) fireEvent.click(screen.getByRole("checkbox", { name }));
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     await screen.findByRole("heading", { name: "Regels" });
@@ -88,7 +106,7 @@ describe("Uniform draw preparation", () => {
   it("requires manual participant selection with excess teams", async () => {
     fixtures.excess = true;
     render(<LiveDrawDialog {...props} initialMethod="random" initialStep="teams" />);
-    await screen.findByText("Deelnemers · 0/4");
+    await screen.findByText("0 / 4");
     expect(screen.getByRole("checkbox", { name: "Team 0" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     expect(screen.getByRole("heading", { name: "Indeling & teams" })).toBeInTheDocument();
