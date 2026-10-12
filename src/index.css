@@ -3085,3 +3085,6 @@ posities + statistieken groen */
   border-color: hsl(var(--border));
 }
 .admin-ui [class*="text-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) { color: hsl(var(--muted-foreground)); }
+@media (max-width: 767px) {
+  .tournament-admin .fixed[class*="bottom-"]:not([role="dialog"]):not([role="alertdialog"]) { margin-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
