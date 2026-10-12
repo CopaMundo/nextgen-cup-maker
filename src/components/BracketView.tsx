@@ -3304,7 +3304,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     { value: "single_leg" as const, label: "ENKELE WEDSTRIJD", desc: "Er wordt één beslissende wedstrijd gespeeld" },
                     { value: "home_away" as const, label: "HEEN EN TERUG", desc: "Er worden twee wedstrijden gespeeld: één thuis en één uit" },
                   ].map(opt => (
-                    <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${matchSettingsMatchType === opt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                    <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${matchSettingsMatchType === opt.value ? "border-primary" : "border-border hover:border-primary/30"}`}>
                       <input
                         type="radio"
                         name="matchSettingsType"
@@ -3339,7 +3339,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     { value: "single_leg" as const, label: "ENKELE WEDSTRIJD", desc: "Eén beslissende wedstrijd" },
                     { value: "home_away" as const, label: "HEEN EN TERUG", desc: "Heen- en terugwedstrijd" },
                   ].map(opt => (
-                    <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${matchSettingsMatchType === opt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                    <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${matchSettingsMatchType === opt.value ? "border-primary" : "border-border hover:border-primary/30"}`}>
                       <input
                         type="radio"
                         name="matchSettingsSMType"
