@@ -88,5 +88,3 @@
 - [x] Potnaam op de bokaalvoet, potteams met afstand onder de bokaal in evenwichtige gecentreerde rijen (5 = 3/2, 6 = 3/3), logo’s zonder rondje en grotere namen; logo’s vierkant bijgesneden en exact gecentreerd.
 - [x] Echte groepsregieloting en apart beamerscherm samen gecontroleerd: publieke voorbereiding zonder bediening, Start loting, volledige balonthulling en gedeelde teamidentiteit; themawijziging in regie verschijnt ook publiek.
 - [x] Teamvak midden tussen de twee middelste LED-ringen (44,3%), schone glazen bokaal zonder donker vierkant met glas vóór de ballen, ballen vullen de kom van onder naar boven, GROEPSFASE gecentreerd op de podiumvoorkant en één vaste naamgrootte over alle teampagina's; 146 tests en schermcontrole in drie thema's geslaagd.
-
-- [x] Complete premium herontwerp beheeromgeving (alle tabs en pop-ups), publieke pagina en lotingshow onaangeroerd

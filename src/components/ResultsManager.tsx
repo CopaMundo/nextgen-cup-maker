@@ -2284,7 +2284,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       className="sticky z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70 lg:top-0"
                       style={isMobile ? { top: mobileStickyOffset } : undefined}
                     >
-                      <span className="section-title">
+                      <span className="text-xs font-black uppercase tracking-[0.18em] text-foreground">
                         {day.label}
                       </span>
                       <div className="h-px flex-1 bg-border" />

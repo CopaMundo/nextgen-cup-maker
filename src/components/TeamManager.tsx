@@ -438,7 +438,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="section-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
+          <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
           {categoryId && importByCategory.length > 0 && (
             <Button variant="outline" size="sm" className="h-8" onClick={() => setShowImport(true)}>
               <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
@@ -507,7 +507,7 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="section-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
+        <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
         {categoryId && importByCategory.length > 0 && (
           <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
             <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie

@@ -553,7 +553,7 @@ const TournamentDetail = () => {
             <nav
               aria-label="Toernooibeheer"
               className={cn(
-                "admin-sidenav shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
+                "shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
                 desktopNavCollapsed ? "w-[68px]" : "w-60"
               )}
             >
@@ -657,7 +657,7 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
-            <header className="admin-subbar sticky top-0 z-20 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur print:hidden">
+            <header className="sticky top-0 z-20 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur print:hidden">
               <div className="mx-auto grid h-full w-full max-w-[1920px] grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] items-center gap-6 px-3 sm:px-6 lg:px-8">
                 <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
                   {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
@@ -731,13 +731,7 @@ const TournamentDetail = () => {
               </div>
             </header>
           )}
-          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1600px] sm:px-6 lg:px-10", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
-            {!isMobile && activeTab !== "schedule" && activeTab !== "results" && (
-              <div className="admin-page-head">
-                <span className="admin-page-eyebrow">{tournament.name}</span>
-                <h1 className="admin-page-title">{sidebarItems.find((item) => item.id === activeTab)?.label}</h1>
-              </div>
-            )}
+          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
             <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>
           </div>
         </div>
