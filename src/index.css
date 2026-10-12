@@ -2862,3 +2862,8 @@ posities + statistieken groen */
 .draw-show-match-wing[data-columns="2"] .draw-show-match-number { font-size: clamp(.5cqw, calc(var(--match-height) * .11), .78cqw); }
 .draw-show-match-wing[data-columns="2"] .draw-show-match-card .draw-show-slot { gap: .3cqw; padding: .1cqw .38cqw; }
 .draw-show-match-card.is-active { box-shadow: inset 0 0 .6cqw hsl(var(--stage-glow) / .25); }
+.draw-show-match-card .draw-show-slot:not(:has(.draw-show-slot-mark)) { grid-template-columns: minmax(0, 1fr); }
+.draw-show-rounds-roster-team:not(:has(.draw-show-rounds-club-logo)) { grid-template-columns: minmax(0, 1fr); }
+.draw-show-rounds-roster-team:not(:has(.draw-show-rounds-club-logo)) .draw-show-rounds-roster-identity,
+.draw-show-rounds-roster-team:not(:has(.draw-show-rounds-club-logo)) .draw-show-rounds-opponent-badges { grid-column: 1; }
+.draw-show-rounds-opponent-badges .draw-show-slot-mark:not(:has(img)) { max-width: none; aspect-ratio: auto; border: 0; border-radius: 0; background: none; }
