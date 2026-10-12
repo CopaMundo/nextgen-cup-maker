@@ -2512,7 +2512,6 @@ posities + statistieken groen */
 /* Beide live lotingen volgen het actieve beheerthema met dezelfde Copa Mundo-accenten. */
 .draw-dialog-theme {
   color-scheme: light;
-  --draw-heading: var(--foreground);
 }
 
 .draw-manager-active > :not(.draw-surface) {
@@ -2521,13 +2520,12 @@ posities + statistieken groen */
 
 [data-mode="dark"] .draw-dialog-theme {
   color-scheme: dark;
-  --draw-heading: 0 0% 100%;
 }
 
 .draw-section-title {
-  color: hsl(var(--draw-heading, var(--foreground)));
+  color: hsl(var(--muted-foreground));
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0;
 }
@@ -2537,7 +2535,7 @@ posities + statistieken groen */
 .draw-panel {
   border: 1px solid hsl(var(--border));
   border-radius: 0.375rem;
-  background: hsl(var(--card));
+  background: hsl(var(--secondary));
 }
 
 .draw-dialog-theme > div:first-child {
@@ -2551,31 +2549,30 @@ posities + statistieken groen */
 
 .draw-dialog-theme .draw-choice,
 .draw-choice {
-  border-left: 0;
-  border-right: 0;
+  border: 1px solid hsl(var(--border));
   border-top-width: 2px;
   border-bottom-width: 2px;
   border-radius: 0.375rem;
-  background: hsl(var(--card));
+  background: hsl(var(--secondary));
 }
 
 .draw-dialog-theme .draw-choice[aria-pressed="true"],
 .draw-choice[aria-pressed="true"] {
   border-top-color: hsl(var(--primary));
   border-bottom-color: hsl(var(--primary));
-  background: hsl(var(--primary) / 0.06);
+  background: hsl(var(--secondary));
 }
 
 /* Type/scope cards match the Copa Mundo competition-format frames. */
 .draw-dialog-theme .draw-type-choice {
   border: 1px solid hsl(var(--border));
   border-radius: 0.25rem;
-  background: hsl(var(--background));
+  background: hsl(var(--secondary));
   box-shadow: none;
 }
 
 .draw-dialog-theme .draw-type-choice:hover:not(:disabled) {
-  background: hsl(var(--background));
+  background: hsl(var(--secondary));
   border-color: hsl(var(--primary) / 0.2);
 }
 
@@ -2584,7 +2581,7 @@ posities + statistieken groen */
   border-color: hsl(var(--border));
   border-top-color: hsl(var(--primary));
   border-bottom-color: hsl(var(--primary));
-  background: hsl(var(--primary) / 0.06);
+  background: hsl(var(--secondary));
   box-shadow: inset 0 1px 0 hsl(var(--primary)), inset 0 -1px 0 hsl(var(--primary));
 }
 

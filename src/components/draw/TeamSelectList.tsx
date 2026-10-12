@@ -3,12 +3,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 type Team = { id: string; name: string; country?: string | null; logoUrl?: string | null };
 
-/** Clear checklist for choosing exactly `capacity` participants when a phase has more teams than places. */
+/** Editable participant checklist; the wizard validates the exact capacity on continuation. */
 export function TeamSelectList({ teams, selectedIds, capacity, onChange, lockedIds }: {
   teams: Team[]; selectedIds: string[]; capacity: number; onChange: (ids: string[]) => void; lockedIds?: Set<string>;
 }) {
   const selected = new Set(selectedIds);
-  const full = selectedIds.length >= capacity;
   return <section className="space-y-2">
     <h3 className="draw-section-title">DEELNEMERS</h3>
     <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -21,7 +20,7 @@ export function TeamSelectList({ teams, selectedIds, capacity, onChange, lockedI
         const locked = Boolean(lockedIds?.has(team.id));
         return <li key={team.id}>
           <label className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-primary/[0.06] ${checked ? "bg-primary/[0.08]" : ""}`}>
-            <Checkbox checked={checked} disabled={locked || (!checked && full)} aria-label={team.name}
+            <Checkbox checked={checked} disabled={locked} aria-label={team.name}
               onCheckedChange={value => onChange(value ? [...selectedIds, team.id] : selectedIds.filter(id => id !== team.id))} />
             {team.logoUrl && <img src={team.logoUrl} alt="" className="h-6 w-6 shrink-0 object-contain" />}
             <span className="min-w-0 flex-1 truncate">{team.name}</span>

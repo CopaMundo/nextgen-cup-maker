@@ -140,6 +140,7 @@ const LiveDrawDialog = ({
   const [teams, setTeams] = useState<DrawTeam[]>([]);
   const [selectedMatchTeams, setSelectedMatchTeams] = useState<string[]>([]);
   const [adjustOpen, setAdjustOpen] = useState(false);
+  const [participantError, setParticipantError] = useState("");
   const originalMatchContainers = useRef<DrawContainer[]>([]);
   const [usePots, setUsePots] = useState(false);
   const [useSeeds, setUseSeeds] = useState(false);
@@ -172,7 +173,7 @@ const LiveDrawDialog = ({
   const teamById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
   const assignedTeamIds = useMemo(() => new Set(pots.flatMap((p) => p.teamIds)), [pots]);
   const fixedIds = useMemo(() => new Set(containers.flatMap(c => c.teamIds)), [containers]);
-  const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || (!isMatchDraw && teams.length <= containers.reduce((sum, c) => sum + c.capacity - c.teamIds.length, 0)) || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams, isMatchDraw, containers]);
+  const eligibleTeams = useMemo(() => teams.filter(t => !fixedIds.has(t.id) && (usePots || selectedMatchTeams.includes(t.id))), [teams, fixedIds, usePots, selectedMatchTeams, isMatchDraw, containers]);
   const unassignedTeams = useMemo(() => eligibleTeams.filter((t) => !assignedTeamIds.has(t.id)), [eligibleTeams, assignedTeamIds]);
   const participatingTeams = useMemo(() => {
     const ids = new Set(usePots ? pots.flatMap(p => p.teamIds) : [...fixedIds, ...eligibleTeams.map(t => t.id)]);
@@ -224,7 +225,6 @@ const LiveDrawDialog = ({
       originalMatchContainers.current = nextContainers;
       const matchTeamIds = (teamRows || []).filter(t => !categoryId || t.category_id === categoryId).map(t => t.id);
       const originalFixed = nextContainers.flatMap(c => c.teamIds);
-      const availableCapacity = nextContainers.reduce((sum, c) => sum + c.capacity, 0);
       setSeedCount(defaultDrawSeedCount(nextContainers.length * 2));
       setUsePots(initialMethod === "pots");
 
@@ -232,7 +232,7 @@ const LiveDrawDialog = ({
       const available = (teamRows || [])
         .filter((t) => (categoryId ? t.category_id === categoryId : true))
         .filter((t) => !occupied.has(t.id));
-      setSelectedMatchTeams(isMatchDraw ? [...originalFixed, ...(matchTeamIds.length === availableCapacity ? matchTeamIds.filter(id => !originalFixed.includes(id)) : [])] : available.length === availableCapacity ? available.map(t => t.id) : []);
+      setSelectedMatchTeams(isMatchDraw ? matchTeamIds : available.map(t => t.id));
       setTeams((isMatchDraw ? (teamRows || []).filter(t => !categoryId || t.category_id === categoryId) : available).map((t) => ({ id: t.id, name: t.name, country: t.country, logoUrl: t.logo_url })));
 
       const availableIds = new Set(available.map((t) => t.id));
@@ -298,6 +298,7 @@ const LiveDrawDialog = ({
   useEffect(() => {
     if (!open) return;
     setDraftReady(false);
+    setParticipantError("");
     setStep(initialStep);
     setAdvancedOpen(false);
     setAdvancedSpreadOpen(false);
@@ -801,8 +802,8 @@ const requestPotCount = (count: number) => {
 
   const validationError = (): { step: Step; message: string } | null => {
     if (containers.length === 0) return { step: "method", message: "Er zijn nog geen groepen in deze fase." };
-    if (!isMatchDraw && !usePots && teams.length > drawSize && new Set(selectedMatchTeams).size !== drawSize) return { step: "teams", message: `Selecteer precies ${drawSize} teams.` };
-    if (isMatchDraw && !usePots && (selectedMatchTeams.length !== containers.length * 2 || new Set(selectedMatchTeams).size !== selectedMatchTeams.length)) return { step: "teams", message: `Kies precies ${containers.length * 2} verschillende teams.` };
+    if (!isMatchDraw && !usePots && new Set(selectedMatchTeams).size !== drawSize) return { step: "teams", message: `Selecteer precies ${drawSize} teams voor de loting. Er zijn nu ${selectedMatchTeams.length} teams geselecteerd.` };
+    if (isMatchDraw && !usePots && (selectedMatchTeams.length !== containers.length * 2 || new Set(selectedMatchTeams).size !== selectedMatchTeams.length)) return { step: "teams", message: `Selecteer precies ${containers.length * 2} verschillende teams voor de loting. Er zijn nu ${selectedMatchTeams.length} teams geselecteerd.` };
     const seedRanks = containers.flatMap(c => c.seedRanks ?? []).filter((rank): rank is number => rank != null);
     if (fixtureKind === "knockout" && useSeeds && !fixedIds.size) return { step: "teams", message: "Kies minstens één reekshoofd op een vaste wedstrijdplaats." };
     if (usePots && pots.some(p => p.teamIds.some(id => !eligibleTeams.some(t => t.id === id)))) return { step: "pots", message: "Een pot bevat een vast reekshoofd of een niet-geselecteerd team. Pas de potindeling aan." };
@@ -845,7 +846,7 @@ const requestPotCount = (count: number) => {
       <h3 className="draw-section-title">Landenlimiet per poule</h3>
       <div className="space-y-3 rounded-lg border border-border p-3">
         <div>
-          <Label className="text-xs">Maximum aantal teams uit hetzelfde land</Label>
+          <Label className="draw-section-title">Maximum aantal teams uit hetzelfde land</Label>
           <Select
             value={rules.countryMaxDefault == null ? "none" : String(rules.countryMaxDefault)}
             onValueChange={(value) => setRules((previous) => ({
@@ -864,7 +865,7 @@ const requestPotCount = (count: number) => {
         </div>
 
         {rules.countryMaxDefault != null && exceptionalCountries.length > 0 && <div className="space-y-2">
-          <div><Label className="text-xs">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Deze landen passen niet binnen de algemene limiet. Het verschil tussen poules blijft maximaal één team.</p></div>
+          <div><Label className="draw-section-title">Uitzonderingen op de landenlimiet</Label><p className="text-xs text-muted-foreground">Deze landen passen niet binnen de algemene limiet. Het verschil tussen poules blijft maximaal één team.</p></div>
           {exceptionalCountries.map((country) => (
             <div key={country} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1.5 text-xs">
               <CountryFlag country={country} className="h-3 w-4" />
@@ -925,7 +926,7 @@ const requestPotCount = (count: number) => {
     <div className="space-y-3">
       <h3 className="draw-section-title">Lotingsregels</h3>
       <div className="draw-panel flex items-start justify-between gap-4 p-3">
-        <div><Label htmlFor="country-protection" className="font-medium">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
+        <div><Label htmlFor="country-protection" className="draw-section-title">Landbescherming</Label><p className="text-xs text-muted-foreground">Teams uit hetzelfde land worden niet tegen elkaar geloot.</p></div>
         <Switch id="country-protection" checked={rules.separateSameCountry} onCheckedChange={(checked) => setRules((previous) => ({ ...previous, separateSameCountry: checked }))} />
       </div>
       <div className="draw-panel space-y-3 p-3">
@@ -989,17 +990,21 @@ const requestPotCount = (count: number) => {
             <div className="flex justify-center py-12"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
           ) : step === "method" ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
-              <h2 className="text-lg font-bold">Type loting</h2>
+              <h2 className="section-title">Type loting</h2>
               <DrawTypeChoices format={fixtureKind ?? "group"} value={useSeeds ? "seeds" : usePots ? "pots" : "random"}
                 seedsDisabled={containers.length < 2}
                 onChange={method => { if (isMatchDraw) selectMatchMethod(method); else setUsePots(method === "pots"); }} />
             </div>
           ) : step === "teams" && !usePots ? (
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={setSelectedMatchTeams} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : (teams.length > drawSize ? <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={setSelectedMatchTeams} /> : <section className="space-y-2"><h3 className="draw-section-title">DEELNEMERS</h3><div className="flex flex-wrap items-center gap-3 text-sm"><p>Selecteer {drawSize} teams voor de loting</p><span className="font-semibold tabular-nums">{teams.length} / {drawSize}</span></div><ul className="draw-panel grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">{teams.map(team => <li key={team.id}><TeamChip id={team.id} /></li>)}</ul></section>)}{isMatchDraw && !useSeeds && teams.length <= containers.length * 2 && <PotTeamSlots teams={teams} teamIds={selectedMatchTeams} assignedIds={new Set(selectedMatchTeams)} capacity={containers.length * 2} disabled onChange={() => {}} />}</div>
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto">
+              <h2 className="section-title">Indeling &amp; teams</h2>
+              {isMatchDraw ? <MatchDrawSetup teams={teams} selectedIds={selectedMatchTeams} onTeamsChange={ids => { setSelectedMatchTeams(ids); setParticipantError(""); }} containers={containers} originals={originalMatchContainers.current} useSeeds={useSeeds} seedCount={seedCount} onSeedCount={changeSeedCount} onSeed={changeRankedSeed} /> : <TeamSelectList teams={teams} selectedIds={selectedMatchTeams} capacity={drawSize} onChange={ids => { setSelectedMatchTeams(ids); setParticipantError(""); }} />}
+              {participantError && <p role="alert" className="text-sm text-destructive">{participantError}</p>}
+            </div>
           ) : step === "pots" || (step === "teams" && usePots) ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>
-                <h2 className="text-lg font-bold">Indeling &amp; teams</h2>
+                <h2 className="section-title">Indeling &amp; teams</h2>
               </div>
 
                 <div className="flex flex-wrap items-end gap-2">
@@ -1034,7 +1039,7 @@ const requestPotCount = (count: number) => {
 
             </div>
           ) : step === "rules" ? (
-            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{isMatchDraw ? renderMatchRules() : renderRules()}{!isMatchDraw && usePots && potOptions.includes(pots.length) && (
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="section-title">Regels</h2>{isMatchDraw ? renderMatchRules() : renderRules()}{!isMatchDraw && usePots && potOptions.includes(pots.length) && (
                   <div className="space-y-5 pt-4">
                     <section className="space-y-2">
                       <h3 className="draw-section-title">Verdeling van potten over groepen</h3>
@@ -1065,7 +1070,7 @@ const requestPotCount = (count: number) => {
           ) : step === "settings" ? (
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
               <div>
-                <h2 className="text-lg font-bold">Instellingen Live loting</h2>
+                <h2 className="section-title">Instellingen Live loting</h2>
               </div>
               <DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}>
                 {!isMatchDraw && <div className="space-y-2"><Label className="draw-section-title">Groepstoewijzing</Label><div className="grid gap-3 sm:grid-cols-2"><DrawChoice label="Automatisch toewijzen" description="Na de loting van het team wordt deze direct toegewezen aan de eerstvolgende beschikbare poule." selected={placementMode === "automatic"} onClick={() => setPlacementMode("automatic")} /><DrawChoice label="Groep loten" description="Na het loten van het team volgt een aparte loting om de poule te bepalen." selected={placementMode === "manual"} onClick={() => setPlacementMode("manual")} /></div></div>}
@@ -1075,7 +1080,7 @@ const requestPotCount = (count: number) => {
           ) : drawContent}
 
           {step !== "draw" && (
-            <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-primary/30 pt-4 sm:flex-row sm:items-center">
+            <footer className="flex shrink-0 flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center">
               <div className="ml-auto flex gap-2">
                 <Button variant="outline" disabled={loading || savingSlot || step === "method"} onClick={() => {
                   if (step === "teams" || step === "pots") { if (onBack && isRounds) onBack(); else setStep("method"); }
@@ -1086,6 +1091,7 @@ const requestPotCount = (count: number) => {
                   if (step === "settings") { openDraw(); return; }
                   const error = validationError();
                   if (error && (step === "rules" || (error.step !== "rules" && error.step !== "settings"))) {
+                    if (error.step === "teams" && !usePots) setParticipantError(error.message);
                     toast({ title: "Loting nog niet compleet", description: error.message, variant: "destructive" }); return;
                   }
                   setStep(step === "rules" ? "settings" : "rules");

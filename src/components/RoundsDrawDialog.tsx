@@ -20,6 +20,7 @@ import {
   type ScheduledMatch,
 } from "@/lib/roundsSchedule";
 import { emptyRoundsRules, shuffle } from "@/lib/liveDraw";
+import { TeamSelectList } from "@/components/draw/TeamSelectList";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 import { DrawWizardHeader } from "@/components/draw/DrawWizardHeader";
 import { DrawTypeChoices } from "@/components/draw/DrawTypeChoices";
@@ -79,6 +80,7 @@ interface RoundsDrawDraft {
   revealAt?: number;
   revealTimes?: Record<string, Record<string, number>>;
   groupRounds?: Record<string, number>;
+  selectedTeamsByGroup?: Record<string, string[]>;
 }
 
 const REVEAL_MS = 1300;
@@ -131,6 +133,8 @@ const RoundsDrawDialog = ({
   const [method, setMethod] = useState<"free" | "pots">("free");
   const [teams, setTeams] = useState<Team[]>([]);
   const [groups, setGroups] = useState<GroupInfo[]>([]);
+  const [selectedTeamsByGroup, setSelectedTeamsByGroup] = useState<Record<string, string[]>>({});
+  const [participantError, setParticipantError] = useState("");
   const [roundInputs, setRoundInputs] = useState<Record<string, string>>({});
   const [potGroups, setPotGroups] = useState<Record<string, GroupInfo["pots"]>>({});
   const [potError, setPotError] = useState("");
@@ -219,6 +223,7 @@ const RoundsDrawDialog = ({
         };
       });
       setGroups(infos);
+      setSelectedTeamsByGroup(Object.fromEntries(infos.map(g => [g.id, [...g.teamIds]])));
       setSlotRowsByGroup(Object.fromEntries(infos.map((g) => [g.id, (slotRows || []).filter((s) => s.group_id === g.id).map((s) => s.id as string)])));
       setAssignDraft(Object.fromEntries(infos.map((g) => [g.id, [...g.teamIds]])));
       setPotGroups(Object.fromEntries(infos.map((g) => {
@@ -249,6 +254,7 @@ const RoundsDrawDialog = ({
             if (savedRounds && Number.isInteger(savedRounds) && savedRounds > 0) group.rounds = savedRounds;
           });
           setGroups([...infos]);
+          if (draft.selectedTeamsByGroup) setSelectedTeamsByGroup(Object.fromEntries(infos.map(g => [g.id, (draft.selectedTeamsByGroup?.[g.id] ?? g.teamIds).filter(id => g.teamIds.includes(id))])));
           const teamIdsByGroup = new Map(infos.map((group) => [group.id, new Set(group.teamIds)]));
           const restoredPots = Object.fromEntries(Object.entries(draft.potGroups).filter(([groupId, groupPots]) => validGroupIds.has(groupId) && groupPots.every((pot) => pot.teamIds.every((id) => teamIdsByGroup.get(groupId)?.has(id)))));
            const drawsValid = infos.every((group) => liveRoundsAvailable(group.rounds)) && draft.draws.every((draw) => validGroupIds.has(draw.groupId) && draw.order.every((id) => teamIdsByGroup.get(draw.groupId)?.has(id)));
@@ -281,6 +287,7 @@ const RoundsDrawDialog = ({
   useEffect(() => {
     if (!open) return;
     setDraftReady(false);
+    setParticipantError("");
     setStep(initialStep);
     setMethod(initialMethod === "pots" ? "pots" : "free");
     setPotError("");
@@ -301,9 +308,9 @@ const RoundsDrawDialog = ({
 
   useEffect(() => {
     if (!open || !draftReady) return;
-    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealsStarted, revealAt, revealTimes, groupRounds: Object.fromEntries(groups.map((g) => [g.id, g.rounds])) };
+    const draft: RoundsDrawDraft = { version: 1, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealsStarted, revealAt, revealTimes, selectedTeamsByGroup, groupRounds: Object.fromEntries(groups.map((g) => [g.id, g.rounds])) };
     localStorage.setItem(draftKey, JSON.stringify(draft));
-  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealsStarted, revealAt, revealTimes, groups]);
+  }, [open, draftReady, draftKey, step, method, potGroups, matrices, sameForAll, sameCountry, maxMeetings, forbiddenPairs, draws, activeGroupIdx, teamIdx, revealed, autoReveal, revealsStarted, revealAt, revealTimes, groups, selectedTeamsByGroup]);
 
   // Vrij loten negeert potten; pottenloting gebruikt de indeling die hier per groep is samengesteld.
   const drawGroups = useMemo(() => method === "pots" ? groups.map((g) => ({ ...g, pots: potGroups[g.id] || [] })) : groups.map((g) => ({
@@ -372,6 +379,10 @@ const RoundsDrawDialog = ({
   };
 
   const nextToRules = () => {
+    if (method === "free") {
+      const incomplete = groups.find(g => (selectedTeamsByGroup[g.id] ?? []).length !== g.teamIds.length);
+      if (incomplete) { setParticipantError(`Selecteer precies ${incomplete.teamIds.length} teams voor de loting in ${incomplete.name}. Er zijn nu ${selectedTeamsByGroup[incomplete.id]?.length ?? 0} teams geselecteerd.`); setStep("teams"); return; }
+    }
     if (method === "pots" && !potDrawAvailable) return;
     const next: Record<string, number[][]> = {};
     drawGroups.forEach((g) => {
@@ -695,7 +706,7 @@ const RoundsDrawDialog = ({
   const matrixGroup = sameForAll && canShare ? drawGroups[0] : editGroup;
 
   const assignedGroupTeams = new Set(Object.values(assignDraft).flat());
-  const assignScreen = <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>
+  const assignScreen = <div className="space-y-4"><h2 className="section-title">Indeling &amp; teams</h2>
     <p className="text-sm text-muted-foreground">Deel de teams handmatig in over de poules. Daarna kies je het type loting voor de speelrondes.</p>
     {assignError && <p role="alert" className="flex items-start gap-2 text-sm text-destructive"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />{assignError}</p>}
     <div className="grid gap-4 md:grid-cols-2">{groups.map(group => { const list = assignDraft[group.id] || []; const cap = slotRowsByGroup[group.id]?.length || 0; return <section key={group.id} className="draw-panel space-y-2 p-3">
@@ -727,7 +738,7 @@ const RoundsDrawDialog = ({
 
   const methodScreen = (
     <div className="space-y-5 overflow-y-auto pr-1">
-      <h3 className="text-lg font-bold">Type loting</h3>
+      <h3 className="section-title">Type loting</h3>
       <DrawTypeChoices value={method === "pots" ? "pots" : "random"} potsDisabled={!potDrawAvailable} onChange={value => setMethod(value === "pots" ? "pots" : "free")} />
       {!potDrawAvailable && <p className="flex items-start gap-2 text-sm text-warning"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Loting met niveau-potten vereist minimaal 4 plaatsen en een even aantal plaatsen per poule.</p>}
     </div>
@@ -751,7 +762,7 @@ const RoundsDrawDialog = ({
             <div className="text-muted-foreground">
               {g.teamIds.length} teams · {g.rounds} speelrondes · {matchesPerTeam(g.teamIds.length, g.rounds)} wedstrijden per team
             </div>
-            <Label htmlFor={`draw-rounds-${g.id}`} className="mt-3 block">Aantal speelrondes</Label>
+            <Label htmlFor={`draw-rounds-${g.id}`} className="draw-section-title mt-3 block">Aantal speelrondes</Label>
              <Input id={`draw-rounds-${g.id}`} type="number" min={1} max={MAX_LIVE_DRAW_ROUNDS} step={1} className="mt-1 w-24" value={roundInputs[g.id] ?? String(g.rounds)} disabled={g.hasPlayed} onChange={(event) => updateRounds(g.id, event.target.value)} />
             {method === "pots" && <div className="text-xs text-muted-foreground">{g.pots.map((p) => `${p.name} (${p.teamIds.length})`).join(" · ")}</div>}
             {g.freeSlots > 0 && <div className="mt-1 text-xs text-destructive">Nog {g.freeSlots} lege plaatsen in deze groep.</div>}
@@ -855,7 +866,7 @@ const RoundsDrawDialog = ({
             </RadioGroup>
           </div>
           <div className="flex items-center gap-3">
-            <Label className="text-sm">Maximum aantal keer dat twee teams elkaar ontmoeten</Label>
+            <Label className="draw-section-title">Maximum aantal keer dat twee teams elkaar ontmoeten</Label>
             <Input type="number" min={1} className="h-8 w-16" value={maxMeetings} onChange={(e) => setMaxMeetings(Math.max(1, Number(e.target.value) || 1))} />
           </div>
           <div>
@@ -889,7 +900,7 @@ const RoundsDrawDialog = ({
 
   const potScreen = (
     <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
-      <div><h3 className="text-lg font-bold">Indeling &amp; teams</h3></div>
+      <div><h3 className="section-title">Indeling &amp; teams</h3></div>
       {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary bg-primary/[0.06]" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
       {potGroup && <>
         <div className="flex flex-wrap items-end gap-2">
@@ -996,10 +1007,10 @@ const RoundsDrawDialog = ({
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Laden...</div>
                    ) : step === "method" ? methodScreen
-            : step === "teams" || step === "pots" ? <div className="min-h-0 flex-1 overflow-y-auto">{editingGroups ? assignScreen : method === "pots" ? potScreen : <div className="space-y-4"><h2 className="text-lg font-bold">Indeling &amp; teams</h2>{groups.map(group => <section key={group.id} className="space-y-2"><h3 className="draw-section-title">{group.name} · {group.teamIds.length} teams</h3><PotTeamSlots teams={teams} teamIds={group.teamIds} assignedIds={new Set(group.teamIds)} capacity={group.teamIds.length} disabled onChange={() => {}} /></section>)}</div>}</div>
-            : step === "rules" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Regels</h2>{settings}</div>
-            : step === "settings" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="text-lg font-bold">Instellingen Live loting</h2><DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} aria-pressed={autoReveal} onClick={() => setAutoReveal(true)}><Play className="h-4 w-4" />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} aria-pressed={!autoReveal} onClick={() => setAutoReveal(false)}><Pause className="h-4 w-4" />Per wedstrijd</Button></div></DrawShowOptions></div> : drawScreen}
-        {step !== "draw" && <footer className="flex shrink-0 justify-end gap-2 border-t border-primary/30 pt-4">
+            : step === "teams" || step === "pots" ? <div className="min-h-0 flex-1 overflow-y-auto">{editingGroups ? assignScreen : method === "pots" ? potScreen : <div className="space-y-4"><h2 className="section-title">Indeling &amp; teams</h2>{groups.map(group => <section key={group.id} className="space-y-2"><h3 className="draw-section-title">{group.name} · {group.teamIds.length} teams</h3><TeamSelectList teams={teams.filter(t => group.teamIds.includes(t.id))} selectedIds={selectedTeamsByGroup[group.id] ?? []} capacity={group.teamIds.length} onChange={ids => { setSelectedTeamsByGroup(prev => ({ ...prev, [group.id]: ids })); setParticipantError(""); }} /></section>)}{participantError && <p role="alert" className="text-sm text-destructive">{participantError}</p>}</div>}</div>
+            : step === "rules" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="section-title">Regels</h2>{settings}</div>
+            : step === "settings" ? <div className="min-h-0 flex-1 space-y-5 overflow-y-auto"><h2 className="section-title">Instellingen Live loting</h2><DrawShowOptions phaseId={phaseId} options={showOptions} onChange={setShowOptions}><div className="flex gap-2"><Button variant={autoReveal ? "default" : "outline"} aria-pressed={autoReveal} onClick={() => setAutoReveal(true)}><Play className="h-4 w-4" />Automatisch</Button><Button variant={!autoReveal ? "default" : "outline"} aria-pressed={!autoReveal} onClick={() => setAutoReveal(false)}><Pause className="h-4 w-4" />Per wedstrijd</Button></div></DrawShowOptions></div> : drawScreen}
+        {step !== "draw" && <footer className="flex shrink-0 justify-end gap-2 border-t border-border pt-4">
           <Button variant="outline" disabled={loading || checking || savingAssign || (step === "method" && !(assignGroups && initialStep === "teams"))} onClick={() => {
             if (step === "method") { setGroupsConfirmed(false); setStep("teams"); return; }
             if ((step === "teams" || step === "pots") && assignGroups && !editingGroups) { setStep("method"); return; }
