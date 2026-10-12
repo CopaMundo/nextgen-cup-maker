@@ -1,7 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { AdminPageActionsContext } from "@/components/admin/AdminPageActions";
-import { DesktopAdminHeader } from "@/components/admin/DesktopAdminHeader";
-import logo from "@/assets/copa-mundo-logo.png";
 import { AdminAppearanceContext } from "@/contexts/AdminAppearanceContext";
 import { loadFieldLocations } from "@/lib/fieldLocations";
 import { useParams, Link } from "react-router-dom";
@@ -9,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Settings, Tv2, ArrowLeft, ChevronRight, Users, Plus, Globe, Palette, Handshake, BarChart3, MonitorPlay, ListChecks } from "lucide-react";
+import { Settings, Tv2, PanelLeftClose, PanelLeftOpen, ArrowLeft, ChevronRight, Users, Plus, Globe, Palette, Handshake, BarChart3, MonitorPlay, ListChecks } from "lucide-react";
 import { GiWhistle } from "react-icons/gi";
 import BracketTreeIcon from "@/components/icons/BracketTreeIcon";
 import ScoreboardIcon from "@/components/icons/ScoreboardIcon";
@@ -31,6 +28,7 @@ import StatisticsView from "@/components/StatisticsView";
 import SponsorManager from "@/components/SponsorManager";
 import PollManager from "@/components/PollManager";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
@@ -83,7 +81,6 @@ const TournamentDetail = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const [pageActionsTarget, setPageActionsTarget] = useState<HTMLDivElement | null>(null);
   const [phaseHeader, setPhaseHeader] = useState<PhaseHeaderState | null>(null);
 
   const [tournament, setTournament] = useState<any>(null);
@@ -182,6 +179,20 @@ const TournamentDetail = () => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem(mobileSidebarStorageKey) === "true";
   });
+  const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("admin-desktop-nav-collapsed") === "true";
+  });
+
+  const toggleDesktopNav = () => {
+    setDesktopNavCollapsed((collapsed) => {
+      const next = !collapsed;
+      sessionStorage.setItem("admin-desktop-nav-collapsed", String(next));
+      return next;
+    });
+  };
+
+
   const toggleMobileSidebar = () => {
     setMobileSidebarCollapsed((collapsed) => {
       const next = !collapsed;
@@ -288,8 +299,7 @@ const TournamentDetail = () => {
   }, [tournament]);
 
   const fetchTournament = async () => {
-    if (!id) { setLoading(false); return; }
-    const { data } = await supabase.from("tournaments").select("*").eq("id", id).single();
+    const { data } = await supabase.from("tournaments").select("*").eq("id", id!).single();
     setTournament(data);
     if (id) void loadFieldLocations(id);
     setLoading(false);
@@ -304,7 +314,7 @@ const TournamentDetail = () => {
     );
   }
 
-  if (!tournament || !id) {
+  if (!tournament) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -318,7 +328,7 @@ const TournamentDetail = () => {
 
   const categorySelector = (
     <CategorySelector
-      tournamentId={id}
+      tournamentId={id!}
       isMultiCategory={tournament.is_multi_category}
       selectedCategoryId={selectedCategoryId}
       onSelect={setSelectedCategoryId}
@@ -367,10 +377,10 @@ const TournamentDetail = () => {
                 null
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
-                  <TeamManager tournamentId={id} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
+                  <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 )}
                 {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "referees" && (
-                  <RefereeManager tournamentId={id} categoryId={effectiveCategoryId} />
+                  <RefereeManager tournamentId={id!} categoryId={effectiveCategoryId} />
                 )}
               </>
             )}
@@ -383,7 +393,7 @@ const TournamentDetail = () => {
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <PhaseManager
                 key={`phases-${id}-${effectiveCategoryId ?? "all"}`}
-                tournamentId={id}
+                tournamentId={id!}
                 tournamentType={tournament.tournament_type}
                 categoryId={effectiveCategoryId}
                 onHeaderStateChange={isMobile ? undefined : setPhaseHeader}
@@ -397,7 +407,7 @@ const TournamentDetail = () => {
           <>
             {isMobile && (
               <CategorySelector
-                tournamentId={id}
+                tournamentId={id!}
                 isMultiCategory={tournament.is_multi_category}
                 selectedCategoryId={selectedCategoryId}
                 onSelect={setSelectedCategoryId}
@@ -406,7 +416,7 @@ const TournamentDetail = () => {
             )}
             {isMobile && (
               <LocationSelector
-                tournamentId={id}
+                tournamentId={id!}
                 selectedLocation={selectedLocation}
                 onSelect={setSelectedLocation}
                 selectClassName={compactSelect}
@@ -418,7 +428,7 @@ const TournamentDetail = () => {
         const showScheduler = !tournament.is_multi_category || !!effectiveCategoryId;
         return showScheduler ? (
           <MatchScheduler
-            tournamentId={id}
+            tournamentId={id!}
             tournament={tournament}
             categoryId={effectiveCategoryId}
             selectedLocation={selectedLocation}
@@ -449,9 +459,9 @@ const TournamentDetail = () => {
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
-                <ResultsManager tournamentId={id} tournament={tournament} categoryId={effectiveCategoryId} />
+                <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
               ) : (
-                <StatisticsView tournamentId={id} tournament={tournament} categoryId={effectiveCategoryId} />
+                <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
               )
             )}
           </>
@@ -483,8 +493,8 @@ const TournamentDetail = () => {
             {presentationSubTab === "visualization" && (
               <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="visualization" />
             )}
-            {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id} />}
-            {presentationSubTab === "polls" && <PollManager tournamentId={id} tournament={tournament} />}
+            {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id!} />}
+            {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
           </>
         );
       }
@@ -514,13 +524,13 @@ const TournamentDetail = () => {
 
   return (
     <AdminAppearanceContext.Provider value={true}>
-    <AdminPageActionsContext.Provider value={isMobile ? null : pageActionsTarget}>
     <div
       className="admin-ui tournament-admin h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
     >
 
 
-      {isMobile && <><Navbar /><ThemeSwitcher /></>}
+      <Navbar />
+      <ThemeSwitcher />
       {isMobile && (
         <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-card px-4 print:hidden">
           <span className="min-w-0 flex-1 truncate text-xs font-bold uppercase tracking-wider text-foreground">
@@ -537,13 +547,83 @@ const TournamentDetail = () => {
         </div>
       )}
       <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
-        {!isMobile && <aside className="admin-platform-sidebar print:hidden">
-          <Link to="/dashboard" className="admin-platform-brand"><img src={logo} alt="Copa Mundo" /><span>COPA MUNDO</span></Link>
-          <nav aria-label="Toernooibeheer" className="admin-primary-navigation">
-            {sidebarItems.map(item => <Button key={item.id} variant="ghost" aria-label={item.label} aria-current={activeTab === item.id ? "page" : undefined} onClick={() => setActiveTab(item.id)} className={cn("admin-primary-tab", activeTab === item.id && "is-active")}><item.icon className="h-[18px] w-[18px] shrink-0" /><span>{item.label}</span></Button>)}
-          </nav>
-          <Link to="/dashboard" className="admin-platform-return"><ArrowLeft className="h-4 w-4" />Mijn toernooien</Link>
-        </aside>}
+        {/* Desktop: left navigation column */}
+        {!isMobile && (
+          <TooltipProvider delayDuration={300}>
+            <nav
+              aria-label="Toernooibeheer"
+              className={cn(
+                "admin-sidenav shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
+                desktopNavCollapsed ? "w-[68px]" : "w-60"
+              )}
+            >
+              <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-3">
+                {tournament.logo_url ? (
+                  <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+                ) : (
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-sm font-bold text-primary">
+                    {tournament.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
+                {!desktopNavCollapsed && (
+                  <span className="min-w-0 flex-1 truncate font-display text-sm font-bold uppercase tracking-wide text-foreground" title={tournament.name}>
+                    {tournament.name}
+                  </span>
+                )}
+              </div>
+
+              <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
+                {sidebarItems.map((item) => {
+                  const active = activeTab === item.id;
+                  return (
+                    <Tooltip key={item.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab(item.id)}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "group relative flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-semibold transition-colors",
+                            desktopNavCollapsed && "justify-center px-0",
+                            active
+                              ? "admin-nav-active text-foreground"
+                              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          )}
+                        >
+                          {active && !desktopNavCollapsed && (
+                            <span className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-primary" />
+                          )}
+                          <item.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-primary")} />
+                          {!desktopNavCollapsed && <span className="truncate">{item.label}</span>}
+                        </button>
+                      </TooltipTrigger>
+                      {desktopNavCollapsed && (
+                        <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
+                      )}
+                    </Tooltip>
+                  );
+                })}
+              </div>
+
+              <div className="shrink-0 border-t border-border p-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={toggleDesktopNav}
+                  className={cn(
+                    "w-full justify-start gap-3 px-2.5 text-xs font-semibold text-muted-foreground",
+                    desktopNavCollapsed && "justify-center px-0"
+                  )}
+                  aria-label={desktopNavCollapsed ? "Menu openen" : "Menu inklappen"}
+                >
+                  {desktopNavCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+                  {!desktopNavCollapsed && <span>Inklappen</span>}
+                </Button>
+              </div>
+            </nav>
+          </TooltipProvider>
+        )}
+
         {/* Mobile: bottom navigation bar */}
         {isMobile && (
           <nav
@@ -577,36 +657,94 @@ const TournamentDetail = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           {!isMobile && (
-            <DesktopAdminHeader
-              title={sidebarItems.find((item) => item.id === activeTab)?.label || "Toernooibeheer"}
-              tournamentName={tournament.name}
-              tournamentLogo={tournament.logo_url || logo}
-              actionsRef={setPageActionsTarget}
-              selectors={<>
-                {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
-                {activeTab === "schedule" && id && <LocationSelector tournamentId={id} selectedLocation={selectedLocation} onSelect={setSelectedLocation} showLabel={false} />}
-              </>}
-              actions={activeTab === "phases" && phaseHeader ? <Button size="sm" onClick={phaseHeader.onAdd} className="gap-1.5"><Plus className="h-4 w-4" /> Fase toevoegen</Button> : null}
-              navigation={desktopSegments ? <div role="tablist" aria-label="Onderdelen" className="admin-platform-sections">
-                {desktopSegments.items.map(seg => <Button key={seg.id} variant="ghost" role="tab" aria-selected={desktopSegments.active === seg.id} onClick={() => desktopSegments.onSelect(seg.id)} className={cn("admin-section-choice", desktopSegments.active === seg.id && "is-active")}>{seg.label}</Button>)}
-              </div> :
-                activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
-                  <PhaseStripNav phases={phaseHeader.phases} activePhaseNumber={phaseHeader.activePhaseNumber} onSelect={phaseHeader.onSelect} onEdit={phaseHeader.onEdit} onDelete={phaseHeader.onDelete} />
-                ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
-                  <DateStripNav dates={tournamentDates} activeDate={plannerDate} onSelect={handlePlannerDateChange} maxVisible={3} centerActive onInvalidPick={(iso) => toast({ title: "Datum buiten toernooiperiode", description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`, variant: "destructive" })} />
-                ) : null
-              }
-            />
+            <header className="admin-subbar sticky top-0 z-20 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur print:hidden">
+              <div className="mx-auto grid h-full w-full max-w-[1920px] grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] items-center gap-6 px-3 sm:px-6 lg:px-8">
+                <div className="flex flex-col items-start gap-1 justify-self-start [&>*]:mb-0">
+                  {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
+                  {activeTab === "schedule" && (
+                    <LocationSelector
+                      tournamentId={id!}
+                      selectedLocation={selectedLocation}
+                      onSelect={setSelectedLocation}
+                    />
+                  )}
+                </div>
+
+                <div className="flex min-w-0 justify-center justify-self-center">
+                  {activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
+                    <PhaseStripNav
+                      phases={phaseHeader.phases}
+                      activePhaseNumber={phaseHeader.activePhaseNumber}
+                      onSelect={phaseHeader.onSelect}
+                      onEdit={phaseHeader.onEdit}
+                      onDelete={phaseHeader.onDelete}
+                    />
+                  ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
+                    <DateStripNav
+                      dates={tournamentDates}
+                      activeDate={plannerDate}
+                      onSelect={handlePlannerDateChange}
+                      maxVisible={3}
+                      centerActive
+                      onInvalidPick={(iso) => {
+                        toast({
+                          title: "Datum buiten toernooiperiode",
+                          description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
+                          variant: "destructive",
+                        });
+                      }}
+                    />
+                  ) : (
+                    desktopSegments && (
+                      <div className="flex shrink-0 items-center gap-1">
+                        {desktopSegments.items.map((seg) => {
+                          const active = desktopSegments.active === seg.id;
+                          return (
+                            <button
+                              key={seg.id}
+                              type="button"
+                              onClick={() => desktopSegments.onSelect(seg.id)}
+                              className={cn(
+                                "relative flex items-center gap-2 rounded-t-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground",
+                                active
+                                  ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
+                                  : ""
+                              )}
+                            >
+                              {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
+                              <span className="truncate">{seg.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end gap-3">
+                  {activeTab === "phases" && phaseHeader && (
+                    <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
+                      <Plus className="h-4 w-4" /> Fase
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </header>
           )}
-          <div className={cn(!isMobile && "admin-workspace-content admin-editor-layout", "w-full px-3 sm:mx-auto sm:max-w-[1600px] sm:px-6 lg:px-10", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
-            <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && "admin-editor-body")} data-admin-tab={activeTab}>{renderContent()}</div>
+          <div className={cn("w-full px-3 sm:mx-auto sm:max-w-[1600px] sm:px-6 lg:px-10", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
+            {!isMobile && activeTab !== "schedule" && activeTab !== "results" && (
+              <div className="admin-page-head">
+                <span className="admin-page-eyebrow">{tournament.name}</span>
+                <h1 className="admin-page-title">{sidebarItems.find((item) => item.id === activeTab)?.label}</h1>
+              </div>
+            )}
+            <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>
           </div>
         </div>
 
       </div>
 
     </div>
-    </AdminPageActionsContext.Provider>
     </AdminAppearanceContext.Provider>
   );
 };

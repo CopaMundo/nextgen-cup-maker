@@ -55,7 +55,7 @@ const DialogContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className={cn("grid gap-4 min-h-0 overscroll-contain", admin && "admin-dialog-layout", scrollable && "overflow-y-auto")}>{children}</div>
+      <div className={cn("grid gap-4 min-h-0 overscroll-contain", scrollable && "overflow-y-auto")}>{children}</div>
       <DialogPrimitive.Close
         aria-label="Sluiten"
         className="absolute right-3 top-3 z-[60] rounded-full bg-background p-1.5 text-foreground shadow-md ring-1 ring-border/60 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
@@ -70,12 +70,12 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("dialog-header flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
+  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
 );
 DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("dialog-footer flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2", className)} {...props} />
+  <div className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2", className)} {...props} />
 );
 DialogFooter.displayName = "DialogFooter";
 

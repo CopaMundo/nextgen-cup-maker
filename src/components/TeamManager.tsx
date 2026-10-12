@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { AdminPageActions } from "@/components/admin/AdminPageActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,7 +55,6 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   const [newTeamLogo, setNewTeamLogo] = useState<{ file: File; preview: string } | null>(null);
   const [editTeam, setEditTeam] = useState({ name: "", country: "" });
   const isMobile = useIsMobile();
-  const [teamSearch, setTeamSearch] = useState("");
 
   const { toast } = useToast();
 
@@ -507,56 +505,54 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
   }
 
   return (
-    <div className="space-y-4 admin-participants-register">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="section-title admin-register-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
-        <AdminPageActions><Button size="sm" onClick={() => setShowAdd(true)} disabled={teams.length >= 128}><Plus className="h-4 w-4" />{singularLabel} toevoegen</Button></AdminPageActions>
+        <h2 className="section-title">{pluralLabel} <span className="text-sm font-semibold text-muted-foreground">{teams.length}</span></h2>
         {categoryId && importByCategory.length > 0 && (
-          <AdminPageActions><Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
-            <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
-          </Button></AdminPageActions>
+          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
+            <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
+          </Button>
         )}
       </div>
 
-      <div className="admin-register-toolbar"><Input aria-label="Zoek deelnemers" placeholder="Zoek deelnemers..." value={teamSearch} onChange={e => setTeamSearch(e.target.value)} /><span className="text-xs text-muted-foreground">{teams.filter(team => team.name.toLowerCase().includes(teamSearch.toLowerCase())).length} / {teams.length} {pluralLabel.toLowerCase()}</span></div>
-      <div className="admin-register-columns"><span>{singularLabel}</span><span>Land</span><span>Beheer</span></div>
-      <div className="admin-team-register">
-        {teams.filter(team => team.name.toLowerCase().includes(teamSearch.toLowerCase())).map(team => (
-          <div key={team.id} className={`group admin-team-row ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
-            <div className="admin-team-mark">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 min-[1900px]:grid-cols-7">
+        {teams.map(team => (
+          <div key={team.id} className={`group relative flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-md ${isPlayers ? "" : "cursor-pointer"}`} onClick={isPlayers ? undefined : () => setSelectedTeamId(team.id)}>
+            <div className="h-20 w-20 overflow-hidden flex-shrink-0">
               {team.logo_url ? (
                 <img src={team.logo_url} alt={team.name} className="h-full w-full object-contain" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-muted-foreground">{team.name.charAt(0)}</div>
               )}
             </div>
-            <div className="min-w-0 admin-team-name">
+            <div className="w-full min-w-0 text-center">
               <span className="block truncate text-sm font-medium text-foreground" title={team.name}>{team.name}</span>
+              {showCountry && team.country && <CountryFlag country={team.country} className="mx-auto mt-1 h-3.5 w-5 object-contain" />}
             </div>
-            <div className="admin-team-country">{showCountry && team.country && <><CountryFlag country={team.country} className="h-4 w-6 object-contain" /><span>{team.country}</span></>}</div>
-            <div className="flex gap-2 admin-team-actions" onClick={e => e.stopPropagation()}>
-              <Button variant="ghost" size="icon" onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} title={`${singularLabel} bewerken`} aria-label={`${team.name} bewerken`}>
+            <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+              <button onClick={() => { setEditingId(team.id); setEditTeam({ name: team.name, country: team.country || "" }); }} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title={`${singularLabel} bewerken`}>
                 <Pencil className="h-4 w-4" />
-              </Button>
+              </button>
               {!isPlayers && (
-                <Button variant="ghost" size="icon" onClick={() => setSelectedTeamId(team.id)} title="Teammanagement" aria-label={`${team.name} beheren`}>
+                <button onClick={() => setSelectedTeamId(team.id)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent" title="Teammanagement">
                   <Users className="h-4 w-4" />
-                </Button>
+                </button>
               )}
-              <Button variant="ghost" size="icon" onClick={() => setTeamToDelete(team.id)} title="Verwijderen" aria-label={`${team.name} verwijderen`} className="hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
             </div>
+            <button onClick={(e) => { e.stopPropagation(); setTeamToDelete(team.id); }} className="absolute top-2 right-2 rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100" title="Verwijderen">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
           </div>
 
         ))}
-        {teamSearch && !teams.some(team => team.name.toLowerCase().includes(teamSearch.toLowerCase())) && <p className="py-8 text-center text-sm text-muted-foreground">Geen deelnemers gevonden.</p>}
         {teams.length < 128 && (
-          <Button variant="ghost"
+          <button
             onClick={() => setShowAdd(true)}
-            className="admin-register-add"
+            className="rounded-xl border border-border bg-card p-4 flex flex-col items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors min-h-[160px]"
           >
             <Plus className="h-6 w-6 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">{singularLabel} toevoegen</span>
-          </Button>
+          </button>
         )}
       </div>
 

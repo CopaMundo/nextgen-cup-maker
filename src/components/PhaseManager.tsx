@@ -1485,13 +1485,13 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                 </div>
               )
             ) : (
-            <div className="space-y-3 admin-format-workspace">
+            <div className="space-y-3">
               {/* Format cards - always visible, individually collapsible */}
               <SortableVerticalList
                 items={container.formats}
                 getId={(f) => f.id}
                 onReorder={(next) => reorderFormats(next)}
-                className="space-y-3 admin-format-stack"
+                className="space-y-3"
               >
               {container.formats.map((format, formatIdx) => (
                 <SortableRowShell key={format.id} id={format.id} manualRowDrag dragLabel="Format verplaatsen">

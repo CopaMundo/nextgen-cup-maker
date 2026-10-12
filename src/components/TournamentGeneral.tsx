@@ -661,10 +661,9 @@ const TournamentGeneral = ({
         ) : null}
 
         {generalSubTab === "info" && (
-        <div className="section-card space-y-6 admin-information-sheet">
+        <div className="section-card space-y-6">
           <h2 className="section-title">Toernooi informatie</h2>
 
-          <div className="admin-identity-fields">
           <div className="space-y-2">
             <Label className="form-label">Toernooinaam</Label>
             {isMobile ? (
@@ -675,13 +674,12 @@ const TournamentGeneral = ({
                 placeholder="Naam van het toernooi"
               />
             ) : (
-              <Button variant="outline"
+              <div
                 onClick={() => { setEditName(form.name); setShowEditName(true); }}
-                className="w-full h-auto justify-start rounded-md border border-border bg-secondary px-4 py-2.5 text-sm font-normal text-foreground whitespace-normal text-left"
-                aria-label="Toernooinaam bewerken"
+                className="cursor-pointer rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors"
               >
                 {form.name || <span className="text-muted-foreground">Klik om naam in te vullen</span>}
-              </Button>
+              </div>
             )}
           </div>
           <div className="space-y-2">
@@ -696,20 +694,16 @@ const TournamentGeneral = ({
                 placeholder="Beschrijving van het toernooi"
               />
             ) : (
-              <Button variant="outline"
+              <div
                 onClick={() => { setEditDesc(form.description); setShowEditDesc(true); }}
-                className="w-full h-auto items-start justify-start rounded-md border border-border bg-secondary px-4 py-2.5 text-sm font-normal text-foreground min-h-[72px] overflow-hidden whitespace-pre-wrap text-left"
-                aria-label="Toernooibeschrijving bewerken"
+                className="cursor-pointer rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground hover:border-primary/50 transition-colors min-h-[72px] overflow-hidden line-clamp-2 whitespace-pre-wrap"
               >
                 {form.description || <span className="text-muted-foreground">Klik om beschrijving toe te voegen</span>}
-              </Button>
+              </div>
             )}
           </div>
 
-          </div>
 
-          <div className="admin-competition-fields">
-          <h3 className="admin-desktop-section-title">Deelnemers & sport</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 h-5"><Label className="form-label">Sport</Label></div>
@@ -834,14 +828,11 @@ const TournamentGeneral = ({
               </div>
             </div>
           </div>
-          </div>
 
-          <div className="admin-brand-fields">
-          <h3 className="admin-desktop-section-title">Toernooi-identiteit</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
               <Label className="form-label">Logo</Label>
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4 md:flex-wrap">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.logo_url && (
                   <img src={tournament.logo_url} alt="Logo" className="h-20 w-20 rounded-lg object-contain bg-secondary border border-border" />
                  )}
@@ -853,7 +844,7 @@ const TournamentGeneral = ({
             </div>
             <div className="space-y-2">
               <Label className="form-label">Omslagfoto</Label>
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4 md:flex-wrap">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                 {tournament.cover_url && (
                   <img src={tournament.cover_url} alt="Cover" className="h-20 w-36 rounded-lg object-cover bg-secondary border border-border" />
                 )}
@@ -864,9 +855,8 @@ const TournamentGeneral = ({
               </div>
             </div>
           </div>
-          </div>
 
-          <div className="admin-attachment-fields space-y-3 pt-4 border-t border-border">
+          <div className="space-y-3 pt-4 border-t border-border">
             <div className="space-y-1">
               <Label className="form-label">Bijlagen</Label>
               <p className="text-xs sm:text-sm text-muted-foreground">Upload hier documenten die bezoekers kunnen downloaden op je toernooipagina.</p>

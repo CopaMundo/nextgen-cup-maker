@@ -130,7 +130,7 @@ const PresentationManager = ({
 
   return (
     <>
-      <div className={`w-full space-y-6 admin-presentation-layout admin-presentation-${subTab}`}>
+      <div className="w-full space-y-6">
 
         {subTab === "website" && (
           <>

@@ -2101,11 +2101,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
 
   return (
-    <div className="admin-results-workspace space-y-3 lg:h-full lg:min-h-0 lg:space-y-0 lg:overflow-hidden">
+    <div className="space-y-3 lg:h-full lg:min-h-0 lg:space-y-0 lg:overflow-hidden">
       <div className="flex h-full min-h-0 gap-3 lg:flex-row flex-col">
         {/* Format chips – left sidebar (own scroll on desktop) */}
         {phaseNumbers.length > 0 && (
-          <aside ref={mobileHeaderRef} className="admin-results-formats sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
+          <aside ref={mobileHeaderRef} className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
             <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:pt-2">
               {phaseNumbers.length > 1 && isMobile && (
                 <Select value={String(selectedPhaseNumber ?? phaseNumbers[0])} onValueChange={value => setSelectedPhaseNumber(Number(value))}>
