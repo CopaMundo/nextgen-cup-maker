@@ -3207,7 +3207,17 @@ posities + statistieken groen */
  .admin-section-choice.is-active .admin-section-number { color:hsl(var(--primary)); }
  .admin-editor-body { min-width:0; width:100%; }
  .admin-workspace-content :is(.section-title,.dialog-heading) { letter-spacing:0; font-size:17px; font-weight:600; }
- .admin-ui .admin-workspace-content .section-card { border:0; background:transparent; border-radius:0; box-shadow:none; padding:24px 0; }
+ .tournament-admin.admin-ui .admin-workspace-content .section-card { border:0; background:transparent; border-radius:0; box-shadow:none; padding:24px 0; }
+ .tournament-admin.admin-ui .admin-workspace-controls button.bg-primary { background:hsl(var(--primary)); color:hsl(var(--primary-foreground)); }
+ .tournament-admin.admin-ui .admin-section-choice:not(.is-active) { border-color:transparent; background:transparent; }
+ .admin-results-workspace > .flex { flex-direction:column; }
+ .admin-results-workspace .admin-results-formats { position:static; width:100%; height:auto; flex-shrink:0; border-right:0; padding:0 0 18px; border-bottom:1px solid hsl(var(--admin-line)); background:transparent; }
+ .admin-results-formats > div:last-child { flex-direction:row; overflow-x:auto; padding-bottom:4px; }
+ .admin-results-formats > div:last-child > div { flex:0 0 200px; padding:14px; }
+ .admin-results-formats > div:first-child > div { flex-direction:row; }
+ .admin-results-formats > div:first-child button { width:auto; }
+ .admin-format-stack { border-left:1px solid hsl(var(--admin-line)); padding-left:24px; }
+ .admin-schedule-workspace { border-top:1px solid hsl(var(--admin-line)); padding-top:16px; }
  .admin-workspace-content .form-label { letter-spacing:0; font-size:10px; font-weight:600; }
  .admin-ui .admin-information-sheet { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,.65fr); gap:24px 32px; padding-top:18px; }
  .admin-information-sheet > .section-title { grid-column:1 / -1; padding-bottom:16px; border-bottom:1px solid hsl(var(--admin-line)); }
