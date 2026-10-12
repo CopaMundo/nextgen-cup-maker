@@ -25,7 +25,13 @@ const props = { open: true, onOpenChange: vi.fn(), tournamentId: "tournament", p
 
 describe("Uniform draw preparation", () => {
   it("keeps the per-group pot table behind the advanced allocation choice", async () => {
-    render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="rules" />);
+    render(<LiveDrawDialog {...props} initialMethod="pots" initialStep="teams" />);
+    await screen.findByText("0 / 4");
+    for (let index = 0; index < 3; index++) {
+      fireEvent.click(screen.getAllByRole("combobox", { name: "Teamvak 1" })[index]);
+      fireEvent.click(await screen.findByRole("option", { name: `Team ${index}` }));
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     const toggle = await screen.findByRole("button", { name: "Geavanceerde groepsverdeling aanpassen" });
     expect(screen.getAllByText(/Maximaal/).length).toBeGreaterThan(0);
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
