@@ -1040,9 +1040,11 @@ const requestPotCount = (count: number) => {
                     <section className="space-y-2">
                       <h3 className="draw-section-title">Verdeling van potten over groepen</h3>
                       <div className="draw-panel p-3">
-                        <p className="text-sm font-medium">{Object.keys(rules.potQuota).length ? "Handmatige verdeling" : "Automatisch evenwichtig verdelen"}</p>
                         <p className="text-xs text-muted-foreground">Teams uit elke pot worden gelijkmatig over de groepen verdeeld. Waar nodig wijst de loting het resterende team toe.</p>
-                        <div className="mt-3 space-y-3">
+                         <div className="mt-3 space-y-2">{pots.map(pot => <div key={pot.id} className="flex flex-wrap items-center justify-between gap-2 text-sm"><span className="font-semibold">{pot.name}</span><span>Maximaal <strong>{Math.ceil(pot.teamIds.length / Math.max(1, containers.length))}</strong> team(s) per poule</span></div>)}</div>
+                         <Collapsible open={advancedSpreadOpen} onOpenChange={setAdvancedSpreadOpen} className="mt-3">
+                           <CollapsibleTrigger asChild><Button variant="outline" size="sm" className="h-auto whitespace-normal text-left"><ChevronDown className={`h-4 w-4 shrink-0 ${advancedSpreadOpen ? "rotate-180" : ""}`} />Geavanceerde groepsverdeling aanpassen</Button></CollapsibleTrigger>
+                           <CollapsibleContent className="mt-3 space-y-3">
                             <Button variant="ghost" size="sm" onClick={resetQuota}><RotateCcw className="h-3.5 w-3.5" /> Automatische verdeling herstellen</Button>
                             <div className="overflow-x-auto">
                               <table className="draw-table min-w-[520px] text-xs">
@@ -1057,7 +1059,8 @@ const requestPotCount = (count: number) => {
                                   <tr className="border-t border-border"><td className="p-2 font-semibold">Plaatsen</td>{containers.map(container => <td key={container.id} className="p-2 text-center font-semibold">{container.capacity}</td>)}</tr>
                                 </tbody>
                               </table>
-                            </div>
+                           </CollapsibleContent>
+                         </Collapsible>
                         </div>
                       </div>
                     </section>
