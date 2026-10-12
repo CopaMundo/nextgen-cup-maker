@@ -1,8 +1,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PotTeamSlots } from "@/components/draw/PotTeamSlots";
 
 afterEach(cleanup);
+beforeEach(() => {
+  Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
+});
 const teams = [{ id: "a", name: "Ajax" }, { id: "b", name: "Brugge" }, { id: "c", name: "Celtic" }];
 
 describe("Pot team choices", () => {
