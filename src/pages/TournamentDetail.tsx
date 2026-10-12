@@ -553,7 +553,7 @@ const TournamentDetail = () => {
       )}
       <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
         {/* Desktop: left navigation column */}
-        {!isMobile && (
+        {false && !isMobile && (
           <TooltipProvider delayDuration={300}>
             <nav
               aria-label="Toernooibeheer"
@@ -666,6 +666,10 @@ const TournamentDetail = () => {
             <DesktopAdminHeader
               title={sidebarItems.find((item) => item.id === activeTab)?.label || "Toernooibeheer"}
               tournamentName={tournament.name}
+              tournamentLogo={tournament.logo_url || logo}
+              primaryNavigation={<nav aria-label="Toernooibeheer" className="admin-primary-navigation">
+                {sidebarItems.map(item => <Button key={item.id} variant="ghost" aria-label={item.label} aria-current={activeTab === item.id ? "page" : undefined} onClick={() => setActiveTab(item.id)} className={cn("admin-primary-tab", activeTab === item.id && "is-active")}><item.icon className="h-[18px] w-[18px] shrink-0" /><span>{item.label}</span></Button>)}
+              </nav>}
               actionsRef={setPageActionsTarget}
               selectors={<>
                 {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
@@ -677,20 +681,18 @@ const TournamentDetail = () => {
                   <PhaseStripNav phases={phaseHeader.phases} activePhaseNumber={phaseHeader.activePhaseNumber} onSelect={phaseHeader.onSelect} onEdit={phaseHeader.onEdit} onDelete={phaseHeader.onDelete} />
                 ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
                   <DateStripNav dates={tournamentDates} activeDate={plannerDate} onSelect={handlePlannerDateChange} maxVisible={3} centerActive onInvalidPick={(iso) => toast({ title: "Datum buiten toernooiperiode", description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`, variant: "destructive" })} />
-                ) : desktopSegments ? (
-                  <div className="admin-workspace-tabs" role="tablist" aria-label="Onderdelen">
-                    {desktopSegments.items.map((seg) => (
-                      <Button key={seg.id} variant="ghost" role="tab" aria-selected={desktopSegments.active === seg.id} onClick={() => desktopSegments.onSelect(seg.id)} className={cn("admin-workspace-tab", desktopSegments.active === seg.id && "admin-workspace-tab-active")}>
-                        {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}<span>{seg.label}</span>
-                      </Button>
-                    ))}
-                  </div>
                 ) : null
               }
             />
           )}
-          <div className={cn(!isMobile && "admin-workspace-content", "w-full px-3 sm:mx-auto sm:max-w-[1600px] sm:px-6 lg:px-10", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
-            <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>
+          <div className={cn(!isMobile && "admin-workspace-content admin-editor-layout", "w-full px-3 sm:mx-auto sm:max-w-[1600px] sm:px-6 lg:px-10", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 sm:pt-0 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-4 sm:py-6")}>
+            {!isMobile && desktopSegments && <aside className="admin-section-rail">
+              <span className="form-label">{sidebarItems.find(item => item.id === activeTab)?.label}</span>
+              <div role="tablist" aria-label="Onderdelen" aria-orientation="vertical">
+                {desktopSegments.items.map((seg, index) => <Button key={seg.id} variant="ghost" role="tab" aria-selected={desktopSegments.active === seg.id} onClick={() => desktopSegments.onSelect(seg.id)} className={cn("admin-section-choice", desktopSegments.active === seg.id && "is-active")}><span className="admin-section-number">{String(index + 1).padStart(2, "0")}</span><span>{seg.label}</span><ChevronRight className="h-3.5 w-3.5 shrink-0" /></Button>)}
+              </div>
+            </aside>}
+            <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && "admin-editor-body")} data-admin-tab={activeTab}>{renderContent()}</div>
           </div>
         </div>
 
