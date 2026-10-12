@@ -7,7 +7,7 @@ export function DrawChoice({ label, description, selected, disabled, onClick }: 
   label: string; description: string; selected: boolean; disabled?: boolean; onClick: () => void;
 }) {
   return <Button type="button" variant="outline" aria-label={label} aria-pressed={selected} disabled={disabled} onClick={onClick}
-    className="draw-choice draw-type-choice h-auto min-h-28 w-full flex-col items-start justify-start gap-1 whitespace-normal p-3 text-left">
+    className="draw-choice draw-type-choice h-auto min-h-28 w-full flex-col items-start justify-start gap-2 whitespace-normal p-4 text-left">
     <span className="text-sm font-bold uppercase text-foreground">{label}</span>
     <span className="text-sm font-normal leading-snug text-muted-foreground">{description}</span>
   </Button>;

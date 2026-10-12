@@ -2522,6 +2522,41 @@ posities + statistieken groen */
   color-scheme: dark;
 }
 
+.draw-wizard-page {
+  padding: 1.25rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  background: hsl(var(--card));
+}
+
+.draw-wizard-page .draw-panel {
+  border-radius: 0.5rem;
+}
+
+.draw-wizard-page .draw-table th {
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.draw-wizard-page .draw-table td {
+  padding: 0.5rem 0.75rem;
+}
+
+.draw-wizard-page input:not([type="checkbox"]):not([type="radio"]),
+.draw-wizard-page [role="combobox"] {
+  min-height: 2.75rem;
+}
+
+.draw-wizard-page .draw-table input {
+  min-height: 2.25rem;
+}
+
+@media (min-width: 640px) {
+  .draw-wizard-page { padding: 1.75rem; }
+}
+
 .draw-section-title {
   color: hsl(var(--muted-foreground));
   font-size: 0.75rem;

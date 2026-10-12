@@ -22,7 +22,7 @@ export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, 
       const locked = Boolean(current && lockedIds?.has(current));
       return <div key={index} className="flex min-w-0 items-center gap-1.5">
         <Select value={current || "empty"} disabled={disabled || locked} onValueChange={(value) => onChange(Math.min(index, teamIds.length), value === "empty" ? null : value)}>
-          <SelectTrigger aria-label={`Teamvak ${index + 1}`} className="h-11 min-w-0 flex-1 border-border bg-background text-left">
+          <SelectTrigger aria-label={`Teamvak ${index + 1}`} className="h-11 min-w-0 flex-1 border-border bg-secondary text-left">
             <SelectValue>
               {selected ? <span className="flex min-w-0 items-center gap-2">
                 {selected.logoUrl && <img src={selected.logoUrl} alt="" className="h-6 w-6 shrink-0 object-contain" />}
@@ -38,7 +38,7 @@ export function PotTeamSlots({ teams, teamIds, assignedIds, capacity, onChange, 
             )}
           </SelectContent>
         </Select>
-        <Button type="button" variant="ghost" size="icon" className="h-9 w-9 shrink-0" disabled={disabled || locked || !current} aria-label={`Team uit plaats ${index + 1} verwijderen`} onClick={() => onChange(index, null)}>
+        <Button type="button" variant="ghost" size="icon" className="h-11 w-11 shrink-0 text-muted-foreground" disabled={disabled || locked || !current} aria-label={`Team uit plaats ${index + 1} verwijderen`} onClick={() => onChange(index, null)}>
           <X className="h-4 w-4" />
         </Button>
       </div>;
