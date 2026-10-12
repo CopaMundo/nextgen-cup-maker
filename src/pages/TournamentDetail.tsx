@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { AdminAppearanceContext } from "@/contexts/AdminAppearanceContext";
 import { loadFieldLocations } from "@/lib/fieldLocations";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -522,8 +523,9 @@ const TournamentDetail = () => {
       : null;
 
   return (
+    <AdminAppearanceContext.Provider value={true}>
     <div
-      className="tournament-admin h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
+      className="admin-ui tournament-admin h-dvh min-h-0 bg-background flex flex-col overflow-hidden"
     >
 
 
@@ -763,6 +765,7 @@ const TournamentDetail = () => {
       </div>
 
     </div>
+    </AdminAppearanceContext.Provider>
   );
 };
 
