@@ -844,7 +844,8 @@ const requestPotCount = (count: number) => {
 
   const renderRules = () => (
     <div className="draw-rules space-y-5">
-      <div className="space-y-4">
+      <h3 className="form-label">Landenregels</h3>
+      <div className="draw-panel space-y-4 p-4">
         <div>
           <Label htmlFor="draw-country-limit" className="form-label">Aantal teams uit hetzelfde land per poule</Label>
           <Select
@@ -857,7 +858,7 @@ const requestPotCount = (count: number) => {
             }))}
           >
             <SelectTrigger id="draw-country-limit" className="mt-2"><SelectValue /></SelectTrigger>
-            <SelectContent>
+            <SelectContent className="draw-select-menu">
               <SelectItem value="none">Geen beperking</SelectItem>
               {Array.from({ length: maxGroupCapacity }, (_, index) => index + 1).map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}
             </SelectContent>
@@ -879,7 +880,7 @@ const requestPotCount = (count: number) => {
                     onValueChange={(value) => setRules((previous) => ({ ...previous, countryMax: { ...previous.countryMax, [country]: Number(value) } }))}
                   >
                     <SelectTrigger className="h-8 w-28"><SelectValue placeholder="Kies max" /></SelectTrigger>
-                    <SelectContent>{options.map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}</SelectContent>
+                    <SelectContent className="draw-select-menu">{options.map((number) => <SelectItem key={number} value={String(number)}>Max {number} per poule</SelectItem>)}</SelectContent>
                   </Select>
                 );
               })()}
@@ -890,15 +891,15 @@ const requestPotCount = (count: number) => {
 
       <h3 className="form-label">Teamregels</h3>
       <div className="draw-panel space-y-4 p-4">
-        <p className="text-sm text-muted-foreground">Kies twee teams die niet samen in één poule mogen komen.</p>
+        <p className="text-sm text-foreground">Teams die niet samen in één poule mogen worden geloot</p>
         <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
           <Select value={pairA} onValueChange={setPairA}>
             <SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger>
-            <SelectContent>{participatingTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+            <SelectContent className="draw-select-menu">{participatingTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={pairB} onValueChange={setPairB}>
             <SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger>
-            <SelectContent>{participatingTeams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
+            <SelectContent className="draw-select-menu">{participatingTeams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent>
           </Select>
         <Button
             variant="outline"
@@ -932,8 +933,8 @@ const requestPotCount = (count: number) => {
       <div className="draw-panel space-y-3 p-3">
         <p className="text-sm text-muted-foreground">Verboden combinaties: kies twee teams die niet tegen elkaar mogen loten.</p>
         <div className="grid gap-2 sm:grid-cols-2">
-          <Select value={pairA} onValueChange={setPairA}><SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger><SelectContent>{participatingTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
-          <Select value={pairB} onValueChange={setPairB}><SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger><SelectContent>{participatingTeams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
+          <Select value={pairA} onValueChange={setPairA}><SelectTrigger><SelectValue placeholder="Team 1" /></SelectTrigger><SelectContent className="draw-select-menu">{participatingTeams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
+          <Select value={pairB} onValueChange={setPairB}><SelectTrigger><SelectValue placeholder="Team 2" /></SelectTrigger><SelectContent className="draw-select-menu">{participatingTeams.filter((team) => team.id !== pairA).map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>
         </div>
         <Button variant="outline" size="sm" disabled={!pairA || !pairB} onClick={() => { setRules((previous) => ({ ...previous, forbiddenPairs: [...previous.forbiddenPairs, [pairA, pairB]] })); setPairA(""); setPairB(""); }}>Niet tegen elkaar</Button>
         <div className="space-y-1">{rules.forbiddenPairs.map(([first, second], index) => <div key={`match-forbidden-${index}`} className="inline-flex max-w-full items-center gap-2 rounded-md border border-border px-2 py-1 text-xs"><span>Niet tegen elkaar: {teamById.get(first)?.name} · {teamById.get(second)?.name}</span><Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label="Regel verwijderen" onClick={() => setRules((previous) => ({ ...previous, forbiddenPairs: previous.forbiddenPairs.filter((_, itemIndex) => itemIndex !== index) }))}><Trash2 className="h-3 w-3" /></Button></div>)}</div>
@@ -1012,7 +1013,7 @@ const requestPotCount = (count: number) => {
                    <Label className="form-label" htmlFor="group-pot-distribution">POTVERDELING</Label>
                    <Select value={potOptions.includes(pots.length) ? String(pots.length) : ""} onValueChange={(value) => requestPotCount(Number(value))}>
                      <SelectTrigger id="group-pot-distribution" className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
-                     <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{isMatchDraw ? `Pot 1: ${matchPotCapacity(containers, 0)} · Pot 2: ${matchPotCapacity(containers, 1)}` : `${count} potten van ${drawSize / count} teams`}</SelectItem>)}</SelectContent>
+                     <SelectContent className="draw-select-menu">{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{isMatchDraw ? `Pot 1: ${matchPotCapacity(containers, 0)} · Pot 2: ${matchPotCapacity(containers, 1)}` : `${count} potten van ${drawSize / count} teams`}</SelectItem>)}</SelectContent>
                    </Select>
                  </div>
                  <span className="mb-3.5 shrink-0 text-sm font-semibold tabular-nums" aria-label="Teams in potten">{potTeamTotal} / {drawSize}</span>

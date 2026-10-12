@@ -807,7 +807,7 @@ const RoundsDrawDialog = ({
               {!(sameForAll && canShare) && groups.length > 1 && (
                 <Select value={editGroup?.id} onValueChange={setEditGroupId}>
                   <SelectTrigger className="h-11 w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>{drawGroups.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}</SelectContent>
+                  <SelectContent className="draw-select-menu">{drawGroups.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}</SelectContent>
                 </Select>
               )}
               <Button size="sm" variant="outline" onClick={() => resetMatrix(matrixGroup.id)}>Standaard</Button>
@@ -887,11 +887,11 @@ const RoundsDrawDialog = ({
             <div className="mt-2 flex flex-wrap gap-2">
               <Select value={pairA} onValueChange={setPairA}>
                 <SelectTrigger className="h-11 w-full sm:w-44"><SelectValue placeholder="Team" /></SelectTrigger>
-                 <SelectContent>{drawGroups.flatMap((g) => g.teamIds).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
+                 <SelectContent className="draw-select-menu">{drawGroups.flatMap((g) => g.teamIds).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={pairB} onValueChange={setPairB}>
                 <SelectTrigger className="h-11 w-full sm:w-44"><SelectValue placeholder="Team" /></SelectTrigger>
-                 <SelectContent>{drawGroups.flatMap((g) => g.teamIds).filter((id) => id !== pairA).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
+                 <SelectContent className="draw-select-menu">{drawGroups.flatMap((g) => g.teamIds).filter((id) => id !== pairA).map((id) => <SelectItem key={id} value={id}>{teamById.get(id)?.name}</SelectItem>)}</SelectContent>
               </Select>
               <Button size="sm" variant="outline" disabled={!pairA || !pairB} onClick={() => { setForbiddenPairs((p) => [...p, [pairA, pairB]]); setPairA(""); setPairB(""); }}>
                 <Plus className="h-4 w-4" /> Toevoegen
@@ -919,7 +919,7 @@ const RoundsDrawDialog = ({
           <div className="min-w-[220px] flex-1 sm:max-w-sm"><Label className="form-label">POTVERDELING</Label>
             <Select value={groupPots.length ? String(groupPots.length) : undefined} onValueChange={(value) => selectPotCount(potGroup, Number(value))}>
               <SelectTrigger className="mt-1"><SelectValue placeholder="Kies een gelijke potverdeling" /></SelectTrigger>
-              <SelectContent>{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {potGroup.teamIds.length / count} teams</SelectItem>)}</SelectContent>
+              <SelectContent className="draw-select-menu">{potOptions.map((count) => <SelectItem key={count} value={String(count)}>{count} potten van {potGroup.teamIds.length / count} teams</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <span className="mb-3 shrink-0 text-sm font-semibold tabular-nums" aria-label="Teams in potten">{assigned.size} / {potGroup.teamIds.length}</span>

@@ -2574,10 +2574,27 @@ posities + statistieken groen */
 }
 
 .draw-dialog-theme input:not([type="checkbox"]):not([type="radio"]),
-.draw-dialog-theme [role="combobox"],
 .draw-dialog-theme .draw-table {
   background: hsl(var(--secondary));
   border-color: hsl(var(--border));
+}
+
+.draw-dialog-theme [role="combobox"],
+.draw-select-menu {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+
+.draw-dialog-theme [role="combobox"]:focus,
+.draw-dialog-theme [role="combobox"][data-state="open"] {
+  border-top-color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
+}
+
+.draw-select-menu [role="option"][data-highlighted] {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
 }
 
 
