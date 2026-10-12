@@ -532,6 +532,9 @@ const TournamentDetail = () => {
       <Navbar />
       {isMobile && (
         <div className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card px-4 print:hidden">
+          <Button variant="ghost" size="icon" onClick={toggleMobileSidebar} aria-label={mobileSidebarCollapsed ? "Menu openen" : "Menu inklappen"} aria-expanded={!mobileSidebarCollapsed} className="h-8 w-8 shrink-0">
+            {mobileSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </Button>
           <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
             {sidebarItems.find((item) => item.id === activeTab)?.label}
           </span>
@@ -546,7 +549,7 @@ const TournamentDetail = () => {
           <ThemeSwitcher embedded />
         </div>
       )}
-      <div className={cn("relative flex flex-1 overflow-hidden min-h-0", isMobile && "flex-col-reverse")}>
+      <div className="relative flex flex-1 overflow-hidden min-h-0">
         {/* Desktop: left navigation column */}
         {!isMobile && (
           <TooltipProvider delayDuration={300}>
@@ -626,31 +629,31 @@ const TournamentDetail = () => {
           </TooltipProvider>
         )}
 
-        {/* Mobile: bottom navigation bar */}
-        {isMobile && (
+        {/* Mobile: fully hideable icon-only navigation */}
+        {isMobile && !mobileSidebarCollapsed && (
           <nav
             aria-label="Toernooibeheer"
-            className="admin-bottom-nav shrink-0 grid border-t border-border bg-card print:hidden"
-            style={{ gridTemplateColumns: `repeat(${sidebarItems.length}, minmax(0, 1fr))` }}
+            className="flex w-14 shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-card px-1 py-3 print:hidden"
           >
             {sidebarItems.map(item => {
               const active = activeTab === item.id;
               return (
-                <button
+                <Button
                   key={item.id}
+                  variant="ghost"
+                  size="icon"
                   type="button"
                   onClick={() => setActiveTab(item.id)}
                   aria-label={item.label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex min-w-0 flex-col items-center justify-center gap-1 py-2 text-[10px] font-semibold transition-colors",
-                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    "relative h-11 w-full shrink-0 rounded-md",
+                    active ? "admin-nav-active text-primary" : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  {active && <span className="absolute left-1/2 top-0 h-[2px] w-8 -translate-x-1/2 rounded-full bg-primary" />}
+                  {active && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary" />}
                   <item.icon className={cn("h-5 w-5 shrink-0", active && "text-primary")} />
-                  <span className="max-w-full truncate px-0.5">{item.label}</span>
-                </button>
+                </Button>
               );
             })}
           </nav>

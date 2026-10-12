@@ -3079,7 +3079,6 @@ posities + statistieken groen */
 .admin-ui .admin-tabs button { letter-spacing: 0; }
 .admin-ui .admin-tabs button[aria-current="page"] { font-weight: 600; }
 .admin-ui .admin-page-heading h1 { letter-spacing: 0; }
-.admin-ui .admin-bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
 .admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button):not([role="switch"]) {
   background-color: hsl(var(--secondary));
 }
