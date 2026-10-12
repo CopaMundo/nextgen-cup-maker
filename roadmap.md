@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Live wizard: deelnemende teams, uitgestelde potvalidatie, deelnemersgebonden landenlimieten, dynamische potbandbreedtes en uniforme showinstellingen; gerichte tests en schermcontrole.
 - [x] Type loting: exacte teksten en standaardkeuzes voor alle formaten, geen stapteller/subtitel, gedeelde keuzekaarten en tweedelige voortgang bij speelrondes. 18 tests geslaagd en build OK; aangemelde groepsfase visueel gecontroleerd, potkeuze blijft behouden na vooruit/terug. Speelrondedoorstroom niet toegepast tijdens deze presentatiecontrole.
 - [x] Alle formats: uniforme vierstappen-opstartwizard, vaste kop/navigatie, teamselectie en voorwaardelijke potaanvulling, reekshoofden en gedeelde showinstellingen. 22 gerichte tests geslaagd, inclusief vier formats, terugnavigatie, selectietelling en showstart; actuele build OK.
 - [ ] Aangemelde controle van de wizard en poule-naar-speelrondedoorstroom in een echt toernooi. Blokker: geen actieve previewsessie; automatisch aanmelden kon geen bijbehorend account bepalen.
