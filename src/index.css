@@ -2946,9 +2946,57 @@ posities + statistieken groen */
 /* Shared management surfaces; portal scopes arrive through AdminAppearanceContext.
    Broadcast pages and the projected stage deliberately retain their own palette. */
 .admin-ui {
+  /* Management surfaces are achromatic; brand colors belong to accents only. */
+  --background: 0 0% 6%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 10%;
+  --popover-foreground: 0 0% 95%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 85%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 62%;
+  --accent: 0 0% 19%;
+  --accent-foreground: 0 0% 95%;
+  --primary-foreground: 0 0% 6%;
+  --border: 0 0% 22%;
+  --input: 0 0% 22%;
+  --sidebar-background: 0 0% 6%;
+  --sidebar-foreground: 0 0% 85%;
+  --sidebar-accent: 0 0% 14%;
+  --sidebar-accent-foreground: 0 0% 95%;
+  --sidebar-border: 0 0% 22%;
   --admin-panel: var(--secondary);
   --admin-panel-border: var(--border);
   --admin-title-accent: var(--primary);
+}
+
+[data-mode="light"] .admin-ui {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 12%;
+  --secondary: 0 0% 92%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 0 0% 93%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 88%;
+  --accent-foreground: 0 0% 12%;
+  --primary-foreground: 0 0% 100%;
+  --border: 0 0% 82%;
+  --input: 0 0% 82%;
+  --sidebar-background: 0 0% 96%;
+  --sidebar-foreground: 0 0% 25%;
+  --sidebar-accent: 0 0% 92%;
+  --sidebar-accent-foreground: 0 0% 25%;
+  --sidebar-border: 0 0% 82%;
+}
+
+.admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *) {
+  background-color: hsl(var(--secondary));
 }
 
 .admin-ui.admin-dialog:not(.draw-dialog-theme) {
@@ -3015,8 +3063,8 @@ posities + statistieken groen */
   border-color: hsl(var(--border));
 }
 .admin-select-menu [role="option"][data-highlighted] {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
 }
 @media (prefers-reduced-motion: reduce) {
   .admin-ui :is(input, textarea, select, [role="combobox"]):not(.draw-show-stage *) { transition: none; }
