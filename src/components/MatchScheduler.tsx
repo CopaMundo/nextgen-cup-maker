@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, type ReactNode, type SetStateAction } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { AdminPageActions } from "@/components/admin/AdminPageActions";
 import { Button } from "@/components/ui/button";
 import { fetchTournamentMatches } from "@/lib/fetchTournamentMatches";
 import { Input } from "@/components/ui/input";
@@ -3278,7 +3279,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {/* Field columns */}
             <div className={cn("flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
+              <AdminPageActions><div className={cn("flex items-center justify-between gap-2 print:hidden", isMobile && "sticky top-0 z-20 bg-background/95 backdrop-blur-sm py-1 pr-2")}>
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
@@ -3315,7 +3316,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   </Button>
                   )}
                 </div>
-              </div>
+              </div></AdminPageActions>
               {plannerFields.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border py-12 text-center">
                   <p className="text-muted-foreground text-sm mb-3">Voeg velden toe om de planner te gebruiken</p>

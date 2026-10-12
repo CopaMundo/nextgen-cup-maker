@@ -3166,3 +3166,54 @@ posities + statistieken groen */
 .admin-ui.admin-dialog { --admin-raised: 0 0% 9%; --admin-field: 0 0% 6.5%; --admin-line: 0 0% 100% / 0.07; --admin-line-strong: 0 0% 100% / 0.12; }
 [data-mode="light"] .admin-ui.admin-dialog { --admin-raised: 0 0% 100%; --admin-field: 0 0% 98.5%; --admin-line: 0 0% 0% / 0.08; --admin-line-strong: 0 0% 0% / 0.14; }
 .admin-select-menu { border-radius: 10px; box-shadow: 0 20px 50px -20px hsl(0 0% 0% / 0.6); }
+
+/* Desktop/tablet workspace: preserve phone rules and the public/live-stage boundary. */
+@media (min-width: 768px) {
+  .tournament-admin {
+    --admin-canvas: 0 0% 6%; --admin-raised: 0 0% 10%; --admin-field: 0 0% 8%;
+    --admin-radius: 8px; --admin-workspace-head: 0 0% 8%;
+    --admin-workspace-shadow: 0 1px 0 hsl(0 0% 100% / 0.03) inset;
+    background: hsl(var(--admin-canvas));
+  }
+  [data-mode="light"] .tournament-admin {
+    --admin-canvas: 0 0% 96%; --admin-raised: 0 0% 100%; --admin-field: 0 0% 98%;
+    --admin-workspace-head: 0 0% 100%; --admin-workspace-shadow: 0 1px 2px hsl(0 0% 0% / 0.04);
+  }
+  .admin-ui .admin-workspace-sidebar { background: hsl(var(--admin-workspace-head)); }
+  .admin-workspace-brand { display: flex; align-items: center; gap: 10px; height: 88px; padding: 0 18px; flex-shrink: 0; }
+  .admin-workspace-tournament { display: flex; align-items: center; gap: 10px; margin: 0 12px 20px; padding: 12px 6px; border-top: 1px solid hsl(var(--admin-line)); border-bottom: 1px solid hsl(var(--admin-line)); }
+  .admin-workspace-header { position: sticky; top: 0; z-index: 25; flex-shrink: 0; padding: 26px 32px 0; background: hsl(var(--admin-workspace-head)); border-bottom: 1px solid hsl(var(--admin-line)); }
+  .admin-workspace-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 22px; }
+  .admin-workspace-breadcrumb { display: flex; align-items: center; gap: 8px; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.5; margin-bottom: 9px; }
+  .admin-workspace-breadcrumb a { flex-shrink: 0; }
+  .admin-workspace-breadcrumb a:hover { color: hsl(var(--foreground)); }
+  .admin-workspace-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: 0; color: hsl(var(--foreground)); }
+  .admin-workspace-utilities { display: flex; align-items: center; gap: 3px; color: hsl(var(--muted-foreground)); flex-shrink: 0; }
+  .admin-workspace-utilities button, .admin-workspace-utilities a { width: 34px; height: 34px; }
+  .admin-workspace-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; min-height: 50px; }
+  .admin-workspace-navigation { min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: thin; }
+  .admin-workspace-tabs { display: flex; align-items: stretch; gap: 20px; width: max-content; }
+  .admin-ui .admin-workspace-tab { position: relative; height: 50px; padding: 0 0 12px; border-radius: 0; background: transparent; color: hsl(var(--muted-foreground)); font-size: 12px; font-weight: 500; letter-spacing: 0; }
+  .admin-ui .admin-workspace-tab:hover { background: transparent; color: hsl(var(--foreground)); }
+  .admin-ui .admin-workspace-tab-active { color: hsl(var(--foreground)); }
+  .admin-workspace-tab-active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: hsl(var(--primary)); }
+  .admin-workspace-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; padding-bottom: 10px; }
+  .admin-workspace-controls [role="combobox"] { height: 32px; min-width: 105px; max-width: 200px; padding: 0 10px; font-size: 12px; }
+  .admin-workspace-controls button { min-height: 32px; }
+  .admin-ui .admin-workspace-content { max-width: 1800px; padding: 28px 32px; }
+  .admin-workspace-content :is(.section-title, .dialog-heading) { letter-spacing: 0; font-size: 15px; font-weight: 600; }
+  .admin-workspace-content :is(.border.bg-card, .border.bg-secondary, .section-card):not(.draw-show-stage *):not(.draw-scene-settings *) { box-shadow: var(--admin-workspace-shadow); }
+  .admin-workspace-content .form-label { letter-spacing: 0; }
+}
+@media (min-width: 768px) and (max-width: 1100px) {
+  .admin-workspace-sidebar { width: 72px; }
+  .admin-workspace-sidebar .admin-workspace-brand span,
+  .admin-workspace-sidebar .admin-workspace-tournament > div,
+  .admin-workspace-sidebar button > span { display: none; }
+  .admin-workspace-sidebar button { justify-content: center; padding-left: 0; padding-right: 0; }
+  .admin-workspace-sidebar .admin-workspace-tournament { margin-left: 12px; margin-right: 12px; }
+  .admin-workspace-sidebar .admin-workspace-brand { padding: 0 18px; }
+  .admin-workspace-header { padding: 22px 22px 0; }
+  .admin-ui .admin-workspace-content { padding: 22px; }
+  .admin-workspace-tabs { gap: 16px; }
+}
