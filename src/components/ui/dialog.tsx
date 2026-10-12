@@ -3,6 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useAdminAppearance } from "@/contexts/AdminAppearanceContext";
 import { focusFirstDialogField } from "@/hooks/useDialogFocus";
 
 const Dialog = DialogPrimitive.Root;
@@ -31,7 +32,9 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { scrollable?: boolean }
->(({ className, children, onOpenAutoFocus, scrollable = true, ...props }, ref) => (
+>(({ className, children, onOpenAutoFocus, scrollable = true, ...props }, ref) => {
+  const admin = useAdminAppearance();
+  return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -46,6 +49,7 @@ const DialogContent = React.forwardRef<
         window.setTimeout(() => focusFirstDialogField(content), 60);
       }}
       className={cn(
+        admin && "admin-ui admin-dialog",
         "fixed left-[50%] top-[6%] z-50 flex flex-col w-[calc(100%-1.5rem)] max-w-lg max-h-[88dvh] overflow-visible translate-x-[-50%] translate-y-0 sm:top-[50%] sm:translate-y-[-50%] sm:max-h-[85dvh] gap-4 rounded-lg border bg-background p-4 shadow-lg duration-200 sm:w-full sm:p-6 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
         className,
       )}
@@ -61,7 +65,8 @@ const DialogContent = React.forwardRef<
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
-));
+);
+});
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -80,7 +85,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+    className={cn("dialog-heading text-lg font-semibold leading-snug", className)}
     {...props}
   />
 ));

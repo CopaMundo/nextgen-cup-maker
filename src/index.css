@@ -2942,3 +2942,82 @@ posities + statistieken groen */
 .draw-show-rounds-roster-team:not(:has(.draw-show-rounds-club-logo)) .draw-show-rounds-roster-identity,
 .draw-show-rounds-roster-team:not(:has(.draw-show-rounds-club-logo)) .draw-show-rounds-opponent-badges { grid-column: 1; }
 .draw-show-rounds-opponent-badges .draw-show-slot-mark:not(:has(img)) { max-width: none; aspect-ratio: auto; border: 0; border-radius: 0; background: none; }
+
+/* Shared management surfaces; portal scopes arrive through AdminAppearanceContext.
+   Broadcast pages and the projected stage deliberately retain their own palette. */
+.admin-ui {
+  --admin-panel: var(--secondary);
+  --admin-panel-border: var(--border);
+  --admin-title-accent: var(--primary);
+}
+
+.admin-ui.admin-dialog:not(.draw-dialog-theme) {
+  background: hsl(var(--background));
+  border-color: hsl(var(--admin-panel-border));
+  border-radius: 0.5rem;
+}
+
+.admin-ui :is(.border.bg-card, .border.bg-secondary, .section-card, .draw-panel):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  background-color: hsl(var(--admin-panel));
+  border-color: hsl(var(--admin-panel-border));
+  border-radius: 0.375rem;
+  box-shadow: none;
+}
+
+.admin-ui :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea, select, [role="combobox"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--input));
+  border-radius: 0.375rem;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.admin-ui :is(input, textarea, select, [role="combobox"]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *),
+.admin-ui [role="combobox"][data-state="open"]:not(.draw-show-stage *):not(.draw-scene-settings *) {
+  border-top-color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
+}
+
+.admin-ui :is(.form-label, [data-ui="form-label"]):not(.draw-rules *):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.admin-ui :is(.section-title, .dialog-heading) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: hsl(var(--foreground));
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.admin-ui :is(.section-title, .dialog-heading)::before {
+  content: "";
+  flex: 0 0 0.25rem;
+  width: 0.25rem;
+  height: 1.5rem;
+  border-radius: 0.125rem;
+  background: hsl(var(--admin-title-accent));
+}
+
+.admin-select-menu {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+.admin-select-menu [role="option"][data-highlighted] {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-ui :is(input, textarea, select, [role="combobox"]):not(.draw-show-stage *) { transition: none; }
+}
