@@ -519,7 +519,7 @@ const TournamentDetail = () => {
     }
   };
 
-  const sectionLinks = activeTab === "general" ? generalSubTabs
+  const sectionLinks = activeTab === "general" ? generalSubTabs.map(section => section.id === "info" ? { ...section, label: "Toernooi-informatie" } : section)
     : activeTab === "teams" ? [
       { id: "teams", label: tournament.teams_label || "Teams" },
       { id: "referees", label: tournament.referees_label || "Scheidsrechters" },
@@ -666,7 +666,7 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          {!isMobile && (activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
+          {!isMobile && (activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
             <header className="admin-workbar sticky top-0 z-20 shrink-0 border-b border-border bg-card print:hidden">
               <div className="mx-auto flex min-h-14 w-full max-w-[1920px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 sm:px-6 lg:px-8">
                 <div className="flex shrink-0 flex-wrap items-center gap-2 empty:hidden [&>*]:mb-0">

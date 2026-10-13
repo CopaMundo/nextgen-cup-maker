@@ -3195,6 +3195,7 @@ posities + statistieken groen */
   .admin-section-body [data-admin-section] { scroll-margin-top: 88px; }
   .admin-section-body [data-admin-section] + [data-admin-section] { margin-top: 36px; }
   .admin-section-body .section-card { padding-bottom: 32px; }
+  .admin-section-body > .admin-stacked-section > .section-card { border-bottom: 0; }
   .admin-section-body > :last-child { padding-bottom: 40px; }
   .admin-page-heading h1 { font-size: 1.75rem; font-weight: 600; }
 }
