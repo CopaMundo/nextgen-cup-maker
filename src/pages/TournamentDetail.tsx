@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import AdminSectionLayout, { AdminSection } from "@/components/admin/AdminSectionLayout";
 import { AdminAppearanceContext } from "@/contexts/AdminAppearanceContext";
 import { loadFieldLocations } from "@/lib/fieldLocations";
 import { useParams, Link } from "react-router-dom";
@@ -80,6 +81,7 @@ const TournamentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const adminScrollRoot = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [phaseHeader, setPhaseHeader] = useState<PhaseHeaderState | null>(null);
 
@@ -299,7 +301,7 @@ const TournamentDetail = () => {
   }, [tournament]);
 
   const fetchTournament = async () => {
-    const { data } = await supabase.from("tournaments").select("*").eq("id", id!).single();
+    const { data } = await supabase.from("tournaments").select("*").eq("id", id ?? "").single();
     setTournament(data);
     if (id) void loadFieldLocations(id);
     setLoading(false);
@@ -328,7 +330,7 @@ const TournamentDetail = () => {
 
   const categorySelector = (
     <CategorySelector
-      tournamentId={id!}
+      tournamentId={id ?? ""}
       isMultiCategory={tournament.is_multi_category}
       selectedCategoryId={selectedCategoryId}
       onSelect={setSelectedCategoryId}
@@ -376,11 +378,19 @@ const TournamentDetail = () => {
                 ) : (
                 null
                 )}
-                {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "teams" && (
-                  <TeamManager tournamentId={id!} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
+                {!isMobile && <>
+                  <AdminSection id="teams" title={tournament.teams_label || "Teams"}>
+                    <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
+                  </AdminSection>
+                  <AdminSection id="referees" title={tournament.referees_label || "Scheidsrechters"}>
+                    <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} />
+                  </AdminSection>
+                </>}
+                {isMobile && !mobileDeelnemersOverview && deelnemersSubTab === "teams" && (
+                  <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 )}
-                {(!isMobile || !mobileDeelnemersOverview) && deelnemersSubTab === "referees" && (
-                  <RefereeManager tournamentId={id!} categoryId={effectiveCategoryId} />
+                {isMobile && !mobileDeelnemersOverview && deelnemersSubTab === "referees" && (
+                  <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} />
                 )}
               </>
             )}
@@ -393,7 +403,7 @@ const TournamentDetail = () => {
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               <PhaseManager
                 key={`phases-${id}-${effectiveCategoryId ?? "all"}`}
-                tournamentId={id!}
+                tournamentId={id ?? ""}
                 tournamentType={tournament.tournament_type}
                 categoryId={effectiveCategoryId}
                 onHeaderStateChange={isMobile ? undefined : setPhaseHeader}
@@ -407,7 +417,7 @@ const TournamentDetail = () => {
           <>
             {isMobile && (
               <CategorySelector
-                tournamentId={id!}
+                tournamentId={id ?? ""}
                 isMultiCategory={tournament.is_multi_category}
                 selectedCategoryId={selectedCategoryId}
                 onSelect={setSelectedCategoryId}
@@ -416,7 +426,7 @@ const TournamentDetail = () => {
             )}
             {isMobile && (
               <LocationSelector
-                tournamentId={id!}
+                tournamentId={id ?? ""}
                 selectedLocation={selectedLocation}
                 onSelect={setSelectedLocation}
                 selectClassName={compactSelect}
@@ -428,7 +438,7 @@ const TournamentDetail = () => {
         const showScheduler = !tournament.is_multi_category || !!effectiveCategoryId;
         return showScheduler ? (
           <MatchScheduler
-            tournamentId={id!}
+            tournamentId={id ?? ""}
             tournament={tournament}
             categoryId={effectiveCategoryId}
             selectedLocation={selectedLocation}
@@ -459,9 +469,9 @@ const TournamentDetail = () => {
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
-                <ResultsManager tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+                <ResultsManager tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} />
               ) : (
-                <StatisticsView tournamentId={id!} tournament={tournament} categoryId={effectiveCategoryId} />
+                <StatisticsView tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} />
               )
             )}
           </>
@@ -475,6 +485,11 @@ const TournamentDetail = () => {
           { id: "sponsors" as const, label: "Sponsors", icon: Handshake },
           { id: "polls" as const, label: "Polls", icon: ListChecks },
         ];
+        if (!isMobile) return <>
+          <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} stacked />
+          <AdminSection id="sponsors"><SponsorManager tournamentId={id ?? ""} /></AdminSection>
+          <AdminSection id="polls"><PollManager tournamentId={id ?? ""} tournament={tournament} /></AdminSection>
+        </>;
         if (isMobile && mobilePresentationOverview) {
           return renderMobileOverview(presentationItems, (sid) => { setPresentationSubTab(sid); setMobilePresentationOverview(false); });
         }
@@ -493,8 +508,8 @@ const TournamentDetail = () => {
             {presentationSubTab === "visualization" && (
               <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} subTab="visualization" />
             )}
-            {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id!} />}
-            {presentationSubTab === "polls" && <PollManager tournamentId={id!} tournament={tournament} />}
+            {presentationSubTab === "sponsors" && <SponsorManager tournamentId={id ?? ""} />}
+            {presentationSubTab === "polls" && <PollManager tournamentId={id ?? ""} tournament={tournament} />}
           </>
         );
       }
@@ -504,23 +519,13 @@ const TournamentDetail = () => {
     }
   };
 
-  const desktopSegments: { items: readonly { id: string; label: string; icon?: any }[]; active: string; onSelect: (id: any) => void } | null =
-    activeTab === "general"
-      ? { items: generalSubTabs, active: generalSubTab, onSelect: setGeneralSubTab }
-      : activeTab === "teams"
-      ? {
-          items: [
-            { id: "teams", label: tournament.teams_label || "Teams" },
-            { id: "referees", label: tournament.referees_label || "Scheidsrechters" },
-          ],
-          active: deelnemersSubTab,
-          onSelect: setDeelnemersSubTab,
-        }
-      : activeTab === "results"
-      ? { items: resultsSubTabs, active: resultsSubTab, onSelect: setResultsSubTab }
-      : activeTab === "presentation"
-      ? { items: presentationSubTabs, active: presentationSubTab, onSelect: setPresentationSubTab }
-      : null;
+  const sectionLinks = activeTab === "general" ? generalSubTabs.map(section => section.id === "info" ? { ...section, label: "Toernooi-informatie" } : section)
+    : activeTab === "teams" ? [
+      { id: "teams", label: tournament.teams_label || "Teams" },
+      { id: "referees", label: tournament.referees_label || "Scheidsrechters" },
+    ] : activeTab === "presentation" ? presentationSubTabs : null;
+  const desktopSegments = activeTab === "results"
+    ? { items: resultsSubTabs, active: resultsSubTab, onSelect: setResultsSubTab } : null;
 
   return (
     <AdminAppearanceContext.Provider value={true}>
@@ -660,15 +665,15 @@ const TournamentDetail = () => {
         )}
 
         {/* Main content */}
-        <div className="flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          {!isMobile && (
+        <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
+          {!isMobile && (activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
             <header className="admin-workbar sticky top-0 z-20 shrink-0 border-b border-border bg-card print:hidden">
               <div className="mx-auto flex min-h-14 w-full max-w-[1920px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 sm:px-6 lg:px-8">
                 <div className="flex shrink-0 flex-wrap items-center gap-2 empty:hidden [&>*]:mb-0">
-                  {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && categorySelector}
+                  {categorySelector}
                   {activeTab === "schedule" && (
                     <LocationSelector
-                      tournamentId={id!}
+                      tournamentId={id ?? ""}
                       selectedLocation={selectedLocation}
                       onSelect={setSelectedLocation}
                     />
@@ -718,7 +723,6 @@ const TournamentDetail = () => {
                                   : ""
                               )}
                             >
-                              {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
                               <span className="truncate">{seg.label}</span>
                             </Button>
                           );
@@ -740,9 +744,13 @@ const TournamentDetail = () => {
           )}
           <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
             {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
-              <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.title}</h1>
+              <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
             </div>}
-            <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>
+            {!isMobile && sectionLinks ? (
+              <AdminSectionLayout key={`${activeTab}-${effectiveCategoryId ?? "all"}`} sections={sectionLinks} scrollRoot={adminScrollRoot}>
+                {renderContent()}
+              </AdminSectionLayout>
+            ) : <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>}
           </div>
         </div>
 
