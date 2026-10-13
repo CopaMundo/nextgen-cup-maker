@@ -660,9 +660,9 @@ const TournamentGeneral = ({
           )
         ) : null}
 
-        {generalSubTab === "info" && (
-        <div className="section-card space-y-6">
-          <h2 className="section-title">Toernooi informatie</h2>
+        {(!isMobile || generalSubTab === "info") && (
+        <div id="admin-section-info" data-admin-section="info" className="section-card space-y-6">
+          <h2 className="section-title">{isMobile ? "Toernooi informatie" : "Toernooi-informatie"}</h2>
 
           <div className="space-y-2">
             <Label className="form-label">Toernooinaam</Label>
@@ -886,8 +886,8 @@ const TournamentGeneral = ({
         )}
 
 
-        {generalSubTab === "wedstrijddagen" && (
-          <div className="section-card space-y-5">
+        {(!isMobile || generalSubTab === "wedstrijddagen") && (
+          <div id="admin-section-wedstrijddagen" data-admin-section="wedstrijddagen" className="section-card space-y-5">
             <h2 className="section-title">Wedstrijddagen</h2>
 
             {(form.match_days || []).length > 0 && (
@@ -962,8 +962,8 @@ const TournamentGeneral = ({
           </div>
         )}
 
-        {generalSubTab === "locaties" && (
-          <div className="section-card space-y-5">
+        {(!isMobile || generalSubTab === "locaties") && (
+          <div id="admin-section-locaties" data-admin-section="locaties" className="section-card space-y-5">
             <h2 className="section-title">Locaties</h2>
             {!form.is_esport && (
               <>
@@ -1030,8 +1030,8 @@ const TournamentGeneral = ({
           </div>
         )}
 
-        {generalSubTab === "divisies" && (
-          <div className="section-card space-y-5">
+        {(!isMobile || generalSubTab === "divisies") && (
+          <div id="admin-section-divisies" data-admin-section="divisies" className="section-card space-y-5">
             <h2 className="section-title">Divisies</h2>
 
             {categories.length > 0 && (
@@ -1065,11 +1065,11 @@ const TournamentGeneral = ({
           </div>
         )}
 
-        {generalSubTab === "puntentelling" && (
-          <div className="space-y-6">
+        {(!isMobile || generalSubTab === "puntentelling") && (
+          <div id="admin-section-puntentelling" data-admin-section="puntentelling" className="space-y-6">
             <div className="section-card space-y-5">
               <div className="space-y-2">
-                <h2 className="section-title">Puntentelling</h2>
+                <h2 className="section-title">{isMobile ? "Puntentelling" : "Puntensysteem"}</h2>
                 <p className="text-xs sm:text-sm text-muted-foreground">Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.</p>
               </div>
               <ScoringSystemsManager tournamentId={tournament.id} tournament={tournament} onUpdate={onUpdate} />

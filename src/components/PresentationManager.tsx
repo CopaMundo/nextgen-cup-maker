@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdminSection } from "@/components/admin/AdminSectionLayout";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BROADCAST_STYLES,
@@ -40,12 +41,15 @@ const PresentationManager = ({
   tournament,
   onUpdate,
   subTab = "website",
+  stacked = false,
 }: {
   tournament: any;
   onUpdate: (t: any) => void;
   subTab?: SubTab;
+  stacked?: boolean;
 }) => {
   const { toast } = useToast();
+  const ContentHeading = stacked ? "h3" : "h2";
   const [showQR, setShowQR] = useState(false);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const [displayStyle, setDisplayStyle] = useState<BroadcastStyle>(normalizeBroadcastStyle(tournament.view_display_style));
@@ -132,11 +136,11 @@ const PresentationManager = ({
     <>
       <div className="w-full space-y-6">
 
-        {subTab === "website" && (
-          <>
+        {(stacked || subTab === "website") && (
+          <AdminSection id="website" title={stacked ? "Website" : undefined}>
             {/* Website link */}
             <div className="section-card space-y-5">
-              <h2 className="section-title">Website-link</h2>
+              <ContentHeading className="section-title">Website-link</ContentHeading>
               <p className="text-sm text-muted-foreground">
                 Deel deze link zodat anderen het toernooi kunnen volgen met realtime updates.
               </p>
@@ -176,7 +180,7 @@ const PresentationManager = ({
 
             {/* Site visibility */}
             <div className="section-card space-y-5">
-              <h2 className="section-title">Zichtbaarheid op de site</h2>
+              <ContentHeading className="section-title">Zichtbaarheid op de site</ContentHeading>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-foreground">Vindbaar op de website</p>
@@ -191,14 +195,14 @@ const PresentationManager = ({
               </div>
             </div>
 
-          </>
+          </AdminSection>
         )}
 
-        {subTab === "slideshow" && (
-          <>
+        {(stacked || subTab === "slideshow") && (
+          <AdminSection id="slideshow" title={stacked ? "Dialoogvoorstelling" : undefined}>
             {!tournament.view_link_active && (
               <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-foreground">
-                Activeer eerst de website-link (tab Website) om de dialoogvoorstelling te kunnen gebruiken.
+                {stacked ? "Activeer eerst de website-link bij Website om de dialoogvoorstelling te kunnen gebruiken." : "Activeer eerst de website-link (tab Website) om de dialoogvoorstelling te kunnen gebruiken."}
               </div>
             )}
             <SlideshowConfig
@@ -206,14 +210,14 @@ const PresentationManager = ({
               tournament={tournament}
               onUpdate={onUpdate}
             />
-          </>
+          </AdminSection>
         )}
 
-        {subTab === "visualization" && (
-          <>
+        {(stacked || subTab === "visualization") && (
+          <AdminSection id="visualization" title={stacked ? "Vormgeving" : undefined}>
             {/* Broadcast style */}
             <div className="section-card space-y-5">
-              <h2 className="section-title">Broadcast stijl</h2>
+              <ContentHeading className="section-title">Broadcast stijl</ContentHeading>
               {(() => {
                 const applyStyle = async (target: BroadcastStyle, name: string) => {
                   const nextAppearance = target === displayStyle ? appearance : defaultAppearanceForStyle(target);
@@ -293,7 +297,7 @@ const PresentationManager = ({
             {/* Format display */}
             <div className="section-card space-y-5">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="section-title">Formatweergave</h2>
+                <ContentHeading className="section-title">Formatweergave</ContentHeading>
                 <TooltipProvider delayDuration={150}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -332,7 +336,7 @@ const PresentationManager = ({
                 </button>
               </div>
             </div>
-          </>
+          </AdminSection>
         )}
 
         {/* QR Code Dialog */}
