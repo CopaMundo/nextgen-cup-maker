@@ -723,7 +723,6 @@ const TournamentDetail = () => {
                                   : ""
                               )}
                             >
-                              {seg.icon && <seg.icon className="h-4 w-4 shrink-0" />}
                               <span className="truncate">{seg.label}</span>
                             </Button>
                           );
