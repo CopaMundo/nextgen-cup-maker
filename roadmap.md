@@ -94,3 +94,4 @@
 - [x] Teamvak midden tussen de twee middelste LED-ringen (44,3%), schone glazen bokaal zonder donker vierkant met glas vóór de ballen, ballen vullen de kom van onder naar boven, GROEPSFASE gecentreerd op de podiumvoorkant en één vaste naamgrootte over alle teampagina's; 146 tests en schermcontrole in drie thema's geslaagd.
 
 - [x] Premium desktop/tablet: midnight-navy/champagne tokens, plain sidebar and focused module sub-screens. All Algemeen, Deelnemers, Resultaten and Presentatie choices checked in an authenticated tournament, including collapsed navigation and 820px tablet; 393px mobile screenshot matches baseline exactly. Existing light palette, public/show code and form/calculation logic preserved; 16 regression tests passed, build OK.
+- [ ] Indeling: fases als verticaal stappenoverzicht in de werkruimte (ingedekte fasekaarten links, geopende fase spreidt formats rechts uit); bovenbalk-fasebalk verwijderd, mobiel ongewijzigd.
