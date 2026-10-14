@@ -23,7 +23,6 @@ import { SortableVerticalList, SortableRowShell } from "@/components/SortableLis
 import ScoringSystemSelector from "./ScoringSystemSelector";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { generateRoundRobin } from "@/lib/matchGenerator";
-import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const NumberSelect = ({
@@ -69,53 +68,9 @@ interface PhaseContainer {
   formats: Phase[];
 }
 
-const PhaseHeaderReporter = ({
-  phases,
-  activePhaseNumber,
-  onSelect,
-  onEdit,
-  onDelete,
-  onAdd,
-  onAddFormat,
-  onHeaderStateChange,
-}: {
-  phases: PhaseHeaderState["phases"];
-  activePhaseNumber: number | null;
-  onSelect: (n: number) => void;
-  onEdit: (n: number) => void;
-  onDelete: (n: number) => void;
-  onAdd: () => void;
-  onAddFormat: () => void;
-  onHeaderStateChange: (state: PhaseHeaderState | null) => void;
-}) => {
-  const key = `${phases.map((p) => `${p.phaseNumber}:${p.label}:${p.canDelete}`).join("|")}#${activePhaseNumber}`;
-  const latest = useRef({ phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd, onAddFormat });
-  latest.current = { phases, activePhaseNumber, onSelect, onEdit, onDelete, onAdd, onAddFormat };
-
-  useEffect(() => {
-    const c = latest.current;
-    onHeaderStateChange({
-      phases: c.phases,
-      activePhaseNumber: c.activePhaseNumber,
-      onSelect: (n) => latest.current.onSelect(n),
-      onEdit: (n) => latest.current.onEdit(n),
-      onDelete: (n) => latest.current.onDelete(n),
-      onAdd: () => latest.current.onAdd(),
-      onAddFormat: () => latest.current.onAddFormat(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
-  useEffect(() => {
-    return () => onHeaderStateChange(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return null;
-};
 
 
-const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateChange }: { tournamentId: string; tournamentType: string; categoryId?: string | null; onHeaderStateChange?: (state: PhaseHeaderState | null) => void }) => {
+const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
   const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
@@ -1321,31 +1276,52 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
 
   const openFormat = openFormatId ? allFormats.find((f) => f.id === openFormatId) ?? null : null;
 
-  const phaseHeaderList = containers.map((c) => ({
-    phaseNumber: c.phaseNumber,
-    label: allFormats.some((f) => f.phase_number === c.phaseNumber)
-      ? getPhaseLabel(c.phaseNumber, allFormats)
-      : (pendingPhaseLabels[c.phaseNumber] || `Fase ${c.phaseNumber}`),
-    canDelete: containers.length > 1 && c.phaseNumber !== 1,
-  }));
+  const labelFor = (n: number) =>
+    allFormats.some((f) => f.phase_number === n)
+      ? getPhaseLabel(n, allFormats)
+      : (pendingPhaseLabels[n] || `Fase ${n}`);
 
-  const phaseHeaderReporter = onHeaderStateChange && !isMobile ? (
-    <PhaseHeaderReporter
-      phases={phaseHeaderList}
-      activePhaseNumber={activePhaseNumber}
-      onSelect={setActivePhaseNumber}
-      onEdit={(n) => openPhaseEdit(n)}
-      onDelete={(n) => setDeletePhaseNumber(n)}
-      onAdd={() => addNewPhase()}
-      onAddFormat={() => setShowAddFormat(activePhaseNumber)}
-      onHeaderStateChange={onHeaderStateChange}
-    />
-  ) : null;
+  // Desktop/tablet: verticaal stappenoverzicht; de geopende fase spreidt zijn formats rechts uit.
+  const phaseRail = (
+    <aside aria-label="Fasestappen" className="w-56 shrink-0 space-y-2 lg:w-64">
+      {containers.map((c) => {
+        const isActive = c.phaseNumber === activePhaseNumber;
+        return (
+          <button
+            key={c.phaseNumber}
+            type="button"
+            aria-current={isActive ? "true" : undefined}
+            onClick={() => { setActivePhaseNumber(c.phaseNumber); setOpenFormatId(null); }}
+            className={cn(
+              "relative flex w-full items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-left transition-colors",
+              isActive
+                ? "border-primary/50 bg-accent/40"
+                : "border-border hover:border-primary/40 hover:bg-accent/30"
+            )}
+          >
+            {isActive && <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-full bg-primary" aria-hidden="true" />}
+            <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold", isActive ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground")}>{c.phaseNumber}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-foreground">{labelFor(c.phaseNumber)}</span>
+              <span className="block text-[11px] text-muted-foreground">{c.formats.length === 0 ? "Nog geen formats" : c.formats.length === 1 ? "1 format" : `${c.formats.length} formats`}</span>
+            </span>
+            <ChevronRight className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground")} />
+          </button>
+        );
+      })}
+      <button
+        type="button"
+        onClick={addNewPhase}
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-accent/40"
+      >
+        <Plus className="h-4 w-4" /> Fase toevoegen
+      </button>
+    </aside>
+  );
 
 
   return (
     <div className="space-y-6">
-      {phaseHeaderReporter}
       {/* Mobiel: fases als tegels */}
       {isMobile && mobilePhaseOverview && (
         <div className="grid grid-cols-1 gap-2">
@@ -1396,28 +1372,21 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
         </div>
       )}
 
-      {/* Phase strip nav (max 3 zichtbaar, pijltjes, middelste actief) */}
-      {containers.length > 0 && !isMobile && !onHeaderStateChange && (
-        <div className="sticky top-0 z-20 -mt-2 border-b border-border bg-background/95 py-2 backdrop-blur">
-          <div className="flex items-center justify-center gap-4">
-            <PhaseStripNav
-              phases={phaseHeaderList}
-              activePhaseNumber={activePhaseNumber}
-              onSelect={setActivePhaseNumber}
-              onEdit={openPhaseEdit}
-              onDelete={(n) => setDeletePhaseNumber(n)}
-            />
-            <Button size="sm" onClick={addNewPhase} title="Fase toevoegen" className="shrink-0 gap-1.5">
-              <Plus className="h-4 w-4" /> Fase toevoegen
-            </Button>
-          </div>
+      {!isMobile && !loading && containers.length === 0 && (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-card/50 px-6 py-10 text-center">
+          <p className="text-sm text-muted-foreground">Nog geen fases. Voeg je eerste fase toe om de indeling op te bouwen.</p>
+          <Button onClick={addNewPhase} className="gap-1.5">
+            <Plus className="h-4 w-4" /> Fase toevoegen
+          </Button>
         </div>
       )}
 
       {!(isMobile && mobilePhaseOverview) && containers
         .filter((c) => c.phaseNumber === activePhaseNumber)
         .map((container) => (
-          <div key={container.phaseNumber}>
+          <div key={container.phaseNumber} className={!isMobile ? "flex items-start gap-6" : undefined}>
+            {!isMobile && phaseRail}
+            <div className="min-w-0 flex-1">
             {isMobile ? (
               openFormat ? (
                 <div className="space-y-3">
@@ -1485,7 +1454,19 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                 </div>
               )
             ) : (
-            <div className="space-y-3">
+            <>
+              <div className="mb-4 flex min-w-0 items-center gap-2">
+                <h2 className="min-w-0 flex-1 truncate font-display text-lg font-semibold text-foreground">{labelFor(container.phaseNumber)}</h2>
+                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Naam bewerken" onClick={() => openPhaseEdit(container.phaseNumber)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                {containers.length > 1 && container.phaseNumber !== 1 && (
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label="Fase verwijderen" onClick={() => setDeletePhaseNumber(container.phaseNumber)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <div className="space-y-3">
               {/* Format cards - always visible, individually collapsible */}
               <SortableVerticalList
                 items={container.formats}
@@ -1526,8 +1507,10 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, onHeaderStateC
                   <Plus className="h-3 w-3" /> Format toevoegen
                 </button>
               </div>
-            </div>
+              </div>
+            </>
             )}
+            </div>
           </div>
         ))}
 
