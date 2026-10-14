@@ -1,0 +1,1 @@
+Dark admin contrast ladder: page darkest, cards/panels slightly lighter, fields/buttons/keuzelijsten clearly lighter with visible border so elements stand out (user feedback: everything looked the same color).
