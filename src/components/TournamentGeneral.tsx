@@ -660,7 +660,7 @@ const TournamentGeneral = ({
           )
         ) : null}
 
-        {(!isMobile || generalSubTab === "info") && (
+        {(generalSubTab === "info") && (
         <div id="admin-section-info" data-admin-section="info" className="section-card space-y-6">
           <h2 className="section-title">{isMobile ? "Toernooi informatie" : "Toernooi-informatie"}</h2>
 
@@ -886,7 +886,7 @@ const TournamentGeneral = ({
         )}
 
 
-        {(!isMobile || generalSubTab === "wedstrijddagen") && (
+        {(generalSubTab === "wedstrijddagen") && (
           <div id="admin-section-wedstrijddagen" data-admin-section="wedstrijddagen" className="section-card space-y-5">
             <h2 className="section-title">Wedstrijddagen</h2>
 
@@ -962,7 +962,7 @@ const TournamentGeneral = ({
           </div>
         )}
 
-        {(!isMobile || generalSubTab === "locaties") && (
+        {(generalSubTab === "locaties") && (
           <div id="admin-section-locaties" data-admin-section="locaties" className="section-card space-y-5">
             <h2 className="section-title">Locaties</h2>
             {!form.is_esport && (
@@ -1030,7 +1030,7 @@ const TournamentGeneral = ({
           </div>
         )}
 
-        {(!isMobile || generalSubTab === "divisies") && (
+        {(generalSubTab === "divisies") && (
           <div id="admin-section-divisies" data-admin-section="divisies" className="section-card space-y-5">
             <h2 className="section-title">Divisies</h2>
 
@@ -1065,7 +1065,7 @@ const TournamentGeneral = ({
           </div>
         )}
 
-        {(!isMobile || generalSubTab === "puntentelling") && (
+        {(generalSubTab === "puntentelling") && (
           <div id="admin-section-puntentelling" data-admin-section="puntentelling" className="space-y-6">
             <div className="section-card space-y-5">
               <div className="space-y-2">

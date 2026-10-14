@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import AdminSectionLayout, { AdminSection } from "@/components/admin/AdminSectionLayout";
 import { AdminAppearanceContext } from "@/contexts/AdminAppearanceContext";
 import { loadFieldLocations } from "@/lib/fieldLocations";
 import { useParams, Link } from "react-router-dom";
@@ -378,14 +377,11 @@ const TournamentDetail = () => {
                 ) : (
                 null
                 )}
-                {!isMobile && <>
-                  <AdminSection id="teams" title={tournament.teams_label || "Teams"}>
-                    <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
-                  </AdminSection>
-                  <AdminSection id="referees" title={tournament.referees_label || "Scheidsrechters"}>
-                    <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} />
-                  </AdminSection>
-                </>}
+                {!isMobile && (deelnemersSubTab === "teams" ? (
+                  <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
+                ) : (
+                  <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} />
+                ))}
                 {isMobile && !mobileDeelnemersOverview && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 )}
@@ -485,11 +481,6 @@ const TournamentDetail = () => {
           { id: "sponsors" as const, label: "Sponsors", icon: Handshake },
           { id: "polls" as const, label: "Polls", icon: ListChecks },
         ];
-        if (!isMobile) return <>
-          <PresentationManager tournament={tournament} onUpdate={t => setTournament(t)} stacked />
-          <AdminSection id="sponsors"><SponsorManager tournamentId={id ?? ""} /></AdminSection>
-          <AdminSection id="polls"><PollManager tournamentId={id ?? ""} tournament={tournament} /></AdminSection>
-        </>;
         if (isMobile && mobilePresentationOverview) {
           return renderMobileOverview(presentationItems, (sid) => { setPresentationSubTab(sid); setMobilePresentationOverview(false); });
         }
@@ -519,13 +510,16 @@ const TournamentDetail = () => {
     }
   };
 
-  const sectionLinks = activeTab === "general" ? generalSubTabs.map(section => section.id === "info" ? { ...section, label: "Toernooi-informatie" } : section)
-    : activeTab === "teams" ? [
-      { id: "teams", label: tournament.teams_label || "Teams" },
-      { id: "referees", label: tournament.referees_label || "Scheidsrechters" },
-    ] : activeTab === "presentation" ? presentationSubTabs : null;
-  const desktopSegments = activeTab === "results"
-    ? { items: resultsSubTabs, active: resultsSubTab, onSelect: setResultsSubTab } : null;
+  const desktopSubItems = activeTab === "general" ? {
+    items: generalSubTabs, active: generalSubTab, select: (value: string) => setGeneralSubTab(value as GeneralSubTab),
+  } : activeTab === "teams" ? {
+    items: [{ id: "teams", label: tournament.teams_label || "Teams" }, { id: "referees", label: tournament.referees_label || "Scheidsrechters" }],
+    active: deelnemersSubTab, select: (value: string) => setDeelnemersSubTab(value as "teams" | "referees"),
+  } : activeTab === "results" ? {
+    items: resultsSubTabs, active: resultsSubTab, select: (value: string) => setResultsSubTab(value as ResultsSubTab),
+  } : activeTab === "presentation" ? {
+    items: presentationSubTabs, active: presentationSubTab, select: (value: string) => setPresentationSubTab(value as PresentationSubTab),
+  } : null;
 
   return (
     <AdminAppearanceContext.Provider value={true}>
@@ -561,18 +555,11 @@ const TournamentDetail = () => {
             <nav
               aria-label="Toernooibeheer"
               className={cn(
-                "shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
+                "admin-module-sidebar shrink-0 self-stretch flex flex-col min-h-0 border-r border-border bg-card print:hidden transition-[width] duration-200",
                 desktopNavCollapsed ? "w-[68px]" : "w-60"
               )}
             >
               <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-3">
-                {tournament.logo_url ? (
-                  <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
-                ) : (
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-sm font-bold text-primary">
-                    {tournament.name?.charAt(0)?.toUpperCase()}
-                  </div>
-                )}
                 {!desktopNavCollapsed && (
                   <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
                     {tournament.name}
@@ -584,12 +571,17 @@ const TournamentDetail = () => {
                 {sidebarItems.map((item) => {
                   const active = activeTab === item.id;
                   return (
-                    <Tooltip key={item.id}>
+                    <div key={item.id}>
+                    <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="ghost"
                           type="button"
-                          onClick={() => setActiveTab(item.id)}
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            if (generalSubTab === "overview") setGeneralSubTab("info");
+                            adminScrollRoot.current?.scrollTo({ top: 0 });
+                          }}
                           aria-current={active ? "page" : undefined}
                           className={cn(
                             "group relative flex h-11 w-full justify-start items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
@@ -610,6 +602,25 @@ const TournamentDetail = () => {
                         <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
                       )}
                     </Tooltip>
+                    {active && desktopSubItems && (
+                      <div className={cn("admin-module-subnav", desktopNavCollapsed && "admin-module-subnav-mini")} aria-label={`${item.label} onderdelen`}>
+                        {desktopSubItems.items.map((subItem) => (
+                          <Tooltip key={subItem.id}>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" type="button"
+                                aria-label={subItem.label}
+                                aria-current={desktopSubItems.active === subItem.id ? "page" : undefined}
+                                onClick={() => { desktopSubItems.select(subItem.id); adminScrollRoot.current?.scrollTo({ top: 0 }); }}
+                                className="admin-module-sublink">
+                                {desktopNavCollapsed ? <span aria-hidden="true">{subItem.label.charAt(0)}</span> : <span>{subItem.label}</span>}
+                              </Button>
+                            </TooltipTrigger>
+                            {desktopNavCollapsed && <TooltipContent side="right">{subItem.label}</TooltipContent>}
+                          </Tooltip>
+                        ))}
+                      </div>
+                    )}
+                    </div>
                   );
                 })}
               </div>
@@ -704,32 +715,8 @@ const TournamentDetail = () => {
                         });
                       }}
                     />
-                  ) : (
-                    desktopSegments && (
-                      <div className="admin-tabs flex w-max min-w-full items-center gap-1">
-                        {desktopSegments.items.map((seg) => {
-                          const active = desktopSegments.active === seg.id;
-                          return (
-                            <Button
-                              variant="ghost"
-                              key={seg.id}
-                              type="button"
-                              onClick={() => desktopSegments.onSelect(seg.id)}
-                              aria-current={active ? "page" : undefined}
-                              className={cn(
-                                "relative flex h-10 shrink-0 items-center gap-2 rounded-none px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
-                                active
-                                  ? "text-foreground after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full after:bg-primary"
-                                  : ""
-                              )}
-                            >
-                              <span className="truncate">{seg.label}</span>
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    )
-                  )}
+                  ) : null}
+
                 </div>
 
                 <div className="flex shrink-0 items-center justify-end gap-3 empty:hidden">
@@ -746,11 +733,9 @@ const TournamentDetail = () => {
             {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
               <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
             </div>}
-            {!isMobile && sectionLinks ? (
-              <AdminSectionLayout key={`${activeTab}-${effectiveCategoryId ?? "all"}`} sections={sectionLinks} scrollRoot={adminScrollRoot}>
-                {renderContent()}
-              </AdminSectionLayout>
-            ) : <div className="flex flex-col gap-4 md:flex-1 md:min-h-0">{renderContent()}</div>}
+            <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && activeTab !== "schedule" && activeTab !== "results" && "admin-focused-screen")}>
+              {renderContent()}
+            </div>
           </div>
         </div>
 

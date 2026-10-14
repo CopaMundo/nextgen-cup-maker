@@ -3115,22 +3115,78 @@ posities + statistieken groen */
 /* The approved phone experience and independent stage tokens stay untouched. */
 @media (min-width: 768px) {
   .tournament-admin.admin-ui {
-    --background: 0 0% 13%;
-    --card: 0 0% 17%;
-    --secondary: 0 0% 20%;
-    --border: 0 0% 27%;
-    --input: 0 0% 33%;
-    --admin-field: 0 0% 21%;
-    --admin-title-accent: 43 57% 70%;
+    --background: 222 37.143% 6.863%;
+    --foreground: 240 11.111% 96.471%;
+    --card: 223.333 36% 9.804%;
+    --card-foreground: var(--foreground);
+    --secondary: var(--card);
+    --secondary-foreground: var(--foreground);
+    --popover: var(--card);
+    --popover-foreground: var(--foreground);
+    --muted: var(--card);
+    --muted-foreground: 214.839 16.316% 62.157%;
+    --accent: 221.538 30.233% 16.863%;
+    --accent-foreground: var(--foreground);
+    --border: 221.538 30.233% 16.863%;
+    --input: var(--border);
+    --primary: 45.86 64.431% 52.353%;
+    --primary-foreground: var(--background);
+    --ring: var(--primary);
+    --admin-field: var(--background);
+    --admin-title-accent: var(--primary);
+    --admin-frame-radius: .625rem;
+    --admin-shadow: none;
   }
   [data-mode="light"] .tournament-admin.admin-ui {
     --background: 0 0% 92%;
+    --foreground: 0 0% 19%;
     --card: 0 0% 95%;
     --secondary: 0 0% 89%;
+    --secondary-foreground: 0 0% 25%;
+    --muted: 0 0% 89%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 0 0% 86%;
+    --primary: 211 100% 45%;
+    --primary-foreground: 0 0% 98%;
     --border: 0 0% 80%;
     --input: 0 0% 74%;
     --admin-field: 0 0% 95%;
     --admin-title-accent: var(--primary);
+  }
+  .tournament-admin.admin-ui :is(h1, h2, h3, h4, .font-display):not(.draw-show-stage *):not(.draw-scene-settings *) {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .tournament-admin .admin-module-sidebar {
+    background-image: none;
+    box-shadow: none;
+  }
+  .admin-module-sidebar::before, .admin-module-sidebar::after { display: none; }
+  .admin-module-subnav { margin: 4px 0 12px 21px; padding-left: 14px; border-left: 1px solid hsl(var(--border)); }
+  .admin-module-subnav .admin-module-sublink {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 38px;
+    justify-content: flex-start;
+    padding: 8px 10px;
+    font-size: .8125rem;
+    line-height: 1.5;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+    white-space: normal;
+    text-align: left;
+  }
+  .admin-module-subnav .admin-module-sublink[aria-current="page"] { color: hsl(var(--primary)); background: hsl(var(--accent) / .45); }
+  .admin-module-sublink[aria-current="page"]::before {
+    content: ''; position: absolute; left: -15px; top: 10px; bottom: 10px; width: 2px; background: hsl(var(--primary));
+  }
+  .admin-module-subnav-mini { margin-left: 0; padding-left: 0; border-left: 0; }
+  .admin-module-subnav-mini .admin-module-sublink { justify-content: center; }
+  .admin-module-subnav-mini .admin-module-sublink::before { left: 0; }
+  .admin-focused-screen { max-width: 1120px; }
+  .admin-focused-screen .section-card { border-bottom: 0; }
+  .tournament-admin :is(input, textarea, select, [role="combobox"]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *) {
+    outline-color: hsl(var(--ring) / .4);
   }
   .admin-section-layout {
     display: grid;
