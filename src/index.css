@@ -3136,6 +3136,7 @@ posities + statistieken groen */
     --admin-title-accent: var(--primary);
     --admin-frame-radius: .625rem;
     --admin-shadow: none;
+    color: hsl(var(--foreground));
   }
   [data-mode="light"] .tournament-admin.admin-ui {
     --background: 0 0% 92%;
@@ -3146,7 +3147,7 @@ posities + statistieken groen */
     --muted: 0 0% 89%;
     --muted-foreground: 0 0% 42%;
     --accent: 0 0% 86%;
-    --primary: 211 100% 45%;
+    --primary: 220.17 100% 23.14%;
     --primary-foreground: 0 0% 98%;
     --border: 0 0% 80%;
     --input: 0 0% 74%;
