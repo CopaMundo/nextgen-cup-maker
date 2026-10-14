@@ -15,7 +15,6 @@ import ShirtIcon from "@/components/icons/ShirtIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
-import { PhaseStripNav, type PhaseHeaderState } from "@/components/PhaseStripNav";
 import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey, DateStripNav } from "@/components/MatchScheduler";
 import { getMiddleDate } from "@/lib/dateUtils";
 import ResultsManager from "@/components/ResultsManager";
@@ -82,7 +81,6 @@ const TournamentDetail = () => {
   const isMobile = useIsMobile();
   const adminScrollRoot = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const [phaseHeader, setPhaseHeader] = useState<PhaseHeaderState | null>(null);
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -402,7 +400,6 @@ const TournamentDetail = () => {
                 tournamentId={id ?? ""}
                 tournamentType={tournament.tournament_type}
                 categoryId={effectiveCategoryId}
-                onHeaderStateChange={isMobile ? undefined : setPhaseHeader}
               />
             )}
           </>
@@ -692,15 +689,7 @@ const TournamentDetail = () => {
                 </div>
 
                 <div className="min-w-0 flex-1 overflow-x-auto scrollbar-none">
-                  {activeTab === "phases" && phaseHeader && phaseHeader.phases.length > 0 ? (
-                    <PhaseStripNav
-                      phases={phaseHeader.phases}
-                      activePhaseNumber={phaseHeader.activePhaseNumber}
-                      onSelect={phaseHeader.onSelect}
-                      onEdit={phaseHeader.onEdit}
-                      onDelete={phaseHeader.onDelete}
-                    />
-                  ) : activeTab === "schedule" && tournamentDates.length > 0 ? (
+                  {activeTab === "schedule" && tournamentDates.length > 0 ? (
                     <DateStripNav
                       dates={tournamentDates}
                       activeDate={plannerDate}
@@ -720,11 +709,6 @@ const TournamentDetail = () => {
                 </div>
 
                 <div className="flex shrink-0 items-center justify-end gap-3 empty:hidden">
-                  {activeTab === "phases" && phaseHeader && (
-                    <Button size="sm" onClick={phaseHeader.onAdd} title="Fase toevoegen" className="gap-1.5">
-                      <Plus className="h-4 w-4" /> Fase
-                    </Button>
-                  )}
                 </div>
               </div>
             </header>
