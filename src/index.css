@@ -3114,33 +3114,38 @@ posities + statistieken groen */
 
 /* The approved phone experience and independent stage tokens stay untouched. */
 @media (min-width: 768px) {
-  .tournament-admin.admin-ui {
-    --background: 222 37.143% 6.863%;
+  /* Rijk nachtbluew in plaats van gitzwart: achtergrond, panelen, velden en
+     randen volgen één marineblauwe ladder. Goud blijft uitsluitend accent. */
+  [data-mode="dark"] .admin-ui,
+  [data-mode="dark"] .tournament-admin.admin-ui {
+    --background: 222 35% 11%;
     --foreground: 240 11.111% 96.471%;
-    --card: 223.333 36% 9.804%;
+    --card: 222 35% 16%;
     --card-foreground: var(--foreground);
-    --secondary: 222 27% 13.922%;
-    --secondary-foreground: var(--foreground);
-    --popover: 222 31% 11.490%;
+    --popover: 222 35% 16%;
     --popover-foreground: var(--foreground);
-    --muted: 222 26% 13.922%;
+    --secondary: 222 34% 21%;
+    --secondary-foreground: var(--foreground);
+    --muted: 222 34% 21%;
     --muted-foreground: 214.839 16.316% 62.157%;
-    --accent: 221.538 30.233% 18.627%;
+    --accent: 222 33% 25%;
     --accent-foreground: var(--foreground);
-    --border: 220.5 27% 20%;
-    --input: 220 24% 23.922%;
+    --border: 222 33% 30%;
+    --input: 222 33% 25%;
     --primary: 45.86 64.431% 52.353%;
     --primary-foreground: var(--background);
-    --ring: var(--primary);
-    --admin-field: 222 27% 14.902%;
+    --admin-field: 222 34% 21%;
     --admin-edge: 0 0% 100% / .05;
-    --admin-shadow: inset 0 1px 0 hsl(var(--admin-edge)), 0 2px 6px hsl(0 0% 0% / .2);
     --admin-field-shadow: inset 0 1px 2px hsl(0 0% 0% / .28);
     --admin-title-accent: var(--primary);
+  }
+  .tournament-admin.admin-ui {
+    --ring: var(--primary);
     --admin-frame-radius: .625rem;
     --admin-shadow: none;
     color: hsl(var(--foreground));
   }
+
   [data-mode="light"] .tournament-admin.admin-ui {
     --background: 0 0% 92%;
     --foreground: 0 0% 19%;
