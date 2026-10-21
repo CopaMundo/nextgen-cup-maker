@@ -3130,9 +3130,9 @@ posities + statistieken groen */
     --muted-foreground: 214.839 16.316% 62.157%;
     --accent: 222 33% 25%;
     --accent-foreground: var(--foreground);
-    --border: 222 33% 30%;
+    --border: 222 20% 28%;
     --input: 222 33% 25%;
-    --primary: 45.86 64.431% 52.353%;
+    --primary: 52 100% 50%;
     --primary-foreground: var(--background);
     --admin-field: 222 34% 21%;
     --admin-edge: 0 0% 100% / .05;
@@ -3141,8 +3141,8 @@ posities + statistieken groen */
   }
   .tournament-admin.admin-ui {
     --ring: var(--primary);
-    --admin-frame-radius: .625rem;
-    --admin-shadow: none;
+    --admin-frame-radius: .75rem;
+    --admin-shadow: inset 0 1px 0 hsl(var(--admin-edge)), 0 3px 10px hsl(0 0% 0% / .12);
     color: hsl(var(--foreground));
   }
 
@@ -3271,4 +3271,51 @@ posities + statistieken groen */
 }
 @media (max-width: 767px) {
   .admin-stacked-section { display: contents; }
+}
+
+/* Closed frames and stable full-perimeter states in the desktop/tablet workspace.
+   Portaled admin controls share the treatment; public and live-stage controls do not. */
+@media (min-width: 768px) {
+  [data-mode="dark"] .tournament-admin.admin-ui .admin-module-sidebar {
+    --card: var(--background);
+    --secondary: 222 18% 17%;
+    --accent: 222 18% 19%;
+    --border: 222 14% 21%;
+    background-color: hsl(var(--background));
+  }
+  .tournament-admin.admin-ui .admin-module-subnav { border-left: 0; }
+  .tournament-admin.admin-ui .admin-module-sidebar button {
+    border: 1px solid transparent;
+  }
+  .tournament-admin.admin-ui .admin-module-sidebar button[aria-current="page"] {
+    border-color: hsl(var(--primary));
+    color: hsl(var(--primary));
+    background-color: hsl(var(--secondary));
+  }
+  .tournament-admin.admin-ui .admin-module-sidebar button[aria-current="page"] > .absolute,
+  .tournament-admin.admin-ui .admin-module-sublink[aria-current="page"]::before {
+    display: none;
+  }
+  .tournament-admin.admin-ui .admin-content :is(div, section, article, label):is(.border.rounded, .border.rounded-md, .border.rounded-lg, .border.rounded-xl, .border.rounded-2xl):not(.section-card):not(.draw-show-stage *):not(.draw-scene-settings *) {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: var(--admin-frame-radius);
+  }
+  .admin-ui :is([class*="border-y-primary"], [role="combobox"][data-state="open"], [role="tab"][data-state="active"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
+    border: 1px solid hsl(var(--primary));
+    outline: 1px solid hsl(var(--primary));
+    outline-offset: -1px;
+  }
+  .admin-ui [role="tab"][data-state="active"]:not(.draw-show-stage *):not(.draw-scene-settings *) {
+    background: hsl(var(--secondary));
+    color: hsl(var(--primary));
+  }
+  .admin-ui :is(button, input, textarea, select, [role="combobox"], [tabindex]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *) {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    --tw-ring-color: transparent;
+  }
+  .admin-ui :is(select, [role="combobox"]):focus:not(.draw-show-stage *):not(.draw-scene-settings *) {
+    border: 1px solid hsl(var(--primary));
+  }
 }
