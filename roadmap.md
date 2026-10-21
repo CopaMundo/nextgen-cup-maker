@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Oorspronkelijke compacte kaderhoeken en gewone zijbalk hersteld; oplichting bij aanwijzen/focus/selectie; wit/blauwe lichte beheeromgeving en themavaste pop-ups. Acht regressietests geslaagd; gedeelde controles en pop-ups op 1280/820px in beide thema's gecontroleerd, geen overflow/runtimefouten. Echte aangemelde toernooicontrole blijft geblokkeerd zoals hieronder vermeld.
 - [x] Desktop/tablet: rustige nachtblauwe zijbalk, origineel logo-geel, gesloten afgeronde paneelranden met diepte en volledige selectie-/focusomlijning; mobiel/publiek/liveshow behouden. Vier regressietests geslaagd, build OK; gedeelde bediening op 1280/820px visueel gecontroleerd zonder overflow, dropdownkeuze teruggelezen.
 - [ ] Nieuwe zijbalk/paneelafwerking in aangemeld toernooi controleren. Blokker: geen previewsessie; automatisch aanmelden vindt geen eigen account. Alleen gedeelde controles met voorbeeldinhoud geverifieerd.
 - [x] Horizontaal stappenoverzicht voor Indeling als voorbeeldafbeelding gemaakt; geen wijzigingen aan de app.
