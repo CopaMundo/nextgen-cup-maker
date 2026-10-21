@@ -53,7 +53,9 @@ const DropdownMenuSubContent = React.forwardRef<
     )}
     {...props}
   />
-));
+  </DropdownMenuPrimitive.SubContent>
+  );
+}));
 DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
 
 const DropdownMenuContent = React.forwardRef<
@@ -73,8 +75,10 @@ const DropdownMenuContent = React.forwardRef<
       )}
       {...props}
     />
+  </DropdownMenuPrimitive.Content>
   </DropdownMenuPrimitive.Portal>
-));
+  );
+}));
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef<
