@@ -399,26 +399,26 @@ html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
 }
 
 [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
-  --background: 222 35% 11%;
+  --background: 222 51% 14%;
   --foreground: 240 11.111% 96.471%;
   /* Kaders en kaarten delen de pagina-achtergrond (zoals in light);
      enkel infobalken behouden een eigen nuance via --secondary. */
   --card: var(--background);
   --card-foreground: var(--foreground);
-  --popover: 222 35% 16%;
+  --popover: 222 50% 19%;
   --popover-foreground: var(--foreground);
   --primary: 52 100% 50%;
   --primary-foreground: var(--background);
-  --secondary: 222 34% 21%;
+  --secondary: 222 49% 22%;
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --muted-foreground: 214.839 16.316% 62.157%;
-  --accent: 222 33% 25%;
+  --accent: 222 47% 26%;
   --accent-foreground: var(--foreground);
   --destructive: 2 66% 56%;
   --destructive-foreground: 0 0% 100%;
-  --border: 222 20% 28%;
-  --input: 222 33% 25%;
+  --border: 222 47% 26%;
+  --input: 222 47% 26%;
   --ring: var(--primary);
   --radius: 0.2rem;
   --gradient-hero: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
@@ -2958,30 +2958,30 @@ posities + statistieken groen */
 /* Management theme is scoped through AdminAppearanceContext, including portals.
    The public site and timestamp-driven draw stage keep their independent design. */
 .admin-ui {
-  --background: 222 35% 11%;
+  --background: 222 51% 14%;
   --foreground: 240 11.111% 96.471%;
-  --card: 222 35% 16%;
+  --card: 222 50% 19%;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --secondary: 222 34% 21%;
+  --secondary: 222 49% 22%;
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --muted-foreground: 214.839 16.316% 62.157%;
-  --accent: 222 33% 25%;
+  --accent: 222 47% 26%;
   --accent-foreground: var(--foreground);
   --primary: 52 100% 50%;
   --primary-foreground: var(--background);
   --ring: var(--primary);
-  --border: 222 20% 28%;
-  --input: 222 33% 25%;
+  --border: 222 47% 26%;
+  --input: 222 47% 26%;
   --sidebar-background: var(--card);
   --sidebar-foreground: var(--muted-foreground);
   --sidebar-accent: var(--secondary);
   --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--border);
   --admin-panel: var(--card);
-  --admin-field: 222 34% 21%;
+  --admin-field: 222 49% 22%;
   --admin-panel-border: var(--border);
   --admin-frame-radius: .5rem;
   --admin-edge: 0 0% 100% / .045;
@@ -3137,27 +3137,27 @@ posities + statistieken groen */
 
 /* The approved phone experience and independent stage tokens stay untouched. */
 @media (min-width: 768px) {
-  /* Rijk nachtbluew in plaats van gitzwart: achtergrond, panelen, velden en
-     randen volgen één marineblauwe ladder. Goud blijft uitsluitend accent. */
-  [data-mode="dark"] .admin-ui,
-  [data-mode="dark"] .tournament-admin.admin-ui {
-    --background: 222 35% 11%;
+    /* Deep Navy nachtblauw: achtergrond, panelen, velden en randen volgen
+       één marineblauwe ladder. Goud blijft uitsluitend accent. */
+    [data-mode="dark"] .admin-ui,
+    [data-mode="dark"] .tournament-admin.admin-ui {
+    --background: 222 51% 14%;
     --foreground: 240 11.111% 96.471%;
-    --card: 222 35% 16%;
+    --card: 222 50% 19%;
     --card-foreground: var(--foreground);
-    --popover: 222 35% 16%;
+    --popover: 222 50% 19%;
     --popover-foreground: var(--foreground);
-    --secondary: 222 34% 21%;
+    --secondary: 222 49% 22%;
     --secondary-foreground: var(--foreground);
-    --muted: 222 34% 21%;
+    --muted: 222 49% 22%;
     --muted-foreground: 214.839 16.316% 62.157%;
-    --accent: 222 33% 25%;
+    --accent: 222 47% 26%;
     --accent-foreground: var(--foreground);
-    --border: 222 20% 28%;
-    --input: 222 33% 25%;
+    --border: 222 47% 26%;
+    --input: 222 47% 26%;
     --primary: 52 100% 50%;
     --primary-foreground: var(--background);
-    --admin-field: 222 34% 21%;
+    --admin-field: 222 49% 22%;
     --admin-edge: 0 0% 100% / .05;
     --admin-field-shadow: inset 0 1px 2px hsl(0 0% 0% / .28);
     --admin-title-accent: var(--primary);
@@ -3372,9 +3372,9 @@ posities + statistieken groen */
 /* Portaled management windows stay dark even on smaller screens; stage
    confirmation windows retain their explicitly selected show theme. */
 [data-mode="dark"] .admin-ui.admin-dialog:not(.draw-dialog-theme) {
-  --background: 222 35% 11%;
+  --background: 222 51% 14%;
   --foreground: 240 11.111% 96.471%;
-  --card: 222 35% 16%;
+  --card: 222 50% 19%;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
@@ -3383,49 +3383,3 @@ posities + statistieken groen */
   color-scheme: dark;
 }
 
-/* ============= Tijdelijke nachtblauw-varianten (preview-vergelijking) =============
-   Optie 1 · Deep Navy: canvas #111C35, panelen #182647, randen #243763
-   Optie 3 · Slate Navy: canvas #131B2E, kaarten #1E293B, randen #334155, infobalken #283548
-   Geldt voor de beheeromgeving (admin-ui) én de publieke Copa Mundo-link. */
-html[data-navy="deep"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="deep"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="deep"]:not([data-mode="light"]) .admin-ui,
-html[data-navy="deep"][data-mode="dark"] .admin-ui {
-  --background: 222 51% 14%;
-  --card: 222 50% 19%;
-  --card-foreground: var(--foreground);
-  --popover: 222 50% 19%;
-  --popover-foreground: var(--foreground);
-  --secondary: 222 49% 22%;
-  --muted: var(--secondary);
-  --accent: 222 47% 26%;
-  --border: 222 47% 26%;
-  --input: 222 47% 26%;
-  --admin-field: 222 49% 22%;
-}
-/* Publieke link: kaarten delen de pagina-achtergrond (zoals in light). */
-html[data-navy="deep"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="deep"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
-  --card: var(--background);
-}
-
-html[data-navy="slate"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="slate"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="slate"]:not([data-mode="light"]) .admin-ui,
-html[data-navy="slate"][data-mode="dark"] .admin-ui {
-  --background: 222 42% 13%;
-  --card: 217 33% 17%;
-  --card-foreground: var(--foreground);
-  --popover: 217 33% 17%;
-  --popover-foreground: var(--foreground);
-  --secondary: 216 29% 22%;
-  --muted: var(--secondary);
-  --accent: 215 25% 27%;
-  --border: 215 25% 27%;
-  --input: 215 25% 27%;
-  --admin-field: 216 29% 22%;
-}
-html[data-navy="slate"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="slate"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
-  --card: var(--background);
-}
