@@ -3007,7 +3007,7 @@ posities + statistieken groen */
 }
 /* One frame finish for repeated items, framed tools and wizard choices.
    Page sections stay unframed and broadcast surfaces remain independent. */
-.admin-ui :is(div, section, article, label):is(.border.rounded, .border.rounded-md, .border.rounded-lg, .border.rounded-xl, .border.rounded-2xl, .draw-panel):not(.section-card):not(.draw-show-stage *):not(.draw-scene-settings *) {
+.admin-ui :is(div, section, article, label):is(.border.rounded, .border.rounded-md, .border.rounded-lg, .border.rounded-xl, .border.rounded-2xl, .draw-panel):not(.section-card):not(.admin-detail-section):not(.draw-show-stage *):not(.draw-scene-settings *) {
   background-color: hsl(var(--admin-panel));
   border-color: hsl(var(--admin-panel-border));
   border-radius: var(--admin-frame-radius);
