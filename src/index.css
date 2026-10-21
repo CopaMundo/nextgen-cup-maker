@@ -3105,6 +3105,7 @@ posities + statistieken groen */
   background: hsl(var(--popover));
   color: hsl(var(--foreground));
   border-color: hsl(var(--border));
+  border-radius: var(--admin-frame-radius);
   box-shadow: var(--admin-dialog-shadow);
 }
 .admin-select-menu [role="option"][data-highlighted] {
@@ -3339,9 +3340,6 @@ posities + statistieken groen */
   }
   .admin-ui :is(select, [role="combobox"]):focus:not(.draw-show-stage *):not(.draw-scene-settings *) {
     border: 1px solid hsl(var(--primary));
-  }
-  .admin-ui :is(input, textarea, select, [role="combobox"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
-    border-radius: var(--radius);
   }
   .admin-ui :is(input, textarea, select, [role="combobox"]):focus-visible:not(.draw-show-stage *):not(.draw-scene-settings *) {
     border-color: hsl(var(--primary));
