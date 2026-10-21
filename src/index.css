@@ -3015,6 +3015,13 @@ posities + statistieken groen */
 }
 .admin-ui .draw-type-choice { border-radius: var(--admin-frame-radius); box-shadow: var(--admin-shadow); }
 .admin-ui :is(.border.rounded-md, .border.rounded-lg, .border.rounded-xl, .draw-panel) :is(.border.rounded-md, .border.rounded-lg, .border.rounded-xl):not(.draw-show-stage *):not(.draw-scene-settings *) { box-shadow: none; }
+/* One finish for every frame that holds an entry field or dropdown, including
+   borderless banded frames; the panel stays a step above the field ladder. */
+.admin-ui :is(div, section, article, label):is(.rounded, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl):not(.rounded-full):not(.section-card):not(.admin-detail-section):not([role="dialog"]):not(.draw-show-stage *):not(.draw-scene-settings *):not(:has(.draw-show-stage, .draw-scene-settings)):has(:is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]), textarea, select, [role="combobox"])) {
+  background-color: hsl(var(--admin-panel));
+  border: 1px solid hsl(var(--admin-panel-border));
+  border-radius: var(--admin-frame-radius);
+}
 /* Settings sections are unframed bands, not nested floating cards. */
 .admin-ui .section-card:not(.draw-show-stage *):not(.draw-scene-settings *) {
   background: transparent;
@@ -3029,7 +3036,7 @@ posities + statistieken groen */
   background-color: hsl(var(--admin-field));
   color: hsl(var(--foreground));
   border-color: hsl(var(--input));
-  border-radius: .375rem;
+  border-radius: var(--admin-frame-radius);
   box-shadow: var(--admin-field-shadow);
   font-size: .875rem;
   line-height: 1.5;
