@@ -3385,7 +3385,7 @@ posities + statistieken groen */
 
 /* ============= Tijdelijke nachtblauw-varianten (preview-vergelijking) =============
    Optie 1 · Deep Navy: canvas #111C35, panelen #182647, randen #243763
-   Optie 2 · Royal Navy: canvas #142143, panelen #1C2E5C, randen #2B4380
+   Optie 3 · Slate Navy: canvas #131B2E, kaarten #1E293B, randen #334155, infobalken #283548
    Geldt voor de beheeromgeving (admin-ui) én de publieke Copa Mundo-link. */
 html[data-navy="deep"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
 html[data-navy="deep"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
@@ -3409,23 +3409,23 @@ html[data-navy="deep"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
   --card: var(--background);
 }
 
-html[data-navy="royal"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="royal"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="royal"]:not([data-mode="light"]) .admin-ui,
-html[data-navy="royal"][data-mode="dark"] .admin-ui {
-  --background: 222 54% 17%;
-  --card: 223 53% 24%;
+html[data-navy="slate"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
+html[data-navy="slate"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
+html[data-navy="slate"]:not([data-mode="light"]) .admin-ui,
+html[data-navy="slate"][data-mode="dark"] .admin-ui {
+  --background: 222 42% 13%;
+  --card: 217 33% 17%;
   --card-foreground: var(--foreground);
-  --popover: 223 53% 24%;
+  --popover: 217 33% 17%;
   --popover-foreground: var(--foreground);
-  --secondary: 223 52% 29%;
+  --secondary: 216 29% 22%;
   --muted: var(--secondary);
-  --accent: 223 50% 34%;
-  --border: 223 50% 34%;
-  --input: 223 50% 34%;
-  --admin-field: 223 52% 29%;
+  --accent: 215 25% 27%;
+  --border: 215 25% 27%;
+  --input: 215 25% 27%;
+  --admin-field: 216 29% 22%;
 }
-html[data-navy="royal"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
-html[data-navy="royal"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
+html[data-navy="slate"][data-broadcast="copa_mundo_bc"][data-mode="dark"],
+html[data-navy="slate"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
   --card: var(--background);
 }
