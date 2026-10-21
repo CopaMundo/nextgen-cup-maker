@@ -15,7 +15,7 @@ import ShirtIcon from "@/components/icons/ShirtIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
-import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey, DateStripNav } from "@/components/MatchScheduler";
+import MatchScheduler, { plannerDateStorageKey } from "@/components/MatchScheduler";
 import { getMiddleDate } from "@/lib/dateUtils";
 import ResultsManager from "@/components/ResultsManager";
 
@@ -30,7 +30,6 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useToast } from "@/hooks/use-toast";
 
 
 const sidebarItems = [
