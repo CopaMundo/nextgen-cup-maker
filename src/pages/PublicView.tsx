@@ -256,10 +256,13 @@ const PublicView = () => {
   }
 
   const displayStyle = normalizeBroadcastStyle(data.tournament.view_display_style);
+  const copaAppearance = displayStyle === "copa_mundo_bc"
+    ? normalizeAppearance(displayStyle, data.tournament.view_display_appearance)
+    : undefined;
 
   return (
     <BroadcastStyleContext.Provider value={displayStyle}>
-      <div className="min-h-screen bg-background pb-20" data-broadcast={displayStyle}>
+      <div className="min-h-screen bg-background pb-20" data-broadcast={displayStyle} data-mode={copaAppearance}>
         {activeTab === "info" && <PublicInfo data={data} selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} />}
         {activeTab === "teams" && <PublicTeams data={filteredData} favoriteTeam={favoriteTeam} />}
         {activeTab === "home" && <PublicHomepage data={filteredData} favoriteTeam={favoriteTeam} toggleFavorite={toggleFavorite} setActiveTab={handleSetActiveTab} onPollVoteAdded={handlePollVoteAdded} homeResetKey={homeResetKey} />}
