@@ -15,7 +15,7 @@ import ShirtIcon from "@/components/icons/ShirtIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
-import MatchScheduler, { plannerDateStorageKey } from "@/components/MatchScheduler";
+import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey } from "@/components/MatchScheduler";
 import { getMiddleDate } from "@/lib/dateUtils";
 import ResultsManager from "@/components/ResultsManager";
 
