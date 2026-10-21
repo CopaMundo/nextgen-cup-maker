@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(new URL("../../index.css", import.meta.url), "utf8");
+const css = readFileSync(new URL("../index.css", import.meta.url), "utf8");
 
 /** Deep Navy dark-mode ladder (user-chosen fixed default). */
 const darkBlock = (selector: string) => {
