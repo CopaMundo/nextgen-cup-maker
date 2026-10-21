@@ -3007,7 +3007,7 @@ posities + statistieken groen */
 }
 /* One frame finish for repeated items, framed tools and wizard choices.
    Page sections stay unframed and broadcast surfaces remain independent. */
-.admin-ui :is(div, section, article, label):is(.border.rounded, .border.rounded-md, .border.rounded-lg, .border.rounded-xl, .border.rounded-2xl, .draw-panel):not(.section-card):not(.draw-show-stage *):not(.draw-scene-settings *) {
+.admin-ui :is(div, section, article, label):is(.border.rounded, .border.rounded-md, .border.rounded-lg, .border.rounded-xl, .border.rounded-2xl, .draw-panel):not(.section-card):not(.admin-detail-section):not(.draw-show-stage *):not(.draw-scene-settings *) {
   background-color: hsl(var(--admin-panel));
   border-color: hsl(var(--admin-panel-border));
   border-radius: var(--admin-frame-radius);
@@ -3299,10 +3299,18 @@ posities + statistieken groen */
     color: hsl(var(--foreground));
   }
   .admin-ui .section-card:not(.draw-show-stage *):not(.draw-scene-settings *) {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    padding: 1.75rem;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0 0 1.75rem;
+  }
+  .tournament-admin.admin-ui .admin-detail-section {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
   }
   .admin-ui :is([class*="border-y-primary"], [role="combobox"][data-state="open"], [role="tab"][data-state="active"], .draw-type-choice[aria-pressed="true"], .draw-choice[aria-pressed="true"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
     border: 1px solid hsl(var(--primary));
@@ -3334,9 +3342,23 @@ posities + statistieken groen */
     outline-offset: -1px;
   }
   .admin-ui.admin-dialog {
-    background-color: hsl(var(--card));
+    background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     color-scheme: dark;
   }
   [data-mode="light"] .admin-ui.admin-dialog { color-scheme: light; }
+}
+
+/* Portaled management windows stay dark even on smaller screens; stage
+   confirmation windows retain their explicitly selected show theme. */
+[data-mode="dark"] .admin-ui.admin-dialog:not(.draw-dialog-theme) {
+  --background: 222 35% 11%;
+  --foreground: 240 11.111% 96.471%;
+  --card: 222 35% 16%;
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  color-scheme: dark;
 }
