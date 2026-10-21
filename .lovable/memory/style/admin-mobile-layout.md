@@ -6,3 +6,5 @@ type: design
 Op mobiele schermen gebruikt de toernooibeheeromgeving een echte mobiele app-indeling en nooit een verkleinde desktopweergave. De navigatie is een smalle balk met alleen iconen en kan volledig verdwijnen zodat de instellingen alle beschikbare breedte krijgen. Onder de bovenbalk staat een dunne contextbalk met de actieve tab links, de toernooinaam rechts en de knop om de navigatie te openen of sluiten.
 
 **Regel:** Geen mobiele onderbalk. De iconenzijbalk moet volledig inklapbaar zijn en via de vaste contextbalk opnieuw geopend kunnen worden. Controleer aanpassingen altijd in mobiele weergave (393px).
+
+De mobiele beheerkleuren volgen nu dezelfde huidige kleuren als desktop/tablet: nachtblauw met logo-geel in donker; wit, donkergrijze tekst, subtiele grijze randen en blauwe accenten in licht. Behoud de mobiele indeling en bediening. Copa Mundo Light/Dark op de publieke link gebruikt dezelfde themakleuren, ook op mobiel; andere broadcaststijlen blijven behouden.
