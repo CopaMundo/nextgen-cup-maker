@@ -674,45 +674,6 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          {!isMobile && (activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
-            <header className="admin-workbar sticky top-0 z-20 shrink-0 border-b border-border bg-card print:hidden">
-              <div className="mx-auto flex min-h-14 w-full max-w-[1920px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 sm:px-6 lg:px-8">
-                <div className="flex shrink-0 flex-wrap items-center gap-2 empty:hidden [&>*]:mb-0">
-                  {categorySelector}
-                  {activeTab === "schedule" && (
-                    <LocationSelector
-                      tournamentId={id ?? ""}
-                      selectedLocation={selectedLocation}
-                      onSelect={setSelectedLocation}
-                    />
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1 overflow-x-auto scrollbar-none">
-                  {activeTab === "schedule" && tournamentDates.length > 0 ? (
-                    <DateStripNav
-                      dates={tournamentDates}
-                      activeDate={plannerDate}
-                      onSelect={handlePlannerDateChange}
-                      maxVisible={3}
-                      centerActive
-                      onInvalidPick={(iso) => {
-                        toast({
-                          title: "Datum buiten toernooiperiode",
-                          description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
-                          variant: "destructive",
-                        });
-                      }}
-                    />
-                  ) : null}
-
-                </div>
-
-                <div className="flex shrink-0 items-center justify-end gap-3 empty:hidden">
-                </div>
-              </div>
-            </header>
-          )}
           <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
             {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
               <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
