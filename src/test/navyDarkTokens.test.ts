@@ -26,7 +26,14 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
   });
 
   it("copa_mundo_bc broadcast dark uses Deep Navy with card equal to background", () => {
-    const block = darkBlock('[data-broadcast="copa_mundo_bc"][data-mode="dark"] {');
+    const selector = '[data-broadcast="copa_mundo_bc"][data-mode="dark"] {';
+    let block = "";
+    let idx = css.indexOf(selector);
+    while (idx > -1 && !block) {
+      const candidate = css.slice(idx, css.indexOf("}", idx));
+      if (candidate.includes("--background")) block = candidate;
+      idx = css.indexOf(selector, idx + 1);
+    }
     expect(block).toContain("--background: 222 51% 14%");
     expect(block).toContain("--card: var(--background)");
     expect(block).toContain("--secondary: 222 49% 22%");
