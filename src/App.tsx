@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import NavyPreviewToggle from "@/components/NavyPreviewToggle";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -31,6 +32,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <NavyPreviewToggle />
           <BrowserRouter>
             <AuthProvider>
               <Routes>
