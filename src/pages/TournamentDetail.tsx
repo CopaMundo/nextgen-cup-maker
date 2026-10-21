@@ -79,7 +79,6 @@ const TournamentDetail = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const adminScrollRoot = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -291,10 +290,6 @@ const TournamentDetail = () => {
 
   useEffect(() => { if (id) fetchTournament(); }, [id]);
 
-  const tournamentDates = useMemo(() => {
-    if (!tournament) return [];
-    return getTournamentPlannerDates(tournament);
-  }, [tournament]);
 
   const fetchTournament = async () => {
     const { data } = await supabase.from("tournaments").select("*").eq("id", id ?? "").single();
