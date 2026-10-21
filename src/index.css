@@ -3382,3 +3382,46 @@ posities + statistieken groen */
   color: hsl(var(--foreground));
   color-scheme: dark;
 }
+
+/* ============= Tijdelijke nachtblauw-varianten (preview-vergelijking) =============
+   Optie 1 · Deep Navy: canvas #111C35, panelen #182647, randen #243763
+   Optie 2 · Royal Navy: canvas #142143, panelen #1C2E5C, randen #2B4380
+   Geldt voor de beheeromgeving (admin-ui) én de publieke Copa Mundo-link. */
+html[data-navy="deep"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
+html[data-navy="deep"]:not([data-mode="light"]) .admin-ui,
+html[data-navy="deep"][data-mode="dark"] .admin-ui {
+  --background: 222 51% 14%;
+  --card: 222 50% 19%;
+  --card-foreground: var(--foreground);
+  --popover: 222 50% 19%;
+  --popover-foreground: var(--foreground);
+  --secondary: 222 49% 22%;
+  --muted: var(--secondary);
+  --accent: 222 47% 26%;
+  --border: 222 47% 26%;
+  --input: 222 47% 26%;
+  --admin-field: 222 49% 22%;
+}
+/* Publieke link: kaarten delen de pagina-achtergrond (zoals in light). */
+html[data-navy="deep"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
+  --card: var(--background);
+}
+
+html[data-navy="royal"] [data-broadcast="copa_mundo_bc"][data-mode="dark"],
+html[data-navy="royal"]:not([data-mode="light"]) .admin-ui,
+html[data-navy="royal"][data-mode="dark"] .admin-ui {
+  --background: 222 54% 17%;
+  --card: 223 53% 24%;
+  --card-foreground: var(--foreground);
+  --popover: 223 53% 24%;
+  --popover-foreground: var(--foreground);
+  --secondary: 223 52% 29%;
+  --muted: var(--secondary);
+  --accent: 223 50% 34%;
+  --border: 223 50% 34%;
+  --input: 223 50% 34%;
+  --admin-field: 223 52% 29%;
+}
+html[data-navy="royal"] [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
+  --card: var(--background);
+}
