@@ -401,9 +401,11 @@ html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
 [data-broadcast="copa_mundo_bc"][data-mode="dark"] {
   --background: 222 35% 11%;
   --foreground: 240 11.111% 96.471%;
-  --card: 222 35% 16%;
+  /* Kaders en kaarten delen de pagina-achtergrond (zoals in light);
+     enkel infobalken behouden een eigen nuance via --secondary. */
+  --card: var(--background);
   --card-foreground: var(--foreground);
-  --popover: var(--card);
+  --popover: 222 35% 16%;
   --popover-foreground: var(--foreground);
   --primary: 52 100% 50%;
   --primary-foreground: var(--background);
