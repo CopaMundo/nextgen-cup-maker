@@ -3157,15 +3157,15 @@ posities + statistieken groen */
   [data-mode="light"] .admin-ui,
   [data-mode="light"] .tournament-admin.admin-ui {
     --background: 0 0% 100%;
-    --foreground: 220.17 100% 23.14%;
+    --foreground: 0 0% 12%;
     --card: 0 0% 100%;
     --card-foreground: var(--foreground);
     --popover: var(--card);
     --popover-foreground: var(--foreground);
     --secondary: 220 12% 96%;
-    --secondary-foreground: var(--foreground);
+    --secondary-foreground: 0 0% 25%;
     --muted: var(--secondary);
-    --muted-foreground: 220 45% 36%;
+    --muted-foreground: 0 0% 40%;
     --accent: 220 18% 94%;
     --accent-foreground: var(--foreground);
     --primary: 220.17 100% 23.14%;
