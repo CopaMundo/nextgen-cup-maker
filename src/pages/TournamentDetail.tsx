@@ -15,7 +15,7 @@ import ShirtIcon from "@/components/icons/ShirtIcon";
 import TournamentGeneral from "@/components/TournamentGeneral";
 import TeamManager from "@/components/TeamManager";
 import PhaseManager from "@/components/PhaseManager";
-import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey, DateStripNav } from "@/components/MatchScheduler";
+import MatchScheduler, { getTournamentPlannerDates, plannerDateStorageKey } from "@/components/MatchScheduler";
 import { getMiddleDate } from "@/lib/dateUtils";
 import ResultsManager from "@/components/ResultsManager";
 
@@ -30,7 +30,6 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useToast } from "@/hooks/use-toast";
 
 
 const sidebarItems = [
@@ -80,7 +79,6 @@ const TournamentDetail = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const adminScrollRoot = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
 
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -292,10 +290,6 @@ const TournamentDetail = () => {
 
   useEffect(() => { if (id) fetchTournament(); }, [id]);
 
-  const tournamentDates = useMemo(() => {
-    if (!tournament) return [];
-    return getTournamentPlannerDates(tournament);
-  }, [tournament]);
 
   const fetchTournament = async () => {
     const { data } = await supabase.from("tournaments").select("*").eq("id", id ?? "").single();
@@ -557,6 +551,9 @@ const TournamentDetail = () => {
               )}
             >
               <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-3">
+                {tournament.logo_url && (
+                  <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+                )}
                 {!desktopNavCollapsed && (
                   <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
                     {tournament.name}
@@ -674,48 +671,28 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          {!isMobile && (activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
-            <header className="admin-workbar sticky top-0 z-20 shrink-0 border-b border-border bg-card print:hidden">
-              <div className="mx-auto flex min-h-14 w-full max-w-[1920px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 sm:px-6 lg:px-8">
-                <div className="flex shrink-0 flex-wrap items-center gap-2 empty:hidden [&>*]:mb-0">
-                  {categorySelector}
+          <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
+            {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
+              <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
+              {(activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
+                <div className="flex shrink-0 items-center gap-2">
                   {activeTab === "schedule" && (
                     <LocationSelector
                       tournamentId={id ?? ""}
                       selectedLocation={selectedLocation}
                       onSelect={setSelectedLocation}
+                      selectClassName="h-9 min-w-[150px] rounded-lg px-3 text-sm font-semibold"
                     />
                   )}
+                  <CategorySelector
+                    tournamentId={id ?? ""}
+                    isMultiCategory={tournament.is_multi_category}
+                    selectedCategoryId={selectedCategoryId}
+                    onSelect={setSelectedCategoryId}
+                    selectClassName="h-9 min-w-[150px] rounded-lg px-3 text-sm font-semibold"
+                  />
                 </div>
-
-                <div className="min-w-0 flex-1 overflow-x-auto scrollbar-none">
-                  {activeTab === "schedule" && tournamentDates.length > 0 ? (
-                    <DateStripNav
-                      dates={tournamentDates}
-                      activeDate={plannerDate}
-                      onSelect={handlePlannerDateChange}
-                      maxVisible={3}
-                      centerActive
-                      onInvalidPick={(iso) => {
-                        toast({
-                          title: "Datum buiten toernooiperiode",
-                          description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
-                          variant: "destructive",
-                        });
-                      }}
-                    />
-                  ) : null}
-
-                </div>
-
-                <div className="flex shrink-0 items-center justify-end gap-3 empty:hidden">
-                </div>
-              </div>
-            </header>
-          )}
-          <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
-            {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
-              <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
+              )}
             </div>}
             <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && activeTab !== "schedule" && activeTab !== "results" && "admin-focused-screen")}>
               {renderContent()}
