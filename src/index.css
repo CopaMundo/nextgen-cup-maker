@@ -371,11 +371,21 @@ vaste stappen. */
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── BROADCAST #1: COPA MUNDO ──────────────────────────────────────────────
-   Dark: dark green-black #07110D + Copa Mundo yellow #FFD900
-   Light: #F8F9FB + deep Copa Mundo blue #0B3B82
+   Dark: current navy surfaces + Copa Mundo logo yellow
+   Light: current white surfaces + Copa Mundo blue
    ───────────────────────────────────────────────────────────────────────── */
 [data-broadcast="copa_mundo_bc"] {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+/* Paint the mobile browser canvas (including overscroll) in the public theme. */
+html[data-broadcast="copa_mundo_bc"] {
+  background-color: hsl(var(--background));
+}
+html[data-broadcast="copa_mundo_bc"][data-mode="light"] {
+  color-scheme: light;
+}
+html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
+  color-scheme: dark;
 }
 [data-broadcast="copa_mundo_bc"] h1,
 [data-broadcast="copa_mundo_bc"] h2,
