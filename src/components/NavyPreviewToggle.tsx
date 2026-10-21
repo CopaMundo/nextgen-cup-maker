@@ -13,7 +13,8 @@ const OPTIONS: { value: NavyVariant; label: string; swatch: string }[] = [
 /** Tijdelijke vergelijkingsschakelaar voor de nachtblauwe varianten (preview). */
 const NavyPreviewToggle = () => {
   const [variant, setVariant] = useState<NavyVariant>(() => {
-    return (localStorage.getItem(STORAGE_KEY) as NavyVariant) || "standaard";
+    const saved = localStorage.getItem(STORAGE_KEY) as NavyVariant | null;
+    return saved && OPTIONS.some((o) => o.value === saved) ? saved : "standaard";
   });
 
   useEffect(() => {
