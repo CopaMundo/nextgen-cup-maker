@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 
-type NavyVariant = "standaard" | "deep" | "royal";
+type NavyVariant = "standaard" | "deep" | "slate";
 
 const STORAGE_KEY = "copa-navy-preview";
 
 const OPTIONS: { value: NavyVariant; label: string; swatch: string }[] = [
   { value: "standaard", label: "Huidig", swatch: "#121826" },
   { value: "deep", label: "Optie 1 · Deep Navy", swatch: "#111C35" },
-  { value: "royal", label: "Optie 2 · Royal Navy", swatch: "#142143" },
+  { value: "slate", label: "Optie 3 · Slate Navy", swatch: "#131B2E" },
 ];
 
 /** Tijdelijke vergelijkingsschakelaar voor de nachtblauwe varianten (preview). */
 const NavyPreviewToggle = () => {
   const [variant, setVariant] = useState<NavyVariant>(() => {
-    return (localStorage.getItem(STORAGE_KEY) as NavyVariant) || "standaard";
+    const saved = localStorage.getItem(STORAGE_KEY) as NavyVariant | null;
+    return saved && OPTIONS.some((o) => o.value === saved) ? saved : "standaard";
   });
 
   useEffect(() => {
