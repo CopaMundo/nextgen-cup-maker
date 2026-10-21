@@ -8,7 +8,7 @@ export type BroadcastStyle =
 
 
 export const BROADCAST_STYLES: Record<BroadcastStyle, { name: string; description: string; preview: string }> = {
-  copa_mundo_bc: { name: "Copa Mundo", description: "De native Copa Mundo identiteit: donkergroen/zwart met geel (dark) en diep blauw (light), Inter typografie", preview: "🟡" },
+  copa_mundo_bc: { name: "Copa Mundo", description: "De native Copa Mundo identiteit: nachtblauw met geel (dark), wit met donkergrijze tekst en blauwe accenten (light), Inter typografie", preview: "🟡" },
   european_nights: { name: "European Nights", description: "Premium Europese voetbalavond: nachtblauw met elektrisch blauw, cyan, violet en prisma-accenten, Roboto Condensed + Inter", preview: "🌙" },
   wc26: { name: "The World Stage", description: "Internationale broadcastlook: zwart-wit met turquoise accent en spaarzaam goud, Barlow Condensed + Inter", preview: "🟦" },
   la_rosa: { name: "La Gazzetta Rosa", description: "Moderne Italiaanse sportkrant: roze papier, zwarte inkt en magenta accenten, Roboto Condensed headlines + Roboto body", preview: "🩷" },

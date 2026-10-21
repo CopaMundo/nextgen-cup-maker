@@ -4,6 +4,7 @@
 - Admin op mobiel: icon-only zijbalk die volledig verdwijnt; dunne contextbalk toont actieve tab en toernooinaam; controleer op 393px.
 
 ## Memories
+- [Copa Mundo public design](mem://style/copa-mundo-public-design) — Alleen Copa Mundo Light/Dark volgt het huidige beheerthema; andere stijlen behouden
 - [Live draw podium](mem://style/live-draw-stage) — Compact gold studio, silent reveal, valid-group sweep and integrated organizer controls
 - [Broadcaststijlen en vormgevingskeuze](mem://style/broadcast-stijlen-keuze) — 6 stijlen, welke light/dark bestaat, beheerder kiest vormgeving
 - [Admin mobile layout](mem://style/admin-mobile-layout) — Beheer op mobiel gebruikt een volledig inklapbare iconenzijbalk met dunne contextbalk
