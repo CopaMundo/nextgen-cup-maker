@@ -551,6 +551,9 @@ const TournamentDetail = () => {
               )}
             >
               <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-3">
+                {tournament.logo_url && (
+                  <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+                )}
                 {!desktopNavCollapsed && (
                   <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
                     {tournament.name}
@@ -670,7 +673,26 @@ const TournamentDetail = () => {
         <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
             {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
-              <h1 className="text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
+              <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
+              {(activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
+                <div className="flex shrink-0 items-center gap-2">
+                  {activeTab === "schedule" && (
+                    <LocationSelector
+                      tournamentId={id ?? ""}
+                      selectedLocation={selectedLocation}
+                      onSelect={setSelectedLocation}
+                      selectClassName="h-9 min-w-[150px] rounded-lg px-3 text-sm font-semibold"
+                    />
+                  )}
+                  <CategorySelector
+                    tournamentId={id ?? ""}
+                    isMultiCategory={tournament.is_multi_category}
+                    selectedCategoryId={selectedCategoryId}
+                    onSelect={setSelectedCategoryId}
+                    selectClassName="h-9 min-w-[150px] rounded-lg px-3 text-sm font-semibold"
+                  />
+                </div>
+              )}
             </div>}
             <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && activeTab !== "schedule" && activeTab !== "results" && "admin-focused-screen")}>
               {renderContent()}
