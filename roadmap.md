@@ -1,5 +1,6 @@
 - [x] Algemeen/Presentatie-secties en teamdetailfoto/spelers/staff zonder buitenkader; individuele items behouden kaders. Pop-ups donker nachtblauw en portaled keuzepop-ups thematisch. Acht tests geslaagd; Presentatie/teamdetails/pop-ups met voorbeeldgegevens op 1280/820px in beide thema's gecontroleerd zonder overflow/runtimefouten. Aangemelde controle blijft geblokkeerd door ontbrekend eigen account.
 # Roadmap
+- [x] Rechterschermtitels op gelijke hoogte en divisiekiezer bij Deelnemers; mobiele indeling behouden. Gedeelde titelgeometrie op 1280/820px gelijk; vier bestaande beheercontroles geslaagd, build OK. Controle in echt toernooi geblokkeerd door ontbrekend eigen account/previewsessie.
 - [x] Mobiele publieke Copa Mundo-achtergrond direct op de pagina én browsercanvas aan het gekozen thema gekoppeld; Light wit, Dark nachtblauw, andere stijlen behouden. Info/Teams/Standen/Schema op 393px in beide thema’s gecontroleerd met bestaande toernooidata en lokaal gekozen weergave; 192 tests geslaagd, build OK.
 - [x] Mobiele beheerkleuren gelijkgetrokken met desktop/tablet, zonder wijziging aan mobiele indeling; Copa Mundo publieke link gebruikt dezelfde kleuren op mobiel.
 - [x] Alleen Copa Mundo Light/Dark-broadcastkleuren afgestemd op huidig beheer: nachtblauw/geel en wit/donkergrijs/blauw, bestaande publieke indeling behouden.

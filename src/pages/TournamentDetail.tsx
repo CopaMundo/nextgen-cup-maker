@@ -671,10 +671,10 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
-          <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:py-7")}>
-            {!isMobile && <div className="admin-page-heading mb-6 flex shrink-0 items-center gap-3">
+          <div className={cn("admin-content w-full px-4 sm:mx-auto sm:max-w-[1920px] sm:px-6 lg:px-8", activeTab === "schedule" || activeTab === "results" ? "pb-4 sm:pb-6 pt-4 flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden" : "py-5 sm:pb-7 sm:pt-4")}>
+            {!isMobile && <div className="admin-page-heading mb-6 flex min-h-9 shrink-0 items-center gap-3">
               <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
-              {(activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
+              {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
                 <div className="flex shrink-0 items-center gap-2">
                   {activeTab === "schedule" && (
                     <LocationSelector
