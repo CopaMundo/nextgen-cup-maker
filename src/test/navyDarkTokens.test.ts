@@ -52,14 +52,24 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
     expect(block).toContain("--primary: 52 100% 50%");
   });
 
-  it("site-wide light mode: white cards on a fresh blue-tinted background with soft blue-gray borders", () => {
+  it("site-wide light mode (Richting B): white cards on a soft ice-blue background with very light borders", () => {
     const block = darkBlock("[data-mode=\"light\"] {");
-    expect(block).toContain("--background: 220 30% 97%");
+    expect(block).toContain("--background: 210 40% 98%");
     expect(block).toContain("--card: 0 0% 100%");
-    expect(block).toContain("--border: 220 15% 82%");
-    expect(block).toContain("--input: 220 13% 76%");
-    expect(block).toContain("--secondary: 220 24% 95%");
+    expect(block).toContain("--border: 214 32% 91%");
+    expect(block).toContain("--input: 213 27% 84%");
+    expect(block).toContain("--secondary: 214 100% 97%");
+    expect(block).toContain("--accent: 214 95% 93%");
     expect(block).toContain("--primary: 220.17 100% 23.14%");
+  });
+
+  it("light mode has no mouse-gray secondary surfaces or borders left", () => {
+    expect(css).not.toContain("--secondary: 220 24% 95%");
+    expect(css).not.toContain("--accent: 220 20% 94%");
+    expect(css).not.toContain("--border: 220 15% 82%");
+    expect(css).not.toContain("--input: 220 13% 76%");
+    expect(css).not.toContain("--muted-foreground: 220 8% 42%");
+    expect(css).not.toContain("--background: 220 30% 97%");
   });
 
   it("light mode has no legacy dead-gray tokens left", () => {
