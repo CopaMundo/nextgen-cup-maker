@@ -78,4 +78,16 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
     expect(css).not.toContain("--input: 0 0% 74%");
     expect(css).not.toContain("--background: 0 0% 12%");
   });
+
+  it("selected sidebar subtab shows only the accent bar and theme-coloured name", () => {
+    const block = darkBlock('.admin-module-subnav .admin-module-sublink[aria-current="page"] {');
+    expect(block).toContain("color: hsl(var(--primary))");
+    expect(block).toContain("background: transparent");
+    expect(block).not.toContain("hsl(var(--accent)");
+    expect(css).toContain('.admin-module-sublink[aria-current="page"]::before');
+    // the sidebar-wide active-button fill must not leak onto subtabs
+    const scoped = darkBlock('.tournament-admin.admin-ui .admin-module-sidebar .admin-module-sublink[aria-current="page"] {');
+    expect(scoped).toContain("background: transparent");
+    expect(scoped).not.toContain("hsl(var(--secondary))");
+  });
 });
