@@ -1,4 +1,4 @@
-import blueLogo from "@/assets/copa-mundo-blue.png.asset.json";
+import cobaltLogo from "@/assets/copa-mundo-cobalt.png";
 import yellowLogo from "@/assets/copa-mundo-yellow.png.asset.json";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -12,7 +12,7 @@ const CopaMundoMark = ({ className = "h-10 w-10", title = "Copa Mundo" }: Props)
 
   return (
     <img
-      src={mode === "dark" ? yellowLogo.url : blueLogo.url}
+      src={mode === "dark" ? yellowLogo.url : cobaltLogo}
       alt={title}
       className={`inline-block object-contain ${className}`}
     />
