@@ -3844,7 +3844,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {hasSelection && <Label className="text-[10px] text-muted-foreground">Selecteer poules/brackets</Label>}
                             <button
                               onClick={() => openDropdown("brackets")} data-dd-inside="true"
-                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none ${open ? "border-y-2 border-y-primary" : ""}`}
+                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none ${open ? "border-primary admin-selected" : ""}`}
                             >
                               <span className="flex items-center gap-1 truncate">
                                 {hasSelection ? (
@@ -3898,7 +3898,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {hasSelection && !noBracketsSelected && <Label className="text-[10px] text-muted-foreground">Selecteer rondes</Label>}
                             <button
                               onClick={() => openDropdown("rounds")} data-dd-inside="true"
-                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none ${open ? "border-y-2 border-y-primary" : ""}`}
+                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none ${open ? "border-primary admin-selected" : ""}`}
                             >
                               <span className="flex items-center gap-1 truncate">
                                 {hasSelection && !noBracketsSelected ? (
@@ -3969,7 +3969,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             <button
                               onClick={() => hasFields && openDropdown("fields")} data-dd-inside="true"
                               disabled={!hasFields}
-                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${open ? "border-y-2 border-y-primary" : ""}`}
+                              className={`w-full flex h-9 items-center justify-between rounded-md border border-input bg-background px-3 text-xs transition-colors hover:bg-secondary/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${open ? "border-primary admin-selected" : ""}`}
                             >
                               <span className="flex items-center gap-1 truncate">
                                 {hasSelection ? (

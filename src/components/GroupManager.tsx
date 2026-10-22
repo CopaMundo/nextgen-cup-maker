@@ -1185,7 +1185,7 @@ const GroupManager = ({
                 onClick={() => setDialogMatchType(opt.value)}
                 className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
                   dialogMatchType === opt.value
-                    ? "border-y-2 border-y-primary"
+                    ? "border-primary admin-selected"
                     : "border-border hover:border-primary/20"
                 }`}
               >
@@ -1250,7 +1250,7 @@ const GroupManager = ({
                     onClick={() => setDialogMatchGenMode(opt.value)}
                     className={`rounded-lg border p-2.5 text-center transition-all text-xs ${
                       dialogMatchGenMode === opt.value
-                        ? "border-y-2 border-y-primary"
+                        ? "border-primary admin-selected"
                         : "border-border hover:border-primary/20"
                     }`}
                   >
@@ -1545,7 +1545,7 @@ const GroupManager = ({
                             value={m.home || "__empty__"}
                             onValueChange={(value) => setPlanValue(m.id, "home", value === "__empty__" ? "" : value)}
                           >
-                            <SelectTrigger className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary ">
+                            <SelectTrigger className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-primary ">
                               <SelectValue placeholder="Kies team" />
                             </SelectTrigger>
                             <SelectContent>
@@ -1560,7 +1560,7 @@ const GroupManager = ({
                             value={m.away || "__empty__"}
                             onValueChange={(value) => setPlanValue(m.id, "away", value === "__empty__" ? "" : value)}
                           >
-                            <SelectTrigger className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary ">
+                            <SelectTrigger className="flex h-9 flex-1 min-w-0 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-primary ">
                               <SelectValue placeholder="Kies team" />
                             </SelectTrigger>
                             <SelectContent>
