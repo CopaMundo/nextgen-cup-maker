@@ -43,4 +43,20 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
     expect(css).not.toContain("data-navy");
     expect(css).not.toContain("Tijdelijke nachtblauw");
   });
+
+  it("site-wide pages (login, search, dashboard, profile) share the same dark ladder", () => {
+    const block = darkBlock("[data-mode=\"dark\"] {");
+    expect(block).toContain("--background: 222 51% 14%");
+    expect(block).toContain("--card: 222 50% 19%");
+    expect(block).toContain("--border: 222 47% 26%");
+    expect(block).toContain("--primary: 52 100% 50%");
+  });
+
+  it("site-wide light mode matches the admin/broadcast light theme", () => {
+    const block = darkBlock("[data-mode=\"light\"] {");
+    expect(block).toContain("--background: 0 0% 100%");
+    expect(block).toContain("--foreground: 0 0% 12%");
+    expect(block).toContain("--border: 0 0% 82%");
+    expect(block).toContain("--primary: 220.17 100% 23.14%");
+  });
 });
