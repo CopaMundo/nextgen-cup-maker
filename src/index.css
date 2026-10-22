@@ -109,7 +109,7 @@ Blue #002776
     --card-foreground: var(--foreground);
     --popover: 0 0% 100%;
     --popover-foreground: var(--foreground);
-    --primary: 220.17 100% 23.14%;
+    --primary: 220.7 100% 50%;
     --primary-foreground: 0 0% 98%;
     --secondary: 214 100% 97%;
     --secondary-foreground: 217 40% 28%;
@@ -135,7 +135,7 @@ Blue #002776
     --sidebar-ring: var(--primary);
     --gradient-hero: linear-gradient(135deg, hsl(210, 40%, 98%) 0%, hsl(214, 100%, 97%) 40%, hsl(214, 60%, 96%) 100%);
     --gradient-brand: linear-gradient(135deg, hsl(220, 100%, 23%), hsl(143, 100%, 31%));
-    --shadow-glow: 0 0 30px -5px hsla(220, 100%, 23%, 0.15);
+    --shadow-glow: 0 0 30px -5px hsla(220.7, 100%, 50%, 0.18);
   }
 }
 
@@ -446,7 +446,7 @@ html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
   --card-foreground: var(--foreground);
   --popover: 0 0% 100%;
   --popover-foreground: var(--foreground);
-  --primary: 220.17 100% 23.14%;
+  --primary: 220.7 100% 50%;
   --primary-foreground: 0 0% 98%;
   --secondary: 214 100% 97%;
   --secondary-foreground: 217 40% 28%;
@@ -3007,7 +3007,7 @@ posities + statistieken groen */
   --muted-foreground: 215 30% 45%;
   --accent: 214 95% 93%;
   --accent-foreground: var(--foreground);
-  --primary: 220.17 100% 23.14%;
+  --primary: 220.7 100% 50%;
   --primary-foreground: 0 0% 98%;
   --border: 214 60% 90%;
   --input: 213 45% 82%;
@@ -3184,7 +3184,7 @@ posities + statistieken groen */
     --muted-foreground: 215 30% 45%;
     --accent: 214 95% 93%;
     --accent-foreground: var(--foreground);
-    --primary: 220.17 100% 23.14%;
+    --primary: 220.7 100% 50%;
     --primary-foreground: 0 0% 98%;
     --border: 214 60% 90%;
     --input: 213 45% 82%;

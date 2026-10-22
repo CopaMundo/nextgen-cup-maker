@@ -61,7 +61,7 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
     expect(block).toContain("--secondary: 214 100% 97%");
     expect(block).toContain("--accent: 214 95% 93%");
     expect(block).toContain("--muted-foreground: 215 30% 45%");
-    expect(block).toContain("--primary: 220.17 100% 23.14%");
+    expect(block).toContain("--primary: 220.7 100% 50%");
   });
 
   it("light mode has no mouse-gray secondary surfaces or borders left", () => {
@@ -89,5 +89,13 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
     const scoped = darkBlock('.tournament-admin.admin-ui .admin-module-sidebar .admin-module-sublink[aria-current="page"] {');
     expect(scoped).toContain("background: transparent");
     expect(scoped).not.toContain("hsl(var(--secondary))");
+  });
+
+  it("light mode active accents are bright cobalt in every light block", () => {
+    // the old dark navy read as muted next to the yellow used in dark mode
+    expect(css).not.toContain("--primary: 220.17 100% 23.14%");
+    const cobalt = (css.match(/--primary: 220\.7 100% 50%/g) || []).length;
+    expect(cobalt).toBe(4); // base, copa_mundo broadcast, .admin-ui, .tournament-admin.admin-ui
+    expect(darkBlock('[data-mode="light"] .admin-ui {')).toContain("--primary: 220.7 100% 50%");
   });
 });
