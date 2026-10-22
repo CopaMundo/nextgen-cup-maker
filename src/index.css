@@ -100,10 +100,10 @@ Blue #002776
     --shadow-glow: 0 0 30px -5px hsla(52, 100%, 50%, 0.25);
   }
 
-  /* Light Mode — frisse blauwgetinte achtergrond, witte kaarten, zachte
-     blauwgrijze randen en blauwe accenten, passend bij Deep Navy */
+  /* Light Mode (Richting B) — zachte ijsblauwe achtergrond #f8fafc, helder witte
+     kaarten, zeer zachte randen en ijsblauwe secundaire vlakken in plaats van grijs */
   [data-mode="light"] {
-    --background: 220 30% 97%;
+    --background: 210 40% 98%;
     --foreground: 222 30% 16%;
     --card: 0 0% 100%;
     --card-foreground: var(--foreground);
@@ -111,29 +111,29 @@ Blue #002776
     --popover-foreground: var(--foreground);
     --primary: 220.17 100% 23.14%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 220 24% 95%;
-    --secondary-foreground: 0 0% 25%;
+    --secondary: 214 100% 97%;
+    --secondary-foreground: 217 40% 28%;
     --muted: var(--secondary);
-    --muted-foreground: 220 8% 42%;
-    --accent: 220 20% 94%;
+    --muted-foreground: 215 30% 45%;
+    --accent: 214 95% 93%;
     --accent-foreground: var(--foreground);
     --warning: 32 95% 50%;
     --warning-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 82%;
-    --input: 220 13% 76%;
+    --border: 214 60% 90%;
+    --input: 213 45% 82%;
     --ring: var(--primary);
     --radius: 0.2rem;
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 25%;
+    --sidebar-foreground: 217 40% 28%;
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
     --sidebar-accent: var(--secondary);
-    --sidebar-accent-foreground: 0 0% 25%;
+    --sidebar-accent-foreground: 217 40% 28%;
     --sidebar-border: var(--border);
     --sidebar-ring: var(--primary);
-    --gradient-hero: linear-gradient(135deg, hsl(220, 15%, 96%) 0%, hsl(143, 10%, 94%) 40%, hsl(52, 15%, 96%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(210, 40%, 98%) 0%, hsl(214, 100%, 97%) 40%, hsl(214, 60%, 96%) 100%);
     --gradient-brand: linear-gradient(135deg, hsl(220, 100%, 23%), hsl(143, 100%, 31%));
     --shadow-glow: 0 0 30px -5px hsla(220, 100%, 23%, 0.15);
   }
@@ -440,7 +440,7 @@ html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
 }
 
 [data-broadcast="copa_mundo_bc"][data-mode="light"] {
-  --background: 220 30% 97%;
+  --background: 210 40% 98%;
   --foreground: 222 30% 16%;
   --card: 0 0% 100%;
   --card-foreground: var(--foreground);
@@ -448,16 +448,16 @@ html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
   --popover-foreground: var(--foreground);
   --primary: 220.17 100% 23.14%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 220 24% 95%;
-  --secondary-foreground: 0 0% 25%;
+  --secondary: 214 100% 97%;
+  --secondary-foreground: 217 40% 28%;
   --muted: var(--secondary);
-  --muted-foreground: 220 8% 42%;
-  --accent: 220 20% 94%;
+  --muted-foreground: 215 30% 45%;
+  --accent: 214 95% 93%;
   --accent-foreground: var(--foreground);
   --destructive: 0 72% 54%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 15% 82%;
-  --input: 220 13% 76%;
+  --border: 214 60% 90%;
+  --input: 213 45% 82%;
   --ring: var(--primary);
   --radius: 0.2rem;
   --gradient-hero: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
@@ -2995,23 +2995,23 @@ posities + statistieken groen */
   line-height: 1.6;
 }
 [data-mode="light"] .admin-ui {
-  --background: 220 30% 97%;
+  --background: 210 40% 98%;
   --foreground: 222 30% 16%;
   --card: 0 0% 100%;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --secondary: 220 24% 95%;
-  --secondary-foreground: 0 0% 25%;
+  --secondary: 214 100% 97%;
+  --secondary-foreground: 217 40% 28%;
   --muted: var(--secondary);
-  --muted-foreground: 220 8% 42%;
-  --accent: 220 20% 94%;
+  --muted-foreground: 215 30% 45%;
+  --accent: 214 95% 93%;
   --accent-foreground: var(--foreground);
   --primary: 220.17 100% 23.14%;
   --primary-foreground: 0 0% 98%;
-  --border: 220 15% 82%;
-  --input: 220 13% 76%;
-  --admin-field: 220 30% 99%;
+  --border: 214 60% 90%;
+  --input: 213 45% 82%;
+  --admin-field: 210 40% 99%;
   --admin-edge: 0 0% 100% / .5;
   --admin-field-shadow: inset 0 1px 2px hsl(220 30% 20% / .05);
   --admin-shadow: inset 0 1px 0 hsl(var(--admin-edge)), 0 2px 5px hsl(220 30% 15% / .05);
@@ -3172,23 +3172,23 @@ posities + statistieken groen */
 
   [data-mode="light"] .admin-ui,
   [data-mode="light"] .tournament-admin.admin-ui {
-    --background: 220 30% 97%;
+    --background: 210 40% 98%;
     --foreground: 222 30% 16%;
     --card: 0 0% 100%;
     --card-foreground: var(--foreground);
     --popover: var(--card);
     --popover-foreground: var(--foreground);
-    --secondary: 220 24% 95%;
-    --secondary-foreground: 0 0% 25%;
+    --secondary: 214 100% 97%;
+    --secondary-foreground: 217 40% 28%;
     --muted: var(--secondary);
-    --muted-foreground: 220 8% 42%;
-    --accent: 220 20% 94%;
+    --muted-foreground: 215 30% 45%;
+    --accent: 214 95% 93%;
     --accent-foreground: var(--foreground);
     --primary: 220.17 100% 23.14%;
     --primary-foreground: 0 0% 98%;
-    --border: 220 15% 82%;
-    --input: 220 13% 76%;
-    --admin-field: 220 30% 99%;
+    --border: 214 60% 90%;
+    --input: 213 45% 82%;
+    --admin-field: 210 40% 99%;
     --admin-field-shadow: inset 0 1px 2px hsl(220 30% 20% / .05);
     --admin-title-accent: var(--primary);
   }
