@@ -109,7 +109,7 @@ Blue #002776
     --card-foreground: var(--foreground);
     --popover: 0 0% 100%;
     --popover-foreground: var(--foreground);
-    --primary: 220.17 100% 23.14%;
+    --primary: 220.7 100% 50%;
     --primary-foreground: 0 0% 98%;
     --secondary: 214 100% 97%;
     --secondary-foreground: 217 40% 28%;
@@ -446,7 +446,7 @@ html[data-broadcast="copa_mundo_bc"][data-mode="dark"] {
   --card-foreground: var(--foreground);
   --popover: 0 0% 100%;
   --popover-foreground: var(--foreground);
-  --primary: 220.17 100% 23.14%;
+  --primary: 220.7 100% 50%;
   --primary-foreground: 0 0% 98%;
   --secondary: 214 100% 97%;
   --secondary-foreground: 217 40% 28%;
@@ -3007,7 +3007,7 @@ posities + statistieken groen */
   --muted-foreground: 215 30% 45%;
   --accent: 214 95% 93%;
   --accent-foreground: var(--foreground);
-  --primary: 220.17 100% 23.14%;
+  --primary: 220.7 100% 50%;
   --primary-foreground: 0 0% 98%;
   --border: 214 60% 90%;
   --input: 213 45% 82%;
@@ -3184,7 +3184,7 @@ posities + statistieken groen */
     --muted-foreground: 215 30% 45%;
     --accent: 214 95% 93%;
     --accent-foreground: var(--foreground);
-    --primary: 220.17 100% 23.14%;
+    --primary: 220.7 100% 50%;
     --primary-foreground: 0 0% 98%;
     --border: 214 60% 90%;
     --input: 213 45% 82%;
