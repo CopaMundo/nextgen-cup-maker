@@ -9,6 +9,8 @@ Laatste keuze: alleen Copa Mundo Light en Dark volgen het huidige beheerthema. D
 
 Ook op de mobiele publieke link volgen alle achtergronden het huidige thema: wit in Light en rijk nachtblauw in Dark, inclusief de achtergrond bij doorscrollen. Geen oude zwarte achtergrond in Light. Accentkleuren blijven spaarzaam voor actieve navigatie, tijden, punten en belangrijke knoppen.
 
+De hele site deelt dit thema: de algemene pagina's (inloggen, registreren, zoek toernooien, Mijn Toernooien, profiel, landingspagina) gebruiken dezelfde basistokens als beheer en publieke link — Dark: Deep Navy-ladder met geel accent; Light: wit, donkergrijze tekst, grijze randen, blauwe accenten. Nooit terug naar de oude groen-zwarte donkertinten of blauwgrijze lichte tekst.
+
 Typografie: bestaande Inter-typografie behouden.
 
 UI: rounded 12-16px cards, dunne borders (foreground/10), nauwelijks shadows, veel spacing. Standen: dunne verticale kwalificatie-indicatoren, subtiele rijscheidingen, punten in gele pills. Bottom nav: donkere verhoogde cirkel met dunne gele rand + clublogo (geen gekleurde vulling).
