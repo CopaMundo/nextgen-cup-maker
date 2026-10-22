@@ -12,7 +12,7 @@ const CopaMundoMark = ({ className = "h-10 w-10", title = "Copa Mundo" }: Props)
 
   return (
     <img
-      src={mode === "dark" ? yellowLogo.url : blueLogo.url}
+      src={mode === "dark" ? yellowLogo.url : cobaltLogo}
       alt={title}
       className={`inline-block object-contain ${className}`}
     />
