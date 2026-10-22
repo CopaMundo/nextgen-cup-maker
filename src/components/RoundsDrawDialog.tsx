@@ -913,7 +913,7 @@ const RoundsDrawDialog = ({
   const potScreen = (
     <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
       <div><h3 className="section-title">Indeling &amp; teams</h3></div>
-      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-y-2 border-y-primary" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
+      {groups.length > 1 && <div className="flex flex-wrap gap-2">{groups.map((g) => <Button key={g.id} size="sm" variant="outline" aria-pressed={potGroup?.id === g.id} className={`draw-choice ${potGroup?.id === g.id ? "border-primary admin-selected" : "border-y-border"}`} onClick={() => { setPotGroupId(g.id); setPotError(""); }}>{g.name} {potGroups[g.id]?.length ? `· ${potGroups[g.id].flatMap((p) => p.teamIds).length}/${g.teamIds.length}` : ""}</Button>)}</div>}
       {potGroup && <>
         <div className="flex flex-wrap items-end gap-2">
           <div className="min-w-[220px] flex-1 sm:max-w-sm"><Label className="form-label">POTVERDELING</Label>

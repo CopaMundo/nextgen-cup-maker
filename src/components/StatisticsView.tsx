@@ -441,7 +441,7 @@ const StatisticsView = ({ tournamentId, tournament, categoryId }: { tournamentId
                     className={cn(
                       "w-full rounded-md border px-2 py-1.5 text-left text-[11px] font-semibold uppercase transition-colors",
                       isSelected
-                        ? "border-y-2 border-y-primary text-primary"
+                        ? "border-primary admin-selected text-primary"
                         : "border-border bg-card text-muted-foreground hover:text-foreground"
                     )}
                   >

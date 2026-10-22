@@ -142,11 +142,11 @@ Blue #002776
 @layer components {
   /* Eén keuzestijl voor native selectors binnen het toernooibeheer. */
   .tournament-admin select {
-    @apply rounded-md border border-input bg-background text-foreground transition-colors hover:bg-secondary/50 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary  disabled:cursor-not-allowed disabled:opacity-50;
+    @apply rounded-md border border-input bg-background text-foreground transition-colors hover:bg-secondary/50 focus:outline-none focus:ring-0 focus:border-primary  disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .tournament-admin [role="combobox"] {
-    @apply transition-colors hover:bg-secondary/50 data-[state=open]:border-y-2 data-[state=open]:border-y-primary ;
+    @apply transition-colors hover:bg-secondary/50 data-[state=open]:border-primary ;
   }
 
   .tournament-admin [role="combobox"] svg:last-child {
@@ -3336,7 +3336,7 @@ posities + statistieken groen */
     box-shadow: none;
     padding: 0;
   }
-  .admin-ui :is([class*="border-y-primary"], [role="combobox"][data-state="open"], [role="tab"][data-state="active"], .draw-type-choice[aria-pressed="true"], .draw-choice[aria-pressed="true"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
+  .admin-ui :is(.admin-selected, [role="combobox"][data-state="open"], [role="tab"][data-state="active"], .draw-type-choice[aria-pressed="true"], .draw-choice[aria-pressed="true"]):not(.draw-show-stage *):not(.draw-scene-settings *) {
     border: 1px solid hsl(var(--primary));
     outline: 1px solid hsl(var(--primary));
     outline-offset: -1px;

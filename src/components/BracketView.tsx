@@ -2540,7 +2540,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   value={score ?? ""}
                   onChange={(e) => handleScoreChange(match.id, scoreField as any, e.target.value)}
                   onBlur={() => handleBlurSave(match.id)}
-                  className="h-6 w-8 text-center text-[11px] font-bold border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary "
+                  className="h-6 w-8 text-center text-[11px] font-bold border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-primary "
                   placeholder="–" onClick={e => e.stopPropagation()}
                 />
                 <input
@@ -2548,7 +2548,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   value={haTerugScore ?? ""}
                   onChange={(e) => handleScoreChange(pairedMatch.id, haTerugField as any, e.target.value)}
                   onBlur={() => handleBlurSave(pairedMatch.id)}
-                  className="h-6 w-8 text-center text-[11px] font-bold border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary "
+                  className="h-6 w-8 text-center text-[11px] font-bold border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-primary "
                   placeholder="–" onClick={e => e.stopPropagation()}
                 />
                 {haTotal?.isTied && (
@@ -2557,7 +2557,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     value={penalties ?? ""}
                     onChange={(e) => handlePenaltyChange(match.id, isHome ? "home_penalties" : "away_penalties", e.target.value)}
                     onBlur={() => handleBlurSave(match.id)}
-                    className="h-5 w-5 text-center text-[8px] border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary  ml-px"
+                    className="h-5 w-5 text-center text-[8px] border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-primary  ml-px"
                     placeholder="·" onClick={e => e.stopPropagation()}
                   />
                 )}
@@ -2589,7 +2589,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   value={score ?? ""}
                   onChange={(e) => handleScoreChange(match.id, scoreField as any, e.target.value)}
                   onBlur={() => handleBlurSave(match.id)}
-                  className="h-6 w-8 text-center text-[11px] font-bold border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary "
+                  className="h-6 w-8 text-center text-[11px] font-bold border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-primary "
                   placeholder="–"
                   onClick={e => e.stopPropagation()}
                 />
@@ -2601,7 +2601,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     value={penalties ?? ""}
                     onChange={(e) => handlePenaltyChange(match.id, isHome ? "home_penalties" : "away_penalties", e.target.value)}
                     onBlur={() => handleBlurSave(match.id)}
-                    className="h-5 w-5 text-center text-[8px] border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-y-2 focus:border-y-primary  ml-px"
+                    className="h-5 w-5 text-center text-[8px] border border-muted rounded bg-background p-0 focus:outline-none focus:ring-0 focus:border-primary  ml-px"
                     placeholder="·"
                     onClick={e => e.stopPropagation()}
                   />

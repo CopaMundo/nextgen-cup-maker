@@ -37,7 +37,7 @@ const PhoneInput = ({
       <select
         value={countryCode}
         onChange={(e) => onCountryCodeChange(e.target.value)}
-        className="h-10 w-28 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-y-2 focus:border-y-primary "
+        className="h-10 w-28 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:border-primary "
       >
         {CODES.map((c) => (
           <option key={c.code} value={c.code}>{c.label}</option>
