@@ -56,8 +56,8 @@ describe("Deep Navy dark tokens (Copa Mundo)", () => {
     const block = darkBlock("[data-mode=\"light\"] {");
     expect(block).toContain("--background: 210 40% 98%");
     expect(block).toContain("--card: 0 0% 100%");
-    expect(block).toContain("--border: 214 32% 91%");
-    expect(block).toContain("--input: 213 27% 84%");
+    expect(block).toContain("--border: 214 60% 90%");
+    expect(block).toContain("--input: 213 45% 82%");
     expect(block).toContain("--secondary: 214 100% 97%");
     expect(block).toContain("--accent: 214 95% 93%");
     expect(block).toContain("--muted-foreground: 215 30% 45%");
