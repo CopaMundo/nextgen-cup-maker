@@ -100,29 +100,29 @@ Blue #002776
     --shadow-glow: 0 0 30px -5px hsla(52, 100%, 50%, 0.25);
   }
 
-  /* Light Mode — wit met donkergrijze tekst, grijze randen en blauwe accenten,
-     gelijk aan beheer en publieke link */
+  /* Light Mode — frisse blauwgetinte achtergrond, witte kaarten, zachte
+     blauwgrijze randen en blauwe accenten, passend bij Deep Navy */
   [data-mode="light"] {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 12%;
+    --background: 220 30% 97%;
+    --foreground: 222 30% 16%;
     --card: 0 0% 100%;
     --card-foreground: var(--foreground);
     --popover: 0 0% 100%;
     --popover-foreground: var(--foreground);
     --primary: 220.17 100% 23.14%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 220 12% 96%;
+    --secondary: 220 24% 95%;
     --secondary-foreground: 0 0% 25%;
     --muted: var(--secondary);
-    --muted-foreground: 0 0% 40%;
-    --accent: 220 18% 94%;
+    --muted-foreground: 220 8% 42%;
+    --accent: 220 20% 94%;
     --accent-foreground: var(--foreground);
     --warning: 32 95% 50%;
     --warning-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 82%;
-    --input: 0 0% 74%;
+    --border: 220 15% 82%;
+    --input: 220 13% 76%;
     --ring: var(--primary);
     --radius: 0.2rem;
     --sidebar-background: 0 0% 100%;
