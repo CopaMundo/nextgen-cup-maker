@@ -3114,6 +3114,14 @@ posities + statistieken groen */
 .admin-ui .admin-page-heading h1 { letter-spacing: 0; }
 /* Reserveer altijd de schuifbalkruimte zodat titels en inhoud nooit verspringen wanneer een lijst langer wordt. */
 .admin-scroll-pane { scrollbar-gutter: stable; }
+/* The title bar never participates in scrolling; reserve the same gutter as the body. */
+.tournament-admin .admin-workspace-header {
+  height: 72px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  position: relative;
+  z-index: 10;
+}
 .admin-ui [class*="bg-primary/"]:not(.draw-show-stage *):not(.draw-scene-settings *):not(button):not([role="switch"]) {
   background-color: hsl(var(--secondary));
 }
