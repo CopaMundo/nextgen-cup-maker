@@ -1,6 +1,7 @@
 # Architecture rules
 
 - Draw-stage rules (bowl, balls, wings, overview, logos): src/components/draw/AGENTS.md.
+- Keep the shared desktop/tablet administration title bar outside the content scroll pane with equal horizontal gutters; one stationary shell prevents tab-specific scrolling and controls from shifting headings.
 - Represent live knockout and single-match entry encounters as fixed home/away slot containers in the shared draw session; source their geometry from existing matches and never infer seed rank from slot codes, so bracket positions and return legs stay intact.
 - Keep rounds-draw pot assignments per group in a phase-scoped browser draft and include them in the final draw report; phase-wide pot tables cannot replace group-specific assignments, and applying clears the draft.
 - Scope admin and portaled dialogs/selects/popovers through AdminAppearanceContext; unframe sections, frame items. Desktop/tablet sub-items select focused screens. Preserve mobile, schedule/results, public/stage styles and embedded theme controls.
