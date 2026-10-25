@@ -681,54 +681,67 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
               {isOpen && (
                 <div className="border-t border-border bg-card p-4 space-y-5">
-                  {/* Punten / Sets toggle */}
-                  <div className="space-y-2">
-                    <Label>Type</Label>
-                    <div className="grid grid-cols-2 rounded-md border border-border bg-secondary p-1 h-10">
-                      {(["points", "sets"] as const).map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => handleTypeChange(sys, opt)}
-                          className={cn(
-                            "rounded-sm text-xs font-semibold uppercase tracking-wide transition-colors",
-                            sys.scoring_type === opt
-                              ? "bg-primary text-primary-foreground shadow-sm"
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          {opt === "points" ? "Punten" : "Sets"}
-                        </button>
-                      ))}
+                  {/* Type and its advanced settings share one compact control row. */}
+                  <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+                    <div className="w-56 max-w-full space-y-2">
+                      <Label>Type</Label>
+                      <div className="grid h-10 grid-cols-2 rounded-md border border-border bg-secondary p-1">
+                        {(["points", "sets"] as const).map((opt) => (
+                          <Button
+                            key={opt}
+                            type="button"
+                            variant="ghost"
+                            onClick={() => handleTypeChange(sys, opt)}
+                            className={cn(
+                              "h-auto rounded-sm text-xs font-semibold uppercase tracking-wide",
+                              sys.scoring_type === opt
+                                ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:text-primary-foreground"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            {opt === "points" ? "Punten" : "Sets"}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
+                    {sys.scoring_type === "points" && (
+                      <div className="flex min-h-10 items-center gap-3">
+                        <Switch
+                          id={`adv-${sys.id}`}
+                          checked={showAdv}
+                          onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
+                        />
+                        <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-sm font-medium">
+                          Geavanceerde instellingen
+                        </Label>
+                      </div>
+                    )}
                   </div>
 
                   {sys.scoring_type === "points" && (
                     <>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between py-1">
-                          <Label htmlFor={`adv-${sys.id}`} className="text-sm font-medium cursor-pointer">
-                            Geavanceerde instellingen
-                          </Label>
-                          <Switch
-                            id={`adv-${sys.id}`}
-                            checked={showAdv}
-                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
-                          />
-                        </div>
-
+                      <div className="space-y-4">
                         <p className="text-xs text-muted-foreground">
                           Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel.
                         </p>
+                        <div className={cn("grid gap-3", showAdv ? "sm:grid-cols-3" : "grid-cols-3")} >
+                        <div className="flex min-w-0 flex-col gap-1">
+                          <Label className="flex flex-1 items-end text-xs">Bij winst</Label>
+                          <Input
+                            type="number"
+                            value={sys.points_win ?? ""}
+                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
+                          />
+                        </div>
 
                         {showAdv && (
-                          <>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Bij een grote overwinning</Label>
+                            <div className="flex min-w-0 flex-col gap-1">
+                              <Label className="flex flex-1 items-end text-xs">Bij een grote overwinning</Label>
                               <div className="flex gap-2">
                                 <Input
                                   type="number"
-                                  className="flex-1"
+                                  className="min-w-0 flex-1"
                                   value={sys.points_big_win ?? ""}
                                   onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                                   onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value) })}
@@ -737,7 +750,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                   value={String(sys.big_win_threshold ?? 2)}
                                   onValueChange={(v) => { applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
                                 >
-                                  <SelectTrigger className="w-[120px]">
+                                  <SelectTrigger className="w-28 shrink-0">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -748,22 +761,10 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 </Select>
                               </div>
                             </div>
-                          </>
                         )}
-
-                        <div className="space-y-1">
-                          <Label className="text-xs">Bij winst</Label>
-                          <Input
-                            type="number"
-                            value={sys.points_win ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
-                          />
-                        </div>
-
                         {showAdv && (
-                          <div className={cn("space-y-1", !sys.no_draws && "opacity-50")}>
-                            <Label className="text-xs">Bij winst na verlenging, strafschoppen of golden goal</Label>
+                          <div className={cn("flex min-w-0 flex-col gap-1", !sys.no_draws && "opacity-50")}>
+                            <Label className="flex flex-1 items-end text-xs">Bij winst na verlenging, strafschoppen of golden goal</Label>
                             <Input
                               type="number"
                               disabled={!sys.no_draws}
@@ -774,9 +775,38 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           </div>
                         )}
 
+                        {!showAdv && (
+                          <>
                         {(!showAdv || !sys.no_draws) && (
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij gelijkspel</Label>
+                          <div className="flex min-w-0 flex-col gap-1">
+                            <Label className="flex flex-1 items-end text-xs">Bij gelijkspel</Label>
+                            <Input
+                              type="number"
+                              value={sys.points_draw ?? ""}
+                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
+                            />
+                          </div>
+                        )}
+
+                        <div className="flex min-w-0 flex-col gap-1">
+                          <Label className="flex flex-1 items-end text-xs">Bij verlies</Label>
+                          <Input
+                            type="number"
+                            value={sys.points_loss ?? ""}
+                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                            onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                          />
+                        </div>
+
+                          </>
+                        )}
+                        </div>
+                        {showAdv && !sys.no_draws && (
+                          <div className="grid gap-3 sm:grid-cols-3">
+                        {(!showAdv || !sys.no_draws) && (
+                          <div className="flex min-w-0 flex-col gap-1">
+                            <Label className="flex flex-1 items-end text-xs">Bij gelijkspel</Label>
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
@@ -788,8 +818,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                         {showAdv && !sys.no_draws && (
                           <>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Bij gelijkspel met doelpunten</Label>
+                            <div className="flex min-w-0 flex-col gap-1">
+                              <Label className="flex flex-1 items-end text-xs">Bij gelijkspel met doelpunten</Label>
                               <Input
                                 type="number"
                                 value={sys.points_draw_with_goals ?? ""}
@@ -797,8 +827,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? (sys.points_draw ?? 1) : parseInt(e.target.value) })}
                               />
                             </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Bij gelijkspel zonder doelpunten</Label>
+                            <div className="flex min-w-0 flex-col gap-1">
+                              <Label className="flex flex-1 items-end text-xs">Bij gelijkspel zonder doelpunten</Label>
                               <Input
                                 type="number"
                                 value={sys.points_draw_no_goals ?? ""}
@@ -809,8 +839,13 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           </>
                         )}
 
-                        <div className="space-y-1">
-                          <Label className="text-xs">Bij verlies</Label>
+                          </div>
+                        )}
+                        {showAdv && (
+                          <>
+                            <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="flex min-w-0 flex-col gap-1">
+                          <Label className="flex flex-1 items-end text-xs">Bij verlies</Label>
                           <Input
                             type="number"
                             value={sys.points_loss ?? ""}
@@ -819,10 +854,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           />
                         </div>
 
-                        {showAdv && (
-                          <>
-                            <div className={cn("space-y-1", !sys.no_draws && "opacity-50")}>
-                              <Label className="text-xs">Bij verlies na verlenging, strafschoppen of golden goal</Label>
+                            <div className={cn("flex min-w-0 flex-col gap-1", !sys.no_draws && "opacity-50")}>
+                              <Label className="flex flex-1 items-end text-xs">Bij verlies na verlenging, strafschoppen of golden goal</Label>
                               <Input
                                 type="number"
                                 disabled={!sys.no_draws}
@@ -830,6 +863,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss_overtime: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                                 onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? (sys.points_loss ?? 0) : parseInt(e.target.value) })}
                               />
+                            </div>
                             </div>
                             <div className="pt-2 border-t border-border">
                               <div className="flex items-start justify-between gap-3">
@@ -857,7 +891,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         <p className="text-xs text-muted-foreground">
                           Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen.
                         </p>
-                        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
+                        <div className="mt-2 py-1">
                           <ol className="text-sm text-foreground space-y-1">
                             {sys.tiebreaker_rules
                               .filter((rule) => rule !== "fairplay" || tournament?.enable_fairplay)
@@ -1102,7 +1136,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         <p className="text-xs text-muted-foreground">
                           Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen.
                         </p>
-                        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
+                        <div className="mt-2 py-1">
                           <ol className="text-sm text-foreground space-y-1">
                             {sys.tiebreaker_rules.map((rule, idx) => (
                               <li key={`${sys.id}-tb-${rule}`} className="flex gap-2">
