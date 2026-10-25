@@ -680,69 +680,55 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
               </div>
 
               {isOpen && (
-                <div className="bg-card p-4 space-y-6">
-                  {/* Type and its advanced settings share one compact control row. */}
-                  <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-                    <div className="w-56 max-w-full space-y-2">
-                      <Label>Type</Label>
-                      <div className="grid h-10 grid-cols-2 rounded-md border border-border bg-secondary p-1">
-                        {(["points", "sets"] as const).map((opt) => (
-                          <Button
-                            key={opt}
-                            type="button"
-                            variant="ghost"
-                            onClick={() => handleTypeChange(sys, opt)}
-                            className={cn(
-                              "h-auto rounded-sm text-xs font-semibold uppercase tracking-wide",
-                              sys.scoring_type === opt
-                                ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:text-primary-foreground"
-                                : "text-muted-foreground hover:text-foreground"
-                            )}
-                          >
-                            {opt === "points" ? "Punten" : "Sets"}
-                          </Button>
-                        ))}
-                      </div>
+                <div className="border-t border-border bg-card p-4 space-y-5">
+                  {/* Punten / Sets toggle */}
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <div className="grid grid-cols-2 rounded-md border border-border bg-secondary p-1 h-10">
+                      {(["points", "sets"] as const).map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => handleTypeChange(sys, opt)}
+                          className={cn(
+                            "rounded-sm text-xs font-semibold uppercase tracking-wide transition-colors",
+                            sys.scoring_type === opt
+                              ? "bg-primary text-primary-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          {opt === "points" ? "Punten" : "Sets"}
+                        </button>
+                      ))}
                     </div>
-                    {sys.scoring_type === "points" && (
-                      <div className="flex min-h-10 items-center gap-3">
-                        <Switch
-                          id={`adv-${sys.id}`}
-                          checked={showAdv}
-                          onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
-                        />
-                        <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-sm font-medium">
-                          Geavanceerde instellingen
-                        </Label>
-                      </div>
-                    )}
                   </div>
 
                   {sys.scoring_type === "points" && (
                     <>
-                      <div className="space-y-4">
-                        <h4 className="form-label">Puntenverdeling groepsfase</h4>
-                        <p className="text-xs text-muted-foreground">
-                          Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel.
-                        </p>
-                        <div className={cn("grid gap-3", showAdv ? "sm:grid-cols-3" : "grid-cols-3")} >
-                        <div className="flex min-w-0 flex-col gap-1">
-                          <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij winst</Label>
-                          <Input
-                            type="number"
-                            value={sys.points_win ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between py-1">
+                          <Label htmlFor={`adv-${sys.id}`} className="text-sm font-medium cursor-pointer">
+                            Geavanceerde instellingen
+                          </Label>
+                          <Switch
+                            id={`adv-${sys.id}`}
+                            checked={showAdv}
+                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
                           />
                         </div>
 
+                        <p className="text-xs text-muted-foreground">
+                          Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel.
+                        </p>
+
                         {showAdv && (
-                            <div className="flex min-w-0 flex-col gap-1">
-                              <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij een grote overwinning</Label>
+                          <>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Bij een grote overwinning</Label>
                               <div className="flex gap-2">
                                 <Input
                                   type="number"
-                                  className="min-w-0 flex-1"
+                                  className="flex-1"
                                   value={sys.points_big_win ?? ""}
                                   onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
                                   onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value) })}
@@ -751,7 +737,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                   value={String(sys.big_win_threshold ?? 2)}
                                   onValueChange={(v) => { applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
                                 >
-                                  <SelectTrigger className="w-28 shrink-0">
+                                  <SelectTrigger className="w-[120px]">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -762,10 +748,22 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 </Select>
                               </div>
                             </div>
+                          </>
                         )}
+
+                        <div className="space-y-1">
+                          <Label className="text-xs">Bij winst</Label>
+                          <Input
+                            type="number"
+                            value={sys.points_win ?? ""}
+                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
+                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
+                          />
+                        </div>
+
                         {showAdv && (
-                          <div className={cn("flex min-w-0 flex-col gap-1", !sys.no_draws && "opacity-50")}>
-                            <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij winst na verlenging, strafschoppen of golden goal</Label>
+                          <div className={cn("space-y-1", !sys.no_draws && "opacity-50")}>
+                            <Label className="text-xs">Bij winst na verlenging, strafschoppen of golden goal</Label>
                             <Input
                               type="number"
                               disabled={!sys.no_draws}
@@ -776,38 +774,9 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           </div>
                         )}
 
-                        {!showAdv && (
-                          <>
                         {(!showAdv || !sys.no_draws) && (
-                          <div className="flex min-w-0 flex-col gap-1">
-                            <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij gelijkspel</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_draw ?? ""}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
-                            />
-                          </div>
-                        )}
-
-                        <div className="flex min-w-0 flex-col gap-1">
-                          <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij verlies</Label>
-                          <Input
-                            type="number"
-                            value={sys.points_loss ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                          />
-                        </div>
-
-                          </>
-                        )}
-                        </div>
-                        {showAdv && !sys.no_draws && (
-                          <div className="grid gap-3 sm:grid-cols-3">
-                        {(!showAdv || !sys.no_draws) && (
-                          <div className="flex min-w-0 flex-col gap-1">
-                            <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij gelijkspel</Label>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Bij gelijkspel</Label>
                             <Input
                               type="number"
                               value={sys.points_draw ?? ""}
@@ -819,8 +788,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                         {showAdv && !sys.no_draws && (
                           <>
-                            <div className="flex min-w-0 flex-col gap-1">
-                              <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij gelijkspel met doelpunten</Label>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Bij gelijkspel met doelpunten</Label>
                               <Input
                                 type="number"
                                 value={sys.points_draw_with_goals ?? ""}
@@ -828,8 +797,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? (sys.points_draw ?? 1) : parseInt(e.target.value) })}
                               />
                             </div>
-                            <div className="flex min-w-0 flex-col gap-1">
-                              <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij gelijkspel zonder doelpunten</Label>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Bij gelijkspel zonder doelpunten</Label>
                               <Input
                                 type="number"
                                 value={sys.points_draw_no_goals ?? ""}
@@ -840,13 +809,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           </>
                         )}
 
-                          </div>
-                        )}
-                        {showAdv && (
-                          <>
-                            <div className="grid gap-3 sm:grid-cols-3">
-                        <div className="flex min-w-0 flex-col gap-1">
-                          <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij verlies</Label>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Bij verlies</Label>
                           <Input
                             type="number"
                             value={sys.points_loss ?? ""}
@@ -855,8 +819,10 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           />
                         </div>
 
-                            <div className={cn("flex min-w-0 flex-col gap-1", !sys.no_draws && "opacity-50")}>
-                              <Label className={cn("flex items-end text-xs", showAdv && "min-h-12 sm:min-h-10")}>Bij verlies na verlenging, strafschoppen of golden goal</Label>
+                        {showAdv && (
+                          <>
+                            <div className={cn("space-y-1", !sys.no_draws && "opacity-50")}>
+                              <Label className="text-xs">Bij verlies na verlenging, strafschoppen of golden goal</Label>
                               <Input
                                 type="number"
                                 disabled={!sys.no_draws}
@@ -865,8 +831,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? (sys.points_loss ?? 0) : parseInt(e.target.value) })}
                               />
                             </div>
-                            </div>
-                            <div className="pt-2">
+                            <div className="pt-2 border-t border-border">
                               <div className="flex items-start justify-between gap-3">
                                 <div>
                                   <p className="text-sm font-semibold text-foreground">Poulewedstrijden mogen niet eindigen in een gelijkspel</p>
@@ -887,12 +852,12 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         )}
                       </div>
 
-                      <div className="space-y-3">
-                        <h4 className="form-label">Criteria bij gelijk aantal punten in de groep</h4>
+                      <div className="pt-4 border-t border-border space-y-2">
+                        <h4 className="text-sm font-semibold text-foreground">Rangschikking bij gelijk aantal punten in de groep</h4>
                         <p className="text-xs text-muted-foreground">
                           Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen.
                         </p>
-                        <div className="mt-2 py-1">
+                        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
                           <ol className="text-sm text-foreground space-y-1">
                             {sys.tiebreaker_rules
                               .filter((rule) => rule !== "fairplay" || tournament?.enable_fairplay)
@@ -927,9 +892,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         Stel in hoeveel sets er gespeeld worden en hoe punten worden toegekend.
                       </p>
 
-                      <div className="grid items-end gap-4 sm:grid-cols-2">
                       {/* Aantal sets */}
-                      <div className="min-w-0 space-y-2">
+                      <div className="space-y-1">
                         <Label className="text-xs">Aantal sets</Label>
                         <Select
                           value={String(sys.num_sets)}
@@ -948,9 +912,52 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         </Select>
                       </div>
 
+                      {/* Beslissende set (even sets) */}
+                      {sys.num_sets % 2 === 0 && (
+                        <div className="space-y-3 pt-2 border-t border-border">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-foreground">Beslissende set</span>
+                            <Switch
+                              checked={sys.decisive_set}
+                              onCheckedChange={(checked) => {
+                                applyUpdate(sys.id, { decisive_set: checked });
+                              }}
+                            />
+                          </div>
+                          {sys.decisive_set && (
+                            <div className="flex items-center justify-between pl-2">
+                              <span className="text-sm text-foreground">Laat beslissende set meetellen in doelsaldo</span>
+                              <Switch
+                                checked={sys.decisive_set_goal_diff}
+                                onCheckedChange={(checked) => {
+                                  applyUpdate(sys.id, { decisive_set_goal_diff: checked });
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Playoff modus (odd sets >= 3, only when NOT per_set scoring) */}
+                      {sys.num_sets >= 3 && sys.num_sets % 2 === 1 && sys.set_points_mode !== "per_set" && (
+                        <div className="pt-2 border-t border-border">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-foreground">
+                              Playoff modus (beste van {sys.num_sets})
+                            </span>
+                            <Switch
+                              checked={sys.playoff_mode}
+                              onCheckedChange={(checked) => {
+                                applyUpdate(sys.id, { playoff_mode: checked });
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
                       {/* Punten toekennen */}
                       {sys.num_sets >= 2 && (
-                        <div className="min-w-0 space-y-2">
+                        <div className="space-y-1 pt-2 border-t border-border">
                           <Label className="text-xs">Punten toekennen per team tijdens de groepsfase</Label>
                           <Select
                             value={sys.set_points_mode}
@@ -969,57 +976,10 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         </div>
                       )}
 
-                      </div>
-
-                      {/* Beslissende set (even sets) */}
-                      {sys.num_sets % 2 === 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium text-foreground">Beslissende set</span>
-                            <Switch
-                              checked={sys.decisive_set}
-                              onCheckedChange={(checked) => {
-                                applyUpdate(sys.id, { decisive_set: checked });
-                              }}
-                            />
-                          </div>
-                          {sys.decisive_set && (
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="text-sm text-foreground">Laat beslissende set meetellen in doelsaldo</span>
-                              <Switch
-                                checked={sys.decisive_set_goal_diff}
-                                onCheckedChange={(checked) => {
-                                  applyUpdate(sys.id, { decisive_set_goal_diff: checked });
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Playoff modus (odd sets >= 3, only when NOT per_set scoring) */}
-                      {sys.num_sets >= 3 && sys.num_sets % 2 === 1 && sys.set_points_mode !== "per_set" && (
-                        <div className="pt-2">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium text-foreground">
-                              Playoff modus (beste van {sys.num_sets})
-                            </span>
-                            <Switch
-                              checked={sys.playoff_mode}
-                              onCheckedChange={(checked) => {
-                                applyUpdate(sys.id, { playoff_mode: checked });
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      <h4 className="form-label">Puntenverdeling groepsfase</h4>
-
                       {/* Per set: W/D/L */}
                       {sys.num_sets >= 2 && sys.set_points_mode === "per_set" && (
-                        <div className="grid grid-cols-3 gap-3">
-                          <div className="min-w-0 space-y-1">
+                        <div className="space-y-2">
+                          <div className="space-y-1">
                             <Label className="text-xs">Bij winst</Label>
                             <Input
                               type="number"
@@ -1054,14 +1014,13 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         const outcomes = generateSetOutcomes(sys.num_sets, sys.playoff_mode, sys.decisive_set);
                         const rp: SetResultPoints = sys.set_result_points || {};
                         return outcomes.length > 0 ? (
-                          <div className="grid items-start gap-x-6 gap-y-4 sm:grid-cols-2">
+                          <div className="space-y-3">
                             {outcomes.map(({ key: oc, isDraw }) => {
                               const pts = rp[oc] || { win: 2, loss: 0, draw: 1 };
                               if (isDraw) {
                                 return (
                                   <div key={oc} className="space-y-1">
                                     <Label className="text-xs">Punten bij gelijkspel {oc}</Label>
-                                    <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-0.5">
                                       <span className="text-[10px] text-muted-foreground">Beide teams</span>
                                       <Input
@@ -1070,7 +1029,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                         onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
                                         onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
                                       />
-                                    </div>
                                     </div>
                                   </div>
                                 );
@@ -1107,8 +1065,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                       {/* 1 set: standard W/D/L */}
                       {sys.num_sets === 1 && (
-                        <div className="grid grid-cols-3 gap-3">
-                          <div className="min-w-0 space-y-1">
+                        <div className="space-y-2">
+                          <div className="space-y-1">
                             <Label className="text-xs">Bij winst</Label>
                             <Input
                               type="number"
@@ -1139,12 +1097,12 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                       )}
 
                       {/* Tiebreaker section */}
-                      <div className="space-y-3">
-                        <h4 className="form-label">Criteria bij gelijk aantal punten in de groep</h4>
+                      <div className="pt-4 border-t border-border space-y-2">
+                        <h4 className="text-sm font-semibold text-foreground">Rangschikking bij gelijk aantal punten in de groep</h4>
                         <p className="text-xs text-muted-foreground">
                           Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen.
                         </p>
-                        <div className="mt-2 py-1">
+                        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
                           <ol className="text-sm text-foreground space-y-1">
                             {sys.tiebreaker_rules.map((rule, idx) => (
                               <li key={`${sys.id}-tb-${rule}`} className="flex gap-2">

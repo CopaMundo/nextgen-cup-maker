@@ -83,13 +83,13 @@ export const StandingsColumnsInline = ({
   };
 
   return (
-    <div className="space-y-3">
-      <h4 className="form-label">Weergave stand</h4>
+    <div className="pt-4 border-t border-border space-y-2">
+      <h4 className="text-sm font-semibold text-foreground">Standen tabellen</h4>
       <p className="text-xs text-muted-foreground">
         Bepaal welke kolommen zichtbaar zijn in de klassementen. Punten (P) staat altijd aan.
       </p>
-      <div className="mt-2 py-1">
-        <div className="flex flex-wrap gap-x-5 gap-y-3">
+      <div className="rounded-lg border border-border bg-secondary/30 px-3 py-3 mt-2">
+        <div className="flex flex-wrap gap-x-5 gap-y-2">
           {cols.map(({ key, label, short }) => (
             <label
               key={key}
