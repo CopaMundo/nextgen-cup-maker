@@ -83,8 +83,8 @@ export const StandingsColumnsInline = ({
   };
 
   return (
-    <div className="pt-4 border-t border-border space-y-2">
-      <h4 className="text-sm font-semibold text-foreground">Standen tabellen</h4>
+    <div className="space-y-3">
+      <h4 className="form-label">Weergave stand</h4>
       <p className="text-xs text-muted-foreground">
         Bepaal welke kolommen zichtbaar zijn in de klassementen. Punten (P) staat altijd aan.
       </p>
