@@ -1089,7 +1089,7 @@ const TournamentGeneral = ({
               <ScoringSystemsManager tournamentId={tournament.id} tournament={tournament} onUpdate={onUpdate} />
             </div>
 
-            <div className="space-y-4 border-t border-border pt-5">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-foreground">Spelersstatistieken</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl">
