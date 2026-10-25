@@ -1070,19 +1070,33 @@ const TournamentGeneral = ({
             <div className="section-card space-y-5">
               <div className="space-y-2">
                 <h2 className="section-title">{isMobile ? "Puntentelling" : "Puntensysteem"}</h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-foreground">Puntentelling</h3>
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" aria-label="Info over puntentelling">
+                          <Info className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs text-xs">
+                        Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
               <ScoringSystemsManager tournamentId={tournament.id} tournament={tournament} onUpdate={onUpdate} />
             </div>
 
-            <div className="section-card space-y-5">
+            <div className="space-y-4 border-t border-border pt-5">
               <div className="space-y-2">
-                <h3 className="section-title">Spelersstatistieken</h3>
+                <h3 className="text-sm font-semibold text-foreground">Spelersstatistieken</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl">
                   Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
                 </p>
               </div>
-              <div className="grid gap-3 lg:grid-cols-2">
+              <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
                 {[
                   { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers" },
                   { key: "enable_assists", publicKey: "show_public_assists", label: "Assists" },
@@ -1090,10 +1104,11 @@ const TournamentGeneral = ({
                   const isEnabled = form[key as keyof typeof form] as boolean;
 
                   return (
-                  <div key={key} className="rounded-lg border border-border bg-background/40 p-4">
+                  <div key={key} className="min-w-0 py-2">
                     <div className="flex items-center justify-between gap-3">
                       <h4 className="text-sm font-semibold text-foreground">{label}</h4>
                       <Switch
+                        aria-label={label}
                         checked={isEnabled}
                         onCheckedChange={(value) => {
                           const updates: any = { [key]: value };
@@ -1107,10 +1122,11 @@ const TournamentGeneral = ({
                 })}
               </div>
 
-              <div className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
+              <div className="space-y-4 border-t border-border pt-4">
                 <div className="flex items-center justify-between gap-3">
                   <h4 className="text-sm font-semibold text-foreground">Kaarten</h4>
                   <Switch
+                    aria-label="Kaarten"
                     checked={form.enable_yellow_cards}
                     onCheckedChange={(value) => {
                       const updates: any = { enable_yellow_cards: value, enable_red_cards: value };
@@ -1121,7 +1137,7 @@ const TournamentGeneral = ({
                 </div>
 
               {form.enable_yellow_cards && (
-                <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+                <div className="space-y-4 border-t border-border pt-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-semibold text-foreground">Fairplayklassement</h4>
