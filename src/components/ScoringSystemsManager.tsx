@@ -152,6 +152,42 @@ const hasAdvancedSettings = (sys: ScoringSystem): boolean => {
 };
 
 
+/** Getalveld met eigen label: blijft leeg tijdens typen, slaat op bij blur. */
+const draftNumber = (raw: string) => (raw === "" ? (null as any) : parseInt(raw));
+
+const PointsNumberField = ({
+  id,
+  label,
+  value,
+  onValueChange,
+  onCommit,
+  disabled,
+  className,
+}: {
+  id?: string;
+  label: string;
+  value: number | null | undefined;
+  onValueChange: (raw: string) => void;
+  onCommit: (raw: string) => void;
+  disabled?: boolean;
+  className?: string;
+}) => (
+  <div className={cn("space-y-1", className)}>
+    <Label htmlFor={id} className="text-xs">
+      {label}
+    </Label>
+    <Input
+      id={id}
+      type="number"
+      disabled={disabled}
+      value={value ?? ""}
+      onChange={(e) => onValueChange(e.target.value)}
+      onBlur={(e) => onCommit(e.target.value)}
+    />
+  </div>
+);
+
+
 const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournamentId: string; tournament?: any; onUpdate?: (t: any) => void }) => {
   const { toast } = useToast();
   const [systems, setSystems] = useState<ScoringSystem[]>([]);
@@ -642,6 +678,40 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
         {systems.map((sys, sysIdx) => {
           const isOpen = expandedId === sys.id;
           const showAdv = showAdvancedId === sys.id;
+          /** Puntenveld voor deze tellings; overal dezelfde typ-/opslagregels. */
+          const pointsField = (
+            label: string,
+            key:
+              | "points_win"
+              | "points_draw"
+              | "points_loss"
+              | "points_win_overtime"
+              | "points_draw_with_goals"
+              | "points_draw_no_goals"
+              | "points_loss_overtime",
+            fallback: number,
+            opts?: { disabled?: boolean; className?: string },
+          ) => {
+            const fieldId = `${sys.id}-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+            return (
+            <PointsNumberField
+              id={fieldId}
+              label={label}
+              value={sys[key]}
+              disabled={opts?.disabled}
+              className={opts?.className}
+              onValueChange={(raw) =>
+                setSystems((prev) =>
+                  prev.map((s) => (s.id === sys.id ? ({ ...s, [key]: draftNumber(raw) } as ScoringSystem) : s)),
+                )
+              }
+              onCommit={(raw) =>
+                applyUpdate(sys.id, { [key]: raw === "" ? fallback : parseInt(raw) } as Partial<ScoringSystem>)
+              }
+            />
+            );
+          };
+
           return (
             <div key={sys.id} className="rounded-lg border border-border bg-secondary/30 overflow-hidden">
               <div
@@ -725,130 +795,100 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         />
 
                         {showAdv && (
-                          <>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Bij een grote overwinning</Label>
-                              <div className="flex gap-2">
-                                <Input
-                                  type="number"
-                                  className="flex-1"
-                                  value={sys.points_big_win ?? ""}
-                                  onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_big_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                                  onBlur={(e) => applyUpdate(sys.id, { points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value) })}
-                                />
-                                <Select
-                                  value={String(sys.big_win_threshold ?? 2)}
-                                  onValueChange={(v) => { applyUpdate(sys.id, { big_win_threshold: parseInt(v) }); }}
-                                >
-                                  <SelectTrigger className="w-[120px]">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {[2, 3, 4, 5].map((n) => (
-                                      <SelectItem key={n} value={String(n)}>+ {n} goals</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                          </>
-                        )}
-
-                        <div className="space-y-1">
-                          <Label className="text-xs">Bij winst</Label>
-                          <Input
-                            type="number"
-                            value={sys.points_win ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
-                          />
-                        </div>
-
-                        {showAdv && (
-                          <div className={cn("space-y-1", !sys.no_draws && "opacity-50")}>
-                            <Label className="text-xs">Bij winst na verlenging, strafschoppen of golden goal</Label>
-                            <Input
-                              type="number"
-                              disabled={!sys.no_draws}
-                              value={sys.points_win_overtime ?? ""}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win_overtime: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                              onBlur={(e) => applyUpdate(sys.id, { points_win_overtime: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value) })}
-                            />
-                          </div>
-                        )}
-
-                        {(!showAdv || !sys.no_draws) && (
                           <div className="space-y-1">
-                            <Label className="text-xs">Bij gelijkspel</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_draw ?? ""}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
-                            />
+                            <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-xs">
+                              Bij een grote overwinning
+                            </Label>
+                            <div className="flex gap-2">
+                              <Input
+                                type="number"
+                                id={`${sys.id}-grote-overwinning`}
+                                className="flex-1"
+                                value={sys.points_big_win ?? ""}
+                                onChange={(e) =>
+                                  setSystems((prev) =>
+                                    prev.map((s) =>
+                                      s.id === sys.id ? { ...s, points_big_win: draftNumber(e.target.value) } : s,
+                                    ),
+                                  )
+                                }
+                                onBlur={(e) =>
+                                  applyUpdate(sys.id, {
+                                    points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value),
+                                  })
+                                }
+                              />
+                              <Select
+                                value={String(sys.big_win_threshold ?? 2)}
+                                onValueChange={(v) => {
+                                  applyUpdate(sys.id, { big_win_threshold: parseInt(v) });
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {[2, 3, 4, 5].map((n) => (
+                                    <SelectItem key={n} value={String(n)}>+ {n} goals</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                         )}
 
-                        {showAdv && !sys.no_draws && (
+                        {showAdv ? (
                           <>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Bij gelijkspel met doelpunten</Label>
-                              <Input
-                                type="number"
-                                value={sys.points_draw_with_goals ?? ""}
-                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_with_goals: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                                onBlur={(e) => applyUpdate(sys.id, { points_draw_with_goals: e.target.value === "" ? (sys.points_draw ?? 1) : parseInt(e.target.value) })}
-                              />
+                            {/* Winst: basiswaarde en verlenging naast elkaar */}
+                            <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
+                              {pointsField("Bij winst", "points_win", 3)}
+                              {pointsField("Bij winst na verlenging, strafschoppen of golden goal", "points_win_overtime", sys.points_win ?? 3, {
+                                disabled: !sys.no_draws,
+                                className: !sys.no_draws ? "opacity-50" : undefined,
+                              })}
                             </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Bij gelijkspel zonder doelpunten</Label>
-                              <Input
-                                type="number"
-                                value={sys.points_draw_no_goals ?? ""}
-                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw_no_goals: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                                onBlur={(e) => applyUpdate(sys.id, { points_draw_no_goals: e.target.value === "" ? (sys.points_draw ?? 1) : parseInt(e.target.value) })}
-                              />
+
+                            {/* Gelijkspel: basiswaarde en de twee varianten naast elkaar */}
+                            {!sys.no_draws && (
+                              <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                                {pointsField("Bij gelijkspel", "points_draw", 1)}
+                                {pointsField("Bij gelijkspel met doelpunten", "points_draw_with_goals", sys.points_draw ?? 1)}
+                                {pointsField("Bij gelijkspel zonder doelpunten", "points_draw_no_goals", sys.points_draw ?? 1)}
+                              </div>
+                            )}
+
+                            {/* Verlies: basiswaarde en verlenging naast elkaar */}
+                            <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
+                              {pointsField("Bij verlies", "points_loss", 0)}
+                              {pointsField("Bij verlies na verlenging, strafschoppen of golden goal", "points_loss_overtime", sys.points_loss ?? 0, {
+                                disabled: !sys.no_draws,
+                                className: !sys.no_draws ? "opacity-50" : undefined,
+                              })}
                             </div>
                           </>
+                        ) : (
+                          /* Winst, gelijkspel en verlies op één horizontale lijn */
+                          <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                            {pointsField("Bij winst", "points_win", 3)}
+                            {pointsField("Bij gelijkspel", "points_draw", 1)}
+                            {pointsField("Bij verlies", "points_loss", 0)}
+                          </div>
                         )}
-
-                        <div className="space-y-1">
-                          <Label className="text-xs">Bij verlies</Label>
-                          <Input
-                            type="number"
-                            value={sys.points_loss ?? ""}
-                            onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                          />
-                        </div>
-
                         {showAdv && (
-                          <>
-                            <div className={cn("space-y-1", !sys.no_draws && "opacity-50")}>
-                              <Label className="text-xs">Bij verlies na verlenging, strafschoppen of golden goal</Label>
-                              <Input
-                                type="number"
-                                disabled={!sys.no_draws}
-                                value={sys.points_loss_overtime ?? ""}
-                                onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss_overtime: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                                onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? (sys.points_loss ?? 0) : parseInt(e.target.value) })}
+                          <InfoHeading
+                            className="pt-1"
+                            title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
+                            info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
+                            right={
+                              <Switch
+                                checked={sys.no_draws}
+                                onCheckedChange={async (checked) => {
+                                  await applyUpdate(sys.id, { no_draws: checked });
+                                }}
+                                className="shrink-0"
                               />
-                            </div>
-                            <InfoHeading
-                              className="pt-1"
-                              title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
-                              info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
-                              right={
-                                <Switch
-                                  checked={sys.no_draws}
-                                  onCheckedChange={async (checked) => {
-                                    await applyUpdate(sys.id, { no_draws: checked });
-                                  }}
-                                  className="shrink-0"
-                                />
-                              }
-                            />
-                          </>
+                            }
+                          />
                         )}
                       </div>
 
@@ -978,34 +1018,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                       {/* Per set: W/D/L */}
                       {sys.num_sets >= 2 && sys.set_points_mode === "per_set" && (
-                        <div className="space-y-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij winst</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_win ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij gelijkspel</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_draw ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij verlies</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_loss ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            />
-                          </div>
+                        /* Winst, gelijkspel en verlies op één horizontale lijn */
+                        <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                          {pointsField("Bij winst", "points_win", 3)}
+                          {pointsField("Bij gelijkspel", "points_draw", 1)}
+                          {pointsField("Bij verlies", "points_loss", 0)}
                         </div>
                       )}
 
@@ -1065,34 +1082,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                       {/* 1 set: standard W/D/L */}
                       {sys.num_sets === 1 && (
-                        <div className="space-y-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij winst</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_win ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_win: e.target.value === "" ? 3 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_win: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij gelijkspel</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_draw ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_draw: e.target.value === "" ? 1 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_draw: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Bij verlies</Label>
-                            <Input
-                              type="number"
-                              value={sys.points_loss ?? ""}
-                              onBlur={(e) => applyUpdate(sys.id, { points_loss: e.target.value === "" ? 0 : parseInt(e.target.value) })}
-                              onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, points_loss: e.target.value === "" ? (null as any) : parseInt(e.target.value) } : s))}
-                            />
-                          </div>
+                        /* Winst, gelijkspel en verlies op één horizontale lijn */
+                        <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                          {pointsField("Bij winst", "points_win", 3)}
+                          {pointsField("Bij gelijkspel", "points_draw", 1)}
+                          {pointsField("Bij verlies", "points_loss", 0)}
                         </div>
                       )}
 
