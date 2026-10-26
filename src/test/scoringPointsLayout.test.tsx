@@ -33,7 +33,8 @@ const { SYSTEM } = vi.hoisted(() => ({
 vi.mock("@/integrations/supabase/client", () => {
   const query = (result: any) => {
     const q: any = { then: (res: any) => Promise.resolve(result).then(res) };
-    return new Proxy(q, { get: (t, p) => (p in t ? (t as any)[p] : () => q) });
+    const chain: any = new Proxy(q, { get: (t, p) => (p in t ? (t as any)[p] : () => chain) });
+    return chain;
   };
   return { supabase: { from: () => query({ data: [SYSTEM], count: 0, error: null }) } };
 });
