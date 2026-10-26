@@ -1069,7 +1069,7 @@ const TournamentGeneral = ({
           <div id="admin-section-puntentelling" data-admin-section="puntentelling" className="space-y-6">
             <div className="section-card space-y-5">
               <div className="space-y-2">
-                <h2 className="section-title">{isMobile ? "Puntentelling" : "Puntensysteem"}</h2>
+                <h2 className="section-title">Puntentelling</h2>
                 <p className="text-xs sm:text-sm text-muted-foreground">Kies tussen punten of sets, bepaal de puntentoekenning en stel de rangschikkingsregels vast voor een gelijke stand in de poule. Voeg meerdere puntentellingen toe om ze later per format, groep of wedstrijd te kunnen kiezen.</p>
               </div>
               <ScoringSystemsManager tournamentId={tournament.id} tournament={tournament} onUpdate={onUpdate} />
@@ -1079,70 +1079,68 @@ const TournamentGeneral = ({
               <div className="space-y-2">
                 <h3 className="section-title">Spelersstatistieken</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl">
-                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
+                  Als je spelers aan je teams hebt toegevoegd, kun je hier kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden.
                 </p>
               </div>
-              <div className="grid gap-3 lg:grid-cols-2">
-                {[
-                  { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers" },
-                  { key: "enable_assists", publicKey: "show_public_assists", label: "Assists" },
-                ].map(({ key, publicKey, label }) => {
-                  const isEnabled = form[key as keyof typeof form] as boolean;
 
-                  return (
-                  <div key={key} className="rounded-lg border border-border bg-background/40 p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <h4 className="text-sm font-semibold text-foreground">{label}</h4>
+              <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-5">
+                <div className="space-y-4">
+                  {[
+                    { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Topscorers bijhouden", info: "Houd per wedstrijd de doelpuntenmakers bij. Het topscorersklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
+                    { key: "enable_assists", publicKey: "show_public_assists", label: "Assists bijhouden", info: "Houd per doelpunt de aangever bij. Het assistklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
+                  ].map(({ key, publicKey, label, info }) => (
+                    <InfoHeading
+                      key={key}
+                      title={label}
+                      info={info}
+                      right={
+                        <Switch
+                          checked={form[key as keyof typeof form] as boolean}
+                          onCheckedChange={(value) => saveToDb({ [key]: value, [publicKey]: value } as any)}
+                        />
+                      }
+                    />
+                  ))}
+                </div>
+
+                <div className="space-y-4 border-t border-border pt-5">
+                  <InfoHeading
+                    title="Gele en rode kaarten bijhouden"
+                    info="Registreer per wedstrijd gele, tweede gele en rode kaarten per speler."
+                    right={
                       <Switch
-                        checked={isEnabled}
+                        checked={form.enable_yellow_cards}
                         onCheckedChange={(value) => {
-                          const updates: any = { [key]: value };
-                          if (publicKey) updates[publicKey] = value;
+                          const updates: any = { enable_yellow_cards: value, enable_red_cards: value };
+                          if (!value) updates.enable_fairplay = false;
                           saveToDb(updates);
                         }}
                       />
-                    </div>
-                  </div>
-                  );
-                })}
-              </div>
-
-              <div className="rounded-lg border border-border bg-background/40 p-4 space-y-4">
-                <div className="flex items-center justify-between gap-3">
-                  <h4 className="text-sm font-semibold text-foreground">Kaarten</h4>
-                  <Switch
-                    checked={form.enable_yellow_cards}
-                    onCheckedChange={(value) => {
-                      const updates: any = { enable_yellow_cards: value, enable_red_cards: value };
-                      if (!value) updates.enable_fairplay = false;
-                      saveToDb(updates);
-                    }}
+                    }
                   />
-                </div>
 
-              {form.enable_yellow_cards && (
-                <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <h4 className="text-sm font-semibold text-foreground">Fairplayklassement</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">Alleen zichtbaar in de beheeromgeving. Je kunt fairplay ook toevoegen als criterium bij gelijke punten in de puntentelling.</p>
-                    </div>
-                    <Switch
-                      checked={form.enable_fairplay}
-                      onCheckedChange={(value) => {
-                        const updates: any = { enable_fairplay: value };
-                        if (value && !tournament.fairplay_config) updates.fairplay_config = { ...FAIRPLAY_DEFAULTS };
-                        saveToDb(updates);
-                      }}
+                  {form.enable_yellow_cards && (
+                    <InfoHeading
+                      title="Fair-playklassement activeren"
+                      info="Alleen zichtbaar in de beheeromgeving. Je kunt fairplay ook toevoegen als criterium bij gelijke punten in de puntentelling."
+                      right={
+                        <Switch
+                          checked={form.enable_fairplay}
+                          onCheckedChange={(value) => {
+                            const updates: any = { enable_fairplay: value };
+                            if (value && !tournament.fairplay_config) updates.fairplay_config = { ...FAIRPLAY_DEFAULTS };
+                            saveToDb(updates);
+                          }}
+                        />
+                      }
                     />
-                  </div>
+                  )}
 
-
-                  {form.enable_fairplay && (
+                  {form.enable_yellow_cards && form.enable_fairplay && (
                     <div className="space-y-3">
-                      <p className="text-xs text-muted-foreground">Bepaal hoeveel strafpunten elke kaart kost. Een gele kaart gevolgd door een rechtstreekse rode kaart voor dezelfde speler telt op (standaard 1 + 5 = 6 strafpunten).</p>
+                      <p className="text-xs text-muted-foreground">Strafpunten per kaart. Een gele kaart gevolgd door een rechtstreekse rode kaart telt op (standaard 1 + 5 = 6).</p>
                       <TooltipProvider delayDuration={150}>
-                        <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="grid gap-2 sm:grid-cols-3">
                           {([
                             { key: "yellow", icon: <div className="h-4 w-3 rounded-sm bg-yellow-400" />, tip: "Gele kaart" },
                             { key: "second_yellow", icon: (
@@ -1153,7 +1151,7 @@ const TournamentGeneral = ({
                             ), tip: "Tweede gele kaart → rood" },
                             { key: "red", icon: <div className="h-4 w-3 rounded-sm bg-red-500" />, tip: "Rechtstreekse rode kaart" },
                           ] as const).map(({ key, icon, tip }) => (
-                            <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2">
+                            <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5">
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <span className="inline-flex items-center cursor-help">{icon}</span>
@@ -1173,7 +1171,7 @@ const TournamentGeneral = ({
                           ))}
                         </div>
                       </TooltipProvider>
-                      <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="grid gap-2 sm:grid-cols-2">
                         <div className="space-y-1.5">
                           <Label className="text-xs">Punten voor een wedstrijd zonder kaarten</Label>
                           <Input
@@ -1196,13 +1194,10 @@ const TournamentGeneral = ({
                           />
                         </div>
                       </div>
-                      
                     </div>
                   )}
                 </div>
-              )}
               </div>
-
             </div>
           </div>
         )}
