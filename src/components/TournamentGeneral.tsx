@@ -21,6 +21,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getFairplayConfig, FAIRPLAY_DEFAULTS } from "@/lib/fairplay";
+import { InfoHeading } from "@/components/admin/InfoHeading";
 
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
