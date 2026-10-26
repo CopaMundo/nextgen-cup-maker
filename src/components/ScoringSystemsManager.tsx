@@ -17,6 +17,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { StandingsColumnsInline } from "./StandingsColumnsSettings";
 import { SortableVerticalList, SortableRowShell } from "@/components/SortableList";
+import { InfoHeading } from "@/components/admin/InfoHeading";
 
 const TIEBREAKER_OPTIONS = [
   { value: "goal_difference", label: "Doelpuntensaldo" },
@@ -705,21 +706,23 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                   {sys.scoring_type === "points" && (
                     <>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between py-1">
-                          <Label htmlFor={`adv-${sys.id}`} className="text-sm font-medium cursor-pointer">
-                            Geavanceerde instellingen
-                          </Label>
-                          <Switch
-                            id={`adv-${sys.id}`}
-                            checked={showAdv}
-                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
-                          />
-                        </div>
-
-                        <p className="text-xs text-muted-foreground">
-                          Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel.
-                        </p>
+                      <div className="space-y-3 pt-5 border-t border-border">
+                        <InfoHeading
+                          title="Puntentoekenning in groepswedstrijden"
+                          info="Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel."
+                          right={
+                            <div className="flex shrink-0 items-center gap-2">
+                              <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-xs font-medium text-muted-foreground">
+                                Geavanceerde instellingen
+                              </Label>
+                              <Switch
+                                id={`adv-${sys.id}`}
+                                checked={showAdv}
+                                onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
+                              />
+                            </div>
+                          }
+                        />
 
                         {showAdv && (
                           <>
@@ -831,32 +834,29 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                                 onBlur={(e) => applyUpdate(sys.id, { points_loss_overtime: e.target.value === "" ? (sys.points_loss ?? 0) : parseInt(e.target.value) })}
                               />
                             </div>
-                            <div className="pt-2 border-t border-border">
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <p className="text-sm font-semibold text-foreground">Poulewedstrijden mogen niet eindigen in een gelijkspel</p>
-                                  <p className="text-xs text-muted-foreground mt-0.5">
-                                    Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand.
-                                  </p>
-                                </div>
+                            <InfoHeading
+                              className="pt-1"
+                              title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
+                              info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
+                              right={
                                 <Switch
                                   checked={sys.no_draws}
                                   onCheckedChange={async (checked) => {
                                     await applyUpdate(sys.id, { no_draws: checked });
                                   }}
-                                  className="mt-1 shrink-0"
+                                  className="shrink-0"
                                 />
-                              </div>
-                            </div>
+                              }
+                            />
                           </>
                         )}
                       </div>
 
-                      <div className="pt-4 border-t border-border space-y-2">
-                        <h4 className="text-sm font-semibold text-foreground">Rangschikking bij gelijk aantal punten in de groep</h4>
-                        <p className="text-xs text-muted-foreground">
-                          Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen.
-                        </p>
+                      <div className="pt-5 border-t border-border space-y-2">
+                        <InfoHeading
+                          title="Criteria bij gelijk aantal punten in de groep"
+                          info="Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen."
+                        />
                         <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
                           <ol className="text-sm text-foreground space-y-1">
                             {sys.tiebreaker_rules

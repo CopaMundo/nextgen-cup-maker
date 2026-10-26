@@ -10,6 +10,11 @@ import {
   type PointsColumnsConfig,
   type SetsColumnsConfig,
 } from "@/lib/standingsDisplay";
+import { InfoHeading } from "@/components/admin/InfoHeading";
+import { cn } from "@/lib/utils";
+
+/** Maximum number of optional columns shown in a standings table. */
+export const MAX_STANDINGS_COLUMNS = 7;
 
 interface Props {
   tournament: any;
@@ -72,8 +77,11 @@ export const StandingsColumnsInline = ({
 
   const cols = mode === "points" ? POINTS_COLS : SETS_COLS;
   const current = mode === "points" ? cfg.points : cfg.sets;
+  const selectedCount = cols.filter(({ key }) => (current as any)[key]).length;
+  const limitReached = selectedCount >= MAX_STANDINGS_COLUMNS;
 
   const toggle = async (key: string, val: boolean) => {
+    if (val && limitReached) return;
     const next: StandingsColumnsConfig =
       mode === "points"
         ? { ...cfg, points: { ...cfg.points, [key]: val } as PointsColumnsConfig }
@@ -83,26 +91,32 @@ export const StandingsColumnsInline = ({
   };
 
   return (
-    <div className="pt-4 border-t border-border space-y-2">
-      <h4 className="text-sm font-semibold text-foreground">Standen tabellen</h4>
-      <p className="text-xs text-muted-foreground">
-        Bepaal welke kolommen zichtbaar zijn in de klassementen. Punten (P) staat altijd aan.
-      </p>
+    <div className="pt-5 border-t border-border space-y-2">
+      <InfoHeading
+        title="Weergave stand"
+        info={`Bepaal welke kolommen zichtbaar zijn in de klassementen. Punten (P) staat altijd aan. Je kunt maximaal ${MAX_STANDINGS_COLUMNS} kolommen aanduiden.`}
+        right={<span className="text-xs tabular-nums text-muted-foreground">{selectedCount}/{MAX_STANDINGS_COLUMNS}</span>}
+      />
       <div className="rounded-lg border border-border bg-secondary/30 px-3 py-3 mt-2">
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          {cols.map(({ key, label, short }) => (
+          {cols.map(({ key, label, short }) => {
+            const checked = !!(current as any)[key];
+            const disabled = !checked && limitReached;
+            return (
             <label
               key={key}
               title={label}
-              className="flex items-center gap-2 cursor-pointer select-none"
+              className={cn("flex items-center gap-2 select-none", disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer")}
             >
               <Checkbox
-                checked={(current as any)[key]}
+                checked={checked}
+                disabled={disabled}
                 onCheckedChange={(v) => toggle(key as string, !!v)}
               />
               <span className="text-xs font-medium text-foreground">{short}</span>
             </label>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
