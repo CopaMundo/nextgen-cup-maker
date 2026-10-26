@@ -862,21 +862,21 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             {pointsField("Bij verlies", "points_loss", 0)}
                           </div>
                         )}
-                            <InfoHeading
-                              className="pt-1"
-                              title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
-                              info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
-                              right={
-                                <Switch
-                                  checked={sys.no_draws}
-                                  onCheckedChange={async (checked) => {
-                                    await applyUpdate(sys.id, { no_draws: checked });
-                                  }}
-                                  className="shrink-0"
-                                />
-                              }
-                            />
-                          </>
+                        {showAdv && (
+                          <InfoHeading
+                            className="pt-1"
+                            title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
+                            info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
+                            right={
+                              <Switch
+                                checked={sys.no_draws}
+                                onCheckedChange={async (checked) => {
+                                  await applyUpdate(sys.id, { no_draws: checked });
+                                }}
+                                className="shrink-0"
+                              />
+                            }
+                          />
                         )}
                       </div>
 
