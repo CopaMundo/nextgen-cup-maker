@@ -156,6 +156,7 @@ const hasAdvancedSettings = (sys: ScoringSystem): boolean => {
 const draftNumber = (raw: string) => (raw === "" ? (null as any) : parseInt(raw));
 
 const PointsNumberField = ({
+  id,
   label,
   value,
   onValueChange,
@@ -163,6 +164,7 @@ const PointsNumberField = ({
   disabled,
   className,
 }: {
+  id?: string;
   label: string;
   value: number | null | undefined;
   onValueChange: (raw: string) => void;
@@ -171,8 +173,11 @@ const PointsNumberField = ({
   className?: string;
 }) => (
   <div className={cn("space-y-1", className)}>
-    <Label className="text-xs">{label}</Label>
+    <Label htmlFor={id} className="text-xs">
+      {label}
+    </Label>
     <Input
+      id={id}
       type="number"
       disabled={disabled}
       value={value ?? ""}
@@ -686,8 +691,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
               | "points_loss_overtime",
             fallback: number,
             opts?: { disabled?: boolean; className?: string },
-          ) => (
+          ) => {
+            const fieldId = `${sys.id}-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+            return (
             <PointsNumberField
+              id={fieldId}
               label={label}
               value={sys[key]}
               disabled={opts?.disabled}
@@ -701,7 +709,8 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                 applyUpdate(sys.id, { [key]: raw === "" ? fallback : parseInt(raw) } as Partial<ScoringSystem>)
               }
             />
-          );
+            );
+          };
 
           return (
             <div key={sys.id} className="rounded-lg border border-border bg-secondary/30 overflow-hidden">
@@ -787,10 +796,13 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                         {showAdv && (
                           <div className="space-y-1">
-                            <Label className="text-xs">Bij een grote overwinning</Label>
+                            <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-xs">
+                              Bij een grote overwinning
+                            </Label>
                             <div className="flex gap-2">
                               <Input
                                 type="number"
+                                id={`${sys.id}-grote-overwinning`}
                                 className="flex-1"
                                 value={sys.points_big_win ?? ""}
                                 onChange={(e) =>
