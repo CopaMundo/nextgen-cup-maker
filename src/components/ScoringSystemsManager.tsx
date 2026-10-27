@@ -173,7 +173,7 @@ const PointsNumberField = ({
   className?: string;
 }) => (
   <div className={cn("space-y-1", className)}>
-    <Label htmlFor={id} className="text-xs">
+    <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">
       {label}
     </Label>
     <Input
