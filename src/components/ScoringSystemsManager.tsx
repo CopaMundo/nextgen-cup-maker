@@ -173,7 +173,7 @@ const PointsNumberField = ({
   className?: string;
 }) => (
   <div className={cn("space-y-1", className)}>
-    <Label htmlFor={id} className="text-xs font-medium text-foreground">
+    <Label htmlFor={id} className="text-sm font-medium text-foreground">
       {label}
     </Label>
     <Input
@@ -779,7 +779,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                     <>
                       <div className="space-y-3 pt-5 border-t border-border">
                         <InfoHeading
-                          title="Puntentoekenning"
+                          title="Puntenverdeling"
                           info="Stel in hoeveel punten een team in een groepswedstrijd krijgt bij winst, verlies en gelijkspel."
                           right={
                             <div className="flex shrink-0 items-center gap-2">
@@ -798,7 +798,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         {showAdv && (
                           <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
                             <div className="space-y-1">
-                              <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-xs font-medium text-foreground">
+                              <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-sm font-medium text-foreground">
                                 Bij een grote overwinning
                               </Label>
                               <div className="flex gap-2">
