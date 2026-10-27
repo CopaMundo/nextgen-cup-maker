@@ -173,7 +173,7 @@ const PointsNumberField = ({
   className?: string;
 }) => (
   <div className={cn("space-y-1", className)}>
-    <Label htmlFor={id} className="text-xs">
+    <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">
       {label}
     </Label>
     <Input
@@ -780,74 +780,70 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         <InfoHeading
                           title="Puntentoekenning in groepswedstrijden"
                           info="Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel."
-                          right={
-                            <div className="flex shrink-0 items-center gap-2">
-                              <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-xs font-medium text-muted-foreground">
-                                Geavanceerde instellingen
-                              </Label>
-                              <Switch
-                                id={`adv-${sys.id}`}
-                                checked={showAdv}
-                                onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
-                              />
-                            </div>
-                          }
                         />
+                        <div className="flex items-center justify-end gap-2">
+                          <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-xs font-normal text-muted-foreground">
+                            Geavanceerde instellingen
+                          </Label>
+                          <Switch
+                            id={`adv-${sys.id}`}
+                            checked={showAdv}
+                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
+                          />
+                        </div>
 
                         {showAdv && (
-                          <div className="space-y-1">
-                            <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-xs">
-                              Bij een grote overwinning
-                            </Label>
-                            <div className="flex gap-2">
-                              <Input
-                                type="number"
-                                id={`${sys.id}-grote-overwinning`}
-                                className="flex-1"
-                                value={sys.points_big_win ?? ""}
-                                onChange={(e) =>
-                                  setSystems((prev) =>
-                                    prev.map((s) =>
-                                      s.id === sys.id ? { ...s, points_big_win: draftNumber(e.target.value) } : s,
-                                    ),
-                                  )
-                                }
-                                onBlur={(e) =>
-                                  applyUpdate(sys.id, {
-                                    points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value),
-                                  })
-                                }
-                              />
-                              <Select
-                                value={String(sys.big_win_threshold ?? 2)}
-                                onValueChange={(v) => {
-                                  applyUpdate(sys.id, { big_win_threshold: parseInt(v) });
-                                }}
-                              >
-                                <SelectTrigger className="w-[120px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {[2, 3, 4, 5].map((n) => (
-                                    <SelectItem key={n} value={String(n)}>+ {n} goals</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                          <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                            <div className="space-y-1">
+                              <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-xs font-normal text-muted-foreground">
+                                Bij een grote overwinning
+                              </Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  type="number"
+                                  id={`${sys.id}-grote-overwinning`}
+                                  className="flex-1"
+                                  value={sys.points_big_win ?? ""}
+                                  onChange={(e) =>
+                                    setSystems((prev) =>
+                                      prev.map((s) =>
+                                        s.id === sys.id ? { ...s, points_big_win: draftNumber(e.target.value) } : s,
+                                      ),
+                                    )
+                                  }
+                                  onBlur={(e) =>
+                                    applyUpdate(sys.id, {
+                                      points_big_win: e.target.value === "" ? (sys.points_win ?? 3) : parseInt(e.target.value),
+                                    })
+                                  }
+                                />
+                                <Select
+                                  value={String(sys.big_win_threshold ?? 2)}
+                                  onValueChange={(v) => {
+                                    applyUpdate(sys.id, { big_win_threshold: parseInt(v) });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[120px]">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {[2, 3, 4, 5].map((n) => (
+                                      <SelectItem key={n} value={String(n)}>+ {n} goals</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
                             </div>
+                            {pointsField("Bij winst", "points_win", 3)}
+                            {pointsField("Bij winst na verlenging, strafschoppen of golden goal", "points_win_overtime", sys.points_win ?? 3, {
+                              disabled: !sys.no_draws,
+                              className: !sys.no_draws ? "opacity-50" : undefined,
+                            })}
                           </div>
                         )}
 
                         {showAdv ? (
                           <>
-                            {/* Winst: basiswaarde en verlenging naast elkaar */}
-                            <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
-                              {pointsField("Bij winst", "points_win", 3)}
-                              {pointsField("Bij winst na verlenging, strafschoppen of golden goal", "points_win_overtime", sys.points_win ?? 3, {
-                                disabled: !sys.no_draws,
-                                className: !sys.no_draws ? "opacity-50" : undefined,
-                              })}
-                            </div>
-
                             {/* Gelijkspel: basiswaarde en de twee varianten naast elkaar */}
                             {!sys.no_draws && (
                               <div className="grid gap-3 sm:grid-cols-3 sm:items-end">

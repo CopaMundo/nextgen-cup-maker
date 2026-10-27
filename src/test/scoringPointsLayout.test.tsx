@@ -59,12 +59,13 @@ describe("Puntentoekenning in groepswedstrijden", () => {
     expect(rowOf("Bij winst").querySelectorAll('input[type="number"]')).toHaveLength(3);
   });
 
-  it("schikt geavanceerde velden naast hun eigen basiswaarde", async () => {
+  it("schikt geavanceerde velden: alle winst bij elkaar, daarna gelijkspel en verlies", async () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
     fireEvent.click(await screen.findByLabelText("Geavanceerde instellingen"));
 
+    expect(rowOf("Bij een grote overwinning")).toBe(rowOf("Bij winst"));
     expect(rowOf("Bij winst na verlenging, strafschoppen of golden goal")).toBe(rowOf("Bij winst"));
-    expect(rowOf("Bij winst").className).toContain("sm:grid-cols-2");
+    expect(rowOf("Bij winst").className).toContain("sm:grid-cols-3");
 
     expect(rowOf("Bij gelijkspel met doelpunten")).toBe(rowOf("Bij gelijkspel"));
     expect(rowOf("Bij gelijkspel zonder doelpunten")).toBe(rowOf("Bij gelijkspel"));
@@ -72,5 +73,20 @@ describe("Puntentoekenning in groepswedstrijden", () => {
 
     expect(rowOf("Bij verlies na verlenging, strafschoppen of golden goal")).toBe(rowOf("Bij verlies"));
     expect(rowOf("Bij verlies").className).toContain("sm:grid-cols-2");
+
+    const winstRow = rowOf("Bij winst");
+    const gelijkRow = rowOf("Bij gelijkspel");
+    expect(winstRow.compareDocumentPosition(gelijkRow) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("geeft veldlabels een subtiel gewicht los van de sectietitel", async () => {
+    render(<ScoringSystemsManager tournamentId="t-1" />);
+    const input = await screen.findByLabelText("Bij winst");
+    const label = document.querySelector(`label[for="${input.id}"]`);
+    expect(label?.className).toContain("font-normal");
+    expect(label?.className).toContain("text-muted-foreground");
+
+    const advSwitch = screen.getByLabelText("Geavanceerde instellingen");
+    expect(advSwitch.closest("div")?.textContent).not.toContain("Puntentoekenning");
   });
 });
