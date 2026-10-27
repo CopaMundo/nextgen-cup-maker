@@ -117,7 +117,7 @@ const H2H_SUB_OPTIONS = [
  * For playoff (best of N): outcomes where winner reaches ceil(N/2) sets won first.
  * For non-playoff: all W-L combinations summing to num_sets.
  */
-const generateSetOutcomes = (numSets: number, playoff: boolean, decisiveSet: boolean): { key: string; isDraw: boolean }[] => {
+export const generateSetOutcomes = (numSets: number, playoff: boolean, decisiveSet: boolean): { key: string; isDraw: boolean }[] => {
   if (numSets <= 1) return [];
   if (playoff) {
     const needed = Math.ceil(numSets / 2);
@@ -131,10 +131,10 @@ const generateSetOutcomes = (numSets: number, playoff: boolean, decisiveSet: boo
   for (let w = numSets; w > numSets / 2; w--) {
     outcomes.push({ key: `${w}-${numSets - w}`, isDraw: false });
   }
-  // Even sets: add draw outcome unless decisive set is enabled
-  if (numSets % 2 === 0 && !decisiveSet) {
+  // Even sets: a tie at half-half is either a draw or settled by the decisive set
+  if (numSets % 2 === 0) {
     const half = numSets / 2;
-    outcomes.push({ key: `${half}-${half}`, isDraw: true });
+    outcomes.push(decisiveSet ? { key: `${half + 1}-${half}`, isDraw: false } : { key: `${half}-${half}`, isDraw: true });
   }
   return outcomes;
 };
@@ -985,9 +985,9 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         )}
 
                         {(sys.num_sets === 1 || sys.set_points_mode === "per_set") && (
-                          <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                          <div className={cn("grid gap-3 sm:items-end", sys.num_sets % 2 === 0 && sys.decisive_set ? "sm:grid-cols-2" : "sm:grid-cols-3")}>
                             {pointsField("Bij winst", "points_win", 3)}
-                            {pointsField("Bij gelijkspel", "points_draw", 1)}
+                            {!(sys.num_sets % 2 === 0 && sys.decisive_set) && pointsField("Bij gelijkspel", "points_draw", 1)}
                             {pointsField("Bij verlies", "points_loss", 0)}
                           </div>
                         )}
