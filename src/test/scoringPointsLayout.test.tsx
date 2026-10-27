@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ScoringSystemsManager from "@/components/ScoringSystemsManager";
 
@@ -64,19 +64,38 @@ describe("Puntentoekenning", () => {
     fireEvent.click(await screen.findByLabelText("Geavanceerde instellingen"));
 
     expect(rowOf("Bij een grote overwinning")).toBe(rowOf("Bij winst"));
-    expect(rowOf("Bij winst na verlenging, strafschoppen of golden goal")).toBe(rowOf("Bij winst"));
+    expect(rowOf("Bij winst na gelijkspel")).toBe(rowOf("Bij winst"));
     expect(rowOf("Bij winst").className).toContain("sm:grid-cols-3");
 
-    expect(rowOf("Bij gelijkspel met doelpunten")).toBe(rowOf("Bij gelijkspel"));
-    expect(rowOf("Bij gelijkspel zonder doelpunten")).toBe(rowOf("Bij gelijkspel"));
-    expect(rowOf("Bij gelijkspel").querySelectorAll('input[type="number"]')).toHaveLength(3);
+    // Gelijkspel toont alleen de twee varianten, naast elkaar
+    expect(rowOf("Bij gelijkspel met doelpunten")).toBe(rowOf("Bij gelijkspel zonder doelpunten"));
+    expect(rowOf("Bij gelijkspel met doelpunten").querySelectorAll('input[type="number"]')).toHaveLength(2);
 
-    expect(rowOf("Bij verlies na verlenging, strafschoppen of golden goal")).toBe(rowOf("Bij verlies"));
+    expect(rowOf("Bij verlies na gelijkspel")).toBe(rowOf("Bij verlies"));
     expect(rowOf("Bij verlies").className).toContain("sm:grid-cols-2");
 
     const winstRow = rowOf("Bij winst");
-    const gelijkRow = rowOf("Bij gelijkspel");
+    const gelijkRow = rowOf("Bij gelijkspel met doelpunten");
     expect(winstRow.compareDocumentPosition(gelijkRow) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("staat de schakelaar 'geen gelijkspel' direct bij de gelijkspelvelden en schakelt die uit", async () => {
+    render(<ScoringSystemsManager tournamentId="t-1" />);
+    fireEvent.click(await screen.findByLabelText("Geavanceerde instellingen"));
+
+    const gelijkRow = rowOf("Bij gelijkspel met doelpunten");
+    const schakelaarTitel = screen.getByText("Groepswedstrijden mogen niet eindigen in een gelijkspel");
+    expect(gelijkRow.compareDocumentPosition(schakelaarTitel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect((schakelaarTitel.closest("div.grid") ?? schakelaarTitel.parentElement?.parentElement?.parentElement)?.textContent)
+      .not.toContain("Bij verlies");
+
+    const switches = screen.getAllByRole("switch");
+    fireEvent.click(switches[switches.length - 1]);
+
+    await waitFor(() => expect(screen.getByLabelText("Bij gelijkspel met doelpunten")).toBeDisabled());
+    expect(screen.getByLabelText("Bij gelijkspel zonder doelpunten")).toBeDisabled();
+    expect(screen.getByLabelText("Bij winst na gelijkspel")).toBeEnabled();
+    expect(screen.getByLabelText("Bij verlies na gelijkspel")).toBeEnabled();
   });
 
   it("geeft veldlabels het standaard gewicht en zet de geavanceerde schakelaar naast de titel", async () => {
