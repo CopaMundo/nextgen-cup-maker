@@ -48,7 +48,7 @@ const rowOf = (label: string) => {
 
 afterEach(() => cleanup());
 
-describe("Puntentoekenning in groepswedstrijden", () => {
+describe("Puntentoekenning", () => {
   it("zet winst, gelijkspel en verlies op één horizontale rij", async () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
     await screen.findByLabelText("Bij winst");
