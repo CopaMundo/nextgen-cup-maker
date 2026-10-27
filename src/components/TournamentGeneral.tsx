@@ -1080,20 +1080,19 @@ const TournamentGeneral = ({
               <div className="space-y-2">
                 <h3 className="section-title">Spelersstatistieken</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl">
-                  Als je spelers aan je teams hebt toegevoegd, kun je hier kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden.
+                  Als je spelers aan je teams hebt toegevoegd, kun je hieronder kiezen welke spelersstatistieken je per wedstrijd wilt bijhouden. Een klassement voor doelpuntenmakers en assists wordt automatisch zichtbaar op de publieke toernooiwebsite zodra je deze aanvinkt.
                 </p>
               </div>
 
               <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-5">
-                <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
                   {[
-                    { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers", info: "Houd per wedstrijd de doelpuntenmakers bij. Het topscorersklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
-                    { key: "enable_assists", publicKey: "show_public_assists", label: "Assists", info: "Houd per doelpunt de aangever bij. Het assistklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
-                  ].map(({ key, publicKey, label, info }) => (
+                    { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers" },
+                    { key: "enable_assists", publicKey: "show_public_assists", label: "Assists" },
+                  ].map(({ key, publicKey, label }) => (
                     <InfoHeading
                       key={key}
                       title={label}
-                      info={info}
                       right={
                         <Switch
                           checked={form[key as keyof typeof form] as boolean}
