@@ -85,9 +85,10 @@ describe("Puntentoekenning", () => {
 
     const gelijkRow = rowOf("Bij gelijkspel met doelpunten");
     const schakelaarTitel = screen.getByText("Groepswedstrijden mogen niet eindigen in een gelijkspel");
-    expect(gelijkRow.compareDocumentPosition(schakelaarTitel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect((schakelaarTitel.closest("div.grid") ?? schakelaarTitel.parentElement?.parentElement?.parentElement)?.textContent)
-      .not.toContain("Bij verlies");
+    const schakelaarBlok = schakelaarTitel.closest("div.flex") as HTMLElement;
+    expect(schakelaarBlok.parentElement).toBe(gelijkRow.parentElement);
+    const broers = Array.from(schakelaarBlok.parentElement!.children);
+    expect(broers.indexOf(schakelaarBlok)).toBe(broers.indexOf(gelijkRow) + 1);
 
     const switches = screen.getAllByRole("switch");
     fireEvent.click(switches[switches.length - 1]);
