@@ -3067,7 +3067,7 @@ posities + statistieken groen */
   border-top-color: hsl(var(--primary));
   border-bottom-color: hsl(var(--primary));
 }
-.admin-ui :is(.form-label, [data-ui="form-label"], .draw-section-title):not(.draw-rules *):not(.draw-show-stage *):not(.draw-scene-settings *) {
+.admin-ui :is(.form-label, [data-ui="form-label"], .draw-section-title):not(.admin-plain-label):not(.draw-rules *):not(.draw-show-stage *):not(.draw-scene-settings *) {
   color: hsl(var(--muted-foreground));
   font-size: .75rem;
   font-weight: 600;
@@ -3407,3 +3407,6 @@ posities + statistieken groen */
   color-scheme: dark;
 }
 
+
+/* Field labels that must read like list items (sentence case, foreground). */
+.admin-ui .admin-plain-label { color: hsl(var(--foreground)); font-size: .875rem; font-weight: 400; line-height: 1.25rem; text-transform: none; letter-spacing: 0; }
