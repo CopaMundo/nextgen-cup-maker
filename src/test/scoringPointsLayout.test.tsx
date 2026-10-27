@@ -48,7 +48,7 @@ const rowOf = (label: string) => {
 
 afterEach(() => cleanup());
 
-describe("Puntentoekenning", () => {
+describe("Puntenverdeling", () => {
   it("zet winst, gelijkspel en verlies op één horizontale rij", async () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
     await screen.findByLabelText("Bij winst");
@@ -103,16 +103,17 @@ describe("Puntentoekenning", () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
     const input = await screen.findByLabelText("Bij winst");
     const label = document.querySelector(`label[for="${input.id}"]`);
+    expect(label?.className).toContain("text-sm");
     expect(label?.className).toContain("font-medium");
     expect(label?.className).toContain("text-foreground");
     expect(label?.className).not.toContain("text-muted-foreground");
 
-    const title = await screen.findByText("Puntentoekenning");
-    expect(title.textContent).toBe("Puntentoekenning");
-    expect(screen.queryByText(/^Puntentoekenning in/)).toBeNull();
+    const title = await screen.findByText("Puntenverdeling");
+    expect(title.textContent).toBe("Puntenverdeling");
+    expect(screen.queryByText("Puntentoekenning")).toBeNull();
 
     const advSwitch = screen.getByLabelText("Geavanceerde instellingen");
     expect(advSwitch.closest("div")?.parentElement).toBe(title.closest("div")?.parentElement);
-    expect(advSwitch.closest("div")?.parentElement?.textContent).toContain("Puntentoekenning");
+    expect(advSwitch.closest("div")?.parentElement?.textContent).toContain("Puntenverdeling");
   });
 });
