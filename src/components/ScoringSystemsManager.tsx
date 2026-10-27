@@ -180,6 +180,7 @@ const PointsNumberField = ({
       id={id}
       type="number"
       disabled={disabled}
+      className="font-semibold text-foreground"
       value={value ?? ""}
       onChange={(e) => onValueChange(e.target.value)}
       onBlur={(e) => onCommit(e.target.value)}
@@ -837,7 +838,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               </div>
                             </div>
                             {pointsField("Bij winst", "points_win", 3)}
-                            {pointsField("Bij winst na verlenging, strafschoppen of golden goal", "points_win_overtime", sys.points_win ?? 3, {
+                            {pointsField("Bij winst na gelijkspel", "points_win_overtime", sys.points_win ?? 3, {
                               disabled: !sys.no_draws,
                               className: !sys.no_draws ? "opacity-50" : undefined,
                             })}
@@ -846,19 +847,38 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                         {showAdv ? (
                           <>
-                            {/* Gelijkspel: basiswaarde en de twee varianten naast elkaar */}
-                            {!sys.no_draws && (
-                              <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
-                                {pointsField("Bij gelijkspel", "points_draw", 1)}
-                                {pointsField("Bij gelijkspel met doelpunten", "points_draw_with_goals", sys.points_draw ?? 1)}
-                                {pointsField("Bij gelijkspel zonder doelpunten", "points_draw_no_goals", sys.points_draw ?? 1)}
-                              </div>
-                            )}
+                            {/* Gelijkspel: de twee varianten naast elkaar, grijs bij 'geen gelijkspel' */}
+                            <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
+                              {pointsField("Bij gelijkspel met doelpunten", "points_draw_with_goals", sys.points_draw ?? 1, {
+                                disabled: sys.no_draws,
+                                className: sys.no_draws ? "opacity-50" : undefined,
+                              })}
+                              {pointsField("Bij gelijkspel zonder doelpunten", "points_draw_no_goals", sys.points_draw ?? 1, {
+                                disabled: sys.no_draws,
+                                className: sys.no_draws ? "opacity-50" : undefined,
+                              })}
+                            </div>
+
+                            {/* Schakelaar direct bij de gelijkspelvelden */}
+                            <InfoHeading
+                              className="pt-1"
+                              title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
+                              info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
+                              right={
+                                <Switch
+                                  checked={sys.no_draws}
+                                  onCheckedChange={async (checked) => {
+                                    await applyUpdate(sys.id, { no_draws: checked });
+                                  }}
+                                  className="shrink-0"
+                                />
+                              }
+                            />
 
                             {/* Verlies: basiswaarde en verlenging naast elkaar */}
                             <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
                               {pointsField("Bij verlies", "points_loss", 0)}
-                              {pointsField("Bij verlies na verlenging, strafschoppen of golden goal", "points_loss_overtime", sys.points_loss ?? 0, {
+                              {pointsField("Bij verlies na gelijkspel", "points_loss_overtime", sys.points_loss ?? 0, {
                                 disabled: !sys.no_draws,
                                 className: !sys.no_draws ? "opacity-50" : undefined,
                               })}
@@ -868,25 +888,12 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                           /* Winst, gelijkspel en verlies op één horizontale lijn */
                           <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
                             {pointsField("Bij winst", "points_win", 3)}
-                            {pointsField("Bij gelijkspel", "points_draw", 1)}
+                            {pointsField("Bij gelijkspel", "points_draw", 1, {
+                              disabled: sys.no_draws,
+                              className: sys.no_draws ? "opacity-50" : undefined,
+                            })}
                             {pointsField("Bij verlies", "points_loss", 0)}
                           </div>
-                        )}
-                        {showAdv && (
-                          <InfoHeading
-                            className="pt-1"
-                            title="Groepswedstrijden mogen niet eindigen in een gelijkspel"
-                            info="Wanneer ingeschakeld wordt altijd gevraagd de winnaar aan te geven bij een gelijke eindstand."
-                            right={
-                              <Switch
-                                checked={sys.no_draws}
-                                onCheckedChange={async (checked) => {
-                                  await applyUpdate(sys.id, { no_draws: checked });
-                                }}
-                                className="shrink-0"
-                              />
-                            }
-                          />
                         )}
                       </div>
 
