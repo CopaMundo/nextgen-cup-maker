@@ -81,7 +81,8 @@ describe("Puntentoekenning in groepswedstrijden", () => {
 
   it("geeft veldlabels een subtiel gewicht los van de sectietitel", async () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
-    const label = (await screen.findByLabelText("Bij winst")).closest("label");
+    const input = await screen.findByLabelText("Bij winst");
+    const label = document.querySelector(`label[for="${input.id}"]`);
     expect(label?.className).toContain("font-normal");
     expect(label?.className).toContain("text-muted-foreground");
 
