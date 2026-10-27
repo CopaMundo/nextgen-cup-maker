@@ -109,6 +109,7 @@ describe("Puntenverdeling", () => {
     expect(label?.className).not.toContain("text-muted-foreground");
 
     const title = await screen.findByText("Puntenverdeling");
+    expect(title.className).toContain("font-medium");
     expect(title.textContent).toBe("Puntenverdeling");
     expect(screen.queryByText("Puntentoekenning")).toBeNull();
 
