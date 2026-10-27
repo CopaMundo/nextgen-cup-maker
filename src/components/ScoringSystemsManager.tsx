@@ -780,19 +780,17 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         <InfoHeading
                           title="Puntentoekenning in groepswedstrijden"
                           info="Stel in hoeveel punten een team in een groep krijgt bij winst, verlies en gelijkspel."
-                          right={
-                            <div className="flex shrink-0 items-center gap-2">
-                              <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-xs font-medium text-muted-foreground">
-                                Geavanceerde instellingen
-                              </Label>
-                              <Switch
-                                id={`adv-${sys.id}`}
-                                checked={showAdv}
-                                onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
-                              />
-                            </div>
-                          }
                         />
+                        <div className="flex items-center justify-end gap-2">
+                          <Label htmlFor={`adv-${sys.id}`} className="cursor-pointer text-xs font-normal text-muted-foreground">
+                            Geavanceerde instellingen
+                          </Label>
+                          <Switch
+                            id={`adv-${sys.id}`}
+                            checked={showAdv}
+                            onCheckedChange={(checked) => { handleAdvancedToggle(sys, checked); }}
+                          />
+                        </div>
 
                         {showAdv && (
                           <div className="space-y-1">
