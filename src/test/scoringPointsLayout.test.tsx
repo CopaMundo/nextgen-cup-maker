@@ -99,16 +99,17 @@ describe("Puntenverdeling", () => {
     expect(screen.getByLabelText("Bij verlies na gelijkspel")).toBeEnabled();
   });
 
-  it("geeft veldlabels het standaard gewicht en zet de geavanceerde schakelaar naast de titel", async () => {
+  it("geeft veldlabels het gewicht van de criteria (normaal) en houdt de titel als kop", async () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
     const input = await screen.findByLabelText("Bij winst");
     const label = document.querySelector(`label[for="${input.id}"]`);
     expect(label?.className).toContain("text-sm");
-    expect(label?.className).toContain("font-medium");
+    expect(label?.className).not.toContain("font-medium");
     expect(label?.className).toContain("text-foreground");
     expect(label?.className).not.toContain("text-muted-foreground");
 
     const title = await screen.findByText("Puntenverdeling");
+    expect(title.className).toContain("font-medium");
     expect(title.textContent).toBe("Puntenverdeling");
     expect(screen.queryByText("Puntentoekenning")).toBeNull();
 
