@@ -85,7 +85,7 @@ describe("Puntentoekenning", () => {
 
     const gelijkRow = rowOf("Bij gelijkspel met doelpunten");
     const schakelaarTitel = screen.getByText("Groepswedstrijden mogen niet eindigen in een gelijkspel");
-    const schakelaarBlok = schakelaarTitel.closest("div.flex") as HTMLElement;
+    const schakelaarBlok = schakelaarTitel.closest("div.min-h-5") as HTMLElement;
     expect(schakelaarBlok.parentElement).toBe(gelijkRow.parentElement);
     const broers = Array.from(schakelaarBlok.parentElement!.children);
     expect(broers.indexOf(schakelaarBlok)).toBe(broers.indexOf(gelijkRow) + 1);
