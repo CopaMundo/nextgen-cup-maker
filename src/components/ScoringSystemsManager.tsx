@@ -844,15 +844,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                         {showAdv ? (
                           <>
-                            {/* Winst: basiswaarde en verlenging naast elkaar */}
-                            <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
-                              {pointsField("Bij winst", "points_win", 3)}
-                              {pointsField("Bij winst na verlenging, strafschoppen of golden goal", "points_win_overtime", sys.points_win ?? 3, {
-                                disabled: !sys.no_draws,
-                                className: !sys.no_draws ? "opacity-50" : undefined,
-                              })}
-                            </div>
-
                             {/* Gelijkspel: basiswaarde en de twee varianten naast elkaar */}
                             {!sys.no_draws && (
                               <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
