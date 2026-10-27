@@ -1106,7 +1106,6 @@ const TournamentGeneral = ({
                 <div className="space-y-4 border-t border-border pt-5">
                   <InfoHeading
                     title="Kaarten"
-                    info="Registreer per wedstrijd gele, tweede gele en rode kaarten per speler."
                     right={
                       <Switch
                         checked={form.enable_yellow_cards}
