@@ -1036,14 +1036,16 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                       </div>
 
                       {/* Tiebreaker section */}
-                      <div className="pt-4 border-t border-border space-y-2">
-                        <h4 className="text-sm font-semibold text-foreground">Rangschikking bij gelijk aantal punten in de groep</h4>
-                        <p className="text-xs text-muted-foreground">
-                          Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen.
-                        </p>
+                      <div className="pt-5 border-t border-border space-y-2">
+                        <InfoHeading
+                          title="Criteria bij gelijk aantal punten in de groep"
+                          info="Kies de criteria die moeten gelden als twee of meer teams op hetzelfde aantal punten eindigen."
+                        />
                         <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5 mt-2">
                           <ol className="text-sm text-foreground space-y-1">
-                            {sys.tiebreaker_rules.map((rule, idx) => (
+                            {sys.tiebreaker_rules
+                              .filter((rule) => rule !== "fairplay" || tournament?.enable_fairplay)
+                              .map((rule, idx) => (
                               <li key={`${sys.id}-tb-${rule}`} className="flex gap-2">
                                 <span className="text-muted-foreground font-medium">{idx + 1}.</span>
                                 <span>{getTbLabel(rule, true)}</span>
