@@ -79,14 +79,20 @@ describe("Puntentoekenning", () => {
     expect(winstRow.compareDocumentPosition(gelijkRow) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("geeft veldlabels een subtiel gewicht los van de sectietitel", async () => {
+  it("geeft veldlabels het standaard gewicht en zet de geavanceerde schakelaar naast de titel", async () => {
     render(<ScoringSystemsManager tournamentId="t-1" />);
     const input = await screen.findByLabelText("Bij winst");
     const label = document.querySelector(`label[for="${input.id}"]`);
-    expect(label?.className).toContain("font-normal");
-    expect(label?.className).toContain("text-muted-foreground");
+    expect(label?.className).toContain("font-medium");
+    expect(label?.className).toContain("text-foreground");
+    expect(label?.className).not.toContain("text-muted-foreground");
+
+    const title = await screen.findByText("Puntentoekenning");
+    expect(title.textContent).toBe("Puntentoekenning");
+    expect(screen.queryByText(/^Puntentoekenning in/)).toBeNull();
 
     const advSwitch = screen.getByLabelText("Geavanceerde instellingen");
-    expect(advSwitch.closest("div")?.textContent).not.toContain("Puntentoekenning");
+    expect(advSwitch.closest("div")?.parentElement).toBe(title.closest("div")?.parentElement);
+    expect(advSwitch.closest("div")?.parentElement?.textContent).toContain("Puntentoekenning");
   });
 });
