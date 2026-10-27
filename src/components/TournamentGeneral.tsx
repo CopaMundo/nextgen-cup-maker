@@ -1087,8 +1087,8 @@ const TournamentGeneral = ({
               <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-5">
                 <div className="space-y-4">
                   {[
-                    { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Topscorers bijhouden", info: "Houd per wedstrijd de doelpuntenmakers bij. Het topscorersklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
-                    { key: "enable_assists", publicKey: "show_public_assists", label: "Assists bijhouden", info: "Houd per doelpunt de aangever bij. Het assistklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
+                    { key: "enable_goalscorers", publicKey: "show_public_top_scorers", label: "Doelpuntenmakers", info: "Houd per wedstrijd de doelpuntenmakers bij. Het topscorersklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
+                    { key: "enable_assists", publicKey: "show_public_assists", label: "Assists", info: "Houd per doelpunt de aangever bij. Het assistklassement wordt automatisch zichtbaar op de publieke toernooiwebsite." },
                   ].map(({ key, publicKey, label, info }) => (
                     <InfoHeading
                       key={key}
@@ -1106,7 +1106,7 @@ const TournamentGeneral = ({
 
                 <div className="space-y-4 border-t border-border pt-5">
                   <InfoHeading
-                    title="Gele en rode kaarten bijhouden"
+                    title="Kaarten"
                     info="Registreer per wedstrijd gele, tweede gele en rode kaarten per speler."
                     right={
                       <Switch
