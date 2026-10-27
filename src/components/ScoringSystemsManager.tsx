@@ -933,11 +933,11 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                    {sys.scoring_type === "sets" && (
                     <div className="space-y-3">
-                      {/* Aantal sets + beslissende set / playoff op één lijn */}
+                      {/* Aantal sets met beslissende set / playoff erachter */}
                       <div className="space-y-3 pt-5 border-t border-border">
-                        <div className="flex flex-wrap items-end justify-between gap-4">
-                          <div className="w-40 space-y-1">
-                            <Label htmlFor={`${sys.id}-num-sets`} className="admin-plain-label text-sm font-normal text-foreground">Aantal sets</Label>
+                        <InfoHeading title="Aantal sets" htmlFor={`${sys.id}-num-sets`} />
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                          <div className="w-full sm:w-64">
                             <Select value={String(sys.num_sets)} onValueChange={(v) => applyUpdate(sys.id, { num_sets: parseInt(v) })}>
                               <SelectTrigger id={`${sys.id}-num-sets`}><SelectValue /></SelectTrigger>
                               <SelectContent>
@@ -953,6 +953,12 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                               <Switch id={`${sys.id}-decisive`} checked={sys.decisive_set} onCheckedChange={(checked) => applyUpdate(sys.id, { decisive_set: checked })} />
                             </div>
                           )}
+                          {sys.num_sets % 2 === 0 && sys.decisive_set && (
+                            <div className="flex h-10 items-center gap-2">
+                              <Label htmlFor={`${sys.id}-decisive-gd`} className="admin-plain-label cursor-pointer text-sm font-normal text-foreground">Laat beslissende set meetellen in doelsaldo</Label>
+                              <Switch id={`${sys.id}-decisive-gd`} checked={sys.decisive_set_goal_diff} onCheckedChange={(checked) => applyUpdate(sys.id, { decisive_set_goal_diff: checked })} />
+                            </div>
+                          )}
                           {sys.num_sets >= 3 && sys.num_sets % 2 === 1 && sys.set_points_mode !== "per_set" && (
                             <div className="flex h-10 items-center gap-2">
                               <Label htmlFor={`${sys.id}-playoff`} className="admin-plain-label cursor-pointer text-sm font-normal text-foreground">Playoff modus (beste van {sys.num_sets})</Label>
@@ -960,12 +966,6 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             </div>
                           )}
                         </div>
-                        {sys.num_sets % 2 === 0 && sys.decisive_set && (
-                          <div className="flex items-center justify-end gap-2">
-                            <Label htmlFor={`${sys.id}-decisive-gd`} className="admin-plain-label cursor-pointer text-sm font-normal text-foreground">Laat beslissende set meetellen in doelsaldo</Label>
-                            <Switch id={`${sys.id}-decisive-gd`} checked={sys.decisive_set_goal_diff} onCheckedChange={(checked) => applyUpdate(sys.id, { decisive_set_goal_diff: checked })} />
-                          </div>
-                        )}
                       </div>
 
                       {/* Puntenverdeling */}
@@ -1015,18 +1015,20 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                             </div>
                           );
                           return outcomes.length > 0 ? (
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                               {outcomes.map(({ key: oc, isDraw }) => {
                                 const pts: Pts = rp[oc] || { win: 2, loss: 0, draw: 1 };
                                 return (
-                                  <div key={oc} className="grid gap-3 sm:grid-cols-3 sm:items-end">
-                                    <div className="flex h-10 items-center text-sm font-medium text-foreground">Uitslag {oc}</div>
-                                    {isDraw
-                                      ? field(oc, pts, "draw", "Beide teams", 1)
-                                      : (<>
-                                          {field(oc, pts, "win", "Winnaar", "")}
-                                          {field(oc, pts, "loss", "Verliezer", "")}
-                                        </>)}
+                                  <div key={oc} className="space-y-2">
+                                    <Label className="block">Uitslag {oc}</Label>
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                      {isDraw
+                                        ? field(oc, pts, "draw", "Beide teams", 1)
+                                        : (<>
+                                            {field(oc, pts, "win", "Winnaar", "")}
+                                            {field(oc, pts, "loss", "Verliezer", "")}
+                                          </>)}
+                                    </div>
                                   </div>
                                 );
                               })}
