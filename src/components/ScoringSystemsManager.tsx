@@ -173,7 +173,7 @@ const PointsNumberField = ({
   className?: string;
 }) => (
   <div className={cn("space-y-1", className)}>
-    <Label htmlFor={id} className="text-sm font-medium text-foreground">
+    <Label htmlFor={id} className="text-sm text-foreground">
       {label}
     </Label>
     <Input
@@ -798,7 +798,7 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
                         {showAdv && (
                           <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
                             <div className="space-y-1">
-                              <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-sm font-medium text-foreground">
+                              <Label htmlFor={`${sys.id}-grote-overwinning`} className="text-sm text-foreground">
                                 Bij een grote overwinning
                               </Label>
                               <div className="flex gap-2">
