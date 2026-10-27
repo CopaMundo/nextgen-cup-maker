@@ -42,6 +42,19 @@ describe("Spelersstatistieken", () => {
     expect(screen.queryByText("Topscorers bijhouden")).not.toBeInTheDocument();
     expect(screen.queryByText("Assists bijhouden")).not.toBeInTheDocument();
     expect(screen.queryByText("Gele en rode kaarten bijhouden")).not.toBeInTheDocument();
+
+    // Originele toelichting onder de hoofdtitel, zonder extra i-knopjes
+    expect(screen.getByText(/Als je spelers aan je teams hebt toegevoegd/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Uitleg: Doelpuntenmakers")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Uitleg: Assists")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Uitleg: Kaarten")).not.toBeInTheDocument();
+
+    // Doelpuntenmakers en Assists naast elkaar op één lijn
+    const doelpuntenmakers = screen.getByText("Doelpuntenmakers");
+    const assists = screen.getByText("Assists");
+    const rij = doelpuntenmakers.closest("div.grid");
+    expect(rij?.className).toContain("sm:grid-cols-2");
+    expect(rij).toBe(assists.closest("div.grid"));
   });
 
   it("sluit het fair-playklassement direct aan bij Kaarten met strafpunten", async () => {
