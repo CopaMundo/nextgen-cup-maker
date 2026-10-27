@@ -933,167 +933,107 @@ const ScoringSystemsManager = ({ tournamentId, tournament, onUpdate }: { tournam
 
                    {sys.scoring_type === "sets" && (
                     <div className="space-y-3">
-                      <p className="text-xs text-muted-foreground">
-                        Stel in hoeveel sets er gespeeld worden en hoe punten worden toegekend.
-                      </p>
-
-                      {/* Aantal sets */}
-                      <div className="space-y-1">
-                        <Label className="text-xs">Aantal sets</Label>
-                        <Select
-                          value={String(sys.num_sets)}
-                          onValueChange={(v) => {
-                            applyUpdate(sys.id, { num_sets: parseInt(v) });
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 36 }, (_, i) => i + 1).map((n) => (
-                              <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Beslissende set (even sets) */}
-                      {sys.num_sets % 2 === 0 && (
-                        <div className="space-y-3 pt-2 border-t border-border">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-foreground">Beslissende set</span>
-                            <Switch
-                              checked={sys.decisive_set}
-                              onCheckedChange={(checked) => {
-                                applyUpdate(sys.id, { decisive_set: checked });
-                              }}
-                            />
+                      {/* Aantal sets + beslissende set / playoff op één lijn */}
+                      <div className="space-y-3 pt-5 border-t border-border">
+                        <div className="flex flex-wrap items-end justify-between gap-4">
+                          <div className="w-40 space-y-1">
+                            <Label htmlFor={`${sys.id}-num-sets`} className="admin-plain-label text-sm font-normal text-foreground">Aantal sets</Label>
+                            <Select value={String(sys.num_sets)} onValueChange={(v) => applyUpdate(sys.id, { num_sets: parseInt(v) })}>
+                              <SelectTrigger id={`${sys.id}-num-sets`}><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                {Array.from({ length: 36 }, (_, i) => i + 1).map((n) => (
+                                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
-                          {sys.decisive_set && (
-                            <div className="flex items-center justify-between pl-2">
-                              <span className="text-sm text-foreground">Laat beslissende set meetellen in doelsaldo</span>
-                              <Switch
-                                checked={sys.decisive_set_goal_diff}
-                                onCheckedChange={(checked) => {
-                                  applyUpdate(sys.id, { decisive_set_goal_diff: checked });
-                                }}
-                              />
+                          {sys.num_sets % 2 === 0 && (
+                            <div className="flex h-10 items-center gap-2">
+                              <Label htmlFor={`${sys.id}-decisive`} className="admin-plain-label cursor-pointer text-sm font-normal text-foreground">Beslissende set</Label>
+                              <Switch id={`${sys.id}-decisive`} checked={sys.decisive_set} onCheckedChange={(checked) => applyUpdate(sys.id, { decisive_set: checked })} />
+                            </div>
+                          )}
+                          {sys.num_sets >= 3 && sys.num_sets % 2 === 1 && sys.set_points_mode !== "per_set" && (
+                            <div className="flex h-10 items-center gap-2">
+                              <Label htmlFor={`${sys.id}-playoff`} className="admin-plain-label cursor-pointer text-sm font-normal text-foreground">Playoff modus (beste van {sys.num_sets})</Label>
+                              <Switch id={`${sys.id}-playoff`} checked={sys.playoff_mode} onCheckedChange={(checked) => applyUpdate(sys.id, { playoff_mode: checked })} />
                             </div>
                           )}
                         </div>
-                      )}
-
-                      {/* Playoff modus (odd sets >= 3, only when NOT per_set scoring) */}
-                      {sys.num_sets >= 3 && sys.num_sets % 2 === 1 && sys.set_points_mode !== "per_set" && (
-                        <div className="pt-2 border-t border-border">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-foreground">
-                              Playoff modus (beste van {sys.num_sets})
-                            </span>
-                            <Switch
-                              checked={sys.playoff_mode}
-                              onCheckedChange={(checked) => {
-                                applyUpdate(sys.id, { playoff_mode: checked });
-                              }}
-                            />
+                        {sys.num_sets % 2 === 0 && sys.decisive_set && (
+                          <div className="flex items-center justify-end gap-2">
+                            <Label htmlFor={`${sys.id}-decisive-gd`} className="admin-plain-label cursor-pointer text-sm font-normal text-foreground">Laat beslissende set meetellen in doelsaldo</Label>
+                            <Switch id={`${sys.id}-decisive-gd`} checked={sys.decisive_set_goal_diff} onCheckedChange={(checked) => applyUpdate(sys.id, { decisive_set_goal_diff: checked })} />
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
 
-                      {/* Punten toekennen */}
-                      {sys.num_sets >= 2 && (
-                        <div className="space-y-1 pt-2 border-t border-border">
-                          <Label className="text-xs">Punten toekennen per team tijdens de groepsfase</Label>
-                          <Select
-                            value={sys.set_points_mode}
-                            onValueChange={(v) => {
-                              applyUpdate(sys.id, { set_points_mode: v as "per_set" | "total_result" });
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
+                      {/* Puntenverdeling */}
+                      <div className="space-y-3 pt-5 border-t border-border">
+                        <InfoHeading
+                          title="Puntenverdeling"
+                          info="Stel in hoeveel punten een team in een groepswedstrijd krijgt: per gewonnen, gelijke of verloren set, of op basis van de totale uitslag."
+                        />
+                        {sys.num_sets >= 2 && (
+                          <Select value={sys.set_points_mode} onValueChange={(v) => applyUpdate(sys.id, { set_points_mode: v as "per_set" | "total_result" })}>
+                            <SelectTrigger aria-label="Punten toekennen"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="per_set">Per set</SelectItem>
-                              <SelectItem value="total_result">Op basis van totale uitslag</SelectItem>
+                              <SelectItem value="total_result">Op basis van uitslag</SelectItem>
                             </SelectContent>
                           </Select>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Per set: W/D/L */}
-                      {sys.num_sets >= 2 && sys.set_points_mode === "per_set" && (
-                        /* Winst, gelijkspel en verlies op één horizontale lijn */
-                        <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
-                          {pointsField("Bij winst", "points_win", 3)}
-                          {pointsField("Bij gelijkspel", "points_draw", 1)}
-                          {pointsField("Bij verlies", "points_loss", 0)}
-                        </div>
-                      )}
+                        {(sys.num_sets === 1 || sys.set_points_mode === "per_set") && (
+                          <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                            {pointsField("Bij winst", "points_win", 3)}
+                            {pointsField("Bij gelijkspel", "points_draw", 1)}
+                            {pointsField("Bij verlies", "points_loss", 0)}
+                          </div>
+                        )}
 
-                      {/* Total result: outcome-based */}
-                      {sys.num_sets >= 2 && sys.set_points_mode === "total_result" && (() => {
-                        const outcomes = generateSetOutcomes(sys.num_sets, sys.playoff_mode, sys.decisive_set);
-                        const rp: SetResultPoints = sys.set_result_points || {};
-                        return outcomes.length > 0 ? (
-                          <div className="space-y-3">
-                            {outcomes.map(({ key: oc, isDraw }) => {
-                              const pts = rp[oc] || { win: 2, loss: 0, draw: 1 };
-                              if (isDraw) {
+                        {sys.num_sets >= 2 && sys.set_points_mode === "total_result" && (() => {
+                          const outcomes = generateSetOutcomes(sys.num_sets, sys.playoff_mode, sys.decisive_set);
+                          const rp: SetResultPoints = sys.set_result_points || {};
+                          type Pts = { win?: number; loss?: number; draw?: number };
+                          const setPts = (oc: string, pts: Pts, f: keyof Pts, raw: string, save: boolean) => {
+                            const next = { ...rp, [oc]: { ...pts, [f]: raw === "" ? 0 : parseInt(raw) } } as SetResultPoints;
+                            if (save) applyUpdate(sys.id, { set_result_points: next });
+                            else setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: next } : s));
+                          };
+                          const field = (oc: string, pts: Pts, f: keyof Pts, label: string, fallback: number | "") => (
+                            <div className="space-y-1">
+                              <Label htmlFor={`${sys.id}-${oc}-${f}`} className="admin-plain-label text-sm font-normal text-foreground">{label}</Label>
+                              <Input
+                                id={`${sys.id}-${oc}-${f}`}
+                                type="number"
+                                className="font-semibold text-foreground"
+                                value={pts[f] ?? fallback}
+                                onChange={(e) => setPts(oc, pts, f, e.target.value, false)}
+                                onBlur={(e) => setPts(oc, pts, f, e.target.value, true)}
+                              />
+                            </div>
+                          );
+                          return outcomes.length > 0 ? (
+                            <div className="space-y-3">
+                              {outcomes.map(({ key: oc, isDraw }) => {
+                                const pts: Pts = rp[oc] || { win: 2, loss: 0, draw: 1 };
                                 return (
-                                  <div key={oc} className="space-y-1">
-                                    <Label className="text-xs">Punten bij gelijkspel {oc}</Label>
-                                    <div className="space-y-0.5">
-                                      <span className="text-[10px] text-muted-foreground">Beide teams</span>
-                                      <Input
-                                        type="number"
-                                        value={pts.draw ?? 1}
-                                        onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
-                                        onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, draw: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
-                                      />
-                                    </div>
+                                  <div key={oc} className="grid gap-3 sm:grid-cols-3 sm:items-end">
+                                    <div className="flex h-10 items-center text-sm font-medium text-foreground">Uitslag {oc}</div>
+                                    {isDraw
+                                      ? field(oc, pts, "draw", "Beide teams", 1)
+                                      : (<>
+                                          {field(oc, pts, "win", "Winnaar", "")}
+                                          {field(oc, pts, "loss", "Verliezer", "")}
+                                        </>)}
                                   </div>
                                 );
-                              }
-                              return (
-                                <div key={oc} className="space-y-1">
-                                  <Label className="text-xs">Punten bij uitslag {oc}</Label>
-                                  <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-0.5">
-                                      <span className="text-[10px] text-muted-foreground">Winnaar</span>
-                                      <Input
-                                        type="number"
-                                        value={pts.win ?? ""}
-                                        onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
-                                        onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, win: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
-                                      />
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <span className="text-[10px] text-muted-foreground">Verliezer</span>
-                                      <Input
-                                        type="number"
-                                        value={pts.loss ?? ""}
-                                        onChange={(e) => setSystems((prev) => prev.map((s) => s.id === sys.id ? { ...s, set_result_points: { ...rp, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } } } : s))}
-                                        onBlur={(e) => applyUpdate(sys.id, { set_result_points: { ...rp, [oc]: { ...pts, loss: e.target.value === "" ? 0 : parseInt(e.target.value) } } })}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ) : null;
-                      })()}
-
-                      {/* 1 set: standard W/D/L */}
-                      {sys.num_sets === 1 && (
-                        /* Winst, gelijkspel en verlies op één horizontale lijn */
-                        <div className="grid gap-3 sm:grid-cols-3 sm:items-end">
-                          {pointsField("Bij winst", "points_win", 3)}
-                          {pointsField("Bij gelijkspel", "points_draw", 1)}
-                          {pointsField("Bij verlies", "points_loss", 0)}
-                        </div>
-                      )}
+                              })}
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
 
                       {/* Tiebreaker section */}
                       <div className="pt-4 border-t border-border space-y-2">
