@@ -286,18 +286,24 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
       return sel;
     }
     if (r.allowedFields === null) return ["Alle velden"];
-    return locationNames.map(loc => {
+    const single = locationNames.length === 1;
+    const lines = locationNames.map(loc => {
       const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
-      if (mode === "none") return `${loc}: Geen`;
-      if (mode === "all" || fieldOnlyNames.length === 0) return `${loc}: Alle velden`;
       const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
-      return `${loc}: ${sel.length > 0 ? sel.join(", ") : "Geen"}`;
+      const value = mode === "none" ? "Geen"
+        : mode === "all" || fieldOnlyNames.length === 0 ? "Alle velden"
+        : sel.length > 0 ? sel.join(", ") : "Geen";
+      // Bij één locatie enkel de veldnamen tonen, zonder locatievoorvoegsel.
+      return single ? value : `${loc}: ${value}`;
     });
+    // Locaties zonder gekozen velden ("...: Geen") achteraan plaatsen.
+    return lines.sort((a, b) => Number(a.endsWith(": Geen")) - Number(b.endsWith(": Geen")));
   };
 
   const availabilityLines = (r: RefereeConfig): string[] => {
-    if (!r.availability) return ["Alle dagen"];
-    if (days.length > 0 && days.every(d => r.availability!.some(a => a.date === d && a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to))) return ["Alle dagen"];
+    const fullLabel = days.length <= 1 ? "Hele dag" : "Alle dagen";
+    if (!r.availability) return [fullLabel];
+    if (days.length > 0 && days.every(d => r.availability!.some(a => a.date === d && a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to))) return [fullLabel];
     if (days.length === 0) return r.availability.length > 0
       ? r.availability.map(win => `${formatIsoDateForLocale(win.date)}: ${win.from}–${win.to}`)
       : ["Niet beschikbaar"];
@@ -316,7 +322,18 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
 
   const roleLine = (r: RefereeConfig): string => {
     if (!r.roles || r.roles.length === 0 || r.roles.length >= ALL_ROLES.length) return "Alle rollen";
-    return [...r.roles].sort((a, b) => a - b).map(n => `${n}e`).join(", ");
+    const sorted = [...r.roles].sort((a, b) => a - b);
+    const parts: string[] = [];
+    let start = sorted[0];
+    let prev = sorted[0];
+    for (let i = 1; i <= sorted.length; i++) {
+      const cur = sorted[i];
+      if (cur === prev + 1) { prev = cur; continue; }
+      parts.push(start === prev ? `${start}` : `${start}-${prev}`);
+      start = cur;
+      prev = cur;
+    }
+    return parts.join(", ");
   };
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
