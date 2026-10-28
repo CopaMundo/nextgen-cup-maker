@@ -341,6 +341,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   return (
     <div className="space-y-4">
       <RefereeOverview
+        participantsKind={isPlayers ? "players" : "teams"}
         referees={referees.map(r => ({
           name: r.name,
           locations: locationLines(r),
@@ -348,7 +349,6 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
           role: roleLine(r),
           maxMatches: r.maxMatches,
           excludedTeams: excludedLines(r),
-          excludedKind: r.excludedKind === "players" ? "players" : "teams",
         }))}
         onEdit={openEdit}
         onDelete={setDeleteIdx}
@@ -494,15 +494,14 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                 />
               </div>
 
-              {/* Uitgesloten teams */}
+              {/* Uitgesloten teams/spelers */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">Uitgesloten teams/spelers</Label>
+                <Label className="text-sm font-semibold">Uitgesloten {isPlayers ? "spelers" : "teams"}</Label>
                 <Select value={excludeMode} onValueChange={(v) => applyExcludeMode(v as ExcludeMode)}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Geen</SelectItem>
-                    <SelectItem value="teams">Selecteer teams</SelectItem>
-                    <SelectItem value="players">Selecteer spelers</SelectItem>
+                    <SelectItem value="select">Selecteer {isPlayers ? "spelers" : "teams"}</SelectItem>
                   </SelectContent>
                 </Select>
                 {excludeMode !== "none" && (
