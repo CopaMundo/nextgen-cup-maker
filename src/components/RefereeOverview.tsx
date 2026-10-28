@@ -10,7 +10,6 @@ export interface RefereeCardDetails {
   role: string;
   maxMatches: number | null;
   excludedTeams: string[];
-  excludedKind?: "teams" | "players";
 }
 
 const LABEL = "text-xs font-bold uppercase tracking-wider text-muted-foreground";
@@ -26,7 +25,7 @@ function CompactDetails({ label, lines }: { label: string; lines: string[] }) {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="sm" className="h-7 shrink-0 px-1.5 text-xs text-primary" aria-label={`${label}: alle details`}>
-                {lines.length > 1 ? `+${lines.length - 1} meer` : <MoreHorizontal className="h-4 w-4" />}
+                {lines.length > 1 ? "+ meer" : <MoreHorizontal className="h-4 w-4" />}
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="max-w-[calc(100vw-2rem)] p-3">
@@ -44,13 +43,17 @@ function CompactDetails({ label, lines }: { label: string; lines: string[] }) {
 
 interface Props {
   referees: RefereeCardDetails[];
+  /** of het toernooi met teams of spelers werkt (bepaalt de rubriek "Uitgesloten ...") */
+  participantsKind?: "teams" | "players";
   onEdit: (index: number) => void;
   onDelete: (index: number) => void;
   onAdd: () => void;
   onImport?: () => void;
 }
 
-export default function RefereeOverview({ referees, onEdit, onDelete, onAdd, onImport }: Props) {
+export default function RefereeOverview({ referees, participantsKind = "teams", onEdit, onDelete, onAdd, onImport }: Props) {
+  const players = participantsKind === "players";
+  const excludedTitle = `Uitgesloten ${players ? "spelers" : "teams"}`;
   return (
     <div className="space-y-3">
       <div className="flex min-h-8 items-center justify-between gap-3">
@@ -61,54 +64,53 @@ export default function RefereeOverview({ referees, onEdit, onDelete, onAdd, onI
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {referees.map((referee, index) => (
-          <article key={index} aria-label={referee.name} className="flex h-[25rem] min-w-0 flex-col gap-2.5 rounded-lg border border-border bg-card p-4">
-            <div className="flex h-9 shrink-0 items-center gap-2">
-              <WhistleIcon className="h-5 w-5 shrink-0 text-primary" />
-              <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={referee.name}>{referee.name}</h3>
-              <div className="flex shrink-0 items-center">
-                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground" onClick={() => onEdit(index)} aria-label={`${referee.name} bewerken`} title="Bewerken"><Pencil className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => onDelete(index)} aria-label={`${referee.name} verwijderen`} title="Verwijderen"><Trash2 className="h-4 w-4" /></Button>
-              </div>
-            </div>
-            <CompactDetails label="Locaties en velden" lines={referee.locations} />
-            <CompactDetails label="Beschikbaarheid" lines={referee.availability} />
-            <div className="min-w-0 shrink-0">
-              <p className={LABEL}>Max. aantal wedstrijden</p>
-              <p className="flex h-7 items-center truncate text-sm text-foreground">Max. aantal wedstrijden: {referee.maxMatches !== null ? `${referee.maxMatches} wedstrijd${referee.maxMatches !== 1 ? "en" : ""}` : "Geen limiet"}</p>
-            </div>
-            {(() => {
-              const players = referee.excludedKind === "players";
-              const count = referee.excludedTeams.length;
-              const noun = players ? (count !== 1 ? "spelers" : "speler") : (count !== 1 ? "teams" : "team");
-              return (
-                <div className="min-w-0 shrink-0">
-                  <p className={LABEL}>Uitgesloten {players ? "spelers" : "teams"}</p>
-                  <div className="flex h-7 items-center">
-                    {count === 0 ? <span className="text-sm text-foreground">Geen</span> : (
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="-ml-1.5 h-7 min-w-0 px-1.5 text-sm text-primary" aria-label={`Uitgesloten ${players ? "spelers" : "teams"} van ${referee.name}`}>
-                            <span className="truncate">{count} uitgesloten {noun}</span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent align="start" className="max-w-[calc(100vw-2rem)] p-3">
-                          <p className="mb-2 text-sm font-semibold">Uitgesloten {players ? "spelers" : "teams"}</p>
-                          <ul className="max-h-60 space-y-2 overflow-y-auto text-sm">{referee.excludedTeams.map((name, i) => <li key={i} className="break-words">{name}</li>)}</ul>
-                        </PopoverContent>
-                      </Popover>
-                    )}
-                  </div>
+        {referees.map((referee, index) => {
+          const count = referee.excludedTeams.length;
+          const noun = players ? (count !== 1 ? "spelers" : "speler") : (count !== 1 ? "teams" : "team");
+          return (
+            <article key={index} aria-label={referee.name} className="flex h-[21rem] min-w-0 flex-col gap-2.5 rounded-lg border border-border bg-card p-4">
+              <div className="flex h-9 shrink-0 items-center gap-2">
+                <WhistleIcon className="h-5 w-5 shrink-0 text-primary" />
+                <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={referee.name}>{referee.name}</h3>
+                <div className="flex shrink-0 items-center">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground" onClick={() => onEdit(index)} aria-label={`${referee.name} bewerken`} title="Bewerken"><Pencil className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => onDelete(index)} aria-label={`${referee.name} verwijderen`} title="Verwijderen"><Trash2 className="h-4 w-4" /></Button>
                 </div>
-              );
-            })()}
-            <div className="mt-auto min-w-0 shrink-0">
-              <p className={LABEL}>Rol</p>
-              <p className="flex h-7 items-center truncate text-sm text-foreground" title={referee.role}>Rol: {referee.role}</p>
-            </div>
-          </article>
-        ))}
-        <Button variant="outline" onClick={onAdd} className="flex h-[25rem] min-w-0 flex-col gap-3 whitespace-normal rounded-lg border-dashed bg-card text-foreground hover:border-primary">
+              </div>
+              <CompactDetails label="Locaties en velden" lines={referee.locations} />
+              <CompactDetails label="Beschikbaarheid" lines={referee.availability} />
+              <div className="min-w-0 shrink-0">
+                <p className={LABEL}>Max. aantal wedstrijden</p>
+                <p className="flex h-7 items-center truncate text-sm text-foreground">
+                  {referee.maxMatches !== null ? `${referee.maxMatches} wedstrijd${referee.maxMatches !== 1 ? "en" : ""}` : "Geen limiet"}
+                </p>
+              </div>
+              <div className="min-w-0 shrink-0">
+                <p className={LABEL}>{excludedTitle}</p>
+                <div className="flex h-7 items-center">
+                  {count === 0 ? <span className="text-sm text-foreground">Geen</span> : (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="sm" className="-ml-1.5 h-7 min-w-0 px-1.5 text-sm text-primary" aria-label={`${excludedTitle} van ${referee.name}`}>
+                          <span className="truncate">{count} {noun}</span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="start" className="max-w-[calc(100vw-2rem)] p-3">
+                        <p className="mb-2 text-sm font-semibold">{excludedTitle}</p>
+                        <ul className="max-h-60 space-y-2 overflow-y-auto text-sm">{referee.excludedTeams.map((name, i) => <li key={i} className="break-words">{name}</li>)}</ul>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+              </div>
+              <div className="min-w-0 shrink-0">
+                <p className={LABEL}>Rol</p>
+                <p className="flex h-7 items-center truncate text-sm text-foreground" title={referee.role}>{referee.role}</p>
+              </div>
+            </article>
+          );
+        })}
+        <Button variant="outline" onClick={onAdd} className="flex h-[21rem] min-w-0 flex-col gap-3 whitespace-normal rounded-lg border-dashed bg-card text-foreground hover:border-primary">
           <Plus className="h-7 w-7 text-primary" />
           <span className="text-sm font-medium">Scheidsrechter toevoegen</span>
         </Button>

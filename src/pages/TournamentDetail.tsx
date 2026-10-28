@@ -372,13 +372,13 @@ const TournamentDetail = () => {
                 {!isMobile && (deelnemersSubTab === "teams" ? (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 ) : (
-                  <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} />
+<RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} />
                 ))}
                 {isMobile && !mobileDeelnemersOverview && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 )}
                 {isMobile && !mobileDeelnemersOverview && deelnemersSubTab === "referees" && (
-                  <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} />
+                  <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} />
                 )}
               </>
             )}
