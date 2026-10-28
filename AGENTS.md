@@ -1,5 +1,7 @@
 # Architecture rules
 
+- Keep referee overview presentation separate from RefereeManager persistence and draft dialogs; bounded card rows and portaled details keep desktop/mobile geometry stable without changing scheduling rules.
+
 - Draw-stage rules (bowl, balls, wings, overview, logos): src/components/draw/AGENTS.md.
 - Keep the shared desktop/tablet administration title bar outside the content scroll pane with equal horizontal gutters; one stationary shell prevents tab-specific scrolling and controls from shifting headings.
 - Represent live knockout and single-match entry encounters as fixed home/away slot containers in the shared draw session; source their geometry from existing matches and never infer seed rank from slot codes, so bracket positions and return legs stay intact.
