@@ -439,11 +439,14 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
-          {categoryId && importByCategory.length > 0 && (
-            <Button variant="outline" size="sm" className="h-8" onClick={() => setShowImport(true)}>
-              <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {categoryId && importByCategory.length > 0 && (
+              <Button variant="outline" size="sm" className="h-8" onClick={() => setShowImport(true)}>
+                <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
+              </Button>
+            )}
+            {teams.length < 128 && <Button size="sm" className="h-8" onClick={() => setShowAdd(true)}><Plus className="h-3.5 w-3.5 mr-1" /> {singularLabel} toevoegen</Button>}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-2">
@@ -508,11 +511,14 @@ const TeamManager = ({ tournamentId, teamCount, showCountry, categoryId, teamsLa
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{teams.length} {pluralLabel}</p>
-        {categoryId && importByCategory.length > 0 && (
-          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
-            <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {categoryId && importByCategory.length > 0 && (
+            <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
+              <Copy className="h-3.5 w-3.5 mr-1" /> Importeer uit andere divisie
+            </Button>
+          )}
+          {teams.length < 128 && <Button size="sm" onClick={() => setShowAdd(true)}><Plus className="h-3.5 w-3.5 mr-1" /> {singularLabel} toevoegen</Button>}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 min-[1900px]:grid-cols-7">
