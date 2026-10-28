@@ -23,7 +23,7 @@ import {
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
 
 type DayMode = "all" | "times" | "none";
-type ExcludeMode = "none" | "select";
+type ExcludeMode = "none" | "teams" | "players";
 type RoleMode = "all" | "select";
 const WHOLE_DAY = { from: "00:00", to: "23:59" };
 
@@ -114,7 +114,9 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   const openEdit = (i: number) => {
-    const ref: RefereeConfig = JSON.parse(JSON.stringify(referees[i]));
+    const ref: RefereeConfig = i === -1
+      ? { name: "", allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], excludedKind: "teams", roles: null }
+      : JSON.parse(JSON.stringify(referees[i]));
     setEditIdx(i);
     setDraft(ref);
     const modes: Record<string, LocationFieldMode> = {};
@@ -122,7 +124,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldOnlyNames);
     });
     setLocModes(modes);
-    setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
+    setExcludeMode(ref.excludedTeams.length > 0 ? (ref.excludedKind === "players" ? "players" : "teams") : "none");
     setRoleMode(ref.roles === null ? "all" : "select");
   };
 
@@ -130,6 +132,11 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
   const saveEdit = async () => {
     if (editIdx === null || !draft || !draft.name.trim()) return;
+    if (editIdx === -1) {
+      await saveReferees([...referees, { ...draft, name: draft.name.trim() }]);
+      closeEdit();
+      return;
+    }
     const oldName = referees[editIdx].name;
     const newName = draft.name.trim();
     if (oldName !== newName) {
@@ -234,6 +241,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     if (!draft) return;
     setExcludeMode(mode);
     if (mode === "none") setDraft({ ...draft, excludedTeams: [] });
+    else setDraft({ ...draft, excludedKind: mode });
   };
   const toggleTeam = (id: string) => {
     if (!draft) return;
@@ -311,10 +319,11 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
           role: roleLine(r),
           maxMatches: r.maxMatches,
           excludedTeams: excludedLines(r),
+          excludedKind: r.excludedKind === "players" ? "players" : "teams",
         }))}
         onEdit={openEdit}
         onDelete={setDeleteIdx}
-        onAdd={() => { setNewRef(""); setShowAdd(true); }}
+        onAdd={() => openEdit(-1)}
         onImport={categoryId ? openImport : undefined}
       />
 
@@ -335,7 +344,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       {/* Edit dialog */}
       <Dialog open={editIdx !== null} onOpenChange={(open) => { if (!open) closeEdit(); }}>
         <DialogContent ref={editDialogRef} className="max-w-md max-h-[85vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Scheidsrechter bewerken</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editIdx === -1 ? "Scheidsrechter toevoegen" : "Scheidsrechter bewerken"}</DialogTitle></DialogHeader>
           {draft && (
             <div className="space-y-5">
               {/* Naam */}
@@ -463,10 +472,11 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Geen</SelectItem>
-                    <SelectItem value="select">Selecteer teams/spelers</SelectItem>
+                    <SelectItem value="teams">Selecteer teams</SelectItem>
+                    <SelectItem value="players">Selecteer spelers</SelectItem>
                   </SelectContent>
                 </Select>
-                {excludeMode === "select" && (
+                {excludeMode !== "none" && (
                   teams.length === 0 ? (
                     <p className="text-xs text-muted-foreground">Nog geen deelnemers toegevoegd.</p>
                   ) : (
@@ -506,7 +516,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
               <div className="flex justify-end gap-2 pt-1">
                 <Button variant="outline" onClick={closeEdit}>Annuleren</Button>
-                <Button onClick={saveEdit} className="bg-foreground text-background hover:bg-foreground/90">Opslaan</Button>
+                <Button onClick={saveEdit} disabled={!draft.name.trim()} className="bg-foreground text-background hover:bg-foreground/90">{editIdx === -1 ? "Toevoegen" : "Opslaan"}</Button>
               </div>
             </div>
           )}

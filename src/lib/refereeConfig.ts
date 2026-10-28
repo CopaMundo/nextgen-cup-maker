@@ -14,6 +14,8 @@ export interface RefereeConfig {
   maxMatches: number | null;
   /** team ids die deze scheidsrechter niet mag fluiten */
   excludedTeams: string[];
+  /** of de uitsluiting als teams of spelers is gekozen */
+  excludedKind?: "teams" | "players";
   /** null = alle rollen (1..5) */
   roles: number[] | null;
 }
@@ -83,6 +85,7 @@ export const parseReferee = (entry: any): RefereeConfig => {
     maxMatches: typeof e.maxMatches === "number" && e.maxMatches > 0 ? e.maxMatches : null,
     excludedTeams: Array.isArray(e.excludedTeams) ? e.excludedTeams.filter((t: any) => typeof t === "string") : [],
     roles: Array.isArray(e.roles) ? e.roles.filter((r: any) => typeof r === "number") : null,
+    excludedKind: e.excludedKind === "players" ? "players" : "teams",
   };
 };
 
@@ -96,6 +99,7 @@ export const serializeReferees = (refs: RefereeConfig[]) =>
     availability: r.availability,
     maxMatches: r.maxMatches,
     excludedTeams: r.excludedTeams,
+    excludedKind: r.excludedKind ?? "teams",
     roles: r.roles,
   }));
 
