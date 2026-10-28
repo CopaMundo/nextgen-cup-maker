@@ -8,7 +8,7 @@ afterEach(cleanup);
 const referees: RefereeCardDetails[] = [{
   name: "Alex Janssens", locations: ["Sporthal: Veld 1", "Stadion: Veld 2", "Bijveld: Veld 3"],
   availability: ["28/10/2026: 09:00–12:00", "29/10/2026: Hele dag"],
-  role: "1e, 2e", maxMatches: 8, excludedTeams: ["Team A", "Team B"],
+  role: "1-2", maxMatches: 8, excludedTeams: ["Team A", "Team B"],
 }];
 
 describe("Referee overview controls", () => {
@@ -39,5 +39,33 @@ describe("Referee overview controls", () => {
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
     fireEvent.click(screen.getByRole("button", { name: "Uitgesloten teams van Alex Janssens" }));
     expect(within(screen.getByRole("dialog")).getByText("Team B")).toBeVisible();
+  });
+
+  it("uses '+ meer' for truncated rows and shows compact max/role values", () => {
+    render(<RefereeOverview referees={referees} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
+    // Afkappingsknoppen tonen altijd "+ meer", nooit een teller.
+    const moreButtons = screen.getAllByRole("button", { name: /: alle details$/ });
+    expect(moreButtons.length).toBeGreaterThan(0);
+    moreButtons.forEach(b => expect(b).toHaveTextContent("+ meer"));
+    // Max. aantal wedstrijden zonder herhaalde rubriektekst.
+    expect(screen.getByText("8 wedstrijden")).toBeVisible();
+    expect(screen.queryByText(/Max\. aantal wedstrijden:/)).toBeNull();
+    // Rol direct als waarde, zonder "Rol:" voorvoegsel.
+    expect(screen.getByText("1-2")).toBeVisible();
+    expect(screen.queryByText(/^Rol: /)).toBeNull();
+  });
+
+  it("labels the excluded section after the tournament participant kind", () => {
+    render(<RefereeOverview participantsKind="players" referees={referees} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
+    expect(screen.getByText("Uitgesloten spelers")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Uitgesloten spelers van Alex Janssens" }));
+    expect(within(screen.getByRole("dialog")).getByText("Team B")).toBeVisible();
+  });
+
+  it("shows 'Geen limiet' and 'Geen' for unset values", () => {
+    render(<RefereeOverview referees={[{ name: "Bo Peeters", locations: ["Alle velden"], availability: ["Hele dag"], role: "Alle rollen", maxMatches: null, excludedTeams: [] }]} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
+    expect(screen.getByText("Geen limiet")).toBeVisible();
+    expect(screen.getByText("Geen")).toBeVisible();
+    expect(screen.getByText("Alle rollen")).toBeVisible();
   });
 });
