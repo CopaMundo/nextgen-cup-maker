@@ -6,7 +6,8 @@ import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Plus, Pencil, Trash2, Copy } from "lucide-react";
+import { Copy } from "lucide-react";
+import RefereeOverview from "@/components/RefereeOverview";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -19,7 +20,6 @@ import {
   RefereeConfig, ALL_ROLES, parseReferees, serializeReferees,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
 
 type DayMode = "all" | "times" | "none";
@@ -33,7 +33,6 @@ interface Props {
 }
 
 const RefereeManager = ({ tournamentId, categoryId }: Props) => {
-  const isMobile = useIsMobile();
   const [referees, setReferees] = useState<RefereeConfig[]>([]);
   const [fieldNames, setFieldNames] = useState<string[]>([]);
   const [locationNames, setLocationNames] = useState<string[]>([]);
@@ -260,13 +259,14 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   // ==== detail-weergave per scheidsrechter ====
   const locationLines = (r: RefereeConfig): string[] => {
     if (locationNames.length === 0) {
-      if (fieldOnlyNames.length === 0) return ["Alle velden"];
+      if (fieldOnlyNames.length === 0) return r.allowedFields === null ? ["Alle velden"] : r.allowedFields.length > 0 ? r.allowedFields : ["Geen"];
       if (r.allowedFields === null) return ["Alle velden"];
-      const sel = fieldOnlyNames.filter(f => r.allowedFields!.includes(f));
+      const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
       if (sel.length === 0) return ["Geen"];
       if (sel.length === fieldOnlyNames.length) return ["Alle velden"];
       return sel;
     }
+    if (r.allowedFields === null) return ["Alle velden"];
     return locationNames.map(loc => {
       const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
       if (mode === "none") return `${loc}: Geen`;
@@ -277,7 +277,10 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   const availabilityLines = (r: RefereeConfig): string[] => {
-    if (days.length === 0) return ["Hele dag"];
+    if (!r.availability) return ["Hele toernooi"];
+    if (days.length === 0) return r.availability.length > 0
+      ? r.availability.map(win => `${formatIsoDateForLocale(win.date)}: ${win.from}–${win.to}`)
+      : ["Niet beschikbaar"];
     return days.map(d => {
       const label = formatIsoDateForLocale(d);
       if (!r.availability) return `${label}: Hele dag`;
@@ -289,7 +292,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   const excludedLines = (r: RefereeConfig): string[] =>
-    r.excludedTeams.length === 0 ? ["/"] : r.excludedTeams.map(teamName);
+    r.excludedTeams.map(teamName);
 
   const roleLine = (r: RefereeConfig): string => {
     if (!r.roles || r.roles.length === 0 || r.roles.length >= ALL_ROLES.length) return "Alle rollen";
@@ -300,138 +303,20 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
 
   return (
     <div className="space-y-4">
-      {isMobile ? (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-muted-foreground">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
-            {categoryId && (
-              <Button variant="outline" size="sm" className="h-8" onClick={openImport}>
-                <Copy className="h-3.5 w-3.5 mr-1" /> Importeren
-              </Button>
-            )}
-          </div>
-          <div className="grid grid-cols-1 gap-2">
-            {referees.map((r, i) => (
-              <div
-                key={i}
-                onClick={() => openEdit(i)}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                  <WhistleIcon className="h-4 w-4" />
-                </div>
-                <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground">{r.name}</span>
-                <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => openEdit(i)}
-                     className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                     aria-label={`${r.name} bewerken`}
-                    title="Bewerken"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteIdx(i)}
-                     className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                     aria-label={`${r.name} verwijderen`}
-                    title="Verwijderen"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-            <button
-              onClick={() => { setNewRef(""); setShowAdd(true); }}
-              className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left transition-colors active:bg-accent/40"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <Plus className="h-4 w-4" />
-              </div>
-              <span className="font-display text-sm font-semibold text-foreground">Scheidsrechter toevoegen</span>
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-      {/* Actions row */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Button
-          size="sm"
-          onClick={() => { setNewRef(""); setShowAdd(true); }}
-          className="gap-1 bg-foreground text-background hover:bg-foreground/90"
-        >
-          <Plus className="h-3.5 w-3.5" /> Scheidsrechter
-        </Button>
-        {categoryId && (
-          <Button variant="outline" size="sm" onClick={openImport} className="gap-1">
-            <Copy className="h-3.5 w-3.5" /> Importeer uit divisies
-          </Button>
-        )}
-        <p className="text-sm text-muted-foreground ml-auto">{referees.length} Scheidsrechter{referees.length !== 1 ? "s" : ""}</p>
-      </div>
-
-      {/* List of referees */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px] text-sm">
-            <thead className="sticky top-0 z-10">
-              <tr className="border-b border-border bg-secondary/60 backdrop-blur">
-                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Scheidsrechter</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Locaties en velden</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Beschikbaarheid (Dagen en tijden)</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Max. aantal wedstrijden</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Uitgesloten teams/spelers</th>
-                <th className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Rol (1-5)</th>
-                <th className="px-3 py-2.5" />
-              </tr>
-            </thead>
-            <tbody>
-              {referees.map((r, i) => (
-                <tr key={i} className="border-b border-border/60 last:border-b-0 align-top transition-colors hover:bg-accent/30">
-
-                  <td className="px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <WhistleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="font-medium text-foreground">{r.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                    {locationLines(r).map((l, k) => <div key={k} className="whitespace-nowrap">{l}</div>)}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                    {availabilityLines(r).map((l, k) => <div key={k} className="whitespace-nowrap">{l}</div>)}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">
-                    {r.maxMatches ?? "Geen limiet"}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                    {excludedLines(r).map((l, k) => <div key={k}>{l}</div>)}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{roleLine(r)}</td>
-                  <td className="px-3 py-2.5">
-                    <div className="flex items-center justify-end gap-3">
-                      <button onClick={() => openEdit(i)} className="text-muted-foreground hover:text-foreground transition-colors" title="Bewerken">
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button onClick={() => setDeleteIdx(i)} className="text-muted-foreground hover:text-destructive transition-colors" title="Verwijderen">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {referees.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-3 py-6 text-center text-sm text-muted-foreground">Nog geen scheidsrechters toegevoegd.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-        </>
-      )}
+      <RefereeOverview
+        referees={referees.map(r => ({
+          name: r.name,
+          locations: locationLines(r),
+          availability: availabilityLines(r),
+          role: roleLine(r),
+          maxMatches: r.maxMatches,
+          excludedTeams: excludedLines(r),
+        }))}
+        onEdit={openEdit}
+        onDelete={setDeleteIdx}
+        onAdd={() => { setNewRef(""); setShowAdd(true); }}
+        onImport={categoryId ? openImport : undefined}
+      />
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
