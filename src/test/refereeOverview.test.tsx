@@ -19,8 +19,8 @@ describe("Referee overview controls", () => {
     expect(onEdit).toHaveBeenCalledWith(0);
     fireEvent.click(screen.getByRole("button", { name: "Alex Janssens verwijderen" }));
     expect(onDelete).toHaveBeenCalledWith(0);
-    fireEvent.click(screen.getByRole("button", { name: "Scheidsrechter toevoegen" }));
-    expect(onAdd).toHaveBeenCalledOnce();
+    screen.getAllByRole("button", { name: "Scheidsrechter toevoegen" }).forEach(b => fireEvent.click(b));
+    expect(onAdd).toHaveBeenCalledTimes(2);
   });
 
   it("opens all selected locations in an admin-scoped detail popover", () => {
