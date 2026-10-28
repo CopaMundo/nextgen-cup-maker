@@ -54,6 +54,14 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   const editDialogRef = useDialogFocus(editIdx !== null);
   const importDialogRef = useDialogFocus(showImport);
 
+  const [hasOtherDivisions, setHasOtherDivisions] = useState(false);
+  useEffect(() => {
+    if (!categoryId) { setHasOtherDivisions(false); return; }
+    supabase.from("tournament_categories").select("id", { count: "exact", head: true })
+      .eq("tournament_id", tournamentId).neq("id", categoryId)
+      .then(({ count }) => setHasOtherDivisions((count ?? 0) > 0));
+  }, [tournamentId, categoryId]);
+
   useEffect(() => {
     fetchAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -285,7 +293,8 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
   };
 
   const availabilityLines = (r: RefereeConfig): string[] => {
-    if (!r.availability) return ["Hele toernooi"];
+    if (!r.availability) return ["Alle dagen"];
+    if (days.length > 0 && days.every(d => r.availability!.some(a => a.date === d && a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to))) return ["Alle dagen"];
     if (days.length === 0) return r.availability.length > 0
       ? r.availability.map(win => `${formatIsoDateForLocale(win.date)}: ${win.from}–${win.to}`)
       : ["Niet beschikbaar"];
@@ -324,7 +333,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
         onEdit={openEdit}
         onDelete={setDeleteIdx}
         onAdd={() => openEdit(-1)}
-        onImport={categoryId ? openImport : undefined}
+        onImport={categoryId && hasOtherDivisions ? openImport : undefined}
       />
 
       {/* Add dialog */}
