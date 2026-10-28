@@ -74,4 +74,38 @@ describe("Spelersstatistieken", () => {
     expect(kaarten.compareDocumentPosition(fairplay) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(fairplay.compareDocumentPosition(strafpunten) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
+
+  it("toont aparte blokken: Doelpuntenmakers en Assists naast elkaar, Kaarten op volle breedte", async () => {
+    render(
+      <TournamentGeneral
+        tournament={{ ...TOURNAMENT, enable_fairplay: true } as any}
+        onUpdate={vi.fn()}
+        generalSubTab="puntentelling"
+        onGeneralSubTabChange={vi.fn()}
+      />,
+    );
+
+    const doelpuntenmakers = await screen.findByText("Doelpuntenmakers");
+    const assists = screen.getByText("Assists");
+    const kaarten = screen.getByText("Kaarten");
+
+    const blockDm = doelpuntenmakers.closest("div.rounded-lg");
+    const blockAs = assists.closest("div.rounded-lg");
+    const blockKa = kaarten.closest("div.rounded-lg");
+
+    // Elk statuut in zijn eigen blok; Kaarten zit in een apart, breder blok.
+    expect(blockDm).not.toBeNull();
+    expect(blockAs).not.toBeNull();
+    expect(blockKa).not.toBeNull();
+    expect(blockDm).not.toBe(blockKa);
+    expect(blockAs).not.toBe(blockKa);
+
+    // Doelpuntenmakers- en Assists-blok delen dezelfde tweecolumns-grid-ouder.
+    expect(blockDm!.parentElement).toBe(blockAs!.parentElement);
+    expect(blockDm!.parentElement!.className).toContain("sm:grid-cols-2");
+
+    // Kaarten-blok staat buiten die grid-ouder op volle breedte.
+    expect(blockKa!.parentElement).not.toBe(blockDm!.parentElement);
+    expect(blockKa!.className).not.toContain("sm:grid-cols-2");
+  });
 });
