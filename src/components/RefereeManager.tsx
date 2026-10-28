@@ -23,16 +23,19 @@ import {
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
 
 type DayMode = "all" | "times" | "none";
-type ExcludeMode = "none" | "teams" | "players";
+type ExcludeMode = "none" | "select";
 type RoleMode = "all" | "select";
 const WHOLE_DAY = { from: "00:00", to: "23:59" };
 
 interface Props {
   tournamentId: string;
   categoryId?: string | null;
+  /** "Teams" of "Spelers" — bepaalt de uitsluitingskeuze en -benaming */
+  teamsLabel?: string;
 }
 
-const RefereeManager = ({ tournamentId, categoryId }: Props) => {
+const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Props) => {
+  const isPlayers = teamsLabel === "Spelers";
   const [referees, setReferees] = useState<RefereeConfig[]>([]);
   const [fieldNames, setFieldNames] = useState<string[]>([]);
   const [locationNames, setLocationNames] = useState<string[]>([]);
@@ -132,7 +135,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
       modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldOnlyNames);
     });
     setLocModes(modes);
-    setExcludeMode(ref.excludedTeams.length > 0 ? (ref.excludedKind === "players" ? "players" : "teams") : "none");
+    setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
     setRoleMode(ref.roles === null ? "all" : "select");
   };
 
@@ -249,7 +252,7 @@ const RefereeManager = ({ tournamentId, categoryId }: Props) => {
     if (!draft) return;
     setExcludeMode(mode);
     if (mode === "none") setDraft({ ...draft, excludedTeams: [] });
-    else setDraft({ ...draft, excludedKind: mode });
+    else setDraft({ ...draft, excludedKind: isPlayers ? "players" : "teams" });
   };
   const toggleTeam = (id: string) => {
     if (!draft) return;
