@@ -2,6 +2,8 @@ export interface RefereeAvailability {
   date: string; // ISO date
   from: string; // HH:MM
   to: string;   // HH:MM
+  /** Optioneel: enkel deze locatie op deze dag (null/undefined = alle gekozen locaties) */
+  location?: string | null;
 }
 
 export interface RefereeConfig {
@@ -97,7 +99,7 @@ export const parseReferee = (entry: any): RefereeConfig => {
     availability: Array.isArray(e.availability)
       ? e.availability
           .filter((a: any) => a && typeof a.date === "string")
-          .map((a: any) => ({ date: a.date, from: a.from || "00:00", to: a.to || "23:59" }))
+          .map((a: any) => ({ date: a.date, from: a.from || "00:00", to: a.to || "23:59", ...(typeof a.location === "string" && a.location ? { location: a.location } : {}) }))
       : null,
     maxMatches: typeof e.maxMatches === "number" && e.maxMatches > 0 ? e.maxMatches : null,
     excludedTeams: Array.isArray(e.excludedTeams) ? e.excludedTeams.filter((t: any) => typeof t === "string") : [],
@@ -266,7 +268,16 @@ export interface MatchLike {
   field: string | null;
   home_team_id: string | null;
   away_team_id: string | null;
+  /** Locatie van het veld van deze wedstrijd (enkel nodig bij meerdere locaties) */
+  location?: string | null;
 }
+
+/** Locatie-eis voor deze dag: wedstrijd moet op die locatie zijn als de dag aan één locatie gekoppeld is. */
+const dayLocationOk = (windows: RefereeAvailability[], match: MatchLike) => {
+  const loc = windows.find(w => w.location)?.location;
+  return !loc || !match.location || match.location === loc;
+};
+const dayLocation = (windows: RefereeAvailability[]) => windows.find(w => w.location)?.location || null;
 
 /** Mag deze scheidsrechter deze wedstrijd (in deze rol) fluiten? */
 export const refereeCanOfficiate = (
@@ -296,6 +307,7 @@ export const refereeCanOfficiate = (
     if (!match.match_date) return false;
     const windows = ref.availability.filter(a => a.date === match.match_date);
     if (windows.length === 0) return false;
+    if (!dayLocationOk(windows, match)) return false;
     const start = timeToMinutes(match.match_time);
     if (start == null) return true;
     const fits = windows.some(w => {
@@ -350,6 +362,9 @@ export const refereeViolations = (
       if (windows.length === 0) {
         reasons.push("Niet beschikbaar op deze dag");
       } else {
+        if (!dayLocationOk(windows, match)) {
+          reasons.push(`Op deze dag enkel beschikbaar op locatie "${dayLocation(windows)}"`);
+        }
         const start = timeToMinutes(match.match_time);
         if (start != null) {
           const fits = windows.some(w => {
