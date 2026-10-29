@@ -21,6 +21,7 @@ import {
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
+import { parseFieldEntries, stripLocationPrefix } from "@/lib/fieldLocations";
 
 type DayMode = "all" | "times" | "none";
 type ExcludeMode = "none" | "select";
@@ -40,6 +41,8 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   const [fieldNames, setFieldNames] = useState<string[]>([]);
   const [locationNames, setLocationNames] = useState<string[]>([]);
   const [fieldOnlyNames, setFieldOnlyNames] = useState<string[]>([]);
+  /** Velden per locatie (via het location-veld), in toernooivolgorde. */
+  const [fieldsByLocation, setFieldsByLocation] = useState<Record<string, string[]>>({});
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
   const [days, setDays] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,11 +91,20 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     setReferees(parseReferees(source?.referees));
 
     const rawFields = (categoryId ? catRes.data?.fields : tRes.data?.fields) as any;
-    const fieldsList = Array.isArray(rawFields) ? rawFields.map((f: any) => (typeof f === "string" ? f : f?.name)).filter(Boolean) : [];
-    const locations = (locRes.data || []).map((l: any) => l.name).filter(Boolean);
-    setLocationNames(Array.from(new Set(locations)));
+    const entries = parseFieldEntries(rawFields);
+    const fieldsList = entries.map(e => e.name);
+    const uniqueLocations = Array.from(new Set((locRes.data || []).map((l: any) => l.name).filter(Boolean)));
+    setLocationNames(uniqueLocations);
     setFieldOnlyNames(Array.from(new Set(fieldsList)));
-    setFieldNames(Array.from(new Set([...locations, ...fieldsList])));
+    setFieldNames(Array.from(new Set([...uniqueLocations, ...fieldsList])));
+    // Elk veld hoort bij zijn eigen locatie (location-veld); velden zonder geldige locatie vallen onder de eerste locatie.
+    const byLocation: Record<string, string[]> = {};
+    uniqueLocations.forEach(loc => { byLocation[loc] = []; });
+    entries.forEach(e => {
+      const loc = e.location && byLocation[e.location] ? e.location : uniqueLocations[0];
+      if (loc) byLocation[loc].push(e.name);
+    });
+    setFieldsByLocation(byLocation);
 
     setTeams((teamRes.data || []) as any);
 
@@ -132,7 +144,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     setDraft(ref);
     const modes: Record<string, LocationFieldMode> = {};
     locationNames.forEach(loc => {
-      modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldOnlyNames);
+      modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldsByLocation[loc] ?? []);
     });
     setLocModes(modes);
     setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
@@ -198,12 +210,14 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     if (locationNames.length === 0) return current;
     if (locationNames.every(loc => (modes[loc] ?? "all") === "all")) return null;
     const set = new Set<string>();
-    const previouslySelected = (current ?? fieldOnlyNames).filter(f => fieldOnlyNames.includes(f));
     locationNames.forEach(loc => {
       const mode = modes[loc] ?? "all";
       if (mode === "none") return;
+      // Alleen de velden van deze locatie; eerder gekozen velden van deze locatie blijven behouden.
+      const locFields = fieldsByLocation[loc] ?? [];
+      const previouslySelected = (current ?? locFields).filter(f => locFields.includes(f));
       set.add(loc);
-      if (mode === "all") fieldOnlyNames.forEach(f => set.add(f));
+      if (mode === "all") locFields.forEach(f => set.add(f));
       else previouslySelected.forEach(f => set.add(f));
     });
     return Array.from(set);
@@ -276,10 +290,11 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
   const locationValue = (r: RefereeConfig, loc: string): string => {
-    const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
-    const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
+    const locFields = fieldsByLocation[loc] ?? [];
+    const mode = getLocationFieldMode(loc, r.allowedFields, locFields);
+    const sel = locFields.filter(f => r.allowedFields?.includes(f)).map(f => stripLocationPrefix(f, loc));
     return mode === "none" ? "Geen"
-      : mode === "all" || fieldOnlyNames.length === 0 ? "Alle velden"
+      : mode === "all" || locFields.length === 0 ? "Alle velden"
       : sel.length > 0 ? sel.join(", ") : "Geen";
   };
 
