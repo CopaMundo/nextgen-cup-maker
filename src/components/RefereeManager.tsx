@@ -75,7 +75,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
 
     const [tRes, locRes, teamRes, catRes] = await Promise.all([
       supabase.from("tournaments").select("referees, fields, match_days, start_date, end_date").eq("id", tournamentId).single(),
-      supabase.from("tournament_locations").select("name").eq("tournament_id", tournamentId),
+      supabase.from("tournament_locations").select("name").eq("tournament_id", tournamentId).order("sort_order").order("created_at"),
       (categoryId
         ? supabase.from("teams").select("id, name").eq("tournament_id", tournamentId).eq("category_id", categoryId).order("name")
         : supabase.from("teams").select("id, name").eq("tournament_id", tournamentId).order("name")),
@@ -275,7 +275,15 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
-  // ==== detail-weergave per scheidsrechter ====
+  const locationValue = (r: RefereeConfig, loc: string): string => {
+    const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
+    const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
+    return mode === "none" ? "Geen"
+      : mode === "all" || fieldOnlyNames.length === 0 ? "Alle velden"
+      : sel.length > 0 ? sel.join(", ") : "Geen";
+  };
+
+  // Regel voor op het kaartje: alleen actieve locaties in toernooivolgorde; als alles op "Geen" staat toont het "Geen".
   const locationLines = (r: RefereeConfig): string[] => {
     if (locationNames.length === 0) {
       if (fieldOnlyNames.length === 0) return r.allowedFields === null ? ["Alle velden"] : r.allowedFields.length > 0 ? r.allowedFields : ["Geen"];
@@ -286,18 +294,22 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
       return sel;
     }
     if (r.allowedFields === null) return ["Alle velden"];
-    const single = locationNames.length === 1;
-    const lines = locationNames.map(loc => {
-      const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
-      const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
-      const value = mode === "none" ? "Geen"
-        : mode === "all" || fieldOnlyNames.length === 0 ? "Alle velden"
-        : sel.length > 0 ? sel.join(", ") : "Geen";
-      // Bij één locatie enkel de veldnamen tonen, zonder locatievoorvoegsel.
-      return single ? value : `${loc}: ${value}`;
-    });
-    // Locaties zonder gekozen velden ("...: Geen") achteraan plaatsen.
-    return lines.sort((a, b) => Number(a.endsWith(": Geen")) - Number(b.endsWith(": Geen")));
+    const active = locationNames
+      .map(loc => ({ loc, value: locationValue(r, loc) }))
+      .filter(entry => entry.value !== "Geen");
+    if (active.length === 0) return ["Geen"];
+    // Bij één actieve locatie enkel de veldnamen tonen, zonder locatievoorvoegsel.
+    return active.length === 1 ? [active[0].value] : active.map(entry => `${entry.loc}: ${entry.value}`);
+  };
+
+  // Volledig overzicht voor de pop-up: alle locaties in toernooivolgorde, de locaties met "Geen" onderaan.
+  const locationDetails = (r: RefereeConfig): string[] => {
+    if (locationNames.length === 0 || r.allowedFields === null) return locationLines(r);
+    const entries = locationNames.map(loc => ({ loc, value: locationValue(r, loc) }));
+    const active = entries.filter(entry => entry.value !== "Geen");
+    const none = entries.filter(entry => entry.value === "Geen");
+    const activeLines = active.length === 1 ? [active[0].value] : active.map(entry => `${entry.loc}: ${entry.value}`);
+    return [...activeLines, ...none.map(entry => `${entry.loc}: Geen`)];
   };
 
   const availabilityLines = (r: RefereeConfig): string[] => {
@@ -345,6 +357,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
         referees={referees.map(r => ({
           name: r.name,
           locations: locationLines(r),
+          locationDetails: locationDetails(r),
           availability: availabilityLines(r),
           role: roleLine(r),
           maxMatches: r.maxMatches,
