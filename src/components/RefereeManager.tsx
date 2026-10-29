@@ -599,7 +599,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                   title="Rol (1-5)"
                   className="text-sm font-semibold"
                   labelClassName="font-semibold"
-                  info="Bij een wedstrijd kunnen één tot vijf scheidsrechters worden ingezet. Kies hier welke posities deze scheidsrechter mag invullen."
+                  info="Bij een wedstrijd kunnen één tot vijf scheidsrechters worden ingezet. Kies hier welke rollen deze scheidsrechter mag invullen."
                 />
                 <div className="space-y-2 rounded-lg border border-border px-3 py-2.5">
                   <Select value={roleMode} onValueChange={(v) => applyRoleMode(v as RoleMode)}>
