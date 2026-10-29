@@ -607,6 +607,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  // Locatie van een wedstrijdveld voor de per-dag locatie-eis van scheidsrechters.
+  const matchLocationOf = (fieldName: string | null | undefined): string | null => {
+    if (!fieldName || locations.length <= 1) return null;
+    return fields.find(f => f.name === fieldName)?.location || getFieldLocation(fieldName) || locations[0]?.name || null;
+  };
   const [internalSelectedLocation, setInternalSelectedLocation] = useState<string | null>(null);
   const isLocationControlled = selectedLocationProp !== undefined;
   const selectedLocation = isLocationControlled ? selectedLocationProp : internalSelectedLocation;
