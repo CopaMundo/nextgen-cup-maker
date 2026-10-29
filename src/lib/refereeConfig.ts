@@ -272,12 +272,15 @@ export interface MatchLike {
   location?: string | null;
 }
 
-/** Locatie-eis voor deze dag: wedstrijd moet op die locatie zijn als de dag aan één locatie gekoppeld is. */
-const dayLocationOk = (windows: RefereeAvailability[], match: MatchLike) => {
-  const loc = windows.find(w => w.location)?.location;
-  return !loc || !match.location || match.location === loc;
+/** Past de wedstrijd op dit tijdvak qua locatie? (geen locatie = alle gekozen locaties) */
+const windowLocationOk = (w: RefereeAvailability, match: MatchLike) =>
+  !w.location || !match.location || match.location === w.location;
+const windowTimeOk = (w: RefereeAvailability, start: number | null) => {
+  if (start == null) return true;
+  const from = timeToMinutes(w.from) ?? 0;
+  const to = timeToMinutes(w.to) ?? 24 * 60;
+  return start >= from && start <= to;
 };
-const dayLocation = (windows: RefereeAvailability[]) => windows.find(w => w.location)?.location || null;
 
 /** Mag deze scheidsrechter deze wedstrijd (in deze rol) fluiten? */
 export const refereeCanOfficiate = (
@@ -307,14 +310,8 @@ export const refereeCanOfficiate = (
     if (!match.match_date) return false;
     const windows = ref.availability.filter(a => a.date === match.match_date);
     if (windows.length === 0) return false;
-    if (!dayLocationOk(windows, match)) return false;
     const start = timeToMinutes(match.match_time);
-    if (start == null) return true;
-    const fits = windows.some(w => {
-      const from = timeToMinutes(w.from) ?? 0;
-      const to = timeToMinutes(w.to) ?? 24 * 60;
-      return start >= from && start <= to;
-    });
+    const fits = windows.some(w => windowTimeOk(w, start) && windowLocationOk(w, match));
     if (!fits) return false;
   }
 
@@ -362,19 +359,13 @@ export const refereeViolations = (
       if (windows.length === 0) {
         reasons.push("Niet beschikbaar op deze dag");
       } else {
-        if (!dayLocationOk(windows, match)) {
-          reasons.push(`Op deze dag enkel beschikbaar op locatie "${dayLocation(windows)}"`);
-        }
         const start = timeToMinutes(match.match_time);
-        if (start != null) {
-          const fits = windows.some(w => {
-            const from = timeToMinutes(w.from) ?? 0;
-            const to = timeToMinutes(w.to) ?? 24 * 60;
-            return start >= from && start <= to;
-          });
-          if (!fits) {
-            reasons.push(`Buiten beschikbaarheid (${windows.map(w => `${w.from}–${w.to}`).join(", ")})`);
-          }
+        const timeWindows = windows.filter(w => windowTimeOk(w, start));
+        if (timeWindows.length === 0) {
+          reasons.push(`Buiten beschikbaarheid (${windows.map(w => `${w.from}–${w.to}`).join(", ")})`);
+        } else if (!timeWindows.some(w => windowLocationOk(w, match))) {
+          const locs = Array.from(new Set(timeWindows.map(w => w.location).filter(Boolean)));
+          reasons.push(`Op dit tijdstip enkel beschikbaar op locatie ${locs.map(l => `"${l}"`).join(", ")}`);
         }
       }
     }

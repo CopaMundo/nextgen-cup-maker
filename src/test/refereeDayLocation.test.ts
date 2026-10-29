@@ -17,3 +17,21 @@ describe("per-dag locatie van scheidsrechters", () => {
     expect(refereeViolations(ref, { ...base, location: "Sporthal" })).toHaveLength(0);
   });
 });
+
+describe("meerdere tijdvakken per dag", () => {
+  const multi = parseReferee({ name: "An", availability: [
+    { date: "2026-11-01", from: "09:00", to: "12:00", location: "Sporthal" },
+    { date: "2026-11-01", from: "14:00", to: "18:00", location: "Buitenveld" },
+  ] });
+  const m = (time: string, location: string) => ({ match_date: "2026-11-01", match_time: time, field: "Veld 1", home_team_id: null, away_team_id: null, location });
+  it("volgt per tijdvak de eigen locatie", () => {
+    expect(refereeCanOfficiate(multi, m("10:00", "Sporthal"))).toBe(true);
+    expect(refereeCanOfficiate(multi, m("10:00", "Buitenveld"))).toBe(false);
+    expect(refereeCanOfficiate(multi, m("15:00", "Buitenveld"))).toBe(true);
+    expect(refereeCanOfficiate(multi, m("13:00", "Sporthal"))).toBe(false);
+  });
+  it("meldt locatie- en tijdovertredingen", () => {
+    expect(refereeViolations(multi, m("15:00", "Sporthal"))[0]).toContain("Buitenveld");
+    expect(refereeViolations(multi, m("13:00", "Sporthal"))[0]).toContain("Buiten beschikbaarheid");
+  });
+});

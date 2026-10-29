@@ -6,7 +6,7 @@ import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Copy } from "lucide-react";
+import { Copy, Plus, X } from "lucide-react";
 import RefereeOverview from "@/components/RefereeOverview";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
@@ -231,48 +231,58 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     });
   };
 
+  const isWhole = (w: RefereeAvailability) => w.from === WHOLE_DAY.from && w.to === WHOLE_DAY.to;
+  const dayWindows = (date: string): RefereeAvailability[] =>
+    draft?.availability ? draft.availability.filter(a => a.date === date) : [{ date, ...WHOLE_DAY }];
   const dayMode = (date: string): DayMode => {
     if (!draft?.availability) return "all";
-    const win = draft.availability.find(a => a.date === date);
-    if (!win) return "none";
-    return win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to ? "all" : "times";
+    const wins = dayWindows(date);
+    if (wins.length === 0) return "none";
+    return wins.length === 1 && isWhole(wins[0]) ? "all" : "times";
+  };
+  /** Vervang alle tijdvakken van één dag en normaliseer (alles hele dag zonder locatie = null). */
+  const setDayWindows = (date: string, wins: RefereeAvailability[]) => {
+    if (!draft) return;
+    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    const next = [...base.filter(a => a.date !== date), ...wins.map(w => ({ ...w, date }))];
+    next.sort((x, y) => x.date.localeCompare(y.date) || x.from.localeCompare(y.from));
+    const allWholeDay = days.every(d => {
+      const ws = next.filter(a => a.date === d);
+      return ws.length === 1 && isWhole(ws[0]) && !ws[0].location;
+    }) && next.length === days.length;
+    setDraft({ ...draft, availability: allWholeDay ? null : next });
   };
   const applyDayMode = (date: string, mode: DayMode) => {
-    if (!draft) return;
-    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
-    let next = base.filter(a => a.date !== date);
-    const prevLoc = draft.availability?.find(a => a.date === date)?.location;
-    const locPart = prevLoc ? { location: prevLoc } : {};
-    if (mode === "all") next = [...next, { date, ...WHOLE_DAY, ...locPart }];
-    if (mode === "times") {
-      const prev = draft.availability?.find(a => a.date === date);
-      const isWholeDay = !prev || (prev.from === WHOLE_DAY.from && prev.to === WHOLE_DAY.to);
-      next = [...next, { date, from: isWholeDay ? "09:00" : prev.from, to: isWholeDay ? "18:00" : prev.to, ...locPart }];
-    }
-    next.sort((a, b) => a.date.localeCompare(b.date));
-    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to && !a.location);
-    setDraft({ ...draft, availability: allWholeDay ? null : next });
+    const prev = dayWindows(date);
+    const locPart = prev[0]?.location ? { location: prev[0].location } : {};
+    if (mode === "none") return setDayWindows(date, []);
+    if (mode === "all") return setDayWindows(date, [{ date, ...WHOLE_DAY, ...locPart }]);
+    const timed = prev.filter(w => !isWhole(w));
+    setDayWindows(date, timed.length > 0 ? timed : [{ date, from: "09:00", to: "18:00", ...locPart }]);
   };
-  /** Locatie per dag: null = alle gekozen locaties. */
-  const setDayLocation = (date: string, location: string | null) => {
-    if (!draft) return;
-    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
-    const next: RefereeAvailability[] = base.map(a => {
-      if (a.date !== date) return a;
-      const { location: _old, ...rest } = a;
-      return location ? { ...rest, location } : rest;
+  const updateWindow = (date: string, idx: number, patch: Partial<RefereeAvailability>) => {
+    const wins = dayWindows(date).map((w, i) => {
+      if (i !== idx) return w;
+      const merged = { ...w, ...patch };
+      if (!merged.location) { const { location: _l, ...rest } = merged; return rest; }
+      return merged;
     });
-    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to && !a.location);
-    setDraft({ ...draft, availability: allWholeDay ? null : next });
+    setDayWindows(date, wins);
+  };
+  const addWindow = (date: string) => {
+    const wins = dayWindows(date);
+    const last = wins[wins.length - 1];
+    const from = last && last.to < "23:00" ? last.to : "09:00";
+    const to = from < "22:00" ? `${String(Math.min(23, Number(from.slice(0, 2)) + 2)).padStart(2, "0")}:${from.slice(3, 5)}` : "23:59";
+    setDayWindows(date, [...wins, { date, from, to }]);
+  };
+  const removeWindow = (date: string, idx: number) => {
+    setDayWindows(date, dayWindows(date).filter((_, i) => i !== idx));
   };
   const dayLocationChoices = (): string[] => {
     if (!draft || locationNames.length <= 1) return [];
     const active = locationNames.filter(loc => getLocationFieldMode(loc, draft.allowedFields, fieldsByLocation[loc] ?? []) !== "none");
     return active.length > 0 ? active : locationNames;
-  };
-  const updateWindow = (date: string, key: "from" | "to", value: string) => {
-    if (!draft?.availability) return;
-    setDraft({ ...draft, availability: draft.availability.map(a => (a.date === date ? { ...a, [key]: value } : a)) });
   };
 
   const applyExcludeMode = (mode: ExcludeMode) => {
@@ -347,14 +357,15 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     if (days.length === 0) return r.availability.length > 0
       ? r.availability.map(win => `${formatIsoDateForLocale(win.date)}: ${win.from}–${win.to}`)
       : ["Niet beschikbaar"];
+    const winText = (win: RefereeAvailability) => {
+      const locSuffix = win.location && locationNames.length > 1 ? ` (${win.location})` : "";
+      return win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to ? `Hele dag${locSuffix}` : `${win.from}–${win.to}${locSuffix}`;
+    };
     return days.map(d => {
       const label = formatIsoDateForLocale(d);
-      if (!r.availability) return `${label}: Hele dag`;
-      const win = r.availability.find(a => a.date === d);
-      if (!win) return `${label}: Niet beschikbaar`;
-      const locSuffix = win.location && locationNames.length > 1 ? ` (${win.location})` : "";
-      if (win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to) return `${label}: Hele dag${locSuffix}`;
-      return `${label}: Vanaf ${win.from} Tot ${win.to}${locSuffix}`;
+      const wins = r.availability!.filter(a => a.date === d).sort((x, y) => x.from.localeCompare(y.from));
+      if (wins.length === 0) return `${label}: Niet beschikbaar`;
+      return `${label}: ${wins.map(winText).join(", ")}`;
     });
   };
 
@@ -500,7 +511,20 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                 ) : (
                   days.map(d => {
                     const mode = dayMode(d);
-                    const win = draft.availability?.find(a => a.date === d);
+                    const wins = dayWindows(d);
+                    const locChoices = dayLocationChoices();
+                    const locSelect = (w: RefereeAvailability, i: number) => (
+                      <Select
+                        value={w.location && locChoices.includes(w.location) ? w.location : "__all__"}
+                        onValueChange={(v) => updateWindow(d, i, { location: v === "__all__" ? null : v })}
+                      >
+                        <SelectTrigger className="h-8 text-xs" aria-label={`Locatie op ${formatIsoDateForLocale(d)}`}><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">Alle gekozen locaties</SelectItem>
+                          {locChoices.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    );
                     return (
                       <div key={d} className="space-y-1.5 rounded-lg border border-border px-2.5 py-2">
                         <p className="text-[11px] font-medium text-muted-foreground">{formatIsoDateForLocale(d)}</p>
@@ -512,24 +536,28 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                             <SelectItem value="none">Niet beschikbaar</SelectItem>
                           </SelectContent>
                         </Select>
-                        {mode === "times" && win && (
-                          <div className="flex items-center gap-1">
-                            <TimePicker value={win.from} onChange={(v) => updateWindow(d, "from", v)} className="h-8 w-[110px] text-xs" />
-                            <span className="text-xs text-muted-foreground">tot</span>
-                            <TimePicker value={win.to} onChange={(v) => updateWindow(d, "to", v)} className="h-8 w-[110px] text-xs" />
+                        {mode === "all" && wins[0] && locChoices.length > 0 && locSelect(wins[0], 0)}
+                        {mode === "times" && (
+                          <div className="space-y-2">
+                            {wins.map((w, i) => (
+                              <div key={i} className="space-y-1.5 border-l-2 border-border pl-2">
+                                <div className="flex items-center gap-1">
+                                  <TimePicker value={w.from} onChange={(v) => updateWindow(d, i, { from: v })} className="h-8 w-[110px] text-xs" />
+                                  <span className="text-xs text-muted-foreground">tot</span>
+                                  <TimePicker value={w.to} onChange={(v) => updateWindow(d, i, { to: v })} className="h-8 w-[110px] text-xs" />
+                                  {wins.length > 1 && (
+                                    <Button type="button" variant="ghost" size="icon" className="ml-auto h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeWindow(d, i)} aria-label="Tijdvak verwijderen">
+                                      <X className="h-3.5 w-3.5" />
+                                    </Button>
+                                  )}
+                                </div>
+                                {locChoices.length > 0 && locSelect(w, i)}
+                              </div>
+                            ))}
+                            <Button type="button" variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => addWindow(d)}>
+                              <Plus className="h-3.5 w-3.5" /> Tijdvak toevoegen
+                            </Button>
                           </div>
-                        )}
-                        {mode !== "none" && dayLocationChoices().length > 0 && (
-                          <Select
-                            value={win?.location && dayLocationChoices().includes(win.location) ? win.location : "__all__"}
-                            onValueChange={(v) => setDayLocation(d, v === "__all__" ? null : v)}
-                          >
-                            <SelectTrigger className="h-8 text-xs" aria-label={`Locatie op ${formatIsoDateForLocale(d)}`}><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="__all__">Alle gekozen locaties</SelectItem>
-                              {dayLocationChoices().map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
                         )}
                       </div>
                     );
