@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees,
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, buildFieldsByLocation,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
@@ -98,13 +98,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     setFieldOnlyNames(Array.from(new Set(fieldsList)));
     setFieldNames(Array.from(new Set([...uniqueLocations, ...fieldsList])));
     // Elk veld hoort bij zijn eigen locatie (location-veld); velden zonder geldige locatie vallen onder de eerste locatie.
-    const byLocation: Record<string, string[]> = {};
-    uniqueLocations.forEach(loc => { byLocation[loc] = []; });
-    entries.forEach(e => {
-      const loc = e.location && byLocation[e.location] ? e.location : uniqueLocations[0];
-      if (loc) byLocation[loc].push(e.name);
-    });
-    setFieldsByLocation(byLocation);
+    setFieldsByLocation(buildFieldsByLocation(entries, uniqueLocations));
 
     setTeams((teamRes.data || []) as any);
 
