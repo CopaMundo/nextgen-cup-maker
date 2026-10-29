@@ -90,8 +90,8 @@ describe("Referee overview controls", () => {
     expect(items.map(item => item.textContent)).toEqual(["Stadion: Veld 1", "Sporthal: Veld 2", "Bijveld: Geen"]);
   });
 
-  it("keeps availability separated with a comma, not a bullet", () => {
+  it("separates availability dates with a bullet", () => {
     render(<RefereeOverview referees={[{ name: "Bo Peeters", locations: ["Alle velden"], availability: ["28/10: 09:00–12:00", "29/10: Hele dag"], role: "Alle rollen", maxMatches: null, excludedTeams: [] }]} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
-    expect(screen.getByText("28/10: 09:00–12:00, 29/10: Hele dag")).toBeVisible();
+    expect(screen.getByText("28/10: 09:00–12:00 • 29/10: Hele dag")).toBeVisible();
   });
 });

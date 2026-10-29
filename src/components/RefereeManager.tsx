@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, buildFieldsByLocation,
+  RefereeConfig, RefereeAvailability, ALL_ROLES, parseReferees, serializeReferees, buildFieldsByLocation,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
@@ -239,17 +239,36 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   };
   const applyDayMode = (date: string, mode: DayMode) => {
     if (!draft) return;
-    const base = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
     let next = base.filter(a => a.date !== date);
-    if (mode === "all") next = [...next, { date, ...WHOLE_DAY }];
+    const prevLoc = draft.availability?.find(a => a.date === date)?.location;
+    const locPart = prevLoc ? { location: prevLoc } : {};
+    if (mode === "all") next = [...next, { date, ...WHOLE_DAY, ...locPart }];
     if (mode === "times") {
       const prev = draft.availability?.find(a => a.date === date);
       const isWholeDay = !prev || (prev.from === WHOLE_DAY.from && prev.to === WHOLE_DAY.to);
-      next = [...next, { date, from: isWholeDay ? "09:00" : prev.from, to: isWholeDay ? "18:00" : prev.to }];
+      next = [...next, { date, from: isWholeDay ? "09:00" : prev.from, to: isWholeDay ? "18:00" : prev.to, ...locPart }];
     }
     next.sort((a, b) => a.date.localeCompare(b.date));
-    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to);
+    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to && !a.location);
     setDraft({ ...draft, availability: allWholeDay ? null : next });
+  };
+  /** Locatie per dag: null = alle gekozen locaties. */
+  const setDayLocation = (date: string, location: string | null) => {
+    if (!draft) return;
+    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    const next: RefereeAvailability[] = base.map(a => {
+      if (a.date !== date) return a;
+      const { location: _old, ...rest } = a;
+      return location ? { ...rest, location } : rest;
+    });
+    const allWholeDay = next.length === days.length && next.every(a => a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to && !a.location);
+    setDraft({ ...draft, availability: allWholeDay ? null : next });
+  };
+  const dayLocationChoices = (): string[] => {
+    if (!draft || locationNames.length <= 1) return [];
+    const active = locationNames.filter(loc => getLocationFieldMode(loc, draft.allowedFields, fieldsByLocation[loc] ?? []) !== "none");
+    return active.length > 0 ? active : locationNames;
   };
   const updateWindow = (date: string, key: "from" | "to", value: string) => {
     if (!draft?.availability) return;
@@ -324,7 +343,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   const availabilityLines = (r: RefereeConfig): string[] => {
     const fullLabel = days.length <= 1 ? "Hele dag" : "Alle dagen";
     if (!r.availability) return [fullLabel];
-    if (days.length > 0 && days.every(d => r.availability!.some(a => a.date === d && a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to))) return [fullLabel];
+    if (days.length > 0 && days.every(d => r.availability!.some(a => a.date === d && a.from === WHOLE_DAY.from && a.to === WHOLE_DAY.to && !a.location))) return [fullLabel];
     if (days.length === 0) return r.availability.length > 0
       ? r.availability.map(win => `${formatIsoDateForLocale(win.date)}: ${win.from}–${win.to}`)
       : ["Niet beschikbaar"];
@@ -333,8 +352,9 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
       if (!r.availability) return `${label}: Hele dag`;
       const win = r.availability.find(a => a.date === d);
       if (!win) return `${label}: Niet beschikbaar`;
-      if (win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to) return `${label}: Hele dag`;
-      return `${label}: Vanaf ${win.from} Tot ${win.to}`;
+      const locSuffix = win.location && locationNames.length > 1 ? ` (${win.location})` : "";
+      if (win.from === WHOLE_DAY.from && win.to === WHOLE_DAY.to) return `${label}: Hele dag${locSuffix}`;
+      return `${label}: Vanaf ${win.from} Tot ${win.to}${locSuffix}`;
     });
   };
 
@@ -498,6 +518,18 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                             <span className="text-xs text-muted-foreground">tot</span>
                             <TimePicker value={win.to} onChange={(v) => updateWindow(d, "to", v)} className="h-8 w-[110px] text-xs" />
                           </div>
+                        )}
+                        {mode !== "none" && dayLocationChoices().length > 0 && (
+                          <Select
+                            value={win?.location && dayLocationChoices().includes(win.location) ? win.location : "__all__"}
+                            onValueChange={(v) => setDayLocation(d, v === "__all__" ? null : v)}
+                          >
+                            <SelectTrigger className="h-8 text-xs" aria-label={`Locatie op ${formatIsoDateForLocale(d)}`}><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__all__">Alle gekozen locaties</SelectItem>
+                              {dayLocationChoices().map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
                         )}
                       </div>
                     );

@@ -38,7 +38,7 @@ function CompactDetails({ label, lines, popupLines, separator = ", " }: { label:
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="max-w-[calc(100vw-2rem)] p-3">
-              <p className="mb-2 text-sm font-semibold">{label}</p>
+              <p className={`mb-2 ${LABEL}`}>{label}</p>
               <ul className="max-h-60 space-y-2 overflow-y-auto text-sm">
                 {(popupLines ?? lines).map((line, index) => <li key={index} className="break-words">{line}</li>)}
               </ul>
@@ -87,7 +87,7 @@ export default function RefereeOverview({ referees, participantsKind = "teams", 
                 </div>
               </div>
               <CompactDetails label="Locaties en velden" lines={referee.locations} popupLines={referee.locationDetails} separator=" • " />
-              <CompactDetails label="Beschikbaarheid" lines={referee.availability} />
+              <CompactDetails label="Beschikbaarheid" lines={referee.availability} separator=" • " />
               <div className="min-w-0 shrink-0">
                 <p className={LABEL}>Max. aantal wedstrijden</p>
                 <p className="flex h-7 items-center truncate text-sm text-foreground">
@@ -105,7 +105,7 @@ export default function RefereeOverview({ referees, participantsKind = "teams", 
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="start" className="max-w-[calc(100vw-2rem)] p-3">
-                        <p className="mb-2 text-sm font-semibold">{excludedTitle}</p>
+                        <p className={`mb-2 ${LABEL}`}>{excludedTitle}</p>
                         <ul className="max-h-60 space-y-2 overflow-y-auto text-sm">{referee.excludedTeams.map((name, i) => <li key={i} className="break-words">{name}</li>)}</ul>
                       </PopoverContent>
                     </Popover>

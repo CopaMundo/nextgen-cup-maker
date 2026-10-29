@@ -607,6 +607,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [allGroups, setAllGroups] = useState<GroupEntry[]>([]);
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  // Locatie van een wedstrijdveld voor de per-dag locatie-eis van scheidsrechters.
+  const matchLocationOf = (fieldName: string | null | undefined): string | null => {
+    if (!fieldName || locations.length <= 1) return null;
+    return fields.find(f => f.name === fieldName)?.location || getFieldLocation(fieldName) || locations[0]?.name || null;
+  };
   const [internalSelectedLocation, setInternalSelectedLocation] = useState<string | null>(null);
   const isLocationControlled = selectedLocationProp !== undefined;
   const selectedLocation = isLocationControlled ? selectedLocationProp : internalSelectedLocation;
@@ -1174,7 +1179,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           for (let attempt = 0; attempt < refereeConfigs.length; attempt++) {
             const cand = refereeConfigs[(refIndex + attempt) % refereeConfigs.length];
             if (usedInSlot.has(cand.name)) continue;
-            if (!refereeCanOfficiate(cand, m, role, load.get(cand.name) || 0)) continue;
+            if (!refereeCanOfficiate(cand, { ...m, location: matchLocationOf(m.field) }, role, load.get(cand.name) || 0)) continue;
             picked = cand;
             refIndex = (refIndex + attempt + 1) % refereeConfigs.length;
             break;
@@ -1358,7 +1363,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
     if (!cfg) return null;
     const assignedCount = matches.filter(m => refNames(m.referee).includes(name)).length;
-    const reasons = refereeViolations(cfg, match, roleIdx + 1, { assignedCount, teamName: teamNameOf });
+    const reasons = refereeViolations(cfg, { ...match, location: matchLocationOf(match.field) }, roleIdx + 1, { assignedCount, teamName: teamNameOf });
     return reasons.length > 0 ? { level: "warn", reasons } : null;
   };
 
