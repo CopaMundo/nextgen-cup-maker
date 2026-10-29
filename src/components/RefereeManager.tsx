@@ -444,7 +444,8 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                 {locationNames.length > 0 && (
                   <div className="space-y-3">
                     {locationNames.map(loc => {
-                      const mode = locModes[loc] ?? getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
+                      const locFields = fieldsByLocation[loc] ?? [];
+                      const mode = locModes[loc] ?? getLocationFieldMode(loc, draft.allowedFields, locFields);
                       return (
                         <div key={loc} className="space-y-2 rounded-lg border border-border px-3 py-2.5">
                           <p className="text-xs font-medium text-muted-foreground">{loc}</p>
@@ -456,17 +457,18 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                               <SelectItem value="none">Geen</SelectItem>
                             </SelectContent>
                           </Select>
-                          {mode === "select" && fieldOnlyNames.length > 0 && (
+                          {/* Strikt de velden van deze locatie, nooit velden van een andere locatie. */}
+                          {mode === "select" && locFields.length > 0 && (
                             <div className="grid grid-cols-2 gap-2">
-                              {fieldOnlyNames.map(f => (
+                              {locFields.map(f => (
                                 <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
                                   <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
-                                  <span className="truncate">{f}</span>
+                                  <span className="truncate">{stripLocationPrefix(f, loc)}</span>
                                 </label>
                               ))}
                             </div>
                           )}
-                          {mode === "select" && fieldOnlyNames.length === 0 && (
+                          {mode === "select" && locFields.length === 0 && (
                             <p className="text-xs text-muted-foreground">Nog geen velden ingesteld.</p>
                           )}
                         </div>
