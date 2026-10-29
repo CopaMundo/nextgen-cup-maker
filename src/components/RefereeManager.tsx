@@ -239,7 +239,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   };
   const applyDayMode = (date: string, mode: DayMode) => {
     if (!draft) return;
-    const base = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
     let next = base.filter(a => a.date !== date);
     const prevLoc = draft.availability?.find(a => a.date === date)?.location;
     const locPart = prevLoc ? { location: prevLoc } : {};
@@ -256,8 +256,8 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   /** Locatie per dag: null = alle gekozen locaties. */
   const setDayLocation = (date: string, location: string | null) => {
     if (!draft) return;
-    const base = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
-    const next = base.map(a => {
+    const base: RefereeAvailability[] = draft.availability ?? days.map(d => ({ date: d, ...WHOLE_DAY }));
+    const next: RefereeAvailability[] = base.map(a => {
       if (a.date !== date) return a;
       const { location: _old, ...rest } = a;
       return location ? { ...rest, location } : rest;
