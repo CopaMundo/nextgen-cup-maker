@@ -69,6 +69,23 @@ export const toggleFieldInAllowed = (
   return Array.from(set);
 };
 
+/**
+ * Groepeer velden bij hun eigen locatie via het location-veld van de veldconfiguratie.
+ * Velden zonder geldige locatie vallen onder de eerste locatie; de volgorde blijft de toernooivolgorde.
+ */
+export const buildFieldsByLocation = (
+  entries: { name: string; location?: string | null }[],
+  locations: string[]
+): Record<string, string[]> => {
+  const byLocation: Record<string, string[]> = {};
+  locations.forEach(loc => { byLocation[loc] = []; });
+  entries.forEach(e => {
+    const loc = e.location && byLocation[e.location] ? e.location : locations[0];
+    if (loc) byLocation[loc].push(e.name);
+  });
+  return byLocation;
+};
+
 export const parseReferee = (entry: any): RefereeConfig => {
   if (typeof entry === "string") {
     return { name: entry, allowedFields: null, availability: null, maxMatches: null, excludedTeams: [], roles: null };

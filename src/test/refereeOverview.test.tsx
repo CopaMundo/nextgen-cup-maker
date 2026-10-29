@@ -71,4 +71,27 @@ describe("Referee overview controls", () => {
     expect(screen.getByText("Geen")).toBeVisible();
     expect(screen.getByText("Alle rollen")).toBeVisible();
   });
+
+  it("separates card locations with a bullet and lists Geen locations last in the popover", () => {
+    const mixed: RefereeCardDetails[] = [{
+      name: "Alex Janssens",
+      locations: ["Stadion: Veld 1", "Sporthal: Veld 2"],
+      locationDetails: ["Stadion: Veld 1", "Sporthal: Veld 2", "Bijveld: Geen"],
+      availability: ["Hele dag"], role: "Alle rollen", maxMatches: null, excludedTeams: [],
+    }];
+    render(<RefereeOverview referees={mixed} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
+    // Op het kaartje alleen actieve locaties, gescheiden door " • "; "Geen" staat er niet tussen.
+    expect(screen.getByText("Stadion: Veld 1 • Sporthal: Veld 2")).toBeVisible();
+    expect(screen.queryByText("Bijveld: Geen")).toBeNull();
+    // In de pop-up wel alle locaties, actieve eerst in toernooivolgorde en "Geen" onderaan.
+    fireEvent.click(screen.getByRole("button", { name: "Locaties en velden: alle details" }));
+    const details = screen.getByRole("dialog");
+    const items = within(details).getAllByText(/: Veld|: Geen/);
+    expect(items.map(item => item.textContent)).toEqual(["Stadion: Veld 1", "Sporthal: Veld 2", "Bijveld: Geen"]);
+  });
+
+  it("keeps availability separated with a comma, not a bullet", () => {
+    render(<RefereeOverview referees={[{ name: "Bo Peeters", locations: ["Alle velden"], availability: ["28/10: 09:00–12:00", "29/10: Hele dag"], role: "Alle rollen", maxMatches: null, excludedTeams: [] }]} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
+    expect(screen.getByText("28/10: 09:00–12:00, 29/10: Hele dag")).toBeVisible();
+  });
 });

@@ -5,7 +5,10 @@ import WhistleIcon from "@/components/icons/WhistleIcon";
 
 export interface RefereeCardDetails {
   name: string;
+  /** Regels voor op het kaartje: alleen actieve locaties, in toernooivolgorde. */
   locations: string[];
+  /** Volledige regels voor de detail-popover: actieve locaties eerst, locaties met "Geen" daaronder. */
+  locationDetails?: string[];
   availability: string[];
   role: string;
   maxMatches: number | null;
@@ -14,8 +17,8 @@ export interface RefereeCardDetails {
 
 const LABEL = "text-xs font-bold uppercase tracking-wider text-muted-foreground";
 
-function CompactDetails({ label, lines }: { label: string; lines: string[] }) {
-  const first = lines.length > 0 ? lines.join(", ") : "Geen";
+function CompactDetails({ label, lines, popupLines, separator = ", " }: { label: string; lines: string[]; popupLines?: string[]; separator?: string }) {
+  const first = lines.length > 0 ? lines.join(separator) : "Geen";
   return (
     <div className="min-w-0">
       <p className={LABEL}>{label}</p>
@@ -37,7 +40,7 @@ function CompactDetails({ label, lines }: { label: string; lines: string[] }) {
             <PopoverContent align="end" className="max-w-[calc(100vw-2rem)] p-3">
               <p className="mb-2 text-sm font-semibold">{label}</p>
               <ul className="max-h-60 space-y-2 overflow-y-auto text-sm">
-                {lines.map((line, index) => <li key={index} className="break-words">{line}</li>)}
+                {(popupLines ?? lines).map((line, index) => <li key={index} className="break-words">{line}</li>)}
               </ul>
             </PopoverContent>
           </Popover>
@@ -83,7 +86,7 @@ export default function RefereeOverview({ referees, participantsKind = "teams", 
                   <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => onDelete(index)} aria-label={`${referee.name} verwijderen`} title="Verwijderen"><Trash2 className="h-4 w-4" /></Button>
                 </div>
               </div>
-              <CompactDetails label="Locaties en velden" lines={referee.locations} />
+              <CompactDetails label="Locaties en velden" lines={referee.locations} popupLines={referee.locationDetails} separator=" • " />
               <CompactDetails label="Beschikbaarheid" lines={referee.availability} />
               <div className="min-w-0 shrink-0">
                 <p className={LABEL}>Max. aantal wedstrijden</p>

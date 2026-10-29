@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees,
+  RefereeConfig, ALL_ROLES, parseReferees, serializeReferees, buildFieldsByLocation,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
+import { parseFieldEntries, stripLocationPrefix } from "@/lib/fieldLocations";
 
 type DayMode = "all" | "times" | "none";
 type ExcludeMode = "none" | "select";
@@ -40,6 +41,8 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   const [fieldNames, setFieldNames] = useState<string[]>([]);
   const [locationNames, setLocationNames] = useState<string[]>([]);
   const [fieldOnlyNames, setFieldOnlyNames] = useState<string[]>([]);
+  /** Velden per locatie (via het location-veld), in toernooivolgorde. */
+  const [fieldsByLocation, setFieldsByLocation] = useState<Record<string, string[]>>({});
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
   const [days, setDays] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +78,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
 
     const [tRes, locRes, teamRes, catRes] = await Promise.all([
       supabase.from("tournaments").select("referees, fields, match_days, start_date, end_date").eq("id", tournamentId).single(),
-      supabase.from("tournament_locations").select("name").eq("tournament_id", tournamentId),
+      supabase.from("tournament_locations").select("name").eq("tournament_id", tournamentId).order("sort_order").order("created_at"),
       (categoryId
         ? supabase.from("teams").select("id, name").eq("tournament_id", tournamentId).eq("category_id", categoryId).order("name")
         : supabase.from("teams").select("id, name").eq("tournament_id", tournamentId).order("name")),
@@ -88,11 +91,14 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     setReferees(parseReferees(source?.referees));
 
     const rawFields = (categoryId ? catRes.data?.fields : tRes.data?.fields) as any;
-    const fieldsList = Array.isArray(rawFields) ? rawFields.map((f: any) => (typeof f === "string" ? f : f?.name)).filter(Boolean) : [];
-    const locations = (locRes.data || []).map((l: any) => l.name).filter(Boolean);
-    setLocationNames(Array.from(new Set(locations)));
+    const entries = parseFieldEntries(rawFields);
+    const fieldsList = entries.map(e => e.name);
+    const uniqueLocations = Array.from(new Set((locRes.data || []).map((l: any) => l.name).filter(Boolean)));
+    setLocationNames(uniqueLocations);
     setFieldOnlyNames(Array.from(new Set(fieldsList)));
-    setFieldNames(Array.from(new Set([...locations, ...fieldsList])));
+    setFieldNames(Array.from(new Set([...uniqueLocations, ...fieldsList])));
+    // Elk veld hoort bij zijn eigen locatie (location-veld); velden zonder geldige locatie vallen onder de eerste locatie.
+    setFieldsByLocation(buildFieldsByLocation(entries, uniqueLocations));
 
     setTeams((teamRes.data || []) as any);
 
@@ -132,7 +138,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     setDraft(ref);
     const modes: Record<string, LocationFieldMode> = {};
     locationNames.forEach(loc => {
-      modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldOnlyNames);
+      modes[loc] = getLocationFieldMode(loc, ref.allowedFields, fieldsByLocation[loc] ?? []);
     });
     setLocModes(modes);
     setExcludeMode(ref.excludedTeams.length > 0 ? "select" : "none");
@@ -198,12 +204,14 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
     if (locationNames.length === 0) return current;
     if (locationNames.every(loc => (modes[loc] ?? "all") === "all")) return null;
     const set = new Set<string>();
-    const previouslySelected = (current ?? fieldOnlyNames).filter(f => fieldOnlyNames.includes(f));
     locationNames.forEach(loc => {
       const mode = modes[loc] ?? "all";
       if (mode === "none") return;
+      // Alleen de velden van deze locatie; eerder gekozen velden van deze locatie blijven behouden.
+      const locFields = fieldsByLocation[loc] ?? [];
+      const previouslySelected = (current ?? locFields).filter(f => locFields.includes(f));
       set.add(loc);
-      if (mode === "all") fieldOnlyNames.forEach(f => set.add(f));
+      if (mode === "all") locFields.forEach(f => set.add(f));
       else previouslySelected.forEach(f => set.add(f));
     });
     return Array.from(set);
@@ -275,7 +283,16 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
 
   const teamName = (id: string) => teams.find(t => t.id === id)?.name || "?";
 
-  // ==== detail-weergave per scheidsrechter ====
+  const locationValue = (r: RefereeConfig, loc: string): string => {
+    const locFields = fieldsByLocation[loc] ?? [];
+    const mode = getLocationFieldMode(loc, r.allowedFields, locFields);
+    const sel = locFields.filter(f => r.allowedFields?.includes(f)).map(f => stripLocationPrefix(f, loc));
+    return mode === "none" ? "Geen"
+      : mode === "all" || locFields.length === 0 ? "Alle velden"
+      : sel.length > 0 ? sel.join(", ") : "Geen";
+  };
+
+  // Regel voor op het kaartje: alleen actieve locaties in toernooivolgorde; als alles op "Geen" staat toont het "Geen".
   const locationLines = (r: RefereeConfig): string[] => {
     if (locationNames.length === 0) {
       if (fieldOnlyNames.length === 0) return r.allowedFields === null ? ["Alle velden"] : r.allowedFields.length > 0 ? r.allowedFields : ["Geen"];
@@ -286,18 +303,22 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
       return sel;
     }
     if (r.allowedFields === null) return ["Alle velden"];
-    const single = locationNames.length === 1;
-    const lines = locationNames.map(loc => {
-      const mode = getLocationFieldMode(loc, r.allowedFields, fieldOnlyNames);
-      const sel = fieldOnlyNames.filter(f => r.allowedFields?.includes(f));
-      const value = mode === "none" ? "Geen"
-        : mode === "all" || fieldOnlyNames.length === 0 ? "Alle velden"
-        : sel.length > 0 ? sel.join(", ") : "Geen";
-      // Bij één locatie enkel de veldnamen tonen, zonder locatievoorvoegsel.
-      return single ? value : `${loc}: ${value}`;
-    });
-    // Locaties zonder gekozen velden ("...: Geen") achteraan plaatsen.
-    return lines.sort((a, b) => Number(a.endsWith(": Geen")) - Number(b.endsWith(": Geen")));
+    const active = locationNames
+      .map(loc => ({ loc, value: locationValue(r, loc) }))
+      .filter(entry => entry.value !== "Geen");
+    if (active.length === 0) return ["Geen"];
+    // Bij één actieve locatie enkel de veldnamen tonen, zonder locatievoorvoegsel.
+    return active.length === 1 ? [active[0].value] : active.map(entry => `${entry.loc}: ${entry.value}`);
+  };
+
+  // Volledig overzicht voor de pop-up: alle locaties in toernooivolgorde, de locaties met "Geen" onderaan.
+  const locationDetails = (r: RefereeConfig): string[] => {
+    if (locationNames.length === 0 || r.allowedFields === null) return locationLines(r);
+    const entries = locationNames.map(loc => ({ loc, value: locationValue(r, loc) }));
+    const active = entries.filter(entry => entry.value !== "Geen");
+    const none = entries.filter(entry => entry.value === "Geen");
+    const activeLines = active.length === 1 ? [active[0].value] : active.map(entry => `${entry.loc}: ${entry.value}`);
+    return [...activeLines, ...none.map(entry => `${entry.loc}: Geen`)];
   };
 
   const availabilityLines = (r: RefereeConfig): string[] => {
@@ -345,6 +366,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
         referees={referees.map(r => ({
           name: r.name,
           locations: locationLines(r),
+          locationDetails: locationDetails(r),
           availability: availabilityLines(r),
           role: roleLine(r),
           maxMatches: r.maxMatches,
@@ -416,7 +438,8 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                 {locationNames.length > 0 && (
                   <div className="space-y-3">
                     {locationNames.map(loc => {
-                      const mode = locModes[loc] ?? getLocationFieldMode(loc, draft.allowedFields, fieldOnlyNames);
+                      const locFields = fieldsByLocation[loc] ?? [];
+                      const mode = locModes[loc] ?? getLocationFieldMode(loc, draft.allowedFields, locFields);
                       return (
                         <div key={loc} className="space-y-2 rounded-lg border border-border px-3 py-2.5">
                           <p className="text-xs font-medium text-muted-foreground">{loc}</p>
@@ -428,17 +451,18 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                               <SelectItem value="none">Geen</SelectItem>
                             </SelectContent>
                           </Select>
-                          {mode === "select" && fieldOnlyNames.length > 0 && (
+                          {/* Strikt de velden van deze locatie, nooit velden van een andere locatie. */}
+                          {mode === "select" && locFields.length > 0 && (
                             <div className="grid grid-cols-2 gap-2">
-                              {fieldOnlyNames.map(f => (
+                              {locFields.map(f => (
                                 <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
                                   <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
-                                  <span className="truncate">{f}</span>
+                                  <span className="truncate">{stripLocationPrefix(f, loc)}</span>
                                 </label>
                               ))}
                             </div>
                           )}
-                          {mode === "select" && fieldOnlyNames.length === 0 && (
+                          {mode === "select" && locFields.length === 0 && (
                             <p className="text-xs text-muted-foreground">Nog geen velden ingesteld.</p>
                           )}
                         </div>
