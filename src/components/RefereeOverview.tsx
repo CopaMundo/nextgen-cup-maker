@@ -100,8 +100,9 @@ export default function RefereeOverview({ referees, participantsKind = "teams", 
                   {count === 0 ? <span className="text-sm text-foreground">Geen</span> : (
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="ghost" size="sm" className="-ml-1.5 h-7 min-w-0 px-1.5 text-sm text-primary" aria-label={`${excludedTitle} van ${referee.name}`}>
+                        <Button variant="ghost" className="h-7 min-w-0 justify-start gap-1 px-0 text-sm font-normal text-foreground hover:bg-transparent group/details" aria-label={`${excludedTitle} van ${referee.name}`}>
                           <span className="truncate">{count} {noun}</span>
+                          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover/details:text-primary group-data-[state=open]/details:rotate-180" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="start" className="max-w-[calc(100vw-2rem)] p-3">
