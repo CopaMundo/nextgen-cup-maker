@@ -455,7 +455,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                       </SelectContent>
                     </Select>
                     {getLocationFieldMode("", draft.allowedFields, fieldOnlyNames) === "select" && (
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
                         {fieldOnlyNames.map(f => (
                           <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
                             <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
@@ -484,7 +484,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                           </Select>
                           {/* Strikt de velden van deze locatie, nooit velden van een andere locatie. */}
                           {mode === "select" && locFields.length > 0 && (
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
                               {locFields.map(f => (
                                 <label key={f} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
                                   <Checkbox checked={(draft.allowedFields ?? fieldNames).includes(f)} onCheckedChange={() => toggleField(f)} />
@@ -618,11 +618,11 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
                     </SelectContent>
                   </Select>
                   {roleMode === "select" && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {ALL_ROLES.map(role => (
-                        <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
+                        <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
                           <Checkbox checked={(draft.roles ?? ALL_ROLES).includes(role)} onCheckedChange={() => toggleRole(role)} />
-                          <span>Rol {role}</span>
+                          <span className="truncate">Rol {role}</span>
                         </label>
                       ))}
                     </div>
