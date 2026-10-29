@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Copy, Plus, X } from "lucide-react";
 import RefereeOverview from "@/components/RefereeOverview";
+import { InfoHeading } from "@/components/admin/InfoHeading";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, RefereeAvailability, ALL_ROLES, parseReferees, serializeReferees, buildFieldsByLocation,
+  RefereeConfig, RefereeAvailability, ALL_ROLES, formatRefereeRoleLine, parseReferees, serializeReferees, buildFieldsByLocation,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
@@ -372,21 +373,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   const excludedLines = (r: RefereeConfig): string[] =>
     r.excludedTeams.map(teamName);
 
-  const roleLine = (r: RefereeConfig): string => {
-    if (!r.roles || r.roles.length === 0 || r.roles.length >= ALL_ROLES.length) return "Alle rollen";
-    const sorted = [...r.roles].sort((a, b) => a - b);
-    const parts: string[] = [];
-    let start = sorted[0];
-    let prev = sorted[0];
-    for (let i = 1; i <= sorted.length; i++) {
-      const cur = sorted[i];
-      if (cur === prev + 1) { prev = cur; continue; }
-      parts.push(start === prev ? `${start}` : `${start}-${prev}`);
-      start = cur;
-      prev = cur;
-    }
-    return parts.join(", ");
-  };
+  const roleLine = (r: RefereeConfig): string => formatRefereeRoleLine(r.roles);
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
 
@@ -608,7 +595,12 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
 
               {/* Rollen */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">Rol (1-5)</Label>
+                <InfoHeading
+                  title="Rol (1-5)"
+                  className="text-sm font-semibold"
+                  labelClassName="font-semibold"
+                  info="Bij een wedstrijd kunnen één tot vijf scheidsrechters worden ingezet. Kies hier welke posities deze scheidsrechter mag bekleden; bij Alle rollen mag hij elke positie invullen."
+                />
                 <div className="space-y-2 rounded-lg border border-border px-3 py-2.5">
                   <Select value={roleMode} onValueChange={(v) => applyRoleMode(v as RoleMode)}>
                     <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>

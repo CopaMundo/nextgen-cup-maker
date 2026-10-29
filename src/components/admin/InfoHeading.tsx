@@ -11,16 +11,19 @@ export const InfoHeading = ({
   htmlFor,
   right,
   className,
+  labelClassName,
 }: {
   title: string;
   info?: ReactNode;
   htmlFor?: string;
   right?: ReactNode;
   className?: string;
-  }) => (
+  /** Extra styling voor het label zelf (default stijl van ui/label blijft staan). */
+  labelClassName?: string;
+}) => (
   <div className={cn("flex min-h-5 items-center justify-between gap-3", className)}>
     <div className="flex min-w-0 items-center gap-1.5">
-      <Label htmlFor={htmlFor}>{title}</Label>
+      <Label htmlFor={htmlFor} className={labelClassName}>{title}</Label>
       {info && (
         <TooltipProvider delayDuration={150}>
           <Tooltip>
