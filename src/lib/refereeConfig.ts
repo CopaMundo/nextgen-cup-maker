@@ -24,6 +24,12 @@ export interface RefereeConfig {
 
 export const ALL_ROLES = [1, 2, 3, 4, 5];
 
+/** Rolweergave voor op het kaartje: "Alle rollen" of de gekozen rollen op volgorde, zonder bereik-compressie ("1, 2, 4, 5"). */
+export const formatRefereeRoleLine = (roles: number[] | null): string => {
+  if (!roles || roles.length === 0 || roles.length >= ALL_ROLES.length) return "Alle rollen";
+  return [...roles].sort((a, b) => a - b).join(", ");
+};
+
 export type LocationFieldMode = "all" | "select" | "none";
 
 /** Bepaal de veldmodus voor één locatie op basis van allowedFields. */

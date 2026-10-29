@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  RefereeConfig, RefereeAvailability, ALL_ROLES, parseReferees, serializeReferees, buildFieldsByLocation,
+  RefereeConfig, RefereeAvailability, ALL_ROLES, formatRefereeRoleLine, parseReferees, serializeReferees, buildFieldsByLocation,
   getLocationFieldMode, setLocationFieldMode, toggleFieldInAllowed, LocationFieldMode,
 } from "@/lib/refereeConfig";
 import { expandMatchDays, listIsoDatesInRange, normalizeIsoDates, formatIsoDateForLocale, MatchDayEntry } from "@/lib/dateUtils";
@@ -373,10 +373,7 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
   const excludedLines = (r: RefereeConfig): string[] =>
     r.excludedTeams.map(teamName);
 
-  const roleLine = (r: RefereeConfig): string => {
-    if (!r.roles || r.roles.length === 0 || r.roles.length >= ALL_ROLES.length) return "Alle rollen";
-    return [...r.roles].sort((a, b) => a - b).join(", ");
-  };
+  const roleLine = (r: RefereeConfig): string => formatRefereeRoleLine(r.roles);
 
   if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground border-t-transparent" /></div>;
 
