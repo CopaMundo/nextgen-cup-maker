@@ -581,49 +581,53 @@ const RefereeManager = ({ tournamentId, categoryId, teamsLabel = "Teams" }: Prop
               {/* Uitgesloten teams/spelers */}
               <div className="space-y-2">
                 <Label className="text-sm font-semibold">Uitgesloten {isPlayers ? "spelers" : "teams"}</Label>
-                <Select value={excludeMode} onValueChange={(v) => applyExcludeMode(v as ExcludeMode)}>
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Geen</SelectItem>
-                    <SelectItem value="select">Selecteer {isPlayers ? "spelers" : "teams"}</SelectItem>
-                  </SelectContent>
-                </Select>
-                {excludeMode !== "none" && (
-                  teams.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">Nog geen deelnemers toegevoegd.</p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
-                      {teams.map(t => (
-                        <label key={t.id} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
-                          <Checkbox checked={draft.excludedTeams.includes(t.id)} onCheckedChange={() => toggleTeam(t.id)} />
-                          <span className="truncate">{t.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )
-                )}
+                <div className="space-y-2 rounded-lg border border-border px-3 py-2.5">
+                  <Select value={excludeMode} onValueChange={(v) => applyExcludeMode(v as ExcludeMode)}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Geen</SelectItem>
+                      <SelectItem value="select">Selecteer {isPlayers ? "spelers" : "teams"}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {excludeMode !== "none" && (
+                    teams.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">Nog geen deelnemers toegevoegd.</p>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+                        {teams.map(t => (
+                          <label key={t.id} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-sm">
+                            <Checkbox checked={draft.excludedTeams.includes(t.id)} onCheckedChange={() => toggleTeam(t.id)} />
+                            <span className="truncate">{t.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
 
               {/* Rollen */}
               <div className="space-y-2">
                 <Label className="text-sm font-semibold">Rol (1-5)</Label>
-                <Select value={roleMode} onValueChange={(v) => applyRoleMode(v as RoleMode)}>
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle rollen</SelectItem>
-                    <SelectItem value="select">Selecteer rollen</SelectItem>
-                  </SelectContent>
-                </Select>
-                {roleMode === "select" && (
-                  <div className="flex flex-wrap gap-2">
-                    {ALL_ROLES.map(role => (
-                      <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
-                        <Checkbox checked={(draft.roles ?? ALL_ROLES).includes(role)} onCheckedChange={() => toggleRole(role)} />
-                        <span>Rol {role}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
+                <div className="space-y-2 rounded-lg border border-border px-3 py-2.5">
+                  <Select value={roleMode} onValueChange={(v) => applyRoleMode(v as RoleMode)}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle rollen</SelectItem>
+                      <SelectItem value="select">Selecteer rollen</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {roleMode === "select" && (
+                    <div className="flex flex-wrap gap-2">
+                      {ALL_ROLES.map(role => (
+                        <label key={role} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
+                          <Checkbox checked={(draft.roles ?? ALL_ROLES).includes(role)} onCheckedChange={() => toggleRole(role)} />
+                          <span>Rol {role}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-1">

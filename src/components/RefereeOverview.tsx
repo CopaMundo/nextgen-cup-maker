@@ -80,7 +80,7 @@ export default function RefereeOverview({ referees, participantsKind = "teams", 
             <article key={index} aria-label={referee.name} className="flex h-[21rem] min-w-0 flex-col gap-2.5 rounded-lg border border-border bg-card p-4">
               <div className="flex h-9 shrink-0 items-center gap-2">
                 <WhistleIcon className="h-5 w-5 shrink-0 text-primary" />
-                <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={referee.name}>{referee.name}</h3>
+                <h3 className="min-w-0 flex-1 truncate font-display text-sm font-semibold text-foreground" title={referee.name}>{referee.name}</h3>
                 <div className="flex shrink-0 items-center">
                   <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground" onClick={() => onEdit(index)} aria-label={`${referee.name} bewerken`} title="Bewerken"><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => onDelete(index)} aria-label={`${referee.name} verwijderen`} title="Verwijderen"><Trash2 className="h-4 w-4" /></Button>
