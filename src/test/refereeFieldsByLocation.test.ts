@@ -12,7 +12,8 @@ describe("buildFieldsByLocation", () => {
 
   it("koppelt elk veld strikt aan zijn eigen locatie in toernooivolgorde", () => {
     const map = buildFieldsByLocation(entries, ["Sporthal", "Stadion"]);
-    expect(map["Sporthal"]).toEqual(["Veld 1", "Sporthal · Veld 3"]);
+    // Velden zonder eigen locatie vallen onder de eerste locatie, in toernooivolgorde.
+    expect(map["Sporthal"]).toEqual(["Veld 1", "Los veld", "Sporthal · Veld 3", "Zwerfveld"]);
     expect(map["Stadion"]).toEqual(["Veld 2"]);
   });
 
