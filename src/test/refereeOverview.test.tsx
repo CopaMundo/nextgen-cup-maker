@@ -41,12 +41,15 @@ describe("Referee overview controls", () => {
     expect(within(screen.getByRole("dialog")).getByText("Team B")).toBeVisible();
   });
 
-  it("uses '+ meer' for truncated rows and shows compact max/role values", () => {
+  it("uses a chevron for truncated rows and shows compact max/role values", () => {
     render(<RefereeOverview referees={referees} onEdit={vi.fn()} onDelete={vi.fn()} onAdd={vi.fn()} />);
-    // Afkappingsknoppen tonen altijd "+ meer", nooit een teller.
+    // Afkappingsknoppen tonen een pijltje omlaag, nooit "+ meer"-tekst of een teller.
     const moreButtons = screen.getAllByRole("button", { name: /: alle details$/ });
-    expect(moreButtons.length).toBeGreaterThan(0);
-    moreButtons.forEach(b => expect(b).toHaveTextContent("+ meer"));
+    expect(moreButtons.length).toBe(2);
+    moreButtons.forEach(b => {
+      expect(b.textContent).toBe("");
+      expect(b.querySelector("svg")).not.toBeNull();
+    });
     // Max. aantal wedstrijden zonder herhaalde rubriektekst.
     expect(screen.getByText("8 wedstrijden")).toBeVisible();
     expect(screen.queryByText(/Max\. aantal wedstrijden:/)).toBeNull();
