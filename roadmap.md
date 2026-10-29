@@ -111,3 +111,4 @@
 
 - [x] Gedeelde vaste hoofdbalk buiten het scrollvak voor alle desktop/tablet-beheertabs, met gelijke hoogte en schuifbalkruimte; mobiele contextbalk behouden. Scheidingsrand verwijderd, één gedeelde zijmarge en bovenruimte op alle tabs, afwijkende breedtebeperking van gefocuste pagina's verwijderd.
 - [ ] Vaste hoofdbalk in een aangemeld echt toernooi controleren; geblokkeerd doordat geen account aan de aanvrager gekoppeld is voor automatisch aanmelden.
+- [ ] Scheidsrechterdialoog: velden strikt koppelen aan eigen locatie (location-veld), per locatie alleen eigen velden in selecties en overzichten.
