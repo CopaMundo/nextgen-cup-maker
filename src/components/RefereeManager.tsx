@@ -6,7 +6,7 @@ import { TimePicker } from "@/components/ui/timepicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { Copy } from "lucide-react";
+import { Copy, Plus, X } from "lucide-react";
 import RefereeOverview from "@/components/RefereeOverview";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import {
