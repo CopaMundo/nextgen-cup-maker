@@ -1,4 +1,4 @@
-import { Copy, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Copy, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WhistleIcon from "@/components/icons/WhistleIcon";
@@ -19,13 +19,19 @@ function CompactDetails({ label, lines }: { label: string; lines: string[] }) {
   return (
     <div className="min-w-0">
       <p className={LABEL}>{label}</p>
-      <div className="flex h-7 min-w-0 items-center gap-2">
+      <div className="flex h-7 min-w-0 items-center gap-1">
         <span className="min-w-0 flex-1 truncate text-sm text-foreground" title={first}>{first}</span>
         {(lines.length > 1 || first.length > 40) && (
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 shrink-0 px-1.5 text-xs text-primary" aria-label={`${label}: alle details`}>
-                {lines.length > 1 ? "+ meer" : <MoreHorizontal className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="group/details h-6 w-6 shrink-0 text-muted-foreground hover:bg-transparent hover:text-primary"
+                aria-label={`${label}: alle details`}
+                title="Alle details bekijken"
+              >
+                <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]/details:rotate-180" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="max-w-[calc(100vw-2rem)] p-3">
