@@ -394,7 +394,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
 
       if (data.phase_type === "group") {
         for (let i = 0; i < groupConfig.groupCount; i++) {
-          const groupName = `Group ${String.fromCharCode(65 + i)}`;
+          const groupName = `Groep ${String.fromCharCode(65 + i)}`;
           const groupLetter = String.fromCharCode(65 + i);
           const { data: gData, error: groupError } = await supabase.from("groups").insert({
             phase_id: data.id,
@@ -1303,7 +1303,6 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold", isActive ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground")}>{c.phaseNumber}</span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-foreground">{labelFor(c.phaseNumber)}</span>
-                <span className="block text-[11px] text-muted-foreground">{c.formats.length === 0 ? "Nog geen formats" : c.formats.length === 1 ? "1 format" : `${c.formats.length} formats`}</span>
               </span>
             </button>
           );
