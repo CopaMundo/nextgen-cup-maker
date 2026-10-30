@@ -73,6 +73,23 @@ interface PhaseContainer {
 const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
   const railRef = useRef<HTMLDivElement>(null);
   const railDrag = useRef({ x: 0, left: 0, moved: false, active: false });
+  const [railScroll, setRailScroll] = useState({ left: false, right: false });
+
+  // Meet of de fasenrij overloopt en of er links/rechts nog te scrollen valt.
+  const updateRailScroll = () => {
+    const el = railRef.current;
+    if (!el) { setRailScroll({ left: false, right: false }); return; }
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const canLeft = maxScroll > 1 && el.scrollLeft > 1;
+    const canRight = maxScroll > 1 && el.scrollLeft < maxScroll - 1;
+    setRailScroll((prev) => (prev.left === canLeft && prev.right === canRight ? prev : { left: canLeft, right: canRight }));
+  };
+
+  const scrollRail = (dir: -1 | 1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(el.clientWidth * 0.8, 200), behavior: "smooth" });
+  };
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
   const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
@@ -125,6 +142,14 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       setDraftPhaseNumbers(Array.isArray(parsed) ? parsed.filter((n: unknown) => typeof n === "number") as number[] : []);
     } catch { setDraftPhaseNumbers([]); }
   }, [draftStorageKey]);
+
+  // Houd de pijltjesmeting bij bij fasetoename, laden, mobiel/desktop en het einde van het lettertype-laden.
+  useEffect(() => {
+    if (isMobile) { setRailScroll({ left: false, right: false }); return; }
+    updateRailScroll();
+    const timers = [50, 300, 900].map((ms) => window.setTimeout(updateRailScroll, ms));
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [isMobile, loading, allFormats.length, draftPhaseNumbers.length]);
 
   useEffect(() => {
     try { localStorage.setItem(draftStorageKey, JSON.stringify(draftPhaseNumbers)); } catch { /* negeren */ }
@@ -1284,11 +1309,12 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       : (pendingPhaseLabels[n] || `Fase ${n}`);
 
   // Desktop/tablet: horizontale rij fasekaarten bovenaan; bij veel fases scrolt de rij horizontaal.
-  const phaseRail = (
+  const railScroller = (
     <div
       ref={railRef}
       aria-label="Fasestappen"
       className="overflow-x-auto scrollbar-none cursor-grab select-none active:cursor-grabbing"
+      onScroll={updateRailScroll}
       onPointerDown={(e) => {
         if (e.pointerType !== "mouse" || e.button !== 0 || !railRef.current) return;
         railDrag.current = { x: e.clientX, left: railRef.current.scrollLeft, moved: false, active: true };
@@ -1338,6 +1364,40 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           <Plus className="h-4 w-4" /> Fase toevoegen
         </button>
       </div>
+    </div>
+  );
+
+  const railHasOverflow = railScroll.left || railScroll.right;
+
+  const phaseRail = (
+    <div className="flex items-center gap-1.5">
+      {railHasOverflow && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Fases naar links scrollen"
+          className="h-8 w-8 shrink-0"
+          disabled={!railScroll.left}
+          onClick={() => scrollRail(-1)}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      )}
+      <div className="min-w-0 flex-1">{railScroller}</div>
+      {railHasOverflow && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Fases naar rechts scrollen"
+          className="h-8 w-8 shrink-0"
+          disabled={!railScroll.right}
+          onClick={() => scrollRail(1)}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 
