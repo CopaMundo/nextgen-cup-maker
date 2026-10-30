@@ -1104,10 +1104,13 @@ const TournamentGeneral = ({
               </div>
 
               <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-5">
+                <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
                 <InfoHeading
                   title="Kaarten"
+                  htmlFor="statistics-cards"
                   right={
                     <Switch
+                      id="statistics-cards"
                       checked={form.enable_yellow_cards}
                       onCheckedChange={(value) => {
                         const updates: any = { enable_yellow_cards: value, enable_red_cards: value };
@@ -1118,13 +1121,16 @@ const TournamentGeneral = ({
                   }
                 />
 
-                {form.enable_yellow_cards && (
                   <InfoHeading
-                    title="Fair-playklassement activeren"
+                    title="Fairplayklassement"
+                    htmlFor="statistics-fairplay"
+                    className={!form.enable_yellow_cards ? "opacity-50" : undefined}
                     info="Alleen zichtbaar in de beheeromgeving. Je kunt fairplay ook toevoegen als criterium bij gelijke punten in de puntentelling."
                     right={
                       <Switch
-                        checked={form.enable_fairplay}
+                        id="statistics-fairplay"
+                        disabled={!form.enable_yellow_cards}
+                        checked={form.enable_yellow_cards && form.enable_fairplay}
                         onCheckedChange={(value) => {
                           const updates: any = { enable_fairplay: value };
                           if (value && !tournament.fairplay_config) updates.fairplay_config = { ...FAIRPLAY_DEFAULTS };
@@ -1133,35 +1139,25 @@ const TournamentGeneral = ({
                       />
                     }
                   />
-                )}
+                </div>
 
                 {form.enable_yellow_cards && form.enable_fairplay && (
                   <div className="space-y-3">
+                    <InfoHeading title="Strafpunten" />
                     <p className="text-xs text-muted-foreground">Strafpunten per kaart. Een gele kaart gevolgd door een rechtstreekse rode kaart telt op (standaard 1 + 5 = 6).</p>
-                    <TooltipProvider delayDuration={150}>
                       <div className="grid gap-2 sm:grid-cols-3">
                         {([
-                          { key: "yellow", icon: <div className="h-4 w-3 rounded-sm bg-yellow-400" />, tip: "Gele kaart" },
-                          { key: "second_yellow", icon: (
-                            <span className="inline-flex items-center">
-                              <div className="h-4 w-3 rounded-sm bg-yellow-400" />
-                              <div className="h-4 w-3 rounded-sm bg-red-500 -ml-1" />
-                            </span>
-                          ), tip: "Tweede gele kaart → rood" },
-                          { key: "red", icon: <div className="h-4 w-3 rounded-sm bg-red-500" />, tip: "Rechtstreekse rode kaart" },
-                        ] as const).map(({ key, icon, tip }) => (
-                          <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="inline-flex items-center cursor-help">{icon}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>{tip}</TooltipContent>
-                            </Tooltip>
-                            <span className="text-xs text-muted-foreground flex-1">strafpunten</span>
+                          { key: "yellow", label: "Gele kaart" },
+                          { key: "second_yellow", label: "2x geel + rood" },
+                          { key: "red", label: "Direct rood" },
+                        ] as const).map(({ key, label }) => (
+                          <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5">
+                            <Label htmlFor={`fairplay-${key}`} className="admin-plain-label min-w-0 flex-1 text-sm font-normal text-foreground">{label}</Label>
                             <Input
+                              id={`fairplay-${key}`}
                               type="number"
                               min={0}
-                              className="h-8 w-16 text-center"
+                              className="h-8 w-16 shrink-0 text-center"
                               value={fpDraft[key]}
                               onChange={(e) => setFpDraft((p) => ({ ...p, [key]: e.target.value }))}
                               onBlur={() => saveFairplayConfig()}
@@ -1169,7 +1165,6 @@ const TournamentGeneral = ({
                           </div>
                         ))}
                       </div>
-                    </TooltipProvider>
                     <div className="grid gap-2 sm:grid-cols-2">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Punten voor een wedstrijd zonder kaarten</Label>
