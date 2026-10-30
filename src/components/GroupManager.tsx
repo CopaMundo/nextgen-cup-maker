@@ -291,7 +291,7 @@ const GroupManager = ({
   };
 
   const openCreateDialog = () => {
-    setDialogName("");
+    setDialogName(`Groep ${String.fromCharCode(65 + groups.length)}`);
     setDialogSlots(4);
     setDialogMatchType(phaseMatchType);
     setDialogEncounters(phaseEncounters);
@@ -655,7 +655,7 @@ const GroupManager = ({
     }
 
     setUploading(true);
-    const name = dialogName.trim() || `Group ${String.fromCharCode(65 + groups.length)}`;
+    const name = dialogName.trim() || `Groep ${String.fromCharCode(65 + groups.length)}`;
     const groupLetter = name.replace(/[^A-Za-z]/g, "").charAt(0).toUpperCase() || String.fromCharCode(65 + groups.length);
     const isManualPlanning = dialogMatchType === "rounds" && dialogMatchGenMode === "empty";
     const { data } = await supabase

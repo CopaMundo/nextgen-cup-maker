@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, User, ArrowRight, X, ArrowLeftRight } from "lucide-react";
+import { ChevronDown, ArrowRight, X, ArrowLeftRight } from "lucide-react";
 
 interface Slot {
   id: string;
@@ -526,7 +526,6 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
               {display.type === "team" && display.logo && (
                 <img src={display.logo} className="h-4 w-4 object-contain flex-shrink-0" />
               )}
-              {display.type === "team" && <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />}
               {display.type === "ref" && <ArrowRight className="h-3 w-3 text-primary flex-shrink-0" />}
               <span className="flex-1 truncate">
                 {display.type === "ref" && display.label.includes("(") ? (
@@ -721,7 +720,6 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
                         className="w-full px-3 py-1.5 text-left text-xs text-foreground hover:bg-foreground/5 transition-colors flex items-center gap-2"
                       >
                         {t.logo_url && <img src={t.logo_url} className="h-4 w-4 object-contain" />}
-                        <User className="h-3 w-3 text-muted-foreground" />
                         {t.name}
                       </button>
                     ))}
