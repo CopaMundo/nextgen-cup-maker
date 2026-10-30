@@ -71,6 +71,8 @@ interface PhaseContainer {
 
 
 const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
+  const railRef = useRef<HTMLDivElement>(null);
+  const railDrag = useRef({ x: 0, left: 0, moved: false, active: false });
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
   const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
@@ -1283,7 +1285,28 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
 
   // Desktop/tablet: horizontale rij fasekaarten bovenaan; bij veel fases scrolt de rij horizontaal.
   const phaseRail = (
-    <div aria-label="Fasestappen" className="overflow-x-auto pb-1">
+    <div
+      ref={railRef}
+      aria-label="Fasestappen"
+      className="overflow-x-auto scrollbar-none cursor-grab select-none active:cursor-grabbing"
+      onPointerDown={(e) => {
+        if (e.pointerType !== "mouse" || e.button !== 0 || !railRef.current) return;
+        railDrag.current = { x: e.clientX, left: railRef.current.scrollLeft, moved: false, active: true };
+      }}
+      onPointerMove={(e) => {
+        const d = railDrag.current;
+        if (!d.active || !railRef.current) return;
+        const dx = e.clientX - d.x;
+        if (!d.moved && Math.abs(dx) > 5) { d.moved = true; railRef.current.setPointerCapture(e.pointerId); }
+        if (d.moved) railRef.current.scrollLeft = d.left - dx;
+      }}
+      onPointerUp={() => { railDrag.current.active = false; }}
+      onPointerCancel={() => { railDrag.current.active = false; railDrag.current.moved = false; }}
+      onClickCapture={(e) => {
+        if (railDrag.current.moved) { e.preventDefault(); e.stopPropagation(); railDrag.current.moved = false; }
+      }}
+      onDragStart={(e) => e.preventDefault()}
+    >
       <div className="flex w-max min-w-full items-stretch gap-2">
         {containers.map((c) => {
           const isActive = c.phaseNumber === activePhaseNumber;
