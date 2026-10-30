@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, User, ArrowRight, X, ArrowLeftRight } from "lucide-react";
+import { ChevronDown, ArrowRight, X, ArrowLeftRight } from "lucide-react";
 
 interface Slot {
   id: string;
