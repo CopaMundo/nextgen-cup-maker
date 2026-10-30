@@ -1104,7 +1104,7 @@ const TournamentGeneral = ({
               </div>
 
               <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-5">
-                <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
                 <InfoHeading
                   title="Kaarten"
                   htmlFor="statistics-cards"
@@ -1124,7 +1124,7 @@ const TournamentGeneral = ({
                   <InfoHeading
                     title="Fairplayklassement"
                     htmlFor="statistics-fairplay"
-                    className={!form.enable_yellow_cards ? "opacity-50" : undefined}
+                    className={`ml-auto ${!form.enable_yellow_cards ? "opacity-50" : ""}`}
                     info="Alleen zichtbaar in de beheeromgeving. Je kunt fairplay ook toevoegen als criterium bij gelijke punten in de puntentelling."
                     right={
                       <Switch
@@ -1142,9 +1142,8 @@ const TournamentGeneral = ({
                 </div>
 
                 {form.enable_yellow_cards && form.enable_fairplay && (
-                  <div className="space-y-3">
-                    <InfoHeading title="Strafpunten" />
-                    <p className="text-xs text-muted-foreground">Strafpunten per kaart. Een gele kaart gevolgd door een rechtstreekse rode kaart telt op (standaard 1 + 5 = 6).</p>
+                  <div className="space-y-3 border-t border-border pt-5">
+                    <InfoHeading title="Strafpunten" info="Bepaal hoeveel fairplaypunten per kaart worden afgetrokken. Twee gele kaarten voor dezelfde speler in één wedstrijd tellen als ‘2x geel + rood’. Een gele kaart gevolgd door een directe rode kaart telt op: bij de standaardwaarden 1 + 5 = 6 strafpunten." />
                       <div className="grid gap-2 sm:grid-cols-3">
                         {([
                           { key: "yellow", label: "Gele kaart" },
@@ -1152,6 +1151,10 @@ const TournamentGeneral = ({
                           { key: "red", label: "Direct rood" },
                         ] as const).map(({ key, label }) => (
                           <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5">
+                            <span aria-hidden="true" className="inline-flex shrink-0 items-center">
+                              {key !== "red" && <span className="discipline-card-yellow h-4 w-3 rounded-sm" />}
+                              {key !== "yellow" && <span className={`discipline-card-red h-4 w-3 rounded-sm ${key === "second_yellow" ? "-ml-1" : ""}`} />}
+                            </span>
                             <Label htmlFor={`fairplay-${key}`} className="admin-plain-label min-w-0 flex-1 text-sm font-normal text-foreground">{label}</Label>
                             <Input
                               id={`fairplay-${key}`}
@@ -1167,8 +1170,9 @@ const TournamentGeneral = ({
                       </div>
                     <div className="grid gap-2 sm:grid-cols-2">
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Punten voor een wedstrijd zonder kaarten</Label>
+                        <InfoHeading title="Punten voor een wedstrijd zonder kaarten" htmlFor="fairplay-clean-match" labelClassName="text-xs" info="Deze punten worden per gespeelde wedstrijd bij het fairplaytotaal van een team opgeteld als dat team geen kaarten heeft ontvangen. Vul 0 in als je geen bonuspunten wilt toekennen." />
                         <Input
+                          id="fairplay-clean-match"
                           type="number"
                           className="h-8"
                           placeholder="0"
@@ -1178,8 +1182,9 @@ const TournamentGeneral = ({
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Startpuntentotaal</Label>
+                        <InfoHeading title="Startpuntentotaal" htmlFor="fairplay-start" labelClassName="text-xs" info="Elk team begint het fairplayklassement met dit aantal punten. Strafpunten voor kaarten worden afgetrokken en eventuele punten voor wedstrijden zonder kaarten worden erbij opgeteld." />
                         <Input
+                          id="fairplay-start"
                           type="number"
                           className="h-8"
                           value={fpDraft.start}

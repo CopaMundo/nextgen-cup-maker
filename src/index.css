@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --discipline-yellow: 48 96% 53%;
+  --discipline-red: 0 84% 60%;
+}
+
+.discipline-card-yellow { background-color: hsl(var(--discipline-yellow)); }
+.discipline-card-red { background-color: hsl(var(--discipline-red)); }
+
 /* Hide number input spinners globally */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
