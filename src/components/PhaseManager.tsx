@@ -1336,14 +1336,18 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       <div className="flex w-max min-w-full items-stretch gap-2">
         {containers.map((c) => {
           const isActive = c.phaseNumber === activePhaseNumber;
+          const canDelete = containers.length > 1 && c.phaseNumber !== 1;
           return (
-            <button
+            <div
               key={c.phaseNumber}
-              type="button"
+              role="button"
+              tabIndex={0}
               aria-current={isActive ? "true" : undefined}
+              aria-label={labelFor(c.phaseNumber)}
               onClick={() => { setActivePhaseNumber(c.phaseNumber); setOpenFormatId(null); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivePhaseNumber(c.phaseNumber); setOpenFormatId(null); } }}
               className={cn(
-                "flex w-44 shrink-0 items-center gap-2.5 rounded-lg border bg-card px-3 py-2 text-left transition-colors",
+                "flex w-52 shrink-0 cursor-pointer items-center gap-2 rounded-lg border bg-card px-3 py-2 text-left transition-colors",
                 isActive
                   ? "border-primary bg-accent/40 ring-1 ring-primary"
                   : "border-border hover:border-primary/40 hover:bg-accent/30"
@@ -1353,7 +1357,27 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-foreground">{labelFor(c.phaseNumber)}</span>
               </span>
-            </button>
+              <span className="flex shrink-0 items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  aria-label="Naam bewerken"
+                  onClick={(e) => { e.stopPropagation(); openPhaseEdit(c.phaseNumber); }}
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                {canDelete && (
+                  <button
+                    type="button"
+                    aria-label="Fase verwijderen"
+                    onClick={(e) => { e.stopPropagation(); setDeletePhaseNumber(c.phaseNumber); }}
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </span>
+            </div>
           );
         })}
         <button
@@ -1538,17 +1562,6 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               )
             ) : (
             <>
-              <div className="mb-4 flex min-w-0 items-center gap-2">
-                <h2 className="min-w-0 flex-1 truncate font-display text-lg font-semibold text-foreground">{labelFor(container.phaseNumber)}</h2>
-                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Naam bewerken" onClick={() => openPhaseEdit(container.phaseNumber)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                {containers.length > 1 && container.phaseNumber !== 1 && (
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label="Fase verwijderen" onClick={() => setDeletePhaseNumber(container.phaseNumber)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
               <div className="space-y-3">
               {/* Format cards - always visible, individually collapsible */}
               <SortableVerticalList
