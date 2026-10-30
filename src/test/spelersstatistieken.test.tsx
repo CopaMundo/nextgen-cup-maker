@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import TournamentGeneral from "@/components/TournamentGeneral";
 
@@ -68,7 +68,7 @@ describe("Spelersstatistieken", () => {
     );
 
     const kaarten = await screen.findByText("Kaarten");
-    const fairplay = screen.getByText("Fair-playklassement activeren");
+    const fairplay = screen.getByText("Fairplayklassement");
     const strafpunten = screen.getByText("Strafpunten per kaart.", { exact: false });
 
     expect(kaarten.compareDocumentPosition(fairplay) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -101,11 +101,43 @@ describe("Spelersstatistieken", () => {
     expect(blockAs).not.toBe(blockKa);
 
     // Doelpuntenmakers- en Assists-blok delen dezelfde tweecolumns-grid-ouder.
-    expect(blockDm!.parentElement).toBe(blockAs!.parentElement);
-    expect(blockDm!.parentElement!.className).toContain("sm:grid-cols-2");
+    expect(blockDm?.parentElement).toBe(blockAs?.parentElement);
+    expect(blockDm?.parentElement?.className).toContain("sm:grid-cols-2");
 
     // Kaarten-blok staat buiten die grid-ouder op volle breedte.
-    expect(blockKa!.parentElement).not.toBe(blockDm!.parentElement);
-    expect(blockKa!.className).not.toContain("sm:grid-cols-2");
+    expect(blockKa?.parentElement).not.toBe(blockDm?.parentElement);
+    expect(blockKa?.className).not.toContain("sm:grid-cols-2");
+  });
+
+  it("houdt fairplay uit en onbeschikbaar zolang kaarten uit staan", async () => {
+    const onUpdate = vi.fn();
+    render(<TournamentGeneral tournament={{ ...TOURNAMENT, enable_yellow_cards: false, enable_red_cards: false } as any} onUpdate={onUpdate} generalSubTab="puntentelling" onGeneralSubTabChange={vi.fn()} />);
+    const fairplay = screen.getByRole("switch", { name: "Fairplayklassement" });
+    expect(fairplay).toBeDisabled();
+    expect(fairplay).not.toBeChecked();
+    fireEvent.click(fairplay);
+    expect(onUpdate).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("switch", { name: "Kaarten" }));
+    expect(fairplay).toBeEnabled();
+    fireEvent.click(fairplay);
+    await waitFor(() => expect(onUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ enable_yellow_cards: true, enable_red_cards: true, enable_fairplay: true })));
+  });
+
+  it("schakelt fairplay mee uit als kaarten worden uitgezet", async () => {
+    const onUpdate = vi.fn();
+    render(<TournamentGeneral tournament={{ ...TOURNAMENT, enable_fairplay: true } as any} onUpdate={onUpdate} generalSubTab="puntentelling" onGeneralSubTabChange={vi.fn()} />);
+    fireEvent.click(screen.getByRole("switch", { name: "Kaarten" }));
+    expect(screen.getByRole("switch", { name: "Fairplayklassement" })).toBeDisabled();
+    expect(screen.getByRole("switch", { name: "Fairplayklassement" })).not.toBeChecked();
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ enable_yellow_cards: false, enable_red_cards: false, enable_fairplay: false })));
+  });
+
+  it("bewaart de drie strafpunten en de overige fairplaypunten", async () => {
+    const onUpdate = vi.fn();
+    render(<TournamentGeneral tournament={{ ...TOURNAMENT, enable_fairplay: true, fairplay_config: { yellow: 1, second_yellow: 3, red: 5, clean_match: 2, start: 100 } } as any} onUpdate={onUpdate} generalSubTab="puntentelling" onGeneralSubTabChange={vi.fn()} />);
+    const yellow = screen.getByRole("spinbutton", { name: "Gele kaart" });
+    fireEvent.change(yellow, { target: { value: "4" } });
+    fireEvent.blur(yellow);
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ fairplay_config: { yellow: 4, second_yellow: 3, red: 5, clean_match: 2, start: 100 } })));
   });
 });
