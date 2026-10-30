@@ -1562,17 +1562,6 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               )
             ) : (
             <>
-              <div className="mb-4 flex min-w-0 items-center gap-2">
-                <h2 className="min-w-0 flex-1 truncate font-display text-lg font-semibold text-foreground">{labelFor(container.phaseNumber)}</h2>
-                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Naam bewerken" onClick={() => openPhaseEdit(container.phaseNumber)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                {containers.length > 1 && container.phaseNumber !== 1 && (
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label="Fase verwijderen" onClick={() => setDeletePhaseNumber(container.phaseNumber)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
               <div className="space-y-3">
               {/* Format cards - always visible, individually collapsible */}
               <SortableVerticalList
