@@ -1309,11 +1309,12 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       : (pendingPhaseLabels[n] || `Fase ${n}`);
 
   // Desktop/tablet: horizontale rij fasekaarten bovenaan; bij veel fases scrolt de rij horizontaal.
-  const phaseRail = (
+  const railScroller = (
     <div
       ref={railRef}
       aria-label="Fasestappen"
       className="overflow-x-auto scrollbar-none cursor-grab select-none active:cursor-grabbing"
+      onScroll={updateRailScroll}
       onPointerDown={(e) => {
         if (e.pointerType !== "mouse" || e.button !== 0 || !railRef.current) return;
         railDrag.current = { x: e.clientX, left: railRef.current.scrollLeft, moved: false, active: true };
@@ -1363,6 +1364,40 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           <Plus className="h-4 w-4" /> Fase toevoegen
         </button>
       </div>
+    </div>
+  );
+
+  const railHasOverflow = railScroll.left || railScroll.right;
+
+  const phaseRail = (
+    <div className="flex items-center gap-1.5">
+      {railHasOverflow && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Fases naar links scrollen"
+          className="h-8 w-8 shrink-0"
+          disabled={!railScroll.left}
+          onClick={() => scrollRail(-1)}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      )}
+      <div className="min-w-0 flex-1">{railScroller}</div>
+      {railHasOverflow && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Fases naar rechts scrollen"
+          className="h-8 w-8 shrink-0"
+          disabled={!railScroll.right}
+          onClick={() => scrollRail(1)}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 
