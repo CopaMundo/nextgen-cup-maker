@@ -143,6 +143,14 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     } catch { setDraftPhaseNumbers([]); }
   }, [draftStorageKey]);
 
+  // Houd de pijltjesmeting bij bij fasetoename, laden, mobiel/desktop en het einde van het lettertype-laden.
+  useEffect(() => {
+    if (isMobile) { setRailScroll({ left: false, right: false }); return; }
+    updateRailScroll();
+    const timers = [50, 300, 900].map((ms) => window.setTimeout(updateRailScroll, ms));
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [isMobile, loading, allFormats.length, draftPhaseNumbers.length]);
+
   useEffect(() => {
     try { localStorage.setItem(draftStorageKey, JSON.stringify(draftPhaseNumbers)); } catch { /* negeren */ }
   }, [draftStorageKey, draftPhaseNumbers]);
