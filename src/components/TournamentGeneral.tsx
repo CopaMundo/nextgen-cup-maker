@@ -1143,14 +1143,14 @@ const TournamentGeneral = ({
 
                 {form.enable_yellow_cards && form.enable_fairplay && (
                   <div className="space-y-3 border-t border-border pt-5">
-                    <InfoHeading title="Strafpunten" info="Bepaal hoeveel strafpunten per kaart worden afgetrokken." />
+                    <InfoHeading title="Strafpunten" info="Bepaal hoeveel strafpunten per kaart worden afgetrokken. Twee gele kaarten voor dezelfde speler in één wedstrijd tellen als ‘2x geel → rood’. Een gele kaart gevolgd door een directe rode kaart telt op: bij de standaardwaarden 1 + 5 = 6 strafpunten." />
                       <div className="grid gap-2 sm:grid-cols-3">
                         {([
                           { key: "yellow", label: "Gele kaart" },
-                          { key: "second_yellow", label: "Tweede gele kaart (rood)" },
+                          { key: "second_yellow", label: "2x geel → rood" },
                           { key: "red", label: "Rode kaart" },
                         ] as const).map(({ key, label }) => (
-                          <div key={key} className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2.5">
+                          <div key={key} className="flex items-center justify-center gap-3 rounded-md border border-border bg-card px-3 py-2.5">
                             <TooltipProvider delayDuration={150}>
                               <Tooltip>
                                 <TooltipTrigger asChild>
