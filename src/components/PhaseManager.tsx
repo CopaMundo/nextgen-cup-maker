@@ -1381,11 +1381,12 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
         </div>
       )}
 
+      {!isMobile && !loading && containers.length > 0 && phaseRail}
+
       {!(isMobile && mobilePhaseOverview) && containers
         .filter((c) => c.phaseNumber === activePhaseNumber)
         .map((container) => (
-          <div key={container.phaseNumber} className={!isMobile ? "flex items-start gap-6" : undefined}>
-            {!isMobile && phaseRail}
+          <div key={container.phaseNumber}>
             <div className="min-w-0 flex-1">
             {isMobile ? (
               openFormat ? (
