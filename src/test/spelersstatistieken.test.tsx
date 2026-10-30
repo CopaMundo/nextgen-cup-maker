@@ -69,7 +69,7 @@ describe("Spelersstatistieken", () => {
 
     const kaarten = await screen.findByText("Kaarten");
     const fairplay = screen.getByText("Fairplayklassement");
-    const strafpunten = screen.getByText("Strafpunten per kaart.", { exact: false });
+    const strafpunten = screen.getByText("Strafpunten");
 
     expect(kaarten.compareDocumentPosition(fairplay) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(fairplay.compareDocumentPosition(strafpunten) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
