@@ -1155,8 +1155,15 @@ const TournamentGeneral = ({
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <span aria-label={label} className="inline-flex shrink-0 cursor-default items-center">
-                                    {key !== "red" && <span className="discipline-card-yellow h-4 w-3 rounded-sm" />}
-                                    {key !== "yellow" && <span className={`discipline-card-red h-4 w-3 rounded-sm ${key === "second_yellow" ? "-ml-1" : ""}`} />}
+                                    {key === "yellow" && <span className="discipline-card-yellow h-4 w-3 rounded-sm" />}
+                                    {key === "second_yellow" && (
+                                      <span className="inline-flex items-center">
+                                        <span className="discipline-card-yellow h-4 w-3 rounded-sm" />
+                                        <span className="discipline-card-yellow h-4 w-3 rounded-sm -ml-1.5" />
+                                        <span className="discipline-card-red h-4 w-3 rounded-sm -ml-1.5" />
+                                      </span>
+                                    )}
+                                    {key === "red" && <span className="discipline-card-red h-4 w-3 rounded-sm" />}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent side="top" className="text-xs">{label}</TooltipContent>
