@@ -1143,21 +1143,28 @@ const TournamentGeneral = ({
 
                 {form.enable_yellow_cards && form.enable_fairplay && (
                   <div className="space-y-3 border-t border-border pt-5">
-                    <InfoHeading title="Strafpunten" info="Bepaal hoeveel fairplaypunten per kaart worden afgetrokken. Twee gele kaarten voor dezelfde speler in één wedstrijd tellen als ‘2x geel + rood’. Een gele kaart gevolgd door een directe rode kaart telt op: bij de standaardwaarden 1 + 5 = 6 strafpunten." />
+                    <InfoHeading title="Strafpunten" info="Bepaal hoeveel strafpunten per kaart worden afgetrokken." />
                       <div className="grid gap-2 sm:grid-cols-3">
                         {([
                           { key: "yellow", label: "Gele kaart" },
-                          { key: "second_yellow", label: "2x geel + rood" },
-                          { key: "red", label: "Direct rood" },
+                          { key: "second_yellow", label: "Tweede gele kaart (rood)" },
+                          { key: "red", label: "Rode kaart" },
                         ] as const).map(({ key, label }) => (
-                          <div key={key} className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5">
-                            <span aria-hidden="true" className="inline-flex shrink-0 items-center">
-                              {key !== "red" && <span className="discipline-card-yellow h-4 w-3 rounded-sm" />}
-                              {key !== "yellow" && <span className={`discipline-card-red h-4 w-3 rounded-sm ${key === "second_yellow" ? "-ml-1" : ""}`} />}
-                            </span>
-                            <Label htmlFor={`fairplay-${key}`} className="admin-plain-label min-w-0 flex-1 text-sm font-normal text-foreground">{label}</Label>
+                          <div key={key} className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2.5">
+                            <TooltipProvider delayDuration={150}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span aria-label={label} className="inline-flex shrink-0 cursor-default items-center">
+                                    {key !== "red" && <span className="discipline-card-yellow h-4 w-3 rounded-sm" />}
+                                    {key !== "yellow" && <span className={`discipline-card-red h-4 w-3 rounded-sm ${key === "second_yellow" ? "-ml-1" : ""}`} />}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">{label}</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                             <Input
                               id={`fairplay-${key}`}
+                              aria-label={label}
                               type="number"
                               min={0}
                               className="h-8 w-16 shrink-0 text-center"
