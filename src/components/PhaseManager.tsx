@@ -71,6 +71,8 @@ interface PhaseContainer {
 
 
 const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
+  const railRef = useRef<HTMLDivElement>(null);
+  const railDrag = useRef({ x: 0, left: 0, moved: false, active: false });
   const isMobile = useIsMobile();
   const [openFormatId, setOpenFormatId] = useState<string | null>(null);
   const [mobilePhaseOverview, setMobilePhaseOverview] = useState(true);
