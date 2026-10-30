@@ -1281,42 +1281,42 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       ? getPhaseLabel(n, allFormats)
       : (pendingPhaseLabels[n] || `Fase ${n}`);
 
-  // Desktop/tablet: verticaal stappenoverzicht; de geopende fase spreidt zijn formats rechts uit.
+  // Desktop/tablet: horizontale rij fasekaarten bovenaan; bij veel fases scrolt de rij horizontaal.
   const phaseRail = (
-    <aside aria-label="Fasestappen" className="w-56 shrink-0 space-y-2 lg:w-64">
-      {containers.map((c) => {
-        const isActive = c.phaseNumber === activePhaseNumber;
-        return (
-          <button
-            key={c.phaseNumber}
-            type="button"
-            aria-current={isActive ? "true" : undefined}
-            onClick={() => { setActivePhaseNumber(c.phaseNumber); setOpenFormatId(null); }}
-            className={cn(
-              "relative flex w-full items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-left transition-colors",
-              isActive
-                ? "border-primary/50 bg-accent/40"
-                : "border-border hover:border-primary/40 hover:bg-accent/30"
-            )}
-          >
-            {isActive && <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-full bg-primary" aria-hidden="true" />}
-            <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold", isActive ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground")}>{c.phaseNumber}</span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold text-foreground">{labelFor(c.phaseNumber)}</span>
-              <span className="block text-[11px] text-muted-foreground">{c.formats.length === 0 ? "Nog geen formats" : c.formats.length === 1 ? "1 format" : `${c.formats.length} formats`}</span>
-            </span>
-            <ChevronRight className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground")} />
-          </button>
-        );
-      })}
-      <button
-        type="button"
-        onClick={addNewPhase}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-accent/40"
-      >
-        <Plus className="h-4 w-4" /> Fase toevoegen
-      </button>
-    </aside>
+    <div aria-label="Fasestappen" className="overflow-x-auto pb-1">
+      <div className="flex w-max min-w-full items-stretch gap-2">
+        {containers.map((c) => {
+          const isActive = c.phaseNumber === activePhaseNumber;
+          return (
+            <button
+              key={c.phaseNumber}
+              type="button"
+              aria-current={isActive ? "true" : undefined}
+              onClick={() => { setActivePhaseNumber(c.phaseNumber); setOpenFormatId(null); }}
+              className={cn(
+                "flex w-44 shrink-0 items-center gap-2.5 rounded-lg border bg-card px-3 py-2 text-left transition-colors",
+                isActive
+                  ? "border-primary bg-accent/40 ring-1 ring-primary"
+                  : "border-border hover:border-primary/40 hover:bg-accent/30"
+              )}
+            >
+              <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold", isActive ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground")}>{c.phaseNumber}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold text-foreground">{labelFor(c.phaseNumber)}</span>
+                <span className="block text-[11px] text-muted-foreground">{c.formats.length === 0 ? "Nog geen formats" : c.formats.length === 1 ? "1 format" : `${c.formats.length} formats`}</span>
+              </span>
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={addNewPhase}
+          className="flex w-44 shrink-0 items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-accent/40"
+        >
+          <Plus className="h-4 w-4" /> Fase toevoegen
+        </button>
+      </div>
+    </div>
   );
 
 
