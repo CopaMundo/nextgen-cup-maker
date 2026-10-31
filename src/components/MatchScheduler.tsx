@@ -210,12 +210,16 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
 const PlannerTeams = ({ homeName, awayName, homeLogo, awayLogo }: {
   homeName: string; awayName: string; homeLogo: string | null; awayLogo: string | null;
 }) => (
-  <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_14px_10px_14px_minmax(0,1fr)] items-center gap-1 text-[11px] font-medium text-foreground">
-    <span className="min-w-0 truncate text-right" title={homeName}>{homeName}</span>
-    <span className="flex h-3.5 w-3.5 items-center justify-center">{homeLogo && <img src={homeLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
-    <span className="text-center text-muted-foreground">-</span>
-    <span className="flex h-3.5 w-3.5 items-center justify-center">{awayLogo && <img src={awayLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
-    <span className="min-w-0 truncate" title={awayName}>{awayName}</span>
+  <div className="flex min-w-0 items-center gap-1 text-[11px] font-medium text-foreground">
+    <span className="flex min-w-0 flex-1 items-center justify-start gap-1">
+      <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{homeLogo && <img src={homeLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
+      <span className="min-w-0 truncate" title={homeName}>{homeName}</span>
+    </span>
+    <span className="shrink-0 text-center text-muted-foreground">-</span>
+    <span className="flex min-w-0 flex-1 items-center justify-start gap-1">
+      <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{awayLogo && <img src={awayLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
+      <span className="min-w-0 truncate" title={awayName}>{awayName}</span>
+    </span>
   </div>
 );
 
@@ -228,19 +232,20 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
   const [open, setOpen] = useState(false);
   const badge = (
     <span
-      className={`inline-flex max-w-full shrink-0 items-center gap-0.5 rounded border px-1 py-0.5 text-[9px] font-semibold print:text-[10px] ${
+      className={`inline-flex max-w-full shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 leading-none text-[9px] font-medium print:text-[10px] ${
         issue ? "cursor-pointer" : ""
       } ${
         issue?.level === "error"
-          ? "border-destructive bg-destructive/15 text-destructive"
+          ? "border-destructive/70 bg-destructive/10 text-destructive"
           : issue?.level === "warn"
-            ? "border-warning bg-warning/15 text-warning"
-            : "border-border bg-muted text-muted-foreground"
+            ? "border-warning/70 bg-warning/10 text-warning"
+            : "border-border bg-muted/60 text-muted-foreground"
       }`}
     >
-      {roleNumber !== null && <span className={issue ? "font-bold" : "text-primary font-bold"}>{roleNumber}</span>}
-      <WhistleIcon className="h-3 w-3 shrink-0" /> <span className="min-w-0 truncate" title={name}>{name}</span>
-      {issue && <span aria-hidden>⚠</span>}
+      {roleNumber !== null && <span className="shrink-0 font-bold">{roleNumber}</span>}
+      <WhistleIcon className="h-3 w-3 shrink-0 opacity-80" />
+      <span className="min-w-0 truncate" title={name}>{name}</span>
+      {issue && <AlertTriangle className="h-2.5 w-2.5 shrink-0" aria-hidden="true" />}
     </span>
   );
 
@@ -473,21 +478,21 @@ export const DateStripNav = ({
                 type="button"
                 onClick={() => onSelect(d)}
                 className={cn(
-                  "snap-center shrink-0 w-[48%] min-w-[110px] max-w-[160px] flex flex-col items-center justify-center h-11 rounded-md border gap-0 px-2 py-0.5 transition-colors",
+                  "snap-center shrink-0 w-[48%] min-w-[92px] max-w-[140px] flex flex-col items-center justify-center h-9 rounded-md border gap-0 px-2 py-0.5 transition-colors",
                   isActive
-                    ? "bg-card text-foreground border-primary"
-                    : "bg-card/60 text-muted-foreground border-border/60 opacity-60 hover:opacity-90"
-                )}
+                    ? "bg-primary text-primary-foreground border-primary font-semibold shadow-sm"
+                    : "bg-card/60 text-muted-foreground border-border/60 hover:text-foreground"
+                 )}
               >
-                <span className={cn("text-[8px] font-bold uppercase tracking-wider", isActive ? "text-foreground" : "text-muted-foreground")}>
+                <span className="text-[8px] font-semibold uppercase tracking-wide opacity-80">
                   {weekday}
                 </span>
                 <div className="flex items-center gap-1">
                   {isActive && <Calendar className="h-3 w-3" />}
-                  <span className="text-base font-black leading-tight">{dayNum}</span>
+                  <span className="text-sm font-bold leading-tight">{dayNum}</span>
                 </div>
-                <span className={cn("text-[8px] font-bold uppercase", isActive ? "text-foreground" : "text-muted-foreground")}>
-                  {month}
+                <span className="text-[8px] font-semibold uppercase tracking-wide opacity-80">
+                   {month}
                 </span>
               </button>
             );
@@ -569,12 +574,14 @@ const DesktopDateBoxes = ({ dates, activeDate, onSelect }: { dates: string[]; ac
             return (
               <Button variant="outline" key={d} data-date={d} type="button" onClick={() => onSelect(d)} aria-current={isActive ? "date" : undefined}
                 className={cn(
-                  "flex h-11 w-[92px] shrink-0 flex-col items-center justify-center rounded-md border gap-0 px-2 py-0.5 transition-colors",
-                  isActive ? "bg-card text-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                  "flex h-9 w-[78px] shrink-0 flex-col items-center justify-center rounded-md border gap-0 px-1.5 py-0.5 transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary font-semibold shadow-sm"
+                    : "bg-card/60 text-muted-foreground border-border hover:text-foreground"
                 )}>
-                <span className={cn("text-[9px] leading-none font-bold uppercase", isActive ? "text-foreground" : "text-muted-foreground")}>{parts[0] || ""}</span>
-                <span className="text-base font-black leading-tight">{parts[1] || ""}</span>
-                <span className={cn("text-[9px] leading-none font-bold uppercase", isActive ? "text-foreground" : "text-muted-foreground")}>{parts.slice(2).join(" ")}</span>
+                <span className="text-[8px] leading-none font-semibold uppercase tracking-wide opacity-80">{parts[0] || ""}</span>
+                <span className="text-sm font-bold leading-tight">{parts[1] || ""}</span>
+                <span className="text-[8px] leading-none font-semibold uppercase tracking-wide opacity-80">{parts.slice(2).join(" ")}</span>
               </Button>
             );
           })}
@@ -3553,7 +3560,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               : isDragging
                                                 ? "border-primary ring-2 ring-primary/20 bg-primary/5"
                                                 : getMatchClashes(m).length > 0
-                                                  ? "border-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-destructive hover:shadow-md"
+                                                  ? "border-destructive bg-destructive/15 text-foreground hover:border-destructive hover:shadow-md"
                                                   : "border-border bg-card hover:border-primary/50 hover:shadow-md"
                                           }`}
                                         >
