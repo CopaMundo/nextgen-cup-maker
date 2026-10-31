@@ -369,10 +369,17 @@ const TournamentDetail = () => {
                 ) : (
                 null
                 )}
+                {!isMobile && (
+                  <h2 className="section-title">
+                    {deelnemersSubTab === "teams"
+                      ? (tournament.teams_label || "Teams")
+                      : (tournament.referees_label || "Scheidsrechters")}
+                  </h2>
+                )}
                 {!isMobile && (deelnemersSubTab === "teams" ? (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
                 ) : (
-<RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} />
+                  <RefereeManager tournamentId={id ?? ""} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} />
                 ))}
                 {isMobile && !mobileDeelnemersOverview && deelnemersSubTab === "teams" && (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -550,28 +557,30 @@ const TournamentDetail = () => {
                 desktopNavCollapsed ? "w-[68px]" : "w-60"
               )}
             >
-              <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-3">
-                {tournament.logo_url && (
-                  <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
-                )}
-                {!desktopNavCollapsed && (
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
-                    {tournament.name}
-                  </span>
+              <div className="shrink-0 border-b border-border px-3 py-2.5">
+                <div className="flex h-14 items-center gap-2.5">
+                  {tournament.logo_url && (
+                    <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
+                  )}
+                  {!desktopNavCollapsed && (
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
+                      {tournament.name}
+                    </span>
+                  )}
+                </div>
+                {!desktopNavCollapsed && tournament.is_multi_category && (
+                  <div className="mt-2.5">
+                    <CategorySelector
+                      tournamentId={id ?? ""}
+                      isMultiCategory={tournament.is_multi_category}
+                      selectedCategoryId={selectedCategoryId}
+                      onSelect={setSelectedCategoryId}
+                      className="flex w-full"
+                      selectClassName="h-7 w-full max-w-none rounded-md px-2 text-xs font-semibold"
+                    />
+                  </div>
                 )}
               </div>
-              {!desktopNavCollapsed && tournament.is_multi_category && (activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
-                <div className="shrink-0 border-b border-border px-3 py-2.5">
-                  <CategorySelector
-                    tournamentId={id ?? ""}
-                    isMultiCategory={tournament.is_multi_category}
-                    selectedCategoryId={selectedCategoryId}
-                    onSelect={setSelectedCategoryId}
-                    className="flex w-full"
-                    selectClassName="h-9 w-full max-w-none rounded-lg px-3 text-sm font-semibold"
-                  />
-                </div>
-              )}
 
               <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
                 {sidebarItems.map((item) => {
