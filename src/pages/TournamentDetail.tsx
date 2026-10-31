@@ -584,7 +584,7 @@ const TournamentDetail = () => {
                 </div>
                </div>
 
-              <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
+              <div className="scrollbar-none min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
                 {sidebarItems.map((item) => {
                   const active = activeTab === item.id;
                   return (
