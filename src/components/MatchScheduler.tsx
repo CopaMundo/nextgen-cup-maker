@@ -25,6 +25,7 @@ import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee, refereeViolations } from "@/lib/refereeConfig";
 import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix, getFieldLocation } from "@/lib/fieldLocations";
 import { cn } from "@/lib/utils";
+import { sortPlannerMatchesByTeam } from "@/lib/plannerTeamSort";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -666,6 +667,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [filterPhase, setFilterPhase] = useState<string>("all");
   const [filterGroup, setFilterGroup] = useState<string>("all");
   const [filterRound, setFilterRound] = useState<string>("all");
+  const [sidebarSort, setSidebarSort] = useState<"manual" | "team">("manual");
 
   // UI toggles
   const addFieldDialogRef = useDialogFocus(showAddFieldDialog);
@@ -3793,28 +3795,28 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               )}
 
               {/* Tab icons */}
-              <div className="flex border-b border-border">
-                <button
+              <div className="m-2 flex shrink-0 gap-1 rounded-lg bg-muted/60 p-1" role="group" aria-label="Plannerweergave">
+                <Button variant="ghost" size="icon"
                   onClick={() => setRightSidebarTab("plannen")}
-                  className={`flex-1 py-2.5 flex justify-center transition-colors ${rightSidebarTab === "plannen" ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                  title="Plannen"
+                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "plannen" ? "border-border bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
+                  title="Plannen" aria-label="Plannen" aria-pressed={rightSidebarTab === "plannen"}
                 >
                   <CalendarClockIcon className="h-4 w-4" />
-                </button>
-                <button
+                </Button>
+                <Button variant="ghost" size="icon"
                   onClick={() => setRightSidebarTab("scheidsrechters")}
-                  className={`flex-1 py-2.5 flex justify-center transition-colors ${rightSidebarTab === "scheidsrechters" ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                  title="Scheidsrechters"
+                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "scheidsrechters" ? "border-border bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
+                  title="Scheidsrechters" aria-label="Scheidsrechters" aria-pressed={rightSidebarTab === "scheidsrechters"}
                 >
                   <WhistleIcon className="h-4 w-4" />
-                </button>
-                <button
+                </Button>
+                <Button variant="ghost" size="icon"
                   onClick={() => setRightSidebarTab("ongepland")}
-                  className={`flex-1 py-2.5 flex justify-center transition-colors ${rightSidebarTab === "ongepland" ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                  title="Niet gepland"
+                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "ongepland" ? "border-border bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
+                  title="Niet gepland" aria-label="Niet gepland" aria-pressed={rightSidebarTab === "ongepland"}
                 >
                   <CalendarXIcon className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
 
               <div className="p-3 flex-1 min-h-0 flex flex-col overflow-y-auto">
@@ -4146,7 +4148,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 {/* ===== ONGEPLAND TAB ===== */}
                 {rightSidebarTab === "ongepland" && (
                   <div
-                    className={`space-y-3 flex-1 min-h-0 flex flex-col rounded-lg transition-colors ${dragItemId && dragOverField === "__unscheduled__" ? "ring-2 ring-primary/50 bg-primary/5" : ""}`}
+                    className="space-y-2 flex-1 min-h-0 flex flex-col"
                     ref={unscheduledZoneRef}
                     data-planner-drop-zone="true"
                     onDragOver={(e) => {
@@ -4162,10 +4164,10 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     <h3 className="font-display text-sm font-bold text-foreground">Niet gepland ({getUnscheduledMatches().length}/{matches.length})</h3>
 
                     {/* Sidebar filters */}
-                    <div className="flex gap-2 flex-wrap mb-1">
+                    <div className="grid grid-cols-2 gap-1.5 mb-1">
                       {phases.length > 1 && (
                         <Select value={sidebarFormat} onValueChange={(value) => { setSidebarFormat(value); setSidebarGroup("all"); setSidebarRound("all"); }}>
-                          <SelectTrigger className="h-8 w-auto min-w-[6.5rem] text-xs">
+                          <SelectTrigger aria-label="Formatfilter" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
                             <SelectValue placeholder="Alle formats" />
                           </SelectTrigger>
                           <SelectContent>
@@ -4176,7 +4178,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       )}
                       {getSidebarGroups().length > 0 && (
                         <Select value={sidebarGroup} onValueChange={(value) => { setSidebarGroup(value); setSidebarRound("all"); }}>
-                          <SelectTrigger className="h-8 w-auto min-w-[6.5rem] text-xs">
+                          <SelectTrigger aria-label="Groepsfilter" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
                             <SelectValue placeholder="Alle groepen" />
                           </SelectTrigger>
                           <SelectContent>
@@ -4187,7 +4189,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       )}
                       {getSidebarRounds().length > 0 && (
                         <Select value={sidebarRound} onValueChange={(value) => setSidebarRound(value)}>
-                          <SelectTrigger className="h-8 w-auto min-w-[6.5rem] text-xs">
+                          <SelectTrigger aria-label="Rondefilter" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
                             <SelectValue placeholder="Alle rondes" />
                           </SelectTrigger>
                           <SelectContent>
@@ -4211,6 +4213,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       )}
                     </div>
 
+                    <Select value={sidebarSort} onValueChange={value => setSidebarSort(value === "team" ? "team" : "manual")}>
+                      <SelectTrigger aria-label="Wedstrijden sorteren" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="manual">Eigen volgorde</SelectItem>
+                        <SelectItem value="team">Team (A–Z)</SelectItem>
+                      </SelectContent>
+                    </Select>
+
                     {/* Drop zone when dragging */}
                     {dragItemId && (
                       <div
@@ -4230,7 +4242,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                     {/* Unscheduled match list */}
                     <div className="space-y-1 flex-1 min-h-0 overflow-y-auto pr-1">
-                      {getUnscheduledMatches().map((m, idx) => (
+                      {(sidebarSort === "team"
+                        ? sortPlannerMatchesByTeam(getUnscheduledMatches(), m => [getMatchLabel(m.home_team_id, m.home_slot_label), getMatchLabel(m.away_team_id, m.away_slot_label)])
+                        : getUnscheduledMatches()).map((m) => (
                         <div key={m.id} className="space-y-1">
                           <div
                             data-planner-drop-zone="true"
@@ -4238,12 +4252,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               if (!hasPlannerDragData(e)) return;
                               e.preventDefault();
                               setDragOverField("__unscheduled__");
-                              setDragOverIndex(idx);
+                              setDragOverIndex(getUnscheduledMatches().findIndex(match => match.id === m.id));
                             }}
-                            onDrop={(e) => void handleDropToUnscheduled(e, idx)}
+                            onDrop={(e) => void handleDropToUnscheduled(e, getUnscheduledMatches().findIndex(match => match.id === m.id))}
                             className={`transition-all duration-200 overflow-hidden ${
                               dragItemId
-                                ? dragOverField === "__unscheduled__" && dragOverIndex === idx
+                                ? dragOverField === "__unscheduled__" && dragOverIndex === getUnscheduledMatches().findIndex(match => match.id === m.id)
                                   ? "h-7 rounded-md border border-dashed border-primary bg-primary/10"
                                   : "h-2"
                                 : "h-0"
