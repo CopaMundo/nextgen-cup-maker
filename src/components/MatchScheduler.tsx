@@ -3418,7 +3418,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                     <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto px-2 pt-1 pb-2 scroll-smooth">
-                      <div className="flex w-max min-w-full gap-2 md:gap-4 pr-4">
+                      <div className="flex w-full md:w-max min-w-full gap-2 md:gap-4 pr-4 print:w-full">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
                           <div key={field.name} data-planner-field={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 bg-card", isMobile ? "flex-1 min-w-0" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
