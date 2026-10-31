@@ -3417,17 +3417,17 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-                    <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto pb-2 scroll-smooth">
-                      <div className="flex gap-2 md:gap-4 min-w-0">
+                    <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto px-2 pt-1 pb-2 scroll-smooth">
+                      <div className="flex w-full md:w-max min-w-full gap-2 md:gap-4 pr-4 print:w-full">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
-                          <div key={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 overflow-hidden bg-card", isMobile ? "flex-1 min-w-0" : "min-w-[330px] w-[330px] flex-shrink-0")}>
+                          <div key={field.name} data-planner-field={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 bg-card", isMobile ? "flex-1 min-w-0" : "min-w-[330px] w-[330px] flex-shrink-0")}>
                             {/* Field header */}
                             <div
                               data-planner-drop-zone="true"
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => handleDrop(e, field.name, 0)}
                               onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}
-                              className={`bg-primary/10 border-b border-primary/30 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/20" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/15" : ""}`}
+                              className={`rounded-t-lg bg-primary/10 border-b border-primary/30 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/20" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/15" : ""}`}
                             >
                               <div className="flex items-center justify-between">
                                 <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
@@ -3454,7 +3454,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             {/* Field column body */}
                             <div
                               ref={(el) => { if (el) fieldColumnRefs.current.set(field.name, el); }}
-                              className={`min-h-[200px] transition-[background-color] duration-200 ${dragItemId ? "bg-primary/[0.02]" : ""}`}
+                              className={`min-h-[200px] px-2 py-1 space-y-1 transition-[background-color] duration-200 ${dragItemId ? "bg-primary/[0.02]" : ""}`}
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => {
                                 const idx = previewField === field.name && previewIndex !== null ? previewIndex : fieldMatches.length;
@@ -3705,7 +3705,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             </div>
 
                             {/* + PAUZE button at bottom of each column */}
-                            <div className="border-t border-primary/30 bg-primary/5">
+                            <div className="rounded-b-lg border-t border-primary/30 bg-primary/5">
                               <button
                                 onClick={() => { setShowPauzeModal(field.name); setPauzeModalDuration(20); setPauzeModalName("Pauze"); }}
                                 className="w-full py-2 text-xs text-primary/80 hover:text-primary hover:bg-primary/10 transition-colors font-medium uppercase tracking-wider"
