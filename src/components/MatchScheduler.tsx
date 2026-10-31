@@ -25,7 +25,7 @@ import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { RefereeConfig, parseReferees, serializeReferees, refereeCanOfficiate, summarizeReferee, refereeViolations } from "@/lib/refereeConfig";
 import { parseFieldEntries, serializeFieldEntries, registerFieldLocations, formatFieldLabel, displayFieldName, stripLocationPrefix, getFieldLocation } from "@/lib/fieldLocations";
 import { cn } from "@/lib/utils";
-import { sortPlannerMatchesByTeam } from "@/lib/plannerTeamSort";
+import { filterPlannerMatchesByTeam } from "@/lib/plannerTeamFilter";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -287,7 +287,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[86px] md:h-[68px]";
+const PLANNER_ROW_H = "h-[78px] md:h-[62px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -667,7 +667,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const [filterPhase, setFilterPhase] = useState<string>("all");
   const [filterGroup, setFilterGroup] = useState<string>("all");
   const [filterRound, setFilterRound] = useState<string>("all");
-  const [sidebarSort, setSidebarSort] = useState<"manual" | "team">("manual");
+  const [sidebarTeam, setSidebarTeam] = useState<string>("all");
 
   // UI toggles
   const addFieldDialogRef = useDialogFocus(showAddFieldDialog);
@@ -1641,6 +1641,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       const srRound = parseInt(parts[1]);
       unscheduled = unscheduled.filter(m => m.phase_id === srPhaseId && m.round_number === srRound);
     }
+    unscheduled = filterPlannerMatchesByTeam(unscheduled, sidebarTeam);
 
     const orderMap = new Map(unscheduledOrder.map((id, index) => [id, index]));
     return unscheduled.sort((a, b) => {
@@ -3142,7 +3143,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className={cn("pt-2 pb-0 mb-5 print:hidden shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
+            <div className={cn("px-2 pt-2 pb-0 mb-5 print:hidden shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
               <div className="min-w-0 flex-1">
               <DateStripNav
                 dates={tournamentDates}
@@ -3288,7 +3289,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {/* Field columns */}
             <div className={cn("flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm py-1 pr-2 print:hidden">
+              <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm px-2 py-1 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
@@ -4187,7 +4188,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           </SelectContent>
                         </Select>
                       )}
-                      {getSidebarRounds().length > 0 && (
+                      <div className="col-span-2 grid grid-cols-2 gap-1.5">
                         <Select value={sidebarRound} onValueChange={(value) => setSidebarRound(value)}>
                           <SelectTrigger aria-label="Rondefilter" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
                             <SelectValue placeholder="Alle rondes" />
@@ -4210,18 +4211,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                             })}
                           </SelectContent>
                         </Select>
-                      )}
+                      <Select value={sidebarTeam} onValueChange={setSidebarTeam}>
+                        <SelectTrigger aria-label="Teamfilter" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
+                          <SelectValue placeholder="Alle teams" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Alle teams</SelectItem>
+                          {teams.filter(team => matches.some(match => (!match.match_date || !match.match_time || !match.field) && (match.home_team_id === team.id || match.away_team_id === team.id)))
+                            .sort((a, b) => a.name.localeCompare(b.name, "nl"))
+                            .map(team => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      </div>
                     </div>
-
-                    <Select value={sidebarSort} onValueChange={value => setSidebarSort(value === "team" ? "team" : "manual")}>
-                      <SelectTrigger aria-label="Wedstrijden sorteren" className="h-7 min-w-0 px-2 !text-[11px] [&>span]:min-w-0 [&>span]:truncate">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="manual">Eigen volgorde</SelectItem>
-                        <SelectItem value="team">Team (A–Z)</SelectItem>
-                      </SelectContent>
-                    </Select>
 
                     {/* Drop zone when dragging */}
                     {dragItemId && (
@@ -4242,9 +4244,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                     {/* Unscheduled match list */}
                     <div className="space-y-1 flex-1 min-h-0 overflow-y-auto pr-1">
-                      {(sidebarSort === "team"
-                        ? sortPlannerMatchesByTeam(getUnscheduledMatches(), m => [getMatchLabel(m.home_team_id, m.home_slot_label), getMatchLabel(m.away_team_id, m.away_slot_label)])
-                        : getUnscheduledMatches()).map((m) => (
+                      {getUnscheduledMatches().map((m) => (
                         <div key={m.id} className="space-y-1">
                           <div
                             data-planner-drop-zone="true"
