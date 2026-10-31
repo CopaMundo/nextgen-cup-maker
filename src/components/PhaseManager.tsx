@@ -1382,6 +1382,13 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
             </div>
           );
         })}
+        <button
+          type="button"
+          onClick={addNewPhase}
+          className="flex w-44 shrink-0 items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-accent/40"
+        >
+          <Plus className="h-4 w-4" /> Fase toevoegen
+        </button>
       </div>
     </div>
   );
@@ -1417,13 +1424,6 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
           <ChevronRight className="h-4 w-4" />
         </Button>
       )}
-      <button
-        type="button"
-        onClick={addNewPhase}
-        className="flex h-8 w-44 shrink-0 items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-accent/40"
-      >
-        <Plus className="h-4 w-4" /> Fase toevoegen
-      </button>
     </div>
   );
 
