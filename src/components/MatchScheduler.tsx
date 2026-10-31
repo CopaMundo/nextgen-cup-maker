@@ -3139,8 +3139,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               {!isMobile && <div className="shrink-0">{toolbarRight}</div>}
             </div>
           ) : (
-            <div className="py-4 print:hidden border-b border-border mb-0 text-sm text-muted-foreground">
-              Voeg eerst wedstrijddagen toe bij <span className="font-medium text-foreground">Algemeen</span> om de planner te gebruiken.
+            <div className="flex items-center justify-between gap-3 py-4 print:hidden border-b border-border mb-0 text-sm text-muted-foreground">
+              <span>Voeg eerst wedstrijddagen toe bij <span className="font-medium text-foreground">Algemeen</span> om de planner te gebruiken.</span>
+              {!isMobile && toolbarRight}
             </div>
           )}
 
