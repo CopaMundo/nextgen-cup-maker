@@ -206,17 +206,17 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
   );
 };
 
-/** Balanced fixture identity, shared by scheduled, unscheduled and dragged cards. */
+/** Compact inline fixture identity, shared by scheduled, unscheduled and dragged cards. */
 const PlannerTeams = ({ homeName, awayName, homeLogo, awayLogo }: {
   homeName: string; awayName: string; homeLogo: string | null; awayLogo: string | null;
 }) => (
   <div className="flex min-w-0 items-center gap-1 text-[11px] font-medium text-foreground">
-    <span className="flex min-w-0 flex-1 items-center justify-start gap-1">
+    <span className="flex min-w-0 shrink items-center justify-start gap-1">
       <span className="min-w-0 truncate" title={homeName}>{homeName}</span>
       <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{homeLogo && <img src={homeLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
     </span>
     <span className="shrink-0 text-center text-muted-foreground">-</span>
-    <span className="flex min-w-0 flex-1 items-center justify-start gap-1">
+    <span className="flex min-w-0 shrink items-center justify-start gap-1">
       <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{awayLogo && <img src={awayLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
       <span className="min-w-0 truncate" title={awayName}>{awayName}</span>
     </span>
