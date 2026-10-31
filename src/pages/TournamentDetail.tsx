@@ -580,7 +580,7 @@ const TournamentDetail = () => {
                       {tournament.name}
                     </span>
                   )}
-                  {!desktopNavCollapsed && desktopCategorySelector}
+                  {!desktopNavCollapsed && ["teams", "phases", "schedule", "results"].includes(activeTab) && desktopCategorySelector}
                 </div>
                </div>
 
