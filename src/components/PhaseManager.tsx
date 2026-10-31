@@ -1349,7 +1349,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               className={cn(
                 "flex w-52 shrink-0 cursor-pointer items-center gap-2 rounded-lg border bg-card px-3 py-2 text-left transition-colors",
                 isActive
-                  ? "border-2 border-primary bg-primary/5 shadow-[0_0_16px_-2px_hsl(var(--primary)/0.45)]"
+                  ? "border-2 border-primary bg-primary/5"
                   : "border-2 border-border hover:border-primary/40 hover:bg-accent/30"
               )}
             >
