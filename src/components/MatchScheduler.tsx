@@ -206,6 +206,19 @@ const PlannerInsertionMarker = ({ active }: { active: boolean }) => {
   );
 };
 
+/** Balanced fixture identity, shared by scheduled, unscheduled and dragged cards. */
+const PlannerTeams = ({ homeName, awayName, homeLogo, awayLogo }: {
+  homeName: string; awayName: string; homeLogo: string | null; awayLogo: string | null;
+}) => (
+  <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_14px_10px_14px_minmax(0,1fr)] items-center gap-1 text-[11px] font-medium text-foreground">
+    <span className="min-w-0 truncate text-right" title={homeName}>{homeName}</span>
+    <span className="flex h-3.5 w-3.5 items-center justify-center">{homeLogo && <img src={homeLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
+    <span className="text-center text-muted-foreground">-</span>
+    <span className="flex h-3.5 w-3.5 items-center justify-center">{awayLogo && <img src={awayLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
+    <span className="min-w-0 truncate" title={awayName}>{awayName}</span>
+  </div>
+);
+
 /** Scheidsrechterbadge in een wedstrijdkaart; bij een probleem toont tikken/hoveren de melding. */
 const RefereeBadge = ({ name, roleNumber, issue }: {
   name: string;
@@ -215,7 +228,7 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
   const [open, setOpen] = useState(false);
   const badge = (
     <span
-      className={`inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[9px] font-semibold print:text-[10px] ${
+      className={`inline-flex max-w-full shrink-0 items-center gap-0.5 rounded border px-1 py-0.5 text-[9px] font-semibold print:text-[10px] ${
         issue ? "cursor-pointer" : ""
       } ${
         issue?.level === "error"
@@ -226,7 +239,7 @@ const RefereeBadge = ({ name, roleNumber, issue }: {
       }`}
     >
       {roleNumber !== null && <span className={issue ? "font-bold" : "text-primary font-bold"}>{roleNumber}</span>}
-      <WhistleIcon className="h-3 w-3" /> {name}
+      <WhistleIcon className="h-3 w-3 shrink-0" /> <span className="min-w-0 truncate" title={name}>{name}</span>
       {issue && <span aria-hidden>⚠</span>}
     </span>
   );
@@ -460,20 +473,20 @@ export const DateStripNav = ({
                 type="button"
                 onClick={() => onSelect(d)}
                 className={cn(
-                  "snap-center shrink-0 w-[48%] min-w-[110px] max-w-[160px] flex flex-col items-center justify-center rounded-xl border py-1 transition-colors",
+                  "snap-center shrink-0 w-[48%] min-w-[110px] max-w-[160px] flex flex-col items-center justify-center h-11 rounded-md border gap-0 px-2 py-0.5 transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground border-primary"
+                    ? "bg-card text-foreground border-primary"
                     : "bg-card/60 text-muted-foreground border-border/60 opacity-60 hover:opacity-90"
                 )}
               >
-                <span className={cn("text-[8px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                <span className={cn("text-[8px] font-bold uppercase tracking-wider", isActive ? "text-foreground" : "text-muted-foreground")}>
                   {weekday}
                 </span>
                 <div className="flex items-center gap-1">
                   {isActive && <Calendar className="h-3 w-3" />}
                   <span className="text-base font-black leading-tight">{dayNum}</span>
                 </div>
-                <span className={cn("text-[8px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                <span className={cn("text-[8px] font-bold uppercase", isActive ? "text-foreground" : "text-muted-foreground")}>
                   {month}
                 </span>
               </button>
@@ -554,15 +567,15 @@ const DesktopDateBoxes = ({ dates, activeDate, onSelect }: { dates: string[]; ac
             const isActive = activeDate === d;
             const parts = formatIsoDateForLocale(d, "nl-BE", { weekday: "long", day: "numeric", month: "short" }).split(" ");
             return (
-              <button key={d} data-date={d} type="button" onClick={() => onSelect(d)} aria-current={isActive ? "date" : undefined}
+              <Button variant="outline" key={d} data-date={d} type="button" onClick={() => onSelect(d)} aria-current={isActive ? "date" : undefined}
                 className={cn(
-                  "flex w-[92px] shrink-0 flex-col items-center justify-center rounded-xl border py-1 transition-colors",
-                  isActive ? "bg-primary text-primary-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                  "flex h-11 w-[92px] shrink-0 flex-col items-center justify-center rounded-md border gap-0 px-2 py-0.5 transition-colors",
+                  isActive ? "bg-card text-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
                 )}>
-                <span className={cn("text-[9px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>{parts[0] || ""}</span>
+                <span className={cn("text-[9px] leading-none font-bold uppercase", isActive ? "text-foreground" : "text-muted-foreground")}>{parts[0] || ""}</span>
                 <span className="text-base font-black leading-tight">{parts[1] || ""}</span>
-                <span className={cn("text-[9px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>{parts.slice(2).join(" ")}</span>
-              </button>
+                <span className={cn("text-[9px] leading-none font-bold uppercase", isActive ? "text-foreground" : "text-muted-foreground")}>{parts.slice(2).join(" ")}</span>
+              </Button>
             );
           })}
         </div>
@@ -3120,7 +3133,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className={cn("py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
+            <div className={cn("py-2 print:hidden mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
               <div className="min-w-0 flex-1">
               <DateStripNav
                 dates={tournamentDates}
@@ -3138,14 +3151,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               </div>
              </div>
           ) : (
-            <div className="flex items-center gap-3 py-4 print:hidden border-b border-border mb-0 text-sm text-muted-foreground">
+            <div className="flex items-center gap-3 py-4 print:hidden mb-0 text-sm text-muted-foreground">
               <span>Voeg eerst wedstrijddagen toe bij <span className="font-medium text-foreground">Algemeen</span> om de planner te gebruiken.</span>
             </div>
           )}
 
           {/* Locatiekiezer — enkel bij meerdere locaties (fallback wanneer niet via TournamentDetail bestuurd) */}
           {!isLocationControlled && locations.length > 1 && (
-            <div className="flex items-center gap-2 py-2 print:hidden border-b border-border shrink-0">
+            <div className="flex items-center gap-2 py-2 print:hidden shrink-0">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
               <Select value={selectedLocation || ""} onValueChange={(v) => updateSelectedLocation(v || null)}>
                 <SelectTrigger className="h-9 w-auto min-w-[140px] text-sm font-medium"><SelectValue /></SelectTrigger>
@@ -3532,16 +3545,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-0">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} border-b p-1 text-[11px] transition-all duration-200 ${
+                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-md border p-1 text-[11px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
-                                              ? "border-b-primary ring-2 ring-primary/50 bg-primary/10"
+                                              ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
-                                              ? "border-b-primary ring-2 ring-primary/30 bg-primary/10"
+                                              ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
-                                                ? "border-b-primary ring-2 ring-primary/20 bg-primary/5"
+                                                ? "border-primary ring-2 ring-primary/20 bg-primary/5"
                                                 : getMatchClashes(m).length > 0
-                                                  ? "border-b-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-b-destructive hover:shadow-md"
-                                                  : "border-b-border bg-card hover:border-b-primary/50 hover:shadow-md"
+                                                  ? "border-destructive ring-1 ring-destructive/30 bg-destructive/5 hover:border-destructive hover:shadow-md"
+                                                  : "border-border bg-card hover:border-primary/50 hover:shadow-md"
                                           }`}
                                         >
                                           <div
@@ -3579,17 +3592,16 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                </div>
                                             </div>
                                             {/* Teams */}
-                                            <div className="flex items-center gap-1">
-                                              {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
-                                              <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
-                                              <span className="text-muted-foreground font-bold mx-0.5">-</span>
-                                              {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain rounded-sm" draggable={false} />}
-                                              <span className="font-medium text-[11px] truncate text-foreground">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
-                                            </div>
+                                            <PlannerTeams
+                                              homeName={getMatchLabel(m.home_team_id, m.home_slot_label)}
+                                              awayName={getMatchLabel(m.away_team_id, m.away_slot_label)}
+                                              homeLogo={getTeamLogo(m.home_team_id)}
+                                              awayLogo={getTeamLogo(m.away_team_id)}
+                                            />
                                             {/* Referees */}
                                             <div
                                               data-referee-match-id={m.id}
-                                              className={`flex flex-wrap items-center gap-1 rounded transition-colors min-h-[14px] ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                              className={`flex min-w-0 shrink-0 items-center gap-1 overflow-x-auto scrollbar-none rounded transition-colors h-[18px] ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
                                             >
                                               {refNames(m.referee).length > 0 && displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                 const issue = getRefereeIssue(m, name, refIdx);
@@ -4242,13 +4254,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 <GripVertical className="h-3 w-3 text-muted-foreground shrink-0" />
                                 <span className="text-[10px] text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                               </div>
-                              <div className="flex items-center gap-1">
-                                {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" draggable={false} />}
-                                <span className="font-medium text-[11px] truncate">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
-                                <span className="text-muted-foreground mx-0.5">–</span>
-                                {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain" draggable={false} />}
-                                <span className="font-medium text-[11px] truncate">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
-                              </div>
+                              <PlannerTeams
+                                              homeName={getMatchLabel(m.home_team_id, m.home_slot_label)}
+                                              awayName={getMatchLabel(m.away_team_id, m.away_slot_label)}
+                                              homeLogo={getTeamLogo(m.home_team_id)}
+                                              awayLogo={getTeamLogo(m.away_team_id)}
+                                            />
                             </div>
                           </PlannerItem>
                         </div>
@@ -4300,13 +4311,12 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       <span className="text-[11px] font-mono font-bold text-foreground">{m.match_time?.slice(0, 5) || "—"}</span>
                       <span className="text-[9px] font-semibold text-muted-foreground truncate">{getMatchInfoLabel(m)}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      {getTeamLogo(m.home_team_id) && <img src={getTeamLogo(m.home_team_id)!} className="h-3.5 w-3.5 object-contain" />}
-                      <span className="font-medium text-[11px]">{getMatchLabel(m.home_team_id, m.home_slot_label)}</span>
-                      <span className="text-muted-foreground mx-0.5">-</span>
-                      {getTeamLogo(m.away_team_id) && <img src={getTeamLogo(m.away_team_id)!} className="h-3.5 w-3.5 object-contain" />}
-                      <span className="font-medium text-[11px]">{getMatchLabel(m.away_team_id, m.away_slot_label)}</span>
-                    </div>
+                    <PlannerTeams
+                                              homeName={getMatchLabel(m.home_team_id, m.home_slot_label)}
+                                              awayName={getMatchLabel(m.away_team_id, m.away_slot_label)}
+                                              homeLogo={getTeamLogo(m.home_team_id)}
+                                              awayLogo={getTeamLogo(m.away_team_id)}
+                                            />
                   </div>
                 );
               }
