@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import HorizontalRail from "@/components/admin/HorizontalRail";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -85,7 +86,7 @@ const formatDateDMY = (d: string | null) => {
 const phaseStorageKey = (tournamentId: string, categoryId: string | null) =>
   `results-phase:${tournamentId}:${categoryId || "all"}`;
 
-const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId: string; tournament: any; categoryId?: string | null }) => {
+const ResultsManager = ({ tournamentId, tournament, categoryId, toolbarRight }: { tournamentId: string; tournament: any; categoryId?: string | null; toolbarRight?: React.ReactNode }) => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [phases, setPhases] = useState<Phase[]>([]);
@@ -2102,9 +2103,47 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
   return (
     <div className="space-y-3 lg:h-full lg:min-h-0 lg:space-y-0 lg:overflow-hidden">
-      <div className="flex h-full min-h-0 gap-3 lg:flex-row flex-col">
+      <div className="flex h-full min-h-0 gap-3 flex-col">
+        {!isMobile && (
+          <div className="shrink-0 min-w-0 space-y-2">
+            <div className="flex min-w-0 items-start gap-3">
+              <HorizontalRail label="Resultatenfases">
+                {phaseNumbers.map(phaseNumber => (
+                  <Button key={phaseNumber} variant="outline"
+                    onClick={() => setSelectedPhaseNumber(phaseNumber)}
+                    aria-current={phaseNumber === selectedPhaseNumber ? "true" : undefined}
+                    className={cn("h-7 min-w-24 max-w-44 shrink-0 px-3 text-xs font-medium", phaseNumber === selectedPhaseNumber && "border-primary text-primary")}>
+                    <span className="truncate">{getPhaseLabel(phaseNumber, phases)}</span>
+                  </Button>
+                ))}
+              </HorizontalRail>
+              <div className="shrink-0 pt-0.5">{toolbarRight}</div>
+            </div>
+            {currentPhaseFormats.length > 0 && (
+              <HorizontalRail label="Resultatenformats">
+                {currentPhaseFormats.map(format => {
+                  const formatMatches = matches.filter(match => match.phase_id === format.id);
+                  const playedCount = formatMatches.filter(match => match.is_played).length;
+                  const totalCount = formatMatches.length;
+                  const percent = totalCount > 0 ? playedCount / totalCount * 100 : 0;
+                  return <Button key={format.id} variant="outline"
+                    onClick={() => setExpandedFormats(new Set([format.id]))}
+                    className="h-auto min-h-12 w-44 shrink-0 flex-col items-stretch justify-center gap-2 px-2.5 py-2 text-left">
+                    <span className="flex min-w-0 items-start justify-between gap-2">
+                      <span className="min-w-0 break-words text-xs font-medium leading-4 text-foreground">{format.name}</span>
+                      <span className="shrink-0 text-[10px] font-normal tabular-nums text-muted-foreground">{playedCount}/{totalCount}</span>
+                    </span>
+                    <span role="progressbar" aria-label={`${format.name}: gespeelde wedstrijden`} aria-valuemin={0} aria-valuemax={totalCount} aria-valuenow={playedCount} className="h-1 overflow-hidden rounded-full bg-secondary">
+                      <span className="block h-full bg-primary transition-[width]" style={{ width: `${percent}%` }} />
+                    </span>
+                  </Button>;
+                })}
+              </HorizontalRail>
+            )}
+          </div>
+        )}
         {/* Format chips – left sidebar (own scroll on desktop) */}
-        {phaseNumbers.length > 0 && (
+        {isMobile && phaseNumbers.length > 0 && (
           <aside ref={mobileHeaderRef} className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:static lg:w-56 lg:shrink-0 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-border lg:pr-2 lg:pt-2">
             <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:pt-2">
               {phaseNumbers.length > 1 && isMobile && (

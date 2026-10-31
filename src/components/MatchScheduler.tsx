@@ -577,7 +577,7 @@ const DesktopDateBoxes = ({ dates, activeDate, onSelect }: { dates: string[]; ac
   );
 };
 
-const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft, plannerDate: plannerDateProp, onPlannerDateChange }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode; plannerDate?: string; onPlannerDateChange?: (date: string) => void }) => {
+const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft, toolbarRight, plannerDate: plannerDateProp, onPlannerDateChange }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode; toolbarRight?: React.ReactNode; plannerDate?: string; onPlannerDateChange?: (date: string) => void }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
 
@@ -3120,7 +3120,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className={cn("py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm")}>
+            <div className={cn("py-2 print:hidden border-b border-border mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
+              <div className="min-w-0 flex-1">
               <DateStripNav
                 dates={tournamentDates}
                 activeDate={plannerDate}
@@ -3134,10 +3135,13 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                   });
                 }}
               />
+              </div>
+              {!isMobile && <div className="shrink-0">{toolbarRight}</div>}
             </div>
           ) : (
-            <div className="py-4 print:hidden border-b border-border mb-0 text-sm text-muted-foreground">
-              Voeg eerst wedstrijddagen toe bij <span className="font-medium text-foreground">Algemeen</span> om de planner te gebruiken.
+            <div className="flex items-center justify-between gap-3 py-4 print:hidden border-b border-border mb-0 text-sm text-muted-foreground">
+              <span>Voeg eerst wedstrijddagen toe bij <span className="font-medium text-foreground">Algemeen</span> om de planner te gebruiken.</span>
+              {!isMobile && toolbarRight}
             </div>
           )}
 
