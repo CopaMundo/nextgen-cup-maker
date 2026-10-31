@@ -751,6 +751,14 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
     setDraftPhaseNumbers((prev) => (prev.includes(nextPhaseNumber) ? prev : [...prev, nextPhaseNumber]));
     setActivePhaseNumber(nextPhaseNumber);
     setMobilePhaseOverview(false);
+    // Scroll de fasenrij helemaal naar rechts zodat de nieuwe fase én de
+    // "+ Fase toevoegen"-knop (altijd de laatste) zichtbaar blijven.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = railRef.current;
+        if (el) el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+      });
+    });
   };
 
   const clearSlotsReferencingFormats = async (formatIds: string[]) => {
