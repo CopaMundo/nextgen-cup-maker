@@ -337,7 +337,7 @@ const TournamentDetail = () => {
       selectedCategoryId={selectedCategoryId}
       onSelect={setSelectedCategoryId}
       className="shrink-0"
-      selectClassName="h-7 w-36 min-w-0 max-w-36 rounded-md px-2 text-xs"
+      selectClassName="h-7 w-auto min-w-[48px] max-w-[80px] rounded-md px-2 text-xs"
     />
   ) : null;
 
