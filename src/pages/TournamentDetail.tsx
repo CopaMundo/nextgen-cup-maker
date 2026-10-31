@@ -411,12 +411,12 @@ const TournamentDetail = () => {
                 selectClassName={compactSelect}
               />
             )}
-            {isMobile && (
+            {(
               <LocationSelector
                 tournamentId={id ?? ""}
                 selectedLocation={selectedLocation}
                 onSelect={setSelectedLocation}
-                selectClassName={compactSelect}
+                selectClassName={isMobile ? compactSelect : "h-7 min-w-[140px] rounded-md px-2 text-xs font-semibold"}
                 showLabel={false}
               />
             )}
@@ -560,6 +560,18 @@ const TournamentDetail = () => {
                   </span>
                 )}
               </div>
+              {!desktopNavCollapsed && tournament.is_multi_category && (activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
+                <div className="shrink-0 border-b border-border px-3 py-2.5">
+                  <CategorySelector
+                    tournamentId={id ?? ""}
+                    isMultiCategory={tournament.is_multi_category}
+                    selectedCategoryId={selectedCategoryId}
+                    onSelect={setSelectedCategoryId}
+                    className="flex w-full"
+                    selectClassName="h-9 w-full max-w-none rounded-lg px-3 text-sm font-semibold"
+                  />
+                </div>
+              )}
 
               <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
                 {sidebarItems.map((item) => {
@@ -671,30 +683,6 @@ const TournamentDetail = () => {
 
         {/* Main content */}
         <div className="flex flex-1 min-w-0 min-h-0 flex-col">
-            {!isMobile && <header className="admin-workspace-header shrink-0 bg-background">
-            <div className="admin-page-heading admin-workspace-inset flex h-full items-center gap-3">
-              <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold leading-snug text-foreground">{sidebarItems.find(item => item.id === activeTab)?.label}</h1>
-              {(activeTab === "teams" || activeTab === "phases" || activeTab === "schedule" || activeTab === "results") && (
-                <div className="flex shrink-0 items-center gap-2">
-                  {activeTab === "schedule" && (
-                    <LocationSelector
-                      tournamentId={id ?? ""}
-                      selectedLocation={selectedLocation}
-                      onSelect={setSelectedLocation}
-                      selectClassName="h-9 min-w-[150px] rounded-lg px-3 text-sm font-semibold"
-                    />
-                  )}
-                  <CategorySelector
-                    tournamentId={id ?? ""}
-                    isMultiCategory={tournament.is_multi_category}
-                    selectedCategoryId={selectedCategoryId}
-                    onSelect={setSelectedCategoryId}
-                    selectClassName="h-9 min-w-[150px] rounded-lg px-3 text-sm font-semibold"
-                  />
-                </div>
-              )}
-            </div>
-            </header>}
           <div ref={adminScrollRoot} className="admin-scroll-pane flex-1 min-w-0 overflow-auto min-h-0 flex flex-col">
           <div className={cn("admin-content admin-workspace-inset pt-4 pb-4 sm:pb-6", (activeTab === "schedule" || activeTab === "results") && "flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden")}>
             <div className={cn("flex flex-col gap-4 md:flex-1 md:min-h-0", !isMobile && activeTab !== "schedule" && activeTab !== "results" && "admin-focused-screen")}>

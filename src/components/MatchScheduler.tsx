@@ -499,86 +499,8 @@ export const DateStripNav = ({
   }
 
   return (
-    <div className="flex items-center justify-center gap-2">
-      <div className="flex items-center gap-2 min-w-0">
-        {showNav && (
-          <button
-            type="button"
-            onClick={() => {
-              setWindowStart((s) => {
-                const next = Math.max(0, s - 1);
-                selectMiddleOfWindow(next);
-                return next;
-              });
-            }}
-            disabled={safeStart === 0}
-            className="shrink-0 p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            aria-label="Vorige dagen"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-        )}
-
-        <div
-          className="flex items-center gap-4 whitespace-nowrap overflow-hidden"
-          onWheel={(e) => {
-            if (!showNav) return;
-            // Vertical wheel → horizontal date navigation
-            const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
-            if (delta > 0) {
-              setWindowStart((s) => {
-                const next = Math.min(maxStart, s + 1);
-                selectMiddleOfWindow(next);
-                return next;
-              });
-            } else if (delta < 0) {
-              setWindowStart((s) => {
-                const next = Math.max(0, s - 1);
-                selectMiddleOfWindow(next);
-                return next;
-              });
-            }
-          }}
-        >
-          {visible.map((d) => {
-            const isActive = activeDate === d;
-            return (
-              <button
-                key={d}
-                onClick={() => onSelect(d)}
-                className={
-                  "shrink-0 text-sm font-semibold uppercase tracking-wide transition-colors py-1 " +
-                  (isActive
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground")
-                }
-              >
-                {formatIsoDateForLocale(d, "nl-BE", { weekday: "short", day: "numeric", month: "short" })}
-              </button>
-            );
-          })}
-        </div>
-
-        {showNav && (
-          <button
-            type="button"
-            onClick={() => {
-              setWindowStart((s) => {
-                const next = Math.min(maxStart, s + 1);
-                selectMiddleOfWindow(next);
-                return next;
-              });
-            }}
-            disabled={safeStart >= maxStart}
-            className="shrink-0 p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            aria-label="Volgende dagen"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-
-
+    <div className="flex items-center justify-center gap-2 w-full min-w-0">
+      <DesktopDateBoxes dates={dates} activeDate={activeDate} onSelect={onSelect} />
       <DatePicker
         value={activeDate}
         onChange={(iso) => {
@@ -592,6 +514,65 @@ export const DateStripNav = ({
         availableDates={dates}
         onInvalidPick={onInvalidPick}
       />
+    </div>
+  );
+};
+
+const DesktopDateBoxes = ({ dates, activeDate, onSelect }: { dates: string[]; activeDate: string; onSelect: (d: string) => void }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState({ left: false, right: false });
+  const update = () => {
+    const el = ref.current;
+    if (!el) return;
+    setEdges({ left: el.scrollLeft > 2, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 2 });
+  };
+  useEffect(() => {
+    update();
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [dates.join(",")]);
+  useEffect(() => {
+    const btn = ref.current?.querySelector<HTMLElement>(`[data-date="${activeDate}"]`);
+    btn?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+  }, [activeDate]);
+  const overflow = edges.left || edges.right;
+  const scrollBy = (dir: number) => ref.current?.scrollBy({ left: dir * Math.max(160, (ref.current?.clientWidth ?? 0) * 0.7), behavior: "smooth" });
+  return (
+    <div className="flex min-w-0 items-center gap-1">
+      {overflow && (
+        <button type="button" onClick={() => scrollBy(-1)} disabled={!edges.left} aria-label="Vorige dagen"
+          className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed">
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      )}
+      <div ref={ref} onScroll={update} className="min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
+        <div className="flex w-max gap-2 px-0.5 py-0.5">
+          {dates.map((d) => {
+            const isActive = activeDate === d;
+            const parts = formatIsoDateForLocale(d, "nl-BE", { weekday: "long", day: "numeric", month: "short" }).split(" ");
+            return (
+              <button key={d} data-date={d} type="button" onClick={() => onSelect(d)} aria-current={isActive ? "date" : undefined}
+                className={cn(
+                  "flex w-[92px] shrink-0 flex-col items-center justify-center rounded-xl border py-1 transition-colors",
+                  isActive ? "bg-primary text-primary-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                )}>
+                <span className={cn("text-[9px] font-bold uppercase tracking-wider", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>{parts[0] || ""}</span>
+                <span className="text-base font-black leading-tight">{parts[1] || ""}</span>
+                <span className={cn("text-[9px] font-bold uppercase", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>{parts.slice(2).join(" ")}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {overflow && (
+        <button type="button" onClick={() => scrollBy(1)} disabled={!edges.right} aria-label="Volgende dagen"
+          className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed">
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      )}
     </div>
   );
 };
