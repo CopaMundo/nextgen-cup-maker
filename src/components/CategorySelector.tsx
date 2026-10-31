@@ -60,16 +60,15 @@ const CategorySelector = ({
   if (!isMultiCategory || categories.length === 0) return null;
 
   const selectedName = categories.find((c) => c.id === selectedCategoryId)?.name || "";
-  const displayName = selectedName.length > 16 ? `${selectedName.slice(0, 16).trimEnd()}...` : selectedName;
 
   return (
-    <div className={cn("inline-flex items-center", className)}>
+    <div className={cn("inline-flex min-w-0 items-center", className)}>
       <Select value={selectedCategoryId || ""} onValueChange={(value) => onSelect(value || null)}>
         <SelectTrigger
           title={selectedName}
-          className={cn("h-7 w-auto min-w-fit max-w-[18ch] gap-1 px-1.5 text-[11px] font-medium leading-none", !isMobile && "h-6", selectClassName)}
+          className={cn("h-7 w-auto min-w-0 max-w-[18ch] gap-1 overflow-hidden px-1.5 text-[11px] font-medium leading-none [&>span]:min-w-0 [&>span]:truncate", !isMobile && "h-6", selectClassName)}
         >
-          <SelectValue>{displayName || "Kies divisie"}</SelectValue>
+          <SelectValue>{selectedName || "Kies divisie"}</SelectValue>
         </SelectTrigger>
         <SelectContent>
         {categories.map((c) => (
