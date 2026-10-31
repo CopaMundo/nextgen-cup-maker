@@ -4,7 +4,7 @@ import { nl } from "date-fns/locale";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -229,7 +229,7 @@ export function DatePicker({
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-[340px] gap-0 overflow-hidden border border-border bg-popover p-0 text-popover-foreground">
+        <DialogContent scrollable={false} className="w-[calc(100vw-2rem)] max-w-[340px] gap-0 overflow-hidden border border-border bg-popover p-0 text-popover-foreground">
           <div className="bg-popover text-popover-foreground">
 
             {/* Material-style header */}
@@ -298,7 +298,12 @@ export function DatePicker({
               weekStartsOn={1}
               showOutsideDays={false}
               components={{ Caption: () => null }}
-              className="p-3 pointer-events-auto"
+              className="p-3 pt-1 pointer-events-auto"
+              classNames={{
+                row: "flex w-full mt-1",
+                cell: "h-8 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                day: cn(buttonVariants({ variant: "ghost" }), "h-8 w-9 p-0 font-normal aria-selected:opacity-100"),
+              }}
             />
 
             <DialogFooter className="flex-row justify-end gap-2 border-t border-border px-3 py-2">
