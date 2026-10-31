@@ -212,8 +212,8 @@ const PlannerTeams = ({ homeName, awayName, homeLogo, awayLogo }: {
 }) => (
   <div className="flex min-w-0 items-center gap-1 text-[11px] font-medium text-foreground">
     <span className="flex min-w-0 flex-1 items-center justify-start gap-1">
-      <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{homeLogo && <img src={homeLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
       <span className="min-w-0 truncate" title={homeName}>{homeName}</span>
+      <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{homeLogo && <img src={homeLogo} alt="" className="h-3.5 w-3.5 object-contain" draggable={false} />}</span>
     </span>
     <span className="shrink-0 text-center text-muted-foreground">-</span>
     <span className="flex min-w-0 flex-1 items-center justify-start gap-1">
@@ -286,7 +286,7 @@ const timeToMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); 
 const minutesToTime = (m: number) => `${Math.floor(m / 60).toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}`;
 const PLANNER_BREAK_SNAPSHOT_TTL = 2 * 60 * 1000;
 // Uniform block height so all field columns share one visual timeline
-const PLANNER_ROW_H = "h-[78px] md:h-[60px]";
+const PLANNER_ROW_H = "h-[86px] md:h-[68px]";
 
 
 const formatDateDMY = (d: string | null) => {
@@ -478,20 +478,20 @@ export const DateStripNav = ({
                 type="button"
                 onClick={() => onSelect(d)}
                 className={cn(
-                  "snap-center shrink-0 w-[48%] min-w-[92px] max-w-[140px] flex flex-col items-center justify-center h-9 rounded-md border gap-0 px-2 py-0.5 transition-colors",
+                  "snap-center shrink-0 w-[48%] min-w-[92px] max-w-[140px] flex flex-col items-center justify-center h-11 rounded-lg border gap-0.5 px-2 py-1 transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary font-semibold shadow-sm"
                     : "bg-card/60 text-muted-foreground border-border/60 hover:text-foreground"
                  )}
               >
-                <span className="text-[8px] font-semibold uppercase tracking-wide opacity-80">
+                <span className="text-[8px] font-medium uppercase tracking-wide opacity-70">
                   {weekday}
                 </span>
                 <div className="flex items-center gap-1">
                   {isActive && <Calendar className="h-3 w-3" />}
-                  <span className="text-sm font-bold leading-tight">{dayNum}</span>
+                  <span className="text-xs font-semibold leading-tight">{dayNum}</span>
                 </div>
-                <span className="text-[8px] font-semibold uppercase tracking-wide opacity-80">
+                <span className="text-[8px] font-medium uppercase tracking-wide opacity-70">
                    {month}
                 </span>
               </button>
@@ -574,14 +574,14 @@ const DesktopDateBoxes = ({ dates, activeDate, onSelect }: { dates: string[]; ac
             return (
               <Button variant="outline" key={d} data-date={d} type="button" onClick={() => onSelect(d)} aria-current={isActive ? "date" : undefined}
                 className={cn(
-                  "flex h-9 w-[78px] shrink-0 flex-col items-center justify-center rounded-md border gap-0 px-1.5 py-0.5 transition-colors",
+                  "flex h-11 w-[78px] shrink-0 flex-col items-center justify-center rounded-lg border gap-0.5 px-1.5 py-1 transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary font-semibold shadow-sm"
                     : "bg-card/60 text-muted-foreground border-border hover:text-foreground"
                 )}>
-                <span className="text-[8px] leading-none font-semibold uppercase tracking-wide opacity-80">{parts[0] || ""}</span>
-                <span className="text-sm font-bold leading-tight">{parts[1] || ""}</span>
-                <span className="text-[8px] leading-none font-semibold uppercase tracking-wide opacity-80">{parts.slice(2).join(" ")}</span>
+                <span className="text-[8px] leading-none font-medium uppercase tracking-wide opacity-70">{parts[0] || ""}</span>
+                <span className="text-xs font-semibold leading-tight">{parts[1] || ""}</span>
+                <span className="text-[8px] leading-none font-medium uppercase tracking-wide opacity-70">{parts.slice(2).join(" ")}</span>
               </Button>
             );
           })}
@@ -3140,7 +3140,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className={cn("py-2 print:hidden mb-0 shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
+            <div className={cn("pt-2 pb-0 mb-5 print:hidden shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
               <div className="min-w-0 flex-1">
               <DateStripNav
                 dates={tournamentDates}
@@ -3168,7 +3168,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             <div className="flex items-center gap-2 py-2 print:hidden shrink-0">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Locatie</span>
               <Select value={selectedLocation || ""} onValueChange={(v) => updateSelectedLocation(v || null)}>
-                <SelectTrigger className="h-9 w-auto min-w-[140px] text-sm font-medium"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-7 w-auto min-w-[140px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent className="max-h-64">
                   {locations.map(l => (
                     <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>
@@ -3559,9 +3559,9 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                               ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
                                                 ? "border-primary ring-2 ring-primary/20 bg-primary/5"
-                                                : getMatchClashes(m).length > 0
-                                                  ? "border-destructive bg-destructive/15 text-foreground hover:border-destructive hover:shadow-md"
-                                                  : "border-border bg-card hover:border-primary/50 hover:shadow-md"
+                                                  : getMatchClashes(m).length > 0
+                                                  ? "border-destructive bg-destructive/15 text-foreground ring-1 ring-destructive/30 hover:border-destructive hover:shadow-md"
+                                                  : "border-border bg-card hover:border-primary hover:shadow-md"
                                           }`}
                                         >
                                           <div
@@ -3608,7 +3608,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                             {/* Referees */}
                                             <div
                                               data-referee-match-id={m.id}
-                                              className={`flex min-w-0 shrink-0 items-center gap-1 overflow-x-auto scrollbar-none rounded transition-colors h-[18px] ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
+                                              className={`flex min-w-0 shrink-0 items-center gap-1 overflow-x-auto scrollbar-none rounded transition-colors min-h-[18px] ${refInsert?.matchId === m.id ? "bg-primary/10 ring-1 ring-primary/40 px-0.5 py-0.5" : ""}`}
                                             >
                                               {refNames(m.referee).length > 0 && displayRefNames(m.id, m.referee).map((name, refIdx, arr) => {
                                                 const issue = getRefereeIssue(m, name, refIdx);

@@ -434,7 +434,7 @@ const TournamentDetail = () => {
                 tournamentId={id ?? ""}
                 selectedLocation={selectedLocation}
                 onSelect={setSelectedLocation}
-                selectClassName={isMobile ? compactSelect : "h-7 min-w-[140px] rounded-md px-2 text-xs font-semibold"}
+                selectClassName={isMobile ? compactSelect : "h-7 min-w-[140px] max-w-[200px] rounded-md px-2 text-xs font-normal bg-muted/40 hover:bg-muted/60 overflow-hidden [&>span]:min-w-0 [&>span]:truncate"}
                 showLabel={false}
               />
             )}
