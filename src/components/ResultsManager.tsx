@@ -86,7 +86,7 @@ const formatDateDMY = (d: string | null) => {
 const phaseStorageKey = (tournamentId: string, categoryId: string | null) =>
   `results-phase:${tournamentId}:${categoryId || "all"}`;
 
-const ResultsManager = ({ tournamentId, tournament, categoryId, toolbarRight }: { tournamentId: string; tournament: any; categoryId?: string | null; toolbarRight?: React.ReactNode }) => {
+const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId: string; tournament: any; categoryId?: string | null }) => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [phases, setPhases] = useState<Phase[]>([]);
@@ -2117,7 +2117,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId, toolbarRight }: 
                   </Button>
                 ))}
               </HorizontalRail>
-              <div className="shrink-0 pt-0.5">{toolbarRight}</div>
             </div>
             {currentPhaseFormats.length > 0 && (
               <HorizontalRail label="Resultatenformats">

@@ -70,7 +70,7 @@ interface PhaseContainer {
 
 
 
-const PhaseManager = ({ tournamentId, tournamentType, categoryId, toolbarRight }: { tournamentId: string; tournamentType: string; categoryId?: string | null; toolbarRight?: React.ReactNode }) => {
+const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournamentId: string; tournamentType: string; categoryId?: string | null }) => {
   const railRef = useRef<HTMLDivElement>(null);
   const railDrag = useRef({ x: 0, left: 0, moved: false, active: false });
   const [railScroll, setRailScroll] = useState({ left: false, right: false });
@@ -1489,12 +1489,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId, toolbarRight }
         </div>
       )}
 
-      {!isMobile && (
-        <div className="flex min-w-0 items-start gap-3">
-          <div className="min-w-0 flex-1">{!loading && containers.length > 0 && phaseRail}</div>
-          <div className="shrink-0 pt-2">{toolbarRight}</div>
-        </div>
-      )}
+      {!isMobile && !loading && containers.length > 0 && phaseRail}
 
       {!(isMobile && mobilePhaseOverview) && containers
         .filter((c) => c.phaseNumber === activePhaseNumber)

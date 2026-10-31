@@ -381,14 +381,11 @@ const TournamentDetail = () => {
                 null
                 )}
                 {!isMobile && (
-                  <div className="flex min-w-0 items-center justify-between gap-3">
                   <h2 className="section-title min-w-0 !mb-0">
                     {deelnemersSubTab === "teams"
                       ? (tournament.teams_label || "Teams")
                       : (tournament.referees_label || "Scheidsrechters")}
                   </h2>
-                  {desktopCategorySelector}
-                  </div>
                 )}
                 {!isMobile && (deelnemersSubTab === "teams" ? (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -415,7 +412,6 @@ const TournamentDetail = () => {
                 tournamentId={id ?? ""}
                 tournamentType={tournament.tournament_type}
                 categoryId={effectiveCategoryId}
-                toolbarRight={desktopCategorySelector}
               />
             )}
           </>
@@ -456,7 +452,6 @@ const TournamentDetail = () => {
             toolbarLeft={scheduleSelectors}
             plannerDate={plannerDate}
             onPlannerDateChange={handlePlannerDateChange}
-            toolbarRight={desktopCategorySelector}
           />
         ) : (
           <div className="flex flex-wrap items-center gap-3 mb-4">{scheduleSelectors}</div>
@@ -479,10 +474,9 @@ const TournamentDetail = () => {
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
-                <ResultsManager tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} toolbarRight={desktopCategorySelector} />
+                <ResultsManager tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} />
               ) : (
                 <div className="flex min-h-0 flex-1 flex-col gap-3">
-                {!isMobile && <div className="flex justify-end">{desktopCategorySelector}</div>}
                 <StatisticsView tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} />
                 </div>
               )
@@ -577,17 +571,18 @@ const TournamentDetail = () => {
               )}
             >
               <div className="h-14 shrink-0 border-b border-border px-3">
-                <div className="flex h-full items-center gap-2.5">
+                 <div className="flex h-full items-center gap-2.5">
                   {tournament.logo_url && (
                     <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
                   )}
                   {!desktopNavCollapsed && (
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground" title={tournament.name}>
+                    <span className="min-w-0 flex-1 line-clamp-2 text-xs font-semibold leading-tight text-foreground" title={tournament.name}>
                       {tournament.name}
                     </span>
                   )}
+                  {!desktopNavCollapsed && desktopCategorySelector}
                 </div>
-              </div>
+               </div>
 
               <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">
                 {sidebarItems.map((item) => {
