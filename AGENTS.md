@@ -1,6 +1,7 @@
 # Architecture rules
 
 - Keep referee overview presentation separate from RefereeManager persistence and draft dialogs; bounded card rows and portaled details keep desktop/mobile geometry stable without changing scheduling rules.
+- Share balanced team/logo presentation across scheduled, unscheduled and dragged planner cards; keep referee badges on a bounded separate row so identity layout stays stable without changing assignments or timeline heights.
 
 - Draw-stage rules (bowl, balls, wings, overview, logos): src/components/draw/AGENTS.md.
 - Keep desktop/tablet tournament identity in a fixed-height sidebar header and place division selection in each module's top row; reserve its width outside horizontally scrolling phase/date rails to prevent overlap. Preserve mobile layouts.
