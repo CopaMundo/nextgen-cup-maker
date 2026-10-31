@@ -1333,7 +1333,7 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
       }}
       onDragStart={(e) => e.preventDefault()}
     >
-      <div className="flex w-max min-w-full items-stretch gap-2">
+      <div className="flex w-max min-w-full items-stretch gap-2 px-1 py-2">
         {containers.map((c) => {
           const isActive = c.phaseNumber === activePhaseNumber;
           const canDelete = containers.length > 1 && c.phaseNumber !== 1;
@@ -1349,8 +1349,8 @@ const PhaseManager = ({ tournamentId, tournamentType, categoryId }: { tournament
               className={cn(
                 "flex w-52 shrink-0 cursor-pointer items-center gap-2 rounded-lg border bg-card px-3 py-2 text-left transition-colors",
                 isActive
-                  ? "border-primary bg-accent/40 ring-1 ring-primary"
-                  : "border-border hover:border-primary/40 hover:bg-accent/30"
+                  ? "border-2 border-primary bg-primary/5 shadow-[0_0_16px_-2px_hsl(var(--primary)/0.45)]"
+                  : "border-2 border-border hover:border-primary/40 hover:bg-accent/30"
               )}
             >
               <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold", isActive ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground")}>{c.phaseNumber}</span>
