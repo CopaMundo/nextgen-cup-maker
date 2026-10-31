@@ -3517,6 +3517,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
                                 const m = item.match;
                                 const idx = item.idx;
+                                const matchClashes = getMatchClashes(m);
                                 const isDragging = dragItemId === m.id;
                                 const time = slotTimes[idx] || m.match_time?.slice(0, 5) || "—";
                                 const isPreviewHere = visualInsertIdx === idx && dragItemId && dragItemId !== m.id;
@@ -3552,14 +3553,14 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                       <div className="px-0">
                                         <PlannerItem
                                           payload={{ id: m.id, type: "match", field_id: field.name, slot_index: idx, container: "schema" }}
-                                          className={`${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-md border p-1 text-[11px] transition-all duration-200 ${
+                                          className={`planner-match-card ${matchClashes.length > 0 ? "planner-match-conflict" : ""} ${mobileSelectedMatchId === m.id ? "" : `${PLANNER_ROW_H} overflow-hidden`} rounded-md border p-1 text-[11px] transition-all duration-200 ${
                                             refInsert?.matchId === m.id
                                               ? "border-primary ring-2 ring-primary/50 bg-primary/10"
                                               : mobileSelectedMatchId === m.id
                                               ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                               : isDragging
                                                 ? "border-primary ring-2 ring-primary/20 bg-primary/5"
-                                                  : getMatchClashes(m).length > 0
+                                                  : matchClashes.length > 0
                                                   ? "border-destructive bg-destructive/15 text-foreground ring-1 ring-destructive/30 hover:border-destructive hover:shadow-md"
                                                   : "border-border bg-card hover:border-primary hover:shadow-md"
                                           }`}
@@ -3578,11 +3579,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                                 )}
                                               </div>
                                                <div className="flex items-center gap-1 shrink-0">
-                                                 {getMatchClashes(m).length > 0 && (
+                                                 {matchClashes.length > 0 && (
                                                    <button
                                                      type="button"
-                                                     onClick={(e) => { e.stopPropagation(); setClashInfo(getMatchClashes(m)); }}
-                                                     title={getMatchClashes(m).join("\n")}
+                                                     onClick={(e) => { e.stopPropagation(); setClashInfo(matchClashes); }}
+                                                     title={matchClashes.join("\n")}
                                                      aria-label="Conflict bekijken"
                                                      className="flex h-6 w-6 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 md:h-4 md:w-4"
                                                    >
@@ -4250,7 +4251,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                           />
                           <PlannerItem
                             payload={{ id: m.id, type: "match", field_id: null, slot_index: null, container: "unscheduled" }}
-                            className={`rounded-lg border bg-card p-1 text-[11px] hover:border-primary/60 hover:shadow-sm transition-all duration-150 ${
+                            className={`planner-match-card rounded-lg border bg-card p-1 text-[11px] hover:border-primary hover:shadow-sm transition-all duration-150 ${
                               mobileSelectedMatchId === m.id
                                 ? "border-primary ring-2 ring-primary/30 bg-primary/10"
                                 : dragItemId === m.id ? "opacity-30 scale-95 border-primary ring-2 ring-primary/20" : "border-border"
