@@ -330,6 +330,17 @@ const TournamentDetail = () => {
 
   const effectiveCategoryId = selectedCategoryId;
 
+  const desktopCategorySelector = !isMobile && tournament.is_multi_category ? (
+    <CategorySelector
+      tournamentId={id ?? ""}
+      isMultiCategory={tournament.is_multi_category}
+      selectedCategoryId={selectedCategoryId}
+      onSelect={setSelectedCategoryId}
+      className="shrink-0"
+      selectClassName="h-7 w-36 min-w-0 max-w-36 rounded-md px-2 text-xs"
+    />
+  ) : null;
+
   const renderContent = () => {
     switch (activeTab) {
       case "general":
@@ -370,11 +381,14 @@ const TournamentDetail = () => {
                 null
                 )}
                 {!isMobile && (
-                  <h2 className="section-title">
+                  <div className="flex min-w-0 items-center justify-between gap-3">
+                  <h2 className="section-title min-w-0 !mb-0">
                     {deelnemersSubTab === "teams"
                       ? (tournament.teams_label || "Teams")
                       : (tournament.referees_label || "Scheidsrechters")}
                   </h2>
+                  {desktopCategorySelector}
+                  </div>
                 )}
                 {!isMobile && (deelnemersSubTab === "teams" ? (
                   <TeamManager tournamentId={id ?? ""} teamCount={tournament.team_count} showCountry={tournament.show_country} categoryId={effectiveCategoryId} teamsLabel={tournament.teams_label || "Teams"} onDetailOpenChange={setTeamDetailOpen} />
@@ -401,6 +415,7 @@ const TournamentDetail = () => {
                 tournamentId={id ?? ""}
                 tournamentType={tournament.tournament_type}
                 categoryId={effectiveCategoryId}
+                toolbarRight={desktopCategorySelector}
               />
             )}
           </>
@@ -441,6 +456,7 @@ const TournamentDetail = () => {
             toolbarLeft={scheduleSelectors}
             plannerDate={plannerDate}
             onPlannerDateChange={handlePlannerDateChange}
+            toolbarRight={desktopCategorySelector}
           />
         ) : (
           <div className="flex flex-wrap items-center gap-3 mb-4">{scheduleSelectors}</div>
@@ -463,7 +479,7 @@ const TournamentDetail = () => {
             {isMobile && categorySelector}
             {(!tournament.is_multi_category || effectiveCategoryId) && (
               resultsSubTab === "results" ? (
-                <ResultsManager tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} />
+                <ResultsManager tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} toolbarRight={desktopCategorySelector} />
               ) : (
                 <StatisticsView tournamentId={id ?? ""} tournament={tournament} categoryId={effectiveCategoryId} />
               )
@@ -557,8 +573,8 @@ const TournamentDetail = () => {
                 desktopNavCollapsed ? "w-[68px]" : "w-60"
               )}
             >
-              <div className="shrink-0 border-b border-border px-3 py-2.5">
-                <div className="flex h-14 items-center gap-2.5">
+              <div className="h-14 shrink-0 border-b border-border px-3">
+                <div className="flex h-full items-center gap-2.5">
                   {tournament.logo_url && (
                     <img src={tournament.logo_url} alt="" className="h-8 w-8 shrink-0 object-contain" />
                   )}
@@ -568,18 +584,6 @@ const TournamentDetail = () => {
                     </span>
                   )}
                 </div>
-                {!desktopNavCollapsed && tournament.is_multi_category && (
-                  <div className="mt-2.5">
-                    <CategorySelector
-                      tournamentId={id ?? ""}
-                      isMultiCategory={tournament.is_multi_category}
-                      selectedCategoryId={selectedCategoryId}
-                      onSelect={setSelectedCategoryId}
-                      className="flex w-full"
-                      selectClassName="h-7 w-full max-w-none rounded-md px-2 text-xs font-semibold"
-                    />
-                  </div>
-                )}
               </div>
 
               <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-3">

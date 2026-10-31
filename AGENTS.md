@@ -3,7 +3,8 @@
 - Keep referee overview presentation separate from RefereeManager persistence and draft dialogs; bounded card rows and portaled details keep desktop/mobile geometry stable without changing scheduling rules.
 
 - Draw-stage rules (bowl, balls, wings, overview, logos): src/components/draw/AGENTS.md.
-- Keep the shared desktop/tablet administration title bar outside the content scroll pane with equal horizontal gutters; one stationary shell prevents tab-specific scrolling and controls from shifting headings.
+- Keep desktop/tablet tournament identity in a fixed-height sidebar header and place division selection in each module's top row; reserve its width outside horizontally scrolling phase/date rails to prevent overlap. Preserve mobile layouts.
+- Share overflow-aware horizontal rails for results phase and format navigation; keep progress presentation separate from score persistence and completion actions in the format detail dialog.
 - Represent live knockout and single-match entry encounters as fixed home/away slot containers in the shared draw session; source their geometry from existing matches and never infer seed rank from slot codes, so bracket positions and return legs stay intact.
 - Keep rounds-draw pot assignments per group in a phase-scoped browser draft and include them in the final draw report; phase-wide pot tables cannot replace group-specific assignments, and applying clears the draft.
 - Scope admin and portaled dialogs/selects/popovers through AdminAppearanceContext; unframe sections, frame items. Desktop/tablet sub-items select focused screens. Preserve mobile, schedule/results, public/stage styles and embedded theme controls.
