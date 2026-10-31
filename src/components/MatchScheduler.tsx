@@ -3768,7 +3768,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               ref={plannerSidebarRef}
               className={cn(
                 "ml-0 print:hidden flex flex-col overflow-hidden overscroll-contain transition-colors",
-                isMobile ? "fixed inset-0 z-50 bg-background" : "w-72 shrink-0 border-l border-border sticky top-0 h-[calc(100dvh-8rem)] md:h-full",
+                isMobile ? "fixed inset-0 z-50 bg-background" : "ml-2 w-72 shrink-0 rounded-lg border border-border bg-card sticky top-0 h-[calc(100dvh-8rem)] md:h-full",
                 dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""
               )}
               onDragOver={(e) => {
@@ -3825,7 +3825,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
                     {/* Scheduling filters — Tournify-style multi-select dropdowns */}
-                    <div className="space-y-3 border-t border-border pt-3">
+                    <div className="space-y-3">
                       {/* Poules/Brackets dropdown */}
                       {(() => {
                         const options = getUnifiedGroupBracketOptions();
@@ -4012,7 +4012,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     </div>
 
                     {/* Action buttons */}
-                    <div className="space-y-1.5 border-t border-border pt-3">
+                    <div className="space-y-1.5">
                       {(() => {
                         const hasAnyFilter = schedFormats.length > 0 || schedGroups.length > 0 || schedRounds.length > 0;
                         let count = 0;
