@@ -62,7 +62,8 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       const shown = Math.round(progress);
       const scroller = verticalScroller(element);
       const direction = Math.sign(progress - previousProgress) || trackingDirection || 1;
-      if (nextBase !== trackingBase || direction !== trackingDirection || !tracked?.isConnected || Math.abs(scroller.scrollTop - lastVertical) > 1) {
+      const finishingInterval = tracked?.isConnected && direction === trackingDirection && nextBase !== trackingBase && ((direction > 0 && fraction < 0.0001) || (direction < 0 && fraction > 0.9999));
+      if (!finishingInterval && (nextBase !== trackingBase || direction !== trackingDirection || !tracked?.isConnected || Math.abs(scroller.scrollTop - lastVertical) > 1)) {
         // Capture the source visible to the viewer before changing either endpoint.
         const sourceRound = direction > 0 ? nextBase : Math.min(nextBase + 1, last);
         const source = nearestCard(element, scroller, sourceRound);
@@ -74,8 +75,10 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
         if (tracked) {
           const rect = tracked.getBoundingClientRect();
           originCentre = rect.top + rect.height / 2;
-          const sourceRect = source?.getBoundingClientRect();
-          desiredCentre = sourceRect ? sourceRect.top + sourceRect.height / 2 : originCentre;
+          const isRoot = scroller === document.scrollingElement || scroller === document.documentElement;
+          const viewportTop = isRoot ? 0 : Math.max(0, scroller.getBoundingClientRect().top);
+          const viewportBottom = isRoot ? window.innerHeight : Math.min(window.innerHeight, scroller.getBoundingClientRect().top + scroller.clientHeight);
+          desiredCentre = (viewportTop + viewportBottom) / 2;
         }
       }
       const beforeRect = tracked?.getBoundingClientRect();
@@ -94,7 +97,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       if (bottom > 0) element.style.height = `${Math.ceil(bottom + 20)}px`;
       if (tracked && before !== undefined) {
         const rect = tracked.getBoundingClientRect();
-        const travel = direction > 0 ? (fraction - originFraction) / Math.max(0.0001, 1 - originFraction) : (originFraction - fraction) / Math.max(0.0001, originFraction);
+        const travel = finishingInterval ? 1 : direction > 0 ? (fraction - originFraction) / Math.max(0.0001, 1 - originFraction) : (originFraction - fraction) / Math.max(0.0001, originFraction);
         const desired = originCentre + (desiredCentre - originCentre) * Math.max(0, Math.min(1, travel));
         const delta = rect.top + rect.height / 2 - desired;
         if (Math.abs(delta) > 0.5) scroller.scrollBy({ top: delta, behavior: "instant" as ScrollBehavior });
