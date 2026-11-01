@@ -2981,7 +2981,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                       <SelectContent className="max-h-64">
                         {tournamentDates.map((d) => (
                           <SelectItem key={d} value={d} className="text-xs">
-                            {formatIsoDateForLocale(d, "nl-BE", { weekday: "long", day: "numeric", month: "long" })}
+                            {formatIsoDateForLocale(d, "nl-BE", { weekday: "short", day: "numeric", month: "short" })}
                           </SelectItem>
                         ))}
                       </SelectContent>
