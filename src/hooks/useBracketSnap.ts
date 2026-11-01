@@ -38,8 +38,6 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    let anchor: HTMLElement | null = null;
-    let anchorRound = -1;
     const apply = () => {
       const last = Math.max(0, roundCount - 1);
       const progress = Math.max(0, Math.min(last, element.scrollLeft / (columnWidth || 1)));
@@ -47,7 +45,8 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       const fraction = roundCount > 1 ? Math.min(1, progress - nextBase) : 0;
       const shown = Math.round(progress);
       const scroller = verticalScroller(element);
-      if (shown !== anchorRound || !anchor?.isConnected) { anchor = nearestCard(element, scroller, shown); anchorRound = shown; }
+      // Hold the round being entered/left after the base: its cards are the ones that move.
+      const anchor = nearestCard(element, scroller, Math.min(base.current + 1, last));
       const before = anchor?.getBoundingClientRect().top;
       if (nextBase !== base.current) { base.current = nextBase; flushSync(() => onBase(nextBase)); }
       element.style.setProperty("--bf", fraction.toFixed(4));
@@ -59,17 +58,11 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
     };
     const resize = new ResizeObserver(() => { onWidth?.(element.clientWidth); });
     resize.observe(element);
-    // A vertical scroll elsewhere changes what the viewer is looking at.
-    const forget = () => { anchorRound = -1; };
     element.addEventListener("scroll", apply, { passive: true });
-    window.addEventListener("wheel", forget, { passive: true });
-    window.addEventListener("touchend", forget, { passive: true });
     apply();
     return () => {
       resize.disconnect();
       element.removeEventListener("scroll", apply);
-      window.removeEventListener("wheel", forget);
-      window.removeEventListener("touchend", forget);
     };
   }, [ref, columnWidth, roundCount, onBase, onWidth, onIndicator]);
 }
