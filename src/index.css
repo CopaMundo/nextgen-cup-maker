@@ -3430,3 +3430,6 @@ posities + statistieken groen */
 
 /* Field labels that must read like list items (sentence case, foreground). */
 .admin-ui .admin-plain-label { color: hsl(var(--foreground)); font-size: .875rem; font-weight: 400; line-height: 1.25rem; text-transform: none; letter-spacing: 0; }
+
+/* Bracket round convergence is applied in one frame while the followed card is held in place. */
+.bracket-instant, .bracket-instant * { transition: none !important; }
