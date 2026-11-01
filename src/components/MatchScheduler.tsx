@@ -319,8 +319,6 @@ const getFirstScheduledMatchDate = (matches: Match[]) => {
 };
 
 
-};
-
 const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation: selectedLocationProp, onLocationChange, onManageReferees, toolbarLeft, plannerDate: plannerDateProp, onPlannerDateChange }: { tournamentId: string; tournament: any; categoryId?: string | null; selectedLocation?: string | null; onLocationChange?: (loc: string | null) => void; onManageReferees?: () => void; toolbarLeft?: React.ReactNode; plannerDate?: string; onPlannerDateChange?: (date: string) => void }) => {
   const isMobile = useIsMobile();
   const { systems: scoringSystems } = useScoringSystems(tournamentId);
