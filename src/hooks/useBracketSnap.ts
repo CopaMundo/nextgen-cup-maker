@@ -54,7 +54,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    let previousProgress = Math.max(0, element.scrollLeft / (columnWidth || 1));
+    let previousProgress = 0;
     let tracked: HTMLElement | null = null;
     let trackingBase = -1;
     let trackingDirection = 0;
@@ -62,9 +62,22 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
     let desiredCentre = 0;
     let originFraction = 0;
     let lastVertical = verticalScroller(element).scrollTop;
+    // Rail padding shifts where the first round snaps; measure the real snap
+    // positions so a resting round reports exactly --bf 0 instead of a partial step.
+    const snapPosition = (round: number) => {
+      let node = element.querySelector<HTMLElement>(`[data-bracket-round="${round}"]`);
+      while (node && node !== element && getComputedStyle(node).scrollSnapAlign.includes("none")) node = node.parentElement;
+      if (!node || node === element) return undefined;
+      const padding = parseFloat(getComputedStyle(element).scrollPaddingLeft) || 0;
+      return node.getBoundingClientRect().left - element.getBoundingClientRect().left - element.clientLeft + element.scrollLeft - padding;
+    };
     const apply = () => {
       const last = Math.max(0, roundCount - 1);
-      const progress = Math.max(0, Math.min(last, element.scrollLeft / (columnWidth || 1)));
+      const first = snapPosition(0);
+      const second = roundCount > 1 ? snapPosition(1) : undefined;
+      const origin = first !== undefined ? Math.max(0, Math.min(first, element.scrollWidth - element.clientWidth)) : 0;
+      const step = first !== undefined && second !== undefined && second - first > 1 ? second - first : (columnWidth || 1);
+      const progress = Math.max(0, Math.min(last, (element.scrollLeft - origin) / step));
       const nextBase = Math.min(Math.floor(progress), Math.max(0, roundCount - 2));
       const fraction = roundCount > 1 ? Math.min(1, progress - nextBase) : 0;
       const shown = Math.round(progress);
