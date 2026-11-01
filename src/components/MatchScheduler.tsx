@@ -698,6 +698,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const dragVisualTimerRef = useRef<number | null>(null);
   const fieldColumnRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const plannerScrollRef = useRef<HTMLDivElement | null>(null);
+  const fieldNameRailRef = useRef<HTMLDivElement | null>(null);
   const plannerBreaksRef = useRef<PlannerBreak[]>([]);
   const plannerBreaksSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const lastPreviewUpdate = useRef<number>(0);
@@ -3394,7 +3395,19 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-                    <div id="planner-field-scroll" ref={plannerScrollRef} className="overflow-x-auto px-2 pt-1 pb-2 scroll-smooth">
+                    {/* Only names remain visible; the original header and actions scroll away. */}
+                    <div className="pointer-events-none sticky top-0 z-10 h-9 -mb-9 overflow-hidden px-2 pt-1 print:hidden" aria-label="Veldnamen">
+                      <div ref={fieldNameRailRef} className="flex min-w-full w-full md:w-max gap-2 md:gap-4 pr-4">
+                        {visibleFieldData.map(({ field }) => (
+                          <div key={field.name} className={cn("min-w-0 border border-transparent px-3 py-2", isMobile ? "flex-1" : "w-[330px] shrink-0")}>
+                            <h4 className="w-fit max-w-full truncate bg-card font-display text-sm font-bold text-foreground" title={displayFieldName(field.name)}>{displayFieldName(field.name)}</h4>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div id="planner-field-scroll" ref={plannerScrollRef} onScroll={(event) => {
+                      if (fieldNameRailRef.current) fieldNameRailRef.current.style.transform = `translateX(-${event.currentTarget.scrollLeft}px)`;
+                    }} className="overflow-x-auto px-2 pt-1 pb-2 scroll-smooth">
                       <div className="flex w-full md:w-max min-w-full gap-2 md:gap-4 pr-4 print:w-full">
                         {visibleFieldData.map(({ field, fieldMatches, fieldBreaks, slotTimes, items, nextFreeTime }) => (
                           <div key={field.name} data-planner-field={field.name} className={cn("print:min-w-0 print:w-auto print:flex-1 flex flex-col rounded-lg border border-primary/30 bg-card", isMobile ? "flex-1 min-w-0" : "min-w-[330px] w-[330px] flex-shrink-0")}>
@@ -3407,7 +3420,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               className={`rounded-t-lg bg-primary/10 border-b border-primary/30 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/20" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/15" : ""}`}
                             >
                               <div className="flex items-center justify-between">
-                                <h4 className="font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
+                                <h4 aria-hidden="true" className="invisible print:visible font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: stripLocationPrefix(field.name, field.location), startTime: field.startTime ?? "", location: field.location ?? null }); setEditFieldIdx(fields.indexOf(field)); }}
