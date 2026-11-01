@@ -43,7 +43,7 @@ it("unchecking All rounds preserves the selected group and bracket", async () =>
   const parents = await selectParents();
   fireEvent.click(screen.getByText("Alle rondes"));
   fireEvent.click(screen.getByText("Alle rondes", { selector: "label" }));
-  expect(within(parents).getByText("Alle poules/brackets")).toBeInTheDocument();
+  expect(within(parents).getByText("Alle poules/brackets", { selector: "span" })).toBeInTheDocument();
   expect(screen.getByText("Ronde 1 (Groepsfase)").closest("label")?.querySelector('[role="checkbox"]')).toHaveAttribute("aria-checked", "false");
 });
 
@@ -52,13 +52,13 @@ it("unchecking individual rounds never removes either selected parent", async ()
   fireEvent.click(screen.getByText("Alle rondes"));
   for (const label of ["Ronde 1 (Groepsfase)", "Ronde 2 (Groepsfase)", "Ronde 1 (Finales)"]) {
     fireEvent.click(screen.getByText(label).closest("label") as HTMLLabelElement);
-    expect(within(parents).getByText("Alle poules/brackets")).toBeInTheDocument();
+    expect(within(parents).getByText("Alle poules/brackets", { selector: "span" })).toBeInTheDocument();
   }
 });
 
 it("clearing rounds with the clear control preserves the selected group and bracket", async () => {
   const parents = await selectParents();
   fireEvent.click(screen.getByRole("button", { name: "Rondeselectie wissen" }));
-  expect(within(parents).getByText("Alle poules/brackets")).toBeInTheDocument();
+  expect(within(parents).getByText("Alle poules/brackets", { selector: "span" })).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Rondeselectie wissen" })).not.toBeInTheDocument();
 });
