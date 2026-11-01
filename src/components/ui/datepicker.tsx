@@ -192,6 +192,16 @@ export function DatePicker({
     []
   );
 
+  // Alleen beschikbare dagen (bv. wedstrijddagen) zijn klikbaar in de kalender.
+  const availableSet = React.useMemo(
+    () => (availableDates ? new Set(availableDates) : null),
+    [availableDates]
+  );
+  const isDayDisabled = React.useCallback(
+    (day: Date) => (availableSet ? !availableSet.has(format(day, "yyyy-MM-dd")) : false),
+    [availableSet]
+  );
+
   return (
     <>
       <div className={cn("relative", hideInput ? "h-auto w-auto" : "h-10 w-full", className)}>
