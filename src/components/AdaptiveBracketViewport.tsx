@@ -20,7 +20,7 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
   useBracketSnap(ref, columnWidth, roundCount, setActiveRound, setViewportWidth, setIndicatorRound);
   return <div className="min-w-0">
     <BracketRoundIndicators count={roundCount} active={indicatorRound} />
-    <div ref={ref} className="w-full min-w-0 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-2" aria-label="Bracketrondes">
+    <div ref={ref} className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-2" aria-label="Bracketrondes">
     {children({ activeRound, viewportWidth })}
   </div></div>;
 }
