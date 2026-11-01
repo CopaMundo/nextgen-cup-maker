@@ -1,9 +1,11 @@
 import { render, fireEvent, act } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import AdaptiveBracketViewport from "@/components/AdaptiveBracketViewport";
+afterEach(() => vi.unstubAllGlobals());
 
 describe("settled bracket round selection", () => {
   it("keeps geometry unchanged during scrolling and selects the second round only at scrollend", () => {
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
     const view = render(<AdaptiveBracketViewport roundCount={4} columnWidth={304}>{({ activeRound }) => <output>{activeRound}</output>}</AdaptiveBracketViewport>);
     const rail = view.getByLabelText("Bracketrondes");
     rail.scrollLeft = 304;
