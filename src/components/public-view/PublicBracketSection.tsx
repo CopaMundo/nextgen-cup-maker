@@ -934,6 +934,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                         return (
                           <div
                             key={match.id}
+                            data-bracket-round={roundIdx}
                             className="absolute left-0 right-0"
                             style={{
                               top: 0,
@@ -1088,7 +1089,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className="relative" style={{ height: sideHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
+                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
@@ -1204,7 +1205,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
+                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
