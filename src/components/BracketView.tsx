@@ -26,7 +26,7 @@ import LiveDrawDialog from "./LiveDrawDialog";
 import { bracketAggregate } from "@/lib/bracketAggregate";
 import { formatFieldLabel } from "@/lib/fieldLocations";
 import AdaptiveBracketViewport from "./AdaptiveBracketViewport";
-import BracketLabel from "./BracketLabel";
+import BracketLabel, { isStandardBracketLabel } from "./BracketLabel";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 
 interface BracketMatch {
@@ -2525,7 +2525,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           >
             {logo && <img src={logo} className="h-4 w-4 object-contain flex-shrink-0" alt="" />}
             <div className={`flex items-center gap-1 flex-1 min-w-0 ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : (isHome && homeName === "BYE") || (!isHome && awayName === "BYE") ? "font-mono font-bold text-primary" : ""}`}>
-              <BracketLabel name={name} full={compact && !hasTeam} className={`text-[11px] leading-tight ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`} />
+              <BracketLabel name={name} full={compact && !hasTeam && isStandardBracketLabel(name)} className={`text-[11px] leading-tight ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`} />
               {tournament?.show_country && (isHome ? match.home_team_id : match.away_team_id) && (
                 <CountryFlag country={getTeamCountry(isHome ? match.home_team_id : match.away_team_id)} className="h-3 w-4 object-contain flex-shrink-0 align-middle" />
               )}
@@ -2683,7 +2683,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                               groups as any
                             );
                         return (
-                          <BracketLabel name={`${baseName}${suffix}${haSuffix}`} full={compact && /^(?:P\d+-\d+:\s*)?(?:Finale|Halve finale|Kwartfinale|Achtste finale|Zestiende finale|Ronde)\b/i.test(baseName)} className="text-[10px] font-semibold text-muted-foreground leading-tight" />
+                          <BracketLabel name={`${baseName}${suffix}${haSuffix}`} full={compact && isStandardBracketLabel(baseName)} className="text-[10px] font-semibold text-muted-foreground leading-tight" />
                         );
                       })()}
                       {dateStr && (
