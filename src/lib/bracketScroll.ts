@@ -17,7 +17,7 @@ export function bracketVisibleBounds(element: HTMLElement) {
   let bottom = window.innerHeight;
   let parent = element.parentElement;
   while (parent && parent !== document.body && parent !== document.documentElement) {
-    if (/(auto|scroll)/.test(getComputedStyle(parent).overflowY)) {
+    if (!parent.classList.contains("overflow-x-auto") && /(auto|scroll)/.test(getComputedStyle(parent).overflowY)) {
       const rect = parent.getBoundingClientRect();
       top = Math.max(top, rect.top + parent.clientTop);
       bottom = Math.min(bottom, rect.top + parent.clientTop + parent.clientHeight);
@@ -34,7 +34,7 @@ export function centerBracketMatch(card: HTMLElement) {
   let parent = card.parentElement;
   const center = () => container.getBoundingClientRect().top + top + card.getBoundingClientRect().height / 2;
   while (parent && parent !== document.body && parent !== document.documentElement) {
-    if (/(auto|scroll)/.test(getComputedStyle(parent).overflowY) && parent.scrollHeight > parent.clientHeight) {
+    if (!parent.classList.contains("overflow-x-auto") && /(auto|scroll)/.test(getComputedStyle(parent).overflowY) && parent.scrollHeight > parent.clientHeight) {
       parent.scrollTop += center() - bracketVisibleBounds(card).center;
       return;
     }
