@@ -2867,7 +2867,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       </span>
                   </div>
                   {/* Match cards */}
-                  <div className="relative" style={{ height: live(totalHeight, nextTotalHeight), ...(adaptiveRounds && roundIdx <= activeIdx && roundIdx < displayRounds.length - 1 ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
+                  <div className="relative" style={{ height: live(totalHeight, nextTotalHeight), ...(adaptiveRounds && roundIdx < activeIdx ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
                     {round.matches.map((match, matchIdx) => (
                       <div key={match.id} data-bracket-round={roundIdx} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: adaptiveRounds ? bracketLerp(adaptiveLayout.tops[roundIdx]?.[matchIdx] ?? 0, nextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx), minHeight: CARD_H }}>
                         {renderMatchCard(match)}
@@ -2882,7 +2882,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       const hasPlacement = currentPlacementRounds.some((r) => r.matches.length > 0) || showInlinePlacement;
 
                       return (
-                        <div className="absolute left-0 right-0" style={{ top: live(totalHeight / 2 + CARD_H / 2 + placementGap, nextTotalHeight / 2 + CARD_H / 2 + placementGap) }}>
+                        <div data-bracket-placement className="absolute left-0 right-0" style={{ top: live(totalHeight / 2 + CARD_H / 2 + placementGap, nextTotalHeight / 2 + CARD_H / 2 + placementGap) }}>
                           {showInlinePlacement && (
                             <div className="mb-2">
                               <div className="text-center mb-1.5">

@@ -20,3 +20,9 @@ export function bracketLerp(from: number, to: number, unit = "px") {
   if (Math.abs(to - from) < 0.01) return `${from}${unit}`;
   return `calc(${from}${unit} + ${to - from}${unit} * var(--bf, 0))`;
 }
+
+/** Follow the source encounter, not whichever successor happens to be nearest. */
+export function bracketSuccessorIndex(source: number, sourceCount: number, targetCount: number) {
+  if (sourceCount <= 0 || targetCount <= 0) return 0;
+  return Math.min(targetCount - 1, Math.floor(source * targetCount / sourceCount));
+}

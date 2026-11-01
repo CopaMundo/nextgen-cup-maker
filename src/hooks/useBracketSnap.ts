@@ -1,5 +1,6 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { flushSync } from "react-dom";
+import { bracketSuccessorIndex } from "@/lib/adaptiveBracketLayout";
 
 function verticalScroller(element: HTMLElement): HTMLElement {
   let parent = element.parentElement;
@@ -25,6 +26,13 @@ function nearestCard(element: HTMLElement, scroller: HTMLElement, round: number)
   return best as HTMLElement | null;
 }
 
+function successorCard(element: HTMLElement, source: HTMLElement, from: number, to: number) {
+  const sources = Array.from(element.querySelectorAll<HTMLElement>(`[data-bracket-round="${from}"]`));
+  const targets = Array.from(element.querySelectorAll<HTMLElement>(`[data-bracket-round="${to}"]`));
+  const index = sources.indexOf(source);
+  return targets[bracketSuccessorIndex(Math.max(0, index), sources.length, targets.length)] ?? source;
+}
+
 /**
  * The geometry follows the finger: the rail exposes --bf, the fraction between
  * the base round and the next one, and cards interpolate their positions in CSS.
@@ -38,6 +46,13 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
+    let previousProgress = Math.max(0, element.scrollLeft / (columnWidth || 1));
+    let tracked: HTMLElement | null = null;
+    let trackingBase = -1;
+    let trackingDirection = 0;
+    let originCentre = 0;
+    let desiredCentre = 0;
+    let originFraction = 0;
     const apply = () => {
       const last = Math.max(0, roundCount - 1);
       const progress = Math.max(0, Math.min(last, element.scrollLeft / (columnWidth || 1)));
@@ -45,15 +60,45 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       const fraction = roundCount > 1 ? Math.min(1, progress - nextBase) : 0;
       const shown = Math.round(progress);
       const scroller = verticalScroller(element);
-      // Hold the round being entered/left after the base: its cards are the ones that move.
-      const anchor = nearestCard(element, scroller, Math.min(base.current + 1, last));
-      const before = anchor?.getBoundingClientRect().top;
+      const direction = Math.sign(progress - previousProgress) || trackingDirection || 1;
+      if (nextBase !== trackingBase || direction !== trackingDirection || !tracked?.isConnected) {
+        // Capture the source visible to the viewer before changing either endpoint.
+        const sourceRound = direction > 0 ? nextBase : Math.min(nextBase + 1, last);
+        const source = nearestCard(element, scroller, sourceRound);
+        const targetRound = direction > 0 ? Math.min(nextBase + 1, last) : nextBase;
+        tracked = source ? successorCard(element, source, sourceRound, targetRound) : null;
+        trackingBase = nextBase;
+        trackingDirection = direction;
+        originFraction = fraction;
+        if (tracked) {
+          const rect = tracked.getBoundingClientRect();
+          originCentre = rect.top + rect.height / 2;
+          const sourceRect = source?.getBoundingClientRect();
+          desiredCentre = sourceRect ? sourceRect.top + sourceRect.height / 2 : originCentre;
+        }
+      }
+      const beforeRect = tracked?.getBoundingClientRect();
+      const before = beforeRect ? beforeRect.top + beforeRect.height / 2 : undefined;
       if (nextBase !== base.current) { base.current = nextBase; flushSync(() => onBase(nextBase)); }
       element.style.setProperty("--bf", fraction.toFixed(4));
-      if (anchor && before !== undefined) {
-        const delta = anchor.getBoundingClientRect().top - before;
+      // Only visible columns determine the viewport height. Outgoing cards remain
+      // reachable until they actually leave horizontally, instead of being cut off
+      // by the shrinking incoming round. Offscreen columns cannot enlarge the rail.
+      const railRect = element.getBoundingClientRect();
+      let bottom = 0;
+      element.querySelectorAll<HTMLElement>("[data-bracket-round], [data-bracket-placement]").forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (rect.right > railRect.left + 1 && rect.left < railRect.right - 1) bottom = Math.max(bottom, rect.bottom - railRect.top);
+      });
+      if (bottom > 0) element.style.height = `${Math.ceil(bottom + 20)}px`;
+      if (tracked && before !== undefined) {
+        const rect = tracked.getBoundingClientRect();
+        const travel = direction > 0 ? (fraction - originFraction) / Math.max(0.0001, 1 - originFraction) : (originFraction - fraction) / Math.max(0.0001, originFraction);
+        const desired = originCentre + (desiredCentre - originCentre) * Math.max(0, Math.min(1, travel));
+        const delta = rect.top + rect.height / 2 - desired;
         if (Math.abs(delta) > 0.5) scroller.scrollBy({ top: delta, behavior: "instant" as ScrollBehavior });
       }
+      previousProgress = progress;
       if (shown !== indicator.current) { indicator.current = shown; onIndicator?.(shown); }
     };
     const resize = new ResizeObserver(() => { onWidth?.(element.clientWidth); });
