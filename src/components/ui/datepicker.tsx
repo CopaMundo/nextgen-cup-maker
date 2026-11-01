@@ -315,6 +315,7 @@ export function DatePicker({
               locale={nl}
               weekStartsOn={1}
               showOutsideDays={false}
+              disabled={isDayDisabled}
               components={{ Caption: () => null }}
               className="p-3 pt-1 pointer-events-auto"
               classNames={{
