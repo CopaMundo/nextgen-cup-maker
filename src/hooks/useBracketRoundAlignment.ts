@@ -4,6 +4,7 @@ import { alignBracketTop, bracketSuccessorIndex, bracketVisibleBounds, centerBra
 export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeRound: number, enabled = true) {
   const previousRound = useRef(activeRound);
   const anchor = useRef<{ round: number; index: number; counts: number[] } | null>(null);
+  const focusedName = useRef("");
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element || !enabled) return;
@@ -26,6 +27,7 @@ export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeR
         counts[round] = Math.max(counts[round] ?? 0, Number(card.dataset.bracketIndex) + 1);
       });
       anchor.current = { round: previousRound.current, index: Number(closest.dataset.bracketIndex), counts };
+      focusedName.current = closest.dataset.bracketName ?? "";
     };
     document.addEventListener("scroll", capture, true);
     element.addEventListener("pointerdown", capture);
@@ -40,11 +42,19 @@ export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeR
     previousRound.current = activeRound;
     if (!ref.current || !enabled) return;
     const tracked = anchor.current;
-    const index = tracked ? bracketSuccessorIndex(tracked.index, tracked.round, activeRound, tracked.counts) : 0;
+    let index = tracked ? bracketSuccessorIndex(tracked.index, tracked.round, activeRound, tracked.counts) : 0;
+    if (tracked && activeRound === tracked.round + 1 && focusedName.current) {
+      const linked = Array.from(ref.current.querySelectorAll<HTMLElement>(`[data-bracket-round="${activeRound}"]`)).find(card => {
+        try { return (JSON.parse(card.dataset.bracketFeeders ?? "[]") as string[]).includes(focusedName.current); }
+        catch { return false; }
+      });
+      if (linked) index = Number(linked.dataset.bracketIndex);
+    }
     const target = ref.current.querySelector<HTMLElement>(`[data-bracket-round="${activeRound}"][data-bracket-index="${index}"]`);
     if (target && tracked) centerBracketMatch(target);
     else alignBracketTop(ref.current);
     if (tracked) anchor.current = { ...tracked, round: activeRound, index };
+    focusedName.current = target?.dataset.bracketName ?? "";
     // Transforming mobile cards can change their containing block during animation.
     const finish = () => {
       const current = ref.current?.querySelector<HTMLElement>(`[data-bracket-round="${activeRound}"][data-bracket-index="${index}"]`);
