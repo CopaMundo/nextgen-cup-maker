@@ -906,7 +906,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               const opacity = 1;
               const yFrom = (matchIdx: number) => TOP_OFFSET + (mobileLayout.tops[roundIdx]?.[matchIdx] ?? 0);
               const yTo = (matchIdx: number) => TOP_OFFSET + (mobileNextLayout.tops[roundIdx]?.[matchIdx] ?? 0);
-              const clipped = roundIdx < activeRound;
 
               return (
                 <div
@@ -924,7 +923,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                         {round.name}
                       </span>
                     </div>
-                    <div className="relative" style={{ height: mobileTotalH, ...(clipped ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
+                    <div className="relative" style={{ height: mobileTotalH }}>
                       {round.matches.map((match: any, matchIdx: number) => {
                         return (
                           <div
@@ -1198,7 +1197,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     {round.name}
                   </span>
                 </div>
-                <div className="relative" style={{ height: roundHeight, ...(adaptiveDesktop && roundIdx < activeRound ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
+                <div className="relative" style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
                     <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: adaptiveDesktop ? bracketLerp(desktopTop(roundIdx, matchIdx), desktopNextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx) }}>
                       {renderMatchCard(match, false, false)}

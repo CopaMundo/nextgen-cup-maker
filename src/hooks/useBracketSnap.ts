@@ -89,10 +89,13 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       // reachable until they actually leave horizontally, instead of being cut off
       // by the shrinking incoming round. Offscreen columns cannot enlarge the rail.
       const railRect = element.getBoundingClientRect();
+      const railStyle = getComputedStyle(element);
+      const visibleLeft = railRect.left + (parseFloat(railStyle.paddingLeft) || 0);
+      const visibleRight = railRect.right - (parseFloat(railStyle.paddingRight) || 0);
       let bottom = 0;
       element.querySelectorAll<HTMLElement>("[data-bracket-round], [data-bracket-placement]").forEach(card => {
         const rect = card.getBoundingClientRect();
-        if (rect.right > railRect.left + 1 && rect.left < railRect.right - 1) bottom = Math.max(bottom, rect.bottom - railRect.top);
+        if (rect.right > visibleLeft + 1 && rect.left < visibleRight - 1) bottom = Math.max(bottom, rect.bottom - railRect.top);
       });
       if (bottom > 0) element.style.height = `${Math.ceil(bottom + 20)}px`;
       if (tracked && before !== undefined) {
