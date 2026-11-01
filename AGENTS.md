@@ -1,4 +1,5 @@
 # Architecture rules
+- Scope compact bracket geometry and schedule-metadata hiding to the Indeling caller via BracketView's compact presentation prop; retain shared tree/assignment/settings logic and read-only scores, leaving Results and public geometry unchanged.
 - Keep locale date formatting year-inclusive in the shared date utility, including caller-provided options, so compact matchday labels cannot silently omit the year.
 
 - Keep referee overview presentation separate from RefereeManager persistence and draft dialogs; bounded card rows and portaled details keep desktop/mobile geometry stable without changing scheduling rules.
