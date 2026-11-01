@@ -3264,7 +3264,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             {/* Field columns */}
             <div className={cn("flex-1 min-w-0 relative", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="flex items-center justify-between gap-2 px-2 py-1 print:hidden">
+              <div className="sticky top-0 z-20 flex h-9 items-center justify-between gap-2 bg-background px-2 py-1 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
@@ -3395,12 +3395,24 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
 
 
 
-                    {/* Only names remain visible; the original header and actions scroll away. */}
-                    <div className="pointer-events-none sticky top-0 z-10 h-9 -mb-9 overflow-hidden px-2 pt-1 print:hidden" aria-label="Veldnamen">
+                    {/* Field headers stay above the matches and follow horizontal scrolling. */}
+                    <div className="sticky top-9 z-10 h-[59px] -mb-[59px] overflow-hidden bg-background px-2 pt-1 print:hidden" aria-label="Veldnamen">
                       <div ref={fieldNameRailRef} className="flex min-w-full w-full md:w-max gap-2 md:gap-4 pr-4">
-                        {visibleFieldData.map(({ field }) => (
-                          <div key={field.name} className={cn("min-w-0 border border-transparent px-3 py-2", isMobile ? "flex-1" : "w-[330px] shrink-0")}>
-                            <h4 className="w-fit max-w-full truncate bg-card font-display text-sm font-bold text-foreground" title={displayFieldName(field.name)}>{displayFieldName(field.name)}</h4>
+                        {visibleFieldData.map(({ field, fieldMatches }) => (
+                          <div key={field.name} className={cn("h-[54px] min-w-0 rounded-t-lg border border-primary/30 bg-card", isMobile ? "flex-1" : "w-[330px] shrink-0")}>
+                            <div className="h-full bg-primary/10 px-3 py-2" data-planner-drop-zone="true"
+                              onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
+                              onDrop={(e) => handleDrop(e, field.name, 0)}
+                              onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}>
+                              <div className="flex min-w-0 items-center justify-between gap-2">
+                                <h4 className="min-w-0 truncate font-display text-sm font-bold text-foreground" title={displayFieldName(field.name)}>{displayFieldName(field.name)}</h4>
+                                <div className="flex shrink-0 items-center gap-1">
+                                  <Button variant="ghost" size="icon" className="h-5 w-5 text-muted-foreground" aria-label={`Veld bewerken: ${displayFieldName(field.name)}`} onClick={(e) => { e.stopPropagation(); setEditFieldDraft({ name: stripLocationPrefix(field.name, field.location), startTime: field.startTime ?? "", location: field.location ?? null }); setEditFieldIdx(fields.indexOf(field)); }}><Pencil className="h-3 w-3" /></Button>
+                                  <Button variant="ghost" size="icon" className="h-5 w-5 text-muted-foreground hover:text-destructive" aria-label={`Veld verwijderen: ${displayFieldName(field.name)}`} onClick={(e) => { e.stopPropagation(); setDeleteFieldIdx(fields.indexOf(field)); }}><Trash2 className="h-3 w-3" /></Button>
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-muted-foreground">{field.startTime}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -3417,7 +3429,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
                               onDrop={(e) => handleDrop(e, field.name, 0)}
                               onClick={() => { if (isMobile && mobileSelectedMatchId) handleMobilePlaceMatch(field.name, fieldMatches.length); }}
-                              className={`rounded-t-lg bg-primary/10 border-b border-primary/30 px-3 py-2 transition-colors ${previewField === field.name && previewIndex === 0 && dragItemId ? "bg-primary/20" : ""} ${isMobile && mobileSelectedMatchId ? "cursor-pointer hover:bg-primary/15" : ""}`}
+                              className="invisible h-[54px] print:visible rounded-t-lg bg-primary/10 border-b border-primary/30 px-3 py-2"
                             >
                               <div className="flex items-center justify-between">
                                 <h4 aria-hidden="true" className="invisible print:visible font-display text-sm font-bold text-foreground">{displayFieldName(field.name)}</h4>
