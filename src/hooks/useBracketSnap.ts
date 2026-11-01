@@ -53,6 +53,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
     let originCentre = 0;
     let desiredCentre = 0;
     let originFraction = 0;
+    let lastVertical = verticalScroller(element).scrollTop;
     const apply = () => {
       const last = Math.max(0, roundCount - 1);
       const progress = Math.max(0, Math.min(last, element.scrollLeft / (columnWidth || 1)));
@@ -61,7 +62,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       const shown = Math.round(progress);
       const scroller = verticalScroller(element);
       const direction = Math.sign(progress - previousProgress) || trackingDirection || 1;
-      if (nextBase !== trackingBase || direction !== trackingDirection || !tracked?.isConnected) {
+      if (nextBase !== trackingBase || direction !== trackingDirection || !tracked?.isConnected || Math.abs(scroller.scrollTop - lastVertical) > 1) {
         // Capture the source visible to the viewer before changing either endpoint.
         const sourceRound = direction > 0 ? nextBase : Math.min(nextBase + 1, last);
         const source = nearestCard(element, scroller, sourceRound);
@@ -69,7 +70,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
         tracked = source ? successorCard(element, source, sourceRound, targetRound) : null;
         trackingBase = nextBase;
         trackingDirection = direction;
-        originFraction = fraction;
+        originFraction = Math.max(0, Math.min(1, previousProgress - nextBase));
         if (tracked) {
           const rect = tracked.getBoundingClientRect();
           originCentre = rect.top + rect.height / 2;
@@ -99,6 +100,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
         if (Math.abs(delta) > 0.5) scroller.scrollBy({ top: delta, behavior: "instant" as ScrollBehavior });
       }
       previousProgress = progress;
+      lastVertical = scroller.scrollTop;
       if (shown !== indicator.current) { indicator.current = shown; onIndicator?.(shown); }
     };
     const resize = new ResizeObserver(() => { onWidth?.(element.clientWidth); });
