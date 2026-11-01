@@ -2829,34 +2829,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
   const toggleSchedRound = (key: string) => {
     setSchedRounds(prev => {
       const next = prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key];
-      // Sync: deselect groups/brackets whose rounds are ALL deselected
-      syncBracketsFromRounds(next);
       return next;
     });
-  };
-  const setSchedRoundsAndSync = (nextRounds: string[]) => {
-    setSchedRounds(nextRounds);
-    syncBracketsFromRounds(nextRounds);
-  };
-  const syncBracketsFromRounds = (activeRounds: string[]) => {
-    const activePhaseIds = new Set(activeRounds.map(k => k.split(":")[0]));
-    // For each selected group, check if it still has rounds selected
-    setSchedGroups(prev => {
-      const groupPhaseTypes = new Set(["group", "round_robin"]);
-      return prev.filter(gId => {
-        const group = allGroups.find(g => g.id === gId);
-        if (!group) return false;
-        const phase = phases.find(p => p.id === group.phase_id);
-        if (!phase || !groupPhaseTypes.has(phase.phase_type)) return false;
-        // Check if any round from this group's phase is still active
-        return activeRounds.some(k => k.startsWith(phase.id + ":"));
-      });
-    });
-    // For each selected bracket, check if it still has rounds selected
-    setSchedFormats(prev => prev.filter(compositeKey => {
-      const phaseId = compositeKey.split(":")[0];
-      return activePhaseIds.has(phaseId);
-    }));
   };
   const toggleSchedField = (fn: string) => {
     setSchedFields(prev => prev.includes(fn) ? prev.filter(x => x !== fn) : [...prev, fn]);
@@ -3139,11 +3113,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
       <div className="flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
 
         {/* ===== PLANNER VIEW ===== */}
-        <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-hidden">
+        <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-y-auto">
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
           {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
           {tournamentDates.length > 0 ? (
-            <div className={cn("px-2 pt-2 pb-0 mb-5 print:hidden shrink-0 sticky top-0 z-30 bg-background/95 backdrop-blur-sm", !isMobile && "flex min-w-0 items-start gap-3")}>
+            <div className={cn("px-2 pt-2 pb-0 mb-5 print:hidden shrink-0", !isMobile && "flex min-w-0 items-start gap-3")}>
               <div className="min-w-0 flex-1">
               <DateStripNav
                 dates={tournamentDates}
@@ -3285,11 +3259,11 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
           </Dialog>
 
           {/* Main layout: field columns + right sidebar */}
-          <div className="flex gap-0 mt-0 md:items-stretch md:flex-1 md:min-h-0 md:overflow-hidden">
+          <div className="flex shrink-0 gap-0 mt-0 md:items-start">
             {/* Field columns */}
-            <div className={cn("flex-1 min-w-0 relative md:min-h-0 md:overflow-y-auto", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
+            <div className={cn("flex-1 min-w-0 relative", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
-              <div className="sticky top-0 z-20 flex items-center justify-between gap-2 bg-background/95 backdrop-blur-sm px-2 py-1 print:hidden">
+              <div className="flex items-center justify-between gap-2 px-2 py-1 print:hidden">
                 <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
@@ -3771,7 +3745,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               ref={plannerSidebarRef}
               className={cn(
                 "print:hidden flex flex-col overflow-hidden overscroll-contain transition-colors",
-                isMobile ? "fixed inset-0 z-50 bg-background" : "ml-2 w-72 shrink-0 rounded-lg border border-border bg-card sticky top-0 h-[calc(100dvh-8rem)] md:h-full",
+                isMobile ? "fixed inset-0 z-50 bg-background" : "ml-2 w-72 shrink-0 rounded-lg border border-border bg-card sticky top-0 h-[calc(100dvh-8rem)]",
                 dragItemId && dragOverField === "__unscheduled__" ? "bg-primary/5 ring-2 ring-inset ring-primary/50" : ""
               )}
               onDragOver={(e) => {
@@ -3799,21 +3773,21 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
               <div className="m-2 flex shrink-0 gap-1 rounded-lg bg-muted/60 p-1" role="group" aria-label="Plannerweergave">
                 <Button variant="ghost" size="icon"
                   onClick={() => setRightSidebarTab("plannen")}
-                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "plannen" ? "border-border bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
+                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "plannen" ? "border-input bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
                   title="Plannen" aria-label="Plannen" aria-pressed={rightSidebarTab === "plannen"}
                 >
                   <CalendarClockIcon className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon"
                   onClick={() => setRightSidebarTab("scheidsrechters")}
-                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "scheidsrechters" ? "border-border bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
+                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "scheidsrechters" ? "border-input bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
                   title="Scheidsrechters" aria-label="Scheidsrechters" aria-pressed={rightSidebarTab === "scheidsrechters"}
                 >
                   <WhistleIcon className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon"
                   onClick={() => setRightSidebarTab("ongepland")}
-                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "ongepland" ? "border-border bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
+                  className={cn("h-7 flex-1 rounded-md border", rightSidebarTab === "ongepland" ? "border-input bg-card text-primary shadow-sm" : "border-transparent text-muted-foreground hover:text-foreground")}
                   title="Niet gepland" aria-label="Niet gepland" aria-pressed={rightSidebarTab === "ongepland"}
                 >
                   <CalendarXIcon className="h-4 w-4" />
@@ -3915,7 +3889,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 {hasSelection && !noBracketsSelected ? (
                                   <span className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded text-[10px]">
                                     {displayLabel}
-                                    <button onClick={(e) => { e.stopPropagation(); setSchedRoundsAndSync([]); }} className="text-muted-foreground hover:text-destructive"><X className="h-2.5 w-2.5" /></button>
+                                    <button aria-label="Rondeselectie wissen" onClick={(e) => { e.stopPropagation(); setSchedRounds([]); }} className="text-muted-foreground hover:text-destructive"><X className="h-2.5 w-2.5" /></button>
                                   </span>
                                 ) : (
                                   <span className="text-muted-foreground">{displayLabel}</span>
@@ -3934,7 +3908,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                                 ) : (
                                   <>
                                     <label className="flex items-center gap-2 px-3 py-2 text-xs cursor-pointer hover:bg-secondary/50 border-b border-border font-semibold">
-                                      <Checkbox checked={allSelected} onCheckedChange={() => setSchedRoundsAndSync(allSelected ? [] : rounds.map(r => r.key))} className="h-3.5 w-3.5" />
+                                      <Checkbox checked={allSelected} onCheckedChange={() => setSchedRounds(allSelected ? [] : rounds.map(r => r.key))} className="h-3.5 w-3.5" />
                                       Alle rondes
                                     </label>
                                     {rounds.map(r => (
