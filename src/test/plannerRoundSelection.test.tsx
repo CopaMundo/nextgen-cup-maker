@@ -40,7 +40,7 @@ async function selectParents() {
 }
 
 function expectParentsSelected(parents: HTMLElement) {
-  if (!within(parents).queryByRole("checkbox")) {
+  if (within(parents).queryAllByRole("checkbox").length === 0) {
     fireEvent.click(parents.querySelector("button") as HTMLButtonElement);
   }
   const choices = within(parents).getAllByRole("checkbox");
