@@ -1,5 +1,5 @@
 # Architecture rules
-- Use BracketView's compact presentation for Indeling and Results popups, hiding schedule metadata only on cards while retaining it in clicked match details; equal grid team rows share available height, and Results owns both-axis scrolling via scrollInParent. Preserve public geometry and shared assignment/settings logic.
+- Use BracketView's compact presentation for Indeling and Results popups, hiding schedule metadata only on cards while retaining it in clicked match details; equal grid team rows share available height. Results opts into AdaptiveBracketRail for both-axis scrolling and active-round density with neighboring rounds peeking; other callers retain scrollInParent behavior. Preserve public geometry and shared assignment/settings logic.
 - Compute displayed home/away totals with the pure bracketAggregate helper in first-leg orientation; presentation changes must not alter score persistence or winner propagation.
 - Keep locale date formatting year-inclusive in the shared date utility, including caller-provided options, so compact matchday labels cannot silently omit the year.
 
