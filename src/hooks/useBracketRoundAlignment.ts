@@ -36,7 +36,7 @@ export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeR
       document.removeEventListener("scroll", capture, true);
       element.removeEventListener("pointerdown", capture);
     };
-  }, [ref, enabled]);
+  });
   useLayoutEffect(() => {
     if (previousRound.current === activeRound) return;
     previousRound.current = activeRound;
