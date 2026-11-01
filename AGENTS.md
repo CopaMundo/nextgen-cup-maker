@@ -1,5 +1,6 @@
 # Architecture rules
-- Scope compact bracket geometry and schedule-metadata hiding to the Indeling caller via BracketView's compact presentation prop; retain shared tree/assignment/settings logic and read-only scores, leaving Results and public geometry unchanged.
+- Use BracketView's compact presentation for Indeling and Results popups, hiding schedule metadata only on cards while retaining it in clicked match details; equal grid team rows share available height, and Results owns both-axis scrolling via scrollInParent. Preserve public geometry and shared assignment/settings logic.
+- Compute displayed home/away totals with the pure bracketAggregate helper in first-leg orientation; presentation changes must not alter score persistence or winner propagation.
 - Keep locale date formatting year-inclusive in the shared date utility, including caller-provided options, so compact matchday labels cannot silently omit the year.
 
 - Keep referee overview presentation separate from RefereeManager persistence and draft dialogs; bounded card rows and portaled details keep desktop/mobile geometry stable without changing scheduling rules.

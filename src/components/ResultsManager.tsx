@@ -1911,6 +1911,8 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     const awayScore = match.away_score;
     const showPenalties = resolveMatchNeedsDecider(match);
     const needsPenaltiesFilled = showPenalties && (match.home_penalties === null || match.away_penalties === null || match.home_penalties === match.away_penalties);
+    const penaltyLabel = showPenalties && match.home_penalties !== null && match.away_penalties !== null
+      ? `(${match.home_penalties}-${match.away_penalties})` : null;
     const homeName = getDisplayName(match, "home");
     const awayName = getDisplayName(match, "away");
 
@@ -1942,14 +1944,16 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             </div>
 
             {/* Score box */}
-            <div className={cn(scoreBoxBase, scoreBoxState)}>
+            <div className={cn(scoreBoxBase, scoreBoxState, "whitespace-nowrap")} title={needsPenaltiesFilled ? "Vul de beslissende score in" : undefined}>
               <span className="w-5 text-center text-[15px] font-bold tabular-nums text-foreground">
                 {match.home_score ?? "–"}
               </span>
-              <span className="text-[13px] font-bold text-muted-foreground">:</span>
+              <span className="text-[13px] font-bold text-muted-foreground">-</span>
               <span className="w-5 text-center text-[15px] font-bold tabular-nums text-foreground">
                 {match.away_score ?? "–"}
               </span>
+              {penaltyLabel && <span className="text-[10px] tabular-nums text-muted-foreground">{penaltyLabel}</span>}
+              {needsPenaltiesFilled && <span className="text-destructive" aria-label="Vul de beslissende score in">*</span>}
             </div>
 
             {/* Away team */}
@@ -1959,14 +1963,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             </div>
           </div>
 
-          {showPenalties && match.home_penalties !== null && match.away_penalties !== null && (
-            <div className="mt-1.5 text-center text-[10px] text-muted-foreground">
-              ({match.home_penalties} - {match.away_penalties} pen.)
-            </div>
-          )}
-          {showPenalties && needsPenaltiesFilled && (
-            <p className="mt-1 text-center text-[10px] font-medium text-destructive">Vul de beslissende score in</p>
-          )}
         </button>
       );
     }
@@ -2033,24 +2029,27 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
           {/* Teams + score */}
           <div className="flex flex-col items-center gap-0 min-w-0">
-            <div className="grid grid-cols-[1fr_5rem_1fr] gap-2 items-center w-full">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center w-full">
               <div className="flex items-center gap-1 justify-end min-w-0">
                 <span className="font-medium text-foreground text-xs truncate text-right">{homeName}</span>
                 {teamLogo(match.home_team_id) && <img src={teamLogo(match.home_team_id)!} className="h-4 w-4 object-contain flex-shrink-0" />}
               </div>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => canEditMatch(match) && setScoreEntryMatchId(match.id)}
-                className={`flex items-center justify-center gap-0.5 rounded border px-1.5 py-0.5 ${match.is_played ? 'border-primary' : 'border-input'} ${canEditMatch(match) ? "cursor-pointer hover:bg-secondary/50 transition-colors" : "cursor-default"}`}
+                title={needsPenaltiesFilled ? "Vul de beslissende score in" : "Wedstrijdscore"}
+                className={`flex h-7 min-w-20 items-center justify-center gap-1 whitespace-nowrap rounded border px-1.5 py-0.5 ${match.is_played ? 'border-primary' : 'border-input'} ${canEditMatch(match) ? "cursor-pointer hover:bg-secondary/50 transition-colors" : "cursor-default"}`}
               >
                 <span className="h-5 w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
                   {match.home_score ?? "–"}
                 </span>
-                <span className="text-xs font-bold text-muted-foreground">:</span>
+                <span className="text-xs font-bold text-muted-foreground">-</span>
                 <span className="h-5 w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
                   {match.away_score ?? "–"}
                 </span>
-              </button>
+                {penaltyLabel && <span className="text-[10px] tabular-nums text-muted-foreground">{penaltyLabel}</span>}
+                {needsPenaltiesFilled && <span className="text-destructive" aria-label="Vul de beslissende score in">*</span>}
+              </Button>
 
               <div className="flex items-center gap-1 min-w-0">
                 {teamLogo(match.away_team_id) && <img src={teamLogo(match.away_team_id)!} className="h-4 w-4 object-contain flex-shrink-0" />}
@@ -2058,14 +2057,6 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               </div>
             </div>
 
-            {showPenalties && match.home_penalties !== null && match.away_penalties !== null && (
-              <div className="text-[9px] text-muted-foreground text-center leading-tight">
-                ({match.home_penalties} - {match.away_penalties} pen.)
-              </div>
-            )}
-            {showPenalties && needsPenaltiesFilled && (
-              <p className="text-[9px] text-destructive text-center font-medium leading-tight">Vul de beslissende score in</p>
-            )}
           </div>
 
 
@@ -2271,9 +2262,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const formatGroups = openFormat ? groups.filter(g => g.phase_id === openFormat.id) : [];
         return (
           <Dialog open={!!openFormat} onOpenChange={(open) => { if (!open) setExpandedFormats(new Set()); }}>
-            <DialogContent scrollable={false} className="max-w-2xl max-h-[80vh] overflow-hidden p-0">
+            <DialogContent scrollable={false} className="max-w-2xl max-h-[80dvh] overflow-hidden p-0 [&>div:first-child]:flex [&>div:first-child]:flex-col">
               <div className="flex h-full max-h-[80vh] flex-col">
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-16 sm:p-6 sm:pb-16">
+                <div className="min-h-0 flex-1 space-y-4 overflow-auto p-4 pb-16 sm:p-6 sm:pb-16">
                   <DialogHeader>
                     <DialogTitle>{openFormat?.name || ""}</DialogTitle>
                   </DialogHeader>
@@ -2294,6 +2285,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       scoreEditable={false}
                       showRandomAssign={false}
                       compact
+                      scrollInParent
                       tournament={tournament}
                       refreshKey={resultsRefreshKey}
                     />
@@ -2701,10 +2693,11 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const bracketFormat = bracketDialogFormatId ? phases.find(p => p.id === bracketDialogFormatId) : null;
         return (
           <Dialog open={!!bracketDialogFormatId} onOpenChange={(open) => { if (!open) setBracketDialogFormatId(null); }}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogContent scrollable={false} className="max-w-2xl max-h-[80dvh] overflow-hidden [&>div:first-child]:flex [&>div:first-child]:flex-col">
               <DialogHeader>
                 <DialogTitle>{bracketFormat?.name || "Bracket"}</DialogTitle>
               </DialogHeader>
+              <div className="min-h-0 flex-1 overflow-auto overscroll-contain pb-2" aria-label="Bracketboom">
               {bracketFormat && (
                 <BracketView
                   tournamentId={tournamentId}
@@ -2713,10 +2706,12 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   scoreEditable={false}
                   showRandomAssign={false}
                   compact
+                  scrollInParent
                   tournament={tournament}
                   refreshKey={resultsRefreshKey}
                 />
               )}
+              </div>
             </DialogContent>
           </Dialog>
         );
