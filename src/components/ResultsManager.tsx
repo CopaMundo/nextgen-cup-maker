@@ -2293,6 +2293,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       editable={false}
                       scoreEditable={false}
                       showRandomAssign={false}
+                      compact
                       tournament={tournament}
                       refreshKey={resultsRefreshKey}
                     />
@@ -2711,6 +2712,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   editable={false}
                   scoreEditable={false}
                   showRandomAssign={false}
+                  compact
                   tournament={tournament}
                   refreshKey={resultsRefreshKey}
                 />
