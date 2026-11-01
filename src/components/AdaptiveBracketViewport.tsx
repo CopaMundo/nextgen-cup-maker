@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useBracketRoundAlignment } from "@/hooks/useBracketRoundAlignment";
 
 interface ViewportState {
   activeRound: number;
@@ -15,6 +16,7 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
   const ref = useRef<HTMLDivElement>(null);
   const [activeRound, setActiveRound] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
+  useBracketRoundAlignment(ref, activeRound);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;

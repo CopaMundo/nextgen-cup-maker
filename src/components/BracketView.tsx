@@ -122,7 +122,7 @@ const formatDateDMY = (d: string | null) => {
   return d;
 };
 
-const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, showRandomAssign = true, showScores = true, compact = false, scrollInParent = false, adaptiveRounds = false, filterGroupIds, tournament, refreshKey, onSlotChange }: BracketViewProps) => {
+const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, showRandomAssign = true, showScores = true, compact = false, scrollInParent = false, adaptiveRounds = compact, filterGroupIds, tournament, refreshKey, onSlotChange }: BracketViewProps) => {
   const isMobile = useIsMobile();
   const effectiveScoreEditable = scoreEditable ?? editable;
 
@@ -2822,9 +2822,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
     const activeCount = displayRounds[activeIdx]?.matches.length ?? firstRoundCount;
-    // Only the card geometry converges; reserve the first-round footprint for the next tree.
+    // The viewport aligns on round changes so the outer tree can shrink with the active round.
     const totalHeight = adaptiveRounds ? activeCount * CARD_H + Math.max(0, activeCount - 1) * GAP : defaultTotalHeight;
-    const compactHeight = Math.max(defaultTotalHeight, defaultTotalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
+    const compactHeight = Math.max(totalHeight, totalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
     // Active and earlier rounds stack under each other; every later card sits exactly in the middle of its two feeders.
     const adaptiveLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeIdx, CARD_H, GAP);
     const roundTop = (roundIndex: number, idx: number) => {
@@ -2839,7 +2839,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
     return (
       <div className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto overscroll-x-contain"} ${compact ? "pb-2" : "pb-4"}`}>
-        <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : defaultTotalHeight + 200 }}>
+        <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
             const getTop = (idx: number) => roundTop(roundIdx, idx);
@@ -2868,7 +2868,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     )}
                   </div>
                   {/* Match cards */}
-                  <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: adaptiveLayout.containerHeight }}>
+                  <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight }}>
                     {round.matches.map((match, matchIdx) => (
                       <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
                         {renderMatchCard(match)}
@@ -3078,8 +3078,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           const showSep = !isChild || (parentPrefix ? shouldShowSeparator(p, parentPrefix) : false);
           const displayName = getBracketName(p);
           return (
-            <div key={p} className="pt-8">
-              <div className="border-t border-border mb-4" />
+            <div key={p} className="pt-3">
+              <div className="border-t border-border mb-3" />
               <div className="flex items-center justify-between mb-2">
                 <h3 className={`text-sm font-bold text-foreground flex items-center gap-1 ${editable ? "cursor-pointer hover:text-primary" : ""}`}
                     onClick={() => { if (editable) { setEditingBracketName(p); setBracketNameEdit(getSubBracketName(p)); editingBracketRoundsRef.current = loserBrackets[p]; } }}>

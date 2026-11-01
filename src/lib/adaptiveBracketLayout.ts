@@ -3,9 +3,6 @@ export function adaptiveBracketLayout(counts: number[], activeRound: number, car
   const active = Math.max(0, Math.min(activeRound, counts.length - 1));
   const count = counts[active] ?? 0;
   const height = count * cardHeight + Math.max(0, count - 1) * gap;
-  // Reserve the complete first-round tree even when the active cards converge.
-  const firstCount = counts[0] ?? 0;
-  const containerHeight = firstCount * cardHeight + Math.max(0, firstCount - 1) * gap;
   const centers: number[][] = [];
   counts.forEach((size, round) => {
     const previous = centers[round - 1];
@@ -16,5 +13,5 @@ export function adaptiveBracketLayout(counts: number[], activeRound: number, car
       return height / size * (index + 0.5);
     }));
   });
-  return { active, height, containerHeight, tops: centers.map(round => round.map(center => center - cardHeight / 2)) };
+  return { active, height, tops: centers.map(round => round.map(center => center - cardHeight / 2)) };
 }
