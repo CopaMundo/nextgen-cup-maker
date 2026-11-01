@@ -3398,7 +3398,7 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                     {/* Field headers stay above the matches and follow horizontal scrolling. */}
                     <div className="sticky top-9 z-10 h-[59px] -mb-[59px] overflow-hidden bg-background px-2 pt-1 print:hidden" aria-label="Veldnamen">
                       <div ref={fieldNameRailRef} className="flex min-w-full w-full md:w-max gap-2 md:gap-4 pr-4">
-                        {visibleFieldData.map(({ field }) => (
+                        {visibleFieldData.map(({ field, fieldMatches }) => (
                           <div key={field.name} className={cn("h-[54px] min-w-0 rounded-t-lg border border-primary/30 bg-card", isMobile ? "flex-1" : "w-[330px] shrink-0")}>
                             <div className="h-full bg-primary/10 px-3 py-2" data-planner-drop-zone="true"
                               onDragOver={(e) => handleFieldColumnDragOver(e, field.name)}
