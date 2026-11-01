@@ -939,7 +939,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                             style={{
                               top: 0,
                               transform: `translateY(${y}px)`,
-                              transition: "transform 250ms ease",
+                              transition: "transform 300ms cubic-bezier(0.22,1,0.36,1)",
                               willChange: "transform",
                             }}
                           >
@@ -958,7 +958,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                             : (matchPositions.find(p => p.roundIdx === roundIdx && p.matchIdx === matchCount - 1)?.treeY ?? 0);
                         const placementTop = lastMatchY + CARD_H + GAP;
                         return (
-                          <div className="absolute left-0 right-0" style={{ transform: `translateY(${placementTop}px)`, transition: "transform 250ms ease" }}>
+                          <div className="absolute left-0 right-0" style={{ transform: `translateY(${placementTop}px)`, transition: "transform 300ms cubic-bezier(0.22,1,0.36,1)" }}>
                             {placementMatches.map((pm: any, pmIdx: number) => (
                               <div key={pm.id} style={{ marginTop: pmIdx > 0 ? 10 : 0 }}>
                                 <div className="text-center mb-1">
@@ -1089,7 +1089,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className="relative" style={{ height: sideHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
+                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 300ms cubic-bezier(0.22,1,0.36,1)" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
@@ -1205,7 +1205,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
+                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 300ms cubic-bezier(0.22,1,0.36,1)" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
