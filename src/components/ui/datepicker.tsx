@@ -218,16 +218,19 @@ export function DatePicker({
         />
         <Button
           type="button"
-          variant="ghost"
-          size="icon"
+          variant={hideInput && triggerLabel ? "outline" : "ghost"}
+          size={hideInput && triggerLabel ? "sm" : "icon"}
           aria-label="Open kalender"
           onClick={openDialog}
           className={cn(
-            "bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white",
-            hideInput ? "relative h-8 w-8" : "absolute right-0 top-0 h-full w-10"
+            hideInput && triggerLabel
+              ? "relative h-7 w-auto gap-1.5 rounded-md px-2 text-xs font-normal"
+              : "bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white",
+            hideInput && !triggerLabel ? "relative h-8 w-8" : !hideInput ? "absolute right-0 top-0 h-full w-10" : ""
           )}
         >
-          <CalendarIcon className="h-4 w-4" />
+          <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
+          {hideInput && triggerLabel && <span className="truncate">{triggerLabel}</span>}
         </Button>
       </div>
 
