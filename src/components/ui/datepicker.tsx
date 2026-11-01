@@ -30,6 +30,8 @@ interface DatePickerProps {
   hideInput?: boolean;
   availableDates?: string[];
   onInvalidPick?: (iso: string) => void;
+  /** Compact block trigger (icon + label) instead of a bare icon button; only with hideInput. */
+  triggerLabel?: string;
 }
 
 const MASK = "dd/mm/jjjj";
