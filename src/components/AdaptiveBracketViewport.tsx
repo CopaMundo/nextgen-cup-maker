@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useBracketRoundAlignment } from "@/hooks/useBracketRoundAlignment";
+import { useRef, useState, type ReactNode } from "react";
+import { useBracketSnap } from "@/hooks/useBracketSnap";
 
 interface ViewportState {
   activeRound: number;
@@ -16,23 +16,8 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
   const ref = useRef<HTMLDivElement>(null);
   const [activeRound, setActiveRound] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
-  useBracketRoundAlignment(ref, activeRound);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let raf = 0;
-    const update = () => {
-      setActiveRound(Math.max(0, Math.min(roundCount - 1, Math.round(el.scrollLeft / columnWidth))));
-      setViewportWidth(el.clientWidth);
-    };
-    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    update();
-    return () => { cancelAnimationFrame(raf); observer.disconnect(); el.removeEventListener("scroll", onScroll); };
-  }, [columnWidth, roundCount]);
-  return <div ref={ref} className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-2" aria-label="Bracketrondes">
+  useBracketSnap(ref, columnWidth, roundCount, setActiveRound, setViewportWidth);
+  return <div ref={ref} className="w-full min-w-0 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-2" aria-label="Bracketrondes">
     {children({ activeRound, viewportWidth, scrollToRound: round => ref.current?.scrollTo({ left: round * columnWidth, behavior: "smooth" }) })}
   </div>;
 }
