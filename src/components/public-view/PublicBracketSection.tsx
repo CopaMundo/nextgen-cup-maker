@@ -16,7 +16,6 @@ import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
-import { Button } from "@/components/ui/button";
 
 interface BracketSectionProps {
   groups: any[];
@@ -499,10 +498,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const mobileTotalH = activeCompactH + placementExtraH;
 
   useBracketSnap(scrollRef, isMobile ? MOBILE_COL_W : DESKTOP_COL_W, displayRounds.length, setActiveRound, setDesktopViewportW);
-  const scrollToRound = (round: number) => scrollRef.current?.scrollTo({ left: round * (isMobile ? MOBILE_COL_W : DESKTOP_COL_W), behavior: "smooth" });
-  const roundTabs = <div className="flex gap-1 overflow-x-auto overscroll-x-contain mb-2">
-    {displayRounds.map((round, index) => <Button key={round.id} variant="ghost" aria-pressed={index === activeRound} onClick={() => scrollToRound(index)} className={`h-7 shrink-0 px-2 text-[10px] ${index === activeRound ? "bg-primary/15 text-primary" : "text-muted-foreground"}`}>{round.name}</Button>)}
-  </div>;
 
   // Initialize active round on mount
   useEffect(() => {
@@ -885,7 +880,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       <>
       {renderUnifiedDialog()}
       <div className="relative">
-        {roundTabs}
 
         <div
           ref={scrollRef}
@@ -1174,7 +1168,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   return (
     <>
     {renderUnifiedDialog()}
-    {adaptiveDesktop && roundTabs}
     <div ref={adaptiveDesktop ? scrollRef : undefined} className="overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-4">
       <div className="flex" style={adaptiveDesktop ? { width: displayRounds.length * DESKTOP_COL_W + Math.max(0, desktopViewportW - DESKTOP_COL_W) } : undefined}>
         {displayRounds.map((round: any, roundIdx: number) => {

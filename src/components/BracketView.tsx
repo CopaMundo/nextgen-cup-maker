@@ -2817,7 +2817,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const inlinePlacementCount = inlinePlacementMatch && !placementIds.has(inlinePlacementMatch.id) ? 1 : 0;
     const placementCount = placementRounds.reduce((count, r) => count + r.matches.length, inlinePlacementCount);
     const placementGap = compact ? 20 : 48;
-    const renderTree = (adaptiveActiveRound = 0, adaptiveViewportW = 0, scrollAdaptiveToRound: (round: number) => void = () => {}) => {
+    const renderTree = (adaptiveActiveRound = 0, adaptiveViewportW = 0) => {
     const CARD_W = defaultCardWidth;
     const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
@@ -2857,15 +2857,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds ? { opacity: roundIdx < activeIdx ? 0.35 : 1, transition: "opacity 200ms ease" } : {}) }}>
                   {/* Header */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
-                    {adaptiveRounds ? (
-                      <Button variant="ghost" onClick={() => scrollAdaptiveToRound(roundIdx)} className={`text-[10px] font-bold uppercase tracking-wider h-6 px-2 py-0.5 rounded transition-colors ${roundIdx === activeIdx ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
-                        {getRoundDisplayName(round, bracketPrefix)}
-                      </Button>
-                    ) : (
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
                         {getRoundDisplayName(round, bracketPrefix)}
                       </span>
-                    )}
                   </div>
                   {/* Match cards */}
                   <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight }}>
@@ -2960,7 +2954,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     };
     return adaptiveRounds ? (
       <AdaptiveBracketViewport key={bracketPrefix ?? "main"} roundCount={displayRounds.length} columnWidth={defaultCardWidth + 24}>
-        {({ activeRound, viewportWidth, scrollToRound }) => renderTree(activeRound, viewportWidth, scrollToRound)}
+        {({ activeRound, viewportWidth }) => renderTree(activeRound, viewportWidth)}
       </AdaptiveBracketViewport>
     ) : renderTree();
   };
