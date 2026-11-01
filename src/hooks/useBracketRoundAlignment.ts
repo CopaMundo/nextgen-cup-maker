@@ -46,7 +46,10 @@ export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeR
     else alignBracketTop(ref.current);
     if (tracked) anchor.current = { ...tracked, round: activeRound, index };
     // Transforming mobile cards can change their containing block during animation.
-    const finish = () => { if (target && tracked) centerBracketMatch(target); };
+    const finish = () => {
+      const current = ref.current?.querySelector<HTMLElement>(`[data-bracket-round="${activeRound}"][data-bracket-index="${index}"]`);
+      if (current && tracked) centerBracketMatch(current);
+    };
     target?.addEventListener("transitionend", finish, { once: true });
     const observer = new ResizeObserver(finish);
     if (target && tracked) observer.observe(target);
