@@ -48,7 +48,9 @@ export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeR
     // Transforming mobile cards can change their containing block during animation.
     const finish = () => { if (target && tracked) centerBracketMatch(target); };
     target?.addEventListener("transitionend", finish, { once: true });
-    const settled = window.setTimeout(finish, 320);
-    return () => { window.clearTimeout(settled); target?.removeEventListener("transitionend", finish); };
+    const observer = new ResizeObserver(finish);
+    if (target && tracked) observer.observe(target);
+    const settled = window.setTimeout(() => { finish(); observer.disconnect(); }, 500);
+    return () => { observer.disconnect(); window.clearTimeout(settled); target?.removeEventListener("transitionend", finish); };
   }, [activeRound, ref, enabled]);
 }
