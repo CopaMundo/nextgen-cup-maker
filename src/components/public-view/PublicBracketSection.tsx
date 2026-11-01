@@ -16,6 +16,7 @@ import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
+import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 
 interface BracketSectionProps {
   groups: any[];
@@ -386,6 +387,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeRound, setActiveRound] = useState(0);
+  const [indicatorRound, setIndicatorRound] = useState(0);
   const isMobile = useIsMobile();
   const bStyle = useBroadcastStyle();
   const [desktopViewportW, setDesktopViewportW] = useState(0);
@@ -497,7 +499,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const placementExtraH = (CARD_H + GAP + 20) * placementMatches.length;
   const mobileTotalH = activeCompactH + placementExtraH;
 
-  useBracketSnap(scrollRef, isMobile ? MOBILE_COL_W : DESKTOP_COL_W, displayRounds.length, setActiveRound, setDesktopViewportW);
+  useBracketSnap(scrollRef, isMobile ? MOBILE_COL_W : DESKTOP_COL_W, displayRounds.length, setActiveRound, setDesktopViewportW, setIndicatorRound);
 
   // Initialize active round on mount
   useEffect(() => {
@@ -880,6 +882,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       <>
       {renderUnifiedDialog()}
       <div className="relative">
+        <BracketRoundIndicators count={displayRounds.length} active={indicatorRound} />
 
         <div
           ref={scrollRef}
@@ -1168,6 +1171,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   return (
     <>
     {renderUnifiedDialog()}
+    {adaptiveDesktop && <BracketRoundIndicators count={displayRounds.length} active={indicatorRound} />}
     <div ref={adaptiveDesktop ? scrollRef : undefined} className="overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-4">
       <div className="flex" style={adaptiveDesktop ? { width: displayRounds.length * DESKTOP_COL_W + Math.max(0, desktopViewportW - DESKTOP_COL_W) } : undefined}>
         {displayRounds.map((round: any, roundIdx: number) => {
