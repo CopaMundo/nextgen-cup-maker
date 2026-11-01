@@ -15,6 +15,7 @@ import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
+import { useBracketRoundAlignment } from "@/hooks/useBracketRoundAlignment";
 
 interface BracketSectionProps {
   groups: any[];
@@ -385,6 +386,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeRound, setActiveRound] = useState(0);
+  useBracketRoundAlignment(scrollRef, activeRound);
   const isMobile = useIsMobile();
   const bStyle = useBroadcastStyle();
   const rafId = useRef<number>(0);
@@ -491,10 +493,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     return byRound;
   }, [matchPositions, displayRounds.length, CARD_H]);
 
-  // Reserve first-round space and placement rows regardless of the horizontally active round.
-  const firstCompactH = TOP_OFFSET + firstRoundCount * COMPACT_SPACING + 16;
+  // Compact the outer tree with its active round; vertical alignment follows the round change.
+  const activeCount = displayRounds[activeRound]?.matches.length ?? firstRoundCount;
+  const activeCompactH = TOP_OFFSET + activeCount * COMPACT_SPACING + 16;
   const placementExtraH = (CARD_H + GAP + 20) * placementMatches.length;
-  const mobileTotalH = firstCompactH + placementExtraH;
+  const mobileTotalH = activeCompactH + placementExtraH;
 
   // Track scroll progress per round for opacity/position transitions
   const [roundProgress, setRoundProgress] = useState<number[]>(displayRounds.map(() => 0));
@@ -1023,11 +1026,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   }
 
   const desktopLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeRound, CARD_H, GAP);
-  const desktopTreeH = adaptiveDesktop ? desktopLayout.containerHeight : totalHeight;
+  const desktopTreeH = adaptiveDesktop ? desktopLayout.height : totalHeight;
   const desktopTop = (round: number, match: number) => desktopLayout.tops[round]?.[match] ?? 0;
 
   // === DESKTOP: keep broadcast cards, converge the round at the left edge ===
-  // Desktop uses fixed totalHeight based on first round - no dynamic collapsing
+  // Regular desktop follows active geometry; slideshow retains its fixed geometry.
   // Calculate the actual content height needed (placement below finale)
   const lastRoundMatchCount = displayRounds.length > 0 ? displayRounds[displayRounds.length - 1].matches.length : 1;
   const finaleTopDesktop = lastRoundMatchCount === 1 && displayRounds.length > 1
@@ -1036,11 +1039,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const placementBottomDesktop = placementMatches.length > 0
     ? finaleTopDesktop + CARD_H + GAP + (compactTree ? 4 : 16) + placementMatches.length * (CARD_H + (compactTree ? 10 : 36))
     : desktopTreeH;
-  const initialDesktopLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), 0, CARD_H, GAP);
-  const initialFinaleTop = initialDesktopLayout.tops[displayRounds.length - 1]?.[0] ?? 0;
-  const desktopContainerH = adaptiveDesktop
-    ? Math.max(desktopTreeH, initialFinaleTop + CARD_H + GAP + 16 + placementMatches.length * (CARD_H + 36))
-    : Math.max(totalHeight, placementBottomDesktop);
+  const desktopContainerH = Math.max(desktopTreeH, placementBottomDesktop);
 
   // === MIRRORED LAYOUT (presentation slideshow only) ===
   // Splits bracket into left + right halves meeting at the final in the center.
@@ -1586,7 +1585,7 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
 
       {/* Content */}
       {allRoundsToRender ? (
-        <div className={presentationCompact ? "space-y-0" : "space-y-8"} ref={!allRoundsToRender ? undefined : sectionContainerRef}>
+        <div className={presentationCompact ? "space-y-0" : "space-y-3"} ref={!allRoundsToRender ? undefined : sectionContainerRef}>
           {allRoundsToRender.map((section, idx) => (
             <div key={section.section} data-bracket-group={section.rounds.flatMap((r: any) => r.matches.map((m: any) => m.group_id)).filter(Boolean).join(",")}>
               {allRoundsToRender.length > 1 && (
@@ -1601,7 +1600,7 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
           ))}
         </div>
       ) : (selectedSubTab === "all" || !activeSubRounds) ? (
-        <div className={presentationCompact ? "space-y-0" : "space-y-8"} ref={allRoundsToRender ? undefined : sectionContainerRef}>
+        <div className={presentationCompact ? "space-y-0" : "space-y-3"} ref={allRoundsToRender ? undefined : sectionContainerRef}>
           {getSubContent.allRounds.map((section, idx) => (
             <div key={section.section} data-bracket-group={section.rounds.flatMap((r: any) => r.matches.map((m: any) => m.group_id)).filter(Boolean).join(",")}>
               {getSubContent.allRounds.length > 1 && (
