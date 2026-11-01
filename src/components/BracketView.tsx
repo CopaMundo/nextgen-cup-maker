@@ -23,6 +23,8 @@ import { getSlotReferenceLabel as resolveSlotReferenceLabel } from "@/lib/slotLa
 import { firstRefereeName } from "@/lib/refereeConfig";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import LiveDrawDialog from "./LiveDrawDialog";
+import { bracketAggregate } from "@/lib/bracketAggregate";
+import { formatFieldLabel } from "@/lib/fieldLocations";
 
 interface BracketMatch {
   id: string;
@@ -102,6 +104,7 @@ interface BracketViewProps {
   showRandomAssign?: boolean;
   showScores?: boolean;
   compact?: boolean;
+  scrollInParent?: boolean;
   filterGroupIds?: string[];
   tournament?: TournamentInfo;
   refreshKey?: number;
@@ -115,7 +118,7 @@ const formatDateDMY = (d: string | null) => {
   return d;
 };
 
-const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, showRandomAssign = true, showScores = true, compact = false, filterGroupIds, tournament, refreshKey, onSlotChange }: BracketViewProps) => {
+const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, showRandomAssign = true, showScores = true, compact = false, scrollInParent = false, filterGroupIds, tournament, refreshKey, onSlotChange }: BracketViewProps) => {
   const isMobile = useIsMobile();
   const effectiveScoreEditable = scoreEditable ?? editable;
 
@@ -2463,8 +2466,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const haTotal = matchIsHA && pairedMatch ? (() => {
       const heenMatch = isHeen ? match : pairedMatch;
       const terugMatch = isHeen ? pairedMatch : match;
-      const homeTotal = (heenMatch.home_score ?? 0) + (terugMatch.away_score ?? 0);
-      const awayTotal = (heenMatch.away_score ?? 0) + (terugMatch.home_score ?? 0);
+      const { homeTotal, awayTotal } = bracketAggregate(heenMatch, terugMatch);
       const bothPlayed = heenMatch.is_played && terugMatch.is_played;
       const anyScored = heenMatch.home_score !== null || terugMatch.home_score !== null;
       return { homeTotal, awayTotal, bothPlayed, anyScored, isTied: homeTotal === awayTotal && bothPlayed };
@@ -2507,9 +2509,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       const haTerugField = isHome ? "away_score" : "home_score";
 
       return (
-        <div className="relative">
+        <div className="relative min-h-0">
           <div
-            className={`flex items-center gap-1.5 px-2 ${compact ? "min-h-6 py-0.5" : "py-1"} ${isHome ? "border-b border-border" : ""} transition-colors ${won ? "bg-accent/10" : ""} ${canPickTeam ? "cursor-pointer hover:bg-foreground/[0.03]" : ""}`}
+            className={`flex h-full items-center gap-1.5 px-2 ${compact ? "min-h-7 py-0.5" : "min-h-8 py-1"} ${isHome ? "border-b border-border" : ""} transition-colors ${won ? "bg-accent/10" : ""} ${canPickTeam ? "cursor-pointer hover:bg-foreground/[0.03]" : ""}`}
             onClick={(e) => {
               if (canPickTeam) {
                 e.stopPropagation();
@@ -2626,7 +2628,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     return (
       <div
         key={match.id}
-        className={`${compact ? "w-full" : "w-60"} rounded-lg border border-border bg-card shadow-sm ${!canPickTeam && tournament ? "cursor-pointer hover:border-accent/40 transition-colors" : ""}`}
+        className={`${compact ? "w-full" : "w-60"} flex flex-col rounded-lg border border-border bg-card shadow-sm ${!canPickTeam && tournament ? "cursor-pointer hover:border-accent/40 transition-colors" : ""}`}
         style={{ overflow: "visible" }}
         onClick={() => {
           if (!canPickTeam && tournament) {
@@ -2738,7 +2740,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           </div>
         )}
 
-        <div>
+        <div className="grid flex-1 grid-rows-2">
           {renderTeamRow("home")}
           {renderTeamRow("away")}
         </div>
@@ -2820,7 +2822,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     // === BRACKET TREE (fixed round columns + elbow connectors, mobile & desktop) ===
 
     return (
-      <div className={`overflow-x-auto ${compact ? "pb-2" : "pb-4"}`}>
+      <div className={`${scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto"} ${compact ? "pb-2" : "pb-4"}`}>
         <div className="flex" style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
@@ -3096,8 +3098,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         if (!heenM) return null;
         const terugM = matches.find(m => m.match_name === `${getBaseMatchName(heenM.match_name)} (Terug)` && m.group_id === heenM.group_id);
         if (!terugM) return null;
-        const homeTotal = (heenM.home_score ?? 0) + (terugM.away_score ?? 0);
-        const awayTotal = (heenM.away_score ?? 0) + (terugM.home_score ?? 0);
+        const { homeTotal, awayTotal } = bracketAggregate(heenM, terugM);
         const bothPlayed = heenM.is_played && terugM.is_played;
         const isTied = homeTotal === awayTotal && bothPlayed;
         const hasPenalties = isTied && (heenM.home_penalties != null || heenM.away_penalties != null || terugM.home_penalties != null || terugM.away_penalties != null);
@@ -3112,6 +3113,15 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         const awayName = heenM.away_team_id ? (teams.find(t => t.id === heenM.away_team_id)?.name ?? "TBD") : "TBD";
         const homeLogo = teams.find(t => t.id === heenM.home_team_id)?.logo_url;
         const awayLogo = teams.find(t => t.id === heenM.away_team_id)?.logo_url;
+
+        const renderLegMetadata = (leg: BracketMatch) => (
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+            {leg.match_date && <span>{formatDateDMY(leg.match_date)}</span>}
+            {leg.match_time && <span>{formatTime(leg.match_time)}</span>}
+            {leg.field && <span className="flex min-w-0 items-center gap-1"><MapPin className="h-3 w-3 shrink-0" /><span className="break-words">{formatFieldLabel(leg.field)}</span></span>}
+            {leg.referee && <span className="flex min-w-0 items-center gap-1"><WhistleIcon className="h-3 w-3 shrink-0" /><span className="break-words">{leg.referee}</span></span>}
+          </div>
+        );
 
         const renderLegRow = (hName: string, hLogo: string | undefined, aName: string, aLogo: string | undefined, hScore: number | null, aScore: number | null) => (
           <div className="rounded-lg border border-border bg-card overflow-hidden">
@@ -3130,7 +3140,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
         return (
           <Dialog open={!!selectedHAMatchId} onOpenChange={() => setSelectedHAMatchId(null)}>
-            <DialogContent className="max-w-xs p-0 gap-0 overflow-hidden">
+            <DialogContent className="max-w-sm p-0 gap-0 overflow-hidden [&>div:first-child]:gap-0">
               <DialogHeader className="sr-only"><DialogTitle>Wedstrijddetail</DialogTitle></DialogHeader>
               {/* Header: Teams side-by-side with aggregate score */}
               <div className="bg-card px-4 pt-5 pb-3">
@@ -3140,12 +3150,12 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     <span className={`text-xs text-center truncate w-full ${homeWon ? "font-bold" : ""} text-foreground`}>{homeName}</span>
                   </div>
                   <div className="flex flex-col items-center shrink-0">
-                    <span className="text-2xl font-black tabular-nums tracking-tight text-foreground">
-                      {homeTotal}–{awayTotal}
+                    <span className="whitespace-nowrap px-2 text-2xl font-black tabular-nums text-foreground">
+                      {homeTotal} - {awayTotal}
                     </span>
                     {hasPenalties && (
                       <span className="text-[10px] text-muted-foreground font-medium mt-0.5">
-                        ({homePen} – {awayPen} pen.)
+                        ({homePen}-{awayPen})
                       </span>
                     )}
                   </div>
@@ -3157,13 +3167,15 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               </div>
               {/* Leg 1 (Heen) */}
               <div className="px-4 py-2 border-t border-border">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Wedstrijd 1 (Heen)</div>
+                <div className="text-[11px] font-bold text-muted-foreground mb-1.5">{getBaseMatchName(heenM.match_name) || "Wedstrijd 1"} (Heen)</div>
                 {renderLegRow(homeName, homeLogo, awayName, awayLogo, heenM.home_score, heenM.away_score)}
+                {renderLegMetadata(heenM)}
               </div>
               {/* Leg 2 (Terug) - home/away swapped */}
               <div className="px-4 pt-2 pb-4 border-t border-border">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Wedstrijd 2 (Terug)</div>
+                <div className="text-[11px] font-bold text-muted-foreground mb-1.5">{getBaseMatchName(terugM.match_name) || "Wedstrijd 2"} (Terug)</div>
                 {renderLegRow(awayName, awayLogo, homeName, homeLogo, terugM.home_score, terugM.away_score)}
+                {renderLegMetadata(terugM)}
               </div>
             </DialogContent>
           </Dialog>
