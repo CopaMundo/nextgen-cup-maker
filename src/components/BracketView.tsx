@@ -3004,6 +3004,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               </div>
             );
           })}
+          {adaptiveRounds && displayRounds.length > 1 && (
+            <div aria-hidden className="flex-shrink-0" style={{ width: Math.max(0, adaptiveViewportW - ADAPTIVE_COL_W - 48) }} />
+          )}
         </div>
       </div>
     );
