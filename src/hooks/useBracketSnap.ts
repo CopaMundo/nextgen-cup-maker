@@ -31,6 +31,8 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       const viewTop = isRoot ? 0 : scroller.getBoundingClientRect().top;
       const viewBottom = isRoot ? window.innerHeight : viewTop + scroller.clientHeight;
       const centre = (Math.max(viewTop, 0) + Math.min(viewBottom, window.innerHeight)) / 2;
+      // Tree top in view: let the cards glide together as before.
+      if (element.getBoundingClientRect().top >= Math.max(viewTop, 0)) { onRound(round); return; }
       let anchor: HTMLElement | null = null;
       let distance = Infinity;
       element.querySelectorAll<HTMLElement>(`[data-bracket-round="${round}"]`).forEach(card => {
