@@ -225,8 +225,10 @@ export function DatePicker({
           className={cn(
             hideInput && triggerLabel
               ? "relative h-7 w-auto gap-1.5 rounded-md px-2 text-xs font-normal"
-              : "bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white",
-            hideInput && !triggerLabel ? "relative h-8 w-8" : !hideInput ? "absolute right-0 top-0 h-full w-10" : ""
+              : cn(
+                  "bg-transparent text-foreground hover:bg-transparent hover:text-foreground dark:text-white dark:hover:bg-transparent dark:hover:text-white",
+                  hideInput ? "relative h-8 w-8" : "absolute right-0 top-0 h-full w-10"
+                )
           )}
         >
           <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
