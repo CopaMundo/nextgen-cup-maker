@@ -416,7 +416,9 @@ const FormatCard = ({ format, tournamentId, allFormats, onRemove, onUpdate, cate
                 tournamentId={tournamentId}
                 phaseId={format.id}
                 editable={true}
-                showScores={false}
+                compact
+                showScores
+                scoreEditable={false}
                 showRandomAssign={format.phase_number === 1}
                 refreshKey={(refreshKey ?? 0) + localRefreshKey}
                 onSlotChange={onSlotChange}

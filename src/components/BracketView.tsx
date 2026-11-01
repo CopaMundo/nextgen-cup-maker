@@ -101,6 +101,7 @@ interface BracketViewProps {
   scoreEditable?: boolean;
   showRandomAssign?: boolean;
   showScores?: boolean;
+  compact?: boolean;
   filterGroupIds?: string[];
   tournament?: TournamentInfo;
   refreshKey?: number;
@@ -114,7 +115,7 @@ const formatDateDMY = (d: string | null) => {
   return d;
 };
 
-const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, showRandomAssign = true, showScores = true, filterGroupIds, tournament, refreshKey, onSlotChange }: BracketViewProps) => {
+const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, showRandomAssign = true, showScores = true, compact = false, filterGroupIds, tournament, refreshKey, onSlotChange }: BracketViewProps) => {
   const isMobile = useIsMobile();
   const effectiveScoreEditable = scoreEditable ?? editable;
 
@@ -2448,9 +2449,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const canPickTeam = editable && (isSingleMatch || isRound1Match(match));
     const matchHasBye = isBye(match, "home") || isBye(match, "away");
 
-    const fieldStr = match.field;
-    const timeStr = formatTime(match.match_time);
-    const dateStr = formatDateDMY(match.match_date);
+    const fieldStr = compact ? null : match.field;
+    const timeStr = compact ? null : formatTime(match.match_time);
+    const dateStr = compact ? null : formatDateDMY(match.match_date);
 
     // H&A: find paired match for total display (works for both phase-level and per-match H&A)
     const matchIsHA = isMatchHomeAway(match);
@@ -2508,7 +2509,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       return (
         <div className="relative">
           <div
-            className={`flex items-center gap-1.5 px-2 py-1 ${isHome ? "border-b border-border" : ""} transition-colors ${won ? "bg-accent/10" : ""} ${canPickTeam ? "cursor-pointer hover:bg-foreground/[0.03]" : ""}`}
+            className={`flex items-center gap-1.5 px-2 ${compact ? "min-h-6 py-0.5" : "py-1"} ${isHome ? "border-b border-border" : ""} transition-colors ${won ? "bg-accent/10" : ""} ${canPickTeam ? "cursor-pointer hover:bg-foreground/[0.03]" : ""}`}
             onClick={(e) => {
               if (canPickTeam) {
                 e.stopPropagation();
@@ -2517,8 +2518,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
             }}
           >
             {logo && <img src={logo} className="h-4 w-4 object-contain flex-shrink-0" alt="" />}
-            <div className={`flex items-center gap-1 flex-1 min-w-0 ${won ? "font-bold text-accent" : (isHome && homeName === "BYE") || (!isHome && awayName === "BYE") ? "font-mono font-bold text-primary" : ""}`}>
-              <span className={`text-[11px] truncate ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>
+            <div className={`flex items-center gap-1 flex-1 min-w-0 ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : (isHome && homeName === "BYE") || (!isHome && awayName === "BYE") ? "font-mono font-bold text-primary" : ""}`}>
+              <span title={name} className={`text-[11px] truncate ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
                 {name}
               </span>
               {tournament?.show_country && (isHome ? match.home_team_id : match.away_team_id) && (
@@ -2572,10 +2573,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     {isHome ? haTotal.homeTotal : haTotal.awayTotal}
                   </span>
                 )}
-                <span className={`text-[11px] tabular-nums ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>
+                <span className={`text-[11px] tabular-nums ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
                   {score ?? "–"}
                 </span>
-                <span className={`text-[11px] tabular-nums ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>
+                <span className={`text-[11px] tabular-nums ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
                   {haTerugScore ?? "–"}
                 </span>
                 {penalties !== null && <span className="text-[8px] text-muted-foreground font-medium ml-px">({penalties})</span>}
@@ -2612,7 +2613,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               </div>
             ) : !matchHasBye && showScores ? (
               <div className="flex items-center gap-0.5 shrink-0">
-                <span className={`text-[11px] tabular-nums ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>{score ?? "–"}</span>
+                <span className={`text-[11px] tabular-nums ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>{score ?? "–"}</span>
                 {penalties !== null && <span className="text-[8px] text-muted-foreground font-medium ml-px">({penalties})</span>}
               </div>
             ) : null}
@@ -2625,7 +2626,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     return (
       <div
         key={match.id}
-        className={`w-60 rounded-lg border border-border bg-card shadow-sm ${!canPickTeam && tournament ? "cursor-pointer hover:border-accent/40 transition-colors" : ""}`}
+        className={`${compact ? "w-full" : "w-60"} rounded-lg border border-border bg-card shadow-sm ${!canPickTeam && tournament ? "cursor-pointer hover:border-accent/40 transition-colors" : ""}`}
         style={{ overflow: "visible" }}
         onClick={() => {
           if (!canPickTeam && tournament) {
@@ -2637,8 +2638,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           }
         }}
       >
-        {(currentPhase?.name || match.match_name || fieldStr || match.referee) && (
-          <div className="px-2.5 py-1 bg-secondary/50 border-b border-border">
+        {(editable || currentPhase?.name || match.match_name || fieldStr || (!compact && match.referee)) && (
+          <div className={`${compact ? "px-2 py-0.5" : "px-2.5 py-1"} bg-secondary/50 border-b border-border`}>
             <div className="flex items-start justify-between">
               <div className="min-w-0 flex-1">
                 {editable && editingMatchName === match.id ? (
@@ -2655,11 +2656,11 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   </div>
                 ) : (
                   <div className="flex items-start gap-1.5">
-                    {currentPhase?.logo_url && (
+                    {!compact && currentPhase?.logo_url && (
                       <img src={currentPhase.logo_url} alt="" className="h-5 w-5 object-contain flex-shrink-0 rounded-sm mt-0.5" />
                     )}
                     <div className="min-w-0 flex-1">
-                      {currentPhase?.name && (
+                      {!compact && currentPhase?.name && (
                         <div className="text-[9px] font-bold text-primary/80 truncate leading-tight">
                           {currentPhase.name}
                         </div>
@@ -2678,7 +2679,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                               groups as any
                             );
                         return (
-                          <span className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
+                          <span title={`${baseName}${suffix}${haSuffix}`} className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
                             {baseName}{suffix}{haSuffix}
                           </span>
                         );
@@ -2692,22 +2693,23 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               </div>
               <div className="flex items-start gap-1 flex-shrink-0 ml-1">
                 {editable && (
-                  <button 
+                  <Button variant="ghost" size="icon"
                     onClick={(e) => { e.stopPropagation(); openMatchSettings(match.id); }} 
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-0.5"
+                    className={compact ? "h-6 w-6 shrink-0 text-muted-foreground" : "inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:h-auto sm:w-auto sm:p-0.5"}
                     aria-label="Wedstrijd bewerken"
+                    title="Wedstrijd bewerken"
                   >
                     <Pencil className="h-3 w-3" />
-                  </button>
+                  </Button>
                 )}
                 {editable && isSingleMatch && (
-                  <button 
+                  <Button variant="ghost" size="icon"
                     onClick={(e) => { e.stopPropagation(); setShowDeleteSingleConfirm(match.id); }} 
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-0.5"
+                    className={compact ? "h-6 w-6 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" : "inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-auto sm:w-auto sm:p-0.5"}
                     aria-label="Wedstrijd verwijderen"
                   >
                     <Trash2 className="h-3 w-3" />
-                  </button>
+                  </Button>
                 )}
                 <div className="text-right">
                   {fieldStr && (
@@ -2715,7 +2717,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       <MapPin className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={fieldStr}>{fieldStr}</span>
                     </div>
                   )}
-                  {match.referee && (
+                  {!compact && match.referee && (
                     <div className="text-[9px] text-muted-foreground/70 inline-flex items-center gap-0.5 justify-end leading-none">
                       <WhistleIcon className="h-2 w-2 flex-shrink-0" /> <span className="leading-none truncate max-w-[110px]" title={match.referee || undefined}>{firstRefereeName(match.referee)}</span>
                     </div>
@@ -2753,10 +2755,11 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     let max = 0;
     bracketCardEls.current.forEach((el, id) => {
       if (!el.isConnected) { bracketCardEls.current.delete(id); return; }
-      max = Math.max(max, el.offsetHeight);
+      const card = el.firstElementChild;
+      max = Math.max(max, compact && card instanceof HTMLElement ? card.offsetHeight : el.offsetHeight);
     });
     setMeasuredCardH(prev => (Math.abs(prev - max) > 0.5 ? max : prev));
-  }, []);
+  }, [compact]);
 
   const setBracketCardRef = useCallback((id: string) => (el: HTMLDivElement | null) => {
     if (typeof ResizeObserver !== "undefined" && !bracketCardObserver.current) {
@@ -2779,13 +2782,13 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
-    const CARD_W = isMobile ? 236 : 272;
-    const CONNECTOR_W = isMobile ? 24 : 32;
+    const CARD_W = compact ? 208 : isMobile ? 236 : 272;
+    const CONNECTOR_W = compact ? 16 : isMobile ? 24 : 32;
     // Card height is measured from the real DOM (headers, dates, score inputs all change it),
     // so spacing stays correct whether cards are empty, filled with teams or with scores.
-    const CARD_H = Math.max(measuredCardH, effectiveScoreEditable ? 92 : 78);
-    const GAP = CONNECTOR_W;
-    const HEADER_H = 36; // Header height (mb-3 + text)
+    const CARD_H = Math.max(measuredCardH, compact ? 78 : effectiveScoreEditable ? 92 : 78);
+    const GAP = compact ? 10 : CONNECTOR_W;
+    const HEADER_H = compact ? 28 : 36;
 
     const isWinnerRef = (label: string | null) => (label ?? "").startsWith("Winnaar ");
     const isLoserRef = (label: string | null) => (label ?? "").startsWith("Verliezer ");
@@ -2807,12 +2810,18 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const totalHeight = firstRoundCount * CARD_H + (firstRoundCount - 1) * GAP;
 
     const placementTitle = "Finale";
+    const placementRounds = getPlacementRoundsForBracket(displayRounds).filter(r => r.matches.length > 0);
+    const placementIds = new Set(placementRounds.flatMap(r => r.matches.map(m => m.id)));
+    const inlinePlacementCount = inlinePlacementMatch && !placementIds.has(inlinePlacementMatch.id) ? 1 : 0;
+    const placementCount = placementRounds.reduce((count, r) => count + r.matches.length, inlinePlacementCount);
+    const placementGap = compact ? 20 : 48;
+    const compactHeight = Math.max(totalHeight, totalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
 
     // === BRACKET TREE (fixed round columns + elbow connectors, mobile & desktop) ===
 
     return (
-      <div className="overflow-x-auto pb-4">
-        <div className="flex" style={{ minHeight: totalHeight + 200 }}>
+      <div className={`overflow-x-auto ${compact ? "pb-2" : "pb-4"}`}>
+        <div className="flex" style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
             const slotH = totalHeight / matchCount;
@@ -2832,7 +2841,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               <div key={round.id} className="flex flex-shrink-0">
                 <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W }}>
                   {/* Header */}
-                  <div className="text-center mb-3 h-6 flex items-center justify-center">
+                  <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
                         {getRoundDisplayName(round, bracketPrefix)}
                       </span>
@@ -2840,7 +2849,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   {/* Match cards */}
                   <div className="relative" style={{ height: totalHeight }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} ref={setBracketCardRef(match.id)} className="absolute left-0 right-0 flex [&>*]:flex-1 [&>*]:h-full" style={{ top: getTop(matchIdx), minHeight: CARD_H }}>
+                      <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
@@ -2853,7 +2862,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       const hasPlacement = currentPlacementRounds.some((r) => r.matches.length > 0) || showInlinePlacement;
 
                       return (
-                        <div className="absolute left-0 right-0" style={{ top: totalHeight / 2 + CARD_H / 2 + 48 }}>
+                        <div className="absolute left-0 right-0" style={{ top: totalHeight / 2 + CARD_H / 2 + placementGap }}>
                           {showInlinePlacement && (
                             <div className="mb-2">
                               <div className="text-center mb-1.5">
@@ -2931,7 +2940,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const selectedMatch = selectedMatchId ? matches.find(m => m.id === selectedMatchId) : null;
 
   return (
-    <div className="space-y-6">
+    <div className={compact ? "space-y-3" : "space-y-6"}>
       {editable && rounds.length > 0 && (
         <div className="flex items-center gap-2">
           {(isKnockout || isSingleMatch) && <Button variant="outline" size="sm" onClick={() => { if (matches.some(m => m.home_team_id || m.away_team_id || m.is_played)) setShowLiveOverwrite(true); else setLiveDrawOpen(true); }}><Shuffle className="h-3 w-3" />Live loting</Button>}
@@ -2998,12 +3007,12 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           {!editable && (
             <h3 className="text-sm font-bold text-foreground mb-4">{currentPhase?.name || "Plaatsingswedstrijd"}</h3>
           )}
-          <div className="flex flex-col pb-72" style={{ gap: 16, overflow: "visible" }}>
+          <div className={`flex flex-col ${compact ? "pb-4" : "pb-72"}`} style={{ gap: compact ? 10 : 16, overflow: "visible" }}>
             {rounds.flatMap(r => r.matches).map(match => (
-              <div key={match.id} className="relative" style={{ width: 272, overflow: "visible" }}>{renderMatchCard(match)}</div>
+              <div key={match.id} className="relative" style={{ width: compact ? 208 : 272, overflow: "visible" }}>{renderMatchCard(match)}</div>
             ))}
             {editable && (
-              <Button variant="outline" size="sm" className="w-[272px]" onClick={addSingleMatch}>
+              <Button variant="outline" size="sm" className={compact ? "w-52" : "w-[272px]"} onClick={addSingleMatch}>
                 <Plus className="h-3.5 w-3.5" /> Losse wedstrijd
               </Button>
             )}
@@ -3040,7 +3049,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           const displayName = getBracketName(p);
           return (
             <div key={p}>
-              <div className="border-t border-border my-6" />
+              <div className={`border-t border-border ${compact ? "my-3" : "my-6"}`} />
               <div className="flex items-center justify-between mb-2">
                 <h3 className={`text-sm font-bold text-foreground flex items-center gap-1 ${editable ? "cursor-pointer hover:text-primary" : ""}`}
                     onClick={() => { if (editable) { setEditingBracketName(p); setBracketNameEdit(getSubBracketName(p)); editingBracketRoundsRef.current = loserBrackets[p]; } }}>
