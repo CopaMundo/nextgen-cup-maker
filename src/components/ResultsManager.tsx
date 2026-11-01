@@ -1973,27 +1973,61 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
     return (
       <div key={match.id} className="rounded-md border border-border/60 bg-card hover:border-border transition-colors">
-        <div className="px-2 py-1.5 grid grid-cols-[6.5rem_1fr_3.5rem] gap-2 items-center">
-          {/* Format / group / match / field / referee meta — compact left rail */}
-          <div className="flex flex-col min-w-0 gap-0">
-            <div className="flex items-center gap-1 min-w-0">
-              {phase?.logo_url && <img src={phase.logo_url} alt="" className="h-2.5 w-2.5 object-contain rounded flex-shrink-0" />}
-              <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground truncate" title={headerLabel}>{headerLabel}</span>
+        <div className="px-2 py-1.5 grid grid-cols-[9rem_1fr_8rem] gap-2 items-center">
+          {/* Format + match/group with standings icon */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1 min-w-0">
+                {phase?.logo_url && <img src={phase.logo_url} alt="" className="h-2.5 w-2.5 object-contain flex-shrink-0" />}
+                <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground truncate" title={headerLabel}>{headerLabel}</span>
+              </div>
+              {subLabel && (
+                <span className="text-[9px] text-muted-foreground/80 truncate leading-tight" title={subLabel}>{subLabel}</span>
+              )}
             </div>
-            {subLabel && (
-              <span className="text-[9px] text-muted-foreground/80 truncate leading-tight" title={subLabel}>{subLabel}</span>
+            {match.group_id && (phase?.phase_type === "group" || phase?.phase_type === "round_robin") && (
+              <button
+                onClick={() => setStandingsDialogGroupId(match.group_id)}
+                className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                title="Stand bekijken"
+              >
+                <span
+                  aria-label="Stand"
+                  className="block h-3 w-3 bg-current"
+                  style={{
+                    WebkitMaskImage: `url(${rankingPodium})`,
+                    maskImage: `url(${rankingPodium})`,
+                    WebkitMaskRepeat: "no-repeat",
+                    maskRepeat: "no-repeat",
+                    WebkitMaskPosition: "center",
+                    maskPosition: "center",
+                    WebkitMaskSize: "contain",
+                    maskSize: "contain",
+                  }}
+                />
+              </button>
             )}
-            {match.field && (
-              <div className="flex items-center gap-0.5 mt-0.5">
-                <MapPin className="h-2 w-2 shrink-0 text-muted-foreground" />
-                <span className="text-[9px] text-muted-foreground truncate" title={formatFieldLabel(match.field)}>{formatFieldLabel(match.field)}</span>
-              </div>
-            )}
-            {match.referee && (
-              <div className="flex items-center gap-0.5">
-                <WhistleIcon className="h-2 w-2 shrink-0 text-muted-foreground" />
-                <span className="text-[9px] text-muted-foreground truncate" title={match.referee}>{match.referee}</span>
-              </div>
+            {(phase?.phase_type === "knockout" || phase?.phase_type === "single_match") && (
+              <button
+                onClick={() => setBracketDialogFormatId(match.phase_id)}
+                className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                title="Bracket bekijken"
+              >
+                <span
+                  aria-label="Bracket"
+                  className="block h-3 w-3 bg-current"
+                  style={{
+                    WebkitMaskImage: `url(${rankingPodium})`,
+                    maskImage: `url(${rankingPodium})`,
+                    WebkitMaskRepeat: "no-repeat",
+                    maskRepeat: "no-repeat",
+                    WebkitMaskPosition: "center",
+                    maskPosition: "center",
+                    WebkitMaskSize: "contain",
+                    maskSize: "contain",
+                  }}
+                />
+              </button>
             )}
           </div>
 
@@ -2034,53 +2068,20 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
             )}
           </div>
 
-          {/* Action icons */}
-          <div className="flex items-center justify-end gap-1.5 min-w-0">
 
-
-            {match.group_id && (phase?.phase_type === "group" || phase?.phase_type === "round_robin") && (
-              <button
-                onClick={() => setStandingsDialogGroupId(match.group_id)}
-                className="text-muted-foreground hover:text-primary transition-colors"
-                title="Stand bekijken"
-              >
-                <span
-                  aria-label="Stand"
-                  className="block h-3.5 w-3.5 bg-current"
-                  style={{
-                    WebkitMaskImage: `url(${rankingPodium})`,
-                    maskImage: `url(${rankingPodium})`,
-                    WebkitMaskRepeat: "no-repeat",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskPosition: "center",
-                    maskPosition: "center",
-                    WebkitMaskSize: "contain",
-                    maskSize: "contain",
-                  }}
-                />
-              </button>
+          {/* Field + referee */}
+          <div className="flex flex-col items-end min-w-0 gap-0.5">
+            {match.field && (
+              <div className="flex items-center gap-0.5 min-w-0 max-w-full">
+                <MapPin className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
+                <span className="text-[9px] text-muted-foreground truncate" title={formatFieldLabel(match.field)}>{formatFieldLabel(match.field)}</span>
+              </div>
             )}
-            {(phase?.phase_type === "knockout" || phase?.phase_type === "single_match") && (
-              <button
-                onClick={() => setBracketDialogFormatId(match.phase_id)}
-                className="text-muted-foreground hover:text-primary transition-colors"
-                title="Bracket bekijken"
-              >
-                <span
-                  aria-label="Bracket"
-                  className="block h-3.5 w-3.5 bg-current"
-                  style={{
-                    WebkitMaskImage: `url(${rankingPodium})`,
-                    maskImage: `url(${rankingPodium})`,
-                    WebkitMaskRepeat: "no-repeat",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskPosition: "center",
-                    maskPosition: "center",
-                    WebkitMaskSize: "contain",
-                    maskSize: "contain",
-                  }}
-                />
-              </button>
+            {match.referee && (
+              <div className="flex items-center gap-0.5 min-w-0 max-w-full">
+                <WhistleIcon className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
+                <span className="text-[9px] text-muted-foreground truncate" title={match.referee}>{match.referee}</span>
+              </div>
             )}
           </div>
         </div>
@@ -2319,7 +2320,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                     {/* Day header */}
                     <div
                       ref={el => { if (el && !dateHeaderRef.current) dateHeaderRef.current = el; }}
-                      className="sticky z-10 -mx-1 flex items-center gap-3 bg-background/95 px-1 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70 lg:top-0"
+                      className="sticky z-20 -mx-1 flex items-center gap-3 bg-background px-1 py-1.5 shadow-[0_-12px_0_0_hsl(var(--background))] lg:top-0"
                       style={isMobile ? { top: mobileStickyOffset } : undefined}
                     >
                       <span className="text-xs font-black uppercase tracking-[0.18em] text-foreground">
@@ -2351,13 +2352,13 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                             <button
                               type="button"
                               onClick={() => toggleTimeSlot(slot.key)}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-secondary/40 transition-colors"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-secondary/40 transition-colors"
                             >
                               {collapsed
                                 ? <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                                 : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
                               {slot.time && (
-                                <span className="text-base font-bold tabular-nums text-foreground shrink-0">
+                                <span className="text-sm font-bold tabular-nums text-foreground shrink-0">
                                   {slot.time}
                                 </span>
                               )}
