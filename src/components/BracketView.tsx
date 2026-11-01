@@ -2864,7 +2864,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   {/* Match cards */}
                   <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
+                      <div key={match.id} data-bracket-round={roundIdx} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
