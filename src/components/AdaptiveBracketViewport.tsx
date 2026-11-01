@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
+import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 
 interface ViewportState {
   activeRound: number;
@@ -16,7 +17,9 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
   const [activeRound, setActiveRound] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
   useBracketSnap(ref, columnWidth, roundCount, setActiveRound, setViewportWidth);
-  return <div ref={ref} className="w-full min-w-0 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-2" aria-label="Bracketrondes">
+  return <div className="min-w-0">
+    <BracketRoundIndicators count={roundCount} active={activeRound} />
+    <div ref={ref} className="w-full min-w-0 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-2" aria-label="Bracketrondes">
     {children({ activeRound, viewportWidth })}
-  </div>;
+  </div></div>;
 }

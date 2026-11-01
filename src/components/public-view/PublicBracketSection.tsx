@@ -16,6 +16,7 @@ import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
+import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 
 interface BracketSectionProps {
   groups: any[];
@@ -880,6 +881,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       <>
       {renderUnifiedDialog()}
       <div className="relative">
+        <BracketRoundIndicators count={displayRounds.length} active={activeRound} />
 
         <div
           ref={scrollRef}
@@ -1168,6 +1170,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   return (
     <>
     {renderUnifiedDialog()}
+    {adaptiveDesktop && <BracketRoundIndicators count={displayRounds.length} active={activeRound} />}
     <div ref={adaptiveDesktop ? scrollRef : undefined} className="overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-4">
       <div className="flex" style={adaptiveDesktop ? { width: displayRounds.length * DESKTOP_COL_W + Math.max(0, desktopViewportW - DESKTOP_COL_W) } : undefined}>
         {displayRounds.map((round: any, roundIdx: number) => {
