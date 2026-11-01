@@ -1,7 +1,7 @@
 import { useEffect, type RefObject } from "react";
 
 /** Native scrolling owns each frame; React only updates once scrolling settles. */
-export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: number, roundCount: number, onRound: (round: number) => void, onWidth?: (width: number) => void) {
+export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: number, roundCount: number, onRound: (round: number) => void, onWidth?: (width: number) => void, onIndicator?: (round: number) => void) {
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
@@ -20,12 +20,19 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
         parent = parent.parentElement;
       }
       const treeTop = element.getBoundingClientRect().top;
-      element.style.minHeight = treeTop < top ? `${Math.max(0, bottom - treeTop)}px` : "";
-      onRound(Math.max(0, Math.min(roundCount - 1, Math.round(element.scrollLeft / columnWidth))));
+      const round = Math.max(0, Math.min(roundCount - 1, Math.round(element.scrollLeft / columnWidth)));
+      onIndicator?.(round);
+      // Keep the current feeder geometry while lowered: compacting here would
+      // move every match above the viewer, leaving blank space or a sibling tree.
+      if (treeTop >= top) {
+        element.style.minHeight = "";
+        onRound(round);
+      }
     };
     const resize = new ResizeObserver(() => onWidth?.(element.clientWidth));
     resize.observe(element);
     element.addEventListener("scrollend", settle, { passive: true });
-    return () => { resize.disconnect(); element.removeEventListener("scrollend", settle); };
+    document.addEventListener("scrollend", settle, true);
+    return () => { resize.disconnect(); element.removeEventListener("scrollend", settle); document.removeEventListener("scrollend", settle, true); };
   });
 }

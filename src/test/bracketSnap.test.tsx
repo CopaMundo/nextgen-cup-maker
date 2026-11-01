@@ -11,9 +11,9 @@ describe("settled bracket round selection", () => {
     vi.spyOn(rail, "getBoundingClientRect").mockReturnValue({ top: -400 } as DOMRect);
     rail.scrollLeft = 912;
     act(() => rail.dispatchEvent(new Event("scrollend")));
-    expect(rail.style.minHeight).toBe(`${window.innerHeight + 400}px`);
+    expect(rail.style.minHeight).toBe("");
     expect(rail.scrollTop).toBe(0);
-    expect(view.getByRole("status").textContent).toBe("3");
+    expect(view.getByRole("status").textContent).toBe("0");
     view.unmount();
   });
   it("keeps geometry unchanged during scrolling and selects the second round only at scrollend", () => {
