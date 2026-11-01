@@ -1,11 +1,49 @@
 import { useLayoutEffect, useRef, type RefObject } from "react";
-import { alignBracketTop } from "@/lib/bracketScroll";
+import { alignBracketTop, bracketSuccessorIndex, bracketVisibleBounds, centerBracketMatch } from "@/lib/bracketScroll";
 
-export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeRound: number) {
+export function useBracketRoundAlignment(ref: RefObject<HTMLDivElement>, activeRound: number, enabled = true) {
   const previousRound = useRef(activeRound);
+  const anchor = useRef<{ round: number; index: number; counts: number[] } | null>(null);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element || !enabled) return;
+    const capture = () => {
+      const cards = Array.from(element.querySelectorAll<HTMLElement>("[data-bracket-round][data-bracket-index]"));
+      const bounds = bracketVisibleBounds(element);
+      const current = cards.filter(card => Number(card.dataset.bracketRound) === previousRound.current);
+      const visible = current.filter(card => {
+        const rect = card.getBoundingClientRect();
+        return rect.bottom > bounds.top && rect.top < bounds.bottom;
+      });
+      const closest = visible.sort((a, b) => {
+        const center = (card: HTMLElement) => { const rect = card.getBoundingClientRect(); return (rect.top + rect.bottom) / 2; };
+        return Math.abs(center(a) - bounds.center) - Math.abs(center(b) - bounds.center);
+      })[0];
+      if (!closest) return;
+      const counts: number[] = [];
+      cards.forEach(card => {
+        const round = Number(card.dataset.bracketRound);
+        counts[round] = Math.max(counts[round] ?? 0, Number(card.dataset.bracketIndex) + 1);
+      });
+      anchor.current = { round: previousRound.current, index: Number(closest.dataset.bracketIndex), counts };
+    };
+    document.addEventListener("scroll", capture, true);
+    element.addEventListener("pointerdown", capture);
+    capture();
+    return () => {
+      document.removeEventListener("scroll", capture, true);
+      element.removeEventListener("pointerdown", capture);
+    };
+  }, [ref, enabled]);
   useLayoutEffect(() => {
     if (previousRound.current === activeRound) return;
     previousRound.current = activeRound;
-    if (ref.current) alignBracketTop(ref.current);
-  }, [activeRound, ref]);
+    if (!ref.current || !enabled) return;
+    const tracked = anchor.current;
+    const index = tracked ? bracketSuccessorIndex(tracked.index, tracked.round, activeRound, tracked.counts) : 0;
+    const target = ref.current.querySelector<HTMLElement>(`[data-bracket-round="${activeRound}"][data-bracket-index="${index}"]`);
+    if (target && tracked) centerBracketMatch(target);
+    else alignBracketTop(ref.current);
+    if (tracked) anchor.current = { ...tracked, round: activeRound, index };
+  }, [activeRound, ref, enabled]);
 }

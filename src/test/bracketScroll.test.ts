@@ -1,8 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { alignBracketTop } from "@/lib/bracketScroll";
+import { alignBracketTop, bracketSuccessorIndex } from "@/lib/bracketScroll";
 
 afterEach(() => { document.body.innerHTML = ""; vi.restoreAllMocks(); });
 describe("vertical bracket round alignment", () => {
+  it("follows match 20 into match 10, then match 5, instead of resetting to the first match", () => {
+    expect(bracketSuccessorIndex(19, 0, 1, [32, 16, 8, 4, 2, 1])).toBe(9);
+    expect(bracketSuccessorIndex(19, 0, 2, [32, 16, 8, 4, 2, 1])).toBe(4);
+  });
+  it("keeps the same encounter in equal-size rounds and selects its feeder when going back", () => {
+    expect(bracketSuccessorIndex(19, 0, 1, [32, 32, 16])).toBe(19);
+    expect(bracketSuccessorIndex(9, 1, 0, [32, 16])).toBe(18);
+  });
   it("returns a lowered dialog viewport to the new round without changing either horizontal position", () => {
     const parent = document.createElement("div");
     const tree = document.createElement("div");
