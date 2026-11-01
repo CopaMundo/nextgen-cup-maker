@@ -1925,7 +1925,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
     if (isMobile) {
       const homeLogoUrl = teamLogo(match.home_team_id);
       const awayLogoUrl = teamLogo(match.away_team_id);
-      const scoreBoxBase = "flex items-center justify-center gap-1 rounded-lg border px-2 h-8 min-w-[4.25rem]";
+      const scoreBoxBase = "relative flex flex-col items-center justify-center rounded-md border px-1 h-8 w-20 shrink-0";
       const scoreBoxState = match.is_played
         ? "border-primary/60 bg-primary/10"
         : "border-input bg-secondary/40";
@@ -1945,6 +1945,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
 
             {/* Score box */}
             <div className={cn(scoreBoxBase, scoreBoxState, "whitespace-nowrap")} title={needsPenaltiesFilled ? "Vul de beslissende score in" : undefined}>
+              <div className="flex items-center justify-center gap-1 leading-none">
               <span className="w-5 text-center text-[15px] font-bold tabular-nums text-foreground">
                 {match.home_score ?? "–"}
               </span>
@@ -1952,8 +1953,9 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               <span className="w-5 text-center text-[15px] font-bold tabular-nums text-foreground">
                 {match.away_score ?? "–"}
               </span>
-              {penaltyLabel && <span className="text-[10px] tabular-nums text-muted-foreground">{penaltyLabel}</span>}
-              {needsPenaltiesFilled && <span className="text-destructive" aria-label="Vul de beslissende score in">*</span>}
+              </div>
+              {penaltyLabel && <span className="text-[9px] leading-[10px] tabular-nums text-muted-foreground">{penaltyLabel}</span>}
+              {needsPenaltiesFilled && <span className="absolute right-1 top-0 text-destructive" aria-label="Vul de beslissende score in">*</span>}
             </div>
 
             {/* Away team */}
@@ -2038,17 +2040,19 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
               <Button variant="ghost"
                 onClick={() => canEditMatch(match) && setScoreEntryMatchId(match.id)}
                 title={needsPenaltiesFilled ? "Vul de beslissende score in" : "Wedstrijdscore"}
-                className={`flex h-7 min-w-20 items-center justify-center gap-1 whitespace-nowrap rounded border px-1.5 py-0.5 ${match.is_played ? 'border-primary' : 'border-input'} ${canEditMatch(match) ? "cursor-pointer hover:bg-secondary/50 transition-colors" : "cursor-default"}`}
+                className={`relative flex h-7 w-20 shrink-0 flex-col items-center justify-center gap-0 whitespace-nowrap rounded border px-1 py-0 ${match.is_played ? 'border-primary' : 'border-input'} ${canEditMatch(match) ? "cursor-pointer hover:bg-secondary/50 transition-colors" : "cursor-default"}`}
               >
-                <span className="h-5 w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
+                <span className="flex h-3.5 items-center justify-center gap-1 leading-none">
+                <span className="w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
                   {match.home_score ?? "–"}
                 </span>
                 <span className="text-xs font-bold text-muted-foreground">-</span>
-                <span className="h-5 w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
+                <span className="w-7 flex items-center justify-center text-xs font-bold tabular-nums text-foreground">
                   {match.away_score ?? "–"}
                 </span>
-                {penaltyLabel && <span className="text-[10px] tabular-nums text-muted-foreground">{penaltyLabel}</span>}
-                {needsPenaltiesFilled && <span className="text-destructive" aria-label="Vul de beslissende score in">*</span>}
+                </span>
+                {penaltyLabel && <span className="text-[9px] leading-[10px] tabular-nums text-muted-foreground">{penaltyLabel}</span>}
+                {needsPenaltiesFilled && <span className="absolute right-1 top-0 text-destructive" aria-label="Vul de beslissende score in">*</span>}
               </Button>
 
               <div className="flex items-center gap-1 min-w-0">
@@ -2286,6 +2290,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                       showRandomAssign={false}
                       compact
                       scrollInParent
+                      adaptiveRounds
                       tournament={tournament}
                       refreshKey={resultsRefreshKey}
                     />
@@ -2707,6 +2712,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   showRandomAssign={false}
                   compact
                   scrollInParent
+                  adaptiveRounds
                   tournament={tournament}
                   refreshKey={resultsRefreshKey}
                 />
