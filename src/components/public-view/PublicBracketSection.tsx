@@ -14,7 +14,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
-import { adaptiveBracketLayout, bracketLerp } from "@/lib/adaptiveBracketLayout";
+import { adaptiveBracketLayout, bracketFeederIndices, bracketLerp } from "@/lib/adaptiveBracketLayout";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
 import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 
@@ -497,10 +497,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   // activeRound is the base round; geometry interpolates towards nextRound via the rail's --bf.
   const nextRound = Math.min(activeRound + 1, Math.max(0, displayRounds.length - 1));
   const roundCounts = displayRounds.map((round: any) => round.matches.length);
+  const roundFeeders = bracketFeederIndices(displayRounds.map((round: any) => round.matches));
   const placementExtraH = (CARD_H + GAP + 20) * placementMatches.length;
   const mobileHeightFor = (round: number) => TOP_OFFSET + (displayRounds[round]?.matches.length ?? firstRoundCount) * COMPACT_SPACING + 16 + placementExtraH;
-  const mobileLayout = adaptiveBracketLayout(roundCounts, activeRound, CARD_H, GAP);
-  const mobileNextLayout = adaptiveBracketLayout(roundCounts, nextRound, CARD_H, GAP);
+  const mobileLayout = adaptiveBracketLayout(roundCounts, activeRound, CARD_H, GAP, roundFeeders);
+  const mobileNextLayout = adaptiveBracketLayout(roundCounts, nextRound, CARD_H, GAP, roundFeeders);
   const mobileTotalH = bracketLerp(mobileHeightFor(activeRound), mobileHeightFor(nextRound));
 
   useBracketSnap(scrollRef, isMobile ? MOBILE_COL_W : DESKTOP_COL_W, displayRounds.length, setActiveRound, setDesktopViewportW, setIndicatorRound);
@@ -929,6 +930,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                           <div
                             key={match.id}
                             data-bracket-round={roundIdx}
+                            data-bracket-feeders={roundFeeders[roundIdx]?.[matchIdx]?.join(",")}
                             className="absolute left-0 right-0"
                             style={{
                               top: 0,
@@ -972,8 +974,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     );
   }
 
-  const desktopLayout = adaptiveBracketLayout(roundCounts, activeRound, CARD_H, GAP);
-  const desktopNextLayout = adaptiveBracketLayout(roundCounts, nextRound, CARD_H, GAP);
+  const desktopLayout = adaptiveBracketLayout(roundCounts, activeRound, CARD_H, GAP, roundFeeders);
+  const desktopNextLayout = adaptiveBracketLayout(roundCounts, nextRound, CARD_H, GAP, roundFeeders);
   const desktopTreeH = adaptiveDesktop ? desktopLayout.height : totalHeight;
   const desktopTop = (round: number, match: number) => desktopLayout.tops[round]?.[match] ?? 0;
 
@@ -1199,7 +1201,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className="relative" style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: adaptiveDesktop ? bracketLerp(desktopTop(roundIdx, matchIdx), desktopNextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx) }}>
+                    <div key={match.id} data-bracket-round={roundIdx} data-bracket-feeders={roundFeeders[roundIdx]?.[matchIdx]?.join(",")} className="absolute left-0 right-0" style={{ top: adaptiveDesktop ? bracketLerp(desktopTop(roundIdx, matchIdx), desktopNextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx) }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}

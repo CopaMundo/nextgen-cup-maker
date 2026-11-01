@@ -1,5 +1,5 @@
 /** Display geometry only: never reorders matches or changes their references. */
-export function adaptiveBracketLayout(counts: number[], activeRound: number, cardHeight: number, gap: number) {
+export function adaptiveBracketLayout(counts: number[], activeRound: number, cardHeight: number, gap: number, feeders?: number[][][]) {
   const active = Math.max(0, Math.min(activeRound, counts.length - 1));
   const count = counts[active] ?? 0;
   const height = count * cardHeight + Math.max(0, count - 1) * gap;
@@ -8,6 +8,8 @@ export function adaptiveBracketLayout(counts: number[], activeRound: number, car
     const previous = centers[round - 1];
     centers.push(Array.from({ length: size }, (_, index) => {
       if (round <= active || !previous) return index * (cardHeight + gap) + cardHeight / 2;
+      const sources = (feeders?.[round]?.[index] ?? []).filter(source => source >= 0 && source < previous.length);
+      if (sources.length > 0) return sources.reduce((sum, source) => sum + previous[source], 0) / sources.length;
       if (previous.length === size * 2) return ((previous[index * 2] ?? 0) + (previous[index * 2 + 1] ?? 0)) / 2;
       if (previous.length === size) return previous[index] ?? cardHeight / 2;
       return height / size * (index + 0.5);
@@ -25,4 +27,22 @@ export function bracketLerp(from: number, to: number, unit = "px") {
 export function bracketSuccessorIndex(source: number, sourceCount: number, targetCount: number) {
   if (sourceCount <= 0 || targetCount <= 0) return 0;
   return Math.min(targetCount - 1, Math.floor(source * targetCount / sourceCount));
+}
+
+interface FeederMatch { match_name?: string | null; home_slot_label?: string | null; away_slot_label?: string | null }
+const baseName = (name: string) => name.replace(/\s+\((Heen|Terug)\)$/i, "").trim().toLowerCase();
+
+/** Previous-round indices that feed each match ("Winnaar <match>"), so later cards center between their real feeders. */
+export function bracketFeederIndices(rounds: FeederMatch[][]): number[][][] {
+  return rounds.map((matches, round) => {
+    const previous = rounds[round - 1];
+    if (!previous) return matches.map(() => []);
+    const byName = new Map<string, number>();
+    previous.forEach((match, index) => { if (match.match_name) byName.set(baseName(match.match_name), index); });
+    return matches.map(match => [match.home_slot_label, match.away_slot_label].flatMap(label => {
+      const ref = (label ?? "").match(/^Winnaar\s+(.+)$/i);
+      const index = ref ? byName.get(baseName(ref[1])) : undefined;
+      return index === undefined ? [] : [index];
+    }));
+  });
 }

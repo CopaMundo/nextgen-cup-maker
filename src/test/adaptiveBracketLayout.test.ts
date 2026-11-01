@@ -49,3 +49,29 @@ describe("independent converging bracket geometry", () => {
     expect(placement.tops[0]).toEqual([0, 90, 180, 270, 360, 450, 540, 630]);
   });
 });
+describe("bracket feeder centering", () => {
+  it("centers a next-round card between its real feeders, even when they are not adjacent", async () => {
+    const { adaptiveBracketLayout, bracketFeederIndices } = await import("@/lib/adaptiveBracketLayout");
+    const rounds = [
+      [{ match_name: "Kwartfinale 1" }, { match_name: "Kwartfinale 2" }, { match_name: "Kwartfinale 3" }, { match_name: "Kwartfinale 4" }],
+      [
+        { match_name: "Halve finale 1", home_slot_label: "Winnaar Kwartfinale 1", away_slot_label: "Winnaar Kwartfinale 3" },
+        { match_name: "Halve finale 2", home_slot_label: "Winnaar Kwartfinale 2", away_slot_label: "Winnaar Kwartfinale 4" },
+      ],
+    ];
+    const feeders = bracketFeederIndices(rounds);
+    expect(feeders[1]).toEqual([[0, 2], [1, 3]]);
+    const layout = adaptiveBracketLayout([4, 2], 0, 80, 10, feeders);
+    // feeders 0 and 2 have tops 0 and 180 -> centers 40 and 220 -> midpoint 130 -> top 90
+    expect(layout.tops[1][0]).toBe(90);
+  });
+
+  it("ignores Heen/Terug suffixes when resolving feeders", async () => {
+    const { bracketFeederIndices } = await import("@/lib/adaptiveBracketLayout");
+    const feeders = bracketFeederIndices([
+      [{ match_name: "Kwartfinale 1 (Heen)" }, { match_name: "Kwartfinale 2 (Heen)" }],
+      [{ match_name: "Finale", home_slot_label: "Winnaar Kwartfinale 1", away_slot_label: "Winnaar Kwartfinale 2" }],
+    ]);
+    expect(feeders[1]).toEqual([[0, 1]]);
+  });
+});

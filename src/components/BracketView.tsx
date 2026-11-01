@@ -27,7 +27,7 @@ import { bracketAggregate } from "@/lib/bracketAggregate";
 import { formatFieldLabel } from "@/lib/fieldLocations";
 import AdaptiveBracketViewport from "./AdaptiveBracketViewport";
 import BracketLabel, { isStandardBracketLabel } from "./BracketLabel";
-import { adaptiveBracketLayout, bracketLerp } from "@/lib/adaptiveBracketLayout";
+import { adaptiveBracketLayout, bracketFeederIndices, bracketLerp } from "@/lib/adaptiveBracketLayout";
 
 interface BracketMatch {
   id: string;
@@ -2829,8 +2829,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const compactHeight = compactHeightFor(totalHeight);
     // Geometry follows the finger: values interpolate between the base round and the next one.
     const counts = displayRounds.map(round => round.matches.length);
-    const adaptiveLayout = adaptiveBracketLayout(counts, activeIdx, CARD_H, GAP);
-    const nextLayout = adaptiveBracketLayout(counts, nextIdx, CARD_H, GAP);
+    const feeders = bracketFeederIndices(displayRounds.map(round => round.matches));
+    const adaptiveLayout = adaptiveBracketLayout(counts, activeIdx, CARD_H, GAP, feeders);
+    const nextLayout = adaptiveBracketLayout(counts, nextIdx, CARD_H, GAP, feeders);
     const live = (from: number, to: number) => adaptiveRounds ? bracketLerp(from, to) : from;
     const roundTop = (roundIndex: number, idx: number) => {
       const count = displayRounds[roundIndex].matches.length;
@@ -2869,7 +2870,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   {/* Match cards */}
                   <div className="relative" style={{ height: live(totalHeight, nextTotalHeight) }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} data-bracket-round={roundIdx} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: adaptiveRounds ? bracketLerp(adaptiveLayout.tops[roundIdx]?.[matchIdx] ?? 0, nextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx), minHeight: CARD_H }}>
+                      <div key={match.id} data-bracket-round={roundIdx} data-bracket-feeders={feeders[roundIdx]?.[matchIdx]?.join(",")} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "items-center" : "[&>*]:h-full"}`} style={{ top: adaptiveRounds ? bracketLerp(adaptiveLayout.tops[roundIdx]?.[matchIdx] ?? 0, nextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx), minHeight: CARD_H }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}

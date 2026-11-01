@@ -30,6 +30,14 @@ function successorCard(element: HTMLElement, source: HTMLElement, from: number, 
   const sources = Array.from(element.querySelectorAll<HTMLElement>(`[data-bracket-round="${from}"]`));
   const targets = Array.from(element.querySelectorAll<HTMLElement>(`[data-bracket-round="${to}"]`));
   const index = sources.indexOf(source);
+  const feedersOf = (card: HTMLElement) => (card.dataset.bracketFeeders ?? "").split(",").filter(Boolean).map(Number);
+  if (to === from + 1) {
+    const fed = targets.find(card => feedersOf(card).includes(index));
+    if (fed) return fed;
+  } else if (to === from - 1) {
+    const feeder = feedersOf(source)[0];
+    if (feeder !== undefined && targets[feeder]) return targets[feeder];
+  }
   return targets[bracketSuccessorIndex(Math.max(0, index), sources.length, targets.length)] ?? source;
 }
 
