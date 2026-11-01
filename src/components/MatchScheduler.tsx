@@ -3116,26 +3116,8 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
         {/* ===== PLANNER VIEW ===== */}
         <div className="print-planner-area flex flex-col md:flex-1 md:min-h-0 md:overflow-y-auto">
           <DndContext sensors={sensors} onDragStart={handleDndDragStart} onDragEnd={handleDndDragEnd} onDragCancel={() => { setActiveDragPayload(null); handleDragEnd(); endRefereeDrag(); }}>
-          {/* Top bar — wedstrijddagen als subtiele titels, max 7 zichtbaar met navigatie + datepicker */}
-          {tournamentDates.length > 0 ? (
-            <div className={cn("px-2 pt-2 pb-0 mb-5 print:hidden shrink-0", !isMobile && "flex min-w-0 items-start gap-3")}>
-              <div className="min-w-0 flex-1">
-              <DateStripNav
-                dates={tournamentDates}
-                activeDate={plannerDate}
-                onSelect={setPlannerDate}
-                mobileCarousel={isMobile}
-                onInvalidPick={(iso) => {
-                  toast({
-                    title: "Datum buiten toernooiperiode",
-                    description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
-                    variant: "destructive",
-                  });
-                }}
-              />
-              </div>
-             </div>
-          ) : (
+          {/* Geen wedstrijddagen ingesteld */}
+          {tournamentDates.length === 0 && (
             <div className="flex items-center gap-3 py-4 print:hidden mb-0 text-sm text-muted-foreground">
               <span>Voeg eerst wedstrijddagen toe bij <span className="font-medium text-foreground">Algemeen</span> om de planner te gebruiken.</span>
             </div>
