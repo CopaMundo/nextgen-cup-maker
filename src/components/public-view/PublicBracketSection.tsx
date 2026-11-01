@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { MapPin } from "lucide-react";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import CountryFlag from "@/components/CountryFlag";
@@ -15,7 +15,8 @@ import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
-import { useBracketRoundAlignment } from "@/hooks/useBracketRoundAlignment";
+import { useBracketSnap } from "@/hooks/useBracketSnap";
+import { Button } from "@/components/ui/button";
 
 interface BracketSectionProps {
   groups: any[];
@@ -386,10 +387,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeRound, setActiveRound] = useState(0);
-  useBracketRoundAlignment(scrollRef, activeRound, !presentationCompact);
   const isMobile = useIsMobile();
   const bStyle = useBroadcastStyle();
-  const rafId = useRef<number>(0);
   const [desktopViewportW, setDesktopViewportW] = useState(0);
 
   const PEEK_W = 60;
@@ -499,37 +498,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const placementExtraH = (CARD_H + GAP + 20) * placementMatches.length;
   const mobileTotalH = activeCompactH + placementExtraH;
 
-  // Track scroll progress per round for opacity/position transitions
-  const [roundProgress, setRoundProgress] = useState<number[]>(displayRounds.map(() => 0));
-
-  const detectActiveRound = useCallback(() => {
-    if (!scrollRef.current) return;
-    const el = scrollRef.current;
-    const viewportCenter = el.scrollLeft + el.clientWidth / 2;
-    let closestIdx = 0;
-    let closestDist = Infinity;
-    const colWidth = isMobile ? MOBILE_COL_W : DESKTOP_COL_W;
-
-    // Calculate per-round progress: 0 = centered, 1 = fully scrolled away
-    const newProgress = displayRounds.map((_, i) => {
-      const colCenter = i * colWidth + colWidth / 2;
-      const dist = Math.abs(colCenter - viewportCenter);
-      if (dist < closestDist) { closestDist = dist; closestIdx = i; }
-      return Math.min(1, dist / colWidth);
-    });
-
-    if (adaptiveDesktop) {
-      closestIdx = Math.max(0, Math.min(displayRounds.length - 1, Math.round(el.scrollLeft / DESKTOP_COL_W)));
-      setDesktopViewportW(el.clientWidth);
-    }
-    setActiveRound(closestIdx);
-    if (isMobile) setRoundProgress(newProgress);
-  }, [isMobile, adaptiveDesktop, MOBILE_COL_W, DESKTOP_COL_W, displayRounds.length]);
-
-  const handleScroll = useCallback(() => {
-    cancelAnimationFrame(rafId.current);
-    rafId.current = requestAnimationFrame(detectActiveRound);
-  }, [detectActiveRound]);
+  useBracketSnap(scrollRef, isMobile ? MOBILE_COL_W : DESKTOP_COL_W, displayRounds.length, setActiveRound, setDesktopViewportW);
+  const scrollToRound = (round: number) => scrollRef.current?.scrollTo({ left: round * (isMobile ? MOBILE_COL_W : DESKTOP_COL_W), behavior: "smooth" });
+  const roundTabs = <div className="flex gap-1 overflow-x-auto overscroll-x-contain mb-2">
+    {displayRounds.map((round, index) => <Button key={round.id} variant="ghost" aria-pressed={index === activeRound} onClick={() => scrollToRound(index)} className={`h-7 shrink-0 px-2 text-[10px] ${index === activeRound ? "bg-primary/15 text-primary" : "text-muted-foreground"}`}>{round.name}</Button>)}
+  </div>;
 
   // Initialize active round on mount
   useEffect(() => {
@@ -570,9 +543,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
         scrollRef.current.scrollLeft = targetRoundIdx * colWidth;
       }
     }
-    requestAnimationFrame(() => detectActiveRound());
-    return () => cancelAnimationFrame(rafId.current);
-  }, [detectActiveRound, favoriteTeam]);
+
+  }, [favoriteTeam, isMobile]);
 
   const getSlotLabel = (match: any, side: "home" | "away") => {
     return getMatchSideDisplayName(match, side, teams, { slots, phases, groups: labelGroups || groups, emptyLabel: "TBD" });
@@ -913,21 +885,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       <>
       {renderUnifiedDialog()}
       <div className="relative">
-        {/* Round indicator dots */}
-        <div className="flex justify-center gap-1.5 mb-2">
-          {displayRounds.map((_: any, idx: number) => (
-            <div
-              key={idx}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                idx === activeRound ? "w-4 bg-primary" : "w-1.5 bg-muted-foreground/30"
-              }`}
-            />
-          ))}
-        </div>
+        {roundTabs}
 
         <div
           ref={scrollRef}
-          className="overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4"
+          className="overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-4"
           style={{
             scrollSnapType: "x mandatory",
             scrollSnapStop: "always" as any,
@@ -935,14 +897,13 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             paddingLeft: EDGE_PAD,
             paddingRight: EDGE_PAD,
           }}
-          onScroll={handleScroll}
         >
           <div className="flex" style={{ width: displayRounds.length * MOBILE_COL_W + EDGE_PAD }}>
             {displayRounds.map((round: any, roundIdx: number) => {
               const matchCount = round.matches.length;
-              const progress = roundProgress[roundIdx] ?? 0;
+
               const isActive = roundIdx === activeRound;
-              const opacity = isActive ? 1 : Math.max(0.15, 1 - progress * 2.5);
+              const opacity = 1;
               const focusMatchCount = displayRounds[activeRound]?.matches.length ?? 0;
               const focusCompactHeight = Math.max(CARD_H, (focusMatchCount - 1) * COMPACT_SPACING + CARD_H);
               const getFutureRoundTreeY = (matchIdx: number) => {
@@ -976,11 +937,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                         return (
                           <div
                             key={match.id}
-                            data-bracket-round={roundIdx}
-                            data-bracket-index={matchIdx}
-                            data-bracket-top={y}
-                            data-bracket-name={match.match_name?.replace(/\s+\((Heen|Terug)\)$/, "")}
-                            data-bracket-feeders={JSON.stringify([match.home_slot_label, match.away_slot_label].map((label: string | null) => label?.replace(/^(Winnaar|Verliezer)\s+/i, "").replace(/\s+\((Heen|Terug)\)$/, "")))}
                             className="absolute left-0 right-0"
                             style={{
                               top: 0,
@@ -1145,7 +1101,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 
             // Left side: column then connector. Right side: connector then column (mirrored).
             return (
-              <div key={round.id} className="flex flex-shrink-0">
+              <div key={round.id} className="flex flex-shrink-0 snap-start snap-always">
                 {side === "left" ? (
                   <>
                     {columnEl}
@@ -1218,7 +1174,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   return (
     <>
     {renderUnifiedDialog()}
-    <div ref={adaptiveDesktop ? scrollRef : undefined} onScroll={adaptiveDesktop ? handleScroll : undefined} className="overflow-x-auto overscroll-x-contain pb-4">
+    {adaptiveDesktop && roundTabs}
+    <div ref={adaptiveDesktop ? scrollRef : undefined} className="overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-4">
       <div className="flex" style={adaptiveDesktop ? { width: displayRounds.length * DESKTOP_COL_W + Math.max(0, desktopViewportW - DESKTOP_COL_W) } : undefined}>
         {displayRounds.map((round: any, roundIdx: number) => {
           const matchCount = round.matches.length;
@@ -1241,7 +1198,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             : desktopTreeH;
 
           return (
-            <div key={round.id} className="flex flex-shrink-0">
+            <div key={round.id} className="flex flex-shrink-0 snap-start snap-always">
               <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W }}>
                 <div className={`${compactTree ? "mb-2 h-5" : "mb-3 h-6"} text-center flex items-center justify-center`}>
                   <span className={`${ds(bStyle, "badge")} ${compactTree ? "!text-[10px] !px-2 !py-0.5" : ""}`}>
@@ -1250,7 +1207,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} data-bracket-index={matchIdx} data-bracket-name={match.match_name?.replace(/\s+\((Heen|Terug)\)$/, "")} data-bracket-feeders={JSON.stringify([match.home_slot_label, match.away_slot_label].map((label: string | null) => label?.replace(/^(Winnaar|Verliezer)\s+/i, "").replace(/\s+\((Heen|Terug)\)$/, "")))} data-bracket-top={getTop(matchIdx)} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
+                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}

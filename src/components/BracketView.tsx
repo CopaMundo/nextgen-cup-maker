@@ -2853,14 +2853,14 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
             const getNextCenterY = (idx: number) => getNextTop(idx) + CARD_H / 2;
 
             return (
-              <div key={round.id} className="flex flex-shrink-0">
+              <div key={round.id} className="flex flex-shrink-0 snap-start snap-always">
                 <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds ? { opacity: roundIdx < activeIdx ? 0.35 : 1, transition: "opacity 200ms ease" } : {}) }}>
                   {/* Header */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
                     {adaptiveRounds ? (
-                      <button type="button" onClick={() => scrollAdaptiveToRound(roundIdx)} className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${roundIdx === activeIdx ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
+                      <Button variant="ghost" onClick={() => scrollAdaptiveToRound(roundIdx)} className={`text-[10px] font-bold uppercase tracking-wider h-6 px-2 py-0.5 rounded transition-colors ${roundIdx === activeIdx ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
                         {getRoundDisplayName(round, bracketPrefix)}
-                      </button>
+                      </Button>
                     ) : (
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
                         {getRoundDisplayName(round, bracketPrefix)}
@@ -2870,7 +2870,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                   {/* Match cards */}
                   <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} data-bracket-round={roundIdx} data-bracket-index={matchIdx} data-bracket-top={getTop(matchIdx)} data-bracket-name={match.match_name?.replace(/\s+\((Heen|Terug)\)$/, "")} data-bracket-feeders={JSON.stringify([match.home_slot_label, match.away_slot_label].map(label => label?.replace(/^(Winnaar|Verliezer)\s+/i, "").replace(/\s+\((Heen|Terug)\)$/, "")))} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
+                      <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
