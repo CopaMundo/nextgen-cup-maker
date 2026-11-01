@@ -1,5 +1,4 @@
 import { useEffect, useRef, type RefObject } from "react";
-import { flushSync } from "react-dom";
 
 function verticalScroller(element: HTMLElement): HTMLElement {
   let parent = element.parentElement;
@@ -18,6 +17,7 @@ function verticalScroller(element: HTMLElement): HTMLElement {
  */
 export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: number, roundCount: number, onRound: (round: number) => void, onWidth?: (width: number) => void, onIndicator?: (round: number) => void) {
   const current = useRef(0);
+  const frame = useRef(0);
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
@@ -31,8 +31,6 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
       const viewTop = isRoot ? 0 : scroller.getBoundingClientRect().top;
       const viewBottom = isRoot ? window.innerHeight : viewTop + scroller.clientHeight;
       const centre = (Math.max(viewTop, 0) + Math.min(viewBottom, window.innerHeight)) / 2;
-      // Tree top in view: let the cards glide together as before.
-      if (element.getBoundingClientRect().top >= Math.max(viewTop, 0)) { onRound(round); return; }
       let anchor: HTMLElement | null = null;
       let distance = Infinity;
       element.querySelectorAll<HTMLElement>(`[data-bracket-round="${round}"]`).forEach(card => {
@@ -40,15 +38,19 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
         const d = Math.abs(rect.top + rect.height / 2 - centre);
         if (d < distance) { distance = d; anchor = card; }
       });
-      const before = (anchor as HTMLElement | null)?.getBoundingClientRect().top;
-      // Apply the converged geometry in one frame so the anchor can be held still.
-      element.classList.add("bracket-instant");
-      flushSync(() => onRound(round));
-      if (anchor && before !== undefined) {
-        const delta = (anchor as HTMLElement).getBoundingClientRect().top - before;
+      onRound(round);
+      const held = anchor as HTMLElement | null;
+      if (!held) return;
+      // Cards glide via CSS; hold the followed card still during the glide (both directions).
+      const target = held.getBoundingClientRect().top;
+      const started = performance.now();
+      cancelAnimationFrame(frame.current);
+      const hold = () => {
+        const delta = held.getBoundingClientRect().top - target;
         if (Math.abs(delta) > 0.5) scroller.scrollBy({ top: delta, behavior: "instant" as ScrollBehavior });
-      }
-      requestAnimationFrame(() => requestAnimationFrame(() => element.classList.remove("bracket-instant")));
+        if (performance.now() - started < 320) frame.current = requestAnimationFrame(hold);
+      };
+      frame.current = requestAnimationFrame(hold);
     };
     const resize = new ResizeObserver(() => onWidth?.(element.clientWidth));
     resize.observe(element);
