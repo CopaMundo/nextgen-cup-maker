@@ -3247,7 +3247,25 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
             <div className={cn("flex-1 min-w-0 relative", isMobile && mobileSection !== "velden" ? "hidden" : "")}>
               {/* Action bar — divisie/locatie links, Wedstrijdduur + planner collapse rechts */}
               <div className="sticky top-0 z-20 flex h-9 items-center justify-between gap-2 bg-background px-2 py-1 print:hidden">
-                <div className="flex items-center gap-3 min-w-0">{toolbarLeft}</div>
+                <div className="flex items-center gap-2 min-w-0">
+                  {toolbarLeft}
+                  {tournamentDates.length > 0 && (
+                    <DatePicker
+                      value={plannerDate}
+                      onChange={(iso) => setPlannerDate(iso)}
+                      hideInput
+                      triggerLabel={formatIsoDateForLocale(plannerDate, "nl-BE", { weekday: "short", day: "numeric", month: "short" })}
+                      availableDates={tournamentDates}
+                      onInvalidPick={(iso) => {
+                        toast({
+                          title: "Datum buiten toernooiperiode",
+                          description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
+                          variant: "destructive",
+                        });
+                      }}
+                    />
+                  )}
+                </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button
                     variant="outline"
