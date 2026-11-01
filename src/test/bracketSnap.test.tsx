@@ -2,7 +2,7 @@ import { render, fireEvent } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import AdaptiveBracketViewport from "@/components/AdaptiveBracketViewport";
 import { bracketLerp } from "@/lib/adaptiveBracketLayout";
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 const setup = () => {
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
@@ -30,6 +30,7 @@ describe("bracket geometry follows the horizontal scroll", () => {
     expect(bracketLerp(10, 10)).toBe("10px");
   });
   it("does not shorten the viewport below a still-visible outgoing match", () => {
+    vi.spyOn(HTMLElement.prototype, "scrollBy").mockImplementation(() => {});
     const { rail } = setup();
     vi.spyOn(rail, "getBoundingClientRect").mockReturnValue({ left: 0, right: 304, top: 0 } as DOMRect);
     const card = document.createElement("div");
