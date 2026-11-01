@@ -1,4 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
+import { flushSync } from "react-dom";
 
 function verticalScroller(element: HTMLElement): HTMLElement {
   let parent = element.parentElement;
@@ -9,52 +10,66 @@ function verticalScroller(element: HTMLElement): HTMLElement {
   return (document.scrollingElement as HTMLElement) ?? document.documentElement;
 }
 
+function nearestCard(element: HTMLElement, scroller: HTMLElement, round: number) {
+  const isRoot = scroller === document.scrollingElement || scroller === document.documentElement;
+  const top = isRoot ? 0 : Math.max(0, scroller.getBoundingClientRect().top);
+  const bottom = isRoot ? window.innerHeight : Math.min(window.innerHeight, scroller.getBoundingClientRect().top + scroller.clientHeight);
+  const centre = (top + bottom) / 2;
+  let best: HTMLElement | null = null;
+  let distance = Infinity;
+  element.querySelectorAll<HTMLElement>(`[data-bracket-round="${round}"]`).forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const d = Math.abs(rect.top + rect.height / 2 - centre);
+    if (d < distance) { distance = d; best = card; }
+  });
+  return best as HTMLElement | null;
+}
+
 /**
- * Native scrolling owns each frame; React only updates once scrolling settles.
- * The settled round always converges. The card nearest the viewer's centre in
- * the new round stays at the same screen position, so the followed team stays
- * in view and stacked sibling trees never slide underneath the viewer.
+ * The geometry follows the finger: the rail exposes --bf, the fraction between
+ * the base round and the next one, and cards interpolate their positions in CSS.
+ * React only re-renders when the base round changes. The card the viewer is
+ * looking at is held at the same screen position, so the followed team stays in
+ * view in both directions and sibling trees never slide underneath.
  */
-export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: number, roundCount: number, onRound: (round: number) => void, onWidth?: (width: number) => void, onIndicator?: (round: number) => void) {
-  const current = useRef(0);
-  const frame = useRef(0);
+export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: number, roundCount: number, onBase: (round: number) => void, onWidth?: (width: number) => void, onIndicator?: (round: number) => void) {
+  const base = useRef(0);
+  const indicator = useRef(0);
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const settle = () => {
-      const round = Math.max(0, Math.min(roundCount - 1, Math.round(element.scrollLeft / (columnWidth || 1))));
-      onIndicator?.(round);
-      if (round === current.current) return;
-      current.current = round;
+    let anchor: HTMLElement | null = null;
+    let anchorRound = -1;
+    const apply = () => {
+      const last = Math.max(0, roundCount - 1);
+      const progress = Math.max(0, Math.min(last, element.scrollLeft / (columnWidth || 1)));
+      const nextBase = Math.min(Math.floor(progress), Math.max(0, roundCount - 2));
+      const fraction = roundCount > 1 ? Math.min(1, progress - nextBase) : 0;
+      const shown = Math.round(progress);
       const scroller = verticalScroller(element);
-      const isRoot = scroller === document.scrollingElement || scroller === document.documentElement;
-      const viewTop = isRoot ? 0 : scroller.getBoundingClientRect().top;
-      const viewBottom = isRoot ? window.innerHeight : viewTop + scroller.clientHeight;
-      const centre = (Math.max(viewTop, 0) + Math.min(viewBottom, window.innerHeight)) / 2;
-      let anchor: HTMLElement | null = null;
-      let distance = Infinity;
-      element.querySelectorAll<HTMLElement>(`[data-bracket-round="${round}"]`).forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const d = Math.abs(rect.top + rect.height / 2 - centre);
-        if (d < distance) { distance = d; anchor = card; }
-      });
-      onRound(round);
-      const held = anchor as HTMLElement | null;
-      if (!held) return;
-      // Cards glide via CSS; hold the followed card still during the glide (both directions).
-      const target = held.getBoundingClientRect().top;
-      const started = performance.now();
-      cancelAnimationFrame(frame.current);
-      const hold = () => {
-        const delta = held.getBoundingClientRect().top - target;
+      if (shown !== anchorRound || !anchor?.isConnected) { anchor = nearestCard(element, scroller, shown); anchorRound = shown; }
+      const before = anchor?.getBoundingClientRect().top;
+      if (nextBase !== base.current) { base.current = nextBase; flushSync(() => onBase(nextBase)); }
+      element.style.setProperty("--bf", fraction.toFixed(4));
+      if (anchor && before !== undefined) {
+        const delta = anchor.getBoundingClientRect().top - before;
         if (Math.abs(delta) > 0.5) scroller.scrollBy({ top: delta, behavior: "instant" as ScrollBehavior });
-        if (performance.now() - started < 320) frame.current = requestAnimationFrame(hold);
-      };
-      frame.current = requestAnimationFrame(hold);
+      }
+      if (shown !== indicator.current) { indicator.current = shown; onIndicator?.(shown); }
     };
-    const resize = new ResizeObserver(() => onWidth?.(element.clientWidth));
+    const resize = new ResizeObserver(() => { onWidth?.(element.clientWidth); });
     resize.observe(element);
-    element.addEventListener("scrollend", settle, { passive: true });
-    return () => { resize.disconnect(); element.removeEventListener("scrollend", settle); };
-  });
+    // A vertical scroll elsewhere changes what the viewer is looking at.
+    const forget = () => { anchorRound = -1; };
+    element.addEventListener("scroll", apply, { passive: true });
+    window.addEventListener("wheel", forget, { passive: true });
+    window.addEventListener("touchend", forget, { passive: true });
+    apply();
+    return () => {
+      resize.disconnect();
+      element.removeEventListener("scroll", apply);
+      window.removeEventListener("wheel", forget);
+      window.removeEventListener("touchend", forget);
+    };
+  }, [ref, columnWidth, roundCount, onBase, onWidth, onIndicator]);
 }
