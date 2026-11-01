@@ -14,6 +14,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
+import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 
 interface BracketSectionProps {
   groups: any[];
@@ -387,10 +388,12 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const isMobile = useIsMobile();
   const bStyle = useBroadcastStyle();
   const rafId = useRef<number>(0);
+  const [desktopViewportW, setDesktopViewportW] = useState(0);
 
   const PEEK_W = 60;
   const EDGE_PAD = 20;
   const compactTree = presentationCompact && !isMobile;
+  const adaptiveDesktop = !isMobile && !presentationCompact;
   // Compact (slideshow) cards have generous broadcast-style sizing — the BracketAutoFit
   // wrapper scales the entire tree down to fit the viewport.
   // Base sizes scale with the number of rounds in this bracket: fewer rounds = larger,
@@ -515,9 +518,13 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
       return Math.min(1, dist / colWidth);
     });
 
+    if (adaptiveDesktop) {
+      closestIdx = Math.max(0, Math.min(displayRounds.length - 1, Math.round(el.scrollLeft / DESKTOP_COL_W)));
+      setDesktopViewportW(el.clientWidth);
+    }
     setActiveRound(closestIdx);
     if (isMobile) setRoundProgress(newProgress);
-  }, [isMobile, MOBILE_COL_W, DESKTOP_COL_W, displayRounds.length]);
+  }, [isMobile, adaptiveDesktop, MOBILE_COL_W, DESKTOP_COL_W, displayRounds.length]);
 
   const handleScroll = useCallback(() => {
     cancelAnimationFrame(rafId.current);
@@ -1019,16 +1026,20 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     );
   }
 
-  // === DESKTOP: static horizontal bracket with SVG connectors ===
+  const desktopLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeRound, CARD_H, GAP);
+  const desktopTreeH = adaptiveDesktop ? desktopLayout.height : totalHeight;
+  const desktopTop = (round: number, match: number) => desktopLayout.tops[round]?.[match] ?? 0;
+
+  // === DESKTOP: keep broadcast cards, converge the round at the left edge ===
   // Desktop uses fixed totalHeight based on first round - no dynamic collapsing
   // Calculate the actual content height needed (placement below finale)
   const lastRoundMatchCount = displayRounds.length > 0 ? displayRounds[displayRounds.length - 1].matches.length : 1;
   const finaleTopDesktop = lastRoundMatchCount === 1 && displayRounds.length > 1
-    ? (totalHeight - CARD_H) / 2
+    ? adaptiveDesktop ? desktopTop(displayRounds.length - 1, 0) : (totalHeight - CARD_H) / 2
     : 0;
   const placementBottomDesktop = placementMatches.length > 0
     ? finaleTopDesktop + CARD_H + GAP + (compactTree ? 4 : 16) + placementMatches.length * (CARD_H + (compactTree ? 10 : 36))
-    : totalHeight;
+    : desktopTreeH;
   const desktopContainerH = Math.max(totalHeight, placementBottomDesktop);
 
   // === MIRRORED LAYOUT (presentation slideshow only) ===
@@ -1120,7 +1131,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className="relative" style={{ height: sideHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx) }}>
+                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
@@ -1203,13 +1214,13 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   return (
     <>
     {renderUnifiedDialog()}
-    <div className="overflow-x-auto pb-4">
-      <div className="flex">
+    <div ref={adaptiveDesktop ? scrollRef : undefined} onScroll={adaptiveDesktop ? handleScroll : undefined} className="overflow-x-auto pb-4">
+      <div className="flex" style={adaptiveDesktop ? { width: displayRounds.length * DESKTOP_COL_W + Math.max(0, desktopViewportW - DESKTOP_COL_W) } : undefined}>
         {displayRounds.map((round: any, roundIdx: number) => {
           const matchCount = round.matches.length;
           const slotH = totalHeight / matchCount;
           const isFirstRound = roundIdx === 0;
-          const getTop = (idx: number) => isFirstRound
+          const getTop = (idx: number) => adaptiveDesktop ? desktopTop(roundIdx, idx) : isFirstRound
             ? idx * (CARD_H + GAP)
             : slotH * idx + (slotH - CARD_H) / 2;
           const getCenterY = (idx: number) => getTop(idx) + CARD_H / 2;
@@ -1217,13 +1228,13 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           const nextRound = roundIdx < displayRounds.length - 1 ? displayRounds[roundIdx + 1] : null;
           const nextMatchCount = nextRound ? nextRound.matches.length : 0;
           const nextSlotH = nextMatchCount > 0 ? totalHeight / nextMatchCount : 0;
-          const getNextTop = (idx: number) => nextSlotH * idx + (nextSlotH - CARD_H) / 2;
+          const getNextTop = (idx: number) => adaptiveDesktop ? desktopTop(roundIdx + 1, idx) : nextSlotH * idx + (nextSlotH - CARD_H) / 2;
           const getNextCenterY = (idx: number) => getNextTop(idx) + CARD_H / 2;
           
           // Last round with placement: height = placement bottom; others = totalHeight
           const roundHeight = roundIdx === displayRounds.length - 1 && placementMatches.length > 0
             ? placementBottomDesktop
-            : totalHeight;
+            : desktopTreeH;
 
           return (
             <div key={round.id} className="flex flex-shrink-0">
@@ -1233,15 +1244,15 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     {round.name}
                   </span>
                 </div>
-                <div className="relative" style={{ height: roundHeight }}>
+                <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight, transition: adaptiveDesktop ? "height 250ms ease" : undefined }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx) }}>
+                    <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
 
                   {roundIdx === displayRounds.length - 1 && placementMatches.length > 0 && (() => {
-                    const finaleTop = displayRounds.length > 1 ? (totalHeight - CARD_H) / 2 : 0;
+                    const finaleTop = adaptiveDesktop ? desktopTop(roundIdx, 0) : displayRounds.length > 1 ? (totalHeight - CARD_H) / 2 : 0;
       const placementTop = finaleTop + CARD_H + GAP + (compactTree ? 4 : 16);
                     return (
                       <div className="absolute left-0 right-0" style={{ top: placementTop }}>
@@ -1260,7 +1271,9 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                   })()}
                 </div>
               </div>
-              {roundIdx < displayRounds.length - 1 && matchCount >= 2 && (
+              {roundIdx < displayRounds.length - 1 && (adaptiveDesktop ? (
+                <div aria-hidden className="shrink-0" style={{ width: CONNECTOR_W }} />
+              ) : matchCount >= 2 && (
                 <svg className="flex-shrink-0" width={CONNECTOR_W} style={{ marginTop: HEADER_H, height: totalHeight }} xmlns="http://www.w3.org/2000/svg">
                   {round.matches.map((_: any, matchIdx: number) => {
                     if (matchIdx % 2 !== 0) return null;
@@ -1279,7 +1292,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     );
                   })}
                 </svg>
-              )}
+              ))}
             </div>
           );
         })}

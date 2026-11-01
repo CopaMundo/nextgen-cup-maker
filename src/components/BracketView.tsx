@@ -25,6 +25,9 @@ import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import LiveDrawDialog from "./LiveDrawDialog";
 import { bracketAggregate } from "@/lib/bracketAggregate";
 import { formatFieldLabel } from "@/lib/fieldLocations";
+import AdaptiveBracketViewport from "./AdaptiveBracketViewport";
+import BracketLabel from "./BracketLabel";
+import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 
 interface BracketMatch {
   id: string;
@@ -2522,14 +2525,12 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           >
             {logo && <img src={logo} className="h-4 w-4 object-contain flex-shrink-0" alt="" />}
             <div className={`flex items-center gap-1 flex-1 min-w-0 ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : (isHome && homeName === "BYE") || (!isHome && awayName === "BYE") ? "font-mono font-bold text-primary" : ""}`}>
-              <span title={name} className={`text-[11px] truncate ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
-                {name}
-              </span>
+              <BracketLabel name={name} full={compact && !hasTeam} className={`text-[11px] leading-tight ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`} />
               {tournament?.show_country && (isHome ? match.home_team_id : match.away_team_id) && (
                 <CountryFlag country={getTeamCountry(isHome ? match.home_team_id : match.away_team_id)} className="h-3 w-4 object-contain flex-shrink-0 align-middle" />
               )}
             </div>
-            {canPickTeam && !(isHome ? match.home_team_id : match.away_team_id) && <ChevronDown className="h-3 w-3 text-muted-foreground" />}
+            {canPickTeam && !(isHome ? match.home_team_id : match.away_team_id) && <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />}
 
             {/* H&A: total + dual score inputs + inline penalties */}
             {matchIsHA && pairedMatch && !matchHasBye && showScores && effectiveScoreEditable ? (
@@ -2682,9 +2683,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                               groups as any
                             );
                         return (
-                          <span title={`${baseName}${suffix}${haSuffix}`} className="text-[10px] font-semibold text-muted-foreground truncate leading-tight block">
-                            {baseName}{suffix}{haSuffix}
-                          </span>
+                          <BracketLabel name={`${baseName}${suffix}${haSuffix}`} full={compact && /^(?:P\d+-\d+:\s*)?(?:Finale|Halve finale|Kwartfinale|Achtste finale|Zestiende finale|Ronde)\b/i.test(baseName)} className="text-[10px] font-semibold text-muted-foreground leading-tight" />
                         );
                       })()}
                       {dateStr && (
@@ -2782,51 +2781,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
   useEffect(() => () => { bracketCardObserver.current?.disconnect(); bracketCardObserver.current = null; }, []);
 
-  // Results popup: track which round is at the left edge of the scrolling parent,
-  // so that round stacks compactly and later rounds converge between their feeders.
-  const [adaptiveEl, setAdaptiveEl] = useState<HTMLDivElement | null>(null);
-  const [adaptiveActiveRound, setAdaptiveActiveRound] = useState(0);
-  const [adaptiveViewportW, setAdaptiveViewportW] = useState(0);
-  const ADAPTIVE_COL_W = 208 + 24;
-  const getAdaptiveScroller = useCallback((el: HTMLElement | null) => {
-    let node = el?.parentElement ?? null;
-    while (node) {
-      const style = window.getComputedStyle(node);
-      if (/(auto|scroll)/.test(style.overflowX)) return node;
-      node = node.parentElement;
-    }
-    return null;
-  }, []);
-  const getAdaptiveBase = useCallback((el: HTMLElement, scroller: HTMLElement) =>
-    el.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft, []);
-  useEffect(() => {
-    if (!adaptiveRounds || !adaptiveEl) return;
-    const scroller = getAdaptiveScroller(adaptiveEl);
-    if (!scroller) return;
-    let raf = 0;
-    const update = () => {
-      const base = getAdaptiveBase(adaptiveEl, scroller);
-      setAdaptiveActiveRound(Math.max(0, Math.round((scroller.scrollLeft - base) / ADAPTIVE_COL_W)));
-      setAdaptiveViewportW(scroller.clientWidth);
-    };
-    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
-    update();
-    scroller.addEventListener("scroll", onScroll, { passive: true });
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(onScroll) : null;
-    ro?.observe(scroller);
-    return () => { cancelAnimationFrame(raf); scroller.removeEventListener("scroll", onScroll); ro?.disconnect(); };
-  }, [adaptiveRounds, adaptiveEl, getAdaptiveScroller, getAdaptiveBase, ADAPTIVE_COL_W]);
-  const scrollAdaptiveToRound = useCallback((roundIdx: number) => {
-    if (!adaptiveEl) return;
-    const scroller = getAdaptiveScroller(adaptiveEl);
-    if (!scroller) return;
-    scroller.scrollTo({ left: getAdaptiveBase(adaptiveEl, scroller) + roundIdx * ADAPTIVE_COL_W, top: 0, behavior: "smooth" });
-  }, [adaptiveEl, getAdaptiveScroller, getAdaptiveBase, ADAPTIVE_COL_W]);
-
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
-    const defaultCardWidth = compact ? 208 : isMobile ? 236 : 272;
+    const defaultCardWidth = compact ? 280 : isMobile ? 236 : 272;
     const CONNECTOR_W = compact ? 16 : isMobile ? 24 : 32;
     // Card height is measured from the real DOM (headers, dates, score inputs all change it),
     // so spacing stays correct whether cards are empty, filled with teams or with scores.
@@ -2859,30 +2817,19 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const inlinePlacementCount = inlinePlacementMatch && !placementIds.has(inlinePlacementMatch.id) ? 1 : 0;
     const placementCount = placementRounds.reduce((count, r) => count + r.matches.length, inlinePlacementCount);
     const placementGap = compact ? 20 : 48;
-    const renderTree = (CARD_W = defaultCardWidth) => {
+    const renderTree = (adaptiveActiveRound = 0, adaptiveViewportW = 0, scrollAdaptiveToRound: (round: number) => void = () => {}) => {
+    const CARD_W = defaultCardWidth;
+    const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
     const activeCount = displayRounds[activeIdx]?.matches.length ?? firstRoundCount;
     // Results popup: height follows the active round so whitespace disappears as rounds converge.
     const totalHeight = adaptiveRounds ? activeCount * CARD_H + Math.max(0, activeCount - 1) * GAP : defaultTotalHeight;
     const compactHeight = Math.max(totalHeight, totalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
     // Active and earlier rounds stack under each other; every later card sits exactly in the middle of its two feeders.
-    const treeCenters: number[][] = [];
-    if (adaptiveRounds) {
-      displayRounds.forEach((round, r) => {
-        const count = round.matches.length;
-        const prev = treeCenters[r - 1];
-        treeCenters.push(Array.from({ length: count }, (_, i) => {
-          if (r <= activeIdx || !prev) return i * (CARD_H + GAP) + CARD_H / 2;
-          if (prev.length === count * 2) return (prev[2 * i] + prev[2 * i + 1]) / 2;
-          if (prev.length === count) return prev[i];
-          const slot = totalHeight / count;
-          return slot * i + slot / 2;
-        }));
-      });
-    }
+    const adaptiveLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeIdx, CARD_H, GAP);
     const roundTop = (roundIndex: number, idx: number) => {
       const count = displayRounds[roundIndex].matches.length;
-      if (adaptiveRounds) return (treeCenters[roundIndex]?.[idx] ?? CARD_H / 2) - CARD_H / 2;
+      if (adaptiveRounds) return adaptiveLayout.tops[roundIndex]?.[idx] ?? 0;
       if (roundIndex === 0) return idx * (CARD_H + GAP);
       const slot = totalHeight / count;
       return slot * idx + (slot - CARD_H) / 2;
@@ -2891,7 +2838,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     // === BRACKET TREE (fixed round columns + elbow connectors, mobile & desktop) ===
 
     return (
-      <div ref={adaptiveRounds ? setAdaptiveEl : undefined} className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto"} ${compact ? "pb-2" : "pb-4"}`}>
+      <div className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto"} ${compact ? "pb-2" : "pb-4"}`}>
         <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
@@ -3011,7 +2958,11 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       </div>
     );
     };
-    return renderTree();
+    return adaptiveRounds ? (
+      <AdaptiveBracketViewport key={bracketPrefix ?? "main"} roundCount={displayRounds.length} columnWidth={defaultCardWidth + 24}>
+        {({ activeRound, viewportWidth, scrollToRound }) => renderTree(activeRound, viewportWidth, scrollToRound)}
+      </AdaptiveBracketViewport>
+    ) : renderTree();
   };
 
   const hasRenderableContent = rounds.length > 0 || sortedLoserKeys.length > 0;
@@ -3088,10 +3039,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           )}
           <div className={`flex flex-col ${compact ? "pb-4" : "pb-72"}`} style={{ gap: compact ? 10 : 16, overflow: "visible" }}>
             {rounds.flatMap(r => r.matches).map(match => (
-              <div key={match.id} className="relative" style={{ width: compact ? 208 : 272, overflow: "visible" }}>{renderMatchCard(match)}</div>
+              <div key={match.id} className="relative" style={{ width: compact ? 280 : 272, overflow: "visible" }}>{renderMatchCard(match)}</div>
             ))}
             {editable && (
-              <Button variant="outline" size="sm" className={compact ? "w-52" : "w-[272px]"} onClick={addSingleMatch}>
+              <Button variant="outline" size="sm" className={compact ? "w-[280px]" : "w-[272px]"} onClick={addSingleMatch}>
                 <Plus className="h-3.5 w-3.5" /> Losse wedstrijd
               </Button>
             )}
