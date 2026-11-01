@@ -930,6 +930,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                           <div
                             key={match.id}
                             data-bracket-round={roundIdx}
+                            data-bracket-feeders={roundFeeders[roundIdx]?.[matchIdx]?.join(",")}
                             className="absolute left-0 right-0"
                             style={{
                               top: 0,
@@ -1200,7 +1201,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className="relative" style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: adaptiveDesktop ? bracketLerp(desktopTop(roundIdx, matchIdx), desktopNextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx) }}>
+                    <div key={match.id} data-bracket-round={roundIdx} data-bracket-feeders={roundFeeders[roundIdx]?.[matchIdx]?.join(",")} className="absolute left-0 right-0" style={{ top: adaptiveDesktop ? bracketLerp(desktopTop(roundIdx, matchIdx), desktopNextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx) }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
