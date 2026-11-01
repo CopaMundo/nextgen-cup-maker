@@ -2134,15 +2134,15 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                     onClick={() => setExpandedFormats(new Set([format.id]))}
                     className={cn(
                       "flex h-14 w-44 shrink-0 flex-col justify-between rounded-lg border-2 bg-card px-2.5 py-2 text-left transition-colors",
-                      isComplete ? "border-accent/60" : "border-border hover:border-primary/40 hover:bg-accent/30"
+                      isComplete ? "border-green-500/50" : "border-border hover:border-primary/40 hover:bg-accent/30"
                     )}>
                     <span className="flex min-w-0 items-center gap-1.5">
                       <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground" title={format.name}>{format.name}</span>
-                      {isComplete && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-accent" aria-label="Voltooid" />}
+                      {isComplete && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-600 dark:text-green-400" aria-label="Voltooid" />}
                       <span className="shrink-0 text-[10px] font-normal tabular-nums text-muted-foreground">{playedCount}/{totalCount}</span>
                     </span>
                     <span role="progressbar" aria-label={`${format.name}: gespeelde wedstrijden`} aria-valuemin={0} aria-valuemax={totalCount} aria-valuenow={playedCount} className="h-1 w-full overflow-hidden rounded-full bg-secondary">
-                      <span className={cn("block h-full transition-[width]", isComplete ? "bg-accent" : "bg-primary")} style={{ width: `${percent}%` }} />
+                      <span className={cn("block h-full transition-[width]", isComplete ? "bg-green-500" : "bg-primary")} style={{ width: `${percent}%` }} />
                     </span>
                   </button>;
                 })}
