@@ -2,6 +2,19 @@ import { describe, expect, it } from "vitest";
 import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
 
 describe("independent converging bracket geometry", () => {
+  it("reserves the first-round height for every active round without losing compact geometry", () => {
+    for (let round = 0; round < 4; round++) {
+      const layout = adaptiveBracketLayout([8, 4, 2, 1], round, 80, 10);
+      expect(layout.containerHeight).toBe(710);
+      expect(layout.tops[round][0]).toBe(0);
+    }
+    expect(adaptiveBracketLayout([8, 4, 2, 1], 3, 80, 10).height).toBe(80);
+  });
+  it("reserves each placement tree independently and handles an empty tree", () => {
+    expect(adaptiveBracketLayout([16, 8, 4, 2, 1], 4, 80, 10).containerHeight).toBe(1430);
+    expect(adaptiveBracketLayout([8, 4, 2, 1], 0, 80, 10).containerHeight).toBe(710);
+    expect(adaptiveBracketLayout([], 0, 80, 10).containerHeight).toBe(0);
+  });
   it("stacks the active round and centers later matches between both feeders", () => {
     const layout = adaptiveBracketLayout([8, 4, 2, 1], 1, 80, 10);
     expect(layout.height).toBe(350);

@@ -2822,9 +2822,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
     const activeCount = displayRounds[activeIdx]?.matches.length ?? firstRoundCount;
-    // Results popup: height follows the active round so whitespace disappears as rounds converge.
+    // Only the card geometry converges; reserve the first-round footprint for the next tree.
     const totalHeight = adaptiveRounds ? activeCount * CARD_H + Math.max(0, activeCount - 1) * GAP : defaultTotalHeight;
-    const compactHeight = Math.max(totalHeight, totalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
+    const compactHeight = Math.max(defaultTotalHeight, defaultTotalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
     // Active and earlier rounds stack under each other; every later card sits exactly in the middle of its two feeders.
     const adaptiveLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeIdx, CARD_H, GAP);
     const roundTop = (roundIndex: number, idx: number) => {
@@ -2838,8 +2838,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     // === BRACKET TREE (fixed round columns + elbow connectors, mobile & desktop) ===
 
     return (
-      <div className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto"} ${compact ? "pb-2" : "pb-4"}`}>
-        <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
+      <div className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto overscroll-x-contain"} ${compact ? "pb-2" : "pb-4"}`}>
+        <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : defaultTotalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
             const getTop = (idx: number) => roundTop(roundIdx, idx);
@@ -2868,7 +2868,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     )}
                   </div>
                   {/* Match cards */}
-                  <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight, ...(adaptiveRounds ? { transition: "height 250ms ease" } : {}) }}>
+                  <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: adaptiveLayout.containerHeight }}>
                     {round.matches.map((match, matchIdx) => (
                       <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
                         {renderMatchCard(match)}
@@ -3078,8 +3078,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           const showSep = !isChild || (parentPrefix ? shouldShowSeparator(p, parentPrefix) : false);
           const displayName = getBracketName(p);
           return (
-            <div key={p}>
-              <div className={`border-t border-border ${compact ? "my-3" : "my-6"}`} />
+            <div key={p} className="pt-8">
+              <div className="border-t border-border mb-4" />
               <div className="flex items-center justify-between mb-2">
                 <h3 className={`text-sm font-bold text-foreground flex items-center gap-1 ${editable ? "cursor-pointer hover:text-primary" : ""}`}
                     onClick={() => { if (editable) { setEditingBracketName(p); setBracketNameEdit(getSubBracketName(p)); editingBracketRoundsRef.current = loserBrackets[p]; } }}>
