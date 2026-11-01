@@ -30,7 +30,7 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
     update();
     return () => { cancelAnimationFrame(raf); observer.disconnect(); el.removeEventListener("scroll", onScroll); };
   }, [columnWidth, roundCount]);
-  return <div ref={ref} className="w-full min-w-0 overflow-x-auto pb-2" aria-label="Bracketrondes">
+  return <div ref={ref} className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-2" aria-label="Bracketrondes">
     {children({ activeRound, viewportWidth, scrollToRound: round => ref.current?.scrollTo({ left: round * columnWidth, behavior: "smooth" }) })}
   </div>;
 }

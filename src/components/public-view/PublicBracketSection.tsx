@@ -491,13 +491,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     return byRound;
   }, [matchPositions, displayRounds.length, CARD_H]);
 
-  // Container height - dynamic based on active round
-  const activeMatchCount = displayRounds[activeRound]?.matches.length ?? firstRoundCount;
-  const activeCompactH = TOP_OFFSET + activeMatchCount * COMPACT_SPACING + 16;
-  // Only add placement height when we're on the last round (where placement matches live)
-  const isLastRoundActive = activeRound === displayRounds.length - 1;
-  const placementExtraH = (placementMatches.length > 0 && isLastRoundActive) ? (CARD_H + GAP + 20) * placementMatches.length : 0;
-  const mobileTotalH = activeCompactH + placementExtraH;
+  // Reserve first-round space and placement rows regardless of the horizontally active round.
+  const firstCompactH = TOP_OFFSET + firstRoundCount * COMPACT_SPACING + 16;
+  const placementExtraH = (CARD_H + GAP + 20) * placementMatches.length;
+  const mobileTotalH = firstCompactH + placementExtraH;
 
   // Track scroll progress per round for opacity/position transitions
   const [roundProgress, setRoundProgress] = useState<number[]>(displayRounds.map(() => 0));
@@ -927,7 +924,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
 
         <div
           ref={scrollRef}
-          className="overflow-x-auto overflow-y-hidden pb-4"
+          className="overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4"
           style={{
             scrollSnapType: "x mandatory",
             scrollSnapStop: "always" as any,
@@ -943,7 +940,6 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
               const progress = roundProgress[roundIdx] ?? 0;
               const isActive = roundIdx === activeRound;
               const opacity = isActive ? 1 : Math.max(0.15, 1 - progress * 2.5);
-              const compactH = TOP_OFFSET + matchCount * COMPACT_SPACING + 16;
               const focusMatchCount = displayRounds[activeRound]?.matches.length ?? 0;
               const focusCompactHeight = Math.max(CARD_H, (focusMatchCount - 1) * COMPACT_SPACING + CARD_H);
               const getFutureRoundTreeY = (matchIdx: number) => {
@@ -968,7 +964,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                         {round.name}
                       </span>
                     </div>
-                    <div className="relative" style={{ height: isActive ? compactH : mobileTotalH, transition: "height 300ms ease" }}>
+                    <div className="relative" style={{ height: mobileTotalH }}>
                       {round.matches.map((match: any, matchIdx: number) => {
                         const pos = matchPositions.find(p => p.matchId === match.id);
                         const y = isActive
@@ -1027,7 +1023,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   }
 
   const desktopLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeRound, CARD_H, GAP);
-  const desktopTreeH = adaptiveDesktop ? desktopLayout.height : totalHeight;
+  const desktopTreeH = adaptiveDesktop ? desktopLayout.containerHeight : totalHeight;
   const desktopTop = (round: number, match: number) => desktopLayout.tops[round]?.[match] ?? 0;
 
   // === DESKTOP: keep broadcast cards, converge the round at the left edge ===
@@ -1040,7 +1036,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   const placementBottomDesktop = placementMatches.length > 0
     ? finaleTopDesktop + CARD_H + GAP + (compactTree ? 4 : 16) + placementMatches.length * (CARD_H + (compactTree ? 10 : 36))
     : desktopTreeH;
-  const desktopContainerH = Math.max(totalHeight, placementBottomDesktop);
+  const initialDesktopLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), 0, CARD_H, GAP);
+  const initialFinaleTop = initialDesktopLayout.tops[displayRounds.length - 1]?.[0] ?? 0;
+  const desktopContainerH = adaptiveDesktop
+    ? Math.max(desktopTreeH, initialFinaleTop + CARD_H + GAP + 16 + placementMatches.length * (CARD_H + 36))
+    : Math.max(totalHeight, placementBottomDesktop);
 
   // === MIRRORED LAYOUT (presentation slideshow only) ===
   // Splits bracket into left + right halves meeting at the final in the center.
@@ -1214,7 +1214,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   return (
     <>
     {renderUnifiedDialog()}
-    <div ref={adaptiveDesktop ? scrollRef : undefined} onScroll={adaptiveDesktop ? handleScroll : undefined} className="overflow-x-auto pb-4">
+    <div ref={adaptiveDesktop ? scrollRef : undefined} onScroll={adaptiveDesktop ? handleScroll : undefined} className="overflow-x-auto overscroll-x-contain pb-4">
       <div className="flex" style={adaptiveDesktop ? { width: displayRounds.length * DESKTOP_COL_W + Math.max(0, desktopViewportW - DESKTOP_COL_W) } : undefined}>
         {displayRounds.map((round: any, roundIdx: number) => {
           const matchCount = round.matches.length;
@@ -1232,7 +1232,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           const getNextCenterY = (idx: number) => getNextTop(idx) + CARD_H / 2;
           
           // Last round with placement: height = placement bottom; others = totalHeight
-          const roundHeight = roundIdx === displayRounds.length - 1 && placementMatches.length > 0
+          const roundHeight = adaptiveDesktop ? desktopContainerH : roundIdx === displayRounds.length - 1 && placementMatches.length > 0
             ? placementBottomDesktop
             : desktopTreeH;
 
@@ -1244,7 +1244,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     {round.name}
                   </span>
                 </div>
-                <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight, transition: adaptiveDesktop ? "height 250ms ease" : undefined }}>
+                <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
                     <div key={match.id} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
@@ -1544,7 +1544,7 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
     <div className={presentationCompact ? "space-y-0" : "space-y-2"}>
       {/* Level 1: Top-level bracket tabs */}
       {showTopTabs && (
-        <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+        <div className="flex gap-1 overflow-x-auto overscroll-x-contain pb-0.5 scrollbar-none">
           <button
             onClick={() => { handleTopTabChange("all"); }}
             className={`${ds(bStyle, "phaseTab")} ${
@@ -1565,7 +1565,7 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
 
       {/* Level 2: Sub-bracket tabs */}
       {showSubTabs && selectedTopTab !== "all" && (
-        <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+        <div className="flex gap-1 overflow-x-auto overscroll-x-contain pb-0.5 scrollbar-none">
           <button
             onClick={() => setSelectedSubTab("all")}
             className={`${ds(bStyle, "phaseTab")} ${
@@ -1586,11 +1586,11 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
 
       {/* Content */}
       {allRoundsToRender ? (
-        <div className="space-y-0" ref={!allRoundsToRender ? undefined : sectionContainerRef}>
+        <div className={presentationCompact ? "space-y-0" : "space-y-8"} ref={!allRoundsToRender ? undefined : sectionContainerRef}>
           {allRoundsToRender.map((section, idx) => (
             <div key={section.section} data-bracket-group={section.rounds.flatMap((r: any) => r.matches.map((m: any) => m.group_id)).filter(Boolean).join(",")}>
               {allRoundsToRender.length > 1 && (
-                <div className={`flex items-center gap-2 ${presentationCompact ? "mb-1.5" : "mb-3"} ${idx > 0 ? (presentationCompact ? "mt-3" : "mt-6") : ""}`}>
+                <div className={`flex items-center gap-2 ${presentationCompact ? "mb-1.5" : "mb-3"} ${idx > 0 && presentationCompact ? "mt-3" : ""}`}>
                   <div className={ds(bStyle, "sectionDot")} />
                   <h3 className={`${ds(bStyle, "sectionTitle") || "text-sm font-black uppercase tracking-wider"} !text-xs ${bStyle === "teletext" ? "ttx-title-solo" : ""}`}>{section.section}</h3>
                   {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}
@@ -1601,11 +1601,11 @@ const PublicBracketSection = ({ groups, labelGroups, matches, teams, slots = [],
           ))}
         </div>
       ) : (selectedSubTab === "all" || !activeSubRounds) ? (
-        <div className="space-y-0" ref={allRoundsToRender ? undefined : sectionContainerRef}>
+        <div className={presentationCompact ? "space-y-0" : "space-y-8"} ref={allRoundsToRender ? undefined : sectionContainerRef}>
           {getSubContent.allRounds.map((section, idx) => (
             <div key={section.section} data-bracket-group={section.rounds.flatMap((r: any) => r.matches.map((m: any) => m.group_id)).filter(Boolean).join(",")}>
               {getSubContent.allRounds.length > 1 && (
-                <div className={`flex items-center gap-2 ${presentationCompact ? "mb-1.5" : "mb-3"} ${idx > 0 ? (presentationCompact ? "mt-3" : "mt-6") : ""}`}>
+                <div className={`flex items-center gap-2 ${presentationCompact ? "mb-1.5" : "mb-3"} ${idx > 0 && presentationCompact ? "mt-3" : ""}`}>
                   <div className={ds(bStyle, "sectionDot")} />
                   <h3 className={`${ds(bStyle, "sectionTitle") || "text-sm font-black uppercase tracking-wider"} !text-xs ${bStyle === "teletext" ? "ttx-title-solo" : ""}`}>{section.section}</h3>
                   {bStyle !== "teletext" && <div className={ds(bStyle, "sectionLine")} />}

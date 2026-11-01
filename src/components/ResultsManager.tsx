@@ -2268,7 +2268,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
           <Dialog open={!!openFormat} onOpenChange={(open) => { if (!open) setExpandedFormats(new Set()); }}>
             <DialogContent scrollable={false} className={`${openFormat && (openFormat.phase_type === "knockout" || openFormat.phase_type === "single_match") ? "max-w-5xl max-h-[85dvh]" : "max-w-2xl max-h-[80dvh]"} overflow-hidden p-0 [&>div:first-child]:flex [&>div:first-child]:flex-col`}>
               <div className="flex h-full max-h-[80vh] flex-col">
-                <div className="min-h-0 flex-1 space-y-4 overflow-auto p-4 pb-16 sm:p-6 sm:pb-16">
+                <div className={`min-h-0 flex-1 space-y-4 overflow-auto p-4 pb-16 sm:p-6 sm:pb-16 ${openFormat && (openFormat.phase_type === "knockout" || openFormat.phase_type === "single_match") ? "overscroll-x-contain" : ""}`}>
                   <DialogHeader>
                     <DialogTitle>{openFormat?.name || ""}</DialogTitle>
                   </DialogHeader>
