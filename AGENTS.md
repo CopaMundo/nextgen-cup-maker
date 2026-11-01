@@ -1,4 +1,5 @@
 # Architecture rules
+- Keep locale date formatting year-inclusive in the shared date utility, including caller-provided options, so compact matchday labels cannot silently omit the year.
 
 - Keep referee overview presentation separate from RefereeManager persistence and draft dialogs; bounded card rows and portaled details keep desktop/mobile geometry stable without changing scheduling rules.
 - Share compact inline team/logo presentation across scheduled, unscheduled and dragged planner cards; keep referee badges on a bounded separate row. Scope planner hover/conflict feedback above generic admin frame styles so full-card accents remain visible without changing scheduling rules.

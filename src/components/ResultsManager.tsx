@@ -1515,7 +1515,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         let label = formatDateDMY(date) || date;
         try {
           const dt = new Date(date);
-          label = dt.toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
+          label = dt.toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
           label = label.charAt(0).toUpperCase() + label.slice(1);
         } catch { /* keep fallback */ }
         const day: Day = { key: date, date, label, slots: [], unplannedMatches: [] };

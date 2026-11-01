@@ -64,7 +64,10 @@ export const formatIsoDateForLocale = (dateStr: string, locale = "nl-BE", option
   const parsed = parseIsoDate(dateStr);
   if (!parsed) return dateStr;
 
-  return new Intl.DateTimeFormat(locale, options).format(parsed);
+  const dateOptions: Intl.DateTimeFormatOptions = options
+    ? { ...options, year: "numeric" }
+    : { day: "2-digit", month: "2-digit", year: "numeric" };
+  return new Intl.DateTimeFormat(locale, dateOptions).format(parsed);
 };
 
 export type MatchDayEntry = string | { start: string; end: string };
