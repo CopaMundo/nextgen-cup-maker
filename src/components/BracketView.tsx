@@ -2782,6 +2782,47 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
   useEffect(() => () => { bracketCardObserver.current?.disconnect(); bracketCardObserver.current = null; }, []);
 
+  // Results popup: track which round is at the left edge of the scrolling parent,
+  // so that round stacks compactly and later rounds converge between their feeders.
+  const [adaptiveEl, setAdaptiveEl] = useState<HTMLDivElement | null>(null);
+  const [adaptiveActiveRound, setAdaptiveActiveRound] = useState(0);
+  const [adaptiveViewportW, setAdaptiveViewportW] = useState(0);
+  const ADAPTIVE_COL_W = 208 + 24;
+  const getAdaptiveScroller = useCallback((el: HTMLElement | null) => {
+    let node = el?.parentElement ?? null;
+    while (node) {
+      const style = window.getComputedStyle(node);
+      if (/(auto|scroll)/.test(style.overflowX)) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }, []);
+  const getAdaptiveBase = useCallback((el: HTMLElement, scroller: HTMLElement) =>
+    el.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft, []);
+  useEffect(() => {
+    if (!adaptiveRounds || !adaptiveEl) return;
+    const scroller = getAdaptiveScroller(adaptiveEl);
+    if (!scroller) return;
+    let raf = 0;
+    const update = () => {
+      const base = getAdaptiveBase(adaptiveEl, scroller);
+      setAdaptiveActiveRound(Math.max(0, Math.round((scroller.scrollLeft - base) / ADAPTIVE_COL_W)));
+      setAdaptiveViewportW(scroller.clientWidth);
+    };
+    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
+    update();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(onScroll) : null;
+    ro?.observe(scroller);
+    return () => { cancelAnimationFrame(raf); scroller.removeEventListener("scroll", onScroll); ro?.disconnect(); };
+  }, [adaptiveRounds, adaptiveEl, getAdaptiveScroller, getAdaptiveBase, ADAPTIVE_COL_W]);
+  const scrollAdaptiveToRound = useCallback((roundIdx: number) => {
+    if (!adaptiveEl) return;
+    const scroller = getAdaptiveScroller(adaptiveEl);
+    if (!scroller) return;
+    scroller.scrollTo({ left: getAdaptiveBase(adaptiveEl, scroller) + roundIdx * ADAPTIVE_COL_W, top: 0, behavior: "smooth" });
+  }, [adaptiveEl, getAdaptiveScroller, getAdaptiveBase, ADAPTIVE_COL_W]);
+
   // Bracket tree with SVG connectors — FIXED: lines from exact center of match cards
   const renderBracketTree = (bracketRounds: typeof rounds, bracketPrefix?: string | null) => {
     if (bracketRounds.length === 0) return null;
@@ -2819,16 +2860,19 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const placementCount = placementRounds.reduce((count, r) => count + r.matches.length, inlinePlacementCount);
     const placementGap = compact ? 20 : 48;
     const renderTree = (CARD_W = defaultCardWidth) => {
-    const totalHeight = defaultTotalHeight;
+    const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
+    const activeCount = displayRounds[activeIdx]?.matches.length ?? firstRoundCount;
+    // Results popup: height follows the active round so whitespace disappears as rounds converge.
+    const totalHeight = adaptiveRounds ? activeCount * CARD_H + Math.max(0, activeCount - 1) * GAP : defaultTotalHeight;
     const compactHeight = Math.max(totalHeight, totalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
-    // Lineless tree (Results popup): every next-round card sits exactly in the middle of its two feeders.
+    // Active and earlier rounds stack under each other; every later card sits exactly in the middle of its two feeders.
     const treeCenters: number[][] = [];
     if (adaptiveRounds) {
       displayRounds.forEach((round, r) => {
         const count = round.matches.length;
         const prev = treeCenters[r - 1];
         treeCenters.push(Array.from({ length: count }, (_, i) => {
-          if (r === 0 || !prev) return i * (CARD_H + GAP) + CARD_H / 2;
+          if (r <= activeIdx || !prev) return i * (CARD_H + GAP) + CARD_H / 2;
           if (prev.length === count * 2) return (prev[2 * i] + prev[2 * i + 1]) / 2;
           if (prev.length === count) return prev[i];
           const slot = totalHeight / count;
@@ -2847,7 +2891,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     // === BRACKET TREE (fixed round columns + elbow connectors, mobile & desktop) ===
 
     return (
-      <div className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto"} ${compact ? "pb-2" : "pb-4"}`}>
+      <div ref={adaptiveRounds ? setAdaptiveEl : undefined} className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto"} ${compact ? "pb-2" : "pb-4"}`}>
         <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
@@ -2863,17 +2907,23 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
             return (
               <div key={round.id} className="flex flex-shrink-0">
-                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W }}>
+                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds ? { opacity: roundIdx < activeIdx ? 0.35 : 1, transition: "opacity 200ms ease" } : {}) }}>
                   {/* Header */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
+                    {adaptiveRounds ? (
+                      <button type="button" onClick={() => scrollAdaptiveToRound(roundIdx)} className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${roundIdx === activeIdx ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
+                        {getRoundDisplayName(round, bracketPrefix)}
+                      </button>
+                    ) : (
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
                         {getRoundDisplayName(round, bracketPrefix)}
                       </span>
+                    )}
                   </div>
                   {/* Match cards */}
-                  <div className="relative" style={{ height: totalHeight }}>
+                  <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight, ...(adaptiveRounds ? { transition: "height 250ms ease" } : {}) }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H }}>
+                      <div key={match.id} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 250ms ease" } : {}) }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
