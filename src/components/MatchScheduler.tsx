@@ -17,7 +17,6 @@ import { formatIsoDateForLocale, listIsoDatesInRange, normalizeIsoDates, expandM
 import { AlertTriangle, Plus, Trash2, Zap, Coffee, List, GripVertical, ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Calendar, UserCheck, Pencil, Check, BarChart3, Shuffle, Printer, ArrowUp, ArrowDown, ArrowRight, ArrowLeft, X, Settings, PanelRightClose, PanelRightOpen } from "lucide-react";
 import CalendarClockIcon from "@/components/icons/CalendarClockIcon";
 import CalendarXIcon from "@/components/icons/CalendarXIcon";
-import { DatePicker } from "@/components/ui/datepicker";
 import { parseIsoDate, formatIsoDate } from "@/lib/dateUtils";
 import WhistleIcon from "@/components/icons/WhistleIcon";
 import { useScoringSystems } from "@/hooks/useScoringSystems";
@@ -2971,20 +2970,22 @@ const MatchScheduler = ({ tournamentId, tournament, categoryId, selectedLocation
                 <div className="flex items-center gap-2 min-w-0">
                   {toolbarLeft}
                   {tournamentDates.length > 0 && (
-                    <DatePicker
-                      value={plannerDate}
-                      onChange={(iso) => setPlannerDate(iso)}
-                      hideInput
-                      triggerLabel={formatIsoDateForLocale(plannerDate, "nl-BE", { weekday: "short", day: "numeric", month: "short" })}
-                      availableDates={tournamentDates}
-                      onInvalidPick={(iso) => {
-                        toast({
-                          title: "Datum buiten toernooiperiode",
-                          description: `${iso} valt niet binnen de ingestelde wedstrijddagen.`,
-                          variant: "destructive",
-                        });
-                      }}
-                    />
+                    <Select value={plannerDate} onValueChange={(iso) => setPlannerDate(iso)}>
+                      <SelectTrigger
+                        aria-label="Kies speeldag"
+                        className="h-7 w-auto min-w-fit gap-1.5 rounded-md px-2 text-xs font-normal [&>span]:min-w-0 [&>span]:truncate"
+                      >
+                        <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        {tournamentDates.map((d) => (
+                          <SelectItem key={d} value={d} className="text-xs">
+                            {formatIsoDateForLocale(d, "nl-BE", { weekday: "long", day: "numeric", month: "long" })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
