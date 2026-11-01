@@ -2266,7 +2266,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const formatGroups = openFormat ? groups.filter(g => g.phase_id === openFormat.id) : [];
         return (
           <Dialog open={!!openFormat} onOpenChange={(open) => { if (!open) setExpandedFormats(new Set()); }}>
-            <DialogContent scrollable={false} className="max-w-2xl max-h-[80dvh] overflow-hidden p-0 [&>div:first-child]:flex [&>div:first-child]:flex-col">
+            <DialogContent scrollable={false} className="max-w-5xl max-h-[85dvh] overflow-hidden p-0 [&>div:first-child]:flex [&>div:first-child]:flex-col">
               <div className="flex h-full max-h-[80vh] flex-col">
                 <div className="min-h-0 flex-1 space-y-4 overflow-auto p-4 pb-16 sm:p-6 sm:pb-16">
                   <DialogHeader>
@@ -2698,7 +2698,7 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
         const bracketFormat = bracketDialogFormatId ? phases.find(p => p.id === bracketDialogFormatId) : null;
         return (
           <Dialog open={!!bracketDialogFormatId} onOpenChange={(open) => { if (!open) setBracketDialogFormatId(null); }}>
-            <DialogContent scrollable={false} className="max-w-2xl max-h-[80dvh] overflow-hidden [&>div:first-child]:flex [&>div:first-child]:flex-col">
+            <DialogContent scrollable={false} className="max-w-5xl max-h-[85dvh] overflow-hidden [&>div:first-child]:flex [&>div:first-child]:flex-col">
               <DialogHeader>
                 <DialogTitle>{bracketFormat?.name || "Bracket"}</DialogTitle>
               </DialogHeader>
