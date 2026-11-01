@@ -27,7 +27,7 @@ import { bracketAggregate } from "@/lib/bracketAggregate";
 import { formatFieldLabel } from "@/lib/fieldLocations";
 import AdaptiveBracketViewport from "./AdaptiveBracketViewport";
 import BracketLabel, { isStandardBracketLabel } from "./BracketLabel";
-import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
+import { adaptiveBracketLayout, bracketLerp } from "@/lib/adaptiveBracketLayout";
 
 interface BracketMatch {
   id: string;
@@ -2821,12 +2821,17 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const CARD_W = defaultCardWidth;
     const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
-    const activeCount = displayRounds[activeIdx]?.matches.length ?? firstRoundCount;
-    // The viewport aligns on round changes so the outer tree can shrink with the active round.
-    const totalHeight = adaptiveRounds ? activeCount * CARD_H + Math.max(0, activeCount - 1) * GAP : defaultTotalHeight;
-    const compactHeight = Math.max(totalHeight, totalHeight / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
-    // Active and earlier rounds stack under each other; every later card sits exactly in the middle of its two feeders.
-    const adaptiveLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeIdx, CARD_H, GAP);
+    const nextIdx = adaptiveRounds ? Math.min(activeIdx + 1, displayRounds.length - 1) : 0;
+    const heightFor = (round: number) => { const count = displayRounds[round]?.matches.length ?? firstRoundCount; return count * CARD_H + Math.max(0, count - 1) * GAP; };
+    const totalHeight = adaptiveRounds ? heightFor(activeIdx) : defaultTotalHeight;
+    const nextTotalHeight = adaptiveRounds ? heightFor(nextIdx) : defaultTotalHeight;
+    const compactHeightFor = (h: number) => Math.max(h, h / 2 + CARD_H / 2 + placementGap + (placementCount ? placementCount * (CARD_H + 28) : editable && displayRounds.length >= 2 ? 32 : 0));
+    const compactHeight = compactHeightFor(totalHeight);
+    // Geometry follows the finger: values interpolate between the base round and the next one.
+    const counts = displayRounds.map(round => round.matches.length);
+    const adaptiveLayout = adaptiveBracketLayout(counts, activeIdx, CARD_H, GAP);
+    const nextLayout = adaptiveBracketLayout(counts, nextIdx, CARD_H, GAP);
+    const live = (from: number, to: number) => adaptiveRounds ? bracketLerp(from, to) : from;
     const roundTop = (roundIndex: number, idx: number) => {
       const count = displayRounds[roundIndex].matches.length;
       if (adaptiveRounds) return adaptiveLayout.tops[roundIndex]?.[idx] ?? 0;
@@ -2839,7 +2844,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
     return (
       <div className={`${adaptiveRounds ? "w-max min-w-full" : scrollInParent ? "w-max min-w-full overflow-visible" : "overflow-x-auto overscroll-x-contain"} ${compact ? "pb-2" : "pb-4"}`}>
-        <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? compactHeight + HEADER_H : totalHeight + 200 }}>
+        <div className={`flex ${adaptiveRounds ? "gap-6" : ""}`} style={{ minHeight: compact ? live(compactHeight + HEADER_H, compactHeightFor(nextTotalHeight) + HEADER_H) : totalHeight + 200 }}>
           {displayRounds.map((round, roundIdx) => {
             const matchCount = round.matches.length;
             const getTop = (idx: number) => roundTop(roundIdx, idx);
@@ -2854,7 +2859,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
             return (
               <div key={round.id} className="flex flex-shrink-0 snap-start snap-always">
-                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds ? { opacity: roundIdx < activeIdx ? 0.35 : 1, transition: "opacity 200ms ease" } : {}) }}>
+                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds ? { opacity: roundIdx < activeIdx ? 0.35 : roundIdx === activeIdx && nextIdx > activeIdx ? bracketLerp(1, 0.35, "") : 1 } : {}) }}>
                   {/* Header */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
@@ -2862,9 +2867,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       </span>
                   </div>
                   {/* Match cards */}
-                  <div className={`relative ${adaptiveRounds && roundIdx < activeIdx ? "overflow-hidden" : ""}`} style={{ height: totalHeight }}>
+                  <div className="relative" style={{ height: live(totalHeight, nextTotalHeight), ...(adaptiveRounds && roundIdx <= activeIdx && roundIdx < displayRounds.length - 1 ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
                     {round.matches.map((match, matchIdx) => (
-                      <div key={match.id} data-bracket-round={roundIdx} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: getTop(matchIdx), minHeight: CARD_H, ...(adaptiveRounds ? { transition: "top 300ms cubic-bezier(0.22,1,0.36,1)" } : {}) }}>
+                      <div key={match.id} data-bracket-round={roundIdx} ref={setBracketCardRef(match.id)} className={`absolute left-0 right-0 flex [&>*]:flex-1 ${compact ? "" : "[&>*]:h-full"}`} style={{ top: adaptiveRounds ? bracketLerp(adaptiveLayout.tops[roundIdx]?.[matchIdx] ?? 0, nextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx), minHeight: CARD_H }}>
                         {renderMatchCard(match)}
                       </div>
                     ))}
@@ -2877,7 +2882,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                       const hasPlacement = currentPlacementRounds.some((r) => r.matches.length > 0) || showInlinePlacement;
 
                       return (
-                        <div className="absolute left-0 right-0" style={{ top: totalHeight / 2 + CARD_H / 2 + placementGap }}>
+                        <div className="absolute left-0 right-0" style={{ top: live(totalHeight / 2 + CARD_H / 2 + placementGap, nextTotalHeight / 2 + CARD_H / 2 + placementGap) }}>
                           {showInlinePlacement && (
                             <div className="mb-2">
                               <div className="text-center mb-1.5">
