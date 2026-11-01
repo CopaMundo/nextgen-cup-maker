@@ -2518,8 +2518,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
             }}
           >
             {logo && <img src={logo} className="h-4 w-4 object-contain flex-shrink-0" alt="" />}
-            <div className={`flex items-center gap-1 flex-1 min-w-0 ${won ? "font-bold text-accent" : (isHome && homeName === "BYE") || (!isHome && awayName === "BYE") ? "font-mono font-bold text-primary" : ""}`}>
-              <span title={name} className={`text-[11px] truncate ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>
+            <div className={`flex items-center gap-1 flex-1 min-w-0 ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : (isHome && homeName === "BYE") || (!isHome && awayName === "BYE") ? "font-mono font-bold text-primary" : ""}`}>
+              <span title={name} className={`text-[11px] truncate ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
                 {name}
               </span>
               {tournament?.show_country && (isHome ? match.home_team_id : match.away_team_id) && (
@@ -2573,10 +2573,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                     {isHome ? haTotal.homeTotal : haTotal.awayTotal}
                   </span>
                 )}
-                <span className={`text-[11px] tabular-nums ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>
+                <span className={`text-[11px] tabular-nums ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
                   {score ?? "–"}
                 </span>
-                <span className={`text-[11px] tabular-nums ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>
+                <span className={`text-[11px] tabular-nums ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>
                   {haTerugScore ?? "–"}
                 </span>
                 {penalties !== null && <span className="text-[8px] text-muted-foreground font-medium ml-px">({penalties})</span>}
@@ -2613,7 +2613,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               </div>
             ) : !matchHasBye && showScores ? (
               <div className="flex items-center gap-0.5 shrink-0">
-                <span className={`text-[11px] tabular-nums ${won ? "font-bold text-accent" : "font-medium text-foreground"}`}>{score ?? "–"}</span>
+                <span className={`text-[11px] tabular-nums ${won ? compact ? "font-bold text-primary" : "font-bold text-accent" : "font-medium text-foreground"}`}>{score ?? "–"}</span>
                 {penalties !== null && <span className="text-[8px] text-muted-foreground font-medium ml-px">({penalties})</span>}
               </div>
             ) : null}
