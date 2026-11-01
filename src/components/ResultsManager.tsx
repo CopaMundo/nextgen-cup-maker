@@ -2107,18 +2107,21 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
       <div className="flex h-full min-h-0 gap-3 flex-col">
         {!isMobile && (
           <div className="shrink-0 min-w-0 space-y-2">
-            <div className="flex min-w-0 items-start gap-3">
-              <HorizontalRail label="Resultatenfases">
-                {phaseNumbers.map(phaseNumber => (
-                  <Button key={phaseNumber} variant="outline"
-                    onClick={() => setSelectedPhaseNumber(phaseNumber)}
-                    aria-current={phaseNumber === selectedPhaseNumber ? "true" : undefined}
-                    className={cn("h-7 min-w-24 max-w-44 shrink-0 px-3 text-xs font-medium", phaseNumber === selectedPhaseNumber && "border-primary text-primary")}>
-                    <span className="truncate">{getPhaseLabel(phaseNumber, phases)}</span>
-                  </Button>
-                ))}
-              </HorizontalRail>
-            </div>
+            <HorizontalRail label="Resultatenfases">
+              {phaseNumbers.map(phaseNumber => (
+                <Button key={phaseNumber} variant="outline"
+                  onClick={() => setSelectedPhaseNumber(phaseNumber)}
+                  aria-current={phaseNumber === selectedPhaseNumber ? "true" : undefined}
+                  className={cn(
+                    "h-8 min-w-0 max-w-44 shrink-0 rounded-lg border-2 px-3 text-xs font-semibold",
+                    phaseNumber === selectedPhaseNumber
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border hover:border-primary/40"
+                  )}>
+                  <span className="truncate">{getPhaseLabel(phaseNumber, phases)}</span>
+                </Button>
+              ))}
+            </HorizontalRail>
             {currentPhaseFormats.length > 0 && (
               <HorizontalRail label="Resultatenformats">
                 {currentPhaseFormats.map(format => {
@@ -2126,17 +2129,22 @@ const ResultsManager = ({ tournamentId, tournament, categoryId }: { tournamentId
                   const playedCount = formatMatches.filter(match => match.is_played).length;
                   const totalCount = formatMatches.length;
                   const percent = totalCount > 0 ? playedCount / totalCount * 100 : 0;
-                  return <Button key={format.id} variant="outline"
+                  const isComplete = totalCount > 0 && playedCount === totalCount;
+                  return <button key={format.id} type="button"
                     onClick={() => setExpandedFormats(new Set([format.id]))}
-                    className="h-auto min-h-12 w-44 shrink-0 flex-col items-stretch justify-center gap-2 px-2.5 py-2 text-left">
-                    <span className="flex min-w-0 items-start justify-between gap-2">
-                      <span className="min-w-0 break-words text-xs font-medium leading-4 text-foreground">{format.name}</span>
+                    className={cn(
+                      "flex h-14 w-44 shrink-0 flex-col justify-between rounded-lg border-2 bg-card px-2.5 py-2 text-left transition-colors",
+                      isComplete ? "border-green-500/50" : "border-border hover:border-primary/40 hover:bg-accent/30"
+                    )}>
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground" title={format.name}>{format.name}</span>
+                      {isComplete && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-600 dark:text-green-400" aria-label="Voltooid" />}
                       <span className="shrink-0 text-[10px] font-normal tabular-nums text-muted-foreground">{playedCount}/{totalCount}</span>
                     </span>
-                    <span role="progressbar" aria-label={`${format.name}: gespeelde wedstrijden`} aria-valuemin={0} aria-valuemax={totalCount} aria-valuenow={playedCount} className="h-1 overflow-hidden rounded-full bg-secondary">
-                      <span className="block h-full bg-primary transition-[width]" style={{ width: `${percent}%` }} />
+                    <span role="progressbar" aria-label={`${format.name}: gespeelde wedstrijden`} aria-valuemin={0} aria-valuemax={totalCount} aria-valuenow={playedCount} className="h-1 w-full overflow-hidden rounded-full bg-secondary">
+                      <span className={cn("block h-full transition-[width]", isComplete ? "bg-green-500" : "bg-primary")} style={{ width: `${percent}%` }} />
                     </span>
-                  </Button>;
+                  </button>;
                 })}
               </HorizontalRail>
             )}
