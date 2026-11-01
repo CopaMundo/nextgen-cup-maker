@@ -66,6 +66,7 @@ export function DatePicker({
   hideInput,
   availableDates,
   onInvalidPick,
+  triggerLabel,
 }: DatePickerProps) {
   const date = value ? parseISO(value) : undefined;
   const validDate = date && isValid(date) ? date : undefined;
