@@ -14,7 +14,7 @@ import { useScoringSystems } from "@/hooks/useScoringSystems";
 import { getMatchFormatSuffix } from "@/lib/matchFormatLabel";
 import { getMatchTeamPositions } from "@/lib/standingsCalculator";
 import { displayFieldName } from "@/lib/fieldLocations";
-import { adaptiveBracketLayout } from "@/lib/adaptiveBracketLayout";
+import { adaptiveBracketLayout, bracketLerp } from "@/lib/adaptiveBracketLayout";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
 import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 
@@ -494,10 +494,14 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
   }, [matchPositions, displayRounds.length, CARD_H]);
 
   // Compact the outer tree with its active round; vertical alignment follows the round change.
-  const activeCount = displayRounds[activeRound]?.matches.length ?? firstRoundCount;
-  const activeCompactH = TOP_OFFSET + activeCount * COMPACT_SPACING + 16;
+  // activeRound is the base round; geometry interpolates towards nextRound via the rail's --bf.
+  const nextRound = Math.min(activeRound + 1, Math.max(0, displayRounds.length - 1));
+  const roundCounts = displayRounds.map((round: any) => round.matches.length);
   const placementExtraH = (CARD_H + GAP + 20) * placementMatches.length;
-  const mobileTotalH = activeCompactH + placementExtraH;
+  const mobileHeightFor = (round: number) => TOP_OFFSET + (displayRounds[round]?.matches.length ?? firstRoundCount) * COMPACT_SPACING + 16 + placementExtraH;
+  const mobileLayout = adaptiveBracketLayout(roundCounts, activeRound, CARD_H, GAP);
+  const mobileNextLayout = adaptiveBracketLayout(roundCounts, nextRound, CARD_H, GAP);
+  const mobileTotalH = bracketLerp(mobileHeightFor(activeRound), mobileHeightFor(nextRound));
 
   useBracketSnap(scrollRef, isMobile ? MOBILE_COL_W : DESKTOP_COL_W, displayRounds.length, setActiveRound, setDesktopViewportW, setIndicatorRound);
 
@@ -899,15 +903,10 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
             {displayRounds.map((round: any, roundIdx: number) => {
               const matchCount = round.matches.length;
 
-              const isActive = roundIdx === activeRound;
               const opacity = 1;
-              const focusMatchCount = displayRounds[activeRound]?.matches.length ?? 0;
-              const focusCompactHeight = Math.max(CARD_H, (focusMatchCount - 1) * COMPACT_SPACING + CARD_H);
-              const getFutureRoundTreeY = (matchIdx: number) => {
-                if (focusMatchCount <= 0 || matchCount <= 0) return 0;
-                const slotH = focusCompactHeight / matchCount;
-                return TOP_OFFSET + slotH * matchIdx + (slotH - CARD_H) / 2;
-              };
+              const yFrom = (matchIdx: number) => TOP_OFFSET + (mobileLayout.tops[roundIdx]?.[matchIdx] ?? 0);
+              const yTo = (matchIdx: number) => TOP_OFFSET + (mobileNextLayout.tops[roundIdx]?.[matchIdx] ?? 0);
+              const clipped = roundIdx <= activeRound && roundIdx < displayRounds.length - 1;
 
               return (
                 <div
@@ -919,18 +918,14 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     scrollSnapStop: "always" as any,
                   }}
                 >
-                  <div className="mx-auto" style={{ width: CARD_W, opacity, transition: "opacity 200ms ease" }}>
+                  <div className="mx-auto" style={{ width: CARD_W, opacity }}>
                     <div className="text-center mb-2 flex items-center justify-center" style={{ height: HEADER_H }}>
                       <span className={`${ds(bStyle, "badge")} !text-[9px] !px-2 !py-0.5`}>
                         {round.name}
                       </span>
                     </div>
-                    <div className="relative" style={{ height: mobileTotalH }}>
+                    <div className="relative" style={{ height: mobileTotalH, ...(clipped ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
                       {round.matches.map((match: any, matchIdx: number) => {
-                        const pos = matchPositions.find(p => p.matchId === match.id);
-                        const y = isActive
-                          ? (pos?.compactY ?? 0)
-                          : getFutureRoundTreeY(matchIdx);
                         return (
                           <div
                             key={match.id}
@@ -938,8 +933,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                             className="absolute left-0 right-0"
                             style={{
                               top: 0,
-                              transform: `translateY(${y}px)`,
-                              transition: "transform 300ms cubic-bezier(0.22,1,0.36,1)",
+                              transform: `translateY(${bracketLerp(yFrom(matchIdx), yTo(matchIdx))})`,
                               willChange: "transform",
                             }}
                           >
@@ -951,14 +945,9 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                       {/* Placement below finale */}
                       {roundIdx === displayRounds.length - 1 && placementMatches.length > 0 && (() => {
                         // Position placement right below the last match in this round
-                        const lastMatchY = isActive
-                          ? (TOP_OFFSET + (matchCount - 1) * COMPACT_SPACING)
-                          : roundIdx > activeRound
-                            ? getFutureRoundTreeY(matchCount - 1)
-                            : (matchPositions.find(p => p.roundIdx === roundIdx && p.matchIdx === matchCount - 1)?.treeY ?? 0);
-                        const placementTop = lastMatchY + CARD_H + GAP;
+                        const placementTop = bracketLerp(yFrom(matchCount - 1) + CARD_H + GAP, yTo(matchCount - 1) + CARD_H + GAP);
                         return (
-                          <div className="absolute left-0 right-0" style={{ transform: `translateY(${placementTop}px)`, transition: "transform 300ms cubic-bezier(0.22,1,0.36,1)" }}>
+                          <div className="absolute left-0 right-0" style={{ transform: `translateY(${placementTop})` }}>
                             {placementMatches.map((pm: any, pmIdx: number) => (
                               <div key={pm.id} style={{ marginTop: pmIdx > 0 ? 10 : 0 }}>
                                 <div className="text-center mb-1">
@@ -984,7 +973,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     );
   }
 
-  const desktopLayout = adaptiveBracketLayout(displayRounds.map(round => round.matches.length), activeRound, CARD_H, GAP);
+  const desktopLayout = adaptiveBracketLayout(roundCounts, activeRound, CARD_H, GAP);
+  const desktopNextLayout = adaptiveBracketLayout(roundCounts, nextRound, CARD_H, GAP);
   const desktopTreeH = adaptiveDesktop ? desktopLayout.height : totalHeight;
   const desktopTop = (round: number, match: number) => desktopLayout.tops[round]?.[match] ?? 0;
 
@@ -999,6 +989,11 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
     ? finaleTopDesktop + CARD_H + GAP + (compactTree ? 4 : 16) + placementMatches.length * (CARD_H + (compactTree ? 10 : 36))
     : desktopTreeH;
   const desktopContainerH = Math.max(desktopTreeH, placementBottomDesktop);
+  const nextFinaleTop = lastRoundMatchCount === 1 && displayRounds.length > 1 ? desktopNextLayout.tops[displayRounds.length - 1]?.[0] ?? 0 : 0;
+  const nextPlacementBottom = placementMatches.length > 0
+    ? nextFinaleTop + CARD_H + GAP + (compactTree ? 4 : 16) + placementMatches.length * (CARD_H + (compactTree ? 10 : 36))
+    : desktopNextLayout.height;
+  const desktopNextContainerH = Math.max(desktopNextLayout.height, nextPlacementBottom);
 
   // === MIRRORED LAYOUT (presentation slideshow only) ===
   // Splits bracket into left + right halves meeting at the final in the center.
@@ -1191,7 +1186,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
           const getNextCenterY = (idx: number) => getNextTop(idx) + CARD_H / 2;
           
           // Last round with placement: height = placement bottom; others = totalHeight
-          const roundHeight = adaptiveDesktop ? desktopContainerH : roundIdx === displayRounds.length - 1 && placementMatches.length > 0
+          const roundHeight = adaptiveDesktop ? bracketLerp(desktopContainerH, desktopNextContainerH) : roundIdx === displayRounds.length - 1 && placementMatches.length > 0
             ? placementBottomDesktop
             : desktopTreeH;
 
@@ -1203,16 +1198,16 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                     {round.name}
                   </span>
                 </div>
-                <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight }}>
+                <div className="relative" style={{ height: roundHeight, ...(adaptiveDesktop && roundIdx <= activeRound && roundIdx < displayRounds.length - 1 ? { overflow: "clip", overflowClipMargin: 4 } : {}) }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 300ms cubic-bezier(0.22,1,0.36,1)" : undefined }}>
+                    <div key={match.id} data-bracket-round={roundIdx} className="absolute left-0 right-0" style={{ top: adaptiveDesktop ? bracketLerp(desktopTop(roundIdx, matchIdx), desktopNextLayout.tops[roundIdx]?.[matchIdx] ?? 0) : getTop(matchIdx) }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
 
                   {roundIdx === displayRounds.length - 1 && placementMatches.length > 0 && (() => {
                     const finaleTop = adaptiveDesktop ? desktopTop(roundIdx, 0) : displayRounds.length > 1 ? (totalHeight - CARD_H) / 2 : 0;
-      const placementTop = finaleTop + CARD_H + GAP + (compactTree ? 4 : 16);
+      const placementTop = adaptiveDesktop ? bracketLerp(finaleTop + CARD_H + GAP + 4 * (compactTree ? 1 : 4), (desktopNextLayout.tops[roundIdx]?.[0] ?? 0) + CARD_H + GAP + 4 * (compactTree ? 1 : 4)) : finaleTop + CARD_H + GAP + (compactTree ? 4 : 16);
                     return (
                       <div className="absolute left-0 right-0" style={{ top: placementTop }}>
                         {placementMatches.map((pm: any, pmIdx: number) => (

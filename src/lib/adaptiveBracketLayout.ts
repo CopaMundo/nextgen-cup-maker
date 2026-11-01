@@ -15,3 +15,8 @@ export function adaptiveBracketLayout(counts: number[], activeRound: number, car
   });
   return { active, height, tops: centers.map(round => round.map(center => center - cardHeight / 2)) };
 }
+/** CSS value interpolated by the rail's --bf (0 at the base round, 1 at the next round). */
+export function bracketLerp(from: number, to: number, unit = "px") {
+  if (Math.abs(to - from) < 0.01) return `${from}${unit}`;
+  return `calc(${from}${unit} + ${to - from}${unit} * var(--bf, 0))`;
+}
