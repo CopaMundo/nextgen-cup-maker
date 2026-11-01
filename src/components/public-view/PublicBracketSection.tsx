@@ -979,6 +979,8 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                             data-bracket-round={roundIdx}
                             data-bracket-index={matchIdx}
                             data-bracket-top={y}
+                            data-bracket-name={match.match_name?.replace(/\s+\((Heen|Terug)\)$/, "")}
+                            data-bracket-feeders={JSON.stringify([match.home_slot_label, match.away_slot_label].map((label: string | null) => label?.replace(/^(Winnaar|Verliezer)\s+/i, "").replace(/\s+\((Heen|Terug)\)$/, "")))}
                             className="absolute left-0 right-0"
                             style={{
                               top: 0,
@@ -1248,7 +1250,7 @@ const BracketTree = ({ bracketRounds, teams, slots = [], tournament, phases, gro
                 </div>
                 <div className={`relative ${adaptiveDesktop && roundIdx < activeRound ? "overflow-hidden" : ""}`} style={{ height: roundHeight }}>
                   {round.matches.map((match: any, matchIdx: number) => (
-                    <div key={match.id} data-bracket-round={roundIdx} data-bracket-index={matchIdx} data-bracket-top={getTop(matchIdx)} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
+                    <div key={match.id} data-bracket-round={roundIdx} data-bracket-index={matchIdx} data-bracket-name={match.match_name?.replace(/\s+\((Heen|Terug)\)$/, "")} data-bracket-feeders={JSON.stringify([match.home_slot_label, match.away_slot_label].map((label: string | null) => label?.replace(/^(Winnaar|Verliezer)\s+/i, "").replace(/\s+\((Heen|Terug)\)$/, "")))} data-bracket-top={getTop(matchIdx)} className="absolute left-0 right-0" style={{ top: getTop(matchIdx), transition: adaptiveDesktop ? "top 250ms ease" : undefined }}>
                       {renderMatchCard(match, false, false)}
                     </div>
                   ))}
