@@ -101,7 +101,7 @@ const PublicSchedule = ({ data, favoriteTeam }: { data: PublicTournamentData; fa
 
   const formatDate = (d: string) => {
     if (!d) return "Geen datum";
-    return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
+    return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   };
 
   const jumpToDate = (date: string, behavior: ScrollBehavior = "smooth") => {

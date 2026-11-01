@@ -225,7 +225,7 @@ const ScoreEntryDialog = ({
     if (!d) return null;
     try {
       const dt = new Date(d);
-      return dt.toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short" });
+      return dt.toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
     } catch {
       return d;
     }

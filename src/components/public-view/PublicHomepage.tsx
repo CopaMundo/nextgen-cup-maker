@@ -1319,7 +1319,7 @@ const ProgrammaTimeslotList = ({ matches, teams, phases, groups, slots, tourname
 
   const formatDate = (d: string) => {
     if (!d) return "Geen datum";
-    return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
+    return new Date(d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   };
 
   useEffect(() => {

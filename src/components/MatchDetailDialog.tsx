@@ -60,7 +60,7 @@ const MatchDetailDialog = ({ open, onClose, match, tournament, teams, scoreEdita
     if (!d) return null;
     try {
       const date = new Date(d);
-      return date.toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short" });
+      return date.toLocaleDateString("nl-BE", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
     } catch { return d; }
   };
 
