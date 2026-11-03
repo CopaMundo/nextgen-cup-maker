@@ -34,7 +34,15 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
       const top = Math.max(r.top, 0), bottom = Math.min(r.bottom, window.innerHeight);
       if (bottom - top < 44) { setArrowPos(null); return; }
       const centre = Math.min(Math.max((top + bottom) / 2, r.top + 22), r.bottom - 22);
-      setArrowPos(prev => prev && Math.abs(prev.top - centre) < 0.5 && prev.left === r.left && prev.right === r.right ? prev : { top: centre, left: r.left, right: r.right });
+      // A transformed ancestor (e.g. a dialog) becomes the containing block for fixed elements.
+      let ox = 0, oy = 0, p = el.parentElement;
+      while (p && p !== document.body) {
+        const cs = getComputedStyle(p);
+        if (cs.transform !== "none" || cs.filter !== "none" || cs.perspective !== "none") { const pr = p.getBoundingClientRect(); ox = pr.left; oy = pr.top; break; }
+        p = p.parentElement;
+      }
+      const next = { top: centre - oy, left: r.left - ox, right: r.right - ox };
+      setArrowPos(prev => prev && Math.abs(prev.top - next.top) < 0.5 && prev.left === next.left && prev.right === next.right ? prev : next);
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
