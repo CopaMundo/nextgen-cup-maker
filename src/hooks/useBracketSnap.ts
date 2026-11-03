@@ -119,7 +119,7 @@ export function useBracketSnap(ref: RefObject<HTMLDivElement>, columnWidth: numb
         if (rect.right > visibleLeft + 1 && rect.left < visibleRight - 1) bottom = Math.max(bottom, rect.bottom - railRect.top);
       });
       if (bottom > 0) element.style.height = `${Math.ceil(bottom + 20)}px`;
-      if (tracked && before !== undefined) {
+      if (tracked && before !== undefined && element.dataset.dragging !== "true") {
         const rect = tracked.getBoundingClientRect();
         const travel = finishingInterval ? 1 : direction > 0 ? (fraction - originFraction) / Math.max(0.0001, 1 - originFraction) : (originFraction - fraction) / Math.max(0.0001, originFraction);
         const desired = originCentre + (desiredCentre - originCentre) * Math.max(0, Math.min(1, travel));
