@@ -6,7 +6,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info } from "lucide-react";
+import { Pencil, Check, X, Plus, ChevronDown, User, ArrowRight, ArrowLeftRight, Shuffle, Trash2, MapPin, Settings, Info, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -2947,9 +2947,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                               variant="outline"
                               size="sm"
                               className="w-full"
-                              onClick={() => addPlacementMatch(displayRounds, bracketPrefix || undefined)}
+                              disabled={addingBracketKey !== null}
+                              onClick={() => runBracketAdd(`placement:${bracketPrefix || "main"}`, () => addPlacementMatch(displayRounds, bracketPrefix || undefined))}
                             >
-                              <Plus className="h-3 w-3" /> Wedstrijd
+                              {addingBracketKey === `placement:${bracketPrefix || "main"}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Wedstrijd
                             </Button>
                           )}
                         </div>
