@@ -204,7 +204,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
         .eq("tournament_id", tournamentId),
       supabase
         .from("matches")
-        .select("id, home_slot_label, away_slot_label, group_id, phase_id")
+        .select("id, home_slot_label, away_slot_label, group_id, phase_id, home_team_id, away_team_id")
         .eq("tournament_id", tournamentId),
     ]);
 
@@ -298,7 +298,20 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     );
   })();
   
-  const filteredTeams = categoryTeams.filter(t => !teamsUsedInEarlierPhases.has(t.id));
+  // Within one phase a team may only sit in one format (other groups/brackets of the same phase number).
+  const teamsUsedInSiblingFormats = (() => {
+    const siblingIds = new Set(scopedPhases.filter((p) => p.phase_number === currentPhaseNumber && p.id !== phaseId).map((p) => p.id));
+    const used = new Set<string>();
+    for (const s of allTournamentSlots as any[]) if (s.team_id && siblingIds.has(s.phase_id)) used.add(s.team_id);
+    for (const m of allTournamentMatches as any[]) if (siblingIds.has(m.phase_id)) { if (m.home_team_id) used.add(m.home_team_id); if (m.away_team_id) used.add(m.away_team_id); }
+    if (currentPhaseNumber > 1) {
+      const earlierIds = new Set(scopedPhases.filter((p) => p.phase_number < currentPhaseNumber).map((p) => p.id));
+      for (const s of allTournamentSlots as any[]) if (s.team_id && earlierIds.has(s.phase_id)) used.add(s.team_id);
+    }
+    return used;
+  })();
+
+  const filteredTeams = categoryTeams.filter(t => !teamsUsedInEarlierPhases.has(t.id) && !teamsUsedInSiblingFormats.has(t.id));
   const startPosition: number = (currentPhase?.match_config as any)?.startPosition || 1;
   const labelOffset = startPosition - 1;
   const hasPlacement = startPosition > 1;
