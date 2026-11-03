@@ -944,6 +944,13 @@ const GroupManager = ({
       (allSiblingSlots || []).filter(s => s.team_id).map(s => s.team_id!)
     );
 
+    // Brackets in sibling formats store teams on their matches; a team may only be in one format per phase.
+    const otherSiblingIds = siblingPhaseIds.filter(id => id !== phaseId);
+    if (otherSiblingIds.length > 0) {
+      const { data: siblingMatches } = await supabase.from("matches").select("home_team_id, away_team_id").in("phase_id", otherSiblingIds);
+      for (const m of siblingMatches || []) { if (m.home_team_id) assignedIds.add(m.home_team_id); if (m.away_team_id) assignedIds.add(m.away_team_id); }
+    }
+
     if (currentPhaseNumber > 1) {
       const earlierPhaseIds = phases.filter(p => p.phase_number < currentPhaseNumber).map(p => p.id);
       if (earlierPhaseIds.length > 0) {

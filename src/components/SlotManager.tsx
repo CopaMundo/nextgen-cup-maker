@@ -128,14 +128,14 @@ const SlotManager = ({ tournamentId, phaseId, groupId, groupName, phaseNumber, p
   const siblingGroupIds = new Set(allGroups.filter((g) => siblingPhaseIds.has(g.phase_id)).map((g) => g.id));
 
   const assignedTeamIds = new Set(
-    allSlots.filter((s) => s.group_id && siblingGroupIds.has(s.group_id) && s.team_id).map((s) => s.team_id!)
+    allSlots.filter((s: any) => s.team_id && ((s.group_id && siblingGroupIds.has(s.group_id)) || siblingPhaseIds.has(s.phase_id))).map((s) => s.team_id!)
   );
 
   const previousPhases = scopedPhases.filter((p) => p.phase_number < currentPhaseNumber);
   const previousPhaseIds = new Set(previousPhases.map((p) => p.id));
   const previousPhaseGroupIds = new Set(allGroups.filter((g) => previousPhaseIds.has(g.phase_id)).map((g) => g.id));
   const teamsUsedInEarlierPhases = new Set(
-    allSlots.filter((s) => s.group_id && previousPhaseGroupIds.has(s.group_id) && s.team_id).map((s) => s.team_id!)
+    allSlots.filter((s: any) => s.team_id && ((s.group_id && previousPhaseGroupIds.has(s.group_id)) || previousPhaseIds.has(s.phase_id))).map((s) => s.team_id!)
   );
 
   const currentFormatGroupIds = new Set(allGroups.filter((g) => g.phase_id === phaseId).map((g) => g.id));
