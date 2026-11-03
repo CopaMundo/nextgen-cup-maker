@@ -2855,7 +2855,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const inlinePlacementCount = inlinePlacementMatch && !placementIds.has(inlinePlacementMatch.id) ? 1 : 0;
     const placementCount = placementRounds.reduce((count, r) => count + r.matches.length, inlinePlacementCount);
     const placementGap = compact ? 20 : 48;
-    const renderTree = (adaptiveActiveRound = 0, adaptiveViewportW = 0) => {
+    const renderTree = (adaptiveActiveRound = 0, adaptiveViewportW = 0, fitsAll = false) => {
     const CARD_W = defaultCardWidth;
     const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
@@ -2898,7 +2898,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
             return (
               <div key={round.id} className="flex flex-shrink-0 snap-start snap-always">
-                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds ? { opacity: roundIdx < activeIdx ? 0.35 : roundIdx === activeIdx && nextIdx > activeIdx ? bracketLerp(1, 0.35, "") : 1 } : {}) }}>
+                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds && !fitsAll ? { opacity: nextIdx > activeIdx && roundIdx === activeIdx ? bracketLerp(1, 0.5, "") : nextIdx > activeIdx && roundIdx === nextIdx ? bracketLerp(0.5, 1, "") : roundIdx === activeIdx ? 1 : 0.5 } : {}) }}>
                   {/* Header */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
@@ -2990,7 +2990,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               </div>
             );
           })}
-          {adaptiveRounds && displayRounds.length > 1 && (
+          {adaptiveRounds && !fitsAll && displayRounds.length > 1 && (
             <div aria-hidden className="flex-shrink-0" style={{ width: Math.max(0, adaptiveViewportW - ADAPTIVE_COL_W - 48) }} />
           )}
         </div>
@@ -2999,7 +2999,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     };
     return adaptiveRounds ? (
       <AdaptiveBracketViewport key={bracketPrefix ?? "main"} roundCount={displayRounds.length} columnWidth={defaultCardWidth + 24}>
-        {({ activeRound, viewportWidth }) => renderTree(activeRound, viewportWidth)}
+        {({ activeRound, viewportWidth, fits }) => renderTree(activeRound, viewportWidth, fits)}
       </AdaptiveBracketViewport>
     ) : renderTree();
   };

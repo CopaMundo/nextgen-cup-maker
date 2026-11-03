@@ -6,6 +6,8 @@ import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 interface ViewportState {
   activeRound: number;
   viewportWidth: number;
+  /** All rounds fit side by side: render the full tree without snap, arrows or focus. */
+  fits: boolean;
 }
 
 /** Each bracket owns its horizontal scroll position, including placement brackets. */
@@ -21,6 +23,16 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
   const [indicatorRound, setIndicatorRound] = useState(0);
   useBracketSnap(ref, columnWidth, roundCount, setActiveRound, setViewportWidth, setIndicatorRound);
   const frame = useRef<HTMLDivElement>(null);
+  const [fits, setFits] = useState(false);
+  // Natural width = all columns minus the trailing gap; compare with the rail's client width.
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const check = () => setFits(roundCount <= 1 || (el.clientWidth > 0 && roundCount * columnWidth - 24 <= el.clientWidth));
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [roundCount, columnWidth]);
   const [arrowPos, setArrowPos] = useState<{ top: number; left: number; right: number } | null>(null);
 
   // Arrows float (fixed) at the vertical centre of the visible part of this bracket, clamped to its bounds.
@@ -67,6 +79,7 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
   // Mouse drag-to-scroll: snapping is paused while dragging and vertical following is off,
   // so the page never jolts; on release the rail snaps to the nearest round.
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+ if (fits) return;
     if (e.pointerType !== "mouse" || e.button !== 0) return;
     if ((e.target as HTMLElement).closest("button, input, a, select, textarea, [role='button']")) return;
     const el = ref.current; if (!el) return;
@@ -104,15 +117,15 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
 
   const arrow = "pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/95 text-foreground shadow-md backdrop-blur transition-colors hover:border-primary hover:text-primary";
   return <div className="min-w-0">
-    <BracketRoundIndicators count={roundCount} active={indicatorRound} />
+    {!fits && <BracketRoundIndicators count={roundCount} active={indicatorRound} />}
     <div ref={frame} className="relative">
       <div ref={ref}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endDrag} onPointerCancel={endDrag}
         onClickCapture={e => { if (ref.current?.dataset.dragging === "true") { e.stopPropagation(); e.preventDefault(); } }}
-        className="w-full min-w-0 select-none overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto [overflow-anchor:none] pb-2" aria-label="Bracketrondes">
-        {children({ activeRound, viewportWidth })}
+        className={`w-full min-w-0 select-none overflow-x-auto overflow-y-hidden overscroll-x-contain ${fits ? "" : "snap-x snap-mandatory scroll-smooth"} motion-reduce:scroll-auto [overflow-anchor:none] pb-2`} aria-label="Bracketrondes">
+        {children({ activeRound: fits ? 0 : activeRound, viewportWidth: fits ? 0 : viewportWidth, fits })}
       </div>
-      {roundCount > 1 && arrowPos && <>
+      {!fits && roundCount > 1 && arrowPos && <>
         {indicatorRound > 0 && <div className="pointer-events-none fixed z-20" style={{ top: arrowPos.top - 18, left: arrowPos.left + 4 }}>
           <button type="button" aria-label="Vorige ronde" className={arrow} onClick={() => goTo(indicatorRound - 1)}><ChevronLeft className="h-5 w-5" /></button>
         </div>}
