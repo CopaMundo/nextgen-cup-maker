@@ -143,6 +143,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
   const [editingMatchName, setEditingMatchName] = useState<string | null>(null);
   const [matchNameEdit, setMatchNameEdit] = useState("");
   const [savingMatchNameId, setSavingMatchNameId] = useState<string | null>(null);
+  const [addingBracketKey, setAddingBracketKey] = useState<string | null>(null);
+  const addingBracketRef = useRef(false);
   const [matchNameError, setMatchNameError] = useState<string | null>(null);
   const [editingBracketName, setEditingBracketName] = useState<string | null>(null);
   const [bracketNameEdit, setBracketNameEdit] = useState("");
@@ -1269,6 +1271,29 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     setSavingMatchNameId(null);
   };
 
+  /** Serialises bracket additions so double clicks and rapid clicks never create duplicates. */
+  const runBracketAdd = async (key: string, task: () => Promise<void>) => {
+    if (addingBracketRef.current) return;
+    addingBracketRef.current = true;
+    setAddingBracketKey(key);
+    try { await task(); }
+    catch (e: any) { toast({ title: "Toevoegen mislukt", description: e?.message, variant: "destructive" }); await fetchData(); }
+    finally { addingBracketRef.current = false; setAddingBracketKey(null); }
+  };
+
+  /** Reads the latest match_config from the database and merges new bracket group links into it. */
+  const fetchFreshMatchConfig = async () => {
+    const { data, error } = await supabase.from("tournament_phases").select("match_config").eq("id", phaseId).single();
+    if (error) throw error;
+    return ((data as any)?.match_config || {}) as Record<string, any>;
+  };
+  const mergeBracketGroupMap = async (entries: Record<string, string>) => {
+    const fresh = await fetchFreshMatchConfig();
+    const merged = { ...(fresh.bracketGroupMap || {}), ...entries };
+    const { error } = await supabase.from("tournament_phases").update({ match_config: { ...fresh, bracketGroupMap: merged } } as any).eq("id", phaseId);
+    if (error) throw error;
+  };
+
   const addPlacementMatch = async (bracketRounds: { id: string; name: string; matches: BracketMatch[]; minRound: number }[], prefix?: string) => {
     const semiFinalsRound = bracketRounds[bracketRounds.length - 2];
     if (!semiFinalsRound) return;
@@ -1288,12 +1313,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const placementSortOrder = prefix ? parseInt(prefix.split("-")[0]) * 100 + 99 : 99;
     const { data: gData } = await supabase.from("groups").insert({ phase_id: phaseId, tournament_id: tournamentId, name: groupName, sort_order: placementSortOrder }).select("id, name").single();
     if (gData) {
-      if (prefix) {
-        const updatedGroupMap = { ...bracketGroupMap, [gData.id]: prefix };
-        await supabase.from("tournament_phases").update({
-          match_config: { ...(currentPhase?.match_config || {}), bracketGroupMap: updatedGroupMap }
-        } as any).eq("id", phaseId);
-      }
+      if (prefix) await mergeBracketGroupMap({ [gData.id]: prefix });
       await supabase.from("matches").insert({
         tournament_id: tournamentId, phase_id: phaseId, group_id: gData.id,
         home_slot_label: `Verliezer ${matchNames[0]}`, away_slot_label: `Verliezer ${matchNames[1]}`,
@@ -1328,6 +1348,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const prefix = `${posFrom}-${posTo}`;
     const bracketDisplayName = getBracketName(prefix);
     const numSubRounds = Math.ceil(Math.log2(loserCount));
+    const freshConfig = await fetchFreshMatchConfig();
+    if (Object.values(freshConfig.bracketGroupMap || {}).includes(prefix)) { await fetchData(); return; }
     const baseRoundNumber = Math.max(...sourceRound.matches.map(m => m.round_number ?? 0));
     const groupIds: string[] = [];
     const newGroupMap: Record<string, string> = {};
@@ -1345,18 +1367,14 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       groupNames.push(groupName);
       matchSingulars.push(roundLabel);
       matchPlacementSuffixes.push(placementSuffix);
-      const { data } = await supabase.from("groups").insert({ phase_id: phaseId, tournament_id: tournamentId, name: groupName, sort_order: posFrom * 100 + r }).select("id").single();
-      if (data) {
-        groupIds.push(data.id);
-        newGroupMap[data.id] = prefix;
-      }
+      const { data, error } = await supabase.from("groups").insert({ phase_id: phaseId, tournament_id: tournamentId, name: groupName, sort_order: posFrom * 100 + r }).select("id").single();
+      if (error || !data) throw error || new Error("Ronde kon niet worden aangemaakt");
+      groupIds.push(data.id);
+      newGroupMap[data.id] = prefix;
     }
 
-    // Store bracket group mapping
-    const updatedGroupMap = { ...bracketGroupMap, ...newGroupMap };
-    await supabase.from("tournament_phases").update({
-      match_config: { ...(currentPhase?.match_config || {}), bracketGroupMap: updatedGroupMap }
-    } as any).eq("id", phaseId);
+    // Link every round to this bracket in one write, merged into the latest stored map, so the tree stays whole.
+    await mergeBracketGroupMap(newGroupMap);
 
     const allMatchNames: string[][] = [];
     const firstRoundMatchCount = loserCount / 2;
@@ -3110,8 +3128,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
               {editable && getAvailableSubBrackets(p).length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-2">
                   {getAvailableSubBrackets(p).map(b => (
-                    <Button key={b.prefix} variant="outline" size="sm" onClick={() => addLoserBracket(b.sourceRound, b.posFrom, b.posTo)}>
-                      <Plus className="h-3 w-3" /> Bracket {b.prefix}
+                    <Button key={b.prefix} variant="outline" size="sm" disabled={addingBracketKey !== null} onClick={() => runBracketAdd(b.prefix, () => addLoserBracket(b.sourceRound, b.posFrom, b.posTo))}>
+                      {addingBracketKey === b.prefix ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Bracket {b.prefix}
                     </Button>
                   ))}
                 </div>
@@ -3126,8 +3144,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       {editable && availableLoserBrackets.length > 0 && (
         <div className="flex flex-wrap gap-2 pt-2">
           {availableLoserBrackets.map(b => (
-            <Button key={b.prefix} variant="outline" size="sm" onClick={() => addLoserBracket(b.sourceRound, b.posFrom, b.posTo)}>
-              <Plus className="h-3 w-3" /> Bracket {b.prefix}
+            <Button key={b.prefix} variant="outline" size="sm" disabled={addingBracketKey !== null} onClick={() => runBracketAdd(b.prefix, () => addLoserBracket(b.sourceRound, b.posFrom, b.posTo))}>
+              {addingBracketKey === b.prefix ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Bracket {b.prefix}
             </Button>
           ))}
         </div>
