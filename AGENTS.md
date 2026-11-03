@@ -32,3 +32,4 @@
 - Keep overflowing rounds rosters scrollbar-free with a measured continuous loop, and never disable draw-stage animations for OS reduced-motion settings; the draw is a projected show whose ball flight, split and roster loop must look identical on every machine.
 - Share live-show round availability between phase entry choices and rounds preparation, including recovered drafts; presentation limits must never block group draws or tournament schedule generation.
 - Represent automatic group-pot allocations as lower/upper occupancy bounds in the shared container solver; live feasibility checks choose remainder destinations without preassigning them, while explicit cell edits become exact bounds.
+- Serialise bracket/placement additions behind one in-flight lock and merge bracketGroupMap into freshly fetched match_config in a single write per bracket; stale client config or double clicks otherwise duplicate brackets or split trees.
