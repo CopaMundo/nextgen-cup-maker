@@ -1311,14 +1311,18 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     }
 
     const placementSortOrder = prefix ? parseInt(prefix.split("-")[0]) * 100 + 99 : 99;
-    const { data: gData } = await supabase.from("groups").insert({ phase_id: phaseId, tournament_id: tournamentId, name: groupName, sort_order: placementSortOrder }).select("id, name").single();
+    const { data: gData, error: gError } = await supabase.from("groups").insert({ phase_id: phaseId, tournament_id: tournamentId, name: groupName, sort_order: placementSortOrder }).select("id, name").single();
+    if (gError) throw gError;
     if (gData) {
-      if (prefix) await mergeBracketGroupMap({ [gData.id]: prefix });
-      await supabase.from("matches").insert({
-        tournament_id: tournamentId, phase_id: phaseId, group_id: gData.id,
-        home_slot_label: `Verliezer ${matchNames[0]}`, away_slot_label: `Verliezer ${matchNames[1]}`,
-        round_number: (semiFinalsRound.matches[0]?.round_number ?? 1) + 1, match_name: matchName,
-      });
+      const [, matchResult] = await Promise.all([
+        prefix ? mergeBracketGroupMap({ [gData.id]: prefix }) : Promise.resolve(),
+        supabase.from("matches").insert({
+          tournament_id: tournamentId, phase_id: phaseId, group_id: gData.id,
+          home_slot_label: `Verliezer ${matchNames[0]}`, away_slot_label: `Verliezer ${matchNames[1]}`,
+          round_number: (semiFinalsRound.matches[0]?.round_number ?? 1) + 1, match_name: matchName,
+        }),
+      ]);
+      if (matchResult.error) throw matchResult.error;
       toast({ title: `${groupName} toegevoegd` });
       await fetchData();
     }
@@ -1351,8 +1355,6 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const freshConfig = await fetchFreshMatchConfig();
     if (Object.values(freshConfig.bracketGroupMap || {}).includes(prefix)) { await fetchData(); return; }
     const baseRoundNumber = Math.max(...sourceRound.matches.map(m => m.round_number ?? 0));
-    const groupIds: string[] = [];
-    const newGroupMap: Record<string, string> = {};
     const groupNames: string[] = [];
     const matchSingulars: string[] = [];
     const matchPlacementSuffixes: string[] = [];
@@ -1360,23 +1362,22 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     for (let r = 0; r < numSubRounds; r++) {
       const matchesInRound = loserCount / Math.pow(2, r + 1);
       const rangeEnd = posFrom + Math.floor(loserCount / Math.pow(2, r)) - 1;
-      const roundLabel = getBaseKnockoutRoundLabelSingular(matchesInRound);
-      const roundLabelPlural = getBaseKnockoutRoundLabel(matchesInRound);
-      const placementSuffix = ` (Plaats ${posFrom}-${rangeEnd})`;
-      const groupName = `${roundLabelPlural}: Plaats ${posFrom}-${rangeEnd}`;
-      groupNames.push(groupName);
-      matchSingulars.push(roundLabel);
-      matchPlacementSuffixes.push(placementSuffix);
-      const { data, error } = await supabase.from("groups").insert({ phase_id: phaseId, tournament_id: tournamentId, name: groupName, sort_order: posFrom * 100 + r }).select("id").single();
-      if (error || !data) throw error || new Error("Ronde kon niet worden aangemaakt");
-      groupIds.push(data.id);
-      newGroupMap[data.id] = prefix;
+      groupNames.push(`${getBaseKnockoutRoundLabel(matchesInRound)}: Plaats ${posFrom}-${rangeEnd}`);
+      matchSingulars.push(getBaseKnockoutRoundLabelSingular(matchesInRound));
+      matchPlacementSuffixes.push(` (Plaats ${posFrom}-${rangeEnd})`);
     }
 
-    // Link every round to this bracket in one write, merged into the latest stored map, so the tree stays whole.
-    await mergeBracketGroupMap(newGroupMap);
+    // One bulk insert for all rounds; map returned rows back by sort_order.
+    const { data: groupRows, error: groupError } = await supabase.from("groups")
+      .insert(groupNames.map((name, r) => ({ phase_id: phaseId, tournament_id: tournamentId, name, sort_order: posFrom * 100 + r })))
+      .select("id, sort_order");
+    if (groupError || !groupRows || groupRows.length !== numSubRounds) throw groupError || new Error("Rondes konden niet worden aangemaakt");
+    const groupIds = groupNames.map((_, r) => groupRows.find((g: any) => g.sort_order === posFrom * 100 + r)!.id as string);
+    const newGroupMap: Record<string, string> = {};
+    groupIds.forEach(id => { newGroupMap[id] = prefix; });
 
-    const allMatchNames: string[][] = [];
+    const rows: any[] = [];
+    const allMatchNames: string[][] = [[]];
     const firstRoundMatchCount = loserCount / 2;
     for (let m = 0; m < firstRoundMatchCount; m++) {
       const src1 = sourceRound.matches[m * 2]; const src2 = sourceRound.matches[m * 2 + 1];
@@ -1386,9 +1387,8 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       const matchName = firstRoundMatchCount === 1
         ? `${matchSingulars[0]}${matchPlacementSuffixes[0]}`
         : `${matchSingulars[0]} ${m + 1}${matchPlacementSuffixes[0]}`;
-      if (!allMatchNames[0]) allMatchNames[0] = [];
       allMatchNames[0].push(matchName);
-      await supabase.from("matches").insert({
+      rows.push({
         tournament_id: tournamentId, phase_id: phaseId, group_id: groupIds[0],
         home_slot_label: src1Name ? `Verliezer ${src1Name}` : "TBD",
         away_slot_label: src2Name ? `Verliezer ${src2Name}` : "TBD",
@@ -1402,7 +1402,7 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
           ? `${matchSingulars[r]}${matchPlacementSuffixes[r]}`
           : `${matchSingulars[r]} ${m + 1}${matchPlacementSuffixes[r]}`;
         currentNames.push(matchName);
-        await supabase.from("matches").insert({
+        rows.push({
           tournament_id: tournamentId, phase_id: phaseId, group_id: groupIds[r],
           home_slot_label: `Winnaar ${prevNames[m * 2]}`, away_slot_label: `Winnaar ${prevNames[m * 2 + 1]}`,
           round_number: baseRoundNumber + r + 1, match_name: matchName,
@@ -1410,6 +1410,13 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       }
       allMatchNames.push(currentNames);
     }
+
+    // Config merge (one write) and all matches (one bulk insert) in parallel.
+    const [, matchResult] = await Promise.all([
+      mergeBracketGroupMap(newGroupMap),
+      supabase.from("matches").insert(rows),
+    ]);
+    if (matchResult.error) throw matchResult.error;
     toast({ title: `Bracket ${prefix} toegevoegd` });
     await fetchData();
   };
