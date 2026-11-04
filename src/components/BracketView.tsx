@@ -2846,6 +2846,10 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
       }
     }
 
+    {
+      const orderedMatches = orderRoundsByFeeders(displayRounds.map(r => r.matches));
+      displayRounds = displayRounds.map((r, idx) => ({ ...r, matches: orderedMatches[idx] }));
+    }
     const firstRoundCount = displayRounds[0].matches.length;
     const defaultTotalHeight = firstRoundCount * CARD_H + (firstRoundCount - 1) * GAP;
 
@@ -2910,9 +2914,9 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
                 <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W }}>
                   {/* Header — the active round carries a subtle focus halo that hands over while scrolling */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
-                    <span className="relative inline-flex">
-                      <span aria-hidden className="pointer-events-none absolute -inset-x-1.5 -inset-y-0.5 rounded-full bg-primary/10 ring-1 ring-primary/30" style={{ opacity: headerFocus(roundIdx) }} />
-                      <span className="relative text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
+                    <span className="relative inline-flex overflow-hidden rounded bg-secondary">
+                      <span aria-hidden className="pointer-events-none absolute inset-0 bg-primary" style={{ opacity: headerFocus(roundIdx) }} />
+                      <span className="relative text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2 py-0.5" style={{ color: `color-mix(in srgb, hsl(var(--primary-foreground)) calc(${headerFocus(roundIdx)} * 100%), hsl(var(--muted-foreground)))` }}>
                         {getRoundDisplayName(round, bracketPrefix)}
                       </span>
                     </span>
