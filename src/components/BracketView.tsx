@@ -2907,12 +2907,15 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
 
             return (
               <div key={round.id} className="flex flex-shrink-0 snap-start snap-always">
-                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W, ...(adaptiveRounds && !fitsAll ? { opacity: nextIdx > activeIdx && roundIdx === activeIdx ? bracketLerp(1, 0.5, "") : nextIdx > activeIdx && roundIdx === nextIdx ? bracketLerp(0.5, 1, "") : roundIdx === activeIdx ? 1 : 0.5 } : {}) }}>
-                  {/* Header */}
+                <div className="flex flex-col flex-shrink-0" style={{ width: CARD_W }}>
+                  {/* Header — the active round carries a subtle focus halo that hands over while scrolling */}
                   <div className={`text-center ${compact ? "mb-1" : "mb-3"} h-6 flex items-center justify-center`}>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
+                    <span className="relative inline-flex">
+                      <span aria-hidden className="pointer-events-none absolute -inset-x-1.5 -inset-y-0.5 rounded-full bg-primary/10 ring-1 ring-primary/30" style={{ opacity: headerFocus(roundIdx) }} />
+                      <span className="relative text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded">
                         {getRoundDisplayName(round, bracketPrefix)}
                       </span>
+                    </span>
                   </div>
                   {/* Match cards */}
                   <div className="relative" style={{ height: live(totalHeight, nextTotalHeight) }}>
