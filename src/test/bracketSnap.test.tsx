@@ -49,4 +49,8 @@ describe("bracket geometry follows the horizontal scroll", () => {
     fireEvent.scroll(rail);
     expect(rail.style.height).toBe("2800px");
   });
+  it("shows no floating round dots above a snapping admin bracket", () => {
+    const { view } = setup();
+    expect(view.queryByLabelText("Ronde 1 van 4")).toBeNull();
+  });
 });
