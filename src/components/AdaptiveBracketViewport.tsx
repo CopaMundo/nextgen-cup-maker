@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useBracketSnap } from "@/hooks/useBracketSnap";
-import BracketRoundIndicators from "@/components/BracketRoundIndicators";
 
 interface ViewportState {
   activeRound: number;
@@ -117,7 +116,6 @@ export default function AdaptiveBracketViewport({ roundCount, columnWidth, child
 
   const arrow = "pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/95 text-foreground shadow-md backdrop-blur transition-colors hover:border-primary hover:text-primary";
   return <div className="min-w-0">
-    {!fits && <BracketRoundIndicators count={roundCount} active={indicatorRound} />}
     <div ref={frame} className="relative">
       <div ref={ref}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endDrag} onPointerCancel={endDrag}
