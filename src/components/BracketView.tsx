@@ -2860,6 +2860,15 @@ const BracketView = ({ tournamentId, phaseId, editable = false, scoreEditable, s
     const ADAPTIVE_COL_W = CARD_W + 24;
     const activeIdx = adaptiveRounds ? Math.min(adaptiveActiveRound, displayRounds.length - 1) : 0;
     const nextIdx = adaptiveRounds ? Math.min(activeIdx + 1, displayRounds.length - 1) : 0;
+    // No dimming: every round stays at full brightness; the active round carries a subtle
+    // header focus that hands over smoothly to the next round while scrolling.
+    const headerFocus = (roundIdx: number) => {
+      if (!adaptiveRounds || fitsAll || displayRounds.length <= 1) return "0";
+      if (nextIdx <= activeIdx) return roundIdx === activeIdx ? "1" : "0";
+      if (roundIdx === activeIdx) return bracketLerp(1, 0, "");
+      if (roundIdx === nextIdx) return bracketLerp(0, 1, "");
+      return "0";
+    };
     const heightFor = (round: number) => { const count = displayRounds[round]?.matches.length ?? firstRoundCount; return count * CARD_H + Math.max(0, count - 1) * GAP; };
     const totalHeight = adaptiveRounds ? heightFor(activeIdx) : defaultTotalHeight;
     const nextTotalHeight = adaptiveRounds ? heightFor(nextIdx) : defaultTotalHeight;
