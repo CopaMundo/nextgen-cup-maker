@@ -27,7 +27,7 @@ import { bracketAggregate } from "@/lib/bracketAggregate";
 import { formatFieldLabel } from "@/lib/fieldLocations";
 import AdaptiveBracketViewport from "./AdaptiveBracketViewport";
 import BracketLabel, { isStandardBracketLabel } from "./BracketLabel";
-import { adaptiveBracketLayout, bracketFeederIndices, bracketLerp } from "@/lib/adaptiveBracketLayout";
+import { adaptiveBracketLayout, bracketFeederIndices, bracketLerp, orderRoundsByFeeders } from "@/lib/adaptiveBracketLayout";
 
 interface BracketMatch {
   id: string;
