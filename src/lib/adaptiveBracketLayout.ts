@@ -46,3 +46,19 @@ export function bracketFeederIndices(rounds: FeederMatch[][]): number[][][] {
     }));
   });
 }
+
+/** Display-only: order each later round by its feeders' positions so stacked rounds never cross (e.g. QF3 created before QF1). */
+export function orderRoundsByFeeders<M extends FeederMatch>(rounds: M[][]): M[][] {
+  const ordered: M[][] = [];
+  rounds.forEach((matches, round) => {
+    if (round === 0) { ordered.push([...matches]); return; }
+    const feeders = bracketFeederIndices([ordered[round - 1], matches])[1];
+    const keyed = matches.map((match, index) => {
+      const sources = feeders[index];
+      return { match, index, key: sources.length ? Math.min(...sources) : Number.POSITIVE_INFINITY };
+    });
+    keyed.sort((a, b) => (a.key === b.key ? a.index - b.index : a.key - b.key));
+    ordered.push(keyed.map(entry => entry.match));
+  });
+  return ordered;
+}
